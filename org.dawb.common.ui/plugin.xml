@@ -1,0 +1,504 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?eclipse version="3.0"?>
+
+<plugin>
+   <extension-point id="hardwareClass" name="org.dawb.common.ui.views.dashboard.hardware.class" schema="schema/hardwareClass.exsd"/>
+   <extension-point id="plottingClass" name="Plotting System" schema="schema/plottingClass.exsd"/>
+   <extension-point id="valueProviderPage" name="Value Provider Page" schema="schema/valueProviderPage.exsd"/>
+
+   <extension
+         point="org.eclipse.ui.importWizards">
+      <wizard
+            category="org.eclipse.ui.Basic"
+            class="org.dawb.common.ui.project.FolderLinkWizard"
+            icon="icons/data_folder_link.gif"
+            id="org.edna.common.ui.project.FolderLinkWizard"
+            name="Data Folder Link">
+      </wizard>
+   </extension>
+   <extension
+         id="XMLValidationMarker"
+         name="Validation"
+         point="org.eclipse.core.resources.markers">
+      <super
+            type="org.eclipse.core.resources.problemmarker">
+      </super>
+      <super
+            type="org.eclipse.core.resources.textmarker">
+      </super>
+      <persistent
+            value="true">
+      </persistent>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            allowMultiple="false"
+            category="org.dawb.workbench.application.data.ac"
+            class="org.dawb.common.ui.views.monitor.MonitorView"
+            icon="icons/dashboard.png"
+            id="org.dawb.common.ui.views.dashboardView"
+            name="Monitor"
+            restorable="true">
+      </view>
+      <view
+            category="org.dawb.workbench.application.data.ac"
+            class="org.dawb.common.ui.views.ImageMonitorView"
+            icon="icons/image.gif"
+            id="org.dawb.workbench.views.imageMonitorView"
+            name="Images Monitor">
+      </view>
+      
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="toolbar:org.dawb.common.ui.views.dashboardView">
+         <command
+               commandId="uk.ac.gda.client.RefreshDashCommand"
+               icon="icons/page_refresh.png"
+               label="Refresh"
+               style="push"
+               tooltip="Refresh all values and reconnect">
+         </command>
+         <separator
+               name="uk.ac.gda.client.separator1"
+               visible="true">
+         </separator>
+         <command
+               commandId="uk.ac.gda.client.AddScannableCommand"
+               icon="icons/monitor_add.png"
+               label="Add monitor"
+               style="push"
+               tooltip="Add scannable">
+         </command>
+         <command
+               commandId="uk.ac.gda.client.DeleteServerObjectCommand"
+               icon="icons/cross.png"
+               label="Delete monitor"
+               style="push"
+               tooltip="Delete monitor">
+         </command>
+         <command
+               commandId="uk.ac.gda.client.DashUpCommand"
+               icon="icons/arrow_up.png"
+               label="Move Up"
+               style="push"
+               tooltip="Move selected motor up">
+         </command>
+         <command
+               commandId="uk.ac.gda.client.DashDownCommand"
+               icon="icons/arrow_down.png"
+               label="Move Down"
+               style="push"
+               tooltip="Move selected motor down">
+         </command>
+      </menuContribution>
+      <menuContribution
+            locationURI="popup:org.dawb.common.ui.views.dashboardView">
+         <command
+               commandId="uk.ac.gda.client.RefreshDashCommand"
+               icon="icons/page_refresh.png"
+               label="Refresh"
+               style="push"
+               tooltip="Refresh all values and reconnect">
+         </command>
+         <separator
+               name="uk.ac.gda.client.separator1"
+               visible="true">
+         </separator>
+         <command
+               commandId="uk.ac.gda.client.AddScannableCommand"
+               icon="icons/monitor_add.png"
+               label="Add monitor"
+               style="push"
+               tooltip="Add scannable">
+         </command>
+         <command
+               commandId="uk.ac.gda.client.DeleteServerObjectCommand"
+               icon="icons/cross.png"
+               label="Delete monitor"
+               style="push"
+               tooltip="Delete monitor">
+         </command>
+         <command
+               commandId="uk.ac.gda.client.DashUpCommand"
+               icon="icons/arrow_up.png"
+               label="Move Up"
+               style="push"
+               tooltip="Move selected motor up">
+         </command>
+         <command
+               commandId="uk.ac.gda.client.DashDownCommand"
+               icon="icons/arrow_down.png"
+               label="Move Down"
+               style="push"
+               tooltip="Move selected motor down">
+         </command>
+         <separator
+               name="uk.ac.gda.client.separator3"
+               visible="true">
+         </separator>
+         <command
+               commandId="uk.ac.gda.client.dashboard.DashboardPreferences"
+               label="Monitor Preferences..."
+               style="push">
+         </command>
+         <command
+               commandId="uk.ac.gda.client.dashboard.TangoPreferences"
+               label="Tango Preferences..."
+               style="push">
+         </command>
+      </menuContribution>
+      <menuContribution
+            locationURI="menu:org.dawb.common.ui.views.dashboardView">
+         <command
+               commandId="uk.ac.gda.client.ResetServerObjectsCommand"
+               label="Reset"
+               style="push"
+               tooltip="Reset to default view">
+         </command>
+         <command
+               commandId="uk.ac.gda.client.ClearServerObjectsCommand"
+               icon="icons/page_delete.png"
+               label="Clear"
+               style="push"
+               tooltip="Clear all objects">
+         </command>
+         <separator
+               name="uk.ac.gda.client.exafs.separator1"
+               visible="true">
+         </separator>
+         <command
+               commandId="uk.ac.gda.client.dashboard.DashboardPreferences"
+               label="Monitor Preferences..."
+               style="push">
+         </command>
+         <command
+               commandId="uk.ac.gda.client.dashboard.TangoPreferences"
+               label="Tango Preferences..."
+               style="push">
+         </command>
+      </menuContribution>
+   </extension>
+      <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="toolbar:org.dawb.workbench.views.imageMonitorView">
+         <command
+               commandId="org.dawb.workbench.ui.actions.imageMonitorOpenLinked"
+               icon="icons/picture_link.png"
+               label="Open Linked"
+               style="push"
+               tooltip="Opens the selected file and links it to future selections.">
+         </command>
+         <command
+               commandId="org.dawb.workbench.ui.actions.imageMonitorOpen"
+               icon="icons/picture_go.png"
+               label="Open"
+               style="push"
+               tooltip="Opens the selected file in a separate editor to the one linked to this view. Double click opens an editor which changes when the selected image changes.">
+         </command>
+         <separator
+               name="org.dawb.workbench.ui.separator2">
+         </separator>
+         <command
+               commandId="org.dawb.workbench.ui.actions.imageMonitorMonitor"
+               icon="icons/picture.png"
+               id="org.dawb.workbench.ui.actions.imageMonitorMonitorToolbarAction"
+               label="Monitor (on/off)"
+               style="toggle"
+               tooltip="Switch monitoring for new files on and off.">
+         </command>
+         <separator
+               name="org.dawb.workbench.ui.separator3">
+         </separator>
+         <command
+               commandId="org.dawb.workbench.ui.actions.imageMonitorRefresh"
+               icon="icons/arrow_refresh_small.png"
+               label="Refresh"
+               style="push"
+               tooltip="Refresh images, not usually needed if the directory is being monitored.">
+         </command>
+         <command
+               commandId="org.dawb.workbench.ui.actions.imageMonitorDir"
+               icon="icons/image_folder.gif"
+               label="Change directory..."
+               style="push"
+               tooltip="Set the directory to monitor.">
+         </command>
+      </menuContribution>
+      <menuContribution
+            locationURI="popup:org.dawb.workbench.views.imageMonitorView">
+         <command
+               commandId="org.dawb.workbench.ui.actions.imageMonitorOpenLinked"
+               icon="icons/picture_link.png"
+               label="Open Linked"
+               style="push"
+               tooltip="Opens the selected file and links it to future selections.">
+         </command>
+         <command
+               commandId="org.dawb.workbench.ui.actions.imageMonitorOpen"
+               icon="icons/picture_go.png"
+               label="Open"
+               style="push"
+               tooltip="Opens the selected file in a separate editor to the one linked to this view.">
+         </command>
+         <separator
+               name="org.dawb.workbench.ui.separator1">
+         </separator>
+         <command
+               commandId="org.dawb.workbench.ui.actions.imageMonitorRefresh"
+               icon="icons/arrow_refresh_small.png"
+               label="Refresh"
+               style="push"
+               tooltip="Refresh images, not usually needed if the directory is being monitored.">
+         </command>
+         <command
+               commandId="org.dawb.workbench.ui.actions.imageMonitorDir"
+               icon="icons/image_folder.gif"
+               label="Change directory..."
+               style="push"
+               tooltip="Set the directory to monitor.">
+         </command>
+         <separator
+               name="org.dawb.workbench.ui.separator2">
+         </separator>
+         <command
+               commandId="org.edna.workbench.views.preference.preferenceDialog"
+               label="Preferences..."
+               style="push"
+               tooltip="Preferences for the image monitor">
+         </command>
+      </menuContribution>
+      <menuContribution
+            locationURI="menu:org.dawb.workbench.views.imageMonitorView">
+         <command
+               commandId="org.edna.workbench.views.preference.preferenceDialog"
+               label="Preferences..."
+               style="push"
+               tooltip="Preferences for the image monitor">
+         </command>
+      </menuContribution>
+   </extension>
+   
+      <extension
+         point="org.eclipse.ui.commands">
+      <command
+            defaultHandler="org.dawb.common.ui.actions.ImageMonitorDirectoryHandler"
+            id="org.dawb.workbench.ui.actions.imageMonitorDir"
+            name="Image Monitor Directory">
+      </command>
+      <command
+            defaultHandler="org.dawb.common.ui.actions.ImageMonitorRefreshHandler"
+            id="org.dawb.workbench.ui.actions.imageMonitorRefresh"
+            name="Refresh Image Monitor">
+      </command>
+      <command
+            defaultHandler="org.dawb.common.ui.actions.ImageMonitorToggleHandler"
+            id="org.dawb.workbench.ui.actions.imageMonitorMonitor"
+            name="Monitor">
+      </command>
+      <command
+            defaultHandler="org.dawb.common.ui.actions.ImageMonitorOpenHandler"
+            id="org.dawb.workbench.ui.actions.imageMonitorOpen"
+            name="Open file">
+      </command>
+      <command
+            defaultHandler="org.dawb.common.ui.actions.ImageMonitorOpenLinkedHandler"
+            id="org.dawb.workbench.ui.actions.imageMonitorOpenLinked"
+            name="Open linked">
+      </command>
+      <command
+            defaultHandler="org.dawb.common.ui.preferences.ViewPreferencesHandler"
+            id="org.edna.workbench.views.preference.preferenceDialog"
+            name="Preferences...">
+      </command>
+      
+   </extension>
+   
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            defaultHandler="org.dawb.common.ui.views.monitor.actions.AddHardwareObjectHandler"
+            id="uk.ac.gda.client.AddScannableCommand"
+            name="Add motor">
+      </command>
+      <command
+            defaultHandler="org.dawb.common.ui.views.monitor.actions.DeleteHardwareObjectHandler"
+            id="uk.ac.gda.client.DeleteServerObjectCommand"
+            name="Remove motor">
+      </command>
+      <command
+            defaultHandler="org.dawb.common.ui.views.monitor.actions.DashboardPreferencesAction"
+            id="uk.ac.gda.client.dashboard.DashboardPreferences"
+            name="Preferences">
+      </command>
+      <command
+            defaultHandler="org.dawb.common.ui.views.monitor.actions.ResetHardwareObjectsHandler"
+            id="uk.ac.gda.client.ResetServerObjectsCommand"
+            name="Reset">
+      </command>
+      <command
+            defaultHandler="org.dawb.common.ui.views.monitor.actions.RefreshDashHandler"
+            id="uk.ac.gda.client.RefreshDashCommand"
+            name="Refresh Dash">
+      </command>
+      <command
+            defaultHandler="org.dawb.common.ui.views.monitor.actions.ClearHardwareObjectsHandler"
+            id="uk.ac.gda.client.ClearServerObjectsCommand"
+            name="Clear">
+      </command>
+      <command
+            defaultHandler="org.dawb.common.ui.views.monitor.actions.MoveUpHandler"
+            id="uk.ac.gda.client.DashUpCommand"
+            name="Dash Item Up">
+      </command>
+      <command
+            defaultHandler="org.dawb.common.ui.views.monitor.actions.MoveDownHandler"
+            id="uk.ac.gda.client.DashDownCommand"
+            name="Dash Item Down">
+      </command>
+      <command
+            defaultHandler="org.dawb.common.ui.views.monitor.actions.TangoPreferencesAction"
+            id="uk.ac.gda.client.dashboard.TangoPreferences"
+            name="Tango Preferences">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="org.edna.workbench.preferences.root"
+            class="org.dawb.common.ui.views.monitor.MonitorPreferencePage"
+            id="org.dawb.common.ui.views.dashboard.dashboardPreferences"
+            name="Monitor">
+      </page>
+      <page
+            category="org.edna.workbench.preferences.root"
+            class="org.dawb.common.ui.preferences.TangoPreferencePage"
+            id="org.dawb.common.ui.views.tangoPreferences"
+            name="Tango">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="org.dawb.common.ui.preferences.CommonUIPreferenceInitializer">
+      </initializer>
+   </extension>
+   <extension
+         point="org.eclipse.ui.cheatsheets.cheatSheetContent">
+      <category
+            id="org.dawb.common.ui.project.category"
+            name="Using Projects">
+      </category>
+      <cheatsheet
+            category="org.dawb.common.ui.project.category"
+            composite="false"
+            contentFile="cheat/project-new.xml"
+            id="org.dawb.common.ui.project.cheat"
+            name="Projects">
+      </cheatsheet>
+   </extension>
+   <extension
+         point="org.eclipse.ui.actionSets">
+      <actionSet
+            description="Actions required for importing data in another folder"
+            id="org.edna.common.ui.project.import"
+            label="Import Actions"
+            visible="true">
+         <action
+               class="org.dawb.common.ui.project.FolderImportHandler"
+               icon="icons/data_folder_link.gif"
+               id="org.edna.common.ui.import.folder"
+               label="Data Folder Link..."
+               menubarPath="tools/additions"
+               tooltip="Imports a folder as a link to an external folder">
+         </action>
+      </actionSet>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            category="org.dawb.workbench.application.data.analysis"
+            class="org.dawb.common.ui.views.ValuePageView"
+            icon="icons/variable_xml.png"
+            id="org.dawb.passerelle.views.ValueView"
+            name="Value">
+      </view>
+      <view
+            category="org.dawb.workbench.application.data.ac"
+            class="org.dawb.common.ui.views.H5GalleryView"
+            icon="icons/imageStack.png"
+            id="org.dawb.workbench.views.h5GalleryView"
+            name="Image Gallery">
+      </view>
+      
+   </extension>
+   
+   <extension
+         point="org.eclipse.ui.menus">
+
+      <menuContribution
+            locationURI="popup:org.dawb.workbench.views.h5GalleryView">
+         <command
+               commandId="org.edna.workbench.views.preference.preferenceDialog"
+               label="Preferences..."
+               style="push"
+               tooltip="Preferences for the image">
+         </command>
+      </menuContribution>
+   </extension>
+      <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="org.dawb.common.ui.preferences.ViewPreferenceInitializer">
+      </initializer>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="org.edna.workbench.preferences.root"
+            class="org.dawb.common.ui.preferences.ViewPreferencePage"
+            id="org.edna.workbench.views.preferencePage"
+            name="Image Monitor">
+      </page>
+   </extension>
+    <extension
+         point="org.eclipse.ui.views">
+         
+      <view
+            category="org.dawb.workbench.application.data.analysis"
+            class="org.dawb.common.ui.views.PlotDataView"
+            icon="icons/data.gif"
+            id="org.dawb.workbench.views.dataSetView"
+            name="Data"
+            restorable="true">
+      </view>
+       <view
+            allowMultiple="false"
+            category="org.dawb.workbench.application.data.analysis"
+            class="org.dawb.common.ui.views.HeaderTableView"
+            icon="icons/header_table.gif"
+            id="fable.imageviewer.views.HeaderView"
+            name="Header Table">
+      </view>
+         
+   </extension>
+    <extension
+          point="org.eclipse.ui.popupMenus">
+       <objectContribution
+             adaptable="true"
+             id="org.dawb.workbench.views.imageMonitorView"
+             objectClass="org.eclipse.core.resources.IFolder">
+          <action
+                class="org.dawb.common.ui.actions.OpenImageMonitorHandler"
+                enablesFor="1"
+                id="org.dawb.workbench.views.imageMonitorViewOpenAction"
+                label="Open folder in image monitor"
+                tooltip="View images in folder and monitor directory for more as they appear.">
+          </action>
+       </objectContribution>
+    </extension>
+   
+</plugin>

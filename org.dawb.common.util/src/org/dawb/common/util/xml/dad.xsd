@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xs:simpleType name="acquisitionType">
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="MGfrelon2k"/>
+        <xs:enumeration value="MGmono"/>
+       </xs:restriction>
+    </xs:simpleType>
+
+    <xs:element name="userField" >
+      <xs:complexType>
+        <xs:attribute name="name" type="xs:string" />
+        <xs:attribute name="value" type="xs:string" />
+      </xs:complexType>
+    </xs:element>
+    
+    <xs:element name="scanField">
+      <xs:complexType>
+        <xs:attribute name="name" type="xs:string" />
+        <xs:attribute name="value" type="xs:string" />
+      </xs:complexType>
+    </xs:element>
+
+    <xs:element name="acquisition">
+      <xs:complexType>
+        <xs:attribute name="name" type="xs:string" />
+        <xs:attribute name="mg" type="acquisitionType" />
+      </xs:complexType>
+    </xs:element>
+
+    <xs:element name="scan">
+      <xs:complexType>
+        <xs:sequence>
+          <xs:element ref="scanField"    minOccurs="0" maxOccurs="unbounded"/>
+          <xs:element ref="acquisition"  minOccurs="1" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="name" type="xs:string" />
+      </xs:complexType>
+    </xs:element>
+
+    <xs:element name="sequence">
+    
+      <xs:complexType>
+        <xs:sequence>
+          <xs:element ref="userField"   minOccurs="0" maxOccurs="unbounded"/>
+          <xs:element ref="acquisition" minOccurs="1" maxOccurs="unbounded"/>
+          <xs:element ref="scan"        minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="id" type="xs:string" />
+        <xs:attribute name="name" type="xs:string" />
+      </xs:complexType>
+      
+    </xs:element>
+    
+</xs:schema>

@@ -1,0 +1,536 @@
+/*
+ * Copyright (c) 2012 European Synchrotron Radiation Facility,
+ *                    Diamond Light Source Ltd.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ */ 
+package org.dawb.hdf5;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreeNode;
+
+import ncsa.hdf.hdf5lib.H5;
+import ncsa.hdf.object.Dataset;
+import ncsa.hdf.object.Datatype;
+import ncsa.hdf.object.FileFormat;
+import ncsa.hdf.object.Group;
+import ncsa.hdf.object.HObject;
+import ncsa.hdf.object.h5.H5Datatype;
+import ncsa.hdf.object.h5.H5ScalarDS;
+
+import org.dawb.hdf5.nexus.NexusUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * 
+ * This class is a singleton ensuring that one 
+ * one hdf5 file for a given path is open at a time.
+ * 
+ * Currently used only for READING an HDF5 file can be
+ * extended for writing later if required.
+ * 
+ * It keeps a count of the same file being accessed by
+ * different threads. YOU MUST CALL close() in a finally
+ * when using this class.
+ * 
+ * Usage:
+ * 
+ * HierarchicalDataFile file = null;
+ * try {
+ *     file = new HierarchicalDataFile(...);
+ *     Group root = file.getRoot();
+ * } finally {
+ *     file.close();
+ * }
+ * 
+ * @author gerring
+ *
+ */
+class HierarchicalDataFile implements IHierarchicalDataFile {
+	
+	private static final Logger logger = LoggerFactory.getLogger(HierarchicalDataFile.class);
+	
+	private static Map<String,HierarchicalDataFile> readCache;
+	private static Collection<String>               writeCache;
+
+	/**
+	 * Opens a new HierarchicalDataFile or returns the currently
+	 * open one if necessary. Keeps a count of threads which have
+	 * opened the file and only finally closes the file when the count
+	 * is back to zero.
+	 * 
+	 * Used through HierarchicalDataFactory only.
+	 * 
+	 * @param absolutePath
+	 * @return
+	 */
+	static synchronized HierarchicalDataFile open(final String absolutePath, final int openType) throws Exception {
+
+		
+		if (openType == FileFormat.READ) {
+			if (readCache==null) readCache = new HashMap<String,HierarchicalDataFile>(7);
+			HierarchicalDataFile file = readCache.get(absolutePath);
+			if (file!=null) {
+				file.count++; 
+				return file;
+			}
+	
+			file = new HierarchicalDataFile(absolutePath, openType);
+			readCache.put(absolutePath, file);
+			return file;
+			
+		} else if (openType == FileFormat.WRITE || openType == FileFormat.CREATE) {
+			
+			if (writeCache==null) writeCache = new HashSet<String>(11);
+			if (writeCache.contains(absolutePath)) throw new Exception("Already writing to "+absolutePath+"!");
+			
+			HierarchicalDataFile file = new HierarchicalDataFile(absolutePath, openType);
+			writeCache.add(absolutePath);
+			return file;
+			
+		} else {
+			throw new Exception("Unrecognised FileFormat "+openType);
+		}
+	}
+	
+	/**
+	 * close the files and clear them from the cache.
+	 * @throws Exception
+	 */
+	public static synchronized void clear() throws Exception {
+		if (readCache!=null) {
+			final Collection<HierarchicalDataFile> files = readCache.values();
+			for (HierarchicalDataFile file : files) file.close();
+		}
+	}
+	
+	private final int        openType;
+	/**
+	 * The reason that FileFormat file is not available through a getter is
+	 * that we want to ensure that it is never closed externally.
+	 * DO NOT EXPOSE IT WITH A GETTER
+	 */
+	private       FileFormat file;
+	private final String     path;
+	private int              count=0;
+
+	private HierarchicalDataFile(final String path, final int openType) throws Exception {
+		
+		this.path = path;
+		this.openType = openType;
+		// retrieve an instance of H5File
+		FileFormat fileFormat = FileFormat.getFileFormat(FileFormat.FILE_TYPE_HDF5);
+        if (fileFormat == null) throw new NullPointerException("Cannot deal with hdf5 files!");
+
+		// open the file with read-only access
+		this.file = fileFormat.createInstance(path, openType);
+		if (file == null) throw new Exception("Failed to open file: "+path);
+		
+		try {
+		    file.open();
+		} catch (ncsa.hdf.hdf5lib.exceptions.HDF5LibraryException ne) {
+			fileFormat = FileFormat.getFileFormat(FileFormat.FILE_TYPE_HDF4);
+			
+			this.file = fileFormat.createInstance(path, openType);
+			if (file == null) throw new Exception("Failed to open file: "+path);
+			
+		    file.open();
+		    
+		    logger.error("The file "+path+" is HDF4, it will open but plotting features are disabled.");
+		}
+		
+		if (openType == FileFormat.WRITE || openType == FileFormat.CREATE) {
+			if (!file.canWrite()) throw new Exception("Cannot write to '"+path+"'!");
+		}
+		count=1;
+	}
+	
+
+	/**
+	 * Returns the root TreeNode for iterating down the
+	 * tree of data.
+	 * @return
+	 */
+	public TreeNode getNode() {
+		return file.getRootNode();
+	}
+
+	/**
+	 * Returns the root Group. Note that the close method should not
+	 * have been called yet.
+	 * 
+	 * @return
+	 */
+	public Group getRoot() {
+		return (Group)((DefaultMutableTreeNode)getNode()).getUserObject();
+	}
+	
+	/**
+	 * Returns the object with using full name.
+	 * 
+	 * Full name is a / separated full path to the
+	 * data e.g. /entry1/counterTimer01/enery
+	 * 
+	 * @param path
+	 * @return
+	 * @throws Exception 
+	 */
+	public HObject getData(final String path) throws Exception {	
+		return file.get(path);
+	}
+	
+	/**
+	 * 
+	 * @return a list of the full paths of the data sets.
+	 */
+	@Override
+	public HierarchicalInfo getDatasetInformation(int dataType)  throws Exception {
+		final HierarchicalInfo info = new HierarchicalInfo();
+		getDatasetInformation(getRoot(), info, dataType);
+		return info;
+	}
+	
+	private void getDatasetInformation(Group g, HierarchicalInfo info, int dataType)  throws Exception {
+		
+		List<HObject> members = g.getMemberList();
+		for (HObject object : members) {
+			
+			if (object instanceof Dataset) {
+				final Dataset set = (Dataset)object;
+				if (!HierarchicalDataUtils.isDataType(set, dataType)) continue;
+
+				final long[] longShape= (long[])set.getDims();
+				final int[]  intShape = new int[longShape.length];
+				
+				long size = longShape[0];
+				for (int i = 0; i < intShape.length; i++) {
+					intShape[i] = (int)longShape[i];
+					size*=longShape[i];
+				}
+				info.addName(set.getFullName());
+				info.putShape(set.getFullName(), (int[])intShape);
+				info.putSize(set.getFullName(), (int)size);
+			}
+		
+			if (object instanceof Group) {
+				getDatasetInformation((Group)object, info, dataType);
+			}
+		}
+	}
+
+	/**
+	 * 
+	 * @param dataType one of NUMBER_ARRAY or TEXT or one of the Datatype.CLASS_* variables. Use -1 for everything.
+	 * @return
+	 * @throws Exception
+	 */
+	public List<String> getDatasetNames(final int dataType)  throws Exception {
+		return getDatasetNames(getRoot(), dataType, new ArrayList<String>(7));
+	}
+
+	private List<String> getDatasetNames(Group g, final int dataType, final List<String> names)  throws Exception {
+		
+		List<HObject> members = g.getMemberList();
+		for (HObject object : members) {
+			
+			if (object instanceof Dataset) {
+				final Dataset set = (Dataset)object;
+				if (!HierarchicalDataUtils.isDataType(set, dataType)) continue;
+				names.add(set.getFullName());
+			}
+		
+			if (object instanceof Group) {
+				getDatasetNames((Group)object, dataType, names);
+			}
+		}
+		return names;
+	}
+	
+	/**
+	 * 
+	 * @return a list of the full paths of the data sets.
+	 */
+	public Map<String, Integer> getDatasetSizes(int dataType)  throws Exception{
+		return getDatasetSizes(getRoot(), new HashMap<String, Integer>(31), dataType);
+	}
+	
+	private Map<String, Integer> getDatasetSizes(Group g, Map<String, Integer> sizes, int dataType) throws Exception {
+		
+		List<HObject> members = g.getMemberList();
+		for (HObject object : members) {
+			
+			if (object instanceof Dataset) {
+				final Dataset set = (Dataset)object;
+				if (!HierarchicalDataUtils.isDataType(set, dataType)) continue;
+				
+				final long[] shape = (long[])set.getDims();
+				if (shape!=null) {
+					long size = shape[0];
+					for (int i = 1; i < shape.length; i++) size*=shape[i];
+					sizes.put(set.getFullName(), new Integer((int)size));
+				}
+			}
+		
+			if (object instanceof Group) {
+				getDatasetSizes((Group)object, sizes, dataType);
+			}
+		}
+		return sizes;
+	}
+
+	/**
+	 * 
+	 * @return a list of the full paths of the data sets.
+	 */
+	@Override
+	public Map<String, int[]> getDatasetShapes(int dataType)  throws Exception {
+		return getDatasetShapes(getRoot(), new HashMap<String, int[]>(31), dataType);
+	}
+	
+	private Map<String, int[]> getDatasetShapes(Group g, Map<String, int[]> shapes, int dataType)  throws Exception {
+		
+		List<HObject> members = g.getMemberList();
+		for (HObject object : members) {
+			
+			if (object instanceof Dataset) {
+				final Dataset set = (Dataset)object;
+				if (!HierarchicalDataUtils.isDataType(set, dataType)) continue;
+
+				final long[] longShape= (long[])set.getDims();
+				final int[]  intShape = new int[longShape.length];
+				for (int i = 0; i < intShape.length; i++) intShape[i] = (int)longShape[i];
+				shapes.put(set.getFullName(), (int[])intShape);
+			}
+		
+			if (object instanceof Group) {
+				getDatasetShapes((Group)object, shapes, dataType);
+			}
+		}
+		return shapes;
+	}
+
+	/**
+	 * closes a file and removes it from the cache providing there
+	 * are not other users of the file registered.
+	 * 
+	 * Synchronized to avoid more than one file
+	 * being opened for a given path.
+	 * 
+	 * @throws Exception
+	 */
+	public synchronized void close() throws Exception {
+		if (openType == FileFormat.READ) {
+			count--;
+			if (count<=0) {
+				count = 0; // Just to be sure it does not get<0, unlikely
+				file.close();
+				readCache.remove(path);
+			}
+		} else if (openType == FileFormat.WRITE || openType == FileFormat.CREATE) {
+			file.close();
+			writeCache.remove(path);
+		}
+	}
+	
+	/**
+	 * Creates a group or returns the existing one if there is one.
+	 * @param name
+	 * @throws Exception 
+	 */
+	public Group group(final String name) throws Exception {
+		return group(name, getRoot());
+	}
+
+	/**
+	 * Creates a group or returns the existing one if there is one.
+	 * @param name
+	 * @throws Exception 
+	 */
+	public Group group(final String name, final Group group) throws Exception {
+		
+		final HObject o = checkExists(name, group, Group.class);
+		if (o!=null) return (Group)o;
+		return file.createGroup(name, group);
+	}
+	
+	private HObject checkExists(String name, Group group, Class<? extends HObject> clazz) throws Exception{
+		
+		final List childs = group.getMemberList();
+		for (Object object : childs) {
+			if (object instanceof HObject) {
+				final HObject ho = (HObject)object;
+				if (clazz.isInstance(ho) && ho.getName().equals(name)) {
+					return (HObject)ho;
+				}
+				if (ho.getName().equals(name)) {
+				    throw new Exception("'"+name+"' already exists in '"+group.getName()+"' and is not a '"+clazz.getName()+"'");
+				}
+			}
+		}
+		return null; // Not found
+	}
+
+	public void print() throws Exception {
+		printGroup(getRoot(), "");
+	}
+	
+	/**
+     * Recursively print a group and its members.
+     * @throws Exception
+     */
+    private void printGroup(Group g, String indent) throws Exception {
+
+        List<?> members = g.getMemberList();
+
+        int n = members.size();
+        indent += "    ";
+        HObject obj = null;
+        for (int i=0; i<n; i++)
+        {
+            obj = (HObject)members.get(i);
+            System.out.println(indent+obj);
+            if (obj instanceof Group)
+            {
+                printGroup((Group)obj, indent);
+            }
+        }
+    }
+
+	public String getPath() {
+		return path;
+	}
+
+	@Override
+	public void setNexusAttribute(HObject object, String attribute) throws Exception {
+		NexusUtils.setNexusAttribute(file, object, attribute);
+	}
+
+	@Override
+	public Dataset createDataset(String name, 
+			                     final String value, 
+			                     final Group  parent) throws Exception {
+		
+		final int id = parent.open();
+		try {
+			name = getUnique(name, parent, Dataset.class);
+			
+	        String[] arrayValue = {value};
+	        Datatype dtype = new H5Datatype(Datatype.CLASS_STRING, arrayValue[0].length()+1, -1, -1);
+			Dataset dataset = file.createScalarDS(name, parent, dtype, new long[]{1}, null, null, 0, arrayValue);
+			
+			return dataset;
+			
+		} finally {
+			parent.close(id);
+		}
+	}
+	
+
+	@Override
+	public Dataset createDataset(String         name,  
+			                     final Datatype dtype,
+			                     final long[]   shape,
+			                     final Object   buffer,
+			                     final Group    parent) throws Exception {
+		
+		final int id = parent.open();
+		try {
+			name = getUnique(name, parent, Dataset.class);
+			
+			Dataset dataset = file.createScalarDS(name, parent, dtype, shape, null, null, 0, buffer);
+			
+			return dataset;
+			
+		} finally {
+			parent.close(id);
+		}
+		
+	}
+
+	/**
+	 * Method currently synchronized, you cannot have more than one thread
+	 * setting the shape size and writing the data at a time.
+	 */
+	@Override
+	public synchronized Dataset appendDataset(String         name,  
+						                     final Datatype dtype,
+						                     final long[]   shape,
+						                     final Object   buffer,
+						                     final Group    parent) throws Exception {
+		
+		final int id = parent.open();
+		try {
+			final HObject o = checkExists(name, parent, Dataset.class);
+			if (o==null) {
+				final long[] appendShape = new long[shape.length+1];
+				final long[] maxShape = new long[shape.length+1];
+				appendShape[0] = 1;
+				maxShape[0]    = Long.MAX_VALUE;
+				for (int i = 0; i < shape.length; i++) {
+					appendShape[i+1] = shape[i];
+					maxShape[i+1] = shape[i];
+				}
+				Dataset dataset = file.createScalarDS(name, parent, dtype, appendShape, maxShape, null, 0, buffer);
+				return dataset;
+			} else {
+				H5ScalarDS dataset = (H5ScalarDS)o;
+				dataset.getMetadata();
+				final long[] dims  = dataset.getDims();
+				final long   index = dims[0]+1;
+				dims[0] = index;
+				dataset.extend(dims);
+
+				long[] start     = dataset.getStartDims();
+		        long[] stride    = dataset.getStride();
+		        long[] selected  = dataset.getSelectedDims();
+		        
+		        start[0] = index-1;
+		        for (int i = 1; i < start.length; i++) start[i] = 0;
+		        
+		        stride[0] = 1;
+		        for (int i = 1; i < stride.length; i++) stride[i] = 1;
+
+		        selected[0] = 1;
+		        for (int i = 1; i < selected.length; i++) selected[i] = dims[i];
+
+		        dataset.write(buffer); // Hopefully at selected location
+		        		        
+				return dataset;
+			}
+			
+		} finally {
+			parent.close(id);
+		}
+		
+	}
+
+	private String getUnique(String name, final Group parent, final Class<? extends HObject> clazz) throws Exception {
+		
+		final HObject o = checkExists(name, parent, clazz);
+		if (o!=null) {
+			int i=1;
+			while(checkExists(name+i, parent, clazz)!=null) {
+				++i;
+			}
+			name = name+i;
+		}
+		return name;
+	}
+
+	public static boolean isWriting(final String absolutePath) {
+		return writeCache!=null && writeCache.contains(absolutePath);
+	}
+
+
+}

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cheatsheet title="Projects">
+
+	<intro>
+		<description>
+		    The &apos;Project Explorer&apos; is the most useful part of the workbench. Here you have projects of different types, such as workflows and python.<br/>
+		    If you cannot see the &apos;Project Explorer&apos; part go to: <br/><br/>
+		    <b>Window->Show View->Project Explorer</b>
+      </description>
+ 	</intro>
+	
+ 	<item title="Create a Workflow Project">
+ 	  <description>
+ 	  Click below to start the new workflow project wizard. This creates a project capable of containing new workflow files. You can also start this wizard by right clicking and selecting 'New...'.
+      </description>
+      <command
+            required="false"
+            serialization="org.eclipse.ui.newWizard(newWizardId=org.edna.passerelle.common.project.PasserelleWizard)"/>
+   </item>
+   
+   <item title="Python Projects">
+ 	  <description>
+ 	  As seen in order tutorials, you can create projects for python code which will import to other machines. Right click in the Project Explorer and go to:<br/>
+ 	  <br/><b>New->Other...->PyDev->PyDev Project</b><br/>
+ 	  <br/>Press 'Next' and call the new project 'python_scripts'. Specify that a Jython interpreter should be used and that the project should have a 'src' directory. If you see a pop-up dialog for creating an interpreter then please cancel it.
+      </description>
+   </item>
+   
+   <item title="Sub-folders">
+ 	  <description>
+ 	  The projects created may have sub-folders added and files imported so you can organize your data, workflows and python scripts. Try right clicking on your project and using the 'New' menu to create a folder.
+      </description>
+   </item>
+   
+   <item title="Export Data Wizard">
+ 	  <description>
+ 	  
+ 	  You can right click on any project and go to:<br/>
+ 	  <br/><b>Export...->General->Archive File</b><br/><br/>
+ 	  
+ 	  The resulting zip file exported can be imported again back at the lab. <b>Note</b> links to data are followed by this process so you can obtain very large zip files. Do not forget to backup python and workflows, which may take time to develop, regularly.<br/>
+ 	  <br/>
+ 	  Click below to start the export data wizard and give this a try.
+      </description>
+      <command
+            required="false"
+            serialization="org.eclipse.ui.file.export(exportWizardId=org.eclipse.ui.wizards.export.ZipFile)"/>
+   </item>
+   
+   <item title="Conclusion">
+  	  <description>
+ 	 Congratulations, you can now organize things in multiple projects with different roles. Try finding the 'Data' project type and adding links to data in it.
+      </description>
+   </item>
+   
+   
+
+</cheatsheet>

@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Jlchart
+Bundle-SymbolicName: org.dawb.jlchart
+Bundle-Version: 1.0.0.qualifier
+Bundle-ClassPath: JLChart.jar,
+ com.braju.format.jar
+Export-Package: com.braju.format,
+ fr.esrf.tangoatk.widget.util,
+ fr.esrf.tangoatk.widget.util.chart
+Bundle-Vendor: esrf.eu
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
