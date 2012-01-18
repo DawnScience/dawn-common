@@ -23,6 +23,7 @@ Bundle-ActivationPolicy: lazy
 Export-Package: org.dawb.gda.extensions.jython,
  org.dawb.gda.extensions.loaders,
  org.dawb.gda.extensions.plot,
+ org.dawb.gda.extensions.spec,
  org.dawb.gda.extensions.util
 Import-Package: com.thoughtworks.xstream.core.util,
  org.apache.commons.beanutils,
