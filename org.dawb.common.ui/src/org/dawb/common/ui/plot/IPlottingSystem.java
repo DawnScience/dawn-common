@@ -46,6 +46,8 @@ public interface IPlottingSystem {
 	
 	/**
 	 * For 1D - x is the x axis, ys is the y traces or null if only 1 data set should be plotted.
+	 * NOTE Using this option plots everything on the default x and y axes.
+	 * 
 	 * For 2D - x is the image, ys is the axes.
 	 * 
 	 * Does not have to be called in the UI thread. May be called to update as well as the entire
