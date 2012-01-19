@@ -10,6 +10,7 @@
 package org.dawb.gda.extensions;
 
 import org.dawb.gda.extensions.loaders.H5Loader;
+import org.dawb.gda.extensions.spec.SpecLoader;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
@@ -41,7 +42,7 @@ public class Activator extends AbstractUIPlugin {
 		
 		// This removes the nexus loader and uses the good h5 loader.
         H5Loader.setLoaderInFactory();
-        
+        SpecLoader.setLoaderInFactory();
 	}
 
 	/*

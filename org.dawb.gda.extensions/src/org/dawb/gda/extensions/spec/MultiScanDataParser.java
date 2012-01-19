@@ -189,7 +189,12 @@ public class MultiScanDataParser {
 		final BufferedReader reader = new BufferedReader(new InputStreamReader(in, "UTF-8"));
         try {
         	String line = null;
+        	boolean firstLine = true;
         	while((line=reader.readLine())!=null) {
+        		if (firstLine) {
+        			firstLine = false;
+        			if (line.trim().startsWith("&")) throw new Exception("Cannot load SRS files with SpecLoader!");
+        		}
         		processLine(line);
         	}
         	
@@ -298,7 +303,7 @@ public class MultiScanDataParser {
 	}
 	
 	private String getScanName() {
-		return "Spec Scan "+scanNumber;
+		return "Scan "+scanNumber;
 	}
 
 	private void addData(final boolean newScan, final Matcher scan) {
