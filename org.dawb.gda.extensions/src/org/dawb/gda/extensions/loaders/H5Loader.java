@@ -11,6 +11,7 @@ package org.dawb.gda.extensions.loaders;
 
 import gda.analysis.io.ScanFileHolderException;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -27,9 +28,11 @@ import org.dawb.hdf5.IHierarchicalDataFile;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.LazyDataset;
 import uk.ac.diamond.scisoft.analysis.io.AbstractFileLoader;
 import uk.ac.diamond.scisoft.analysis.io.DataHolder;
 import uk.ac.diamond.scisoft.analysis.io.IDataSetLoader;
+import uk.ac.diamond.scisoft.analysis.io.ILazyLoader;
 import uk.ac.diamond.scisoft.analysis.io.IMetaData;
 import uk.ac.diamond.scisoft.analysis.io.IMetaLoader;
 import uk.ac.diamond.scisoft.analysis.io.ISliceLoader;
@@ -151,7 +154,7 @@ public class H5Loader extends AbstractFileLoader implements IMetaLoader, IDataSe
 		}
 	}
 
-	private void resetDims(Dataset dataset) {
+	protected void resetDims(Dataset dataset) {
 		long[] selected = dataset.getSelectedDims(); // the selected size of the dataet
 		long[] dims    = dataset.getDims();
 		for (int i = 0; i < selected.length; i++) {
@@ -188,27 +191,22 @@ public class H5Loader extends AbstractFileLoader implements IMetaLoader, IDataSe
 		}
 	}
 
-	private Map<String, ILazyDataset> getSets(IHierarchicalDataFile file, List<String> fullPaths, IMonitor mon) throws Exception {
+	private Map<String, ILazyDataset> getSets(final IHierarchicalDataFile file, List<String> fullPaths, IMonitor mon) throws Exception {
 		
 		final Map<String, ILazyDataset> ret = new HashMap<String,ILazyDataset>(fullPaths.size());
 		for (String fullPath : fullPaths) {
 			if (mon!=null) mon.worked(1);
-			final Dataset set = (Dataset)file.getData(fullPath);
-			/**
-			 * The diamond slicing leaves the dataset in memory, and the selection.
-			 * Therefore if they were slicing in the DExplore view before going here,
-			 * the full selection is broken, there is a sub slice selected.
-			 * 
-			 * TODO Get Peter to fix this some time.
-			 * 
-			 */
-			resetDims(set);
 			
-			/**
-			 * Get the data
-			 */
-			final Object  val = set.read();
-			ret.put(fullPath, H5Utils.getSet(val,set));
+			final Dataset set = (Dataset)file.getData(fullPath);
+			set.getMetadata();
+			
+			final H5LazyLoader loader = new H5LazyLoader(this, file.getPath(), fullPath);
+			final LazyDataset  lazy   = new LazyDataset(fullPath, 
+					                                 H5Utils.getDataType(set.getDatatype()), 
+					                                 H5Utils.getInt(set.getDims()),
+					                                 loader);
+			
+			ret.put(fullPath, lazy);
 		}
 		return ret;
 	}

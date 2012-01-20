@@ -70,8 +70,7 @@ public class H5Utils {
 	 */
 	public static AbstractDataset getSet(final Object  val, final long[] longShape, final Dataset set) throws Exception {
 
-		final int[] intShape  = new int[longShape.length];
-		for (int i = 0; i < intShape.length; i++) intShape[i] = (int)longShape[i];
+		final int[] intShape  = getInt(longShape);
          
         if (val instanceof byte[]) {
          	return new ByteDataset((byte[])val, intShape);
@@ -88,6 +87,17 @@ public class H5Utils {
         }
         
         throw new Exception("Cannot deal with data type "+set.getDatatype().getDatatypeDescription());
+	}
+
+	/**
+	 * Get a int[] from a long[]
+	 * @param longShape
+	 * @return
+	 */
+	public static int[] getInt(long[] longShape) {
+		final int[] intShape  = new int[longShape.length];
+		for (int i = 0; i < intShape.length; i++) intShape[i] = (int)longShape[i];
+		return intShape;
 	}
 
 	/**
