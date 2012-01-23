@@ -46,7 +46,6 @@ public class HDF5SelectionProvider implements IH5DoubleClickSelectionProvider {
         	final Object[] oa  = sel.toArray();
         	if (oa == null) return null;
         	
-        	ILazyDataset selected  = null;
         	HDF5Node     dataset   = null;
         	HDF5Node     parent    = null;
         	String      fullName   = null;
@@ -70,29 +69,15 @@ public class HDF5SelectionProvider implements IH5DoubleClickSelectionProvider {
                     	Dataset ds = (Dataset)object;
                      	dataset    = createDataset(ds, filePath, new HDF5File(root.getOID()[0], filePath));
                     	fullName   = ds.getFullName();
-                    	try {
-                    		selected = new H5LazyDataset(ds, filePath);
-                    		break;
-                    	} catch (Exception ne) {
-                    		logger.error("Cannot make lazy dataset from "+ds.getFullName(), ne);
-                    		continue;
-                    	}
+                  
                     }
                     
 				}
 			}
         	
         	final HDF5NodeLink link = new HDF5NodeLink(filePath, fullName, parent, dataset);
-        	final HDF5AxisBean bean = HDF5Utils.getAxisInfo(link, false);
-        	
-        	List<AxisSelection> axes = null;
-        	if (bean!=null) axes = bean.getAxes();
-        			
-        	return new HDF5Selection(InspectorType.LINE, 
-        			                 filePath, 
-        			                 fullName, 
-        			                 axes,
-        			                 selected);
+        	return HDF5Utils.createDatasetSelection(link, false);
+       
         }
         
         return null;
