@@ -197,14 +197,9 @@ public class H5Loader extends AbstractFileLoader implements IMetaLoader, IDataSe
 		for (String fullPath : fullPaths) {
 			if (mon!=null) mon.worked(1);
 			
-			final Dataset set = (Dataset)file.getData(fullPath);
+			final Dataset      set = (Dataset)file.getData(fullPath);
 			set.getMetadata();
-			
-			final H5LazyLoader loader = new H5LazyLoader(this, file.getPath(), fullPath);
-			final LazyDataset  lazy   = new LazyDataset(fullPath, 
-					                                 H5Utils.getDataType(set.getDatatype()), 
-					                                 H5Utils.getInt(set.getDims()),
-					                                 loader);
+			final LazyDataset  lazy   = new H5LazyDataset(set, file.getPath());
 			
 			ret.put(fullPath, lazy);
 		}

@@ -62,4 +62,10 @@
             name="(Pre-release) Workflows">
       </introPageRegister>
    </extension>
+   <extension
+         point="org.dawb.hdf5.editor.double.click.listener">
+      <double_click_provider
+            class="org.dawb.gda.extensions.h5.HDF5SelectionProvider">
+      </double_click_provider>
+   </extension>
 </plugin>

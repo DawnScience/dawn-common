@@ -1,5 +1,7 @@
 package org.dawb.gda.extensions.loaders;
 
+import java.io.File;
+
 import ncsa.hdf.object.Dataset;
 
 import org.dawb.hdf5.HierarchicalDataFactory;
@@ -22,18 +24,16 @@ public class H5LazyLoader implements ILazyLoader {
 	private String   fullPath;
 	private H5Loader loader;
 
-	public H5LazyLoader(final H5Loader loader,
-			            final String   path, 
+	public H5LazyLoader(final String   path, 
 			            final String   fullPath) {
-		this.loader   = loader;
+		this.loader   = new H5Loader();
 		this.path     = path;
 		this.fullPath = fullPath;
 	}
 
 	@Override
 	public boolean isFileReadable() {
-		// TODO Auto-generated method stub
-		return false;
+		return (new File(path)).canRead();
 	}
 
 	@Override

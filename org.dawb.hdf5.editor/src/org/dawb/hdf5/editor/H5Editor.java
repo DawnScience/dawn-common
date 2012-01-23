@@ -13,14 +13,21 @@ import javax.swing.tree.TreeNode;
 
 import org.dawb.hdf5.HierarchicalDataFactory;
 import org.dawb.hdf5.IHierarchicalDataFile;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.IContentProvider;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
@@ -82,6 +89,10 @@ public class H5Editor extends EditorPart implements IReusableEditor, IH5Editor {
 	 * @return String
 	 */
 	public String getFilePath(IEditorInput fileInput) {
+		
+		final IFile file = (IFile)fileInput.getAdapter(IFile.class);
+		if (file!=null) return file.getLocation().toOSString();
+
 		if (fileInput instanceof IURIEditorInput) {
 			String path = ((IURIEditorInput)fileInput).getURI().toString();
 			if (path.startsWith("file:")) path = path.substring(5);
@@ -117,7 +128,14 @@ public class H5Editor extends EditorPart implements IReusableEditor, IH5Editor {
 			tCol.setWidth(widths[i]);
 			tCol.setMoveable(true);
 		}
-		getSite().setSelectionProvider(tree);
+		
+		final H5SelectionProvider provider = new H5SelectionProvider();
+		getSite().setSelectionProvider(provider);
+		
+		/**
+		 * Allows double click to fire special tree events for DLS plotting
+		 */
+		createTreeListeners(provider);
 		
 //		final H5Filter filter = new H5Filter();
 //		searchText.addModifyListener(new ModifyListener() {		
@@ -129,7 +147,7 @@ public class H5Editor extends EditorPart implements IReusableEditor, IH5Editor {
 //			}
 //		});
 	}
-	
+
 	@Override
 	public void dispose() {
 		try {
@@ -203,4 +221,55 @@ public class H5Editor extends EditorPart implements IReusableEditor, IH5Editor {
 	public String getFilePath() {
 		return getFilePath(getEditorInput());
 	}
+	
+	/**
+	 * The reason we do not use the TreeViewer as the selection provider is that
+	 * we want to send different selections between double and single clicks.
+	 * 
+	 * @param provider
+	 */
+	private void createTreeListeners(final H5SelectionProvider provider) {
+
+		/**
+		 * This line is used to make the double click work into the DLS plotting.
+		 * This requires a HDF5Selection to be sent. 
+		 */
+		tree.getControl().addListener(SWT.MouseDown, new Listener() {
+			@Override
+			public void handleEvent(Event event) {
+				provider.setSelection(tree.getSelection());
+			}
+		});
+
+		/**
+		 * This line is used to make the double click work into the DLS plotting.
+		 * This requires a HDF5Selection to be sent. 
+		 */
+		tree.getControl().addListener(SWT.MouseDoubleClick, new Listener() {
+			@Override
+			public void handleEvent(Event event) {
+				final IConfigurationElement[] ele = Platform.getExtensionRegistry().getConfigurationElementsFor("org.dawb.hdf5.editor.double.click.listener");
+				for (IConfigurationElement e : ele) {
+					IH5DoubleClickSelectionProvider prov=null;
+					try {
+						prov = (IH5DoubleClickSelectionProvider)e.createExecutableExtension("class");
+					} catch (CoreException e1) {
+						continue;
+					}
+					ISelection selection;
+					try {
+						selection = prov.getSelection(tree.getSelection(), getFilePath());
+					} catch (Exception e1) {
+						logger.error("Cannot translate exception!", e1);
+						continue;
+					}
+					if (selection!=null) {
+						provider.setSelection(selection);
+						return;
+					}
+				}
+			}
+		});
+	}
+
 }
