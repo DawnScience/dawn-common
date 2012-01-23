@@ -13,6 +13,16 @@ import java.io.File;
 
 import ncsa.hdf.object.FileFormat;
 
+/**
+ * This class should be used to access HDF5 files from Java as long as the limiations like those
+ * in HDF 2.7 are in place. This class gives a facade which is designed to ensure no more that
+ * one file handle to a hdf5 file is active at one time - however multiple threads may access
+ * the file. It is better than alternative ways of doing this as the level of synchronization is
+ * lower. Use HierarchicalDataFactory as much as possible to avoid thread problems with HDF5.
+ * 
+ * @author fcp94556
+ *
+ */
 public class HierarchicalDataFactory {
 
 	public static boolean canOpen(final String absolutePath) throws Exception {
