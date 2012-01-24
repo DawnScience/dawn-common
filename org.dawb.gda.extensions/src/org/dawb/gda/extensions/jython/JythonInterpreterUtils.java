@@ -97,8 +97,17 @@ public class JythonInterpreterUtils {
 		
 		// If an interpreter called 'jython2.5.1' exists, use that
 		JythonInterpreterManager man = (JythonInterpreterManager)PydevPlugin.getJythonInterpreterManager();
-		InterpreterInfo          inf = man.getInterpreterInfo("Jython2.5.1", null);
-		if (inf==null) inf =  man.getInterpreterInfo("jython2.5.1", null);
+		InterpreterInfo          inf = null;
+		try {
+			inf = man.getInterpreterInfo("Jython2.5.1", null);
+		} catch (Throwable ignored) {
+			inf = null;
+		}
+		try {
+			if (inf==null) inf =  man.getInterpreterInfo("jython2.5.1", null);
+		} catch (Throwable ignored) {
+			inf = null;
+		}
 		if (inf!=null) {
 			final List<String> paths = inf.getPythonPath();
 			for (String path : paths) state.path.append(new PyString(path));
