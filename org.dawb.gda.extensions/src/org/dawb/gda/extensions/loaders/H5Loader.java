@@ -60,6 +60,10 @@ public class H5Loader extends AbstractFileLoader implements IMetaLoader, IDataSe
 	public static void setLoaderInFactory() throws Exception {
 		LoaderFactory.getSupportedExtensions();
 		
+		/**
+		 * Warning DataImportSource assumes LoaderFactory will return
+		 * H5LazyDatasets in order to then get full data for the pipeline.
+		 */
 		for (String ext : EXT) {
 			LoaderFactory.clearLoader(ext);
 			LoaderFactory.registerLoader(ext, H5Loader.class);
@@ -156,7 +160,8 @@ public class H5Loader extends AbstractFileLoader implements IMetaLoader, IDataSe
 
 	protected void resetDims(Dataset dataset) {
 		long[] selected = dataset.getSelectedDims(); // the selected size of the dataet
-		long[] dims    = dataset.getDims();
+		long[] dims     = dataset.getDims();
+		if (dims==null||selected==null) return;
 		for (int i = 0; i < selected.length; i++) {
 			selected[i] = dims[i];
 		}

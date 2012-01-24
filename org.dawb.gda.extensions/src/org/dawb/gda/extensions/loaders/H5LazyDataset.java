@@ -1,7 +1,9 @@
 package org.dawb.gda.extensions.loaders;
 
 import ncsa.hdf.object.Dataset;
+import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.LazyDataset;
+import uk.ac.gda.monitor.IMonitor;
 
 public class H5LazyDataset extends LazyDataset {
 
@@ -23,5 +25,9 @@ public class H5LazyDataset extends LazyDataset {
               H5Utils.getDataType(set.getDatatype()), 
               H5Utils.getInt(set.getDims()),
 			  new H5LazyLoader(filePath, set.getFullName()));
+	}
+	
+	public AbstractDataset getCompleteData(IMonitor monitor) throws Exception {
+		return ((H5LazyLoader)this.loader).getCompleteData(monitor);
 	}
 }

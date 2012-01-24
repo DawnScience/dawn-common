@@ -64,7 +64,7 @@ public class H5LazyLoader implements ILazyLoader {
 		}	
 	}
 
-	private AbstractDataset getCompleteData(IMonitor mon) throws Exception {
+	protected AbstractDataset getCompleteData(IMonitor mon) throws Exception {
 		
 		IHierarchicalDataFile file = null;
 		try {
