@@ -91,7 +91,8 @@ public class EclipseUtils {
 	 * @return File
 	 */
 	public static File getFile(IEditorInput fileInput) {
-		return new File(EclipseUtils.getFileURI(fileInput));
+		URI uri = getFileURI(fileInput);
+		return uri == null ? null : new File(uri);
 	}
 	
 	public static String getFilePath(IEditorInput fileInput) {
@@ -99,10 +100,10 @@ public class EclipseUtils {
 		if (file==null) return null;
 		return file.getAbsolutePath();
 	}
-	
-	static private boolean isWindowsOS() {
-		return (System.getProperty("os.name").indexOf("Windows") == 0);
-	}
+
+//	static private boolean isWindowsOS() {
+//		return (System.getProperty("os.name").indexOf("Windows") == 0);
+//	}
 	
 	/**
 	 * Try to determine the IFile from the edit input
