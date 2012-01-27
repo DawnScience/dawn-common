@@ -16,7 +16,6 @@ Export-Package: org.dawb.common.util,
  org.dawb.common.util.list,
  org.dawb.common.util.net,
  org.dawb.common.util.object,
- org.dawb.common.util.sync,
  org.dawb.common.util.test,
  org.dawb.common.util.text,
  org.dawb.common.util.xml
