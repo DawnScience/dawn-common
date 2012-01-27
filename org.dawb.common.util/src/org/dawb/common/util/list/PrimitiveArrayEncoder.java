@@ -30,13 +30,20 @@ public class PrimitiveArrayEncoder {
 	public static int[] getIntArray(String dataString) {
 		if (dataString == null) return null;
 		final String tmp = dataString.substring(1,dataString.length()-1);
-		final String[] d = tmp.split(", ");
+		
+		return getIntArrayNoBrackets(tmp);
+	}
+	
+
+	public static int[] getIntArrayNoBrackets(String commaSeped) {
+		final String[] d = commaSeped.split(", ");
 		final int[] ret  = new int[d.length];
 		for (int i = 0; i < d.length; i++) {
 			ret[i] = Integer.parseInt(d[i]);
 		}
-		return ret;
+	    return ret;	
 	}
+
 
 	/**
 	 * int[] -> String
