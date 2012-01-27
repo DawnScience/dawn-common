@@ -37,7 +37,7 @@ public class SpecLoader extends AbstractFileLoader implements IMetaLoader {
 
 	public static void setLoaderInFactory(){
 		try {
-			LoaderFactory.registerLoader("dat", SpecLoader.class, 1); // Important, try SpecLoader before SRSLoader but after DatLoader
+			LoaderFactory.registerLoader("dat", SpecLoader.class);
 		} catch (Exception e) {
 			logger.error("Cannot register "+SpecLoader.class.getName()+" in "+LoaderFactory.class.getName(), e);
 		}
