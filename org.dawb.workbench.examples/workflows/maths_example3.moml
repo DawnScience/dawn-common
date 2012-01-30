@@ -1,0 +1,193 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE entity PUBLIC "-//UC Berkeley//DTD MoML 1//EN"
+    "http://ptolemy.eecs.berkeley.edu/xml/dtd/MoML_1.dtd">
+<entity name="new_model" class="ptolemy.actor.TypedCompositeActor" source="C:\Work\debug_dawb_workspace\workflows\examples\maths_example3.moml">
+    <property name="_createdBy" class="ptolemy.kernel.attributes.VersionAttribute" value="7.0.1">
+    </property>
+    <property name="_workbenchVersion" class="ptolemy.kernel.attributes.VersionAttribute" value="1.0.0">
+    </property>
+    <property name="Director" class="com.isencia.passerelle.domain.cap.Director">
+        <property name="Expert Modeler" class="ptolemy.data.expr.Parameter" value="false">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{20, 20}">
+        </property>
+    </property>
+    <property name="TextAttribute" class="ptolemy.vergil.kernel.attributes.TextAttribute">
+        <property name="_hideName" class="ptolemy.data.expr.SingletonParameter" value="true">
+        </property>
+        <property name="_hideAllParameters" class="ptolemy.data.expr.Parameter" value="true">
+        </property>
+        <property name="textSize" class="ptolemy.data.expr.Parameter" value="14">
+        </property>
+        <property name="textColor" class="ptolemy.actor.gui.ColorAttribute" value="{0.0, 0.0, 1.0, 1.0}">
+        </property>
+        <property name="fontFamily" class="ptolemy.data.expr.StringParameter" value="SansSerif">
+        </property>
+        <property name="bold" class="ptolemy.data.expr.Parameter" value="false">
+        </property>
+        <property name="italic" class="ptolemy.data.expr.Parameter" value="false">
+        </property>
+        <property name="text" class="ptolemy.kernel.util.StringAttribute" value="Please run maths_example2.moml once before running this example.\nThis creates the h5 file which this exmaple uses.">
+            <property name="_style" class="ptolemy.actor.gui.style.TextStyle">
+                <property name="height" class="ptolemy.data.expr.Parameter" value="20">
+                </property>
+                <property name="width" class="ptolemy.data.expr.Parameter" value="80">
+                </property>
+            </property>
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{20.0, 87.0}">
+        </property>
+    </property>
+    <entity name="maths_example2-2d" class="org.dawb.passerelle.actors.data.DataImportSource">
+        <property name="Receiver Q Capacity (-1)" class="ptolemy.data.expr.Parameter" value="-1">
+        </property>
+        <property name="Receiver Q warning size (-1)" class="ptolemy.data.expr.Parameter" value="-1">
+        </property>
+        <property name="Relative Path" class="ptolemy.data.expr.Parameter" value="true">
+        </property>
+        <property name="Folder" class="ptolemy.data.expr.Parameter" value="false">
+        </property>
+        <property name="Include Meta Data" class="ptolemy.data.expr.Parameter" value="false">
+        </property>
+        <property name="File Filter" class="com.isencia.passerelle.util.ptolemy.RegularExpressionParameter" value="">
+        </property>
+        <property name="Path" class="com.isencia.passerelle.util.ptolemy.ResourceParameter" value="/${project_name}/output/maths_example2.h5">
+        </property>
+        <property name="Data Sets" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="/entry/data/two_dimensional">
+        </property>
+        <property name="Rename Data Sets" class="com.isencia.passerelle.util.ptolemy.StringMapParameter" value="">
+        </property>
+        <property name="Data Set Slice" class="org.dawb.passerelle.actors.data.config.SliceParameter" value="PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4gCjxqYXZhIHZlcnNpb249IjEuNi4wXzI5IiBjbGFzcz0iamF2YS5iZWFucy5YTUxEZWNvZGVyIj4gCiA8b2JqZWN0IGNsYXNzPSJvcmcuZGF3Yi5jb21tb24udWkuc2xpY2luZy5EaW1zRGF0YUxpc3QiPiAKICA8dm9pZCBwcm9wZXJ0eT0iZGltc0RhdGEiPiAKICAgPG9iamVjdCBjbGFzcz0iamF2YS51dGlsLkFycmF5TGlzdCI+IAogICAgPHZvaWQgbWV0aG9kPSJhZGQiPiAKICAgICA8b2JqZWN0IGNsYXNzPSJvcmcuZGF3Yi5jb21tb24udWkuc2xpY2luZy5EaW1zRGF0YSI+IAogICAgICA8dm9pZCBwcm9wZXJ0eT0iZGltZW5zaW9uIj4gCiAgICAgICA8aW50PjA8L2ludD4gCiAgICAgIDwvdm9pZD4gCiAgICAgPC9vYmplY3Q+IAogICAgPC92b2lkPiAKICAgIDx2b2lkIG1ldGhvZD0iYWRkIj4gCiAgICAgPG9iamVjdCBjbGFzcz0ib3JnLmRhd2IuY29tbW9uLnVpLnNsaWNpbmcuRGltc0RhdGEiPiAKICAgICAgPHZvaWQgcHJvcGVydHk9ImF4aXMiPiAKICAgICAgIDxpbnQ+MDwvaW50PiAKICAgICAgPC92b2lkPiAKICAgICAgPHZvaWQgcHJvcGVydHk9ImRpbWVuc2lvbiI+IAogICAgICAgPGludD4xPC9pbnQ+IAogICAgICA8L3ZvaWQ+IAogICAgIDwvb2JqZWN0PiAKICAgIDwvdm9pZD4gCiAgICA8dm9pZCBtZXRob2Q9ImFkZCI+IAogICAgIDxvYmplY3QgY2xhc3M9Im9yZy5kYXdiLmNvbW1vbi51aS5zbGljaW5nLkRpbXNEYXRhIj4gCiAgICAgIDx2b2lkIHByb3BlcnR5PSJheGlzIj4gCiAgICAgICA8aW50PjE8L2ludD4gCiAgICAgIDwvdm9pZD4gCiAgICAgIDx2b2lkIHByb3BlcnR5PSJkaW1lbnNpb24iPiAKICAgICAgIDxpbnQ+MjwvaW50PiAKICAgICAgPC92b2lkPiAKICAgICA8L29iamVjdD4gCiAgICA8L3ZvaWQ+IAogICA8L29iamVjdD4gCiAgPC92b2lkPiAKIDwvb2JqZWN0PiAKPC9qYXZhPiAK">
+        </property>
+        <property name="Data Type" class="org.dawb.passerelle.actors.data.DataImportSource$3" value="Complete data as numerical arrays">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{62.0, 279.0}">
+        </property>
+    </entity>
+    <entity name="maths_example2-1d" class="org.dawb.passerelle.actors.data.DataImportSource">
+        <property name="Receiver Q Capacity (-1)" class="ptolemy.data.expr.Parameter" value="-1">
+        </property>
+        <property name="Receiver Q warning size (-1)" class="ptolemy.data.expr.Parameter" value="-1">
+        </property>
+        <property name="Relative Path" class="ptolemy.data.expr.Parameter" value="true">
+        </property>
+        <property name="Folder" class="ptolemy.data.expr.Parameter" value="false">
+        </property>
+        <property name="Include Meta Data" class="ptolemy.data.expr.Parameter" value="false">
+        </property>
+        <property name="File Filter" class="com.isencia.passerelle.util.ptolemy.RegularExpressionParameter" value="">
+        </property>
+        <property name="Path" class="com.isencia.passerelle.util.ptolemy.ResourceParameter" value="/${project_name}/output/maths_example2.h5">
+        </property>
+        <property name="Data Sets" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="/entry/data/one_dimensional">
+        </property>
+        <property name="Rename Data Sets" class="com.isencia.passerelle.util.ptolemy.StringMapParameter" value="">
+        </property>
+        <property name="Data Set Slice" class="org.dawb.passerelle.actors.data.config.SliceParameter" value="PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4gCjxqYXZhIHZlcnNpb249IjEuNi4wXzI5IiBjbGFzcz0iamF2YS5iZWFucy5YTUxEZWNvZGVyIj4gCiA8b2JqZWN0IGNsYXNzPSJvcmcuZGF3Yi5jb21tb24udWkuc2xpY2luZy5EaW1zRGF0YUxpc3QiPiAKICA8dm9pZCBwcm9wZXJ0eT0iZGltc0RhdGEiPiAKICAgPG9iamVjdCBjbGFzcz0iamF2YS51dGlsLkFycmF5TGlzdCI+IAogICAgPHZvaWQgbWV0aG9kPSJhZGQiPiAKICAgICA8b2JqZWN0IGNsYXNzPSJvcmcuZGF3Yi5jb21tb24udWkuc2xpY2luZy5EaW1zRGF0YSI+IAogICAgICA8dm9pZCBwcm9wZXJ0eT0iZGltZW5zaW9uIj4gCiAgICAgICA8aW50PjA8L2ludD4gCiAgICAgIDwvdm9pZD4gCiAgICAgPC9vYmplY3Q+IAogICAgPC92b2lkPiAKICAgIDx2b2lkIG1ldGhvZD0iYWRkIj4gCiAgICAgPG9iamVjdCBjbGFzcz0ib3JnLmRhd2IuY29tbW9uLnVpLnNsaWNpbmcuRGltc0RhdGEiPiAKICAgICAgPHZvaWQgcHJvcGVydHk9ImF4aXMiPiAKICAgICAgIDxpbnQ+MDwvaW50PiAKICAgICAgPC92b2lkPiAKICAgICAgPHZvaWQgcHJvcGVydHk9ImRpbWVuc2lvbiI+IAogICAgICAgPGludD4xPC9pbnQ+IAogICAgICA8L3ZvaWQ+IAogICAgIDwvb2JqZWN0PiAKICAgIDwvdm9pZD4gCiAgIDwvb2JqZWN0PiAKICA8L3ZvaWQ+IAogPC9vYmplY3Q+IAo8L2phdmE+IAo=">
+        </property>
+        <property name="Data Type" class="org.dawb.passerelle.actors.data.DataImportSource$3" value="Complete data as numerical arrays">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{62.0, 141.0}">
+        </property>
+    </entity>
+    <entity name="Multiply" class="org.dawb.passerelle.actors.data.MultiplyDatasets">
+        <property name="Receiver Q Capacity (-1)" class="ptolemy.data.expr.Parameter" value="-1">
+        </property>
+        <property name="Receiver Q warning size (-1)" class="ptolemy.data.expr.Parameter" value="-1">
+        </property>
+        <property name="Expression Mode" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="Evaluate on every data input">
+        </property>
+        <property name="Memory Mode" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="Create copy of data leaving original data intact.">
+        </property>
+        <property name="Name Mode" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="Attempt to use image name if there is one.">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{309.0, 269.0}">
+        </property>
+    </entity>
+    <entity name="Tile" class="org.dawb.passerelle.actors.data.TileDatasets">
+        <property name="Receiver Q Capacity (-1)" class="ptolemy.data.expr.Parameter" value="-1">
+        </property>
+        <property name="Receiver Q warning size (-1)" class="ptolemy.data.expr.Parameter" value="-1">
+        </property>
+        <property name="Expression Mode" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="Evaluate on every data input">
+        </property>
+        <property name="Memory Mode" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="Create copy of data leaving original data intact.">
+        </property>
+        <property name="Name Mode" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="Attempt to use image name if there is one.">
+        </property>
+        <property name="Tile repetitions" class="ptolemy.data.expr.StringParameter" value="2048, 1">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{225.0, 141.0}">
+        </property>
+    </entity>
+    <entity name="Data Export" class="org.dawb.passerelle.actors.data.DataExportTransformer">
+        <property name="Receiver Q Capacity (-1)" class="ptolemy.data.expr.Parameter" value="-1">
+        </property>
+        <property name="Receiver Q warning size (-1)" class="ptolemy.data.expr.Parameter" value="-1">
+        </property>
+        <property name="Expression Mode" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="Evaluate on every data input">
+        </property>
+        <property name="Memory Mode" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="Create copy of data leaving original data intact.">
+        </property>
+        <property name="Name Mode" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="Attempt to use image name if there is one.">
+        </property>
+        <property name="File Format" class="org.dawb.passerelle.actors.data.DataExportTransformer$1" value="hdf5">
+        </property>
+        <property name="Writing Type" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="Replace file referenced by Output">
+        </property>
+        <property name="Output" class="com.isencia.passerelle.util.ptolemy.ResourceParameter" value="/${project_name}/output/maths_example3.h5">
+        </property>
+        <property name="Calibration" class="org.dawb.passerelle.actors.data.DataExportTransformer$2" value="None">
+        </property>
+        <property name="Dataset Name" class="ptolemy.data.expr.StringParameter" value="data/images">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{429.0, 269.0}">
+        </property>
+    </entity>
+    <entity name="Open File" class="org.dawb.passerelle.actors.file.OpenFileSink">
+        <property name="Receiver Q Capacity (-1)" class="ptolemy.data.expr.Parameter" value="-1">
+        </property>
+        <property name="Receiver Q warning size (-1)" class="ptolemy.data.expr.Parameter" value="-1">
+        </property>
+        <property name="PassThrough" class="ptolemy.data.expr.Parameter" value="false">
+        </property>
+        <property name="Expression Mode" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="Evaluate on every data input">
+        </property>
+        <property name="Memory Mode" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="Create copy of data leaving original data intact.">
+        </property>
+        <property name="File Path" class="ptolemy.data.expr.StringParameter" value="${file_path}">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{563.0, 272.0}">
+        </property>
+    </entity>
+    <relation name="_R" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <relation name="_R_2" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <relation name="_R_3" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <relation name="_R_4" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <relation name="_R_5" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <link port="maths_example2-2d.output" relation="_R_2"/>
+    <link port="maths_example2-1d.output" relation="_R"/>
+    <link port="Multiply.a" relation="_R_3"/>
+    <link port="Multiply.output" relation="_R_4"/>
+    <link port="Multiply.b" relation="_R_2"/>
+    <link port="Tile.input" relation="_R"/>
+    <link port="Tile.output" relation="_R_3"/>
+    <link port="Data Export.hasFinished" relation="_R_5"/>
+    <link port="Data Export.input" relation="_R_4"/>
+    <link port="Open File.input" relation="_R_5"/>
+</entity>

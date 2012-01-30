@@ -29,9 +29,9 @@
         </property>
         <property name="Calibration" class="org.dawb.passerelle.actors.data.DataExportTransformer$2" value="None">
         </property>
-        <property name="Dataset Name" class="ptolemy.data.expr.StringParameter" value="data/${data_name}/">
+        <property name="Dataset Name" class="ptolemy.data.expr.StringParameter" value="data/${data_name}">
         </property>
-        <property name="_location" class="ptolemy.kernel.util.Location" value="{310.0, 226.0}">
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{309.0, 150.0}">
         </property>
     </entity>
     <entity name="data_name" class="org.dawb.passerelle.actors.data.Scalar">
@@ -125,20 +125,40 @@
         </property>
         <property name="PassThrough" class="ptolemy.data.expr.Parameter" value="false">
         </property>
-        <property name="Expression Mode" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="Evaluate on every data input">
+        <property name="Expression Mode" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="Evaluate after all data received">
         </property>
         <property name="Memory Mode" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="Create copy of data leaving original data intact.">
         </property>
         <property name="File Path" class="ptolemy.data.expr.StringParameter" value="${file_path}">
         </property>
-        <property name="_location" class="ptolemy.kernel.util.Location" value="{443.0, 229.0}">
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{463.0, 153.0}">
+        </property>
+    </entity>
+    <entity name="DataExportTransformer" class="org.dawb.passerelle.actors.data.DataExportTransformer">
+        <property name="Receiver Q Capacity (-1)" class="ptolemy.data.expr.Parameter" value="-1">
+        </property>
+        <property name="Receiver Q warning size (-1)" class="ptolemy.data.expr.Parameter" value="-1">
+        </property>
+        <property name="Expression Mode" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="Evaluate on every data input">
+        </property>
+        <property name="Memory Mode" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="Create copy of data leaving original data intact.">
+        </property>
+        <property name="Name Mode" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="Attempt to use image name if there is one.">
+        </property>
+        <property name="File Format" class="org.dawb.passerelle.actors.data.DataExportTransformer$1" value="hdf5">
+        </property>
+        <property name="Writing Type" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="Append to file referenced by Output">
+        </property>
+        <property name="Output" class="com.isencia.passerelle.util.ptolemy.ResourceParameter" value="/${project_name}/output/maths_example2.h5">
+        </property>
+        <property name="Calibration" class="org.dawb.passerelle.actors.data.DataExportTransformer$2" value="None">
+        </property>
+        <property name="Dataset Name" class="ptolemy.data.expr.StringParameter" value="data/${data_name}">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{309.0, 288.0}">
         </property>
     </entity>
     <relation name="_R" class="ptolemy.actor.TypedIORelation">
-        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
-        </property>
-    </relation>
-    <relation name="_R_3" class="ptolemy.actor.TypedIORelation">
         <property name="width" class="ptolemy.data.expr.Parameter" value="1">
         </property>
     </relation>
@@ -150,18 +170,22 @@
         <property name="width" class="ptolemy.data.expr.Parameter" value="1">
         </property>
     </relation>
+    <relation name="_R_6" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
     <relation name="_R_2" class="ptolemy.actor.TypedIORelation">
         <property name="width" class="ptolemy.data.expr.Parameter" value="1">
         </property>
     </relation>
     <link port="Data Export.hasFinished" relation="_R_2"/>
-    <link port="Data Export.input" relation="_R_3"/>
     <link port="Data Export.input" relation="_R_5"/>
     <link port="data_name.output" relation="_R"/>
     <link port="Scalar.output" relation="_R_4"/>
     <link port="Python.input" relation="_R"/>
-    <link port="Python.output" relation="_R_3"/>
+    <link port="Python.output" relation="_R_6"/>
     <link port="PythonScript.input" relation="_R_4"/>
     <link port="PythonScript.output" relation="_R_5"/>
     <link port="Open File.input" relation="_R_2"/>
+    <link port="DataExportTransformer.input" relation="_R_6"/>
 </entity>
