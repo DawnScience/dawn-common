@@ -85,6 +85,11 @@ public class DiamondPlottingSystem extends AbstractPlottingSystem {
 			}
 		}); 
 	}
+
+	@Override
+	public Composite getPlotComposite() {
+       return plotWindow.getMainPlotter().getComposite();
+	}
 	
 	/**
 	 * 
@@ -139,6 +144,19 @@ public class DiamondPlottingSystem extends AbstractPlottingSystem {
 	public void dispose() {
     	if (plotServerConnection!=null) plotServerConnection.dispose();
     	if (plotWindow!=null)           plotWindow.dispose();
+	}
+
+	@Override
+	public void clear() {
+		try {
+			// BODGE - Cannot work out how to plot nothing.
+			final AbstractDataset id = new IntegerDataset(new int[]{0,0},2);
+			id.setName("-");
+			plotWindow.getMainPlotter().replaceAllPlots(Arrays.asList(new AbstractDataset[]{id}));
+			plotWindow.getMainPlotter().refresh(true);
+		} catch (Throwable e) {
+			logger.error("Cannot remove plots!", e);
+		}
 	}
 
 }

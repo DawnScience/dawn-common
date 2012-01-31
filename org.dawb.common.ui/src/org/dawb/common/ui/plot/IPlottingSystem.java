@@ -46,6 +46,7 @@ public interface IPlottingSystem {
 	
 	/**
 	 * For 1D - x is the x axis, ys is the y traces or null if only 1 data set should be plotted.
+	 * 
 	 * NOTE Using this option plots everything on the current x and y axes. These are the default axes,
 	 * to change axes, use createAxis(...) then setActiveAxis(...). Then subsequent plotting will plot
 	 * to these active axes.
@@ -53,7 +54,9 @@ public interface IPlottingSystem {
 	 * Does not have to be called in the UI thread - any thread will do. Should be called to switch the entire
 	 * plot contents.
 	 * 
-	 * There is append for 1D plotting, @see IPlottingSystem.append(...)
+	 * There is append for 1D plotting used for single points. @see IPlottingSystem.append(...)
+	 * 
+	 * Each call to createPlot1D(...) adds to the plot and the current selected axes, use reset() to clear the plot.
 	 * 
 	 * @param x
 	 * @param ys
@@ -111,10 +114,14 @@ public interface IPlottingSystem {
 
 
 	/**
-	 * Call to tell the plot to plot nothing.
+	 * Call to tell the plot to plot nothing and reset axes. Thread safe.
 	 */
 	public void reset();
 
+	/**
+	 * Call to tell the plot to remove data and leave axes unchanged. Thread safe.
+	 */
+	public void clear();
 
 	/**
 	 * Call to mark widgets and plotting as no longer required.
@@ -133,9 +140,10 @@ public interface IPlottingSystem {
 	 * Use this method to create axes other than the default y and x axes.
 	 * @param title
 	 * @param isYAxis, normally it is.
+	 * @param side - either SWT.LEFT, SWT.RIGHT, SWT.TOP, SWT.BOTTOM
 	 * @return
 	 */
-	public IAxis createAxis(final String title, final boolean isYAxis);
+	public IAxis createAxis(final String title, final boolean isYAxis, final int side);
 	
 	/**
 	 * The current y axis to plot to. Intended for 1D plotting with multiple axes.
@@ -161,5 +169,12 @@ public interface IPlottingSystem {
 	 */
 	public void setSelectedXAxis(IAxis xAxis);
 	
-
+    /**
+     * The plot composite which plots are being drawn on.
+     * 
+     * Use this method with caution
+     * 
+     * @return
+     */
+	public Composite getPlotComposite();
 }

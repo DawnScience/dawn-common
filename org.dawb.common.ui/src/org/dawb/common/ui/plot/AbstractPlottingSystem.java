@@ -207,14 +207,8 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem {
 							            final IProgressMonitor      monitor);
 	
 	
-	/**
-	 * Use this method to create axes other than the default y and x axes.
-	 * @param title
-	 * @param isYAxis, normally it is.
-	 * @return
-	 */
 	@Override
-	public IAxis createAxis(final String title, final boolean isYAxis) {
+	public IAxis createAxis(final String title, final boolean isYAxis, int side) {
 		throw new RuntimeException("Cannot create an axis with "+getClass().getName());
 	}
 	

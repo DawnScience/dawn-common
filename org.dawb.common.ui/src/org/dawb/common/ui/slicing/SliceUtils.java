@@ -176,6 +176,7 @@ public class SliceUtils {
 		
 		if (monitor!=null) monitor.worked(1);
 		if (mode==PlotType.PT1D) {
+			plotWindow.clear();
 			plotWindow.createPlot1D(slice, null, monitor);
 		} else if (mode==PlotType.PT1D_MULTI || mode==PlotType.PT1D_STACKED) {
 			
