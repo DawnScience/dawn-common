@@ -46,22 +46,38 @@ public interface IPlottingSystem {
 	
 	/**
 	 * For 1D - x is the x axis, ys is the y traces or null if only 1 data set should be plotted.
-	 * NOTE Using this option plots everything on the default x and y axes.
+	 * NOTE Using this option plots everything on the current x and y axes. These are the default axes,
+	 * to change axes, use createAxis(...) then setActiveAxis(...). Then subsequent plotting will plot
+	 * to these active axes.
 	 * 
-	 * For 2D - x is the image, ys is the axes.
+	 * Does not have to be called in the UI thread - any thread will do. Should be called to switch the entire
+	 * plot contents.
 	 * 
-	 * Does not have to be called in the UI thread. May be called to update as well as the entire
-	 * plot contents will be switched. The plot may also change mode.
+	 * There is append for 1D plotting, @see IPlottingSystem.append(...)
 	 * 
-	 * @param sum
+	 * @param x
+	 * @param ys
+	 * @param mode
+	 * @param monitor
+	 */
+	public void createPlot1D(AbstractDataset       x, 
+							 List<AbstractDataset> ys,
+							 IProgressMonitor      monitor);
+	
+	/**
+	 * For 2D - x is the image dataset, ys is the axes.
+	 * 
+	 * Does not have to be called in the UI thread. Should be called to switch the entire
+	 * plot contents. 
+	 * 
+	 * @param image
 	 * @param axes
 	 * @param mode
 	 * @param monitor
 	 */
-	public void createPlot( AbstractDataset       x, 
-							List<AbstractDataset> ys,
-							PlotType              mode, 
-							IProgressMonitor      monitor);
+	public void createPlot2D(AbstractDataset       image, 
+							 List<AbstractDataset> axes,
+							 IProgressMonitor      monitor);
 	
 	/**
 	 * This method can be used to add a single plot data point to 
@@ -77,13 +93,10 @@ public interface IPlottingSystem {
 	 * plottingSystem.createPlot(y, null, PlotType.PT1D, mon);
 	 * 
 	 * ...Update, x value indices in this case
-	 * plottingSystem.add("y", y.getSize()+1, 10, mon);
+	 * plottingSystem.append("y", y.getSize()+1, 10, mon);
 	 * 
 	 * Call this update method in any thread, it will do the update in the UI thread
 	 * if not already called in the UI thread.
-	 * 
-	 * Use redrawStraightAway to not draw if updating many data sets in a loop and
-	 * then later call repaint() to draw all data.
 	 * 
 	 * @param dataSetName
 	 * @param xValue - may be null if using indices
@@ -91,10 +104,10 @@ public interface IPlottingSystem {
 	 * @param monitor - often null, this will be a fast operation.
 	 * @throws Exception
 	 */
-	public void append( final String           dataSetName, 
-			            final Number           xValue,
-					    final Number           yValue,
-					    final IProgressMonitor monitor) throws Exception ;
+	public void append(final String           dataSetName, 
+			           final Number           xValue,
+					   final Number           yValue,
+					   final IProgressMonitor monitor) throws Exception ;
 
 
 	/**
@@ -115,5 +128,38 @@ public interface IPlottingSystem {
 	 * Redraws all the data
 	 */
 	public void repaint();
+	
+	/**
+	 * Use this method to create axes other than the default y and x axes.
+	 * @param title
+	 * @param isYAxis, normally it is.
+	 * @return
+	 */
+	public IAxis createAxis(final String title, final boolean isYAxis);
+	
+	/**
+	 * The current y axis to plot to. Intended for 1D plotting with multiple axes.
+	 * @return
+	 */
+	public IAxis getSelectedYAxis();
+	
+	/**
+	 * Set the current plotting yAxis. Intended for 1D plotting with multiple axes.
+	 * @param yAxis
+	 */
+	public void setSelectedYAxis(IAxis yAxis);
+	
+	/**
+	 * The current x axis to plot to. Intended for 1D plotting with multiple axes.
+	 * @return
+	 */
+	public IAxis getSelectedXAxis();
+	
+	/**
+	 * Set the current plotting xAxis. Intended for 1D plotting with multiple axes.
+	 * @param xAxis
+	 */
+	public void setSelectedXAxis(IAxis xAxis);
+	
 
 }

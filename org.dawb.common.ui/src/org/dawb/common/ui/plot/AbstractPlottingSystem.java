@@ -185,4 +185,73 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem {
 		
 	}
 
+	
+	@Override
+	public void createPlot1D(AbstractDataset       x, 
+							List<AbstractDataset> ys,
+							IProgressMonitor      monitor) {
+		createPlot(x,ys,PlotType.PT1D, monitor);
+	}
+
+
+	@Override
+	public void createPlot2D(AbstractDataset      image, 
+							List<AbstractDataset> axes,
+							IProgressMonitor      monitor) {
+		createPlot(image,axes,PlotType.IMAGE, monitor);
+	}
+
+	protected abstract void createPlot(final AbstractDataset       data, 
+							            final List<AbstractDataset> axes,
+							            final PlotType              mode, 
+							            final IProgressMonitor      monitor);
+	
+	
+	/**
+	 * Use this method to create axes other than the default y and x axes.
+	 * @param title
+	 * @param isYAxis, normally it is.
+	 * @return
+	 */
+	@Override
+	public IAxis createAxis(final String title, final boolean isYAxis) {
+		throw new RuntimeException("Cannot create an axis with "+getClass().getName());
+	}
+	
+	/**
+	 * The current y axis to plot to. Intended for 1D plotting with multiple axes.
+	 * @return
+	 */
+	@Override
+	public IAxis getSelectedYAxis(){
+		throw new RuntimeException("Cannot have multiple axes with "+getClass().getName());
+	}
+	
+	/**
+	 * Set the current plotting yAxis. Intended for 1D plotting with multiple axes.
+	 * @param yAxis
+	 */
+	@Override
+	public void setSelectedYAxis(IAxis yAxis){
+		throw new RuntimeException("Cannot have multiple axes with "+getClass().getName());
+	}
+	
+	/**
+	 * The current x axis to plot to. Intended for 1D plotting with multiple axes.
+	 * @return
+	 */
+	@Override
+	public IAxis getSelectedXAxis(){
+		throw new RuntimeException("Cannot have multiple axes with "+getClass().getName());
+	}
+	
+	/**
+	 * Set the current plotting xAxis. Intended for 1D plotting with multiple axes.
+	 * @param xAxis
+	 */
+	@Override
+	public void setSelectedXAxis(IAxis xAxis){
+		throw new RuntimeException("Cannot have multiple axes with "+getClass().getName());
+	}
+	
 }

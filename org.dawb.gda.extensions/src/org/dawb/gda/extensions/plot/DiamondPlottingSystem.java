@@ -90,7 +90,7 @@ public class DiamondPlottingSystem extends AbstractPlottingSystem {
 	 * 
 	 */
 	@Override
-	public void createPlot(final AbstractDataset       data, 
+	protected void createPlot(final AbstractDataset       data, 
 			               final List<AbstractDataset> axes,
 			               final PlotType              mode, 
 			               final IProgressMonitor      monitor) {

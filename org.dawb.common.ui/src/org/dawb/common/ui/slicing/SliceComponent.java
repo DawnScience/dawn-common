@@ -364,7 +364,7 @@ public class SliceComponent {
 		
 		final CellEditor[] editors  = new CellEditor[3];
 		editors[0] = null;
-		editors[1] = new CComboCellEditor(viewer.getTable(), new String[]{"X","Y",""});
+		editors[1] = new CComboCellEditor(viewer.getTable(), new String[]{"X","Y","(Slice)"});
 		final CCombo combo = ((CComboCellEditor)editors[1]).getCombo();
 		combo.addModifyListener(new ModifyListener() {
 			@Override
@@ -373,7 +373,7 @@ public class SliceComponent {
 				final CComboCellEditor editor = (CComboCellEditor)editors[1];
 				if (!editor.isActivated()) return;
 				final String   value = combo.getText();
-				if ("".equals(value)) {
+				if ("".equals(value) || "(Slice)".equals(value)) {
 					editor.applyEditorValueAndDeactivate(-1);
 					return; // Bit of a bodge
 				}
@@ -418,7 +418,7 @@ public class SliceComponent {
 		
 		final TableViewerColumn axis   = new TableViewerColumn(viewer, SWT.CENTER, 1);
 		axis.getColumn().setText("Axis");
-		axis.getColumn().setWidth(48);
+		axis.getColumn().setWidth(64);
 		axis.setLabelProvider(new SliceColumnLabelProvider(1));
 
 		final TableViewerColumn slice   = new TableViewerColumn(viewer, SWT.RIGHT, 2);
@@ -442,7 +442,7 @@ public class SliceComponent {
 				return (data.getDimension()+1)+"";
 			case 1:
 				final int axis = data.getAxis();
-				return axis==0 ? "X" : axis==1 ? "Y" : "";
+				return axis==0 ? "X" : axis==1 ? "Y" : "(Slice)";
 			case 2:
 				if (data.getSliceRange()!=null) return data.getSliceRange();
 				final int slice = data.getSlice();

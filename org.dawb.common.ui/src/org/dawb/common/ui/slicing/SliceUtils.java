@@ -176,7 +176,7 @@ public class SliceUtils {
 		
 		if (monitor!=null) monitor.worked(1);
 		if (mode==PlotType.PT1D) {
-			plotWindow.createPlot(slice, null, mode, monitor);
+			plotWindow.createPlot1D(slice, null, monitor);
 		} else if (mode==PlotType.PT1D_MULTI || mode==PlotType.PT1D_STACKED) {
 			
 			// We separate the 2D image into several 1d plots
@@ -194,10 +194,10 @@ public class SliceUtils {
 			for (double[] da : sets) {
 				ys.add(new DoubleDataset(da, da.length));
 			}
-			plotWindow.createPlot(ys.get(0), ys, mode, monitor);
+			plotWindow.createPlot1D(ys.get(0), ys, monitor);
 
 		} else {
-			plotWindow.createPlot(slice, currentSlice.getAxes(), mode, monitor);
+			plotWindow.createPlot2D(slice, currentSlice.getAxes(), monitor);
 		}
 
 	}
