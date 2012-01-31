@@ -145,4 +145,16 @@ public interface IAxis {
 	 * @param isYAxis
 	 */
 	public void setYAxis(final boolean isYAxis);
+
+	/**
+	 * 
+	 * @param b
+	 */
+	public void setVisible(boolean b);
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isVisible();
 }
