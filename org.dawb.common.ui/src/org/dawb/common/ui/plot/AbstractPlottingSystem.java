@@ -12,6 +12,9 @@ package org.dawb.common.ui.plot;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.dawb.common.ui.plot.region.IRegionSelection;
+import org.dawb.common.ui.plot.region.IRegionSelectionEvent;
+import org.dawb.common.ui.plot.region.IRegionSelectionListener;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.swt.graphics.Color;
@@ -21,7 +24,17 @@ import org.eclipse.swt.widgets.Text;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 
-
+/**
+ * The base class for IPlottingSystem. NOTE some methods that should be implemented
+ * throw exceptions if they are called. They should be overriden.
+ * Some methods that should be implemented do nothing.
+ * 
+ * There are TODO tags added to provide information as to where these optional
+ * methods to override are.
+ * 
+ * @author fcp94556
+ *
+ */
 public abstract class AbstractPlottingSystem implements IPlottingSystem {
 	
 	
@@ -114,8 +127,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem {
 	 * @param image
 	 */
 	public void setDefaultPlotType(PlotType image) {
-		// TODO Auto-generated method stub
-		
+		//TODO
 	}
 
 	public boolean isXfirst() {
@@ -151,7 +163,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem {
 	 * @param b
 	 */
 	public void setDatasetChoosingRequired(boolean b) {
-		
+		//TODO
 	}
 	
 	/**
@@ -159,7 +171,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem {
 	 * @param title
 	 */
 	public void setTitle(final String title) {
-		
+		//TODO
 	}
 	
 	/**
@@ -175,6 +187,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem {
 			            final Number           xValue,
 					    final Number           yValue,
 					    final IProgressMonitor monitor) throws Exception {
+		//TODO
 		throw new Exception("updatePlot not implemented for "+getClass().getName());
 	}
 	
@@ -182,9 +195,8 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem {
 	 * Please update to repaint the plotting.
 	 */
 	public void repaint() {
-		
+		//TODO
 	}
-
 	
 	@Override
 	public void createPlot1D(AbstractDataset       x, 
@@ -209,6 +221,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem {
 	
 	@Override
 	public IAxis createAxis(final String title, final boolean isYAxis, int side) {
+		//TODO
 		throw new RuntimeException("Cannot create an axis with "+getClass().getName());
 	}
 	
@@ -218,6 +231,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem {
 	 */
 	@Override
 	public IAxis getSelectedYAxis(){
+		//TODO
 		throw new RuntimeException("Cannot have multiple axes with "+getClass().getName());
 	}
 	
@@ -227,6 +241,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem {
 	 */
 	@Override
 	public void setSelectedYAxis(IAxis yAxis){
+		//TODO
 		throw new RuntimeException("Cannot have multiple axes with "+getClass().getName());
 	}
 	
@@ -236,6 +251,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem {
 	 */
 	@Override
 	public IAxis getSelectedXAxis(){
+		//TODO
 		throw new RuntimeException("Cannot have multiple axes with "+getClass().getName());
 	}
 	
@@ -245,7 +261,65 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem {
 	 */
 	@Override
 	public void setSelectedXAxis(IAxis xAxis){
+		//TODO
 		throw new RuntimeException("Cannot have multiple axes with "+getClass().getName());
 	}
 	
+	protected IRegionSelection regionSelection;
+
+	/**
+	 * The current selected region from the plotting, may be null.
+	 * 
+	 * Please override this method to provide a real implementation, default does nothing.
+	 */
+	public IRegionSelection getRegionSelection() {
+		//TODO
+		return regionSelection;
+	}
+
+	/**
+	 * The current selected region from the plotting, may not be null.
+	 * 
+	 * Please override this method to provide a real implementation, default does nothing.
+	 */
+	public void setRegionSelection(IRegionSelection iRegionSelection) {
+		//TODO
+		this.regionSelection = iRegionSelection;
+	}
+	
+	
+	private List<IRegionSelectionListener> regionListeners;
+	
+	/**
+	 * Call to be notified of events which require the plot
+	 * data to be sent again.
+	 * 
+	 * @param l
+	 */
+	public void addRegionSelectionListener(final IRegionSelectionListener l) {
+		if (plotListeners==null) regionListeners = new ArrayList<IRegionSelectionListener>(7);
+		regionListeners.add(l);
+	}
+	/**
+	 * Call to be notified of events which require the plot
+	 * data to be sent again.
+	 * 
+	 * @param l
+	 */
+	public void removeRegionSelectionListener(final IRegionSelectionListener l) {
+		if (plotListeners==null) return;
+		regionListeners.remove(l);
+	}
+	
+	/**
+	 * Call to fire an event to the listeners.
+	 * @param evt
+	 */
+	protected void fireRegionSelectionListeners(final IRegionSelectionEvent evt) {
+		if (plotListeners==null) return;
+		for (IRegionSelectionListener l : regionListeners) {
+			l.regionSelectionPerformed(evt);
+		}
+	}
+
 }
