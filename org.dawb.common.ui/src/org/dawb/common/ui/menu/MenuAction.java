@@ -47,7 +47,15 @@ public class MenuAction extends Action implements IMenuCreator {
 
 	@Override
 	public Menu getMenu(Menu parent) {
-		return null;
+		if (fMenu != null) fMenu.dispose();
+
+		fMenu= new Menu(parent);
+
+		for (IAction action : actions) {
+			addActionToMenu(fMenu, action);
+		}
+
+		return fMenu;
 	}
 
 	public void add(final IAction action) {
