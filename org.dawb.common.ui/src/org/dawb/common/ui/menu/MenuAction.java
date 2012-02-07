@@ -27,6 +27,7 @@ public class MenuAction extends Action implements IMenuCreator {
 	
 	private Menu fMenu;
 	private List<IAction> actions;
+	private Action selectedAction;
 
 	public MenuAction(final String text) {
 		super(text, IAction.AS_DROP_DOWN_MENU);
@@ -72,15 +73,21 @@ public class MenuAction extends Action implements IMenuCreator {
 		item.fill(parent, -1);
 	}
 
-	public void run() {
-
-	}
-
 
 	/**
 	 * Get's rid of the menu, because the menu hangs on to * the searches, etc.
 	 */
 	public void clear() {
 		actions.clear();
+	}
+
+
+	public void setSelectedAction(Action action) {
+		this.setImageDescriptor(action.getImageDescriptor());
+		this.selectedAction = action;
+	}
+	
+	public void run() {
+		if (selectedAction!=null) selectedAction.run();
 	}
 }
