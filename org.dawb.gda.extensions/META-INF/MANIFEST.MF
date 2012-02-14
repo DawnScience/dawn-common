@@ -7,8 +7,6 @@ Bundle-Activator: org.dawb.gda.extensions.Activator
 Bundle-Vendor: ESRF
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
- uk.ac.gda.common.rcp,
- uk.ac.gda.common,
  uk.ac.diamond.scisoft.analysis.rcp,
  uk.ac.diamond.scisoft.analysis,
  uk.ac.diamond.scisoft.python,
@@ -18,7 +16,9 @@ Require-Bundle: org.eclipse.ui,
  org.dawb.fabio;bundle-version="1.0.0",
  org.python.pydev;bundle-version="2.2.4",
  org.python.pydev.core;bundle-version="2.2.4",
- org.dawb.hdf5.editor
+ org.dawb.hdf5.editor,
+ uk.ac.gda.common;bundle-version="1.0.0",
+ uk.ac.gda.common.rcp;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Export-Package: org.dawb.gda.extensions.jython,
