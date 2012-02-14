@@ -32,7 +32,6 @@ import uk.ac.gda.monitor.ProgressMonitorWrapper;
 /**
  * Provides a class which will use any loaders available to load a particular file
  * 
- * TODO change to a real eclipse service at some point
  * 
  * @author gerring
  *
