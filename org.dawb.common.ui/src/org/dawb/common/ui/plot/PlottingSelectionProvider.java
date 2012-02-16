@@ -2,20 +2,59 @@ package org.dawb.common.ui.plot;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.LinkedBlockingDeque;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.progress.UIJob;
 
 
 public class PlottingSelectionProvider implements ISelectionProvider {
 
 	private Set<ISelectionChangedListener> listeners;
-	private ISelection currentSelection;
+	private ISelection currentSelection = new StructuredSelection();
+	private BlockingDeque<ISelection> selectionQueue;
+	private Thread                    selectionJob;
 	
 	public PlottingSelectionProvider() {
-		listeners = new HashSet<ISelectionChangedListener>(11);
+		listeners      = new HashSet<ISelectionChangedListener>(11);
+		selectionQueue = new LinkedBlockingDeque<ISelection>(1);
+		
+		selectionJob   = new Thread("Plot selection thread") {		
+			@Override
+			public void run() {
+				
+				while(listeners!=null&&selectionQueue!=null) {
+					try {
+						currentSelection = selectionQueue.take();
+						
+						Display.getDefault().asyncExec(new Runnable() {
+							@Override
+							public void run() {
+								SelectionChangedEvent e = new SelectionChangedEvent(PlottingSelectionProvider.this, currentSelection);
+								for (ISelectionChangedListener s : listeners) s.selectionChanged(e);
+							}
+						});
+						Thread.sleep(100);
+						
+					} catch (InterruptedException e1) {
+						continue;
+					}
+				}
+			}
+		};
+		selectionJob.setDaemon(true);
+		selectionJob.setPriority(Thread.MIN_PRIORITY);
+		selectionJob.start();
 	}
 	
 	@Override
@@ -33,16 +72,22 @@ public class PlottingSelectionProvider implements ISelectionProvider {
 		listeners.remove(listener);
 	}
 
+	/**
+	 * Method calls listener in background thread mto make frequent updates possible.
+	 */
 	@Override
 	public void setSelection(ISelection selection) {
-		this.currentSelection = selection;
-		SelectionChangedEvent e = new SelectionChangedEvent(this, selection);
-		for (ISelectionChangedListener s : listeners) s.selectionChanged(e);
+		
+		selectionQueue.clear();
+		selectionQueue.add(selection);
+		
 	}
 
 	public void clear() {
 		if (listeners!=null) listeners.clear();
 		currentSelection = null;
+		selectionQueue   = null;
+		selectionJob     = null;
 	}
 
 }

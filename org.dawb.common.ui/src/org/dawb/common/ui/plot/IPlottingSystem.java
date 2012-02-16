@@ -11,8 +11,6 @@ package org.dawb.common.ui.plot;
 
 import java.util.List;
 
-import org.dawb.common.ui.plot.region.IRegionSelection;
-import org.dawb.common.ui.plot.region.IRegionSelectionListener;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.widgets.Composite;
@@ -180,47 +178,12 @@ public interface IPlottingSystem {
      * @return
      */
 	public Composite getPlotComposite();
-	
-	/**
-	 * If a region is selected in the plotting, this method returns the selected region.
-	 * 
-	 * @return
-	 */
-	public IRegionSelection getRegionSelection();
-	
-	/**
-	 * Programmatically selects a region in the plotting.
-	 * 
-	 * @return
-	 */
-	public void setRegionSelection(IRegionSelection sel);
-
-	
-	/**
-	 * Add a listener to be notified when regions change.
-	 * 
-	 * Do not do direct work in the callback, it blocks
-	 * moving the selection
-	 * 
-	 * @param l
-	 */
-	public void addRegionSelectionListener(final IRegionSelectionListener l);
-	
-	
-	/**
-	 * Remove a listener when regions change.
-	 * 
-	 * Do not do direct work in the callback of IRegionSelectionListeners, it blocks
-	 * moving the selection
-	 * 
-	 * @param l
-	 */
-	public void removeRegionSelectionListener(final IRegionSelectionListener l);
-	
+		
 	/**
 	 * This ISelectionProvider will provide StructuredSelections which have been
 	 * made in the graph. It may be registered as a selection provider for the part
-	 * using this IPlottingSystem.
+	 * using this IPlottingSystem. The StructuredSelection will contain objects such
+	 * as 'LinerROI' for the selection.
 	 * 
 	 * @return
 	 */
