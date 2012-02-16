@@ -17,6 +17,7 @@ import org.dawb.common.ui.plot.region.IRegionSelectionEvent;
 import org.dawb.common.ui.plot.region.IRegionSelectionListener;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
@@ -110,13 +111,19 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem {
 
 	
 	public void dispose() {
+		
 		if (extraImageActions!=null) extraImageActions.clear();
 		extraImageActions = null;
+		
 		if (extra1DActions!=null) extra1DActions.clear();
 		extra1DActions = null;
+		
 		if (plotListeners!=null) plotListeners.clear();
 		plotListeners = null;
 		pointControls = null;
+		
+		if (selectionProvider!=null) selectionProvider.clear();
+		selectionProvider = null;
 	}
 
 	/**
@@ -322,4 +329,10 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem {
 		}
 	}
 
+	protected PlottingSelectionProvider selectionProvider;
+	
+	public ISelectionProvider getSelectionProvider() {
+		if (selectionProvider==null) selectionProvider = new PlottingSelectionProvider();
+		return selectionProvider;
+	}
 }

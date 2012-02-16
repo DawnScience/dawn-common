@@ -14,6 +14,7 @@ import java.util.List;
 import org.dawb.common.ui.plot.region.IRegionSelection;
 import org.dawb.common.ui.plot.region.IRegionSelectionListener;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IWorkbenchPart;
@@ -215,4 +216,13 @@ public interface IPlottingSystem {
 	 * @param l
 	 */
 	public void removeRegionSelectionListener(final IRegionSelectionListener l);
+	
+	/**
+	 * This ISelectionProvider will provide StructuredSelections which have been
+	 * made in the graph. It may be registered as a selection provider for the part
+	 * using this IPlottingSystem.
+	 * 
+	 * @return
+	 */
+	public ISelectionProvider getSelectionProvider();
 }
