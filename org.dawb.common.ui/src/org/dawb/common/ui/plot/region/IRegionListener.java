@@ -12,13 +12,13 @@ public interface IRegionListener extends EventListener {
 	
 	
 	/**
-	 * Called when region created.
+	 * Called when region added to graph.
 	 * @param evt
 	 */
 	void regionAdded(final RegionEvent evt);
 
 	/**
-	 * Called when region created.
+	 * Called when region removed from graph.
 	 * @param evt
 	 */
 	void regionRemoved(final RegionEvent evt);

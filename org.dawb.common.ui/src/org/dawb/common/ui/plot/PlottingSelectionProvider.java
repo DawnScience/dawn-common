@@ -36,7 +36,8 @@ public class PlottingSelectionProvider implements ISelectionProvider {
 				while(listeners!=null&&selectionQueue!=null) {
 					try {
 						currentSelection = selectionQueue.take();
-						
+						if (currentSelection instanceof DoneSelection) return;
+ 						
 						Display.getDefault().asyncExec(new Runnable() {
 							@Override
 							public void run() {
@@ -85,9 +86,12 @@ public class PlottingSelectionProvider implements ISelectionProvider {
 
 	public void clear() {
 		if (listeners!=null) listeners.clear();
-		currentSelection = null;
-		selectionQueue   = null;
-		selectionJob     = null;
+		selectionQueue.clear();
+		selectionQueue.add(new DoneSelection());
+	}
+	
+	private final class DoneSelection extends StructuredSelection {
+		
 	}
 
 }

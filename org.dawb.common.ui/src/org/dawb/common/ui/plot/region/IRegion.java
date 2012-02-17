@@ -89,12 +89,28 @@ public interface IRegion {
 	/**
 	 * Get the position (in coordinate frame of the axis that region is added to)
 	 */
-	public RegionBounds getBounds();
+	public RegionBounds getRegionBounds();
 	
 	/**
 	 * Set the position (in coordinate frame of the axis that region is added to)
 	 */
-	public void setBounds(RegionBounds bounds);
+	public void setRegionBounds(RegionBounds bounds);
+	
+	/**
+	 * Add a listener which is notified when this region is resized or
+	 * moved.
+	 * 
+	 * @param l
+	 */
+	public boolean addRegionBoundsListener(final IRegionBoundsListener l);
+	
+	/**
+	 * Remove a RegionBoundsListener
+	 * @param l
+	 */
+	public boolean removeRegionBoundsListener(final IRegionBoundsListener l);
+	
+	
 	
 	/**
 	 * Class packages types of regions, their default names, colors and indices.
