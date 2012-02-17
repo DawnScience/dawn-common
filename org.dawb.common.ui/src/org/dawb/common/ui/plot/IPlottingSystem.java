@@ -11,6 +11,9 @@ package org.dawb.common.ui.plot;
 
 import java.util.List;
 
+import org.dawb.common.ui.plot.region.IRegion;
+import org.dawb.common.ui.plot.region.IRegion.RegionType;
+import org.dawb.common.ui.plot.region.IRegionListener;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.widgets.Composite;
@@ -201,4 +204,41 @@ public interface IPlottingSystem {
 	 * name from here will include the appended points.
 	 */
 	public AbstractDataset getData(final String dataSetName);
+	
+	/**
+	 * Creates a selection region by type. This does not create any user interface
+	 * for the region. You can then call methods on the region to set color and 
+	 * position for the selection. Use addRegion(...) and removeRegion(...) to control
+	 * if the selection is active on the graph.
+	 * 
+	 * @param name
+	 * @param regionType
+	 * @return
+	 */
+	public IRegion createRegion(final String name, final RegionType regionType);
+	
+	/**
+	 * Add a selection region to the graph.
+	 * @param region
+	 */
+	public void addRegion(final IRegion region);
+	
+	
+	/**
+	 * Remove a selection region to the graph.
+	 * @param region
+	 */
+	public void removeRegion(final IRegion region);
+
+	/**
+	 * 
+	 * @param l
+	 */
+	public boolean addRegionListener(final IRegionListener l);
+	
+	/**
+	 * 
+	 * @param l
+	 */
+	public boolean removeRegionListener(final IRegionListener l);
 }

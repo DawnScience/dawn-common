@@ -10,8 +10,14 @@
 package org.dawb.common.ui.plot;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
+import org.dawb.common.ui.plot.region.IRegion;
+import org.dawb.common.ui.plot.region.IRegionListener;
+import org.dawb.common.ui.plot.region.IRegion.RegionType;
+import org.dawb.common.ui.plot.region.RegionEvent;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelectionProvider;
@@ -274,5 +280,71 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem {
 	public ISelectionProvider getSelectionProvider() {
 		if (selectionProvider==null) selectionProvider = new PlottingSelectionProvider();
 		return selectionProvider;
+	}
+	
+	private Collection<IRegionListener> regionListeners;
+	
+	/**
+	 * Creates a selection region by type. This does not create any user interface
+	 * for the region. You can then call methods on the region to set color and 
+	 * position for the selection. Use addRegion(...) and removeRegion(...) to control
+	 * if the selection is active on the graph.
+	 * 
+	 * @param name
+	 * @param regionType
+	 * @return
+	 */
+	public IRegion createRegion(final String name, final RegionType regionType)  {
+		//TODO Please implement creation of region here.
+		return null;
+	}
+	
+	protected void fireRegionCreated(RegionEvent evt) {
+		if (regionListeners==null) return;
+		for (IRegionListener l : regionListeners) l.regionCreated(evt);
+	}
+	
+	/**
+	 * Add a selection region to the graph.
+	 * @param region
+	 */
+	public void addRegion(final IRegion region) {
+		fireRegionAdded(new RegionEvent(region));
+	}
+	protected void fireRegionAdded(RegionEvent evt) {
+		if (regionListeners==null) return;
+		for (IRegionListener l : regionListeners) l.regionAdded(evt);
+	}
+	
+	
+	/**
+	 * Remove a selection region to the graph.
+	 * @param region
+	 */
+	public void removeRegion(final IRegion region) {
+		fireRegionRemoved(new RegionEvent(region));
+	}
+
+	protected void fireRegionRemoved(RegionEvent evt) {
+		if (regionListeners==null) return;
+		for (IRegionListener l : regionListeners) l.regionRemoved(evt);
+	}
+
+	/**
+	 * 
+	 * @param l
+	 */
+	public boolean addRegionListener(final IRegionListener l) {
+		if (regionListeners == null) regionListeners = new HashSet<IRegionListener>(7);
+		return regionListeners.add(l);
+	}
+	
+	/**
+	 * 
+	 * @param l
+	 */
+	public boolean removeRegionListener(final IRegionListener l) {
+		if (regionListeners == null) return true;
+		return regionListeners.remove(l);
 	}
 }

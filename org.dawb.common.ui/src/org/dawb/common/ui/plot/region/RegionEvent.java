@@ -1,0 +1,22 @@
+package org.dawb.common.ui.plot.region;
+
+import java.util.EventObject;
+
+/**
+ * Event with source of the IRegion affected.
+ * 
+ * @author fcp94556
+ *
+ */
+public class RegionEvent extends EventObject {
+
+	public RegionEvent(Object source) {
+		super(source);
+	}
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 3121767937881041584L;
+
+}
