@@ -1,5 +1,7 @@
 package org.dawb.common.ui.plot.region;
 
+import java.util.Arrays;
+
 /**
  * Class attempts to contruct a bound in graph coordinates within
  * which the region should be drawn. This can them be used to get and
@@ -39,5 +41,33 @@ public class RegionBounds {
 	}
 	public void setP2(double[] p2) {
 		this.p2 = p2;
+	}
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + Arrays.hashCode(p1);
+		result = prime * result + Arrays.hashCode(p2);
+		return result;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		RegionBounds other = (RegionBounds) obj;
+		if (!Arrays.equals(p1, other.p1))
+			return false;
+		if (!Arrays.equals(p2, other.p2))
+			return false;
+		return true;
+	}
+	@Override
+	public String toString() {
+		return "RegionBounds [p1=" + Arrays.toString(p1) + ", p2="
+				+ Arrays.toString(p2) + "]";
 	}
 }

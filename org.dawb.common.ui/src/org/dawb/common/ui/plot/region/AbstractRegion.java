@@ -41,7 +41,7 @@ public abstract class AbstractRegion implements IRegion {
 		
 		final RegionBoundsEvent evt = new RegionBoundsEvent(this, bounds);
 		for (IRegionBoundsListener l : regionBoundsListeners) {
-			l.regionBoundsChanged(evt);
+			l.regionBoundsDragged(evt);
 		}
 	}
 	

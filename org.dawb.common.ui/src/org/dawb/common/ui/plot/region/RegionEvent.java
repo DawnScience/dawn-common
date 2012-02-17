@@ -13,6 +13,10 @@ public class RegionEvent extends EventObject {
 	public RegionEvent(Object source) {
 		super(source);
 	}
+	
+	public IRegion getRegion() {
+		return (IRegion)getSource();
+	}
 
 	/**
 	 * 
