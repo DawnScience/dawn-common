@@ -154,6 +154,7 @@ public interface IPlottingSystem {
 	
 	/**
 	 * Set the current plotting yAxis. Intended for 1D plotting with multiple axes.
+	 * May be called with null to reset to the primary axis.
 	 * @param yAxis
 	 */
 	public void setSelectedYAxis(IAxis yAxis);
@@ -166,6 +167,8 @@ public interface IPlottingSystem {
 	
 	/**
 	 * Set the current plotting xAxis. Intended for 1D plotting with multiple axes.
+	 * May be called with null to reset to the primary axis.
+	 * 
 	 * @param xAxis
 	 */
 	public void setSelectedXAxis(IAxis xAxis);
@@ -183,9 +186,19 @@ public interface IPlottingSystem {
 	 * This ISelectionProvider will provide StructuredSelections which have been
 	 * made in the graph. It may be registered as a selection provider for the part
 	 * using this IPlottingSystem. The StructuredSelection will contain objects such
-	 * as 'LinerROI' for the selection.
+	 * as 'LinerROI' for the selection inside the graph.
 	 * 
 	 * @return
 	 */
 	public ISelectionProvider getSelectionProvider();
+	
+	/**
+	 * Call this method to return a plotted data set by name. NOTE the plotting system
+	 * will likely not be using AbstractDataset as internal data. Instead it will get the
+	 * current data of the plot required and construct an AbstractDataset for it. This means
+	 * that you can plot int data but get back double data if the graph keeps data internally
+	 * as doubles for instance. If the append(...) method has been used, the data returned by
+	 * name from here will include the appended points.
+	 */
+	public AbstractDataset getData(final String dataSetName);
 }
