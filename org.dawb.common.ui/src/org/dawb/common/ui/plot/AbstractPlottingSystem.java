@@ -325,6 +325,9 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem {
 	public void removeRegion(final IRegion region) {
 		fireRegionRemoved(new RegionEvent(region));
 	}
+	public void clearRegions() {
+		//TODO
+	}
 	
 	/**
 	 * Get a region by name.
