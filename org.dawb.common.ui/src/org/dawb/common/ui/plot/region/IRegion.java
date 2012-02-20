@@ -3,7 +3,6 @@ package org.dawb.common.ui.plot.region;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.dawb.common.ui.plot.region.IRegion.RegionType;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Display;

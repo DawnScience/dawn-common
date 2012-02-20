@@ -214,8 +214,9 @@ public interface IPlottingSystem {
 	 * @param name
 	 * @param regionType
 	 * @return
+	 * @throws Exception if name exists already.
 	 */
-	public IRegion createRegion(final String name, final RegionType regionType);
+	public IRegion createRegion(final String name, final RegionType regionType) throws Exception;
 	
 	/**
 	 * Add a selection region to the graph.
@@ -229,6 +230,13 @@ public interface IPlottingSystem {
 	 * @param region
 	 */
 	public void removeRegion(final IRegion region);
+	
+	/**
+	 * Get a region by name.
+	 * @param name
+	 * @return
+	 */
+	public IRegion getRegion(final String name);
 
 	/**
 	 * 

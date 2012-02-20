@@ -2,6 +2,8 @@ package org.dawb.common.ui.plot.region;
 
 import java.util.Arrays;
 
+import org.dawb.common.util.text.NumberUtils;
+
 /**
  * Class attempts to contruct a bound in graph coordinates within
  * which the region should be drawn. This can them be used to get and
@@ -69,5 +71,31 @@ public class RegionBounds {
 	public String toString() {
 		return "RegionBounds [p1=" + Arrays.toString(p1) + ", p2="
 				+ Arrays.toString(p2) + "]";
+	}
+
+	public RegionBounds getDiff(final RegionBounds with) {
+		return new RegionBounds(new double[]{p1[0]-with.p1[0], p1[1]-with.p1[1]}, 
+				                new double[]{p2[0]-with.p2[0], p2[1]-with.p2[1]});
+	}
+	
+	/**
+	 * Equals within a tolerance for the rounding error
+	 * @param r1
+	 * @param i
+	 * @param d
+	 * @return
+	 */
+	public boolean equalsTolerance(RegionBounds with, double xTolerance, double yTolerance) {
+		
+		if (this == with) return true;
+		if (with == null) return false;
+	
+		if (!NumberUtils.equalsTolerance(p1[0], with.p1[0], xTolerance)) return false;
+		if (!NumberUtils.equalsTolerance(p2[0], with.p2[0], xTolerance)) return false;
+		
+		if (!NumberUtils.equalsTolerance(p1[1], with.p1[1], yTolerance)) return false;
+		if (!NumberUtils.equalsTolerance(p2[1], with.p2[1], yTolerance)) return false;
+		
+		return true;
 	}
 }

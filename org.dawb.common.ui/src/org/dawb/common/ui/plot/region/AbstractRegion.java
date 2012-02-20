@@ -64,8 +64,16 @@ public abstract class AbstractRegion implements IRegion {
 
 	public void setRegionBounds(RegionBounds bounds) {
 		this.regionBounds = bounds;
+		updateRegionBounds();
 		fireRegionBoundsChanged(bounds);
 	}
+	
+	/**
+	 * Implement to return the real position.
+	 * @param recordResult if true this calculation changes the
+	 *        recorded absolute position.
+	 */
+	protected abstract RegionBounds createRegionBounds(boolean recordResult);
 
 	/**
 	 * Updates the position of the region, usually called
@@ -76,10 +84,18 @@ public abstract class AbstractRegion implements IRegion {
 		if (regionBounds!=null) {
 			try {
 				this.regionEventsActive = false;
-				setRegionBounds(regionBounds);
+				updateRegionBounds(regionBounds);
 			} finally {
 				this.regionEventsActive = true;
 			}
 		}
 	}
+	
+	/**
+	 * Implement this method to redraw the figure to the 
+	 * axis coordinates (only).
+	 * 
+	 * @param bounds
+	 */
+	protected abstract void updateRegionBounds(RegionBounds bounds);
 }

@@ -294,7 +294,8 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem {
 	 * @param regionType
 	 * @return
 	 */
-	public IRegion createRegion(final String name, final RegionType regionType)  {
+	@Override
+	public IRegion createRegion(final String name, final RegionType regionType)  throws Exception {
 		//TODO Please implement creation of region here.
 		return null;
 	}
@@ -323,6 +324,15 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem {
 	 */
 	public void removeRegion(final IRegion region) {
 		fireRegionRemoved(new RegionEvent(region));
+	}
+	
+	/**
+	 * Get a region by name.
+	 * @param name
+	 * @return
+	 */
+	public IRegion getRegion(final String name) {
+		return null; // TODO
 	}
 
 	protected void fireRegionRemoved(RegionEvent evt) {
