@@ -109,7 +109,11 @@ public interface IRegion {
 	 */
 	public boolean removeRegionBoundsListener(final IRegionBoundsListener l);
 	
-	
+	/**
+	 * Will be called to remove the region and clean up resources when the 
+	 * user calls the removeRegion(...) method.
+	 */
+	public void remove();
 	
 	/**
 	 * Class packages types of regions, their default names, colors and indices.
