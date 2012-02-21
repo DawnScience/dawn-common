@@ -32,7 +32,7 @@ import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
  * @author gerring
  *
  */
-public interface IPlottingSystem extends IRegionSystem, IAxisSystem {
+public interface IPlottingSystem extends IRegionSystem, IAxisSystem, IAnnotationSystem {
 
 	/**
 	 * Call to create the UI component dealing with the plotting.

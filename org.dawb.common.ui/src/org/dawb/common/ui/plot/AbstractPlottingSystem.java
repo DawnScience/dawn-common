@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
+import org.dawb.common.ui.plot.annotation.IAnnotation;
 import org.dawb.common.ui.plot.region.IRegion;
 import org.dawb.common.ui.plot.region.IRegionListener;
 import org.dawb.common.ui.plot.region.IRegion.RegionType;
@@ -360,4 +361,55 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem {
 		if (regionListeners == null) return true;
 		return regionListeners.remove(l);
 	}
+	
+	
+	/**
+	 * Creates an annotation. This does not create any user interface
+	 * for the annotation. You can then call methods on the annoation.
+	 * Use addAnnotation(...) and removeAnnotation(...) to control
+	 * if the selection is active on the graph.
+	 * 
+	 * @param name
+	 * @param regionType
+	 * @return
+	 * @throws Exception if name exists already.
+	 */
+	public IAnnotation createAnnotation(final String name) throws Exception {
+		return null;//TODO 
+	}
+	
+	/**
+	 * Add an annotation to the graph.
+	 * @param region
+	 */
+	public void addAnnotation(final IAnnotation region) {
+		//TODO 
+	}
+	
+	
+	/**
+	 * Remove an annotation to the graph.
+	 * @param region
+	 */
+	public void removeAnnotation(final IAnnotation region) {
+		//TODO 
+	}
+	
+	/**
+	 * Get an annotation by name.
+	 * @param name
+	 * @return
+	 */
+	public IAnnotation getAnnotation(final String name) {
+		return null;
+	}
+
+	/**
+	 * Remove all annotations
+	 */
+	public void clearAnnotations(){
+		//TODO 
+	}
+
+
 }
