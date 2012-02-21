@@ -84,6 +84,17 @@ public interface IRegion {
 	 */
 	public void setMotile(boolean motile);
 	
+	/**
+	 * Label shown or not
+	 * @return
+	 */
+	public boolean isShowLabel() ;
+	
+	/**
+	 * Label shown or not
+	 * @return
+	 */
+	public void setShowLabel(boolean label);
 	
 	/**
 	 * Get the position (in coordinate frame of the axis that region is added to)
