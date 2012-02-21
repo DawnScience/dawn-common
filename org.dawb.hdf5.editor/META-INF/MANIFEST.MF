@@ -15,5 +15,6 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Import-Package: org.eclipse.ui,
  org.eclipse.ui.dialogs,
- org.slf4j
+ org.slf4j,
+ uk.ac.diamond.scisoft.analysis.hdf5
 Export-Package: org.dawb.hdf5.editor

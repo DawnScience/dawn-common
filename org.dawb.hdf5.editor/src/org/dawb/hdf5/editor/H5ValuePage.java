@@ -43,6 +43,9 @@ import org.eclipse.ui.part.Page;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.ac.diamond.scisoft.analysis.hdf5.HDF5Attribute;
+import uk.ac.diamond.scisoft.analysis.hdf5.HDF5NodeLink;
+
 public class H5ValuePage extends Page  implements ISelectionListener, IPartListener {
 
 	private static Logger logger = LoggerFactory.getLogger(H5ValuePage.class);
@@ -182,11 +185,10 @@ public class H5ValuePage extends Page  implements ISelectionListener, IPartListe
 			if (ob instanceof HObject) {
 				createH5Value((HObject)ob);
 			}
- 		} else if (sel instanceof H5Path) { // Might be nexus part.
+ 		} else if (sel instanceof H5Path || sel instanceof HDF5NodeLink) { // Might be nexus part.
 			
 			try {
-				final H5Path h5Path = (H5Path)sel;
-				final String path   = h5Path.getPath();
+				final String path   = sel instanceof H5Path ? ((H5Path)sel).getPath() : ((HDF5NodeLink)sel).getPath();
 				final IEditorPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
 				if (part instanceof IH5Editor) {
 					final String filePath = ((IH5Editor)part).getFilePath();
@@ -199,6 +201,8 @@ public class H5ValuePage extends Page  implements ISelectionListener, IPartListe
 				logger.error(ne.getMessage()); // Not serious, no need for stack.
 			}
 			
+		}  	else if (sel instanceof HDF5Attribute) { // Might be nexus part.
+			sourceViewer.getTextWidget().setText(sel.toString());
 		}
 	}
 	
