@@ -7,6 +7,8 @@
     <property name="_workbenchVersion" class="ptolemy.kernel.attributes.VersionAttribute" value="0.8.2">
     </property>
     <property name="Director" class="com.isencia.passerelle.domain.cap.Director">
+        <property name="Expert Modeler" class="ptolemy.data.expr.Parameter" value="true">
+        </property>
         <property name="_location" class="ptolemy.kernel.util.Location" value="{20, 20}">
         </property>
     </property>
@@ -33,7 +35,7 @@
         </property>
     </entity>
     <entity name="numpy" class="org.dawb.passerelle.actors.scripts.PythonScript">
-        <property name="Receiver Q Capacity (-1)" class="ptolemy.data.expr.Parameter" value="-1">
+<display name="numpy"/>        <property name="Receiver Q Capacity (-1)" class="ptolemy.data.expr.Parameter" value="-1">
         </property>
         <property name="Receiver Q warning size (-1)" class="ptolemy.data.expr.Parameter" value="-1">
         </property>
@@ -52,6 +54,8 @@
         <property name="Interpreter Type" class="org.dawb.passerelle.actors.scripts.PythonScript$1" value="Python">
         </property>
         <property name="Dataset Outputs" class="ptolemy.data.expr.StringParameter" value="lnI0It">
+        </property>
+        <property name="Python Debug" class="org.dawb.passerelle.actors.scripts.PythonScript$3" value="Start new python rcp server">
         </property>
         <property name="_location" class="ptolemy.kernel.util.Location" value="{179.0, 147.0}">
         </property>
