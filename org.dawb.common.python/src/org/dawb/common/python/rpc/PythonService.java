@@ -33,6 +33,7 @@ import uk.ac.diamond.scisoft.analysis.rpc.AnalysisRpcClient;
 import uk.ac.gda.util.OSUtils;
 
 import com.isencia.util.commandline.ManagedCommandline;
+import org.eclipse.core.variables.VariablesPlugin;
 
 /**
  * This class encapsulates a system command to python used with the RPC service
@@ -76,7 +77,9 @@ public class PythonService {
 		
 		final PythonService service = new PythonService();
 		
-		final int    port   = NetUtils.getFreePort(getServiceStartPort());
+	    final String scisoftRpcPort = VariablesPlugin.getDefault().getStringVariableManager().performStringSubstitution("${scisoft_rpc_port}");
+
+	    final int    port   = NetUtils.getFreePort(getServiceStartPort());
 		final File   path   = BundleUtils.getBundleLocation("org.dawb.common.python");
 		final String script;
 		if (System.getProperty("eclipse.debug.session")!=null || System.getProperty("org.dawb.test.session")!=null) {
@@ -86,7 +89,7 @@ public class PythonService {
 		}
 		
 		service.command = new ManagedCommandline();
-		service.command.addArguments(new String[]{pythonInterpreter, script, String.valueOf(port)});
+		service.command.addArguments(new String[]{pythonInterpreter, script, String.valueOf(port), scisoftRpcPort});
 		
 		// Ensure uk.ac.diamond.scisoft.python in PYTHONPATH
 		final Map<String,String> env = new HashMap<String,String>(System.getenv());

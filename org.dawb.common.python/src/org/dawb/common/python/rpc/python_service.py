@@ -15,12 +15,17 @@ import time
 import os, sys
 
 '''
-Do not import scisoftpy into this project as dependencies
-on scisoftpy and napi ensue.
+Import the rpc part which we will use for workflows.
 '''
 import scisoftpy.rpc as rpc #@UnresolvedImport
-
 rpcserver = rpc.rpcserver(int(sys.argv[1]))
+
+'''
+We tell scisoft the port to be used for plotting
+'''
+import scisoftpy.plot as plot
+plot.setremoteport(rpcport=int(sys.argv[2]))
+
 
 def isActive(dummy):
     return True
