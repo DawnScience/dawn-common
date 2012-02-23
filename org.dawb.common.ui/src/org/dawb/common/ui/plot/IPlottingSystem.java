@@ -12,6 +12,7 @@ package org.dawb.common.ui.plot;
 import java.util.List;
 
 import org.dawb.common.ui.plot.trace.ITrace;
+import org.dawb.common.ui.plot.trace.ITraceListener;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.widgets.Composite;
@@ -119,6 +120,18 @@ public interface IPlottingSystem extends IRegionSystem, IAxisSystem, IAnnotation
 					   final IProgressMonitor monitor) throws Exception ;
 
 
+	/**
+	 * Add a listener to be notified of new traces plotted
+	 * @param l
+	 */
+	public void addTraceListener(final ITraceListener l);
+	
+	/**
+	 * Remove listener to avoid memory leaks
+	 * @param l
+	 */
+	public void removeTraceListener(final ITraceListener l);
+	
 	/**
 	 * Call to tell the plot to plot nothing and reset axes. Thread safe.
 	 */

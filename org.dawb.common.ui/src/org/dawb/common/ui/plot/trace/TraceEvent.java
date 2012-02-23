@@ -7,18 +7,25 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */ 
-package org.dawb.common.ui.plot;
+package org.dawb.common.ui.plot.trace;
 
 import java.util.EventObject;
 
-public class PlotUpdateEvent extends EventObject {
+/**
+ * Note the source to this event can either be the ITrace
+ * or the plotting system.
+ * 
+ * @author fcp94556
+ *
+ */
+public class TraceEvent extends EventObject {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 5063317569913121122L;
 
-	public PlotUpdateEvent(Object source) {
+	public TraceEvent(Object source) {
 		super(source);
 	}
 

@@ -20,6 +20,8 @@ import org.dawb.common.ui.plot.region.IRegionListener;
 import org.dawb.common.ui.plot.region.IRegion.RegionType;
 import org.dawb.common.ui.plot.region.RegionEvent;
 import org.dawb.common.ui.plot.trace.ITrace;
+import org.dawb.common.ui.plot.trace.ITraceListener;
+import org.dawb.common.ui.plot.trace.TraceEvent;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelectionProvider;
@@ -123,8 +125,8 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem {
 		if (extra1DActions!=null) extra1DActions.clear();
 		extra1DActions = null;
 		
-		if (plotListeners!=null) plotListeners.clear();
-		plotListeners = null;
+		if (traceListeners!=null) traceListeners.clear();
+		traceListeners = null;
 		pointControls = null;
 		
 		if (selectionProvider!=null) selectionProvider.clear();
@@ -150,7 +152,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem {
 		this.xfirst = xfirst;
 	}
 
-	private List<IPlotUpdateListener> plotListeners;
+	private List<ITraceListener> traceListeners;
 	
 	/**
 	 * Call to be notified of events which require the plot
@@ -158,15 +160,38 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem {
 	 * 
 	 * @param l
 	 */
-	public void addPlotListener(final IPlotUpdateListener l) {
-		if (plotListeners==null) plotListeners = new ArrayList<IPlotUpdateListener>(7);
-		plotListeners.add(l);
+	public void addTraceListener(final ITraceListener l) {
+		if (traceListeners==null) traceListeners = new ArrayList<ITraceListener>(7);
+		traceListeners.add(l);
 	}
 	
-	protected void firePlotListeners(final PlotUpdateEvent evt) {
-		if (plotListeners==null) return;
-		for (IPlotUpdateListener l : plotListeners) {
-			l.plotRequested(evt);
+	/**
+	 * Call to be notified of events which require the plot
+	 * data to be sent again.
+	 * 
+	 * @param l
+	 */
+	public void removeTraceListener(final ITraceListener l) {
+		if (traceListeners==null) return;
+		traceListeners.remove(l);
+	}
+	
+	protected void fireTracesAltered(final TraceEvent evt) {
+		if (traceListeners==null) return;
+		for (ITraceListener l : traceListeners) {
+			l.tracesAltered(evt);
+		}
+	}
+	protected void fireTracesCleared(final TraceEvent evt) {
+		if (traceListeners==null) return;
+		for (ITraceListener l : traceListeners) {
+			l.tracesCleared(evt);
+		}
+	}
+	protected void fireTracePlotted(final TraceEvent evt) {
+		if (traceListeners==null) return;
+		for (ITraceListener l : traceListeners) {
+			l.tracePlotted(evt);
 		}
 	}
 
