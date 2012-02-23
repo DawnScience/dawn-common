@@ -11,6 +11,7 @@ package org.dawb.common.ui.plot;
 
 import java.util.List;
 
+import org.dawb.common.ui.plot.trace.ITrace;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.widgets.Composite;
@@ -63,10 +64,12 @@ public interface IPlottingSystem extends IRegionSystem, IAxisSystem, IAnnotation
 	 * @param ys
 	 * @param mode
 	 * @param monitor
+	 * @return List of ITrace objects plotted, may be null. Normally you can cast these to ILineTrace as all 1D 
+	 *         plotting systems will wholey or partially support ILineTrace
 	 */
-	public void createPlot1D(AbstractDataset       x, 
-							 List<AbstractDataset> ys,
-							 IProgressMonitor      monitor);
+	public List<ITrace> createPlot1D(AbstractDataset       x, 
+							         List<AbstractDataset> ys,
+							         IProgressMonitor      monitor);
 	
 	/**
 	 * For 2D - x is the image dataset, ys is the axes.
@@ -78,10 +81,12 @@ public interface IPlottingSystem extends IRegionSystem, IAxisSystem, IAnnotation
 	 * @param axes
 	 * @param mode
 	 * @param monitor
+	 * @return Image trace plotted. You can normally cast this trace to an IImageTrace and
+	 *         use any image methods offered by this interface.
 	 */
-	public void createPlot2D(AbstractDataset       image, 
-							 List<AbstractDataset> axes,
-							 IProgressMonitor      monitor);
+	public ITrace createPlot2D(AbstractDataset       image, 
+							   List<AbstractDataset> axes,
+							   IProgressMonitor      monitor);
 	
 	/**
 	 * This method can be used to add a single plot data point to 

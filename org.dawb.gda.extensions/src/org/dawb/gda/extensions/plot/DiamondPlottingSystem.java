@@ -14,6 +14,7 @@ import java.util.List;
 
 import org.dawb.common.ui.plot.AbstractPlottingSystem;
 import org.dawb.common.ui.plot.PlotType;
+import org.dawb.common.ui.plot.trace.ITrace;
 import org.dawb.common.ui.util.GridUtils;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.util.IPropertyChangeListener;
@@ -96,16 +97,17 @@ public class DiamondPlottingSystem extends AbstractPlottingSystem {
 	 * 
 	 */
 	@Override
-	protected void createPlot(final AbstractDataset       data, 
-			               final List<AbstractDataset> axes,
-			               final PlotType              mode, 
-			               final IProgressMonitor      monitor) {
+	protected List<ITrace> createPlot(final AbstractDataset       data, 
+						               final List<AbstractDataset> axes,
+						               final PlotType              mode, 
+						               final IProgressMonitor      monitor) {
 		
 		if (mode.is1D()) {
 			PlotUtils.create1DPlot(data, axes, getPlotMode(mode), plotWindow, monitor);
 		} else {
 		    PlotUtils.createPlot(data, axes, getGuiPlotMode(mode), plotWindow, monitor);
 		}
+		return null;
 	}
 
 	private GuiPlotMode getGuiPlotMode(PlotType type) {

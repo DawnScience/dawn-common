@@ -19,6 +19,7 @@ import org.dawb.common.ui.plot.region.IRegion;
 import org.dawb.common.ui.plot.region.IRegionListener;
 import org.dawb.common.ui.plot.region.IRegion.RegionType;
 import org.dawb.common.ui.plot.region.RegionEvent;
+import org.dawb.common.ui.plot.trace.ITrace;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelectionProvider;
@@ -210,21 +211,23 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem {
 	}
 	
 	@Override
-	public void createPlot1D(AbstractDataset       x, 
+	public List<ITrace> createPlot1D(AbstractDataset       x, 
 							List<AbstractDataset> ys,
 							IProgressMonitor      monitor) {
-		createPlot(x,ys,PlotType.PT1D, monitor);
+		return createPlot(x,ys,PlotType.PT1D, monitor);
 	}
 
 
 	@Override
-	public void createPlot2D(AbstractDataset      image, 
+	public ITrace createPlot2D(AbstractDataset      image, 
 							List<AbstractDataset> axes,
 							IProgressMonitor      monitor) {
-		createPlot(image,axes,PlotType.IMAGE, monitor);
+		List<ITrace> traces = createPlot(image,axes,PlotType.IMAGE, monitor);
+		if (traces!=null) return traces.get(0);
+		return null;
 	}
 
-	protected abstract void createPlot(final AbstractDataset       data, 
+	protected abstract List<ITrace> createPlot(final AbstractDataset       data, 
 							            final List<AbstractDataset> axes,
 							            final PlotType              mode, 
 							            final IProgressMonitor      monitor);
