@@ -11,7 +11,6 @@ import ncsa.hdf.object.HObject;
 import ncsa.hdf.object.h5.H5Group;
 import ncsa.hdf.object.h5.H5ScalarDS;
 
-import org.dawb.gda.extensions.loaders.H5LazyDataset;
 import org.dawb.hdf5.editor.IH5DoubleClickSelectionProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -26,11 +25,7 @@ import uk.ac.diamond.scisoft.analysis.hdf5.HDF5Node;
 import uk.ac.diamond.scisoft.analysis.hdf5.HDF5NodeLink;
 import uk.ac.diamond.scisoft.analysis.io.ExternalFiles;
 import uk.ac.diamond.scisoft.analysis.io.HDF5Loader;
-import uk.ac.diamond.scisoft.analysis.rcp.hdf5.HDF5AxisBean;
-import uk.ac.diamond.scisoft.analysis.rcp.hdf5.HDF5Selection;
 import uk.ac.diamond.scisoft.analysis.rcp.hdf5.HDF5Utils;
-import uk.ac.diamond.scisoft.analysis.rcp.inspector.AxisSelection;
-import uk.ac.diamond.scisoft.analysis.rcp.inspector.DatasetSelection.InspectorType;
 
 
 public class HDF5SelectionProvider implements IH5DoubleClickSelectionProvider {
