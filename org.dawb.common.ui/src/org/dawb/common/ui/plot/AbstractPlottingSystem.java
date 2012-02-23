@@ -10,13 +10,18 @@
 package org.dawb.common.ui.plot;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
-import org.dawb.common.ui.plot.region.IRegionSelection;
-import org.dawb.common.ui.plot.region.IRegionSelectionEvent;
-import org.dawb.common.ui.plot.region.IRegionSelectionListener;
+import org.dawb.common.ui.plot.annotation.IAnnotation;
+import org.dawb.common.ui.plot.region.IRegion;
+import org.dawb.common.ui.plot.region.IRegionListener;
+import org.dawb.common.ui.plot.region.IRegion.RegionType;
+import org.dawb.common.ui.plot.region.RegionEvent;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
@@ -110,13 +115,19 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem {
 
 	
 	public void dispose() {
+		
 		if (extraImageActions!=null) extraImageActions.clear();
 		extraImageActions = null;
+		
 		if (extra1DActions!=null) extra1DActions.clear();
 		extra1DActions = null;
+		
 		if (plotListeners!=null) plotListeners.clear();
 		plotListeners = null;
 		pointControls = null;
+		
+		if (selectionProvider!=null) selectionProvider.clear();
+		selectionProvider = null;
 	}
 
 	/**
@@ -265,61 +276,140 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem {
 		throw new RuntimeException("Cannot have multiple axes with "+getClass().getName());
 	}
 	
-	protected IRegionSelection regionSelection;
-
+	protected PlottingSelectionProvider selectionProvider;
+	
+	public ISelectionProvider getSelectionProvider() {
+		if (selectionProvider==null) selectionProvider = new PlottingSelectionProvider();
+		return selectionProvider;
+	}
+	
+	private Collection<IRegionListener> regionListeners;
+	
 	/**
-	 * The current selected region from the plotting, may be null.
+	 * Creates a selection region by type. This does not create any user interface
+	 * for the region. You can then call methods on the region to set color and 
+	 * position for the selection. Use addRegion(...) and removeRegion(...) to control
+	 * if the selection is active on the graph.
 	 * 
-	 * Please override this method to provide a real implementation, default does nothing.
+	 * @param name
+	 * @param regionType
+	 * @return
 	 */
-	public IRegionSelection getRegionSelection() {
+	@Override
+	public IRegion createRegion(final String name, final RegionType regionType)  throws Exception {
+		//TODO Please implement creation of region here.
+		return null;
+	}
+	
+	protected void fireRegionCreated(RegionEvent evt) {
+		if (regionListeners==null) return;
+		for (IRegionListener l : regionListeners) l.regionCreated(evt);
+	}
+	
+	/**
+	 * Add a selection region to the graph.
+	 * @param region
+	 */
+	public void addRegion(final IRegion region) {
+		fireRegionAdded(new RegionEvent(region));
+	}
+	protected void fireRegionAdded(RegionEvent evt) {
+		if (regionListeners==null) return;
+		for (IRegionListener l : regionListeners) l.regionAdded(evt);
+	}
+	
+	
+	/**
+	 * Remove a selection region to the graph.
+	 * @param region
+	 */
+	public void removeRegion(final IRegion region) {
+		fireRegionRemoved(new RegionEvent(region));
+	}
+	public void clearRegions() {
 		//TODO
-		return regionSelection;
+	}
+	
+	/**
+	 * Get a region by name.
+	 * @param name
+	 * @return
+	 */
+	public IRegion getRegion(final String name) {
+		return null; // TODO
+	}
+
+	protected void fireRegionRemoved(RegionEvent evt) {
+		if (regionListeners==null) return;
+		for (IRegionListener l : regionListeners) l.regionRemoved(evt);
 	}
 
 	/**
-	 * The current selected region from the plotting, may not be null.
-	 * 
-	 * Please override this method to provide a real implementation, default does nothing.
-	 */
-	public void setRegionSelection(IRegionSelection iRegionSelection) {
-		//TODO
-		this.regionSelection = iRegionSelection;
-	}
-	
-	
-	private List<IRegionSelectionListener> regionListeners;
-	
-	/**
-	 * Call to be notified of events which require the plot
-	 * data to be sent again.
 	 * 
 	 * @param l
 	 */
-	public void addRegionSelectionListener(final IRegionSelectionListener l) {
-		if (plotListeners==null) regionListeners = new ArrayList<IRegionSelectionListener>(7);
-		regionListeners.add(l);
-	}
-	/**
-	 * Call to be notified of events which require the plot
-	 * data to be sent again.
-	 * 
-	 * @param l
-	 */
-	public void removeRegionSelectionListener(final IRegionSelectionListener l) {
-		if (plotListeners==null) return;
-		regionListeners.remove(l);
+	public boolean addRegionListener(final IRegionListener l) {
+		if (regionListeners == null) regionListeners = new HashSet<IRegionListener>(7);
+		return regionListeners.add(l);
 	}
 	
 	/**
-	 * Call to fire an event to the listeners.
-	 * @param evt
+	 * 
+	 * @param l
 	 */
-	protected void fireRegionSelectionListeners(final IRegionSelectionEvent evt) {
-		if (plotListeners==null) return;
-		for (IRegionSelectionListener l : regionListeners) {
-			l.regionSelectionPerformed(evt);
-		}
+	public boolean removeRegionListener(final IRegionListener l) {
+		if (regionListeners == null) return true;
+		return regionListeners.remove(l);
 	}
+	
+	
+	/**
+	 * Creates an annotation. This does not create any user interface
+	 * for the annotation. You can then call methods on the annoation.
+	 * Use addAnnotation(...) and removeAnnotation(...) to control
+	 * if the selection is active on the graph.
+	 * 
+	 * @param name
+	 * @param regionType
+	 * @return
+	 * @throws Exception if name exists already.
+	 */
+	public IAnnotation createAnnotation(final String name) throws Exception {
+		return null;//TODO 
+	}
+	
+	/**
+	 * Add an annotation to the graph.
+	 * @param region
+	 */
+	public void addAnnotation(final IAnnotation region) {
+		//TODO 
+	}
+	
+	
+	/**
+	 * Remove an annotation to the graph.
+	 * @param region
+	 */
+	public void removeAnnotation(final IAnnotation region) {
+		//TODO 
+	}
+	
+	/**
+	 * Get an annotation by name.
+	 * @param name
+	 * @return
+	 */
+	public IAnnotation getAnnotation(final String name) {
+		return null;
+	}
+
+	/**
+	 * Remove all annotations
+	 */
+	public void clearAnnotations(){
+		//TODO 
+	}
+
 
 }

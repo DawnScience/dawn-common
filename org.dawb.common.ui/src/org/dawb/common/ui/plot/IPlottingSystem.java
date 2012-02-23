@@ -11,9 +11,8 @@ package org.dawb.common.ui.plot;
 
 import java.util.List;
 
-import org.dawb.common.ui.plot.region.IRegionSelection;
-import org.dawb.common.ui.plot.region.IRegionSelectionListener;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IWorkbenchPart;
@@ -33,7 +32,7 @@ import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
  * @author gerring
  *
  */
-public interface IPlottingSystem {
+public interface IPlottingSystem extends IRegionSystem, IAxisSystem, IAnnotationSystem {
 
 	/**
 	 * Call to create the UI component dealing with the plotting.
@@ -138,39 +137,6 @@ public interface IPlottingSystem {
 	 */
 	public void repaint();
 	
-	/**
-	 * Use this method to create axes other than the default y and x axes.
-	 * @param title
-	 * @param isYAxis, normally it is.
-	 * @param side - either SWT.LEFT, SWT.RIGHT, SWT.TOP, SWT.BOTTOM
-	 * @return
-	 */
-	public IAxis createAxis(final String title, final boolean isYAxis, final int side);
-	
-	/**
-	 * The current y axis to plot to. Intended for 1D plotting with multiple axes.
-	 * @return
-	 */
-	public IAxis getSelectedYAxis();
-	
-	/**
-	 * Set the current plotting yAxis. Intended for 1D plotting with multiple axes.
-	 * @param yAxis
-	 */
-	public void setSelectedYAxis(IAxis yAxis);
-	
-	/**
-	 * The current x axis to plot to. Intended for 1D plotting with multiple axes.
-	 * @return
-	 */
-	public IAxis getSelectedXAxis();
-	
-	/**
-	 * Set the current plotting xAxis. Intended for 1D plotting with multiple axes.
-	 * @param xAxis
-	 */
-	public void setSelectedXAxis(IAxis xAxis);
-	
     /**
      * The plot composite which plots are being drawn on.
      * 
@@ -179,40 +145,24 @@ public interface IPlottingSystem {
      * @return
      */
 	public Composite getPlotComposite();
-	
+		
 	/**
-	 * If a region is selected in the plotting, this method returns the selected region.
+	 * This ISelectionProvider will provide StructuredSelections which have been
+	 * made in the graph. It may be registered as a selection provider for the part
+	 * using this IPlottingSystem. The StructuredSelection will contain objects such
+	 * as 'LinerROI' for the selection inside the graph.
 	 * 
 	 * @return
 	 */
-	public IRegionSelection getRegionSelection();
+	public ISelectionProvider getSelectionProvider();
 	
 	/**
-	 * Programmatically selects a region in the plotting.
-	 * 
-	 * @return
+	 * Call this method to return a plotted data set by name. NOTE the plotting system
+	 * will likely not be using AbstractDataset as internal data. Instead it will get the
+	 * current data of the plot required and construct an AbstractDataset for it. This means
+	 * that you can plot int data but get back double data if the graph keeps data internally
+	 * as doubles for instance. If the append(...) method has been used, the data returned by
+	 * name from here will include the appended points.
 	 */
-	public void setRegionSelection(IRegionSelection sel);
-
-	
-	/**
-	 * Add a listener to be notified when regions change.
-	 * 
-	 * Do not do direct work in the callback, it blocks
-	 * moving the selection
-	 * 
-	 * @param l
-	 */
-	public void addRegionSelectionListener(final IRegionSelectionListener l);
-	
-	
-	/**
-	 * Remove a listener when regions change.
-	 * 
-	 * Do not do direct work in the callback of IRegionSelectionListeners, it blocks
-	 * moving the selection
-	 * 
-	 * @param l
-	 */
-	public void removeRegionSelectionListener(final IRegionSelectionListener l);
+	public AbstractDataset getData(final String dataSetName);
 }

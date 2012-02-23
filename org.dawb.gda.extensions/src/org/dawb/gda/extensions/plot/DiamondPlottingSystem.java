@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.IntegerDataset;
 import uk.ac.diamond.scisoft.analysis.plotserver.GuiBean;
 import uk.ac.diamond.scisoft.analysis.plotserver.GuiParameters;
@@ -158,5 +159,15 @@ public class DiamondPlottingSystem extends AbstractPlottingSystem {
 			logger.error("Cannot remove plots!", e);
 		}
 	}
-
+	
+	@Override
+	public AbstractDataset getData(String name) {
+        final List<IDataset> sets = plotWindow.getMainPlotter().getCurrentDataSets();
+        for (IDataset set : sets) {
+			if (name.equals(set.getName())) {
+				return (AbstractDataset)set;
+			}
+		}
+        return null;
+	}
 }

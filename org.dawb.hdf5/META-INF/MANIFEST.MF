@@ -26,6 +26,7 @@ Bundle-ClassPath: fits.jar,
  netcdf.jar,
  .
 Export-Package: ncsa.hdf.hdf5lib,
+ ncsa.hdf.hdf5lib.callbacks,
  ncsa.hdf.hdf5lib.exceptions,
  ncsa.hdf.hdf5lib.structs,
  ncsa.hdf.hdflib,

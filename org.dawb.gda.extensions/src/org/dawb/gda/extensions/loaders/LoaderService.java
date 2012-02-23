@@ -13,6 +13,7 @@ import java.io.File;
 import java.util.Collection;
 
 import org.dawb.common.services.ILoaderService;
+import org.dawb.common.util.eclipse.BundleUtils;
 import org.dawb.fabio.FabioFile;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -69,7 +70,7 @@ public class LoaderService extends AbstractServiceFactory implements ILoaderServ
 			isFabioOnly = true;
 			
 		}
-		if (isFabioOnly) {
+		if (isFabioOnly && isFabioAvailable()) {
 			
 			final FabioFile file = new FabioFile(filePath);
 			meta = new MetaDataAdapter() {
@@ -94,6 +95,16 @@ public class LoaderService extends AbstractServiceFactory implements ILoaderServ
 		return meta;
 	}
 	
+	/**
+	 * We test if there is any fabio installed in the product
+	 * @return
+	 */
+	private boolean isFabioAvailable() {
+		
+        final String eclipseDir = BundleUtils.getEclipseHome();
+		return (new File(eclipseDir+"/fabio")).exists();
+	}
+
 	private AbstractDataset getDataset(final File f, final IProgressMonitor monitor) throws Throwable {
 		
 		AbstractDataset set = null;
@@ -114,7 +125,7 @@ public class LoaderService extends AbstractServiceFactory implements ILoaderServ
 			
 		}
 		
-		if (isFabioOnly) {
+		if (isFabioOnly  && isFabioAvailable() ) {
 			try {
 				FabioFile     file = new FabioFile(f.getAbsolutePath());
 				final float[] fa   = file.getImageAsFloat();
