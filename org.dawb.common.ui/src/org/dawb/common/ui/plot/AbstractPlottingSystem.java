@@ -9,26 +9,38 @@
  */ 
 package org.dawb.common.ui.plot;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
+import org.dawb.common.ui.Activator;
+import org.dawb.common.ui.menu.MenuAction;
 import org.dawb.common.ui.plot.annotation.IAnnotation;
 import org.dawb.common.ui.plot.region.IRegion;
-import org.dawb.common.ui.plot.region.IRegionListener;
 import org.dawb.common.ui.plot.region.IRegion.RegionType;
+import org.dawb.common.ui.plot.region.IRegionListener;
 import org.dawb.common.ui.plot.region.RegionEvent;
+import org.dawb.common.ui.plot.tool.IToolChangeListener;
+import org.dawb.common.ui.plot.tool.IToolPage;
+import org.dawb.common.ui.plot.tool.IToolPageSystem;
+import org.dawb.common.ui.plot.tool.ToolChangeEvent;
 import org.dawb.common.ui.plot.trace.ITrace;
 import org.dawb.common.ui.plot.trace.ITraceListener;
 import org.dawb.common.ui.plot.trace.TraceEvent;
+import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Text;
+import org.osgi.framework.Bundle;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 
@@ -40,10 +52,15 @@ import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
  * There are TODO tags added to provide information as to where these optional
  * methods to override are.
  * 
+ * Some methods such as listeners are implemented for everyone.
+ * 
+ * The IToolPageSystem is implemented and populated by tools read from
+ * extension point.
+ * 
  * @author fcp94556
  *
  */
-public abstract class AbstractPlottingSystem implements IPlottingSystem {
+public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPageSystem {
 	
 	
 	public static enum ColorOption {
@@ -439,5 +456,104 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem {
 		//TODO 
 	}
 
+	private IToolPage currentToolPage;
+	private Collection<IToolChangeListener> toolChangeListeners;
+	/**
+	 * Get the current tool page that the user would like to use.
+	 * Fitting, profile, derivative etc. Null if no selection has been made.
+	 * @return
+	 */
+	public IToolPage getCurrentToolPage() {
+		return currentToolPage;
+	}
+	
+	protected void setCurrentToolPage(IToolPage page) {
+		this.currentToolPage = page;
+	}
+	
+	/**
+	 * Add a tool change listener. If the user changes preferred tool
+	 * this listener will be called so that any views showing the current
+	 * tool are updated.
+	 * 
+	 * @param l
+	 */
+	public void addToolChangeListener(IToolChangeListener l) {
+		if (toolChangeListeners==null) toolChangeListeners = new HashSet<IToolChangeListener>(7);
+		toolChangeListeners.add(l);
+	}
+	
+	/**
+	 * Remove a tool change listener if one has been addded.
+	 * @param l
+	 */
+	public void removeToolChangeListener(IToolChangeListener l) {
+		if (toolChangeListeners==null) return;
+		toolChangeListeners.remove(l);
+	}
+	
+	protected void fireToolChangeListeners(final ToolChangeEvent evt) {
+		if (toolChangeListeners==null) return;
+	    for (IToolChangeListener l : toolChangeListeners) {
+			l.toolChanged(evt);
+		}
+	}
 
+	/**
+	 * Return a MenuAction which can be attached to the part using the plotting system.
+	 * 
+	 * 
+	 * @return
+	 */
+	protected MenuAction createToolActions() throws Exception {
+		
+		final MenuAction toolActions = new MenuAction("Switch plotting tool.");
+		toolActions.setId("org.dawb.common.ui.plot.toolActions");
+	       		
+	    final IConfigurationElement[] configs = Platform.getExtensionRegistry().getConfigurationElementsFor("org.dawb.common.ui.plot.toolPage");
+	    for (IConfigurationElement e : configs) {
+			
+	    	final String    label = e.getAttribute("label");
+	    	final IToolPage page  = (IToolPage)e.createExecutableExtension("class");
+	    	final Action    action= new Action(label) {
+	    		public void run() {		
+	    			
+	    			fireToolChangeListeners(new ToolChangeEvent(this, getCurrentToolPage(), page));
+	    			setCurrentToolPage(page);
+	    			
+	    			toolActions.setSelectedAction(this);
+	    		}
+	    	};
+	    	
+	    	action.setId(e.getAttribute("id"));
+	    	final String   icon  = e.getAttribute("icon");
+	    	if (icon!=null) {
+		    	final String   id    = e.getContributor().getName();
+		    	final Bundle   bundle= Platform.getBundle(id);
+		    	final URL      entry = bundle.getEntry(icon);
+		    	final ImageDescriptor des = ImageDescriptor.createFromURL(entry);
+		    	action.setImageDescriptor(des);
+	    	}
+	    	
+	    	final String    tooltip = e.getAttribute("tooltip");
+	    	if (tooltip!=null) action.setToolTipText(tooltip);
+	    	
+	    	toolActions.add(action);
+		}
+	
+    	final Action    clear = new Action("No plotting tool") {
+    		public void run() {		
+    			
+    			fireToolChangeListeners(new ToolChangeEvent(this, getCurrentToolPage(), null));
+    			setCurrentToolPage(null);
+    			
+    			toolActions.setSelectedAction(this);
+    		}
+    	};
+    	clear.setImageDescriptor(Activator.getImageDescriptor("icons/axis.png"));
+    	clear.setToolTipText("No plotting tool");
+	    toolActions.add(clear);
+	    
+	    return toolActions;
+	}
 }
