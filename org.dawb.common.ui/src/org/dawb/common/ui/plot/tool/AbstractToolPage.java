@@ -2,6 +2,7 @@ package org.dawb.common.ui.plot.tool;
 
 import org.dawb.common.ui.plot.IPlottingSystem;
 import org.dawb.common.util.text.StringUtils;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.part.Page;
 
@@ -12,7 +13,6 @@ import org.eclipse.ui.part.Page;
  */
 public abstract class AbstractToolPage extends Page implements IToolPage {
 
-	protected Control controlForPage;
 	private IToolPageSystem toolSystem;
 	private IPlottingSystem plotSystem;
 	private String          title;
@@ -47,11 +47,6 @@ public abstract class AbstractToolPage extends Page implements IToolPage {
 
 	public void setTitle(String title) {
 		this.title = title;
-	}
-	
-	@Override
-	public Control getControl() {
-		return controlForPage;
 	}
 
 	@Override

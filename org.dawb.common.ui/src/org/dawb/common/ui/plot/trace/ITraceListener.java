@@ -37,10 +37,10 @@ public interface ITraceListener extends EventListener{
 	public void tracesCleared(TraceEvent evet);
 	
 	/**
-	 * Fired when a new trace is plotted. Source of event is ITrace
+	 * Fired when a new trace is plotted. Source of event is ITrace or List<ITrace>
 	 * @param evt
 	 */
-	public void tracePlotted(TraceEvent evt);
+	public void tracesPlotted(TraceEvent evt);
 	
 	/**
 	 * Convenience class for creating listeners
@@ -62,7 +62,7 @@ public interface ITraceListener extends EventListener{
 		}
 
 		@Override
-		public void tracePlotted(TraceEvent evt) {
+		public void tracesPlotted(TraceEvent evt) {
 			// TODO Auto-generated method stub
 			
 		}

@@ -9,6 +9,7 @@
  */ 
 package org.dawb.common.ui.plot;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.dawb.common.ui.plot.trace.ITrace;
@@ -38,7 +39,11 @@ public interface IPlottingSystem extends IRegionSystem, IAxisSystem, IAnnotation
 
 	/**
 	 * Call to create the UI component dealing with the plotting.
-	 * @param right
+	 * @param parent
+	 * @param plotName
+	 * @param bars
+	 * @param hint
+	 * @param part - may be null
 	 */
 	public void createPlotPart(Composite      parent,
 			                   String         plotName,
@@ -88,6 +93,14 @@ public interface IPlottingSystem extends IRegionSystem, IAxisSystem, IAnnotation
 	public ITrace createPlot2D(AbstractDataset       image, 
 							   List<AbstractDataset> axes,
 							   IProgressMonitor      monitor);
+	
+	/**
+	 * Call this method to retrieve what is currently plotted.
+	 * See all ITraceListener.
+	 * 
+	 * @return
+	 */
+	public Collection<ITrace> getTraces();
 	
 	/**
 	 * This method can be used to add a single plot data point to 

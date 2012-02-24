@@ -177,6 +177,16 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 		this.xfirst = xfirst;
 	}
 
+	/**
+	 * Call this method to retrieve what is currently plotted.
+	 * See all ITraceListener.
+	 * 
+	 * @return
+	 */
+	public Collection<ITrace> getTraces() {
+		return null; // TODO
+	}
+
 	private List<ITraceListener> traceListeners;
 	
 	/**
@@ -213,10 +223,10 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 			l.tracesCleared(evt);
 		}
 	}
-	protected void fireTracePlotted(final TraceEvent evt) {
+	protected void fireTracesPlotted(final TraceEvent evt) {
 		if (traceListeners==null) return;
 		for (ITraceListener l : traceListeners) {
-			l.tracePlotted(evt);
+			l.tracesPlotted(evt);
 		}
 	}
 
@@ -530,6 +540,8 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	 */
 	protected MenuAction createToolActions() throws Exception {
 		
+		if (!isToolsRequired) return null;
+		
 		final MenuAction toolActions = new MenuAction("Switch plotting tool.");
 		toolActions.setId("org.dawb.common.ui.plot.toolActions");
 	       		
@@ -590,4 +602,11 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	    toolActions.setSelectedAction(clear);
 	    return toolActions;
 	}
+	
+	private boolean isToolsRequired = true;
+	
+	public void setToolsRequired(boolean isToolsRequired) {
+		this.isToolsRequired = isToolsRequired;
+	}
+
 }
