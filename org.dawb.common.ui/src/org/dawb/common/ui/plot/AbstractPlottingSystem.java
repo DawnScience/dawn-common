@@ -29,6 +29,7 @@ import org.dawb.common.ui.plot.tool.ToolChangeEvent;
 import org.dawb.common.ui.plot.trace.ITrace;
 import org.dawb.common.ui.plot.trace.ITraceListener;
 import org.dawb.common.ui.plot.trace.TraceEvent;
+import org.dawb.common.ui.util.EclipseUtils;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
@@ -39,8 +40,14 @@ import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.PartInitException;
 import org.osgi.framework.Bundle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 
@@ -62,6 +69,7 @@ import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
  */
 public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPageSystem {
 	
+	private static final Logger logger = LoggerFactory.getLogger(AbstractPlottingSystem.class);
 	
 	public static enum ColorOption {
 		BY_DATA, BY_NAME, NONE
@@ -250,6 +258,21 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	 */
 	public void repaint() {
 		//TODO
+	}
+	
+	protected IWorkbenchPart part;
+	
+	/**
+	 * This simply assigns the part, subclasses should override this
+	 * and call super.createPlotPart(...) to assign the part.
+	 */
+	public void createPlotPart(final Composite      parent,
+							   final String         plotName,
+							   final IActionBars    bars,
+							   final PlotType       hint,
+							   final IWorkbenchPart part) {
+
+		this.part = part;
 	}
 	
 	@Override
@@ -510,16 +533,26 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 		final MenuAction toolActions = new MenuAction("Switch plotting tool.");
 		toolActions.setId("org.dawb.common.ui.plot.toolActions");
 	       		
-	    final IConfigurationElement[] configs = Platform.getExtensionRegistry().getConfigurationElementsFor("org.dawb.common.ui.plot.toolPage");
+	    final IConfigurationElement[] configs = Platform.getExtensionRegistry().getConfigurationElementsFor("org.dawb.common.ui.toolPage");
 	    for (IConfigurationElement e : configs) {
 			
 	    	final String    label = e.getAttribute("label");
 	    	final IToolPage page  = (IToolPage)e.createExecutableExtension("class");
+	    	page.setToolSystem(this);
+	    	page.setPlottingSystem(this);
+	    	page.setTitle(label);
+	    	
 	    	final Action    action= new Action(label) {
 	    		public void run() {		
 	    			
-	    			fireToolChangeListeners(new ToolChangeEvent(this, getCurrentToolPage(), page));
+	    			try {
+						EclipseUtils.getActivePage().showView("org.dawb.workbench.plotting.views.ToolPageView");
+					} catch (PartInitException e) {
+						logger.error("Cannot find a view with id org.dawb.workbench.plotting.views.ToolPageView", e);
+					}
+	    			final IToolPage old = getCurrentToolPage();
 	    			setCurrentToolPage(page);
+	    			fireToolChangeListeners(new ToolChangeEvent(this, old, page, part));
 	    			
 	    			toolActions.setSelectedAction(this);
 	    		}
@@ -544,16 +577,17 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
     	final Action    clear = new Action("No plotting tool") {
     		public void run() {		
     			
-    			fireToolChangeListeners(new ToolChangeEvent(this, getCurrentToolPage(), null));
-    			setCurrentToolPage(null);
-    			
+    			final IToolPage old = getCurrentToolPage();
+       			setCurrentToolPage(null);
+    			fireToolChangeListeners(new ToolChangeEvent(this, old, null, part));
+     			
     			toolActions.setSelectedAction(this);
     		}
     	};
     	clear.setImageDescriptor(Activator.getImageDescriptor("icons/axis.png"));
     	clear.setToolTipText("No plotting tool");
 	    toolActions.add(clear);
-	    
+	    toolActions.setSelectedAction(clear);
 	    return toolActions;
 	}
 }

@@ -18,6 +18,15 @@ import java.util.Arrays;
  *
  */
 public class StringUtils {
+	
+	/**
+	 * Simply generates what should be a unique string for a clazz instance.
+	 * @param clazz
+	 * @return
+	 */
+	public static final String getUniqueId(final Class<?> clazz) {
+		return String.valueOf(Math.random())+clazz.getName()+String.valueOf(System.currentTimeMillis());
+	}
 
 	/**
 	 * Returns a StringBuilder with only the digits and . contained

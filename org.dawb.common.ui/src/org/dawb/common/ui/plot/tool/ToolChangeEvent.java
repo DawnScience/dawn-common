@@ -2,6 +2,8 @@ package org.dawb.common.ui.plot.tool;
 
 import java.util.EventObject;
 
+import org.eclipse.ui.IWorkbenchPart;
+
 public class ToolChangeEvent extends EventObject {
 
 	/**
@@ -11,11 +13,13 @@ public class ToolChangeEvent extends EventObject {
 
 	private IToolPage oldPage;
 	private IToolPage newPage;
+	private IWorkbenchPart part;
 
-	public ToolChangeEvent(Object source, IToolPage oldPage, IToolPage newPage) {
+	public ToolChangeEvent(Object source, IToolPage oldPage, IToolPage newPage, IWorkbenchPart part) {
 		super(source);
 		this.oldPage = oldPage;
 		this.newPage = newPage;
+		this.part    = part;
 	}
 
 	public IToolPage getOldPage() {
@@ -26,4 +30,7 @@ public class ToolChangeEvent extends EventObject {
 		return newPage;
 	}
 
+	public IWorkbenchPart getPart() {
+		return part;
+	}
 }

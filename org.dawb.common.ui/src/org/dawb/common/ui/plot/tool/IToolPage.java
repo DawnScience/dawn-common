@@ -14,8 +14,20 @@ import org.eclipse.ui.part.IPageBookViewPage;
 public interface IToolPage extends IPageBookViewPage {
 
 	/**
+	 * the title for the tool.
+	 * @return
+	 */
+	public String getTitle();
+	
+	/**
+	 * This title will be show in the part displaying this tool
+	 * @param title
+	 */
+	public void setTitle(final String title);
+	
+	/**
 	 * Called when the tool is read from extension for a given 
-	 * plotting system instance.
+	 * plotting system instance, used internally.
 	 * 
 	 * @param system
 	 */
@@ -35,4 +47,10 @@ public interface IToolPage extends IPageBookViewPage {
 	 * @return
 	 */
 	public IToolPageSystem getToolSystem();
+	
+	/**
+	 * Set the IToolPageSystem, used internally
+	 * @param system
+	 */
+	public void setToolSystem(IToolPageSystem system);
 }

@@ -22,7 +22,8 @@ public interface IToolPageSystem {
 	/**
 	 * Add a tool change listener. If the user changes preferred tool
 	 * this listener will be called so that any views showing the current
-	 * tool are updated.
+	 * tool are updated. This method is always implemented as a HashSet
+	 * to avoid duplicates being added.
 	 * 
 	 * @param l
 	 */
