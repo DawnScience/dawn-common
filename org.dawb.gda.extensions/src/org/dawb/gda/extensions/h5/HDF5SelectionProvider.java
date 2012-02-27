@@ -40,7 +40,8 @@ public class HDF5SelectionProvider implements IH5DoubleClickSelectionProvider {
         	final IStructuredSelection sel = (IStructuredSelection)selection;
         	final Object[] oa  = sel.toArray();
         	if (oa == null) return null;
-        	
+
+        	HDF5File     file      = null;
         	HDF5Node     dataset   = null;
         	HDF5Node     parent    = null;
         	String      fullName   = null;
@@ -55,7 +56,8 @@ public class HDF5SelectionProvider implements IH5DoubleClickSelectionProvider {
                     HObject object = null;
                     if (parNode!=null) {
                     	object  = (HObject)((DefaultMutableTreeNode)parNode).getUserObject();
-                    	parent  = createGroup(object, new HDF5File(root.getOID()[0], filePath));
+                    	file = new HDF5File(root.getOID()[0], filePath);
+                    	parent  = createGroup(object, file);
                     }
 
 					object   = (HObject)((DefaultMutableTreeNode)treeNode).getUserObject();
@@ -70,7 +72,7 @@ public class HDF5SelectionProvider implements IH5DoubleClickSelectionProvider {
 				}
 			}
         	
-        	final HDF5NodeLink link = new HDF5NodeLink(filePath, fullName, parent, dataset);
+        	final HDF5NodeLink link = new HDF5NodeLink(file, filePath, fullName, parent, dataset);
         	return HDF5Utils.createDatasetSelection(link, false);
        
         }
@@ -136,7 +138,7 @@ public class HDF5SelectionProvider implements IH5DoubleClickSelectionProvider {
 		for (HObject h : members) {
 			final String path = h.getPath();
 			final String name = h.getName();
-			ng.addNode(path, name, HDF5Loader.copyNode(file, null, h, false));
+			ng.addNode(file, path, name, HDF5Loader.copyNode(file, null, h, false));
 		}
 
 		return ng;
