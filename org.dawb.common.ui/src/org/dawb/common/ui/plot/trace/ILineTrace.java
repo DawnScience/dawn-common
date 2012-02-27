@@ -6,6 +6,8 @@ import java.util.List;
 
 import org.eclipse.swt.graphics.Color;
 
+import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+
 /**
  * Line trace is used for all 1D trace data. So as well as lines,
  * it is used for histogram data. You can transform lines to histo
@@ -230,5 +232,20 @@ public interface ILineTrace extends ITrace {
 	 * @param errorBarColor
 	 */
 	public void setErrorBarColor(final Color errorBarColor);
+
+	
+	/**
+	 * The Y data of the plot, considered as the main data as the x-data
+	 * might often be indices of y. 
+	 * @return
+	 */
+	public AbstractDataset getYData();
+	
+	
+	/**
+	 * The x data of the plot - might often be indices of y. 
+	 * @return
+	 */
+	public AbstractDataset getXData();
 
 }
