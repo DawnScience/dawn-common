@@ -248,4 +248,10 @@ public interface ILineTrace extends ITrace {
 	 */
 	public AbstractDataset getXData();
 
+	/**
+	 * Set the yData for the trace, replaces old yData
+	 * @param yData
+	 */
+	public void setData(AbstractDataset xData, AbstractDataset yData);
+	
 }

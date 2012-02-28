@@ -1,8 +1,7 @@
-package org.dawb.common.ui.plot;
+package org.dawb.common.ui.plot.region;
 
-import org.dawb.common.ui.plot.region.IRegion;
-import org.dawb.common.ui.plot.region.IRegionListener;
 import org.dawb.common.ui.plot.region.IRegion.RegionType;
+
 
 public interface IRegionSystem {
 
@@ -13,6 +12,8 @@ public interface IRegionSystem {
 	 * position for the selection. Use addRegion(...) and removeRegion(...) to control
 	 * if the selection is active on the graph.
 	 * 
+	 * Usually thread safe.
+	 * 
 	 * @param name
 	 * @param regionType
 	 * @return
@@ -21,14 +22,14 @@ public interface IRegionSystem {
 	public IRegion createRegion(final String name, final RegionType regionType) throws Exception;
 	
 	/**
-	 * Add a selection region to the graph.
+	 * Add a selection region to the graph. Not thread safe, call from UI thread.
 	 * @param region
 	 */
 	public void addRegion(final IRegion region);
 	
 	
 	/**
-	 * Remove a selection region to the graph.
+	 * Remove a selection region to the graph. Not thread safe, call from UI thread.
 	 * @param region
 	 */
 	public void removeRegion(final IRegion region);
@@ -53,7 +54,7 @@ public interface IRegionSystem {
 	public boolean removeRegionListener(final IRegionListener l);
 
 	/**
-	 * Remove all regions
+	 * Remove all regions. Not thread safe, call from UI thread.
 	 */
 	public void clearRegions();
 

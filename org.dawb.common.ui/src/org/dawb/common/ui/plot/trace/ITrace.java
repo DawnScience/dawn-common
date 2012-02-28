@@ -38,5 +38,15 @@ public interface ITrace {
 	 */
 	public AbstractDataset getData();
 	
+	/**
+	 * True if visible
+	 * @return
+	 */
+	public boolean isVisible();
 
+	/**
+	 * True if visible
+	 * @return
+	 */
+	public void setVisible(boolean isVisible);
 }

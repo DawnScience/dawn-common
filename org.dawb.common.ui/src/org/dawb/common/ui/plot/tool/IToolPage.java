@@ -53,4 +53,14 @@ public interface IToolPage extends IPageBookViewPage {
 	 * @param system
 	 */
 	public void setToolSystem(IToolPageSystem system);
+	
+	/**
+	 * Called if the tool is chosen when it already exists.
+	 */
+	public void activate();
+	
+	/**
+	 * Called if the tool swapped for another but it not disposed.
+	 */
+	public void deactivate();
 }

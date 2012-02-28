@@ -26,6 +26,7 @@ import org.dawb.common.ui.plot.tool.IToolChangeListener;
 import org.dawb.common.ui.plot.tool.IToolPage;
 import org.dawb.common.ui.plot.tool.IToolPageSystem;
 import org.dawb.common.ui.plot.tool.ToolChangeEvent;
+import org.dawb.common.ui.plot.trace.ILineTrace;
 import org.dawb.common.ui.plot.trace.ITrace;
 import org.dawb.common.ui.plot.trace.ITraceListener;
 import org.dawb.common.ui.plot.trace.TraceEvent;
@@ -217,6 +218,25 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 			l.tracesAltered(evt);
 		}
 	}
+	protected void fireTraceCreated(final TraceEvent evt) {
+		if (traceListeners==null) return;
+		for (ITraceListener l : traceListeners) {
+			l.traceCreated(evt);
+		}
+	}
+	protected void fireTraceAdded(final TraceEvent evt) {
+		if (traceListeners==null) return;
+		for (ITraceListener l : traceListeners) {
+			l.traceAdded(evt);
+		}
+	}
+	protected void fireTraceRemoved(final TraceEvent evt) {
+		if (traceListeners==null) return;
+		for (ITraceListener l : traceListeners) {
+			l.traceRemoved(evt);
+		}
+	}
+
 	protected void fireTracesCleared(final TraceEvent evt) {
 		if (traceListeners==null) return;
 		for (ITraceListener l : traceListeners) {
@@ -527,6 +547,10 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	
 	protected void fireToolChangeListeners(final ToolChangeEvent evt) {
 		if (toolChangeListeners==null) return;
+		
+		if (evt.getOldPage()!=null) evt.getOldPage().deactivate();
+		if (evt.getNewPage()!=null) evt.getNewPage().activate();
+		
 	    for (IToolChangeListener l : toolChangeListeners) {
 			l.toolChanged(evt);
 		}
@@ -608,5 +632,34 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	public void setToolsRequired(boolean isToolsRequired) {
 		this.isToolsRequired = isToolsRequired;
 	}
+
+	/**
+	 * Creates a line trace used for 1D plotting.
+	 * @param traceName
+	 * @return
+	 */
+	public ILineTrace createLineTrace(String traceName) {
+		// TODO
+		return null;
+	}
+	/**
+	 * Adds trace, makes visible
+	 * @param traceName
+	 * @return
+	 */
+	public void addTrace(ITrace trace) {
+		// TODO
+		fireTraceAdded(new TraceEvent(trace));
+	}
+	/**
+	 * Removes a trace.
+	 * @param traceName
+	 * @return
+	 */
+	public void removeTrace(ITrace trace) {
+		// TODO
+		fireTraceRemoved(new TraceEvent(trace));
+	}
+
 
 }

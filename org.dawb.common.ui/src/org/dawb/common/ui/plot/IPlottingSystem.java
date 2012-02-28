@@ -9,11 +9,12 @@
  */ 
 package org.dawb.common.ui.plot;
 
-import java.util.Collection;
 import java.util.List;
 
+import org.dawb.common.ui.plot.annotation.IAnnotationSystem;
+import org.dawb.common.ui.plot.region.IRegionSystem;
 import org.dawb.common.ui.plot.trace.ITrace;
-import org.dawb.common.ui.plot.trace.ITraceListener;
+import org.dawb.common.ui.plot.trace.ITraceSystem;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.widgets.Composite;
@@ -35,7 +36,7 @@ import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
  * @author gerring
  *
  */
-public interface IPlottingSystem extends IRegionSystem, IAxisSystem, IAnnotationSystem {
+public interface IPlottingSystem extends ITraceSystem, IRegionSystem, IAxisSystem, IAnnotationSystem {
 
 	/**
 	 * Call to create the UI component dealing with the plotting.
@@ -53,6 +54,8 @@ public interface IPlottingSystem extends IRegionSystem, IAxisSystem, IAnnotation
 
 	
 	/**
+	 * See also ITraceSystem for flexible trace manipulation.
+	 * 
 	 * For 1D - x is the x axis, ys is the y traces or null if only 1 data set should be plotted.
 	 * 
 	 * NOTE Using this option plots everything on the current x and y axes. These are the default axes,
@@ -71,13 +74,15 @@ public interface IPlottingSystem extends IRegionSystem, IAxisSystem, IAnnotation
 	 * @param mode
 	 * @param monitor
 	 * @return List of ITrace objects plotted, may be null. Normally you can cast these to ILineTrace as all 1D 
-	 *         plotting systems will wholey or partially support ILineTrace
+	 *         plotting systems will wholly or partially support ILineTrace
 	 */
 	public List<ITrace> createPlot1D(AbstractDataset       x, 
 							         List<AbstractDataset> ys,
 							         IProgressMonitor      monitor);
 	
 	/**
+	 * See also ITraceSystem for flexible trace manipulation.
+     *
 	 * For 2D - x is the image dataset, ys is the axes.
 	 * 
 	 * Does not have to be called in the UI thread. Should be called to switch the entire
@@ -94,13 +99,6 @@ public interface IPlottingSystem extends IRegionSystem, IAxisSystem, IAnnotation
 							   List<AbstractDataset> axes,
 							   IProgressMonitor      monitor);
 	
-	/**
-	 * Call this method to retrieve what is currently plotted.
-	 * See all ITraceListener.
-	 * 
-	 * @return
-	 */
-	public Collection<ITrace> getTraces();
 	
 	/**
 	 * This method can be used to add a single plot data point to 
@@ -132,19 +130,6 @@ public interface IPlottingSystem extends IRegionSystem, IAxisSystem, IAnnotation
 					   final Number           yValue,
 					   final IProgressMonitor monitor) throws Exception ;
 
-
-	/**
-	 * Add a listener to be notified of new traces plotted
-	 * @param l
-	 */
-	public void addTraceListener(final ITraceListener l);
-	
-	/**
-	 * Remove listener to avoid memory leaks
-	 * @param l
-	 */
-	public void removeTraceListener(final ITraceListener l);
-	
 	/**
 	 * Call to tell the plot to plot nothing and reset axes. Thread safe.
 	 */

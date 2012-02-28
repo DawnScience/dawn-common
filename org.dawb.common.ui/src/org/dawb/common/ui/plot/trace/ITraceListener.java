@@ -15,6 +15,30 @@ import java.util.EventListener;
 public interface ITraceListener extends EventListener{
 
 	/**
+	 * Fired whenever a new trace is created, the source of TraceEvent
+	 * is the ITrace created.
+	 * 
+	 * @param evt
+	 */
+	public void traceCreated(final TraceEvent evt);
+	
+	/**
+	 * Fired whenever a new trace is added, the source of TraceEvent
+	 * is the ITrace added.
+	 * 
+	 * @param evt
+	 */
+	public void traceAdded(final TraceEvent evt);
+
+	/**
+	 * Fired whenever a  trace is deleted, the source of TraceEvent
+	 * is the ITrace.
+	 * 
+	 * @param evt
+	 */
+	public void traceRemoved(final TraceEvent evt);
+
+	/**
 	 * Notifies the listener that the plot technology
 	 * requires the data to be resent back to the plot.
 	 * 
@@ -63,6 +87,24 @@ public interface ITraceListener extends EventListener{
 
 		@Override
 		public void tracesPlotted(TraceEvent evt) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void traceCreated(TraceEvent evt) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void traceAdded(TraceEvent evt) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void traceRemoved(TraceEvent evt) {
 			// TODO Auto-generated method stub
 			
 		}

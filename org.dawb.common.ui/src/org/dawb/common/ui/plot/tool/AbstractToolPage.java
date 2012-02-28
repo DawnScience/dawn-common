@@ -48,7 +48,21 @@ public abstract class AbstractToolPage extends Page implements IToolPage {
 	public void setTitle(String title) {
 		this.title = title;
 	}
+	
+	/**
+	 * Does nothing by default - optionally override.
+	 */
+	public void activate() {
+		
+	}
 
+	/**
+	 * Does nothing by default - optionally override.
+	 */
+	public void deactivate() {
+		
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

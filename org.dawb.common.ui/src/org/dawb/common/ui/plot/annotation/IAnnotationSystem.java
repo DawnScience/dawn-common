@@ -1,6 +1,5 @@
-package org.dawb.common.ui.plot;
+package org.dawb.common.ui.plot.annotation;
 
-import org.dawb.common.ui.plot.annotation.IAnnotation;
 
 public interface IAnnotationSystem {
 
