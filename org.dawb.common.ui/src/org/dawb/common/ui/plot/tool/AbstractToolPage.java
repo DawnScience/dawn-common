@@ -2,8 +2,7 @@ package org.dawb.common.ui.plot.tool;
 
 import org.dawb.common.ui.plot.IPlottingSystem;
 import org.dawb.common.util.text.StringUtils;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.part.Page;
 
 /**
@@ -15,6 +14,7 @@ public abstract class AbstractToolPage extends Page implements IToolPage {
 
 	private IToolPageSystem toolSystem;
 	private IPlottingSystem plotSystem;
+	private IWorkbenchPart  part;
 	private String          title;
 	private String unique_id;
 
@@ -49,18 +49,23 @@ public abstract class AbstractToolPage extends Page implements IToolPage {
 		this.title = title;
 	}
 	
+	private boolean isActive = false;
+	public boolean isActive() {
+		return isActive;
+	}
+	
 	/**
 	 * Does nothing by default - optionally override.
 	 */
 	public void activate() {
-		
+		isActive = true;
 	}
 
 	/**
 	 * Does nothing by default - optionally override.
 	 */
 	public void deactivate() {
-		
+		isActive = false;
 	}
 	
 	@Override
@@ -92,5 +97,14 @@ public abstract class AbstractToolPage extends Page implements IToolPage {
 	public String toString(){
 		if (getTitle()!=null) return getTitle();
 		return super.toString();
+	}
+
+	@Override
+	public IWorkbenchPart getPart() {
+		return part;
+	}
+
+	public void setPart(IWorkbenchPart part) {
+		this.part = part;
 	}
 }

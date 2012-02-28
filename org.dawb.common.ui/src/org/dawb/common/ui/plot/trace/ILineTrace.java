@@ -254,4 +254,10 @@ public interface ILineTrace extends ITrace {
 	 */
 	public void setData(AbstractDataset xData, AbstractDataset yData);
 	
+	/**
+	 * May be called to refresh the whole graph, for instance if you change trace
+	 * color, you may need to repaint the legend.
+	 */
+	public void repaint();
+	
 }

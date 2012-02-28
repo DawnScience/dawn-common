@@ -44,6 +44,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PartInitException;
 import org.osgi.framework.Bundle;
@@ -511,12 +512,18 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 
 	private IToolPage currentToolPage;
 	private Collection<IToolChangeListener> toolChangeListeners;
+	private EmptyTool emptyTool;
+
 	/**
 	 * Get the current tool page that the user would like to use.
 	 * Fitting, profile, derivative etc. Null if no selection has been made.
 	 * @return
 	 */
 	public IToolPage getCurrentToolPage() {
+		if (currentToolPage==null) {
+			if (emptyTool==null) emptyTool = createEmptyTool();
+			currentToolPage = emptyTool;
+		}
 		return currentToolPage;
 	}
 	
@@ -577,17 +584,28 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	    	page.setToolSystem(this);
 	    	page.setPlottingSystem(this);
 	    	page.setTitle(label);
+	    	page.setPart(part);
 	    	
 	    	final Action    action= new Action(label) {
 	    		public void run() {		
 	    			
 	    			try {
-						EclipseUtils.getActivePage().showView("org.dawb.workbench.plotting.views.ToolPageView");
+						IViewPart part = EclipseUtils.getActivePage().findView("org.dawb.workbench.plotting.views.ToolPageView");
+						if (part==null) {
+							part = EclipseUtils.getActivePage().showView("org.dawb.workbench.plotting.views.ToolPageView");
+						} else {
+							EclipseUtils.getActivePage().activate(part);
+						}
+						if (part!=null && part instanceof IToolChangeListener) {
+							addToolChangeListener((IToolChangeListener)part);
+						}
 					} catch (PartInitException e) {
 						logger.error("Cannot find a view with id org.dawb.workbench.plotting.views.ToolPageView", e);
 					}
+	    			
 	    			final IToolPage old = getCurrentToolPage();
 	    			setCurrentToolPage(page);
+	    			clearRegionTool();
 	    			fireToolChangeListeners(new ToolChangeEvent(this, old, page, part));
 	    			
 	    			toolActions.setSelectedAction(this);
@@ -611,11 +629,15 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 		}
 	
     	final Action    clear = new Action("No plotting tool") {
-    		public void run() {		
+
+			public void run() {		
     			
     			final IToolPage old = getCurrentToolPage();
-       			setCurrentToolPage(null);
-    			fireToolChangeListeners(new ToolChangeEvent(this, old, null, part));
+    			
+    			if (emptyTool==null) emptyTool = createEmptyTool();
+      			setCurrentToolPage(emptyTool);
+    			clearRegionTool();
+   			    fireToolChangeListeners(new ToolChangeEvent(this, old, emptyTool, part));
      			
     			toolActions.setSelectedAction(this);
     		}
@@ -627,6 +649,19 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	    return toolActions;
 	}
 	
+	protected EmptyTool createEmptyTool() {
+		final EmptyTool tool = new EmptyTool();
+		tool.setToolSystem(this);
+		tool.setPlottingSystem(this);
+		tool.setTitle("No tool");
+		tool.setPart(part);
+		return tool;
+	}
+
+	protected void clearRegionTool() {
+		// TODO Implement to clear any region tool which the plotting system may be adding if createRegion(...) has been called.
+	}
+
 	private boolean isToolsRequired = true;
 	
 	public void setToolsRequired(boolean isToolsRequired) {

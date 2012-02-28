@@ -1,6 +1,7 @@
 package org.dawb.common.ui.plot.tool;
 
 import org.dawb.common.ui.plot.IPlottingSystem;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.part.IPageBookViewPage;
 
 /**
@@ -55,6 +56,12 @@ public interface IToolPage extends IPageBookViewPage {
 	public void setToolSystem(IToolPageSystem system);
 	
 	/**
+	 * Return true if this is the active tool.
+	 * @return
+	 */
+	public boolean isActive();
+	
+	/**
 	 * Called if the tool is chosen when it already exists.
 	 */
 	public void activate();
@@ -63,4 +70,17 @@ public interface IToolPage extends IPageBookViewPage {
 	 * Called if the tool swapped for another but it not disposed.
 	 */
 	public void deactivate();
+
+	/**
+	 * The page on which this tool is used. Normally the page containing the
+	 * plotting system which we are currently a tool of.
+	 * @return
+	 */
+	public IWorkbenchPart getPart();
+	
+	/**
+	 * Sets the part this page is linked to.
+	 * @param part
+	 */
+	public void setPart(IWorkbenchPart part);
 }
