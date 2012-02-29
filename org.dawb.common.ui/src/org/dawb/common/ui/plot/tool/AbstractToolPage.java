@@ -2,6 +2,7 @@ package org.dawb.common.ui.plot.tool;
 
 import org.dawb.common.ui.plot.IPlottingSystem;
 import org.dawb.common.util.text.StringUtils;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.part.Page;
 
@@ -17,6 +18,7 @@ public abstract class AbstractToolPage extends Page implements IToolPage {
 	private IWorkbenchPart  part;
 	private String          title;
 	private String unique_id;
+	private ImageDescriptor imageDescriptor;
 
 	public AbstractToolPage() {
 		this.unique_id = StringUtils.getUniqueId(AbstractToolPage.class);
@@ -106,5 +108,13 @@ public abstract class AbstractToolPage extends Page implements IToolPage {
 
 	public void setPart(IWorkbenchPart part) {
 		this.part = part;
+	}
+
+	public ImageDescriptor getImageDescriptor() {
+		return imageDescriptor;
+	}
+
+	public void setImageDescriptor(ImageDescriptor imageDescriptor) {
+		this.imageDescriptor = imageDescriptor;
 	}
 }

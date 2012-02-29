@@ -512,7 +512,6 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 
 	private IToolPage currentToolPage;
 	private Collection<IToolChangeListener> toolChangeListeners;
-	private EmptyTool emptyTool;
 
 	/**
 	 * Get the current tool page that the user would like to use.
@@ -521,8 +520,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	 */
 	public IToolPage getCurrentToolPage() {
 		if (currentToolPage==null) {
-			if (emptyTool==null) emptyTool = createEmptyTool();
-			currentToolPage = emptyTool;
+			currentToolPage = getEmptyTool();
 		}
 		return currentToolPage;
 	}
@@ -620,6 +618,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 		    	final URL      entry = bundle.getEntry(icon);
 		    	final ImageDescriptor des = ImageDescriptor.createFromURL(entry);
 		    	action.setImageDescriptor(des);
+		    	page.setImageDescriptor(des);
 	    	}
 	    	
 	    	final String    tooltip = e.getAttribute("tooltip");
@@ -634,8 +633,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
     			
     			final IToolPage old = getCurrentToolPage();
     			
-    			if (emptyTool==null) emptyTool = createEmptyTool();
-      			setCurrentToolPage(emptyTool);
+      			setCurrentToolPage(getEmptyTool());
     			clearRegionTool();
    			    fireToolChangeListeners(new ToolChangeEvent(this, old, emptyTool, part));
      			
@@ -643,19 +641,25 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
     		}
     	};
     	clear.setImageDescriptor(Activator.getImageDescriptor("icons/axis.png"));
+    	getEmptyTool().setImageDescriptor(clear.getImageDescriptor());
     	clear.setToolTipText("No plotting tool");
 	    toolActions.add(clear);
 	    toolActions.setSelectedAction(clear);
 	    return toolActions;
 	}
 	
-	protected EmptyTool createEmptyTool() {
-		final EmptyTool tool = new EmptyTool();
-		tool.setToolSystem(this);
-		tool.setPlottingSystem(this);
-		tool.setTitle("No tool");
-		tool.setPart(part);
-		return tool;
+	private EmptyTool emptyTool;
+
+	protected EmptyTool getEmptyTool() {
+		
+		if (emptyTool==null) {
+			emptyTool = new EmptyTool();
+			emptyTool.setToolSystem(this);
+			emptyTool.setPlottingSystem(this);
+			emptyTool.setTitle("No tool");
+			emptyTool.setPart(part);
+		}
+		return emptyTool;
 	}
 
 	protected void clearRegionTool() {

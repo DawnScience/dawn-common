@@ -1,6 +1,7 @@
 package org.dawb.common.ui.plot.tool;
 
 import org.dawb.common.ui.plot.IPlottingSystem;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.part.IPageBookViewPage;
 
@@ -83,4 +84,16 @@ public interface IToolPage extends IPageBookViewPage {
 	 * @param part
 	 */
 	public void setPart(IWorkbenchPart part);
+
+	/**
+	 * The ImageDescriptor for the page
+	 * @param des
+	 */
+	public void setImageDescriptor(ImageDescriptor des);
+	
+	/**
+	 * The ImageDescriptor for the page
+	 * @return
+	 */
+	public ImageDescriptor getImageDescriptor();
 }
