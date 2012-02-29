@@ -437,6 +437,14 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	public IRegion getRegion(final String name) {
 		return null; // TODO
 	}
+	/**
+	 * Get a region by name.
+	 * @param name
+	 * @return
+	 */
+	public Collection<IRegion> getRegions() {
+		return null; // TODO
+	}
 
 	protected void fireRegionRemoved(RegionEvent evt) {
 		if (regionListeners==null) return;

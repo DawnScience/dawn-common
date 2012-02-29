@@ -1,5 +1,6 @@
 package org.dawb.common.ui.plot.region;
 
+import java.text.DecimalFormat;
 import java.util.Arrays;
 
 import org.dawb.common.util.text.NumberUtils;
@@ -29,6 +30,8 @@ public class RegionBounds {
 	 * The lower right if a box, the end point if a line.
 	 */
 	protected double[] p2;
+
+	private DecimalFormat format;
 	
 	public RegionBounds() {
 		super();
@@ -36,6 +39,7 @@ public class RegionBounds {
 	public RegionBounds( double[] p1,  double[] p2) {
 	    this.p1 = p1;
 	    this.p2 = p2;
+		this.format = new DecimalFormat("##0.#####E0");
 	}
 	public double[] getP1() {
 		return p1;
@@ -75,10 +79,23 @@ public class RegionBounds {
 			return false;
 		return true;
 	}
+	
+	
+	
 	@Override
 	public String toString() {
-		return "RegionBounds [p1=" + Arrays.toString(p1) + ", p2="
-				+ Arrays.toString(p2) + "]";
+		if (p1==null || p2==null) return "Empty region";
+		final StringBuilder buf = new StringBuilder();
+		buf.append("(");
+		buf.append(format.format(p1[0]));
+		buf.append(", ");
+		buf.append(format.format(p1[1]));
+		buf.append(") to (");
+		buf.append(format.format(p2[0]));
+		buf.append(", ");
+		buf.append(format.format(p2[1]));
+		buf.append(")");
+		return buf.toString();
 	}
 
 	public RegionBounds getDiff(final RegionBounds with) {

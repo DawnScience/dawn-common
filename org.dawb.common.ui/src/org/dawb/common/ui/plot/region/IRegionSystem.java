@@ -1,5 +1,7 @@
 package org.dawb.common.ui.plot.region;
 
+import java.util.Collection;
+
 import org.dawb.common.ui.plot.region.IRegion.RegionType;
 
 
@@ -58,4 +60,9 @@ public interface IRegionSystem {
 	 */
 	public void clearRegions();
 
+	/**
+	 * Current regions in the plotting system.
+	 * @return
+	 */
+	public Collection<IRegion> getRegions();
 }

@@ -193,4 +193,9 @@ public interface IRegion {
 	 */
 	public void setLineWidth(int i);
 
+	/**
+	 * The type of this region
+	 * @return
+	 */
+	public RegionType getRegionType();
 }
