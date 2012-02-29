@@ -588,12 +588,8 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	    		public void run() {		
 	    			
 	    			try {
-						IViewPart part = EclipseUtils.getActivePage().findView("org.dawb.workbench.plotting.views.ToolPageView");
-						if (part==null) {
-							part = EclipseUtils.getActivePage().showView("org.dawb.workbench.plotting.views.ToolPageView");
-						} else {
-							EclipseUtils.getActivePage().activate(part);
-						}
+						IViewPart part = EclipseUtils.getActivePage().showView("org.dawb.workbench.plotting.views.ToolPageView");
+						
 						if (part!=null && part instanceof IToolChangeListener) {
 							addToolChangeListener((IToolChangeListener)part);
 						}
