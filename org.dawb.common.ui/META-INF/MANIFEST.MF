@@ -40,6 +40,7 @@ Export-Package: org.dawb.common.ui,
  org.eclipse.nebula.widgets.gallery
 Import-Package: org.apache.commons.beanutils,
  org.dawb.common.services,
+ org.eclipse.draw2d,
  org.slf4j,
  uk.ac.diamond.scisoft.analysis.dataset,
  uk.ac.diamond.scisoft.analysis.io

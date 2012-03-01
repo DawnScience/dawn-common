@@ -75,4 +75,22 @@ public interface IAnnotation {
 	 */
 	public void setLineStyle(LineStyle cursorLineStyle);
 	
+	
+	/**
+	 * Call to set location in x and y
+	 */
+	public void setLocation(double x, double y);
+	
+	/**
+	 * visibility
+	 * @return
+	 */
+	public boolean isVisible();
+	
+	/**
+	 * visibility
+	 * @return
+	 */
+	public void setVisible(boolean isVis);
+
 }
