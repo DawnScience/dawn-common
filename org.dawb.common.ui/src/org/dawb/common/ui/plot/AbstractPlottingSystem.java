@@ -308,25 +308,25 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	
 	@Override
 	public List<ITrace> createPlot1D(AbstractDataset       x, 
-							List<AbstractDataset> ys,
-							IProgressMonitor      monitor) {
+							         List<AbstractDataset> ys,
+							         IProgressMonitor      monitor) {
 		return createPlot(x,ys,PlotType.PT1D, monitor);
 	}
 
 
 	@Override
 	public ITrace createPlot2D(AbstractDataset      image, 
-							List<AbstractDataset> axes,
-							IProgressMonitor      monitor) {
+							   List<AbstractDataset> axes,
+							   IProgressMonitor      monitor) {
 		List<ITrace> traces = createPlot(image,axes,PlotType.IMAGE, monitor);
 		if (traces!=null) return traces.get(0);
 		return null;
 	}
 
-	protected abstract List<ITrace> createPlot(final AbstractDataset       data, 
-							            final List<AbstractDataset> axes,
-							            final PlotType              mode, 
-							            final IProgressMonitor      monitor);
+	protected abstract List<ITrace> createPlot( final AbstractDataset       data, 
+									            final List<AbstractDataset> axes,
+									            final PlotType              mode, 
+									            final IProgressMonitor      monitor);
 	
 	
 	@Override
@@ -578,6 +578,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	protected MenuAction createToolActions() throws Exception {
 		
 		if (!isToolsRequired) return null;
+		if (part==null || part.getAdapter(IToolPageSystem.class)==null) return null;
 		
 		final MenuAction toolActions = new MenuAction("Switch plotting tool.");
 		toolActions.setId("org.dawb.common.ui.plot.toolActions");
