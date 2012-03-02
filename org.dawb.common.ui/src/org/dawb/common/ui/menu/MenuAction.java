@@ -95,11 +95,14 @@ public class MenuAction extends Action implements IMenuCreator {
 	public void setCheckedAction(int iAction, boolean isChecked) {
 		actions.get(iAction).setChecked(isChecked);
 	}
+	public IAction getAction(int iAction) {
+		return actions.get(iAction);
+	}
 
 	public void setSelectedAction(IAction action) {
-		this.setImageDescriptor(action.getImageDescriptor());
+		if (action.getImageDescriptor()!=null) this.setImageDescriptor(action.getImageDescriptor());
 		setText(action.getText());
-		setToolTipText(action.getToolTipText());
+		//setToolTipText(action.getToolTipText());
 		this.selectedAction = (Action)action;
 	}
 	
