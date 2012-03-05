@@ -89,7 +89,7 @@ public class PythonService {
 		}
 		
 		service.command = new ManagedCommandline();
-		service.command.addArguments(new String[]{pythonInterpreter, script, String.valueOf(port), scisoftRpcPort});
+		service.command.addArguments(new String[]{pythonInterpreter, "-u", script, String.valueOf(port), scisoftRpcPort});
 		
 		// Ensure uk.ac.diamond.scisoft.python in PYTHONPATH
 		final Map<String,String> env = new HashMap<String,String>(System.getenv());
