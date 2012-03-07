@@ -24,7 +24,10 @@ rpcserver = rpc.rpcserver(int(sys.argv[1]))
 We tell scisoft the port to be used for plotting
 '''
 import scisoftpy.plot as plot
-plot.setremoteport(rpcport=int(sys.argv[2]))
+plottingPort = int(sys.argv[2]);
+
+if (plottingPort>0):
+    plot.setremoteport(rpcport=plottingPort)
 
 
 def isActive(dummy):

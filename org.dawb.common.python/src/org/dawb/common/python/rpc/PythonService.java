@@ -77,7 +77,13 @@ public class PythonService {
 		
 		final PythonService service = new PythonService();
 		
-	    final String scisoftRpcPort = VariablesPlugin.getDefault().getStringVariableManager().performStringSubstitution("${scisoft_rpc_port}");
+	    String scisoftRpcPort; 
+	    try {
+	    	// TODO Ensure plotting is started programatically in the GUI.
+	    	scisoftRpcPort = VariablesPlugin.getDefault().getStringVariableManager().performStringSubstitution("${scisoft_rpc_port}");
+	    } catch (Exception ne) {
+	    	scisoftRpcPort = String.valueOf(0);
+	    }
 
 	    final int    port   = NetUtils.getFreePort(getServiceStartPort());
 		final File   path   = BundleUtils.getBundleLocation("org.dawb.common.python");
