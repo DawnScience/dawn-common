@@ -85,28 +85,30 @@ public class PythonService {
 	    	scisoftRpcPort = String.valueOf(0);
 	    }
 
+		// Find the location of python_service.py and
+		// ensure uk.ac.diamond.scisoft.python in PYTHONPATH
+		final Map<String,String> env = new HashMap<String,String>(System.getenv());
+		String pythonPath = env.get("PYTHONPATH");
+		StringBuilder pyBuf = pythonPath==null ? new StringBuilder() : new StringBuilder(pythonPath);
+		if (OSUtils.isWindowsOS()) pyBuf.append(";"); else pyBuf.append(":");
 	    final int    port   = NetUtils.getFreePort(getServiceStartPort());
 		final File   path   = BundleUtils.getBundleLocation("org.dawb.common.python");
-		final String script;
-		if (System.getProperty("eclipse.debug.session")!=null || System.getProperty("org.dawb.test.session")!=null) {
-			script = path.getAbsolutePath()+"/src/org/dawb/common/python/rpc/python_service.py";
+		String script = path.getAbsolutePath()+"/org/dawb/common/python/rpc/python_service.py";;
+		if (new File(script).exists()) {
+			pyBuf.append(BundleUtils.getBundleLocation("uk.ac.diamond.scisoft.python").getAbsolutePath());
 		} else {
-			script = path.getAbsolutePath()+"/org/dawb/common/python/rpc/python_service.py";
+			// Check if we are running a development version
+			script = path.getAbsolutePath()+"/src/org/dawb/common/python/rpc/python_service.py";
+			if (new File(script).exists()) {
+				pyBuf.append(BundleUtils.getBundleLocation("uk.ac.diamond.scisoft.python").getAbsolutePath()+"/src");
+			} else {
+				throw new RuntimeException("Couldn't find path to python_service.py!");
+			}
 		}
 		
 		service.command = new ManagedCommandline();
 		service.command.addArguments(new String[]{pythonInterpreter, "-u", script, String.valueOf(port), scisoftRpcPort});
 		
-		// Ensure uk.ac.diamond.scisoft.python in PYTHONPATH
-		final Map<String,String> env = new HashMap<String,String>(System.getenv());
-		String pythonPath = env.get("PYTHONPATH");
-		StringBuilder pyBuf = pythonPath==null ? new StringBuilder() : new StringBuilder(pythonPath);
-		if (OSUtils.isWindowsOS()) pyBuf.append(";"); else pyBuf.append(":");
-		if (System.getProperty("eclipse.debug.session")!=null || System.getProperty("org.dawb.test.session")!=null) {
-			pyBuf.append(BundleUtils.getBundleLocation("uk.ac.diamond.scisoft.python").getAbsolutePath()+"/src");
-		} else {
-			pyBuf.append(BundleUtils.getBundleLocation("uk.ac.diamond.scisoft.python").getAbsolutePath());
-		}
 		env.put("PYTHONPATH", pyBuf.toString());
 		service.command.setEnv(env);
 		
