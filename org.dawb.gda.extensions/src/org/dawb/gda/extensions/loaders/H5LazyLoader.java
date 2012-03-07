@@ -72,6 +72,7 @@ public class H5LazyLoader implements ILazyLoader {
 			file = HierarchicalDataFactory.getReader(path);
 			
 			final Dataset set = (Dataset)file.getData(fullPath);
+			if (set.getStartDims()==null) set.getMetadata();
 			
 			/**
 			 * The diamond slicing can leave the dataset in memory, and the selection.
