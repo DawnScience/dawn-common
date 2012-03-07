@@ -27,5 +27,10 @@ public class EmptyTool extends AbstractToolPage {
 		// TODO Auto-generated method stub
 
 	}
+	
+	@Override
+	public ToolPageRole getToolPageRole() {
+		return ToolPageRole.ROLE_1D_AND_2D;
+	}
 
 }

@@ -147,4 +147,14 @@ public class RegionBounds {
 	public void setCentre(double[] center) {
 		this.centre = center;
 	}
+	
+	public double getDx() {
+		return p2[0]-p1[0];
+	}
+	public double getDy() {
+		return p2[1]-p1[1];
+	}
+	public double getLength() {
+		return Math.pow((Math.pow(getDx(), 2)+Math.pow(getDy(), 2)), 0.5d);
+	}
 }

@@ -7,13 +7,43 @@ import org.eclipse.ui.part.IPageBookViewPage;
 
 /**
  * This class represents a page in a page book view which
- * is associated with a specific tool in the plotting system.
- * A given part may implement an adaptable to 
+ * is associated with a specific tool in the plotting system. The tool
+ * is a 1D tool meaning it is linked to a 1D plot. It itself does
+ * not show a 1D plot normally and if it does, no tools menu will be
+ * shown. This prevents recursion which it was decided is too complex
+ * for users.
+ * 
+ * The tool this page connects to currently has some limitations which
+ * should be adhered to for the over all UI design to be coherent:
+ * 
+ * 1. Implement getToolRole() to provide information as to where the tool
+ *    page should appear. For instance ToolPageRole.ROLE_2D would have a 1D plot
+ *    with tool pages available if their type is ToolPageRole.ROLE_1D, normally.
+ *    
+ * 2. Do not plot things in an IToolPage with a 1D role directly. These are 1D
+ * tools and should plot back to the original 1D view if they have 1D data to plot.
+ * This avoids recursion.
+ * 
+ * If you have to plot on a 1D tool, by default the tools menu will not be shown so you cannot
+ * do recursive tools. (This can be overrided by implementing getAdpater(...) for
+ * IToolPageSystem if you really need to, but you are breaking the rules a little and
+ * some things may not work.)
+ * 
+ * 
+ *
  * 
  * @author fcp94556
  *
  */
 public interface IToolPage extends IPageBookViewPage {
+	
+	public enum ToolPageRole {
+		ROLE_2D,  // For instance LineProfile, Profile
+		ROLE_1D,  // 1D only
+		ROLE_1D_AND_2D; // Measure, derivative, peak fitting
+	}
+	
+	public ToolPageRole getToolPageRole();
 
 	/**
 	 * the title for the tool.

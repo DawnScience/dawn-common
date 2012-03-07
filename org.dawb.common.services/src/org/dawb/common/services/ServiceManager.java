@@ -33,6 +33,7 @@ public class ServiceManager {
 		OFFLINE_SERVICES.add(ILoaderService.class);
 		OFFLINE_SERVICES.add(IThumbnailService.class);
 		OFFLINE_SERVICES.add(IUserInputService.class);
+		OFFLINE_SERVICES.add(IImageService.class);
 	}
 
 	/**

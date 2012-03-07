@@ -51,6 +51,12 @@
                serviceClass="org.dawb.common.services.IFileIconService">
          </service>
       </serviceFactory>
+      <serviceFactory
+            factoryClass="org.dawb.gda.extensions.util.ImageService">
+         <service
+               serviceClass="org.dawb.common.services.IImageService">
+         </service>
+      </serviceFactory>
    </extension>
    <extension
          point="uk.ac.diamond.scisoft.introRegister">

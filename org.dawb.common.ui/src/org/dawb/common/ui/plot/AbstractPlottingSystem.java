@@ -24,6 +24,7 @@ import org.dawb.common.ui.plot.region.IRegionListener;
 import org.dawb.common.ui.plot.region.RegionEvent;
 import org.dawb.common.ui.plot.tool.IToolChangeListener;
 import org.dawb.common.ui.plot.tool.IToolPage;
+import org.dawb.common.ui.plot.tool.IToolPage.ToolPageRole;
 import org.dawb.common.ui.plot.tool.IToolPageSystem;
 import org.dawb.common.ui.plot.tool.ToolChangeEvent;
 import org.dawb.common.ui.plot.trace.ILineTrace;
@@ -575,7 +576,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	 * 
 	 * @return
 	 */
-	protected MenuAction createToolActions() throws Exception {
+	protected MenuAction createToolActions(final ToolPageRole role, final String viewId) throws Exception {
 		
 		if (!isToolsRequired) return null;
 		if (part==null || part.getAdapter(IToolPageSystem.class)==null) return null;
@@ -584,10 +585,14 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 		toolActions.setId("org.dawb.common.ui.plot.toolActions");
 	       		
 	    final IConfigurationElement[] configs = Platform.getExtensionRegistry().getConfigurationElementsFor("org.dawb.common.ui.toolPage");
+	    boolean foundSomeActions = false;
 	    for (IConfigurationElement e : configs) {
 			
-	    	final String    label = e.getAttribute("label");
 	    	final IToolPage page  = (IToolPage)e.createExecutableExtension("class");
+	    	if (page.getToolPageRole()!=role) continue;
+		    
+	    	foundSomeActions = true;
+	    	final String    label = e.getAttribute("label");
 	    	page.setToolSystem(this);
 	    	page.setPlottingSystem(this);
 	    	page.setTitle(label);
@@ -597,7 +602,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	    		public void run() {		
 	    			
 	    			try {
-						IViewPart part = EclipseUtils.getActivePage().showView("org.dawb.workbench.plotting.views.ToolPageView");
+						IViewPart part = EclipseUtils.getActivePage().showView(viewId);
 						
 						if (part!=null && part instanceof IToolChangeListener) {
 							addToolChangeListener((IToolChangeListener)part);
@@ -632,7 +637,9 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	    	toolActions.add(action);
 		}
 	
-    	final Action    clear = new Action("No plotting tool") {
+	    if (!foundSomeActions) return null;
+	    
+     	final Action    clear = new Action("No plotting tool") {
 
 			public void run() {		
     			
