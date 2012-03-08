@@ -18,8 +18,6 @@ import org.eclipse.ui.services.AbstractServiceFactory;
 import org.eclipse.ui.services.IServiceLocator;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
-import uk.ac.diamond.scisoft.analysis.dataset.DatasetUtils;
-import uk.ac.diamond.scisoft.analysis.dataset.FloatDataset;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 
 public class ImageService extends AbstractServiceFactory implements IImageService {
@@ -34,24 +32,20 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 		
 	}
 	/**
-	 * Modified from fable
-	 * @param thumbnail
-	 * @return
+	 * getImage(...) provides an image in a given palette data and origin.
 	 */
-	public Image getImage(AbstractDataset image, PaletteData palette) {
+	public Image getImage(AbstractDataset image, PaletteData palette, ImageOrigin origin) {
         
-		final int[]   size = image.getShape();
-		FloatDataset  set  = (FloatDataset)DatasetUtils.cast(image, AbstractDataset.FLOAT32);
-		final float[] data = set.getData();
-		
-		final float[] stats  = getStatistics(size, data);
+		final int[]   shape = image.getShape();
+		final float[] stats  = getStatistics(image); 
+		// Above seems to be faster than using stats in AbstractDataset
 		
 		float min = stats[0];
 		float max = 3*stats[2];
 		if (max > stats[1])	max = stats[1];
 				
 		
-		int len = data.length;
+		int len = image.getSize();
 		if (len == 0) return null;
 
 		// Loop over pixels
@@ -66,50 +60,111 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 		}
 		
 		byte[] scaledImageAsByte = new byte[len];
-		float scaled_pixel;
 
-		int byteIndex = 0;
-		for (int col = 0; col<image.getShape()[1]; ++col) {
-			for (int row = 0; row<image.getShape()[0]; ++row) {
+		ImageData imageData = null;
+		if (origin==ImageOrigin.TOP_LEFT) { // Fastest - also the default which is nice.
+			for (int index = 0; index<len; ++index) {
 				
-				final float val = ((Number)image.getObject(row, col)).floatValue();
-				if (val < min) {
-					scaled_pixel = 0;
-				} else if (val >= max) {
-					scaled_pixel = maxPixel;
-				} else {
-					scaled_pixel = val - min;
-				}
-				scaled_pixel = scaled_pixel * scale_8bit;
-				// Keep it in bounds
-				final byte pixel = (byte) (0x000000FF & ((int) scaled_pixel));
-
-				scaledImageAsByte[byteIndex] = pixel;
-				++byteIndex;
+				final float val = (float)image.getElementDoubleAbs(index);
+				addByte(val, min, max, scale_8bit, maxPixel, scaledImageAsByte, index);
 			}
-		}
+			imageData = new ImageData(shape[1], shape[0], 8, palette, 1, scaledImageAsByte);
 		
-		ImageData imageData = new ImageData(size[0], size[1], 8, palette, 1, scaledImageAsByte);
+		} else if (origin==ImageOrigin.BOTTOM_LEFT) {
+			int byteIndex = 0;
+			// This loop is slower than looping over all data and using image.getElementDoubleAbs(...)
+			// However it reorders data for the axes
+			for (int col = shape[1]-1; col>=0; --col) {
+				for (int row = 0; row<shape[0]; ++row) {
+					
+					final float val = image.getFloat(row, col);
+					addByte(val, min, max, scale_8bit, maxPixel, scaledImageAsByte, byteIndex);
+					++byteIndex;
+				}
+			}
+			imageData = new ImageData(shape[0], shape[1], 8, palette, 1, scaledImageAsByte);
+			
+		} else if (origin==ImageOrigin.BOTTOM_RIGHT) {
+			int byteIndex = 0;
+			// This loop is slower than looping over all data and using image.getElementDoubleAbs(...)
+			// However it reorders data for the axes
+			for (int col = shape[1]-1; col>=0; --col) {
+				for (int row = shape[0]-1; row>=0; --row) {
+					
+					final float val = image.getFloat(row, col);
+					addByte(val, min, max, scale_8bit, maxPixel, scaledImageAsByte, byteIndex);
+					++byteIndex;
+				}
+			}
+			imageData = new ImageData(shape[1], shape[0], 8, palette, 1, scaledImageAsByte);
+			
+		} else if (origin==ImageOrigin.TOP_RIGHT) {
+			int byteIndex = 0;
+			// This loop is slower than looping over all data and using image.getElementDoubleAbs(...)
+			// However it reorders data for the axes
+			for (int col = 0; col<shape[1]; ++col) {
+				for (int row = shape[0]-1; row>=0; --row) {
+					
+					final float val = image.getFloat(row, col);
+					addByte(val, min, max, scale_8bit, maxPixel, scaledImageAsByte, byteIndex);
+					++byteIndex;
+				}
+			}
+			imageData = new ImageData(shape[0], shape[1], 8, palette, 1, scaledImageAsByte);
+		}
 		
 		return new Image(Display.getCurrent(), imageData);
 
 	}
 
-	private static float[] getStatistics(final int[] size, final float[] data) {
+	/**
+	 * private finals inline well by the compiler.
+	 * @param val
+	 * @param min
+	 * @param max
+	 * @param scale_8bit
+	 * @param maxPixel
+	 * @param scaledImageAsByte
+	 */
+	private final void addByte( final float  val, 
+								final float  min, 
+								final float  max, 
+								final float  scale_8bit, 
+								final float  maxPixel, 
+								final byte[] scaledImageAsByte,
+								final int    index) {
+		
+		float scaled_pixel;
+		if (val < min) {
+			scaled_pixel = 0;
+		} else if (val >= max) {
+			scaled_pixel = maxPixel;
+		} else {
+			scaled_pixel = val - min;
+		}
+		scaled_pixel = scaled_pixel * scale_8bit;
+		// Keep it in bounds
+		final byte pixel = (byte) (0x000000FF & ((int) scaled_pixel));
+
+		scaledImageAsByte[index] = pixel;
+	}
+	
+	private static float[] getStatistics(AbstractDataset image) {
 		
 		float min = Float.MAX_VALUE;
 		float max = -Float.MAX_VALUE;
 		float sum = 0.0f;
-		float val;
-		for (int j = 0; j < size[1]; j++) {
-			for (int i = 0; i < size[0]; i++) {
-				val = data[i + j*size[0]];
-				sum += val;
-				if (val < min) min = val;
-				if (val > max) max = val;
-			}
+		final int size = image.getSize();
+		
+		for (int index = 0; index<size; ++index) {
+				
+			final float val = (float)image.getElementDoubleAbs(index);
+			sum += val;
+			if (val < min) min = val;
+			if (val > max) max = val;
+			
 		}
-		float mean = sum / (size[0] * size[1]);
+		float mean = sum / (image.getShape()[0] * image.getShape()[1]);
 		return new float[] { min, max, mean };
 	}
 	

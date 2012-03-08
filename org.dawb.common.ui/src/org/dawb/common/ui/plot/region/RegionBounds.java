@@ -39,7 +39,7 @@ public class RegionBounds {
 	public RegionBounds( double[] p1,  double[] p2) {
 	    this.p1 = p1;
 	    this.p2 = p2;
-		this.format = new DecimalFormat("##0.#####E0");
+		this.format = new DecimalFormat("##0.00E0");
 	}
 	public double[] getP1() {
 		return p1;
