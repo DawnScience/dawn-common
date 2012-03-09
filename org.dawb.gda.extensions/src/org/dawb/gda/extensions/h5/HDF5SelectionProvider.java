@@ -11,7 +11,6 @@ import ncsa.hdf.object.HObject;
 import ncsa.hdf.object.h5.H5Group;
 import ncsa.hdf.object.h5.H5ScalarDS;
 
-import org.dawb.gda.extensions.loaders.H5LazyDataset;
 import org.dawb.hdf5.editor.IH5DoubleClickSelectionProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -26,11 +25,7 @@ import uk.ac.diamond.scisoft.analysis.hdf5.HDF5Node;
 import uk.ac.diamond.scisoft.analysis.hdf5.HDF5NodeLink;
 import uk.ac.diamond.scisoft.analysis.io.ExternalFiles;
 import uk.ac.diamond.scisoft.analysis.io.HDF5Loader;
-import uk.ac.diamond.scisoft.analysis.rcp.hdf5.HDF5AxisBean;
-import uk.ac.diamond.scisoft.analysis.rcp.hdf5.HDF5Selection;
 import uk.ac.diamond.scisoft.analysis.rcp.hdf5.HDF5Utils;
-import uk.ac.diamond.scisoft.analysis.rcp.inspector.AxisSelection;
-import uk.ac.diamond.scisoft.analysis.rcp.inspector.DatasetSelection.InspectorType;
 
 
 public class HDF5SelectionProvider implements IH5DoubleClickSelectionProvider {
@@ -45,7 +40,8 @@ public class HDF5SelectionProvider implements IH5DoubleClickSelectionProvider {
         	final IStructuredSelection sel = (IStructuredSelection)selection;
         	final Object[] oa  = sel.toArray();
         	if (oa == null) return null;
-        	
+
+        	HDF5File     file      = null;
         	HDF5Node     dataset   = null;
         	HDF5Node     parent    = null;
         	String      fullName   = null;
@@ -60,7 +56,8 @@ public class HDF5SelectionProvider implements IH5DoubleClickSelectionProvider {
                     HObject object = null;
                     if (parNode!=null) {
                     	object  = (HObject)((DefaultMutableTreeNode)parNode).getUserObject();
-                    	parent  = createGroup(object, new HDF5File(root.getOID()[0], filePath));
+                    	file = new HDF5File(root.getOID()[0], filePath);
+                    	parent  = createGroup(object, file);
                     }
 
 					object   = (HObject)((DefaultMutableTreeNode)treeNode).getUserObject();
@@ -75,7 +72,7 @@ public class HDF5SelectionProvider implements IH5DoubleClickSelectionProvider {
 				}
 			}
         	
-        	final HDF5NodeLink link = new HDF5NodeLink(filePath, fullName, parent, dataset);
+        	final HDF5NodeLink link = new HDF5NodeLink(file, filePath, fullName, parent, dataset);
         	return HDF5Utils.createDatasetSelection(link, false);
        
         }
@@ -141,7 +138,7 @@ public class HDF5SelectionProvider implements IH5DoubleClickSelectionProvider {
 		for (HObject h : members) {
 			final String path = h.getPath();
 			final String name = h.getName();
-			ng.addNode(path, name, HDF5Loader.copyNode(file, null, h, false));
+			ng.addNode(file, path, name, HDF5Loader.copyNode(file, null, h, false));
 		}
 
 		return ng;
