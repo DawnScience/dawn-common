@@ -38,9 +38,30 @@ import org.eclipse.ui.part.IPageBookViewPage;
 public interface IToolPage extends IPageBookViewPage {
 	
 	public enum ToolPageRole {
-		ROLE_2D,  // For instance LineProfile, Profile
-		ROLE_1D,  // 1D only
-		ROLE_1D_AND_2D; // Measure, derivative, peak fitting
+		ROLE_2D("org.dawb.common.ui.plot.tool.ROLE_2D", false, true),  // For instance LineProfile, Profile
+		ROLE_1D("org.dawb.common.ui.plot.tool.ROLE_1D", true, false),  // 1D only
+		ROLE_1D_AND_2D("org.dawb.common.ui.plot.tool.ROLE_1D_AND_2D", true, true); // Measure, derivative, peak fitting
+		
+		private boolean is1D;
+		private boolean is2D;
+		private String  id;
+
+		ToolPageRole(String id, boolean is1D, boolean is2D) {
+			this.id   = id;
+			this.is1D = is1D;
+			this.is2D = is2D;
+		}
+		
+		public boolean is1D() {
+			return is1D;
+		}
+		public boolean is2D() {
+			return is2D;
+		}
+
+		public String getId() {
+			return id;
+		}
 	}
 	
 	public ToolPageRole getToolPageRole();

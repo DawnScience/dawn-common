@@ -89,7 +89,7 @@ public interface IPlottingSystem extends ITraceSystem, IRegionSystem, IAxisSyste
 	 * plot contents. 
 	 * 
 	 * @param image
-	 * @param axes
+	 * @param axes - may be null and often are.
 	 * @param mode
 	 * @param monitor
 	 * @return Image trace plotted. You can normally cast this trace to an IImageTrace and

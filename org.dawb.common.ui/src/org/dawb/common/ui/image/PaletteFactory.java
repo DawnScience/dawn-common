@@ -2310,10 +2310,10 @@ public class PaletteFactory {
 		
 		final ScopedPreferenceStore store = new ScopedPreferenceStore(InstanceScope.INSTANCE, "org.dawb.fable.imageviewer");
 		final int index = store.getInt("palettePreference");
-		return getPallete(index);
+		return getPalette(index);
 	}
 
-	public static PaletteData getPallete(int index) {
+	public static PaletteData getPalette(int index) {
 		if (index < 0 || index >= PALETTES.size()) {
 			return null;
 		}

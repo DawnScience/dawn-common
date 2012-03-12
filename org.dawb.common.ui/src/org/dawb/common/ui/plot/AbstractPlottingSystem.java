@@ -9,14 +9,11 @@
  */ 
 package org.dawb.common.ui.plot;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
-import org.dawb.common.ui.Activator;
-import org.dawb.common.ui.menu.MenuAction;
 import org.dawb.common.ui.plot.annotation.IAnnotation;
 import org.dawb.common.ui.plot.region.IRegion;
 import org.dawb.common.ui.plot.region.IRegion.RegionType;
@@ -24,20 +21,13 @@ import org.dawb.common.ui.plot.region.IRegionListener;
 import org.dawb.common.ui.plot.region.RegionEvent;
 import org.dawb.common.ui.plot.tool.IToolChangeListener;
 import org.dawb.common.ui.plot.tool.IToolPage;
-import org.dawb.common.ui.plot.tool.IToolPage.ToolPageRole;
 import org.dawb.common.ui.plot.tool.IToolPageSystem;
 import org.dawb.common.ui.plot.tool.ToolChangeEvent;
 import org.dawb.common.ui.plot.trace.ILineTrace;
 import org.dawb.common.ui.plot.trace.ITrace;
 import org.dawb.common.ui.plot.trace.ITraceListener;
 import org.dawb.common.ui.plot.trace.TraceEvent;
-import org.dawb.common.ui.util.EclipseUtils;
-import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Platform;
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
@@ -45,10 +35,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IActionBars;
-import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.PartInitException;
-import org.osgi.framework.Bundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,18 +61,13 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	
 	private static final Logger logger = LoggerFactory.getLogger(AbstractPlottingSystem.class);
 	
-	public static enum ColorOption {
-		BY_DATA, BY_NAME, NONE
-	}
-	
 	protected boolean rescale = true;
 
 	// True if first data set should be plotted as x axis
 	protected boolean xfirst = true;
 	
-	// Extrac actions for 1D and image viewing
-	protected List<IAction> extraImageActions;
-	protected List<IAction> extra1DActions;
+	// Manager for actions
+	protected PlottingActionBarManager actionBarManager;
 	
 	// Feedback for plotting, if needed
 	protected Text      pointControls;
@@ -93,11 +75,24 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	// Color option for 1D plots, if needed.
 	protected ColorOption colorOption=ColorOption.BY_DATA;
 
+    protected String   rootName;
+	
+    
+    
+	public AbstractPlottingSystem() {
+		this.actionBarManager = createActionBarManager();
+	}
+	
+	public static enum ColorOption {
+		BY_DATA, BY_NAME, NONE
+	}
+	
+
 	public void setPointControls(Text pointControls) {
 		this.pointControls = pointControls;
 	}
 
-    protected String   rootName;
+ 
 	public void setRootName(String rootName) {
 		this.rootName = rootName;
 	}
@@ -124,34 +119,28 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	/**
 	 * Wether the plot should rescale when replotted.
 	 * @return rescale
-	 */	public boolean isRescale() {
+	 */	
+	public boolean isRescale() {
 		return rescale;
 	}
 
-	public List<IAction> getExtraImageActions() {
-		return extraImageActions;
+	public void setRescale(boolean rescale) {
+		this.rescale = rescale;
+	}
+	/**
+	 * Please override to provide a  PlottingActionBarManager or a class
+	 * subclassing it. This class deals with Actions to avoid this
+	 * class getting more complex.
+	 * 
+	 * @return
+	 */
+	protected PlottingActionBarManager createActionBarManager() {
+		return new PlottingActionBarManager(this);
 	}
 
-	public void setExtraImageActions(List<IAction> extraImageActions) {
-		this.extraImageActions = extraImageActions;
-	}
-
-	public List<IAction> getExtra1DActions() {
-		return extra1DActions;
-	}
-
-	public void setExtra1DActions(List<IAction> extra1dActions) {
-		extra1DActions = extra1dActions;
-	}
-
-	
 	public void dispose() {
-		
-		if (extraImageActions!=null) extraImageActions.clear();
-		extraImageActions = null;
-		
-		if (extra1DActions!=null) extra1DActions.clear();
-		extra1DActions = null;
+
+		actionBarManager.dispose();
 		
 		if (traceListeners!=null) traceListeners.clear();
 		traceListeners = null;
@@ -214,7 +203,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 		traceListeners.remove(l);
 	}
 	
-	protected void fireTracesAltered(final TraceEvent evt) {
+	public void fireTracesAltered(final TraceEvent evt) {
 		if (traceListeners==null) return;
 		for (ITraceListener l : traceListeners) {
 			l.tracesAltered(evt);
@@ -295,6 +284,13 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	protected IWorkbenchPart part;
 	
 	/**
+	 * NOTE This field is partly deprecated. It is only
+	 * used for the initial plot and plots after that now
+	 * have specific methods for 1D, 2D etc.
+	 */
+	protected PlotType       defaultPlotType;
+	
+	/**
 	 * This simply assigns the part, subclasses should override this
 	 * and call super.createPlotPart(...) to assign the part.
 	 */
@@ -304,6 +300,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 							   final PlotType       hint,
 							   final IWorkbenchPart part) {
 
+		this.defaultPlotType = hint;
 		this.part = part;
 	}
 	
@@ -569,96 +566,6 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 			l.toolChanged(evt);
 		}
 	}
-
-	/**
-	 * Return a MenuAction which can be attached to the part using the plotting system.
-	 * 
-	 * 
-	 * @return
-	 */
-	protected MenuAction createToolActions(final ToolPageRole role, final String viewId) throws Exception {
-		
-		if (!isToolsRequired) return null;
-		if (part==null || part.getAdapter(IToolPageSystem.class)==null) return null;
-		
-		final MenuAction toolActions = new MenuAction("Switch plotting tool.");
-		toolActions.setId("org.dawb.common.ui.plot.toolActions");
-	       		
-	    final IConfigurationElement[] configs = Platform.getExtensionRegistry().getConfigurationElementsFor("org.dawb.common.ui.toolPage");
-	    boolean foundSomeActions = false;
-	    for (IConfigurationElement e : configs) {
-			
-	    	final IToolPage page  = (IToolPage)e.createExecutableExtension("class");
-	    	if (page.getToolPageRole()!=role) continue;
-		    
-	    	foundSomeActions = true;
-	    	final String    label = e.getAttribute("label");
-	    	page.setToolSystem(this);
-	    	page.setPlottingSystem(this);
-	    	page.setTitle(label);
-	    	page.setPart(part);
-	    	
-	    	final Action    action= new Action(label) {
-	    		public void run() {		
-	    			
-	    			try {
-						IViewPart part = EclipseUtils.getActivePage().showView(viewId);
-						
-						if (part!=null && part instanceof IToolChangeListener) {
-							addToolChangeListener((IToolChangeListener)part);
-						}
-					} catch (PartInitException e) {
-						logger.error("Cannot find a view with id org.dawb.workbench.plotting.views.ToolPageView", e);
-					}
-	    			
-	    			final IToolPage old = getCurrentToolPage();
-	    			setCurrentToolPage(page);
-	    			clearRegionTool();
-	    			fireToolChangeListeners(new ToolChangeEvent(this, old, page, part));
-	    			
-	    			toolActions.setSelectedAction(this);
-	    		}
-	    	};
-	    	
-	    	action.setId(e.getAttribute("id"));
-	    	final String   icon  = e.getAttribute("icon");
-	    	if (icon!=null) {
-		    	final String   id    = e.getContributor().getName();
-		    	final Bundle   bundle= Platform.getBundle(id);
-		    	final URL      entry = bundle.getEntry(icon);
-		    	final ImageDescriptor des = ImageDescriptor.createFromURL(entry);
-		    	action.setImageDescriptor(des);
-		    	page.setImageDescriptor(des);
-	    	}
-	    	
-	    	final String    tooltip = e.getAttribute("tooltip");
-	    	if (tooltip!=null) action.setToolTipText(tooltip);
-	    	
-	    	toolActions.add(action);
-		}
-	
-	    if (!foundSomeActions) return null;
-	    
-     	final Action    clear = new Action("No plotting tool") {
-
-			public void run() {		
-    			
-    			final IToolPage old = getCurrentToolPage();
-    			
-      			setCurrentToolPage(getEmptyTool());
-    			clearRegionTool();
-   			    fireToolChangeListeners(new ToolChangeEvent(this, old, emptyTool, part));
-     			
-    			toolActions.setSelectedAction(this);
-    		}
-    	};
-    	clear.setImageDescriptor(Activator.getImageDescriptor("icons/axis.png"));
-    	getEmptyTool().setImageDescriptor(clear.getImageDescriptor());
-    	clear.setToolTipText("No plotting tool");
-	    toolActions.add(clear);
-	    toolActions.setSelectedAction(clear);
-	    return toolActions;
-	}
 	
 	private EmptyTool emptyTool;
 
@@ -676,12 +583,6 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 
 	protected void clearRegionTool() {
 		// TODO Implement to clear any region tool which the plotting system may be adding if createRegion(...) has been called.
-	}
-
-	private boolean isToolsRequired = true;
-	
-	public void setToolsRequired(boolean isToolsRequired) {
-		this.isToolsRequired = isToolsRequired;
 	}
 
 	/**
@@ -710,6 +611,10 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	public void removeTrace(ITrace trace) {
 		// TODO
 		fireTraceRemoved(new TraceEvent(trace));
+	}
+
+	protected IWorkbenchPart getPart() {
+		return part;
 	}
 
 

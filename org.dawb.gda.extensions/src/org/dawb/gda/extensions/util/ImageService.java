@@ -63,6 +63,17 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 
 		ImageData imageData = null;
 		if (origin==ImageOrigin.TOP_LEFT) { // Fastest - also the default which is nice.
+			
+//			int byteIndex = 0;
+//			for (int col = 0; col<shape[1]; ++col) {
+//				for (int row = shape[0]-1; row>=0; --row) {
+//
+//					final float val = image.getFloat(row, col);
+//					addByte(val, min, max, scale_8bit, maxPixel, scaledImageAsByte, byteIndex);
+//					++byteIndex;
+//				}
+//			}
+
 			for (int index = 0; index<len; ++index) {
 				
 				final float val = (float)image.getElementDoubleAbs(index);
@@ -88,8 +99,8 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 			int byteIndex = 0;
 			// This loop is slower than looping over all data and using image.getElementDoubleAbs(...)
 			// However it reorders data for the axes
-			for (int col = shape[1]-1; col>=0; --col) {
-				for (int row = shape[0]-1; row>=0; --row) {
+			for (int row = shape[0]-1; row>=0; --row) {
+			    for (int col = shape[1]-1; col>=0; --col) {
 					
 					final float val = image.getFloat(row, col);
 					addByte(val, min, max, scale_8bit, maxPixel, scaledImageAsByte, byteIndex);
