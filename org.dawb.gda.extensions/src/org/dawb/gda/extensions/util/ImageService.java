@@ -85,10 +85,10 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 			int byteIndex = 0;
 			// This loop is slower than looping over all data and using image.getElementDoubleAbs(...)
 			// However it reorders data for the axes
-			for (int col = shape[1]-1; col>=0; --col) {
-				for (int row = 0; row<shape[0]; ++row) {
+			for (int i = shape[1]-1; i>=0; --i) {
+				for (int j = 0; j<shape[0]; ++j) {
 					
-					final float val = image.getFloat(row, col);
+					final float val = image.getFloat(j, i);
 					addByte(val, min, max, scale_8bit, maxPixel, scaledImageAsByte, byteIndex);
 					++byteIndex;
 				}
@@ -99,10 +99,10 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 			int byteIndex = 0;
 			// This loop is slower than looping over all data and using image.getElementDoubleAbs(...)
 			// However it reorders data for the axes
-			for (int row = shape[0]-1; row>=0; --row) {
-			    for (int col = shape[1]-1; col>=0; --col) {
+			for (int i = shape[0]-1; i>=0; --i) {
+			    for (int j = shape[1]-1; j>=0; --j) {
 					
-					final float val = image.getFloat(row, col);
+					final float val = image.getFloat(i, j);
 					addByte(val, min, max, scale_8bit, maxPixel, scaledImageAsByte, byteIndex);
 					++byteIndex;
 				}
@@ -113,10 +113,10 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 			int byteIndex = 0;
 			// This loop is slower than looping over all data and using image.getElementDoubleAbs(...)
 			// However it reorders data for the axes
-			for (int col = 0; col<shape[1]; ++col) {
-				for (int row = shape[0]-1; row>=0; --row) {
+			for (int i = 0; i<shape[1]; ++i) {
+				for (int j = shape[0]-1; j>=0; --j) {
 					
-					final float val = image.getFloat(row, col);
+					final float val = image.getFloat(j, i);
 					addByte(val, min, max, scale_8bit, maxPixel, scaledImageAsByte, byteIndex);
 					++byteIndex;
 				}
