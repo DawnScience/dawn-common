@@ -73,4 +73,11 @@ public interface IImageTrace extends ITrace {
 	 */
 	public void setPaletteData(PaletteData paletteData);
 	
+	/**
+	 * Call to set image data
+	 * @param image
+	 * @param axes - may be null
+	 */
+	public void setData(final AbstractDataset image, List<AbstractDataset> axes);
+
 }

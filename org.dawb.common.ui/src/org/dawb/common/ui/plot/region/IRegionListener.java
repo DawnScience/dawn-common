@@ -4,6 +4,28 @@ import java.util.EventListener;
 
 public interface IRegionListener extends EventListener {
 
+	public class Stub implements IRegionListener {
+
+		@Override
+		public void regionCreated(RegionEvent evt) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void regionAdded(RegionEvent evt) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void regionRemoved(RegionEvent evt) {
+			// TODO Auto-generated method stub
+
+		}
+
+	}
+
 	/**
 	 * Called when region created.
 	 * @param evt

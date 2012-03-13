@@ -23,6 +23,7 @@ import org.dawb.common.ui.plot.tool.IToolChangeListener;
 import org.dawb.common.ui.plot.tool.IToolPage;
 import org.dawb.common.ui.plot.tool.IToolPageSystem;
 import org.dawb.common.ui.plot.tool.ToolChangeEvent;
+import org.dawb.common.ui.plot.trace.IImageTrace;
 import org.dawb.common.ui.plot.trace.ILineTrace;
 import org.dawb.common.ui.plot.trace.ITrace;
 import org.dawb.common.ui.plot.trace.ITraceListener;
@@ -594,6 +595,23 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 		// TODO
 		return null;
 	}
+	/**
+	 * Creates an image trace used for 1D plotting.
+	 * @param traceName
+	 * @return
+	 */
+	public IImageTrace createImageTrace(String traceName) {
+		// TODO
+		return null;
+	}
+	
+	@Override
+	public ITrace getTrace(String name) {
+		// TODO
+		return null;
+	}
+
+
 	/**
 	 * Adds trace, makes visible
 	 * @param traceName

@@ -4,6 +4,16 @@ import java.util.Collection;
 
 public interface ITraceSystem {
 	
+	
+	/**
+	 * Creates a line trace used for 1D plotting. This does not add the trace
+	 * or give it any data.
+	 * 
+	 * @param traceName
+	 * @return
+	 */
+	public IImageTrace createImageTrace(String traceName);
+
 	/**
 	 * Creates a line trace used for 1D plotting. This does not add the trace
 	 * or give it any data.
@@ -25,7 +35,13 @@ public interface ITraceSystem {
 	 */
 	public void removeTrace(ITrace trace);
 
-
+    /**
+     * return a plotted trace by name.
+     * @param name
+     * @return
+     */
+	public ITrace getTrace(String name);
+	
 	/**
 	 * Call this method to retrieve what is currently plotted.
 	 * See all ITraceListener.
