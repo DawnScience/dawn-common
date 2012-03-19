@@ -157,4 +157,38 @@ public class RegionBounds {
 	public double getLength() {
 		return Math.pow((Math.pow(getDx(), 2)+Math.pow(getDy(), 2)), 0.5d);
 	}
+	
+	/**
+	 * Gets the low y coordinate
+	 * @return
+	 */
+	public double getY() {
+		return Math.min(p1[1], p2[1]);
+	}
+	
+	/**
+	 * Gets the low x coordinate
+	 * @return
+	 */
+	public double getX() {
+		return Math.min(p1[0], p2[0]);
+	}
+
+	
+	/**
+	 * Gets the width as a scalar, ie no sign to indicate direction, value only.
+	 * @return
+	 */
+	public double getWidth() {
+		return Math.max(p1[0], p2[0])-Math.min(p1[0], p2[0]);
+	}
+	
+	/**
+	 * Gets the low x coordinate
+	 * @return
+	 */
+	public double getHeight() {
+		return Math.max(p1[1], p2[1])-Math.min(p1[1], p2[1]);
+	}
+
 }

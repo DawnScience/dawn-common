@@ -181,4 +181,11 @@ public interface IPlottingSystem extends ITraceSystem, IRegionSystem, IAxisSyste
 	 * name from here will include the appended points.
 	 */
 	public AbstractDataset getData(final String dataSetName);
+
+
+	/**
+	 * 
+	 * @return true if some or all of the plotted data is 2D or images.
+	 */
+	public boolean is2D();
 }

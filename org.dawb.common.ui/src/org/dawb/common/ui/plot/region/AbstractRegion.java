@@ -98,4 +98,9 @@ public abstract class AbstractRegion implements IRegion {
 	 * @param bounds
 	 */
 	protected abstract void updateRegionBounds(RegionBounds bounds);
+	
+	public String toString() {
+		if (getName()!=null) return getName();
+		return super.toString();
+	}
 }

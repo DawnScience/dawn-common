@@ -635,5 +635,16 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 		return part;
 	}
 
-
+	/**
+	 * 
+	 * @return true if some or all of the plotted data is 2D or images.
+	 */
+	public boolean is2D() {
+		final Collection<ITrace> traces = getTraces();
+		if (traces==null) return false;
+		for (ITrace iTrace : traces) {
+			if (iTrace instanceof IImageTrace) return true;
+		}
+		return false;
+	}
 }
