@@ -157,4 +157,15 @@ public interface IAxis {
 	 * @return
 	 */
 	public boolean isVisible();
+	
+	/**
+	 * returns the upper bound in the units of the axis (not pixels)
+	 */
+	public double getUpper();
+	
+	/**
+	 * returns the lower bound in the units of the axis (not pixels)
+	 */
+	public double getLower();
+
 }

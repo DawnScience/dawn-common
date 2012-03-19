@@ -250,6 +250,7 @@ public interface ILineTrace extends ITrace {
 
 	/**
 	 * Set the yData for the trace, replaces old yData
+	 * Repaint may be required as the system does not assume you want to repaint right away.
 	 * @param yData
 	 */
 	public void setData(AbstractDataset xData, AbstractDataset yData);
