@@ -52,6 +52,26 @@ public class NumberUtils {
 	
 	/**
 	 * Test if two numbers are equal using their double value.
+	 * Percentage is a percentage of the compare number which the 
+	 * with number must fall within as a fraction of 1.
+	 * 
+	 * @param compare
+	 * @param with
+	 * @param percentage
+	 * @return
+	 */
+	public static boolean equalsPercent(Number compare, Number with, Number percentage) {
+
+		final double c = compare.doubleValue();
+		final double w = with.doubleValue();
+		final double p = percentage.doubleValue();
+		double r = (p * Math.abs(c)) / 100.; // relative tolerance
+		
+		return r >= Math.abs(c - w);
+	}
+	
+	/**
+	 * Test if two numbers are equal using their double value.
 	 * Both the absolute tolerance and a percentage of the compare value can be used.
 	 * The relative tolerance is given by a percentage and calculated from the absolute maximum of the input numbers.
 	 * Equality is found using whichever tolerance  is larger.
