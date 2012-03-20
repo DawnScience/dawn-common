@@ -7,9 +7,9 @@ import org.dawb.common.ui.Activator;
 import org.dawb.common.ui.menu.MenuAction;
 import org.dawb.common.ui.plot.tool.IToolChangeListener;
 import org.dawb.common.ui.plot.tool.IToolPage;
+import org.dawb.common.ui.plot.tool.IToolPage.ToolPageRole;
 import org.dawb.common.ui.plot.tool.IToolPageSystem;
 import org.dawb.common.ui.plot.tool.ToolChangeEvent;
-import org.dawb.common.ui.plot.tool.IToolPage.ToolPageRole;
 import org.dawb.common.ui.util.EclipseUtils;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
@@ -17,6 +17,7 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PartInitException;
 import org.osgi.framework.Bundle;
 import org.slf4j.Logger;
@@ -92,7 +93,9 @@ public class PlottingActionBarManager {
 		if (!isToolsRequired) return null;
 		if (system.getPart()==null || system.getPart().getAdapter(IToolPageSystem.class)==null) return null;
 		
-		final MenuAction toolActions = new MenuAction("Switch plotting tool.");
+		final MenuAction toolActions = new MenuAction(role.getLabel());
+		toolActions.setToolTipText(role.getTooltip());
+		toolActions.setImageDescriptor(Activator.getImageDescriptor(role.getImagePath()));
 		toolActions.setId(role.getId());
 	       	
 		// This list will not be large so we loop over it more than once for each ToolPageRole type
@@ -113,17 +116,18 @@ public class PlottingActionBarManager {
 	    	final Action    action= new Action(label) {
 	    		public void run() {		
 	    			
+	    			IViewPart viewPart=null;
 	    			try {
-						IViewPart part = EclipseUtils.getActivePage().showView(viewId);
+	    				viewPart = EclipseUtils.getActivePage().showView(viewId);
 						
-						if (part!=null && part instanceof IToolChangeListener) {
-							system.addToolChangeListener((IToolChangeListener)part);
+						if (viewPart!=null && viewPart instanceof IToolChangeListener) {
+							system.addToolChangeListener((IToolChangeListener)viewPart);
 						}
 					} catch (PartInitException e) {
 						logger.error("Cannot find a view with id org.dawb.workbench.plotting.views.ToolPageView", e);
 					}
 	    			
-	    			final IToolPage old = system.getCurrentToolPage();
+	    			final IToolPage old = system.getCurrentToolPage(role);
 	    			system.setCurrentToolPage(page);
 	    			system.clearRegionTool();
 	    			system.fireToolChangeListeners(new ToolChangeEvent(this, old, page, system.getPart()));
@@ -151,11 +155,11 @@ public class PlottingActionBarManager {
 	
 	    if (!foundSomeActions) return null;
 	    
-     	final Action    clear = new Action("No plotting tool") {
+     	final Action    clear = new Action("Clear tool") {
 
 			public void run() {		
     			
-    			final IToolPage old = system.getCurrentToolPage();
+    			final IToolPage old = system.getCurrentToolPage(role);
     			
     			system.setCurrentToolPage(system.getEmptyTool());
     			system.clearRegionTool();
@@ -165,10 +169,9 @@ public class PlottingActionBarManager {
     		}
     	};
     	clear.setImageDescriptor(Activator.getImageDescriptor("icons/axis.png"));
-    	system.getEmptyTool().setImageDescriptor(clear.getImageDescriptor());
-    	clear.setToolTipText("No plotting tool");
+    	clear.setToolTipText("Clear tool previously used if any.");
 	    toolActions.add(clear);
-	    toolActions.setSelectedAction(clear);
+
 	    return toolActions;
 	}
 

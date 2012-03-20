@@ -1,6 +1,12 @@
 package org.dawb.common.ui.plot.annotation;
 
 
+/**
+ * No methods in this interface are thread safe.
+ * 
+ * @author fcp94556
+ *
+ */
 public interface IAnnotationSystem {
 
 	

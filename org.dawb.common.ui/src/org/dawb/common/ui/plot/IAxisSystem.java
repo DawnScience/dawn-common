@@ -1,5 +1,11 @@
 package org.dawb.common.ui.plot;
 
+/**
+ * No methods in this interface are thread safe.
+ * 
+ * @author fcp94556
+ *
+ */
 public interface IAxisSystem {
 
 	/**
@@ -39,4 +45,9 @@ public interface IAxisSystem {
 	public void setSelectedXAxis(IAxis xAxis);
 	
 
+	/**
+	 * Call to rescale the axes, for instance after changing data of a few axes you want the
+	 * data to be scaled properly. Not thread safe.
+	 */
+	public void autoscaleAxes();
 }

@@ -1,5 +1,7 @@
 package org.dawb.common.ui.plot.tool;
 
+import org.dawb.common.ui.plot.tool.IToolPage.ToolPageRole;
+
 /**
  * This system allows one to get the page
  * which corresponds to the tool the user would
@@ -17,7 +19,7 @@ public interface IToolPageSystem {
 	 * Fitting, profile, derivative etc. Null if no selection has been made.
 	 * @return
 	 */
-	public IToolPage getCurrentToolPage();
+	public IToolPage getCurrentToolPage(ToolPageRole role);
 	
 	/**
 	 * Add a tool change listener. If the user changes preferred tool

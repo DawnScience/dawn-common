@@ -38,18 +38,24 @@ import org.eclipse.ui.part.IPageBookViewPage;
 public interface IToolPage extends IPageBookViewPage {
 	
 	public enum ToolPageRole {
-		ROLE_2D("org.dawb.common.ui.plot.tool.ROLE_2D", false, true),  // For instance LineProfile, Profile
-		ROLE_1D("org.dawb.common.ui.plot.tool.ROLE_1D", true, false),  // 1D only
-		ROLE_1D_AND_2D("org.dawb.common.ui.plot.tool.ROLE_1D_AND_2D", true, true); // Measure, derivative, peak fitting
+		ROLE_2D("org.dawb.common.ui.plot.tool.ROLE_2D", false, true, "icons/plot-tool-2d.png", "Image tools", "Image tools used to profile and inspect images."),  // For instance LineProfile, Profile
+		ROLE_1D("org.dawb.common.ui.plot.tool.ROLE_1D", true, false, "icons/plot-tool-1d.png", "XY plotting", "XY plotting tools"),  // 1D only
+		ROLE_1D_AND_2D("org.dawb.common.ui.plot.tool.ROLE_1D_AND_2D", true, true, "icons/plot-tool-any.png", "Plotting tools", "Plotting tools (used both for images and XY plots)"); // Measure, derivative, peak fitting
 		
 		private boolean is1D;
 		private boolean is2D;
 		private String  id;
+		private String imagePath;
+		private String label;
+		private String tooltip;
 
-		ToolPageRole(String id, boolean is1D, boolean is2D) {
+		ToolPageRole(String id, boolean is1D, boolean is2D, String imagePath, String label, String tooltip) {
 			this.id   = id;
 			this.is1D = is1D;
 			this.is2D = is2D;
+			this.imagePath = imagePath;
+			this.label = label;
+			this.tooltip = tooltip;
 		}
 		
 		public boolean is1D() {
@@ -61,6 +67,18 @@ public interface IToolPage extends IPageBookViewPage {
 
 		public String getId() {
 			return id;
+		}
+
+		public String getImagePath() {
+			return imagePath;
+		}
+
+		public String getLabel() {
+			return label;
+		}
+
+		public String getTooltip() {
+			return tooltip;
 		}
 	}
 	

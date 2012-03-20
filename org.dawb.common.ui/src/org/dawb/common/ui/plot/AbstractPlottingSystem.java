@@ -11,8 +11,10 @@ package org.dawb.common.ui.plot;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 import org.dawb.common.ui.plot.annotation.IAnnotation;
 import org.dawb.common.ui.plot.region.IRegion;
@@ -21,6 +23,7 @@ import org.dawb.common.ui.plot.region.IRegionListener;
 import org.dawb.common.ui.plot.region.RegionEvent;
 import org.dawb.common.ui.plot.tool.IToolChangeListener;
 import org.dawb.common.ui.plot.tool.IToolPage;
+import org.dawb.common.ui.plot.tool.IToolPage.ToolPageRole;
 import org.dawb.common.ui.plot.tool.IToolPageSystem;
 import org.dawb.common.ui.plot.tool.ToolChangeEvent;
 import org.dawb.common.ui.plot.trace.IImageTrace;
@@ -82,6 +85,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
     
 	public AbstractPlottingSystem() {
 		this.actionBarManager = createActionBarManager();
+		this.currentToolPageMap = new HashMap<ToolPageRole, IToolPage>(3);
 	}
 	
 	public static enum ColorOption {
@@ -149,6 +153,9 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 		
 		if (selectionProvider!=null) selectionProvider.clear();
 		selectionProvider = null;
+		
+		currentToolPageMap.clear();
+		currentToolPageMap = null;
 	}
 
 	/**
@@ -267,6 +274,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 		return null;
 	}
 	
+	@Override
 	public void append( final String           dataSetName, 
 			            final Number           xValue,
 					    final Number           yValue,
@@ -275,9 +283,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 		throw new Exception("updatePlot not implemented for "+getClass().getName());
 	}
 	
-	/**
-	 * Please update to repaint the plotting.
-	 */
+	@Override
 	public void repaint() {
 		//TODO
 	}
@@ -295,6 +301,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	 * This simply assigns the part, subclasses should override this
 	 * and call super.createPlotPart(...) to assign the part.
 	 */
+	@Override
 	public void createPlotPart(final Composite      parent,
 							   final String         plotName,
 							   final IActionBars    bars,
@@ -408,6 +415,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	 * Add a selection region to the graph.
 	 * @param region
 	 */
+	@Override
 	public void addRegion(final IRegion region) {
 		fireRegionAdded(new RegionEvent(region));
 	}
@@ -421,6 +429,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	 * Remove a selection region to the graph.
 	 * @param region
 	 */
+	@Override
 	public void removeRegion(final IRegion region) {
 		fireRegionRemoved(new RegionEvent(region));
 	}
@@ -433,6 +442,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	 * @param name
 	 * @return
 	 */
+	@Override
 	public IRegion getRegion(final String name) {
 		return null; // TODO
 	}
@@ -441,6 +451,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	 * @param name
 	 * @return
 	 */
+	@Override
 	public Collection<IRegion> getRegions() {
 		return null; // TODO
 	}
@@ -480,6 +491,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	 * @return
 	 * @throws Exception if name exists already.
 	 */
+	@Override
 	public IAnnotation createAnnotation(final String name) throws Exception {
 		return null;//TODO 
 	}
@@ -488,6 +500,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	 * Add an annotation to the graph.
 	 * @param region
 	 */
+	@Override
 	public void addAnnotation(final IAnnotation region) {
 		//TODO 
 	}
@@ -497,6 +510,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	 * Remove an annotation to the graph.
 	 * @param region
 	 */
+	@Override
 	public void removeAnnotation(final IAnnotation region) {
 		//TODO 
 	}
@@ -506,6 +520,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	 * @param name
 	 * @return
 	 */
+	@Override
 	public IAnnotation getAnnotation(final String name) {
 		return null;
 	}
@@ -513,11 +528,12 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	/**
 	 * Remove all annotations
 	 */
+	@Override
 	public void clearAnnotations(){
 		//TODO 
 	}
 
-	private IToolPage currentToolPage;
+	private Map<ToolPageRole, IToolPage> currentToolPageMap;
 	private Collection<IToolChangeListener> toolChangeListeners;
 
 	/**
@@ -525,15 +541,19 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	 * Fitting, profile, derivative etc. Null if no selection has been made.
 	 * @return
 	 */
-	public IToolPage getCurrentToolPage() {
-		if (currentToolPage==null) {
-			currentToolPage = getEmptyTool();
+	@Override
+	public IToolPage getCurrentToolPage(ToolPageRole role) {
+		
+		IToolPage toolPage = currentToolPageMap.get(role);
+		if (toolPage==null) {
+			toolPage = getEmptyTool();
+			currentToolPageMap.put(role, toolPage);
 		}
-		return currentToolPage;
+		return toolPage;
 	}
 	
 	protected void setCurrentToolPage(IToolPage page) {
-		this.currentToolPage = page;
+		currentToolPageMap.put(page.getToolPageRole(), page);
 	}
 	
 	/**
@@ -543,6 +563,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	 * 
 	 * @param l
 	 */
+	@Override
 	public void addToolChangeListener(IToolChangeListener l) {
 		if (toolChangeListeners==null) toolChangeListeners = new HashSet<IToolChangeListener>(7);
 		toolChangeListeners.add(l);
@@ -552,6 +573,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	 * Remove a tool change listener if one has been addded.
 	 * @param l
 	 */
+	@Override
 	public void removeToolChangeListener(IToolChangeListener l) {
 		if (toolChangeListeners==null) return;
 		toolChangeListeners.remove(l);
@@ -591,6 +613,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	 * @param traceName
 	 * @return
 	 */
+	@Override
 	public ILineTrace createLineTrace(String traceName) {
 		// TODO
 		return null;
@@ -600,6 +623,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	 * @param traceName
 	 * @return
 	 */
+	@Override
 	public IImageTrace createImageTrace(String traceName) {
 		// TODO
 		return null;
@@ -617,6 +641,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	 * @param traceName
 	 * @return
 	 */
+	@Override
 	public void addTrace(ITrace trace) {
 		// TODO
 		fireTraceAdded(new TraceEvent(trace));
@@ -626,6 +651,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	 * @param traceName
 	 * @return
 	 */
+	@Override
 	public void removeTrace(ITrace trace) {
 		// TODO
 		fireTraceRemoved(new TraceEvent(trace));
@@ -639,6 +665,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	 * 
 	 * @return true if some or all of the plotted data is 2D or images.
 	 */
+	@Override
 	public boolean is2D() {
 		final Collection<ITrace> traces = getTraces();
 		if (traces==null) return false;
@@ -646,5 +673,14 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 			if (iTrace instanceof IImageTrace) return true;
 		}
 		return false;
+	}
+	
+	/**
+	 * (non-Javadoc)
+	 * @see org.dawb.common.ui.plot.IAxisSystem#autoscaleAxes()
+	 */
+	@Override
+	public void autoscaleAxes() {
+		// TODO Does nothing
 	}
 }

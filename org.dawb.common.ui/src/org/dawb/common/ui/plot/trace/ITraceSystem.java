@@ -2,6 +2,12 @@ package org.dawb.common.ui.plot.trace;
 
 import java.util.Collection;
 
+/**
+ * No methods in this interface are thread safe.
+ * 
+ * @author fcp94556
+ *
+ */
 public interface ITraceSystem {
 	
 	

@@ -5,6 +5,12 @@ import java.util.Collection;
 import org.dawb.common.ui.plot.region.IRegion.RegionType;
 
 
+/**
+ * No methods in this interface are thread safe.
+ * 
+ * @author fcp94556
+ *
+ */
 public interface IRegionSystem {
 
 	
