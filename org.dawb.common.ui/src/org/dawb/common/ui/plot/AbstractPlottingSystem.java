@@ -16,6 +16,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.dawb.common.services.ISystemService;
 import org.dawb.common.ui.plot.annotation.IAnnotation;
 import org.dawb.common.ui.plot.region.IRegion;
 import org.dawb.common.ui.plot.region.IRegion.RegionType;
@@ -40,6 +41,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.PlatformUI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -144,6 +146,14 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	}
 
 	public void dispose() {
+
+		if (part!=null) {
+			final ISystemService<IPlottingSystem> service = (ISystemService<IPlottingSystem>)PlatformUI.getWorkbench().getService(ISystemService.class);
+			if (service!=null) {
+				service.removeSystem(part.getTitle());
+				logger.debug("Plotting sytem for '"+part.getTitle()+"' removed.");
+			}
+		}
 
 		actionBarManager.dispose();
 		
@@ -310,6 +320,14 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 
 		this.defaultPlotType = hint;
 		this.part = part;
+		
+		if (part!=null) {
+			final ISystemService<IPlottingSystem> service = (ISystemService<IPlottingSystem>)PlatformUI.getWorkbench().getService(ISystemService.class);
+			if (service!=null) {
+				service.putSystem(part.getTitle(), this);
+				logger.debug("Plotting sytem for '"+part.getTitle()+"' registered.");
+			}
+		}
 	}
 	
 	@Override
