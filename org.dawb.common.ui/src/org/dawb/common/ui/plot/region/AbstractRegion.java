@@ -103,4 +103,29 @@ public abstract class AbstractRegion implements IRegion {
 		if (getName()!=null) return getName();
 		return super.toString();
 	}
+	
+	protected boolean trackMouse;
+
+	@Override
+	public boolean isTrackMouse() {
+		return trackMouse;
+	}
+
+	@Override
+	public void setTrackMouse(boolean trackMouse) {
+		this.trackMouse = trackMouse;
+	}
+	
+	private boolean userRegion = true; // Normally a user region.
+
+	@Override
+	public boolean isUserRegion() {
+		return userRegion;
+	}
+
+	@Override
+	public void setUserRegion(boolean userRegion) {
+		this.userRegion = userRegion;
+	}
+	
 }

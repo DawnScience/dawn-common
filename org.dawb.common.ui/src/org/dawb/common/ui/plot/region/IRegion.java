@@ -198,4 +198,34 @@ public interface IRegion {
 	 * @return
 	 */
 	public RegionType getRegionType();
+	
+	/**
+	 * return true if the mouse should be tracked. The region will mouse with this tracking.
+	 * WARNING Most regions will not respond to this setting.
+	 * 
+	 * @return
+	 */
+	public boolean isTrackMouse();
+	
+	/**
+	 * return true if the mouse should be tracked.
+	 * WARNING Most regions will not respond to this setting. AxisSelection does.
+     *
+	 * @return
+	 */
+	public void setTrackMouse(boolean trackMouse);
+
+	/**
+	 * 
+	 * @return true if user region. If not a user region the region has been created programatically
+	 * and has been marked as not editable to the user.
+	 */
+	public boolean isUserRegion();
+
+	/**
+	 *  If not a user region the region has been created programatically
+	 * and has been marked as not editable to the user.
+	 * @param userRegion
+	 */
+	public void setUserRegion(boolean userRegion);
 }
