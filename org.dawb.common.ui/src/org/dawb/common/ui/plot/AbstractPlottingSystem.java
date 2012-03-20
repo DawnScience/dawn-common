@@ -683,4 +683,25 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	public void autoscaleAxes() {
 		// TODO Does nothing
 	}
+	
+	/**
+	 * Call this method to retrieve what is currently plotted by trace type
+	 * See all ITraceListener.
+	 * 
+	 * @return
+	 */
+	public Collection<ITrace> getTraces(Class<? extends ITrace> clazz) {
+		final Collection<ITrace> traces = getTraces();
+		if (traces==null) return null;
+		
+		final Collection<ITrace> ret= new ArrayList<ITrace>();
+		for (ITrace trace : traces) {
+			if (clazz.isInstance(trace)) {
+				ret.add(trace);
+			}
+		}
+		
+		return ret; // may be empty
+	}
+
 }

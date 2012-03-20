@@ -56,6 +56,13 @@ public interface ITraceSystem {
 	 */
 	public Collection<ITrace> getTraces();
 
+	/**
+	 * Call this method to retrieve what is currently plotted by trace type
+	 * See all ITraceListener.
+	 * 
+	 * @return
+	 */
+	public Collection<ITrace> getTraces(Class<? extends ITrace> clazz);
 	
 
 	/**

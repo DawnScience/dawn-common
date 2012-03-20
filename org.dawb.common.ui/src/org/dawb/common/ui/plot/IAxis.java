@@ -168,4 +168,10 @@ public interface IAxis {
 	 */
 	public double getLower();
 
+	/**
+	 * Sets the range of the axis, start maybe > end for reversed axes.
+	 * @param start
+	 * @param end
+	 */
+	public void setRange(double start, double end);
 }
