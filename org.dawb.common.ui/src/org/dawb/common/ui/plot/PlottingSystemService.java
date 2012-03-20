@@ -8,7 +8,7 @@ import org.eclipse.ui.services.AbstractServiceFactory;
 import org.eclipse.ui.services.IServiceLocator;
 
 /**
- * We reply on OSGI to only make one of these. Too many would not work!
+ * We rely on OSGI to only make one of these. Too many would not work!
  * @author fcp94556
  *
  */
