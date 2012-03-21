@@ -2,6 +2,7 @@ package org.dawb.common.services;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.PaletteData;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
@@ -59,6 +60,14 @@ public interface IImageService {
 	public enum ImageOrigin {
 		TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT;
 	}
+	
+	/**
+	 * Get a full image data for a given data set and PaletteData
+	 * @param set
+	 * @return
+	 */
+	public ImageData getImageData(ImageServiceBean bean) throws Exception;
+
 	/**
 	 * Get a full image for a given data set and PaletteData
 	 * @param set

@@ -32,10 +32,19 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 	public ImageService() {
 		
 	}
+	
 	/**
-	 * getImage(...) provides an image in a given palette data and origin.
+	 * 
 	 */
 	public Image getImage(ImageServiceBean bean) {
+		final ImageData data = getImageData(bean);
+		return new Image(Display.getCurrent(), data);
+	}
+	/**
+	 * getImageData(...) provides an image in a given palette data and origin.
+	 * Faster than getting a resolved image
+	 */
+	public ImageData getImageData(ImageServiceBean bean) {
         
 		final AbstractDataset image    = bean.getImage();
 		final ImageOrigin     origin   = bean.getOrigin();
@@ -137,7 +146,7 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 		}
 		
 		if (bean.isCancelled()) return null;
-		return new Image(Display.getCurrent(), imageData);
+		return imageData;
 
 	}
 
