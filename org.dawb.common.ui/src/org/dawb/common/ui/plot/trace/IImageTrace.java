@@ -80,4 +80,27 @@ public interface IImageTrace extends ITrace {
 	 */
 	public void setData(final AbstractDataset image, List<AbstractDataset> axes);
 
+	/**
+	 * The min intensity for generating the image
+	 * @return
+	 */
+	public Number getMin();
+	
+	/**
+	 * The min intensity for generating the image
+	 * @return
+	 */
+	public void setMin(Number min);
+	
+	/**
+	 * The max intensity for generating the image
+	 * @return
+	 */
+	public Number getMax();
+	
+	/**
+	 * The max intensity for generating the image
+	 * @return
+	 */
+	public void setMax(Number max);
 }
