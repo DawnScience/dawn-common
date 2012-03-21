@@ -4,6 +4,7 @@ import org.dawb.common.ui.plot.IPlottingSystem;
 import org.dawb.common.util.text.StringUtils;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.part.Page;
 
@@ -18,8 +19,9 @@ public abstract class AbstractToolPage extends Page implements IToolPage, IAdapt
 	private IPlottingSystem plotSystem;
 	private IWorkbenchPart  part;
 	private String          title;
-	private String unique_id;
+	private String          unique_id;
 	private ImageDescriptor imageDescriptor;
+	private IViewPart       viewPart;
 
 	public AbstractToolPage() {
 		this.unique_id = StringUtils.getUniqueId(AbstractToolPage.class);
@@ -69,6 +71,13 @@ public abstract class AbstractToolPage extends Page implements IToolPage, IAdapt
 	 */
 	public void deactivate() {
 		isActive = false;
+	}
+	
+	public void dispose() {
+		super.dispose();
+		toolSystem = null;
+	    plotSystem = null;
+		part       = null;
 	}
 	
 	@Override
@@ -124,5 +133,13 @@ public abstract class AbstractToolPage extends Page implements IToolPage, IAdapt
 	 */
 	public Object getAdapter(Class key) {
 		return null;
+	}
+
+	public IViewPart getViewPart() {
+		return viewPart;
+	}
+
+	public void setViewPart(IViewPart viewPart) {
+		this.viewPart = viewPart;
 	}
 }

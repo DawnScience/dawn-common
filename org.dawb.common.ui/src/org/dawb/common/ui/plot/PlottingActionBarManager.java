@@ -91,7 +91,11 @@ public class PlottingActionBarManager {
 	protected MenuAction createToolActions(final ToolPageRole role, final String viewId) throws Exception {
 		
 		if (!isToolsRequired) return null;
-		if (system.getPart()==null || system.getPart().getAdapter(IToolPageSystem.class)==null) return null;
+		
+		final IWorkbenchPart part = system.getPart();
+		if (part==null || part.getAdapter(IToolPageSystem.class)==null) {
+			return null;
+		}
 		
 		final MenuAction toolActions = new MenuAction(role.getLabel());
 		toolActions.setToolTipText(role.getTooltip());
@@ -134,13 +138,6 @@ public class PlottingActionBarManager {
 	    			
 	    			toolActions.setSelectedAction(this);
 	    			
-	    			if (system.getPart()!=null) {
-	    				system.getPlotComposite().getDisplay().asyncExec(new Runnable() {
-	    					public void run() {
-	    						EclipseUtils.getPage().activate(system.getPart());
-	    					}
-	    				});
-	    			}
 	    		}
 	    	};
 	    	

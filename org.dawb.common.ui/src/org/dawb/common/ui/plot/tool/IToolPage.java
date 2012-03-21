@@ -2,6 +2,7 @@ package org.dawb.common.ui.plot.tool;
 
 import org.dawb.common.ui.plot.IPlottingSystem;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.part.IPageBookViewPage;
 
@@ -142,8 +143,13 @@ public interface IToolPage extends IPageBookViewPage {
 	public void deactivate();
 
 	/**
-	 * The page on which this tool is used. Normally the page containing the
-	 * plotting system which we are currently a tool of.
+	 * Normally the page containing the
+	 * plotting system which originated the data. For instance if the data
+	 * is from an ImageEditor then this will be the part. If the tool is on a view
+	 * and then a sub-tool is opened the part will still be the original image part.
+	 * However the method getViewPart can be used to determine the view part which
+	 * we are running the tool on in this case.
+	 * 
 	 * @return
 	 */
 	public IWorkbenchPart getPart();
@@ -165,4 +171,16 @@ public interface IToolPage extends IPageBookViewPage {
 	 * @return
 	 */
 	public ImageDescriptor getImageDescriptor();
+	
+	/**
+	 * 
+	 * @return IViewPart the view that the tool is being shown on, null if not on a view part.
+	 */
+	public IViewPart getViewPart();
+	
+	/**
+	 * Called by the view part using the tool to declare the parent part.
+	 * @param viewPart
+	 */
+	public void setViewPart(IViewPart viewPart);
 }
