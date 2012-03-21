@@ -43,7 +43,10 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 		
 		
 		final int[]   shape = image.getShape();
-		final float[] stats  = getStatistics(image); 
+		if (bean.isCancelled()) return null;
+		
+ 		final float[] stats  = getStatistics(bean); 
+		if (bean.isCancelled()) return null;
 		// Above seems to be faster than using stats in AbstractDataset
 		
 		float min = bean.getMin()!=null ? bean.getMin().floatValue() : stats[0];
@@ -53,7 +56,6 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 		int len = image.getSize();
 		if (len == 0) return null;
 
-		// Loop over pixels
 		float scale_8bit;
 		float maxPixel;
 		if (max > min) {
@@ -64,6 +66,7 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 			maxPixel = 0xFF;
 		}
 		
+		if (bean.isCancelled()) return null;
 		byte[] scaledImageAsByte = new byte[len];
 
 		ImageData imageData = null;
@@ -81,6 +84,7 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 
 			for (int index = 0; index<len; ++index) {
 				
+				if (bean.isCancelled()) return null;
 				final float val = (float)image.getElementDoubleAbs(index);
 				addByte(val, min, max, scale_8bit, maxPixel, scaledImageAsByte, index);
 			}
@@ -93,6 +97,7 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 			for (int i = shape[1]-1; i>=0; --i) {
 				for (int j = 0; j<shape[0]; ++j) {
 					
+					if (bean.isCancelled()) return null;
 					final float val = image.getFloat(j, i);
 					addByte(val, min, max, scale_8bit, maxPixel, scaledImageAsByte, byteIndex);
 					++byteIndex;
@@ -107,6 +112,7 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 			for (int i = shape[0]-1; i>=0; --i) {
 			    for (int j = shape[1]-1; j>=0; --j) {
 					
+					if (bean.isCancelled()) return null;
 					final float val = image.getFloat(i, j);
 					addByte(val, min, max, scale_8bit, maxPixel, scaledImageAsByte, byteIndex);
 					++byteIndex;
@@ -121,6 +127,7 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 			for (int i = 0; i<shape[1]; ++i) {
 				for (int j = shape[0]-1; j>=0; --j) {
 					
+					if (bean.isCancelled()) return null;
 					final float val = image.getFloat(j, i);
 					addByte(val, min, max, scale_8bit, maxPixel, scaledImageAsByte, byteIndex);
 					++byteIndex;
@@ -129,6 +136,7 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 			imageData = new ImageData(shape[0], shape[1], 8, palette, 1, scaledImageAsByte);
 		}
 		
+		if (bean.isCancelled()) return null;
 		return new Image(Display.getCurrent(), imageData);
 
 	}
@@ -165,8 +173,10 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 		scaledImageAsByte[index] = pixel;
 	}
 	
-	private static float[] getStatistics(AbstractDataset image) {
+	private static float[] getStatistics(ImageServiceBean bean) {
 		
+		final AbstractDataset image    = bean.getImage();
+
 		float min = Float.MAX_VALUE;
 		float max = -Float.MAX_VALUE;
 		float sum = 0.0f;
@@ -174,6 +184,7 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 		
 		for (int index = 0; index<size; ++index) {
 				
+			if (bean.isCancelled()) return null;
 			final float val = (float)image.getElementDoubleAbs(index);
 			sum += val;
 			if (val < min) min = val;

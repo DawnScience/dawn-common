@@ -1,5 +1,6 @@
 package org.dawb.common.services;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.PaletteData;
 
@@ -13,6 +14,7 @@ public interface IImageService {
 		private ImageOrigin     origin;
 		private Number          min;
 		private Number          max;
+		private IProgressMonitor monitor;
 		public AbstractDataset getImage() {
 			return image;
 		}
@@ -42,6 +44,15 @@ public interface IImageService {
 		}
 		public void setMax(Number max) {
 			this.max = max;
+		}
+		public void setMonitor(IProgressMonitor monitor) {
+			this.monitor = monitor;
+		}
+		public boolean isCancelled() {
+			return monitor!=null && monitor.isCanceled();
+		}
+		public IProgressMonitor getMonitor() {
+			return monitor;
 		}
 	}
 
