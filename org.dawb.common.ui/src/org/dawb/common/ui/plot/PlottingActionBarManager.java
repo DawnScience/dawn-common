@@ -133,6 +133,14 @@ public class PlottingActionBarManager {
 	    			system.fireToolChangeListeners(new ToolChangeEvent(this, old, page, system.getPart()));
 	    			
 	    			toolActions.setSelectedAction(this);
+	    			
+	    			if (system.getPart()!=null) {
+	    				system.getPlotComposite().getDisplay().asyncExec(new Runnable() {
+	    					public void run() {
+	    						EclipseUtils.getPage().activate(system.getPart());
+	    					}
+	    				});
+	    			}
 	    		}
 	    	};
 	    	

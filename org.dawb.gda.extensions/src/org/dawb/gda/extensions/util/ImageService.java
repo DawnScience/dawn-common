@@ -22,6 +22,7 @@ import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 
 public class ImageService extends AbstractServiceFactory implements IImageService {
 	
+	
 	static {
 		// We just use file extensions
 		LoaderFactory.setLoaderSearching(false); 
@@ -34,17 +35,21 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 	/**
 	 * getImage(...) provides an image in a given palette data and origin.
 	 */
-	public Image getImage(AbstractDataset image, PaletteData palette, ImageOrigin origin) {
+	public Image getImage(ImageServiceBean bean) {
         
+		final AbstractDataset image    = bean.getImage();
+		final ImageOrigin     origin   = bean.getOrigin();
+		final PaletteData     palette  = bean.getPalette();
+		
+		
 		final int[]   shape = image.getShape();
 		final float[] stats  = getStatistics(image); 
 		// Above seems to be faster than using stats in AbstractDataset
 		
-		float min = stats[0];
-		float max = 3*stats[2];
+		float min = bean.getMin()!=null ? bean.getMin().floatValue() : stats[0];
+		float max = bean.getMax()!=null ? bean.getMax().floatValue() : 3*stats[2];
 		if (max > stats[1])	max = stats[1];
 				
-		
 		int len = image.getSize();
 		if (len == 0) return null;
 
