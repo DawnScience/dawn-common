@@ -6,7 +6,7 @@ import java.util.Arrays;
 import org.dawb.common.util.text.NumberUtils;
 
 /**
- * Class attempts to contruct a bound in graph coordinates within
+ * Class attempts to construct a bound in graph coordinates within
  * which the region should be drawn. This can them be used to get and
  * set the location and size of the region which will be drawn within
  * these bounds.
@@ -17,7 +17,7 @@ import org.dawb.common.util.text.NumberUtils;
 public class RegionBounds {
 
 	/**
-	 * The center, which may be null.
+	 * The centre, which may be null.
 	 */
 	protected double[] centre;
 
@@ -36,23 +36,29 @@ public class RegionBounds {
 	public RegionBounds() {
 		super();
 	}
-	public RegionBounds( double[] p1,  double[] p2) {
+
+	public RegionBounds(double[] p1,  double[] p2) {
 	    this.p1 = p1;
 	    this.p2 = p2;
 		this.format = new DecimalFormat("##0.00E0");
 	}
+
 	public double[] getP1() {
 		return p1;
 	}
+
 	public void setP1(double[] p1) {
 		this.p1 = p1;
 	}
+
 	public double[] getP2() {
 		return p2;
 	}
+
 	public void setP2(double[] p2) {
 		this.p2 = p2;
 	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -62,6 +68,7 @@ public class RegionBounds {
 		result = prime * result + Arrays.hashCode(p2);
 		return result;
 	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -79,8 +86,6 @@ public class RegionBounds {
 			return false;
 		return true;
 	}
-	
-	
 	
 	@Override
 	public String toString() {
@@ -125,37 +130,39 @@ public class RegionBounds {
 	}
 	
 	/**
-	 * If a specific value for center has not been set via setCenter(...), then
-	 * a center will be returned from p1 and p2.
+	 * If a specific value for centre has not been set via setCentre(...), then
+	 * a centre will be returned from p1 and p2.
 	 * 
-	 * If a center value has been set, it is saved and even if this is
-	 * not the real center and even if p1 and p2 change!
+	 * If a centre value has been set, it is saved and even if this is
+	 * not the real centre and even if p1 and p2 change!
 	 * 
 	 * @return
 	 */
 	public double[] getCentre() {
 		if (centre==null) {
-			return new double[]{getP2()[0]-getP1()[0], getP2()[1]-getP1()[1]};
+			return new double[]{p2[0]-p1[0], p2[1]-p1[1]};
 		}
 		return centre;
 	}
 	
 	/**
-	 * Use carefully, once set this is the centre even if p1 and/or p2 change.
-	 * @param center
+	 * Use carefully, once set this is the centre even if p1 and/or p2 change (unless it is set to null).
+	 * @param centre (can be null)
 	 */
-	public void setCentre(double[] center) {
-		this.centre = center;
+	public void setCentre(double[] centre) {
+		this.centre = centre;
 	}
-	
+
 	public double getDx() {
 		return p2[0]-p1[0];
 	}
+
 	public double getDy() {
 		return p2[1]-p1[1];
 	}
+
 	public double getLength() {
-		return Math.pow((Math.pow(getDx(), 2)+Math.pow(getDy(), 2)), 0.5d);
+		return Math.hypot(getDx(), getDy());
 	}
 	
 	/**
@@ -174,21 +181,20 @@ public class RegionBounds {
 		return Math.min(p1[0], p2[0]);
 	}
 
-	
 	/**
-	 * Gets the width as a scalar, ie no sign to indicate direction, value only.
+	 * Gets the width as a scalar, i.e. no sign to indicate direction, value only.
 	 * @return
 	 */
 	public double getWidth() {
-		return Math.max(p1[0], p2[0])-Math.min(p1[0], p2[0]);
+		return Math.abs(getDx());
 	}
 	
 	/**
-	 * Gets the low x coordinate
+	 * Gets the height as a scalar, i.e. no sign to indicate direction, value only.
 	 * @return
 	 */
 	public double getHeight() {
-		return Math.max(p1[1], p2[1])-Math.min(p1[1], p2[1]);
+		return Math.abs(getDy());
 	}
 
 }

@@ -10,126 +10,130 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Display;
 
 /**
- * A selection region must conform to this interface. You can set
- * its position, color and transparency settings.
+ * A selection region must conform to this interface. You can set its position, colour and transparency settings.
  * 
  * @author fcp94556
- *
  */
 public interface IRegion {
-		
+
 	/**
-	 * The name of the region
-	 * @return
+	 * @return the name of the region
 	 */
 	public String getName();
-	
+
 	/**
 	 * The name of the region
+	 * 
 	 * @param name
 	 */
 	public void setName(String name);
-	
+
 	/**
-	 * The Color of the region
-	 * @return
+	 * @return the colour of the region
 	 */
 	public Color getRegionColor();
-	
-	/**
-	 * The Color of the region
-	 * @return
-	 */
 
+	/**
+	 * The colour of the region
+	 * 
+	 * @param regionColor
+	 */
 	public void setRegionColor(Color regionColor);
-	
+
+	/**
+	 * @return if true, position information should be shown in the region.
+	 */
+	public boolean isShowPosition();
+
 	/**
 	 * If position information should be shown in the region.
-	 * @return
+	 * 
+	 * @param showPosition
 	 */
-	public boolean isShowPosition() ;
-	/**
-	 * If position information should be shown in the region.
-	 * @return
-	 */
-	public void setShowPosition(boolean showPosition) ;
-	
+	public void setShowPosition(boolean showPosition);
+
 	/**
 	 * Alpha transparency 0-255, 0-transparent, 255-opaque
+	 * 
 	 * @return
 	 */
 	public int getAlpha();
+
 	/**
 	 * Alpha transparency 0-255, 0-transparent, 255-opaque
-	 * @return
+	 * 
+	 * @param alpha
 	 */
 	public void setAlpha(int alpha);
+
 	/**
-	 * Visibility
-	 * @return
+	 * @return true if visible
 	 */
-	public boolean isVisible() ;
+	public boolean isVisible();
+
 	/**
 	 * Visibility
-	 * @return
+	 * 
+	 * @param visible
 	 */
 	public void setVisible(boolean visible);
+
+	/**
+	 * @return true if moveable
+	 */
+	public boolean isMobile();
+
 	/**
 	 * Moveable or not
-	 * @return
+	 * 
+	 * @param mobile
 	 */
-	public boolean isMotile() ;
-	
+	public void setMobile(boolean mobile);
+
 	/**
-	 * Moveable or not
-	 * @return
+	 * @return true if label is shown
 	 */
-	public void setMotile(boolean motile);
-	
-	/**
-	 * Label shown or not
-	 * @return
-	 */
-	public boolean isShowLabel() ;
-	
+	public boolean isShowLabel();
+
 	/**
 	 * Label shown or not
-	 * @return
+	 * 
+	 * @param label
 	 */
 	public void setShowLabel(boolean label);
-	
+
 	/**
 	 * Get the position (in coordinate frame of the axis that region is added to)
 	 */
 	public RegionBounds getRegionBounds();
-	
+
 	/**
 	 * Set the position (in coordinate frame of the axis that region is added to)
 	 */
 	public void setRegionBounds(RegionBounds bounds);
-	
+
 	/**
-	 * Add a listener which is notified when this region is resized or
-	 * moved.
+	 * Add a listener which is notified when this region is resized or moved.
 	 * 
 	 * @param l
 	 */
 	public boolean addRegionBoundsListener(final IRegionBoundsListener l);
-	
+
 	/**
 	 * Remove a RegionBoundsListener
+	 * 
 	 * @param l
 	 */
 	public boolean removeRegionBoundsListener(final IRegionBoundsListener l);
-	
+
 	/**
-	 * Will be called to remove the region and clean up resources when the 
-	 * user calls the removeRegion(...) method.
+	 * Will be called to remove the region and clean up resources when the user
+	 * calls the removeRegion(...) method.
 	 */
 	public void remove();
-	
+
 	/**
-	 * Class packages types of regions, their default names, colors and indices.
+	 * Class packages types of regions, their default names, colours and indices.
 	 * @author fcp94556
 	 *
 	 */
@@ -141,8 +145,8 @@ public interface IRegion {
 		YAXIS("Y-Axis",  3, Display.getDefault().getSystemColor(SWT.COLOR_BLUE)), 
 		SECTOR("Sector", 4, Display.getDefault().getSystemColor(SWT.COLOR_RED)),
 		XAXIS_LINE("X-Axis Line",  5, Display.getDefault().getSystemColor(SWT.COLOR_BLUE)), 
-		YAXIS_LINE("Y-Axis Line",  6, Display.getDefault().getSystemColor(SWT.COLOR_BLUE)); 
-		
+		YAXIS_LINE("Y-Axis Line",  6, Display.getDefault().getSystemColor(SWT.COLOR_BLUE));
+
 		private int    index;
 		private String name;
 		private Color defaultColor;
@@ -160,24 +164,27 @@ public interface IRegion {
 		}
 	
 		RegionType(String name, int index, Color defaultColor) {
-			this.name  = name;
+			this.name = name;
 			this.index = index;
 			this.defaultColor = defaultColor;
 		}
-		
+
 		public int getIndex() {
 			return index;
 		}
+
 		public String getName() {
 			return name;
 		}
+
 		public Color getDefaultColor() {
 			return defaultColor;
 		}
 
 		public static RegionType getRegion(int index) {
 			for (RegionType r : ALL_TYPES) {
-				if (r.getIndex()==index) return r;
+				if (r.getIndex() == index)
+					return r;
 			}
 			return null;
 		}
@@ -219,13 +226,13 @@ public interface IRegion {
 
 	/**
 	 * 
-	 * @return true if user region. If not a user region the region has been created programatically
+	 * @return true if user region. If not a user region the region has been created programmatically
 	 * and has been marked as not editable to the user.
 	 */
 	public boolean isUserRegion();
 
 	/**
-	 *  If not a user region the region has been created programatically
+	 *  If not a user region the region has been created programmatically
 	 * and has been marked as not editable to the user.
 	 * @param userRegion
 	 */
