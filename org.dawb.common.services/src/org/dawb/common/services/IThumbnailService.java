@@ -47,7 +47,7 @@ public interface IThumbnailService extends IFileIconService{
 	 * @param thumb - must be 2D set
 	 * @return
 	 */
-	public Image createImage(AbstractDataset thumb);
+	public Image createImage(AbstractDataset thumb) throws Exception;
 	
 	/**
 	 * Main method for thumbnails, deals with 1D and 2D set thumbnails.

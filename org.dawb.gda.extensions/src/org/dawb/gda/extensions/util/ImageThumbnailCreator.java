@@ -20,6 +20,8 @@ import javax.swing.ImageIcon;
 import javax.swing.filechooser.FileSystemView;
 
 import org.dawb.common.services.IFileIconService;
+import org.dawb.common.services.IImageService;
+import org.dawb.common.services.IImageService.ImageServiceBean;
 import org.dawb.common.services.ILoaderService;
 import org.dawb.common.services.IThumbnailService;
 import org.dawb.common.services.ServiceManager;
@@ -31,6 +33,7 @@ import org.dawb.common.util.io.FileUtils;
 import org.dawb.gda.extensions.Activator;
 import org.dawb.gda.extensions.loaders.H5Loader;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.SWT;
@@ -46,12 +49,11 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.eclipse.ui.services.AbstractServiceFactory;
 import org.eclipse.ui.services.IServiceLocator;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
-import uk.ac.diamond.scisoft.analysis.dataset.DatasetUtils;
-import uk.ac.diamond.scisoft.analysis.dataset.FloatDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.RGBDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.Stats;
 import uk.ac.diamond.scisoft.analysis.dataset.function.Downsample;
@@ -151,76 +153,19 @@ public class ImageThumbnailCreator extends AbstractServiceFactory implements ITh
 	 * Modified from fable
 	 * @param thumbnail
 	 * @return
+	 * @throws Exception 
 	 */
-	public Image createImageSWT(final AbstractDataset thumbnail) {
+	public Image createImageSWT(final AbstractDataset thumbnail) throws Exception {
         
-		final int[]   size = thumbnail.getShape();
-		FloatDataset  set  = (FloatDataset)DatasetUtils.cast(thumbnail, AbstractDataset.FLOAT32);
-		final float[] data = set.getData();
+		final ScopedPreferenceStore store = new ScopedPreferenceStore(InstanceScope.INSTANCE, "org.dawb.workbench.plotting");
+		final ImageServiceBean bean = new ImageServiceBean();
+		bean.setPalette(PaletteFactory.getPalette(store.getInt("org.dawb.plotting.system.paletteChoice")));	
+		bean.setOrigin(IImageService.ImageOrigin.forLabel(store.getString("org.dawb.plotting.system.originChoice")));
+		bean.setImage(thumbnail);
 		
-		final float[] stats  = getStatistics(size, data);
-		
-		float min = stats[0];
-		float max = 3*stats[2];
-		if (max > stats[1])	max = stats[1];
-				
-		
-		final PaletteData     palette = PaletteFactory.getPalette();
-		int len = data.length;
-		if (len == 0) return null;
-
-		// Loop over pixels
-		float scale_8bit;
-		float maxPixel;
-		if (max > min) {
-			scale_8bit = 255f / (max - min);
-			maxPixel = max - min;
-		} else {
-			scale_8bit = 1f;
-			maxPixel = 0xFF;
-		}
-		
-		byte[] scaledImageAsByte = new byte[len];
-		float scaled_pixel;
-
-		for (int i = 0; i < len; i++) {
-			if (data[i] < min) {
-				scaled_pixel = 0;
-			} else if (data[i] >= max) {
-				scaled_pixel = maxPixel;
-			} else {
-				scaled_pixel = data[i] - min;
-			}
-			scaled_pixel = scaled_pixel * scale_8bit;
-			// Keep it in bounds
-			final byte pixel = (byte) (0x000000FF & ((int) scaled_pixel));
-			
-			scaledImageAsByte[i] = pixel;
-		}
-		ImageData imageData = new ImageData(size[1], size[0], 8, palette, 1, scaledImageAsByte);
-		
-		return new Image(Display.getCurrent(), imageData);
-
+		final IImageService service = (IImageService)PlatformUI.getWorkbench().getService(IImageService.class);
+		return  service.getImage(bean);
 	}
-
-	private static float[] getStatistics(final int[] size, final float[] data) {
-		
-		float min = Float.MAX_VALUE;
-		float max = -Float.MAX_VALUE;
-		float sum = 0.0f;
-		float val;
-		for (int j = 0; j < size[1]; j++) {
-			for (int i = 0; i < size[0]; i++) {
-				val = data[i + j*size[0]];
-				sum += val;
-				if (val < min) min = val;
-				if (val > max) max = val;
-			}
-		}
-		float mean = sum / (size[0] * size[1]);
-		return new float[] { min, max, mean };
-	}
-	
 	/**
 	 * Modified from GDA
 	 * @param thumbnail
@@ -276,7 +221,7 @@ public class ImageThumbnailCreator extends AbstractServiceFactory implements ITh
 	}
 
 	@Override
-	public Image createImage(AbstractDataset thumb) {
+	public Image createImage(AbstractDataset thumb) throws Exception {
 		return createImageSWT(thumb);
 	}
 
@@ -289,7 +234,7 @@ public class ImageThumbnailCreator extends AbstractServiceFactory implements ITh
 			return createImage(thumb);
 			
 		} else if (set.getShape().length==1) {
-			
+
 			// We plot to an offscreen plotting system, then take a screen shot of this.
 			final AbstractPlottingSystem system = PlottingFactory.getLightWeightPlottingSystem();
 			

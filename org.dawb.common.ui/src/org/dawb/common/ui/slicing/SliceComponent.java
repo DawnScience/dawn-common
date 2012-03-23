@@ -508,7 +508,7 @@ public class SliceComponent {
 			final SliceObject cs = SliceUtils.createSliceObject(dimsDataList, dataShape, sliceObject);
 			if (currentSlice!=null && currentSlice.equals(cs)) return;
 			sliceQueue.clear();
-			sliceQueue.add(cs);
+			if (cs!=null) sliceQueue.add(cs);
 		} catch (Exception e) {
 			logger.error("Cannot generate slices", e);
 		}

@@ -58,7 +58,7 @@ public class SliceUtils {
     	AbstractDataset y  = null;
     	final StringBuilder buf = new StringBuilder();
 
-     	buf.append("\n");
+     	//buf.append("\n"); // New graphing can deal with long titles.
     	for (int i = 0; i < dimsDataHolder.size(); i++) {
 
     		final DimsData dimsData = dimsDataHolder.getDimsData(i);

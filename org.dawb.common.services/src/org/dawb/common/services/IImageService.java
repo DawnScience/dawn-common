@@ -1,5 +1,8 @@
 package org.dawb.common.services;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
@@ -58,9 +61,33 @@ public interface IImageService {
 	}
 
 	public enum ImageOrigin {
-		TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT;
-	}
-	
+		TOP_LEFT("Top left"), TOP_RIGHT("Top right"), BOTTOM_LEFT("Bottom left"), BOTTOM_RIGHT("Bottom right");
+		
+		public static List<ImageOrigin> origins;
+		static {
+			origins = new ArrayList<ImageOrigin>();
+			origins.add(TOP_LEFT);
+			origins.add(TOP_RIGHT);
+			origins.add(BOTTOM_LEFT);
+			origins.add(BOTTOM_RIGHT);
+		}
+
+		private String label;
+		public String getLabel() {
+			return label;
+		}
+		
+		ImageOrigin(String label) {
+			this.label = label;
+		}
+		
+		public static ImageOrigin forLabel(String label) {
+			for (ImageOrigin o : origins) {
+				if (o.label.equals(label)) return o;
+			}
+			return null;
+		}
+	}	
 	/**
 	 * Get a full image data for a given data set and PaletteData
 	 * @param set
