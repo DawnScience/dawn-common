@@ -5,6 +5,22 @@ import java.util.EventListener;
 public interface IRegionBoundsListener extends EventListener {
 
 	
+	public class Stub implements IRegionBoundsListener {
+
+		@Override
+		public void regionBoundsDragged(RegionBoundsEvent evt) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void regionBoundsChanged(RegionBoundsEvent evt) {
+			// TODO Auto-generated method stub
+
+		}
+
+	}
+
 	/**
 	 * Called when the region is being dragged around and
 	 * its value is being updated in a live way. Do not do

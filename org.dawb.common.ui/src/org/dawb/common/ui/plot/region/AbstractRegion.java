@@ -3,6 +3,9 @@ package org.dawb.common.ui.plot.region;
 import java.util.Collection;
 import java.util.HashSet;
 
+import org.eclipse.draw2d.MouseListener;
+import org.eclipse.draw2d.MouseMotionListener;
+
 
 public abstract class AbstractRegion implements IRegion {
 
@@ -127,5 +130,24 @@ public abstract class AbstractRegion implements IRegion {
 	public void setUserRegion(boolean userRegion) {
 		this.userRegion = userRegion;
 	}
+
+	@Override
+	public void addMouseListener(MouseListener l) {
+		
+	}	
 	
+	@Override
+	public void removeMouseListener(MouseListener l){
+		
+	}
+
+	
+	@Override
+	public void addMouseMotionListener(MouseMotionListener l){
+		
+	}
+	@Override
+	public void removeMouseMotionListener(MouseMotionListener l){
+		
+	}
 }

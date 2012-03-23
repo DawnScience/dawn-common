@@ -3,6 +3,8 @@ package org.dawb.common.ui.plot.region;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.draw2d.MouseListener;
+import org.eclipse.draw2d.MouseMotionListener;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Display;
@@ -228,4 +230,27 @@ public interface IRegion {
 	 * @param userRegion
 	 */
 	public void setUserRegion(boolean userRegion);
+	
+	/**
+	 * Add Mouse listener to the region if it supports it and if it is a draw2d region.
+	 */
+	public void addMouseListener(MouseListener l);
+	
+	
+	/**
+	 * Remove Mouse listener to the region if it supports it and if it is a draw2d region.
+	 */
+	public void removeMouseListener(MouseListener l);
+
+	
+	/**
+	 * Add Mouse motion listener to the region if it supports it and if it is a draw2d region.
+	 */
+	public void addMouseMotionListener(MouseMotionListener l);
+	
+	/**
+	 * Remove Mouse motion listener to the region if it supports it and if it is a draw2d region.
+	 */
+	public void removeMouseMotionListener(MouseMotionListener l);
+
 }
