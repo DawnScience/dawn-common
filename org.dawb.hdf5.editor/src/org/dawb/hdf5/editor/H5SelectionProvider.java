@@ -7,6 +7,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
 
 
 public class H5SelectionProvider implements ISelectionProvider {
@@ -25,6 +26,7 @@ public class H5SelectionProvider implements ISelectionProvider {
 
 	@Override
 	public ISelection getSelection() {
+		if (currentSelection==null) currentSelection = new StructuredSelection();
 		return currentSelection;
 	}
 
