@@ -79,7 +79,7 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 		byte[] scaledImageAsByte = new byte[len];
 
 		ImageData imageData = null;
-		if (origin==ImageOrigin.TOP_LEFT) { // Fastest - also the default which is nice.
+		if (origin==ImageOrigin.TOP_LEFT) { 
 			
 			int byteIndex = 0;
 			// This loop is usually the same as the image is read in but not always depending on loader.
