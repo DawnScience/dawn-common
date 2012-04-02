@@ -81,21 +81,16 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 		ImageData imageData = null;
 		if (origin==ImageOrigin.TOP_LEFT) { // Fastest - also the default which is nice.
 			
-//			int byteIndex = 0;
-//			for (int col = 0; col<shape[1]; ++col) {
-//				for (int row = shape[0]-1; row>=0; --row) {
-//
-//					final float val = image.getFloat(row, col);
-//					addByte(val, min, max, scale_8bit, maxPixel, scaledImageAsByte, byteIndex);
-//					++byteIndex;
-//				}
-//			}
-
-			for (int index = 0; index<len; ++index) {
-				
-				if (bean.isCancelled()) return null;
-				final float val = (float)image.getElementDoubleAbs(index);
-				addByte(val, min, max, scale_8bit, maxPixel, scaledImageAsByte, index);
+			int byteIndex = 0;
+			// This loop is usually the same as the image is read in but not always depending on loader.
+			for (int i = 0; i<shape[0]; ++i) {
+				for (int j = 0; j<shape[1]; ++j) {
+					
+					if (bean.isCancelled()) return null;
+					final float val = image.getFloat(i, j);
+					addByte(val, min, max, scale_8bit, maxPixel, scaledImageAsByte, byteIndex);
+					++byteIndex;
+				}
 			}
 			imageData = new ImageData(shape[1], shape[0], 8, palette, 1, scaledImageAsByte);
 		
