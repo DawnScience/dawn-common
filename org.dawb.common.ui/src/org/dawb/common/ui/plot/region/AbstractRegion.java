@@ -3,15 +3,19 @@ package org.dawb.common.ui.plot.region;
 import java.util.Collection;
 import java.util.HashSet;
 
-import org.eclipse.draw2d.MouseListener;
-import org.eclipse.draw2d.MouseMotionListener;
+import org.eclipse.draw2d.Figure;
 
-
-public abstract class AbstractRegion implements IRegion {
+/**
+ * This is a Figure, disabled for mouse events. 
+ * 
+ * @author fcp94556
+ *
+ */
+public abstract class AbstractRegion extends Figure implements IRegion {
 
 	private Collection<IRegionBoundsListener> regionBoundsListeners;
 	private boolean regionEventsActive = true;
-
+	
 	/**
 	 * Add a listener which is notified when this region is resized or
 	 * moved.
@@ -129,25 +133,5 @@ public abstract class AbstractRegion implements IRegion {
 	@Override
 	public void setUserRegion(boolean userRegion) {
 		this.userRegion = userRegion;
-	}
-
-	@Override
-	public void addMouseListener(MouseListener l) {
-		
-	}	
-	
-	@Override
-	public void removeMouseListener(MouseListener l){
-		
-	}
-
-	
-	@Override
-	public void addMouseMotionListener(MouseMotionListener l){
-		
-	}
-	@Override
-	public void removeMouseMotionListener(MouseMotionListener l){
-		
 	}
 }

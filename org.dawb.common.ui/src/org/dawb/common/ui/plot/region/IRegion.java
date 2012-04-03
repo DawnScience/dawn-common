@@ -3,6 +3,7 @@ package org.dawb.common.ui.plot.region;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.MouseListener;
 import org.eclipse.draw2d.MouseMotionListener;
 import org.eclipse.swt.SWT;
@@ -14,7 +15,7 @@ import org.eclipse.swt.widgets.Display;
  * 
  * @author fcp94556
  */
-public interface IRegion {
+public interface IRegion extends IFigure {
 
 	/**
 	 * @return the name of the region
