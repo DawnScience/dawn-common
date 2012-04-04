@@ -112,4 +112,22 @@ public interface IImageTrace extends ITrace {
 	 * @return
 	 */
 	public IImageService.ImageServiceBean getImageServiceBean();
+	
+	/**
+	 * Returns the getMax() value if it has been set or the last calculated
+	 * value of max if not.
+	 * 
+	 * @return
+	 */
+	public Number getCalculatedMax();
+	
+	
+	/**
+	 * Returns the getMin() value if it has been set or the last calculated
+	 * value of min if not.
+	 * 
+	 * @return
+	 */
+	public Number getCalculatedMin();
+
 }
