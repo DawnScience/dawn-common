@@ -142,11 +142,12 @@ public interface IRegion extends IFigure {
 		
 		LINE("Line",     0, Display.getDefault().getSystemColor(SWT.COLOR_CYAN)), 
 		BOX("Box",       1, Display.getDefault().getSystemColor(SWT.COLOR_GREEN)), 
-		XAXIS("X-Axis",  2, Display.getDefault().getSystemColor(SWT.COLOR_BLUE)), 
-		YAXIS("Y-Axis",  3, Display.getDefault().getSystemColor(SWT.COLOR_BLUE)), 
-		SECTOR("Sector", 4, Display.getDefault().getSystemColor(SWT.COLOR_RED)),
-		XAXIS_LINE("X-Axis Line",  5, Display.getDefault().getSystemColor(SWT.COLOR_BLUE)), 
-		YAXIS_LINE("Y-Axis Line",  6, Display.getDefault().getSystemColor(SWT.COLOR_BLUE));
+		RING("Ring", 2, Display.getDefault().getSystemColor(SWT.COLOR_DARK_YELLOW)), 
+		XAXIS("X-Axis",  3, Display.getDefault().getSystemColor(SWT.COLOR_BLUE)), 
+		YAXIS("Y-Axis",  4, Display.getDefault().getSystemColor(SWT.COLOR_BLUE)), 
+		SECTOR("Sector", 5, Display.getDefault().getSystemColor(SWT.COLOR_RED)),
+		XAXIS_LINE("X-Axis Line",  6, Display.getDefault().getSystemColor(SWT.COLOR_BLUE)), 
+		YAXIS_LINE("Y-Axis Line",  7, Display.getDefault().getSystemColor(SWT.COLOR_BLUE));
 
 		private int    index;
 		private String name;
@@ -157,6 +158,7 @@ public interface IRegion extends IFigure {
 			ALL_TYPES = new ArrayList<RegionType>(5);
 			ALL_TYPES.add(LINE);
 			ALL_TYPES.add(BOX);
+			ALL_TYPES.add(RING);
 			ALL_TYPES.add(XAXIS);
 			ALL_TYPES.add(YAXIS);
 			ALL_TYPES.add(SECTOR);

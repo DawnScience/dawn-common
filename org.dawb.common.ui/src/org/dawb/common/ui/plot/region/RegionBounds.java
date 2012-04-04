@@ -6,7 +6,7 @@ import java.util.Arrays;
 import org.dawb.common.util.text.NumberUtils;
 
 /**
- * Class attempts to construct a bound in graph coordinates within
+ * Class attempts to construct a bound in graph coordinates (not pixels) within
  * which the region should be drawn. This can them be used to get and
  * set the location and size of the region which will be drawn within
  * these bounds.
@@ -15,11 +15,22 @@ import org.dawb.common.util.text.NumberUtils;
  *
  */
 public class RegionBounds {
+	
+	/**
+	 * The inner radius if this is circular bounds
+	 */
+	protected double inner = Double.NaN;
+	
+	/**
+	 * The outer radius if this is circular bounds
+	 */
+	protected double outer = Double.NaN;
+
 
 	/**
 	 * The centre, which may be null.
 	 */
-	protected double[] centre;
+	protected double[] center;
 
 	/**
 	 * The upper left if a box, the start point if a line.
@@ -37,10 +48,28 @@ public class RegionBounds {
 		super();
 	}
 
+	/**
+	 * Rectangular region
+	 * @param p1
+	 * @param p2
+	 */
 	public RegionBounds(double[] p1,  double[] p2) {
 	    this.p1 = p1;
 	    this.p2 = p2;
 		this.format = new DecimalFormat("##0.00E0");
+	}
+
+	/**
+	 * Cicular region
+	 * 
+	 * @param center2
+	 * @param inRad
+	 * @param outRad
+	 */
+	public RegionBounds(double[] center, double inRad, double outRad) {
+		this.center = center;
+		this.inner  = inRad;
+		this.outer  = outRad;
 	}
 
 	public double[] getP1() {
@@ -63,7 +92,12 @@ public class RegionBounds {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + Arrays.hashCode(centre);
+		result = prime * result + Arrays.hashCode(center);
+		long temp;
+		temp = Double.doubleToLongBits(inner);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(outer);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
 		result = prime * result + Arrays.hashCode(p1);
 		result = prime * result + Arrays.hashCode(p2);
 		return result;
@@ -78,7 +112,13 @@ public class RegionBounds {
 		if (getClass() != obj.getClass())
 			return false;
 		RegionBounds other = (RegionBounds) obj;
-		if (!Arrays.equals(centre, other.centre))
+		if (!Arrays.equals(center, other.center))
+			return false;
+		if (Double.doubleToLongBits(inner) != Double
+				.doubleToLongBits(other.inner))
+			return false;
+		if (Double.doubleToLongBits(outer) != Double
+				.doubleToLongBits(other.outer))
 			return false;
 		if (!Arrays.equals(p1, other.p1))
 			return false;
@@ -138,19 +178,19 @@ public class RegionBounds {
 	 * 
 	 * @return
 	 */
-	public double[] getCentre() {
-		if (centre==null) {
+	public double[] getCenter() {
+		if (center==null) {
 			return new double[]{p2[0]-p1[0], p2[1]-p1[1]};
 		}
-		return centre;
+		return center;
 	}
 	
 	/**
 	 * Use carefully, once set this is the centre even if p1 and/or p2 change (unless it is set to null).
 	 * @param centre (can be null)
 	 */
-	public void setCentre(double[] centre) {
-		this.centre = centre;
+	public void setCenter(double[] centre) {
+		this.center = centre;
 	}
 
 	public double getDx() {
@@ -195,6 +235,46 @@ public class RegionBounds {
 	 */
 	public double getHeight() {
 		return Math.abs(getDy());
+	}
+
+	public boolean isRectange() {
+		return p1!=null && p2!=null && Double.isNaN(inner) && Double.isNaN(outer);
+	}
+	
+	public boolean isCircle() {
+		return p1==null && p2==null && !Double.isNaN(inner) && !Double.isNaN(outer) && this.center!=null;
+	}
+
+	public double getInner() {
+		return inner;
+	}
+
+	public void setInner(double inner) {
+		this.inner = inner;
+	}
+
+	public double getOuter() {
+		return outer;
+	}
+
+	public void setOuter(double outer) {
+		this.outer = outer;
+	}
+
+	/**
+	 * Returns a RegionBounds bounding the inner circle
+	 * @return
+	 */
+	public RegionBounds getInnerRectangle() {
+		if (!isCircle()) throw new RuntimeException("Can only calculate inner circle bounds if it is circle bounds!");
+		final double diff = Math.hypot(inner, inner);
+		return new RegionBounds(new double[]{center[0]-diff, center[1]-diff}, new double[]{center[0]+diff, center[1]+diff});
+	}
+
+	public RegionBounds getOuterRectangle() {
+		if (!isCircle()) throw new RuntimeException("Can only calculate outer circle bounds if it is circle bounds!");
+		final double diff = Math.hypot(outer, outer);
+		return new RegionBounds(new double[]{center[0]-diff, center[1]-diff}, new double[]{center[0]+diff, center[1]+diff});
 	}
 
 }
