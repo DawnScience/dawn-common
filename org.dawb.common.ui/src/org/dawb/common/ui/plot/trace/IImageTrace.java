@@ -3,6 +3,7 @@ package org.dawb.common.ui.plot.trace;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.dawb.common.services.IImageService;
 import org.dawb.common.ui.plot.region.RegionBounds;
 import org.eclipse.swt.graphics.PaletteData;
 
@@ -103,4 +104,12 @@ public interface IImageTrace extends ITrace {
 	 * @return
 	 */
 	public void setMax(Number max);
+	
+	/**
+	 * Returns the last image service bean sent to the service for getting
+	 * the image.
+	 * 
+	 * @return
+	 */
+	public IImageService.ImageServiceBean getImageServiceBean();
 }
