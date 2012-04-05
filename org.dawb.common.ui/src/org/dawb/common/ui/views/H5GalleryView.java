@@ -9,6 +9,8 @@
  */ 
 package org.dawb.common.ui.views;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -18,6 +20,7 @@ import org.dawb.common.services.ServiceManager;
 import org.dawb.common.ui.Activator;
 import org.dawb.common.ui.menu.CheckableActionGroup;
 import org.dawb.common.ui.menu.MenuAction;
+import org.dawb.common.ui.plot.IPlottingSystem;
 import org.dawb.common.ui.slicing.ISlicablePlottingPart;
 import org.dawb.common.ui.slicing.ISliceReceiver;
 import org.dawb.common.ui.slicing.SliceComponent;
@@ -63,6 +66,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.DatasetUtils;
+import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.Maths;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 import uk.ac.diamond.scisoft.analysis.io.SliceObject;
 
@@ -100,7 +106,7 @@ public class H5GalleryView extends ViewPart implements MouseListener, SelectionL
 
 		parent.setLayout(new FillLayout());
 
-		this.gallery = new Gallery(parent, SWT.V_SCROLL | SWT.VIRTUAL);
+		this.gallery = new Gallery(parent, SWT.V_SCROLL | SWT.VIRTUAL | SWT.MULTI);
 		gallery.setToolTipText("This part is used to navigate an image set inside an hdf5/nexus file.");
 		
 		// Renderers
@@ -282,27 +288,55 @@ public class H5GalleryView extends ViewPart implements MouseListener, SelectionL
 	}
 	
 	private void updateSelection() {
-		final int index = getSelectedIndex();
-		if (index<0) return;
+		
+		final GalleryItem[] items = gallery.getSelection();
+		if (items==null || items.length<1) return;
 		
 		final IEditorPart part = EclipseUtils.getActiveEditor();
 		if (part instanceof ISlicablePlottingPart) {
+			
 			ISlicablePlottingPart prov = (ISlicablePlottingPart)part;
+			
+			
 			final SliceComponent sliceComponent = prov.getSliceComponent();
-			if (sliceComponent!=null) sliceComponent.setSliceIndex(info.getSliceDimension(), index);
+			if (sliceComponent!=null) {
+				sliceComponent.setSliceIndex(info.getSliceDimension(), items[0].getItemCount(), items.length<=1);
+			}
+			if (items.length<=1) return;
+			
+			List<AbstractDataset> ys = getSlices(items);
+			final IPlottingSystem system = prov.getDataSetComponent().getPlottingSystem();
+			system.clear();
+
+			if (ys.get(0).getShape().length==1) {
+				system.createPlot1D(null, ys, null);
+			} else if (ys.get(0).getShape().length==2) {
+				// Average the images, then plot
+			    AbstractDataset added = Maths.add(Arrays.asList(ys.toArray(new IDataset[ys.size()])), false);
+			    AbstractDataset mean  = Maths.divide(added, ys.size());
+			    system.createPlot2D(mean, null, null);
+			}
 		}
 	}
-
-	private int getSelectedIndex() {
+	
+	private List<AbstractDataset> getSlices(GalleryItem[] items) {
 		
-		final GalleryItem[] items = gallery.getSelection();
-		if (items==null || items.length<1) return -1;
-		
-		final GalleryItem item = items[0];
-		final int  index       = item.getItemCount();
-		return index;
+		final List<AbstractDataset> ys = new ArrayList<AbstractDataset>(11);
+		for (GalleryItem item : items) {
+			final ImageItem ii = new ImageItem();
+			ii.setIndex(item.getItemCount());
+			ii.setItem(item);
+            try {
+            	AbstractDataset slice = getSlice(ii);
+            	slice.setName("Slice "+item.getItemCount());
+				ys.add(slice);
+			} catch (Exception e) {
+				logger.error("Cannot slice ", e);
+				continue;
+			}
+		}
+        return ys;
 	}
-
 
 	public void dispose() {
 		
@@ -338,22 +372,8 @@ public class H5GalleryView extends ViewPart implements MouseListener, SelectionL
 	                   	if (ii.getIndex()<0)    return;
 	                   	if (ii.getItem().isDisposed()) continue;
 	                   	
-	                   	// Do slice
-	            		final SliceObject slice = info.getSlice();
-	            		slice.setSliceStart(getSliceStart(ii.getIndex()));
-		                slice.setSliceStop(getSliceStop(ii.getIndex()));
-		                slice.setSliceStep(getSliceStep(ii.getIndex()));
-	            		
-	            		AbstractDataset set=null;
-	            		try {
-	            			set   = LoaderFactory.getSlice(slice, null);
-	            			if (set==null) continue;
-	            		} catch (java.lang.IllegalArgumentException ne) {
-	            			// We do not want the thread to stop in this case.
-	            			logger.debug("Encountered invalid shape with "+slice);
-	            			continue;
-	            		}
-             			set.setShape(slice.getSlicedShape());
+	                   	final AbstractDataset set = getSlice(ii);
+	                   	if (set==null) continue;
 	            		
 	            		// Generate thumbnail
 	            		int             size  = store.getInt("org.dawb.workbench.views.image.monitor.thumbnail.size");
@@ -376,11 +396,34 @@ public class H5GalleryView extends ViewPart implements MouseListener, SelectionL
 					logger.error("Cannot process images", ne);
 				}
 			}
+
 		}, "Image View Processing Daemon");
 		
 		imageThread.setDaemon(true);
 		imageThread.start();
 	}
+	
+	private AbstractDataset getSlice(final ImageItem ii) throws Exception {
+		// Do slice
+		final SliceObject slice = info.getSlice();
+		slice.setSliceStart(getSliceStart(ii.getIndex()));
+		slice.setSliceStop(getSliceStop(ii.getIndex()));
+		slice.setSliceStep(getSliceStep(ii.getIndex()));
+
+		AbstractDataset set=null;
+		try {
+			set   = LoaderFactory.getSlice(slice, null);
+			if (set==null) return null;
+		} catch (java.lang.IllegalArgumentException ne) {
+			// We do not want the thread to stop in this case.
+			logger.debug("Encountered invalid shape with "+slice);
+			return null;
+		}
+		set.setShape(slice.getSlicedShape());
+
+		return set;
+	}
+
 	
 	protected int[] getSliceStart(int index) {
 		

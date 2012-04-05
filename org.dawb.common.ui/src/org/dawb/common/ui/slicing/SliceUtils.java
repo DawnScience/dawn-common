@@ -180,6 +180,7 @@ public class SliceUtils {
 			plotWindow.createPlot1D(slice, null, monitor);
 		} else if (mode==PlotType.PT1D_MULTI || mode==PlotType.PT1D_STACKED) {
 			
+			plotWindow.clear();
 			// We separate the 2D image into several 1d plots
 			final int[]         shape = slice.getShape();
 			final List<double[]> sets = new ArrayList<double[]>(shape[1]);

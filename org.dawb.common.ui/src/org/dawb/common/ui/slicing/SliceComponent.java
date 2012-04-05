@@ -671,11 +671,11 @@ public class SliceComponent {
 		}
 	}
 
-	public void setSliceIndex(int dimension, int index) {
+	public void setSliceIndex(int dimension, int index, boolean doSlice) {
 		viewer.cancelEditing();
 		this.dimsDataList.getDimsData(dimension).setSlice(index);
 		viewer.refresh();
-		slice(true);
+		if (doSlice) slice(true);
 	}
 	
 	public DimsDataList getDimsDataList() {

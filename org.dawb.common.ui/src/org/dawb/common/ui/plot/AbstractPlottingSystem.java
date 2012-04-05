@@ -10,6 +10,7 @@
 package org.dawb.common.ui.plot;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -46,6 +47,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.IntegerDataset;
 
 /**
  * The base class for IPlottingSystem. NOTE some methods that should be implemented
@@ -343,6 +345,12 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	public ITrace createPlot2D(AbstractDataset      image, 
 							   List<AbstractDataset> axes,
 							   IProgressMonitor      monitor) {
+		
+		if (axes == null) {
+			IntegerDataset x = IntegerDataset.arange(image.getShape()[0]);
+			IntegerDataset y = IntegerDataset.arange(image.getShape()[0]);
+			axes = Arrays.asList(new AbstractDataset[]{x,y});
+		}
 		List<ITrace> traces = createPlot(image,axes,PlotType.IMAGE, monitor);
 		if (traces!=null) return traces.get(0);
 		return null;
