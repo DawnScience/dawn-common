@@ -29,12 +29,7 @@ public interface ITrace {
 	
 	
 	/**
-	 * Call this method to return a plotted data set by this trace. NOTE the plotting system
-	 * will likely not be using AbstractDataset as internal data. Instead it will get the
-	 * current data of the plot required and construct an AbstractDataset for it. This means
-	 * that you can plot int data but get back double data if the graph keeps data internally
-	 * as doubles for instance. If the append(...) method has been used, the data returned by
-	 * name from here will include the appended points.
+	 * Call this method to return a plotted data set by this trace.
 	 */
 	public AbstractDataset getData();
 	

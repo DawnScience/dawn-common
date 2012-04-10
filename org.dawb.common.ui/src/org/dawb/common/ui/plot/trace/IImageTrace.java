@@ -130,4 +130,17 @@ public interface IImageTrace extends ITrace {
 	 */
 	public Number getCalculatedMin();
 
+	/**
+	 * Call to add a palette listener
+	 * @param pl
+	 */
+	public void addPaletteListener(PaletteListener pl);
+	
+	
+	/**
+	 * Call to remove a palette listener
+	 * @param pl
+	 */
+	public void removePaletteListener(PaletteListener pl);
+
 }
