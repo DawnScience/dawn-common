@@ -109,4 +109,10 @@ public class MenuAction extends Action implements IMenuCreator {
 	public void run() {
 		if (selectedAction!=null) selectedAction.run();
 	}
+	
+	public String toString() {
+		if (getText()!=null) return getText();
+		if (getToolTipText()!=null) return getToolTipText();
+		return super.toString();
+	}
 }

@@ -93,9 +93,7 @@ public class PlottingActionBarManager {
 		if (!isToolsRequired) return null;
 		
 		final IWorkbenchPart part = system.getPart();
-		if (part==null || part.getAdapter(IToolPageSystem.class)==null) {
-			return null;
-		}
+		if (part==null)  return null;
 		
 		final MenuAction toolActions = new MenuAction(role.getLabel());
 		toolActions.setToolTipText(role.getTooltip());
