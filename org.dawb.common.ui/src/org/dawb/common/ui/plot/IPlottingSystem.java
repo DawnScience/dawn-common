@@ -188,4 +188,9 @@ public interface IPlottingSystem extends ITraceSystem, IRegionSystem, IAxisSyste
 	 * @return true if some or all of the plotted data is 2D or images.
 	 */
 	public boolean is2D();
+	
+	/**
+	 * @return the action bars containing the graph actions.
+	 */
+	public IActionBars getActionBars();
 }

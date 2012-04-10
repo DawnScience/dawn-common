@@ -85,7 +85,11 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 
     protected String   rootName;
 	
-    
+    /**
+     * The action bars on the part using the plotting system, may be null
+     */
+    protected IActionBars    bars;
+
     
 	public AbstractPlottingSystem() {
 		this.actionBarManager = createActionBarManager();
@@ -323,6 +327,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 
 		this.defaultPlotType = hint;
 		this.part = part;
+		this.bars = bars;
 		
 		if (part!=null) {
 			final ISystemService<IPlottingSystem> service = (ISystemService<IPlottingSystem>)PlatformUI.getWorkbench().getService(ISystemService.class);
@@ -731,4 +736,10 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 		return ret; // may be empty
 	}
 
+	/**
+	 * @return IActionBars, may be null
+	 */
+	public IActionBars getActionBars() {
+		return bars;
+	}
 }
