@@ -174,4 +174,15 @@ public interface IImageTrace extends ITrace {
 	 */
 	public void setDownsampleType(DownsampleType type);
 
+	/**
+	 * 
+	 * @return true if should rehistogram when zoomed.
+	 */
+	public boolean isRehistorgram();
+	
+	/**
+	 * 
+	 * true if should rehistogram when zoomed.
+	 */
+	public void setRehistorgram(boolean rehisto);
 }
