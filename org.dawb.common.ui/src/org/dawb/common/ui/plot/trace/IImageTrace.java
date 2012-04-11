@@ -39,6 +39,24 @@ public interface IImageTrace extends ITrace {
 			return null;
 		}
 	}
+	
+	public enum DownsampleType {
+		
+		POINT("Point, top left of bin"),  // select corner point of bin
+		MEAN("Mean value of bin"),   // mean average over bin
+		MAXIMUM("Maximum value of bin"), // use maximum value in bin
+		MINIMUM("Minimum value of bin"); // use minimum value in bin
+		
+		private String label;
+		
+		DownsampleType(String label) {
+			this.label = label;
+		}
+		
+		public String getLabel() {
+			return label;
+		}
+	}
 
 	/**
 	 * Pulls a data set out of the image data for
@@ -142,5 +160,18 @@ public interface IImageTrace extends ITrace {
 	 * @param pl
 	 */
 	public void removePaletteListener(PaletteListener pl);
+	
+	/**
+	 * 
+	 * @return the downsample type being used for plotting less data
+	 * than recieved.
+	 */
+	public DownsampleType getDownsampleType();
+	
+	/**
+	 * Change the downsample type, will also refresh the UI.
+	 * @param type
+	 */
+	public void setDownsampleType(DownsampleType type);
 
 }
