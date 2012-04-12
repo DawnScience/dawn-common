@@ -165,6 +165,7 @@ public interface IRegion extends IFigure {
 			ALL_TYPES.add(SECTOR);
 			ALL_TYPES.add(XAXIS_LINE);
 			ALL_TYPES.add(YAXIS_LINE);
+			ALL_TYPES.add(FREE_DRAW);
 		}
 	
 		RegionType(String name, int index, Color defaultColor) {
