@@ -140,14 +140,15 @@ public interface IRegion extends IFigure {
 	 */
 	public enum RegionType {
 		
-		LINE("Line",     0, Display.getDefault().getSystemColor(SWT.COLOR_CYAN)), 
-		BOX("Box",       1, Display.getDefault().getSystemColor(SWT.COLOR_GREEN)), 
-		RING("Ring", 2, Display.getDefault().getSystemColor(SWT.COLOR_DARK_YELLOW)), 
-		XAXIS("X-Axis",  3, Display.getDefault().getSystemColor(SWT.COLOR_BLUE)), 
-		YAXIS("Y-Axis",  4, Display.getDefault().getSystemColor(SWT.COLOR_BLUE)), 
-		SECTOR("Sector", 5, Display.getDefault().getSystemColor(SWT.COLOR_RED)),
+		LINE("Line",               0, Display.getDefault().getSystemColor(SWT.COLOR_CYAN)), 
+		BOX("Box",                 1, Display.getDefault().getSystemColor(SWT.COLOR_GREEN)), 
+		RING("Ring",               2, Display.getDefault().getSystemColor(SWT.COLOR_DARK_YELLOW)), 
+		XAXIS("X-Axis",            3, Display.getDefault().getSystemColor(SWT.COLOR_BLUE)), 
+		YAXIS("Y-Axis",            4, Display.getDefault().getSystemColor(SWT.COLOR_BLUE)), 
+		SECTOR("Sector",           5, Display.getDefault().getSystemColor(SWT.COLOR_RED)),
 		XAXIS_LINE("X-Axis Line",  6, Display.getDefault().getSystemColor(SWT.COLOR_BLUE)), 
-		YAXIS_LINE("Y-Axis Line",  7, Display.getDefault().getSystemColor(SWT.COLOR_BLUE));
+		YAXIS_LINE("Y-Axis Line",  7, Display.getDefault().getSystemColor(SWT.COLOR_BLUE)), 
+		FREE_DRAW("Free draw",     8, Display.getDefault().getSystemColor(SWT.COLOR_DARK_YELLOW));
 
 		private int    index;
 		private String name;

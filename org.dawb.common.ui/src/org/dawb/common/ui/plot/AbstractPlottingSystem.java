@@ -742,4 +742,9 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	public IActionBars getActionBars() {
 		return bars;
 	}
+
+
+	public void setFocus() {
+		if (getPlotComposite()!=null) getPlotComposite().setFocus();
+	}
 }

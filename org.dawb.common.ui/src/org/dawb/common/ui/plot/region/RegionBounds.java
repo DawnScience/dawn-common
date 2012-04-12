@@ -1,7 +1,9 @@
 package org.dawb.common.ui.plot.region;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 
 import org.dawb.common.util.text.NumberUtils;
 
@@ -10,6 +12,9 @@ import org.dawb.common.util.text.NumberUtils;
  * which the region should be drawn. This can them be used to get and
  * set the location and size of the region which will be drawn within
  * these bounds.
+ * 
+ * TODO This class could slit into 3 - rectangle, ring, and points with an
+ * abstract super class.
  * 
  * @author fcp94556
  *
@@ -41,6 +46,11 @@ public class RegionBounds {
 	 * The lower right if a box, the end point if a line.
 	 */
 	protected double[] p2;
+	
+	/**
+	 * The points list if this is a points region.
+	 */
+	protected Collection<double[]> points;
 
 	private DecimalFormat format;
 	
@@ -238,11 +248,17 @@ public class RegionBounds {
 	}
 
 	public boolean isRectange() {
+		if (points!=null) return false;
 		return p1!=null && p2!=null && Double.isNaN(inner) && Double.isNaN(outer);
 	}
 	
 	public boolean isCircle() {
+		if (points!=null) return false;
 		return p1==null && p2==null && !Double.isNaN(inner) && !Double.isNaN(outer) && this.center!=null;
+	}
+	
+	public boolean isPoints() {
+		return points!=null;
 	}
 
 	public double getInner() {
@@ -275,6 +291,23 @@ public class RegionBounds {
 		if (!isCircle()) throw new RuntimeException("Can only calculate outer circle bounds if it is circle bounds!");
 		final double diff = Math.hypot(outer, outer);
 		return new RegionBounds(new double[]{center[0]-diff, center[1]-diff}, new double[]{center[0]+diff, center[1]+diff});
+	}
+
+	public Collection<double[]> getPoints() {
+		return points;
+	}
+
+	public void setPoints(Collection<double[]> points) {
+		this.points = points;
+	}
+	
+	/**
+	 * As soon as you add a point, this RegionBounds becomes a points list region bounds.
+	 * @param pnt
+	 */
+	public void addPoint(final double[] pnt) {
+		if (points==null) points = new ArrayList<double[]>(89);
+		points.add(pnt);
 	}
 
 }
