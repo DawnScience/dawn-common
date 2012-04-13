@@ -114,7 +114,7 @@ public class LoaderService extends AbstractServiceFactory implements ILoaderServ
 		if (!isFabioOnly) try {
 			
 			// Load from GDA - error this loads all the data sometimes.
-			final DataHolder      dh  = LoaderFactory.getData(f.getAbsolutePath(), false, new ProgressMonitorWrapper(monitor));
+			final DataHolder      dh  = LoaderFactory.getData(f.getAbsolutePath(), new ProgressMonitorWrapper(monitor));
 			set = dh.getDataset(0);
 			set.setName(f.getName());
 			return set;
