@@ -163,26 +163,24 @@ public interface IImageTrace extends ITrace {
 	
 	/**
 	 * 
-	 * @return the downsample type being used for plotting less data
-	 * than recieved.
+	 * @return the down-sample type being used for plotting less data
+	 * than received.
 	 */
 	public DownsampleType getDownsampleType();
 	
 	/**
-	 * Change the downsample type, will also refresh the UI.
+	 * Change the down-sample type, will also refresh the UI.
 	 * @param type
 	 */
 	public void setDownsampleType(DownsampleType type);
 
 	/**
-	 * 
-	 * @return true if should rehistogram when zoomed.
+	 * @return true if image is re-histogrammed when zoomed.
 	 */
-	public boolean isRehistorgram();
+	public boolean isRehistogram();
 	
 	/**
-	 * 
-	 * true if should rehistogram when zoomed.
+	 * @param rehisto true means image will be re-histogram when zoomed.
 	 */
 	public void setRehistorgram(boolean rehisto);
 }

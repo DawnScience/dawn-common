@@ -10,7 +10,7 @@ import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 
 /**
  * Line trace is used for all 1D trace data. So as well as lines,
- * it is used for histogram data. You can transform lines to histo
+ * it is used for histogram data. You can transform lines to histograms
  * using the setTraceType method.
  * 
  * @author fcp94556

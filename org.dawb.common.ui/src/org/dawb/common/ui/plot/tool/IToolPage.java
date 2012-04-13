@@ -26,7 +26,7 @@ import org.eclipse.ui.part.IPageBookViewPage;
  * This avoids recursion.
  * 
  * If you have to plot on a 1D tool, by default the tools menu will not be shown so you cannot
- * do recursive tools. (This can be overrided by implementing getAdpater(...) for
+ * do recursive tools. (This can be overridden by implementing getAdpater(...) for
  * IToolPageSystem if you really need to, but you are breaking the rules a little and
  * some things may not work.)
  * 

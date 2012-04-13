@@ -7,7 +7,7 @@ import org.dawb.common.ui.plot.IPlottingSystem;
 import org.eclipse.swt.graphics.Color;
 
 /**
- * Class containing untility methods for regions to avoid duplication 
+ * Class containing utility methods for regions to avoid duplication 
  * @author fcp94556
  *
  */
