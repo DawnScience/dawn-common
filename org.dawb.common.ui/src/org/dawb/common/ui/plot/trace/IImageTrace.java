@@ -176,13 +176,7 @@ public interface IImageTrace extends ITrace {
 
 	/**
 	 * 
-	 * @return true if should rehistogram when zoomed.
-	 */
-	public boolean isRehistorgram();
-	
-	/**
-	 * 
 	 * true if should rehistogram when zoomed.
 	 */
-	public void setRehistorgram(boolean rehisto);
+	public void rehistogram();
 }
