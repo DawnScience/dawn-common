@@ -1,8 +1,6 @@
 package org.dawb.common.ui.plot.trace;
 
 
-import org.eclipse.swt.graphics.Color;
-
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 
 /**

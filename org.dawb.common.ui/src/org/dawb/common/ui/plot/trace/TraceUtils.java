@@ -3,7 +3,7 @@ package org.dawb.common.ui.plot.trace;
 import org.dawb.common.ui.plot.IPlottingSystem;
 
 /**
- * Class containing untility methods for regions to avoid duplication 
+ * Class containing utility methods for regions to avoid duplication 
  * @author fcp94556
  *
  */

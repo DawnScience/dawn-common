@@ -9,11 +9,11 @@ import org.dawb.common.util.text.NumberUtils;
 
 /**
  * Class attempts to construct a bound in graph coordinates (not pixels) within
- * which the region should be drawn. This can them be used to get and
+ * which the region should be drawn. This can then be used to get and
  * set the location and size of the region which will be drawn within
  * these bounds.
  * 
- * TODO This class could slit into 3 - rectangle, ring, and points with an
+ * TODO This class could split into 3 - rectangle, ring, and points with an
  * abstract super class.
  * 
  * @author fcp94556
@@ -35,7 +35,7 @@ public class RegionBounds {
 	/**
 	 * The centre, which may be null.
 	 */
-	protected double[] center;
+	protected double[] centre;
 
 	/**
 	 * The upper left if a box, the start point if a line.
@@ -70,14 +70,14 @@ public class RegionBounds {
 	}
 
 	/**
-	 * Cicular region
+	 * Circular region
 	 * 
-	 * @param center2
+	 * @param centre
 	 * @param inRad
 	 * @param outRad
 	 */
-	public RegionBounds(double[] center, double inRad, double outRad) {
-		this.center = center;
+	public RegionBounds(double[] centre, double inRad, double outRad) {
+		this.centre = centre;
 		this.inner  = inRad;
 		this.outer  = outRad;
 	}
@@ -102,7 +102,7 @@ public class RegionBounds {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + Arrays.hashCode(center);
+		result = prime * result + Arrays.hashCode(centre);
 		long temp;
 		temp = Double.doubleToLongBits(inner);
 		result = prime * result + (int) (temp ^ (temp >>> 32));
@@ -122,7 +122,7 @@ public class RegionBounds {
 		if (getClass() != obj.getClass())
 			return false;
 		RegionBounds other = (RegionBounds) obj;
-		if (!Arrays.equals(center, other.center))
+		if (!Arrays.equals(centre, other.centre))
 			return false;
 		if (Double.doubleToLongBits(inner) != Double
 				.doubleToLongBits(other.inner))
@@ -188,19 +188,19 @@ public class RegionBounds {
 	 * 
 	 * @return
 	 */
-	public double[] getCenter() {
-		if (center==null) {
+	public double[] getCentre() {
+		if (centre==null) {
 			return new double[]{p2[0]-p1[0], p2[1]-p1[1]};
 		}
-		return center;
+		return centre;
 	}
 	
 	/**
 	 * Use carefully, once set this is the centre even if p1 and/or p2 change (unless it is set to null).
 	 * @param centre (can be null)
 	 */
-	public void setCenter(double[] centre) {
-		this.center = centre;
+	public void setCentre(double[] centre) {
+		this.centre = centre;
 	}
 
 	public double getDx() {
@@ -254,7 +254,7 @@ public class RegionBounds {
 	
 	public boolean isCircle() {
 		if (points!=null) return false;
-		return p1==null && p2==null && !Double.isNaN(inner) && !Double.isNaN(outer) && this.center!=null;
+		return p1==null && p2==null && !Double.isNaN(inner) && !Double.isNaN(outer) && this.centre!=null;
 	}
 	
 	public boolean isPoints() {
@@ -284,13 +284,13 @@ public class RegionBounds {
 	public RegionBounds getInnerRectangle() {
 		if (!isCircle()) throw new RuntimeException("Can only calculate inner circle bounds if it is circle bounds!");
 		final double diff = Math.hypot(inner, inner);
-		return new RegionBounds(new double[]{center[0]-diff, center[1]-diff}, new double[]{center[0]+diff, center[1]+diff});
+		return new RegionBounds(new double[]{centre[0]-diff, centre[1]-diff}, new double[]{centre[0]+diff, centre[1]+diff});
 	}
 
 	public RegionBounds getOuterRectangle() {
 		if (!isCircle()) throw new RuntimeException("Can only calculate outer circle bounds if it is circle bounds!");
 		final double diff = Math.hypot(outer, outer);
-		return new RegionBounds(new double[]{center[0]-diff, center[1]-diff}, new double[]{center[0]+diff, center[1]+diff});
+		return new RegionBounds(new double[]{centre[0]-diff, centre[1]-diff}, new double[]{centre[0]+diff, centre[1]+diff});
 	}
 
 	public Collection<double[]> getPoints() {
