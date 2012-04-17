@@ -1,6 +1,9 @@
 package org.dawb.common.ui.editors;
 
+import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IEditorSite;
+import org.eclipse.ui.PartInitException;
 
 /**
  * This class should be used to define additional editors which may be added to
@@ -27,6 +30,19 @@ public interface IEditorExtension extends IEditorPart {
 	 *                    </code>
 	 *                    This hard coded approach is simple and understandable from
 	 *                    the code, therefore preferred.
+	 *                    
+	 * NOTE when using IEditorExtension your editor part must have a title. For instance:
+	 * 
+	
+	<code>
+	@Override
+	public void init(IEditorSite site, IEditorInput input) throws PartInitException {
+		setSite(site);
+		setInput(input);
+		setPartName("Fred");		
+	}
+	</code>
+	
 	 *                    
 	 * @return true if part should be shown.
 	 */
