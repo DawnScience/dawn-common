@@ -97,34 +97,25 @@ public class DiamondPlottingSystem extends AbstractPlottingSystem {
 	 * 
 	 */
 	@Override
-	protected List<ITrace> createPlot(final AbstractDataset       data, 
-						               final List<AbstractDataset> axes,
-						               final PlotType              mode, 
+	public List<ITrace> createPlot1D(final AbstractDataset      x, 
+						               final List<AbstractDataset> ys,
 						               final IProgressMonitor      monitor) {
 		
-		if (mode.is1D()) {
-			PlotUtils.create1DPlot(data, axes, getPlotMode(mode), plotWindow, monitor);
-		} else {
-		    PlotUtils.createPlot(data, axes, getGuiPlotMode(mode), plotWindow, monitor);
-		}
+		PlotUtils.create1DPlot(x, ys, PlotMode.PM1D, plotWindow, monitor);
 		return null;
+	}
+
+	@Override
+	public ITrace createPlot2D(final AbstractDataset       data, 
+							            final List<AbstractDataset> axes,
+							            final IProgressMonitor      monitor) {
+        PlotUtils.createPlot(data, axes, GuiPlotMode.TWOD, plotWindow, monitor);
+        return null;
 	}
 
 	private GuiPlotMode getGuiPlotMode(PlotType type) {
 		if (type == PlotType.IMAGE)   return GuiPlotMode.TWOD;
 		if (type == PlotType.SURFACE) return GuiPlotMode.SURF2D;
-		return null;
-	}
-
-	/**
-	 * Bodge together PlotMode and PlotType
-	 * @param type
-	 * @return
-	 */
-	private PlotMode getPlotMode(PlotType type) {
-		if (type == PlotType.PT1D)         return PlotMode.PM1D;
-		if (type == PlotType.PT1D_STACKED) return PlotMode.PMSTACKED;
-		if (type == PlotType.PT1D_3D)      return PlotMode.PM3D;
 		return null;
 	}
 

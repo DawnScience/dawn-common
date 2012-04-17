@@ -337,36 +337,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 			}
 		}
 	}
-	
-	@Override
-	public List<ITrace> createPlot1D(AbstractDataset       x, 
-							         List<AbstractDataset> ys,
-							         IProgressMonitor      monitor) {
-		return createPlot(x,ys,PlotType.PT1D, monitor);
-	}
-
-
-	@Override
-	public ITrace createPlot2D(AbstractDataset      image, 
-							   List<AbstractDataset> axes,
-							   IProgressMonitor      monitor) {
 		
-		if (axes == null) {
-			IntegerDataset x = IntegerDataset.arange(image.getShape()[0]);
-			IntegerDataset y = IntegerDataset.arange(image.getShape()[0]);
-			axes = Arrays.asList(new AbstractDataset[]{x,y});
-		}
-		List<ITrace> traces = createPlot(image,axes,PlotType.IMAGE, monitor);
-		if (traces!=null) return traces.get(0);
-		return null;
-	}
-
-	protected abstract List<ITrace> createPlot( final AbstractDataset       data, 
-									            final List<AbstractDataset> axes,
-									            final PlotType              mode, 
-									            final IProgressMonitor      monitor);
-	
-	
 	@Override
 	public IAxis createAxis(final String title, final boolean isYAxis, int side) {
 		//TODO

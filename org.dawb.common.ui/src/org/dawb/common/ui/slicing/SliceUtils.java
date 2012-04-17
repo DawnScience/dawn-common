@@ -199,7 +199,7 @@ public class SliceUtils {
 			plotWindow.createPlot1D(ys.get(0), ys, monitor);
 
 		} else {
-			plotWindow.createPlot2D(slice, currentSlice.getAxes(), monitor);
+			plotWindow.createPlot2D(slice, null, monitor);
 		}
 
 	}
