@@ -1,9 +1,6 @@
 package org.dawb.common.ui.editors;
 
-import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IEditorSite;
-import org.eclipse.ui.PartInitException;
 
 /**
  * This class should be used to define additional editors which may be added to
