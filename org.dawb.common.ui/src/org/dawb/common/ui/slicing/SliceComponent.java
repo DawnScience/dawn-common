@@ -418,7 +418,7 @@ public class SliceComponent {
 		
 		final TableViewerColumn axis   = new TableViewerColumn(viewer, SWT.CENTER, 1);
 		axis.getColumn().setText("Axis");
-		axis.getColumn().setWidth(64);
+		axis.getColumn().setWidth(120);
 		axis.setLabelProvider(new SliceColumnLabelProvider(1));
 
 		final TableViewerColumn slice   = new TableViewerColumn(viewer, SWT.RIGHT, 2);
