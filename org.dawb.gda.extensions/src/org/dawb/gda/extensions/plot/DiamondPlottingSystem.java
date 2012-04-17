@@ -106,10 +106,17 @@ public class DiamondPlottingSystem extends AbstractPlottingSystem {
 	}
 
 	@Override
-	public ITrace createPlot2D(final AbstractDataset       data, 
-							            final List<AbstractDataset> axes,
-							            final IProgressMonitor      monitor) {
-        PlotUtils.createPlot(data, axes, GuiPlotMode.TWOD, plotWindow, monitor);
+	public ITrace createPlot2D(final AbstractDataset       image, 
+							   List<AbstractDataset> axes,
+							   final IProgressMonitor      monitor) {
+		
+		if (axes == null) {
+			IntegerDataset x = IntegerDataset.arange(image.getShape()[0]);
+			IntegerDataset y = IntegerDataset.arange(image.getShape()[0]);
+			axes = Arrays.asList(new AbstractDataset[]{x,y});
+		}
+
+        PlotUtils.createPlot(image, axes, GuiPlotMode.TWOD, plotWindow, monitor);
         return null;
 	}
 
