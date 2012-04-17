@@ -747,4 +747,8 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	public void setFocus() {
 		if (getPlotComposite()!=null) getPlotComposite().setFocus();
 	}
+	
+	public boolean  isDisposed() {
+		return getPlotComposite().isDisposed();
+	}
 }

@@ -53,21 +53,25 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 		final int[]   shape = image.getShape();
 		if (bean.isCancelled()) return null;
 		
- 		final float[] stats  = getStatistics(bean); 
+ 		
 		if (bean.isCancelled()) return null;
 		// Above seems to be faster than using stats in AbstractDataset
 		
+		float[] stats  = null;
 		float min = 0f;
 		if (bean.getMin()!=null) {
 			min = bean.getMin().floatValue();
 		} else {
+			if (stats==null) stats = getStatistics(bean); // do not get unless have to
 			min = stats[0];
 			bean.setMin(min);
 		}
+		
 		float max = 0f;
 		if (bean.getMax()!=null) {
 			max = bean.getMax().floatValue();
 		} else {
+			if (stats==null) stats = getStatistics(bean); // do not get unless have to
 			max = 3*stats[2];
 			if (max > stats[1])	max = stats[1];
 			bean.setMax(max);
