@@ -17,7 +17,10 @@ import java.util.List;
 import org.dawb.common.ui.monitor.ProgressMonitorWrapper;
 import org.dawb.common.ui.plot.IPlottingSystem;
 import org.dawb.common.ui.plot.PlotType;
+import org.dawb.common.ui.plot.trace.IImageTrace;
+import org.dawb.common.ui.plot.trace.ITrace;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.swt.widgets.Display;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -160,7 +163,7 @@ public class SliceUtils {
 	public static void plotSlice(final SliceObject       currentSlice,
 			                     final int[]             dataShape,
 			                     final PlotType          mode,
-			                     final IPlottingSystem   plotWindow,
+			                     final IPlottingSystem   plottingSystem,
 			                     final IProgressMonitor  monitor) throws Exception {
 
 		if (monitor!=null) monitor.worked(1);
@@ -176,11 +179,11 @@ public class SliceUtils {
 		
 		if (monitor!=null) monitor.worked(1);
 		if (mode==PlotType.PT1D) {
-			plotWindow.clear();
-			plotWindow.createPlot1D(slice, null, monitor);
+			plottingSystem.clear();
+			plottingSystem.createPlot1D(slice, null, monitor);
 		} else if (mode==PlotType.PT1D_MULTI || mode==PlotType.PT1D_STACKED) {
 			
-			plotWindow.clear();
+			plottingSystem.clear();
 			// We separate the 2D image into several 1d plots
 			final int[]         shape = slice.getShape();
 			final List<double[]> sets = new ArrayList<double[]>(shape[1]);
@@ -196,10 +199,27 @@ public class SliceUtils {
 			for (double[] da : sets) {
 				ys.add(new DoubleDataset(da, da.length));
 			}
-			plotWindow.createPlot1D(ys.get(0), ys, monitor);
+			plottingSystem.createPlot1D(ys.get(0), ys, monitor);
 
 		} else {
-			plotWindow.createPlot2D(slice, null, monitor);
+			final Collection<ITrace> traces = plottingSystem.getTraces(IImageTrace.class);
+			if (traces!=null && traces.size()>0) {
+				final IImageTrace image = (IImageTrace)traces.iterator().next();
+				final int[]       shape = image.getData().getShape();
+				if (Arrays.equals(shape, slice.getShape())) {
+					Display.getDefault().syncExec(new Runnable() {
+						public void run() {
+							// This will keep the previous zoom level if there was one
+							// and will be faster than createPlot2D(...) which autoscales.
+							image.setData(slice, image.getAxes(), false);
+						}
+					});
+				} else {
+					plottingSystem.createPlot2D(slice, null, monitor);
+				}
+			} else {
+			    plottingSystem.createPlot2D(slice, null, monitor);
+			}
 		}
 
 	}

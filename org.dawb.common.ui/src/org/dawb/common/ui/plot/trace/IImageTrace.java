@@ -96,8 +96,14 @@ public interface IImageTrace extends ITrace {
 	 * Call to set image data
 	 * @param image
 	 * @param axes - may be null
+	 * @param performAutoScale - true to rescale to new selection, otherwise keeps last axis position.
 	 */
-	public void setData(final AbstractDataset image, List<AbstractDataset> axes);
+	public void setData(final AbstractDataset image, List<AbstractDataset> axes, boolean performAutoScale);
+	
+	/**
+	 * @return the axes if they were set - may be null
+	 */
+	public List<AbstractDataset> getAxes();
 
 	/**
 	 * The min intensity for generating the image
