@@ -40,6 +40,30 @@ public interface IImageTrace extends ITrace {
 		}
 	}
 	
+	public enum HistoType {
+		MEAN("Mean based"), MEDIAN("Median based");
+		
+		public final String label;
+		HistoType(String label) {
+			this.label = label;
+		}
+		public String getLabel() {
+			return label;
+		}
+		public static List<HistoType> histoTypes;
+		static {
+			histoTypes = new ArrayList<HistoType>();
+			histoTypes.add(MEAN);
+			histoTypes.add(MEDIAN);
+		}
+		public static HistoType forLabel(String label) {
+			for (HistoType t : histoTypes) {
+				if (t.label.equals(label)) return t;
+			}
+			return null;
+		}
+	}
+	
 	public enum DownsampleType {
 		
 		POINT("Point, top left of bin"),  // select corner point of bin
@@ -184,4 +208,15 @@ public interface IImageTrace extends ITrace {
 	 * @param rehisto image when run
 	 */
 	public void rehistogram();
+	
+	/**
+	 * return the HistoType being used
+	 * @return
+	 */
+	public HistoType getHistoType();
+	
+	/**
+	 * Sets the histo type.
+	 */
+	public void setHistoType(HistoType type);
 }
