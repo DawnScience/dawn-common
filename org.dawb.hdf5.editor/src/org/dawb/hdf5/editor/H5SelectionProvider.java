@@ -24,9 +24,13 @@ public class H5SelectionProvider implements ISelectionProvider {
 		listeners.add(listener);
 	}
 
+	/**
+	 * You cannot return a null currentSelection as eclipse does not
+	 * like it.
+	 */
 	@Override
 	public ISelection getSelection() {
-		if (currentSelection==null) currentSelection = new StructuredSelection();
+		if (currentSelection==null) currentSelection = new StructuredSelection(); // Cannot be null
 		return currentSelection;
 	}
 
