@@ -148,7 +148,8 @@ public interface IRegion extends IFigure {
 		SECTOR("Sector",           5, Display.getDefault().getSystemColor(SWT.COLOR_RED)),
 		XAXIS_LINE("X-Axis Line",  6, Display.getDefault().getSystemColor(SWT.COLOR_BLUE)), 
 		YAXIS_LINE("Y-Axis Line",  7, Display.getDefault().getSystemColor(SWT.COLOR_BLUE)), 
-		FREE_DRAW("Free draw",     8, Display.getDefault().getSystemColor(SWT.COLOR_DARK_YELLOW));
+		FREE_DRAW("Free draw",     8, Display.getDefault().getSystemColor(SWT.COLOR_DARK_YELLOW)),
+		POINT("Point",             9, Display.getDefault().getSystemColor(SWT.COLOR_DARK_MAGENTA));
 
 		private int    index;
 		private String name;
@@ -166,6 +167,7 @@ public interface IRegion extends IFigure {
 			ALL_TYPES.add(XAXIS_LINE);
 			ALL_TYPES.add(YAXIS_LINE);
 			ALL_TYPES.add(FREE_DRAW);
+			ALL_TYPES.add(POINT);
 		}
 	
 		RegionType(String name, int index, Color defaultColor) {

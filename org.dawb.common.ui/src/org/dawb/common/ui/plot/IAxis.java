@@ -174,4 +174,19 @@ public interface IAxis {
 	 * @param end
 	 */
 	public void setRange(double start, double end);
+	
+	/**
+	 * The position in pixels of a given value.
+	 * @param value
+	 * @return
+	 */
+	public int getValuePosition(double value);
+	
+	/**
+	 * The value for a position in pixels.
+	 * @param value
+	 * @return
+	 */
+	public double getPositionValue(int position);
+
 }
