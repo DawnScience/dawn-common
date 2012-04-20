@@ -47,7 +47,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * The base class for IPlottingSystem. NOTE some methods that should be implemented
- * throw exceptions if they are called. They should be overriden.
+ * throw exceptions if they are called. They should be overridden.
  * Some methods that should be implemented do nothing.
  * 
  * There are TODO tags added to provide information as to where these optional
@@ -126,7 +126,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	}
 
 	/**
-	 * Wether the plot should rescale when replotted.
+	 * Whether the plot should rescale when replotted.
 	 * @return rescale
 	 */	
 	public boolean isRescale() {
@@ -150,6 +150,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	public void dispose() {
 
 		if (part!=null) {
+			@SuppressWarnings("unchecked")
 			final ISystemService<IPlottingSystem> service = (ISystemService<IPlottingSystem>)PlatformUI.getWorkbench().getService(ISystemService.class);
 			if (service!=null) {
 				service.removeSystem(part.getTitle());
@@ -326,6 +327,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 		this.bars = bars;
 		
 		if (part!=null) {
+			@SuppressWarnings("unchecked")
 			final ISystemService<IPlottingSystem> service = (ISystemService<IPlottingSystem>)PlatformUI.getWorkbench().getService(ISystemService.class);
 			if (service!=null) {
 				service.putSystem(part.getTitle(), this);

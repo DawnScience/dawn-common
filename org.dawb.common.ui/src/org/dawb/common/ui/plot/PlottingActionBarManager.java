@@ -8,7 +8,6 @@ import org.dawb.common.ui.menu.MenuAction;
 import org.dawb.common.ui.plot.tool.IToolChangeListener;
 import org.dawb.common.ui.plot.tool.IToolPage;
 import org.dawb.common.ui.plot.tool.IToolPage.ToolPageRole;
-import org.dawb.common.ui.plot.tool.IToolPageSystem;
 import org.dawb.common.ui.plot.tool.ToolChangeEvent;
 import org.dawb.common.ui.util.EclipseUtils;
 import org.eclipse.core.runtime.IConfigurationElement;

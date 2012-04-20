@@ -22,7 +22,7 @@ public class PlottingSystemService extends AbstractServiceFactory implements ISy
 	}
 	
 	@Override
-	public Object create(Class serviceInterface, IServiceLocator parentLocator, IServiceLocator locator) {
+	public Object create(@SuppressWarnings("rawtypes") Class serviceInterface, IServiceLocator parentLocator, IServiceLocator locator) {
 		if (serviceInterface==ISystemService.class) {
 			return this;
 		} 

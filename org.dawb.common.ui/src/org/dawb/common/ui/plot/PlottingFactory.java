@@ -29,7 +29,7 @@ public class PlottingFactory {
 	 */
 	public static AbstractPlottingSystem getPlottingSystem() throws Exception {
 				
-		final ScopedPreferenceStore store = new ScopedPreferenceStore(new InstanceScope(),"org.dawb.workbench.ui");
+		final ScopedPreferenceStore store = new ScopedPreferenceStore(InstanceScope.INSTANCE,"org.dawb.workbench.ui");
 		String plotType = store.getString("org.dawb.plotting.system.choice");
 		if (plotType==null) plotType = System.getProperty("org.dawb.plotting.system.choice");// For Geoff et. al. can override.
 		if (plotType==null) plotType = "org.dawb.workbench.editors.plotting.lightWeightPlottingSystem"; // That is usually around
