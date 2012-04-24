@@ -545,10 +545,13 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	@Override
 	public IToolPage getCurrentToolPage(ToolPageRole role) {
 		
-		IToolPage toolPage = currentToolPageMap.get(role);
+		IToolPage toolPage = null; 
+		if(currentToolPageMap!=null)
+			toolPage = currentToolPageMap.get(role);
 		if (toolPage==null) {
 			toolPage = getEmptyTool();
-			currentToolPageMap.put(role, toolPage);
+			if(currentToolPageMap!=null)
+				currentToolPageMap.put(role, toolPage);
 		}
 		return toolPage;
 	}
