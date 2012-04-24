@@ -89,7 +89,9 @@ public interface IPlottingSystem extends ITraceSystem, IRegionSystem, IAxisSyste
 	 * plot contents. 
 	 * 
 	 * @param image
-	 * @param axes - may be null and often are. x first.
+	 * @param axes - may be null for pixels only. They must be data sets of the same size
+	 *               as the image. The first dataset is the x-axis in standard orientation,
+	 *               the second is the y-axis.
 	 * @param mode
 	 * @param monitor
 	 * @return Image trace plotted. You can normally cast this trace to an IImageTrace and

@@ -41,14 +41,19 @@ public interface IImageTrace extends ITrace {
 	}
 	
 	public enum HistoType {
-		MEAN("Mean based"), MEDIAN("Median based");
+		MEAN(0, "Mean based"), MEDIAN(1, "Median based");
 		
 		public final String label;
-		HistoType(String label) {
+		public final int    index;
+		HistoType(int index, String label) {
+			this.index = index;
 			this.label = label;
 		}
 		public String getLabel() {
 			return label;
+		}
+		public int getIndex() {
+			return index;
 		}
 		public static List<HistoType> histoTypes;
 		static {
@@ -66,19 +71,24 @@ public interface IImageTrace extends ITrace {
 	
 	public enum DownsampleType {
 		
-		POINT("Point, top left of bin"),  // select corner point of bin
-		MEAN("Mean value of bin"),   // mean average over bin
-		MAXIMUM("Maximum value of bin"), // use maximum value in bin
-		MINIMUM("Minimum value of bin"); // use minimum value in bin
+		POINT(0, "Point, top left of bin"),  // select corner point of bin
+		MEAN(1, "Mean value of bin"),   // mean average over bin
+		MAXIMUM(2, "Maximum value of bin"), // use maximum value in bin
+		MINIMUM(3, "Minimum value of bin"); // use minimum value in bin
 		
 		private String label;
+		private int index;
 		
-		DownsampleType(String label) {
+		DownsampleType(int index, String label) {
+			this.index = index;
 			this.label = label;
 		}
 		
 		public String getLabel() {
 			return label;
+		}
+		public int getIndex() {
+			return index;
 		}
 	}
 
@@ -123,6 +133,13 @@ public interface IImageTrace extends ITrace {
 	 * @param performAutoScale - true to rescale to new selection, otherwise keeps last axis position.
 	 */
 	public void setData(final AbstractDataset image, List<AbstractDataset> axes, boolean performAutoScale);
+	
+	/**
+	 * Change the axes without changing the underlying data.
+	 * @param axes
+	 * @param performAutoScale
+	 */
+	public void setAxes(List<AbstractDataset> axes, boolean performAutoScale);
 	
 	/**
 	 * @return the axes if they were set - may be null
@@ -219,4 +236,32 @@ public interface IImageTrace extends ITrace {
 	 * Sets the histo type.
 	 */
 	public void setHistoType(HistoType type);
+
+	/**
+	 * You may set the image not to redraw images during updating a number of 
+	 * settings for efficiency reasons. Do this in a try{} finally{} block to 
+	 * avoid it being left off.
+	 * 
+	 * @param b
+	 */
+	void setImageUpdateActive(boolean b);
+	
+	/**
+	 * Call to redraw the image, normally the same as repaint on Figure.
+	 */
+	public void repaint();
+	
+	
+	/**
+	 * 
+	 * @return the current downsampled AbstractDataset being used to draw the image.
+	 */
+	public AbstractDataset getDownsampled();
+
+	
+	/**
+	 * @return the bin side in pixels which will be used when drawing the image. 
+               The bin is a square of side = the return value.
+	 */
+	public int getDownsampleBin();
 }
