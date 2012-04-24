@@ -103,6 +103,20 @@ public interface IPlottingSystem extends ITraceSystem, IRegionSystem, IAxisSyste
 	
 	
 	/**
+	 * This method is similar to createPlot2D(...) however calling this method swaps the image data for
+	 * a plot - keeping zoom level intact. It can be used for a live update of an image plot for instance.
+	 * If there is no image to update, createPlot2D(...) will be called instead automatically.
+	 * 
+	 * @param image
+	 * @param axes
+	 * @param monitor
+	 * @return
+	 */
+	public ITrace updatePlot2D(AbstractDataset       image, 
+							   List<AbstractDataset> axes,
+							   IProgressMonitor      monitor);
+
+	/**
 	 * This method can be used to add a single plot data point to 
 	 * an individual 1D plot already created in createPlot(...). The dataSetName
 	 * argument is the same as the name of the original data set plotted,
@@ -195,4 +209,6 @@ public interface IPlottingSystem extends ITraceSystem, IRegionSystem, IAxisSyste
 	 * @return the action bars containing the graph actions.
 	 */
 	public IActionBars getActionBars();
+
+
 }
