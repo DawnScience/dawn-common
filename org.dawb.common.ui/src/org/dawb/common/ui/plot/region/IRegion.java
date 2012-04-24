@@ -10,6 +10,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Display;
 
+import uk.ac.diamond.scisoft.analysis.roi.ROIBase;
+
 /**
  * A selection region must conform to this interface. You can set its position, colour and transparency settings.
  * 
@@ -104,14 +106,14 @@ public interface IRegion extends IFigure {
 	public void setShowLabel(boolean label);
 
 	/**
-	 * Get the position (in coordinate frame of the axis that region is added to)
+	 * Get the region of interest (in coordinate frame of the axis that region is added to)
 	 */
-	public RegionBounds getRegionBounds();
+	public ROIBase getROI();
 
 	/**
-	 * Set the position (in coordinate frame of the axis that region is added to)
+	 * Set the region of interest (in coordinate frame of the axis that region is added to)
 	 */
-	public void setRegionBounds(RegionBounds bounds);
+	public void setROI(ROIBase roi);
 
 	/**
 	 * Add a listener which is notified when this region is resized or moved.
@@ -149,7 +151,8 @@ public interface IRegion extends IFigure {
 		XAXIS_LINE("X-Axis Line",  6, Display.getDefault().getSystemColor(SWT.COLOR_BLUE)), 
 		YAXIS_LINE("Y-Axis Line",  7, Display.getDefault().getSystemColor(SWT.COLOR_BLUE)), 
 		FREE_DRAW("Free draw",     8, Display.getDefault().getSystemColor(SWT.COLOR_DARK_YELLOW)),
-		POINT("Point",             9, Display.getDefault().getSystemColor(SWT.COLOR_DARK_MAGENTA));
+		POINT("Point",             9, Display.getDefault().getSystemColor(SWT.COLOR_DARK_MAGENTA)),
+		POLYLINE("Polyline",       10, Display.getDefault().getSystemColor(SWT.COLOR_CYAN));
 
 		private int    index;
 		private String name;
@@ -168,6 +171,7 @@ public interface IRegion extends IFigure {
 			ALL_TYPES.add(YAXIS_LINE);
 			ALL_TYPES.add(FREE_DRAW);
 			ALL_TYPES.add(POINT);
+			ALL_TYPES.add(POLYLINE);
 		}
 	
 		RegionType(String name, int index, Color defaultColor) {

@@ -5,13 +5,15 @@ import java.util.HashSet;
 
 import org.eclipse.draw2d.Figure;
 
+import uk.ac.diamond.scisoft.analysis.roi.ROIBase;
+
 /**
  * This is a Figure, disabled for mouse events. 
  * 
  * @author fcp94556
  *
  */
-public abstract class AbstractRegion extends Figure implements IRegion, IRegionContainer{
+public abstract class AbstractRegion extends Figure implements IRegion, IRegionContainer {
 
 	private Collection<IRegionBoundsListener> regionBoundsListeners;
 	private boolean regionEventsActive = true;
@@ -41,57 +43,55 @@ public abstract class AbstractRegion extends Figure implements IRegion, IRegionC
 		regionBoundsListeners.clear();
 	}
 	
-	protected void fireRegionBoundsDragged(RegionBounds bounds) {
-		
+	protected void fireROIDragged(ROIBase bounds) {
 		if (regionBoundsListeners==null) return;
 		if (!regionEventsActive) return;
 		
-		final RegionBoundsEvent evt = new RegionBoundsEvent(this, bounds);
+		final ROIEvent evt = new ROIEvent(this, bounds);
 		for (IRegionBoundsListener l : regionBoundsListeners) {
-			l.regionBoundsDragged(evt);
+			l.roiDragged(evt);
 		}
 	}
 	
-	protected void fireRegionBoundsChanged(RegionBounds bounds) {
-		
+	protected void fireROIChanged(ROIBase bounds) {
 		if (regionBoundsListeners==null) return;
 		if (!regionEventsActive) return;
 		
-		final RegionBoundsEvent evt = new RegionBoundsEvent(this, bounds);
+		final ROIEvent evt = new ROIEvent(this, bounds);
 		for (IRegionBoundsListener l : regionBoundsListeners) {
-			l.regionBoundsChanged(evt);
+			l.roiChanged(evt);
 		}
-	}
-	
-	protected RegionBounds regionBounds;
-	
-	public RegionBounds getRegionBounds() {
-		return regionBounds;
 	}
 
-	public void setRegionBounds(RegionBounds bounds) {
-		this.regionBounds = bounds;
-		updateRegionBounds();
-		fireRegionBoundsChanged(bounds);
+	protected ROIBase roi;
+
+	@Override
+	public ROIBase getROI() {
+		return roi;
 	}
-	
+
+	@Override
+	public void setROI(ROIBase bounds) {
+		this.roi = bounds;
+		updateROI();
+		fireROIChanged(bounds);
+	}
+
 	/**
-	 * Implement to return the real position.
-	 * @param recordResult if true this calculation changes the
-	 *        recorded absolute position.
+	 * Implement to return the region of interest
+	 * @param recordResult if true this calculation changes the recorded absolute position
 	 */
-	protected abstract RegionBounds createRegionBounds(boolean recordResult);
+	protected abstract ROIBase createROI(boolean recordResult);
 
 	/**
-	 * Updates the position of the region, usually called
-	 * when items have been created and the position of the 
+	 * Updates the region, usually called when items have been created and the position of the
 	 * region should be updated. Does not fire events.
 	 */
-	protected void updateRegionBounds() {
-		if (regionBounds!=null) {
+	protected void updateROI() {
+		if (roi !=null) {
 			try {
 				this.regionEventsActive = false;
-				updateRegionBounds(regionBounds);
+				updateROI(roi);
 			} finally {
 				this.regionEventsActive = true;
 			}
@@ -99,13 +99,12 @@ public abstract class AbstractRegion extends Figure implements IRegion, IRegionC
 	}
 	
 	/**
-	 * Implement this method to redraw the figure to the 
-	 * axis coordinates (only).
+	 * Implement this method to redraw the figure to the axis coordinates (only).
 	 * 
 	 * @param bounds
 	 */
-	protected abstract void updateRegionBounds(RegionBounds bounds);
-	
+	protected abstract void updateROI(ROIBase bounds);
+
 	public String toString() {
 		if (getName()!=null) return getName();
 		return super.toString();
@@ -142,5 +141,4 @@ public abstract class AbstractRegion extends Figure implements IRegion, IRegionC
 	public void setRegion(IRegion region) {
 		// Does nothing
 	}
-
 }

@@ -44,6 +44,7 @@ Import-Package: org.apache.commons.beanutils,
  org.eclipse.draw2d,
  org.slf4j,
  uk.ac.diamond.scisoft.analysis.dataset,
- uk.ac.diamond.scisoft.analysis.io
+ uk.ac.diamond.scisoft.analysis.io,
+ uk.ac.diamond.scisoft.analysis.roi
 Bundle-ClassPath: org.eclipse.nebula.widgets.gallery-0.5.4.jar,
  .

@@ -8,13 +8,13 @@ public interface IRegionBoundsListener extends EventListener {
 	public class Stub implements IRegionBoundsListener {
 
 		@Override
-		public void regionBoundsDragged(RegionBoundsEvent evt) {
+		public void roiDragged(ROIEvent evt) {
 			// TODO Auto-generated method stub
 
 		}
 
 		@Override
-		public void regionBoundsChanged(RegionBoundsEvent evt) {
+		public void roiChanged(ROIEvent evt) {
 			// TODO Auto-generated method stub
 
 		}
@@ -28,7 +28,7 @@ public interface IRegionBoundsListener extends EventListener {
 	 * 
 	 * @param evt
 	 */
-	void regionBoundsDragged(RegionBoundsEvent evt);
+	void roiDragged(ROIEvent evt);
 
 	/**
 	 * Called when the region changes position, and the user has
@@ -37,5 +37,5 @@ public interface IRegionBoundsListener extends EventListener {
 	 * 
 	 * @param evt
 	 */
-	void regionBoundsChanged(RegionBoundsEvent evt);
+	void roiChanged(ROIEvent evt);
 }
