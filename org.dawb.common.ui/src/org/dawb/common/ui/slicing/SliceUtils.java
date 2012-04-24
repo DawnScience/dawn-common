@@ -202,24 +202,7 @@ public class SliceUtils {
 			plottingSystem.createPlot1D(ys.get(0), ys, monitor);
 
 		} else {
-			final Collection<ITrace> traces = plottingSystem.getTraces(IImageTrace.class);
-			if (traces!=null && traces.size()>0) {
-				final IImageTrace image = (IImageTrace)traces.iterator().next();
-				final int[]       shape = image.getData().getShape();
-				if (Arrays.equals(shape, slice.getShape())) {
-					Display.getDefault().syncExec(new Runnable() {
-						public void run() {
-							// This will keep the previous zoom level if there was one
-							// and will be faster than createPlot2D(...) which autoscales.
-							image.setData(slice, image.getAxes(), false);
-						}
-					});
-				} else {
-					plottingSystem.createPlot2D(slice, null, monitor);
-				}
-			} else {
-			    plottingSystem.createPlot2D(slice, null, monitor);
-			}
+			plottingSystem.updatePlot2D(slice, null, monitor);
 		}
 
 	}

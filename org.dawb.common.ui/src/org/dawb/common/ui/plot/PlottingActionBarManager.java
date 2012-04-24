@@ -10,6 +10,7 @@ import org.dawb.common.ui.plot.tool.IToolPage;
 import org.dawb.common.ui.plot.tool.IToolPage.ToolPageRole;
 import org.dawb.common.ui.plot.tool.ToolChangeEvent;
 import org.dawb.common.ui.util.EclipseUtils;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.Action;
@@ -176,5 +177,52 @@ public class PlottingActionBarManager {
 
 	    return toolActions;
 	}
+	
+	
+	/**
+	 * returns false if no tool was shown
+	 * @param toolId
+	 * @return
+	 * @throws Exception 
+	 */
+	public boolean setToolVisible(final String toolId, final ToolPageRole role, final String viewId) throws Exception {
+	    
+		final IConfigurationElement[] configs = Platform.getExtensionRegistry().getConfigurationElementsFor("org.dawb.common.ui.toolPage");
+	    for (IConfigurationElement e : configs) {
+			
+	    	if (!toolId.equals(e.getAttribute("id"))) continue;
+	    	final IToolPage page  = (IToolPage)e.createExecutableExtension("class");
+	    	if (page.getToolPageRole()!=role) continue;
+		    
+	    	final String    label = e.getAttribute("label");
+	    	page.setToolSystem(system);
+	    	page.setPlottingSystem(system);
+	    	page.setTitle(label);
+	    	page.setPart(system.getPart());
+	    	
+
+	    	IViewPart viewPart=null;
+	    	try {
+	    		viewPart = EclipseUtils.getActivePage().showView(viewId);
+
+	    		if (viewPart!=null && viewPart instanceof IToolChangeListener) {
+	    			system.addToolChangeListener((IToolChangeListener)viewPart);
+	    		}
+	    	} catch (PartInitException pe) {
+	    		logger.error("Cannot find a view with id org.dawb.workbench.plotting.views.ToolPageView", pe);
+	    	}
+
+	    	final IToolPage old = system.getCurrentToolPage(role);
+	    	system.setCurrentToolPage(page);
+	    	system.clearRegionTool();
+	    	system.fireToolChangeListeners(new ToolChangeEvent(this, old, page, system.getPart()));
+	    			
+	    	return true;
+	    }
+	    
+	    return false;
+	}
+
+
 
 }

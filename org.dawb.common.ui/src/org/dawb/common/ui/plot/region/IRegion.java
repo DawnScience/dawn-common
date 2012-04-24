@@ -266,5 +266,18 @@ public interface IRegion extends IFigure {
 	 * Remove Mouse motion listener to the region if it supports it and if it is a draw2d region.
 	 */
 	public void removeMouseMotionListener(MouseMotionListener l);
+	
+	/**
+	 * This method will send the figure back to the start of its
+	 * parents child list. This results in it being underneath the other children.
+	 */
+	public void toBack();
+
+	
+	/**
+	 * This method will send the figure to the end of its
+	 * parents child list. This results in it being above the other children.
+	 */
+	public void toFront();
 
 }

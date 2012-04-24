@@ -11,7 +11,7 @@ import org.eclipse.draw2d.Figure;
  * @author fcp94556
  *
  */
-public abstract class AbstractRegion extends Figure implements IRegion, IRegionProvider{
+public abstract class AbstractRegion extends Figure implements IRegion, IRegionContainer{
 
 	private Collection<IRegionBoundsListener> regionBoundsListeners;
 	private boolean regionEventsActive = true;

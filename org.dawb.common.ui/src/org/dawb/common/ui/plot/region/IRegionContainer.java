@@ -8,7 +8,7 @@ package org.dawb.common.ui.plot.region;
  * @author fcp94556
  *
  */
-public interface IRegionProvider {
+public interface IRegionContainer {
 
 	public IRegion getRegion();
 

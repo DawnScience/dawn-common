@@ -89,7 +89,9 @@ public interface IPlottingSystem extends ITraceSystem, IRegionSystem, IAxisSyste
 	 * plot contents. 
 	 * 
 	 * @param image
-	 * @param axes - may be null and often are. x first.
+	 * @param axes - may be null for pixels only. They must be data sets of the same size
+	 *               as the image. The first dataset is the x-axis in standard orientation,
+	 *               the second is the y-axis.
 	 * @param mode
 	 * @param monitor
 	 * @return Image trace plotted. You can normally cast this trace to an IImageTrace and
@@ -100,6 +102,20 @@ public interface IPlottingSystem extends ITraceSystem, IRegionSystem, IAxisSyste
 							   IProgressMonitor      monitor);
 	
 	
+	/**
+	 * This method is similar to createPlot2D(...) however calling this method swaps the image data for
+	 * a plot - keeping zoom level intact. It can be used for a live update of an image plot for instance.
+	 * If there is no image to update, createPlot2D(...) will be called instead automatically.
+	 * 
+	 * @param image
+	 * @param axes
+	 * @param monitor
+	 * @return
+	 */
+	public ITrace updatePlot2D(AbstractDataset       image, 
+							   List<AbstractDataset> axes,
+							   IProgressMonitor      monitor);
+
 	/**
 	 * This method can be used to add a single plot data point to 
 	 * an individual 1D plot already created in createPlot(...). The dataSetName
@@ -193,4 +209,6 @@ public interface IPlottingSystem extends ITraceSystem, IRegionSystem, IAxisSyste
 	 * @return the action bars containing the graph actions.
 	 */
 	public IActionBars getActionBars();
+
+
 }
