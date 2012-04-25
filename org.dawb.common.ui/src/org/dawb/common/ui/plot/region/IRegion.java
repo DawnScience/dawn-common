@@ -120,14 +120,14 @@ public interface IRegion extends IFigure {
 	 * 
 	 * @param l
 	 */
-	public boolean addRegionBoundsListener(final IRegionBoundsListener l);
+	public boolean addROIListener(final IROIListener l);
 
 	/**
-	 * Remove a RegionBoundsListener
+	 * Remove a ROIListener
 	 * 
 	 * @param l
 	 */
-	public boolean removeRegionBoundsListener(final IRegionBoundsListener l);
+	public boolean removeROIListener(final IROIListener l);
 
 	/**
 	 * Will be called to remove the region and clean up resources when the user

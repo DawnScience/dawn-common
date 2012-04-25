@@ -2,10 +2,10 @@ package org.dawb.common.ui.plot.region;
 
 import java.util.EventListener;
 
-public interface IRegionBoundsListener extends EventListener {
+public interface IROIListener extends EventListener {
 
 	
-	public class Stub implements IRegionBoundsListener {
+	public class Stub implements IROIListener {
 
 		@Override
 		public void roiDragged(ROIEvent evt) {

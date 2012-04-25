@@ -15,50 +15,42 @@ import uk.ac.diamond.scisoft.analysis.roi.ROIBase;
  */
 public abstract class AbstractRegion extends Figure implements IRegion, IRegionContainer {
 
-	private Collection<IRegionBoundsListener> regionBoundsListeners;
+	private Collection<IROIListener> roiListeners;
 	private boolean regionEventsActive = true;
-	
-	/**
-	 * Add a listener which is notified when this region is resized or
-	 * moved.
-	 * 
-	 * @param l
-	 */
-	public boolean addRegionBoundsListener(final IRegionBoundsListener l) {
-		if (regionBoundsListeners==null) regionBoundsListeners = new HashSet<IRegionBoundsListener>(11);
-		return regionBoundsListeners.add(l);
+
+	@Override
+	public boolean addROIListener(final IROIListener l) {
+		if (roiListeners==null) roiListeners = new HashSet<IROIListener>(11);
+		return roiListeners.add(l);
 	}
 	
-	/**
-	 * Remove a RegionBoundsListener
-	 * @param l
-	 */
-	public boolean removeRegionBoundsListener(final IRegionBoundsListener l) {
-		if (regionBoundsListeners==null) return false;
-		return regionBoundsListeners.remove(l);
+	@Override
+	public boolean removeROIListener(final IROIListener l) {
+		if (roiListeners==null) return false;
+		return roiListeners.remove(l);
 	}
 	
 	protected void clearListeners() {
-		if (regionBoundsListeners==null) return;
-		regionBoundsListeners.clear();
+		if (roiListeners==null) return;
+		roiListeners.clear();
 	}
 	
 	protected void fireROIDragged(ROIBase bounds) {
-		if (regionBoundsListeners==null) return;
+		if (roiListeners==null) return;
 		if (!regionEventsActive) return;
 		
 		final ROIEvent evt = new ROIEvent(this, bounds);
-		for (IRegionBoundsListener l : regionBoundsListeners) {
+		for (IROIListener l : roiListeners) {
 			l.roiDragged(evt);
 		}
 	}
 	
 	protected void fireROIChanged(ROIBase bounds) {
-		if (regionBoundsListeners==null) return;
+		if (roiListeners==null) return;
 		if (!regionEventsActive) return;
 		
 		final ROIEvent evt = new ROIEvent(this, bounds);
-		for (IRegionBoundsListener l : regionBoundsListeners) {
+		for (IROIListener l : roiListeners) {
 			l.roiChanged(evt);
 		}
 	}

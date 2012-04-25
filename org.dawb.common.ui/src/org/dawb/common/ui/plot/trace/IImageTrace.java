@@ -5,7 +5,6 @@ import java.util.List;
 import org.dawb.common.services.ImageServiceBean;
 import org.dawb.common.services.ImageServiceBean.HistoType;
 import org.dawb.common.services.ImageServiceBean.ImageOrigin;
-import org.dawb.common.ui.plot.region.RegionBounds;
 import org.eclipse.swt.graphics.PaletteData;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
@@ -43,16 +42,6 @@ public interface IImageTrace extends ITrace {
 			return index;
 		}
 	}
-
-	/**
-	 * Pulls a data set out of the image data for
-	 * a given selection. For instance getting the bounds
-	 * of a box to slice and return the data.
-	 * 
-	 * @param bounds
-	 * @return
-	 */
-	AbstractDataset slice(RegionBounds bounds);
 
 	/**
 	 * Default is TOP_LEFT unlike normal plotting
