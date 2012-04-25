@@ -35,9 +35,12 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
+import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider;
+import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
 import org.eclipse.jface.viewers.ICellModifier;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
@@ -48,12 +51,14 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
@@ -271,8 +276,7 @@ public class SliceComponent {
 			try {
 				this.dimsDataList = new DimsDataList(dataShape, sliceObject);
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				logger.error("Cannot make new dims data list!", e);
 			}
 			
 		}
@@ -364,7 +368,7 @@ public class SliceComponent {
 		
 		final CellEditor[] editors  = new CellEditor[3];
 		editors[0] = null;
-		editors[1] = new CComboCellEditor(viewer.getTable(), new String[]{"X","Y","(Slice)"});
+		editors[1] = new CComboCellEditor(viewer.getTable(), new String[]{"X","Y","(Slice)"}, SWT.READ_ONLY);
 		final CCombo combo = ((CComboCellEditor)editors[1]).getCombo();
 		combo.addModifyListener(new ModifyListener() {
 			@Override
@@ -414,43 +418,71 @@ public class SliceComponent {
 		final TableViewerColumn dim   = new TableViewerColumn(viewer, SWT.CENTER, 0);
 		dim.getColumn().setText("Dim");
 		dim.getColumn().setWidth(48);
-		dim.setLabelProvider(new SliceColumnLabelProvider(0));
+		dim.setLabelProvider(new DelegatingStyledCellLabelProvider(new SliceColumnLabelProvider(0)));
 		
 		final TableViewerColumn axis   = new TableViewerColumn(viewer, SWT.CENTER, 1);
 		axis.getColumn().setText("Axis");
 		axis.getColumn().setWidth(120);
-		axis.setLabelProvider(new SliceColumnLabelProvider(1));
+		axis.setLabelProvider(new DelegatingStyledCellLabelProvider(new SliceColumnLabelProvider(1)));
 
-		final TableViewerColumn slice   = new TableViewerColumn(viewer, SWT.RIGHT, 2);
-		slice.getColumn().setText("Slice");
-		slice.getColumn().setWidth(100);
-		slice.setLabelProvider(new SliceColumnLabelProvider(2));
+		final TableViewerColumn slice   = new TableViewerColumn(viewer, SWT.LEFT, 2);
+		slice.getColumn().setText("Slice Index");
+		slice.getColumn().setWidth(200);
+		slice.setLabelProvider(new DelegatingStyledCellLabelProvider(new SliceColumnLabelProvider(2)));
 		
 	}
 
-	private class SliceColumnLabelProvider extends ColumnLabelProvider {
+	private class SliceColumnLabelProvider extends ColumnLabelProvider implements IStyledLabelProvider {
 
 		private int col;
+		private Image spinnerButtons;
 		public SliceColumnLabelProvider(int i) {
 			this.col = i;
+			this.spinnerButtons = Activator.getImageDescriptor("icons/spinner_buttons.png").createImage();
 		}
 		@Override
-		public String getText(Object element) {
+		public StyledString getStyledText(Object element) {
 			final DimsData data = (DimsData)element;
+			final StyledString ret = new StyledString();
 			switch (col) {
 			case 0:
-				return (data.getDimension()+1)+"";
+				ret.append((data.getDimension()+1)+"");
+				break;
 			case 1:
 				final int axis = data.getAxis();
-				return axis==0 ? "X" : axis==1 ? "Y" : "(Slice)";
+				ret.append( axis==0 ? "X" : axis==1 ? "Y" : "(Slice)" );
+				break;
 			case 2:
-				if (data.getSliceRange()!=null) return data.getSliceRange();
-				final int slice = data.getSlice();
-				return slice>-1 ? slice+"" : "";
+				if (data.getSliceRange()!=null) {
+					ret.append( data.getSliceRange() );
+				} else {
+					final int slice = data.getSlice();
+					ret.append( slice>-1 ? slice+"" : "" );
+				}
+				if (data.getAxis()<0 && !errorLabel.isVisible()) {
+					ret.append(new StyledString("        (click to change)", StyledString.QUALIFIER_STYLER));
+				}
+				break;
 			default:
-				return "";
+				ret.append( "" );
+				break;
 			}
+			
+			return ret;
 		}
+		
+		@Override
+		public void dispose() {
+	        spinnerButtons.dispose();
+		}
+		
+		public Image getImage(Object element) {
+//			if (col==2) {
+//				return spinnerButtons;
+//			}
+			return null;
+		}
+
 	}
 	
 	/**

@@ -21,9 +21,10 @@ import javax.swing.filechooser.FileSystemView;
 
 import org.dawb.common.services.IFileIconService;
 import org.dawb.common.services.IImageService;
-import org.dawb.common.services.IImageService.ImageServiceBean;
 import org.dawb.common.services.ILoaderService;
 import org.dawb.common.services.IThumbnailService;
+import org.dawb.common.services.ImageServiceBean;
+import org.dawb.common.services.ImageServiceBean.ImageOrigin;
 import org.dawb.common.services.ServiceManager;
 import org.dawb.common.ui.image.PaletteFactory;
 import org.dawb.common.ui.plot.AbstractPlottingSystem;
@@ -160,7 +161,7 @@ public class ImageThumbnailCreator extends AbstractServiceFactory implements ITh
 		final ScopedPreferenceStore store = new ScopedPreferenceStore(InstanceScope.INSTANCE, "org.dawb.workbench.plotting");
 		final ImageServiceBean bean = new ImageServiceBean();
 		bean.setPalette(PaletteFactory.getPalette(store.getInt("org.dawb.plotting.system.paletteChoice")));	
-		bean.setOrigin(IImageService.ImageOrigin.forLabel(store.getString("org.dawb.plotting.system.originChoice")));
+		bean.setOrigin(ImageOrigin.forLabel(store.getString("org.dawb.plotting.system.originChoice")));
 		bean.setImage(thumbnail);
 		
 		final IImageService service = (IImageService)PlatformUI.getWorkbench().getService(IImageService.class);

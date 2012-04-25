@@ -40,13 +40,15 @@ import uk.ac.diamond.scisoft.analysis.rcp.views.PlotServerConnection;
 
 
 /**
- * Link between EDNA 1D plotting and diamond plotter
+ * Diamond plotter implementation of IPlottingSystem.
  * 
- * This is the only place that the Diamond plotting is referenced in org.edna.
+ * Deprecated but still maintained so that other implementations of IPlottingSystem
+ * exist and can be 
  * 
  * @author gerring
  *
  */
+@Deprecated
 public class DiamondPlottingSystem extends AbstractPlottingSystem {
 
 	private Logger logger = LoggerFactory.getLogger(DiamondPlottingSystem.class);
@@ -105,7 +107,17 @@ public class DiamondPlottingSystem extends AbstractPlottingSystem {
 		return null;
 	}
 
+	/**
+	 * Just calls createPlot2D(...) directly.
+	 */
 	@Override
+	public ITrace updatePlot2D(final AbstractDataset       image, 
+							   List<AbstractDataset> axes,
+							   final IProgressMonitor      monitor) {
+		return createPlot2D(image, axes, monitor);
+	}
+
+    @Override
 	public ITrace createPlot2D(final AbstractDataset       image, 
 							   List<AbstractDataset> axes,
 							   final IProgressMonitor      monitor) {

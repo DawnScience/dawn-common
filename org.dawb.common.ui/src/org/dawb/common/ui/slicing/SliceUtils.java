@@ -11,16 +11,12 @@ package org.dawb.common.ui.slicing;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 import org.dawb.common.ui.monitor.ProgressMonitorWrapper;
 import org.dawb.common.ui.plot.IPlottingSystem;
 import org.dawb.common.ui.plot.PlotType;
-import org.dawb.common.ui.plot.trace.IImageTrace;
-import org.dawb.common.ui.plot.trace.ITrace;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.swt.widgets.Display;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -202,24 +198,7 @@ public class SliceUtils {
 			plottingSystem.createPlot1D(ys.get(0), ys, monitor);
 
 		} else {
-			final Collection<ITrace> traces = plottingSystem.getTraces(IImageTrace.class);
-			if (traces!=null && traces.size()>0) {
-				final IImageTrace image = (IImageTrace)traces.iterator().next();
-				final int[]       shape = image.getData().getShape();
-				if (Arrays.equals(shape, slice.getShape())) {
-					Display.getDefault().syncExec(new Runnable() {
-						public void run() {
-							// This will keep the previous zoom level if there was one
-							// and will be faster than createPlot2D(...) which autoscales.
-							image.setData(slice, image.getAxes(), false);
-						}
-					});
-				} else {
-					plottingSystem.createPlot2D(slice, null, monitor);
-				}
-			} else {
-			    plottingSystem.createPlot2D(slice, null, monitor);
-			}
+			plottingSystem.updatePlot2D(slice, null, monitor);
 		}
 
 	}
