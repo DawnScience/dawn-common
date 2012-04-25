@@ -1,74 +1,26 @@
 package org.dawb.common.ui.plot.trace;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import org.dawb.common.services.IImageService;
+import org.dawb.common.services.ImageServiceBean;
+import org.dawb.common.services.ImageServiceBean.HistoType;
+import org.dawb.common.services.ImageServiceBean.ImageOrigin;
 import org.dawb.common.ui.plot.region.RegionBounds;
 import org.eclipse.swt.graphics.PaletteData;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 
+/**
+ * Interface used for the plotting system to plot images.
+ * 
+ * In the LightWeightPlotter this is called ImageTrace.
+ * 
+ * @author fcp94556
+ *
+ */
 public interface IImageTrace extends ITrace {
 
-	public enum ImageOrigin {
-		TOP_LEFT("Top left"), TOP_RIGHT("Top right"), BOTTOM_LEFT("Bottom left"), BOTTOM_RIGHT("Bottom right");
 		
-		public static List<ImageOrigin> origins;
-		static {
-			origins = new ArrayList<ImageOrigin>();
-			origins.add(TOP_LEFT);
-			origins.add(TOP_RIGHT);
-			origins.add(BOTTOM_LEFT);
-			origins.add(BOTTOM_RIGHT);
-		}
-
-		private String label;
-		public String getLabel() {
-			return label;
-		}
-		
-		ImageOrigin(String label) {
-			this.label = label;
-		}
-		
-		public static ImageOrigin forLabel(String label) {
-			for (ImageOrigin o : origins) {
-				if (o.label.equals(label)) return o;
-			}
-			return null;
-		}
-	}
-	
-	public enum HistoType {
-		MEAN(0, "Mean based"), MEDIAN(1, "Median based");
-		
-		public final String label;
-		public final int    index;
-		HistoType(int index, String label) {
-			this.index = index;
-			this.label = label;
-		}
-		public String getLabel() {
-			return label;
-		}
-		public int getIndex() {
-			return index;
-		}
-		public static List<HistoType> histoTypes;
-		static {
-			histoTypes = new ArrayList<HistoType>();
-			histoTypes.add(MEAN);
-			histoTypes.add(MEDIAN);
-		}
-		public static HistoType forLabel(String label) {
-			for (HistoType t : histoTypes) {
-				if (t.label.equals(label)) return t;
-			}
-			return null;
-		}
-	}
-	
 	public enum DownsampleType {
 		
 		POINT(0, "Point, top left of bin"),  // select corner point of bin
@@ -176,25 +128,8 @@ public interface IImageTrace extends ITrace {
 	 * 
 	 * @return
 	 */
-	public IImageService.ImageServiceBean getImageServiceBean();
+	public ImageServiceBean getImageServiceBean();
 	
-	/**
-	 * Returns the getMax() value if it has been set or the last calculated
-	 * value of max if not.
-	 * 
-	 * @return
-	 */
-	public Number getCalculatedMax();
-	
-	
-	/**
-	 * Returns the getMin() value if it has been set or the last calculated
-	 * value of min if not.
-	 * 
-	 * @return
-	 */
-	public Number getCalculatedMin();
-
 	/**
 	 * Call to add a palette listener
 	 * @param pl
@@ -264,4 +199,5 @@ public interface IImageTrace extends ITrace {
                The bin is a square of side = the return value.
 	 */
 	public int getDownsampleBin();
+	
 }

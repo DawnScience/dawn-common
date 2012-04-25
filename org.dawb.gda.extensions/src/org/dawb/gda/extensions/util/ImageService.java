@@ -10,6 +10,9 @@
 package org.dawb.gda.extensions.util;
 
 import org.dawb.common.services.IImageService;
+import org.dawb.common.services.ImageServiceBean;
+import org.dawb.common.services.ImageServiceBean.HistoType;
+import org.dawb.common.services.ImageServiceBean.ImageOrigin;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.PaletteData;
@@ -18,6 +21,7 @@ import org.eclipse.ui.services.AbstractServiceFactory;
 import org.eclipse.ui.services.IServiceLocator;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.Stats;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 
 public class ImageService extends AbstractServiceFactory implements IImageService {
@@ -62,7 +66,7 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 		if (bean.getMin()!=null) {
 			min = bean.getMin().floatValue();
 		} else {
-			if (stats==null) stats = getStatistics(bean); // do not get unless have to
+			if (stats==null) stats = getFastStatistics(bean); // do not get unless have to
 			min = stats[0];
 			bean.setMin(min);
 		}
@@ -71,7 +75,7 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 		if (bean.getMax()!=null) {
 			max = bean.getMax().floatValue();
 		} else {
-			if (stats==null) stats = getStatistics(bean); // do not get unless have to
+			if (stats==null) stats = getFastStatistics(bean); // do not get unless have to
 			max = 3*stats[2];
 			if (max > stats[1])	max = stats[1];
 			bean.setMax(max);
@@ -192,32 +196,59 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 		scaledImageAsByte[index] = pixel;
 	}
 	
-	private static float[] getStatistics(ImageServiceBean bean) {
+	/**
+	 * Fast statistcs as a rough guide - this is faster than AbstractDataset.getMin()
+	 * and getMax() which may cache but slows the opening of images too much.
+	 * 
+	 * @param bean
+	 * @return [0] = min [1] = max
+	 */
+	public float[] getFastStatistics(ImageServiceBean bean) {
 		
 		final AbstractDataset image    = bean.getImage();
-
 		float min = Float.MAX_VALUE;
 		float max = -Float.MAX_VALUE;
 		float sum = 0.0f;
 		final int size = image.getSize();
-		
 		for (int index = 0; index<size; ++index) {
-				
-			if (bean.isCancelled()) return null;
-			final float val = (float)image.getElementDoubleAbs(index);
+			
+			final double dv = image.getElementDoubleAbs(index);
+			if (Double.isNaN(dv))      continue;
+			if (Double.isInfinite(dv)) continue; // TODO Should use a bound number with ||
+			
+			final float val = (float)dv;
 			sum += val;
 			if (val < min) min = val;
 			if (val > max) max = val;
 			
 		}
-		float mean = sum / (image.getShape()[0] * image.getShape()[1]);
-		return new float[] { min, max, mean };
+		
+		float retMin = min;
+		float retMax = Float.NaN;
+		
+		if (bean.getHistogramType()==HistoType.MEAN) {
+			float mean = sum / size;
+			retMax = ((float)Math.E)*mean; // Not statistical, E seems to be better than 3...
+			
+		} else if (bean.getHistogramType()==HistoType.MEDIAN) { 
+			
+			float median = Float.NaN;
+			try {
+				median = ((Number)Stats.median(image)).floatValue(); // SLOW
+			} catch (Exception ne) {
+				median = ((Number)Stats.median(image.cast(AbstractDataset.INT16))).floatValue();// SLOWER
+			}
+			retMax = 2f*median;
+		}
+		
+		if (retMax > max)	retMax = max;
+		
+		return new float[]{retMin, retMax};
+
 	}
-	
 
 	@Override
-	public Object create(Class serviceInterface, IServiceLocator parentLocator,
-			IServiceLocator locator) {
+	public Object create(Class serviceInterface, IServiceLocator parentLocator, IServiceLocator locator) {
 		
 		if (serviceInterface==IImageService.class) {
 			return new ImageService();
