@@ -13,7 +13,6 @@ import java.io.File;
 import java.util.Collection;
 
 import org.dawb.common.services.ILoaderService;
-import org.dawb.common.util.eclipse.BundleUtils;
 import org.dawb.fabio.FabioFile;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -33,6 +32,7 @@ import uk.ac.gda.monitor.ProgressMonitorWrapper;
 /**
  * Provides a class which will use any loaders available to load a particular file
  * 
+ * TODO change to a real eclipse service at some point
  * 
  * @author gerring
  *
@@ -70,7 +70,7 @@ public class LoaderService extends AbstractServiceFactory implements ILoaderServ
 			isFabioOnly = true;
 			
 		}
-		if (isFabioOnly && isFabioAvailable()) {
+		if (isFabioOnly) {
 			
 			final FabioFile file = new FabioFile(filePath);
 			meta = new MetaDataAdapter() {
@@ -95,16 +95,6 @@ public class LoaderService extends AbstractServiceFactory implements ILoaderServ
 		return meta;
 	}
 	
-	/**
-	 * We test if there is any fabio installed in the product
-	 * @return
-	 */
-	private boolean isFabioAvailable() {
-		
-        final String eclipseDir = BundleUtils.getEclipseHome();
-		return (new File(eclipseDir+"/fabio")).exists();
-	}
-
 	private AbstractDataset getDataset(final File f, final IProgressMonitor monitor) throws Throwable {
 		
 		AbstractDataset set = null;
@@ -125,11 +115,18 @@ public class LoaderService extends AbstractServiceFactory implements ILoaderServ
 			
 		}
 		
-		if (isFabioOnly  && isFabioAvailable() ) {
+		if (isFabioOnly) {
 			try {
-				FabioFile     file = new FabioFile(f.getAbsolutePath());
+				FabioFile     file = new FabioFile(f.getAbsolutePath()); //Used FableJep, now C
 				final float[] fa   = file.getImageAsFloat();
-				set = new FloatDataset(fa, new int[]{file.getHeight(), file.getWidth()});
+
+//				PilatusFile file = new PilatusFile(); //Uses C bridge
+//				file.load( f.getAbsolutePath() );
+
+//				PilatusData file = PilatusLoader.loadPilatus( f.getAbsolutePath() ); //Uses C bridge
+//				final float[] fa   = file.getData();
+
+				set = new FloatDataset( fa, new int[] { file.getHeight(), file.getWidth() } );
 				set.setName(f.getName());
 				
 			} finally {
