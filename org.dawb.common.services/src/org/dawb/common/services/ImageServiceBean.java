@@ -19,7 +19,6 @@ package org.dawb.common.services;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.dawb.common.services.ImageServiceBean.HistoType;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
@@ -44,7 +43,9 @@ public class ImageServiceBean {
 	private Number          max;
 	private IProgressMonitor monitor;
 	private HistoType       histogramType = HistoType.MEAN;
-	
+	private int             depth=8; // Either 8 or 16 usually. If function object !=null then 
+	                                 // this is assumed to override the depth
+	private Object          functionObject;
 
 	public ImageServiceBean() {
 		
@@ -262,6 +263,42 @@ public class ImageServiceBean {
 			}
 			return null;
 		}
+	}
+
+
+
+	public int getDepth() {
+		return depth;
+	}
+	
+	/**
+	 * NOTE PaletteData with RGB[] only works with 8-bit or below
+	 * For 16-bit and above you must use a direct ImagePalette using the
+	 * constructor ImagePalette(int,int,int)
+	 * 
+	 * @param colorDepth
+	 */
+	public void setDepth(int colorDepth) {
+		this.depth = colorDepth;
+	}
+	
+	/**
+	 * Normally null or may be a SDAFunctionBean which
+	 * defines the functions to use.
+	 * 
+	 * @return
+	 */
+	public Object getFunctionObject() {
+		return functionObject;
+	}
+	/**
+	 * Normally null or you may set to a SDAFunctionBean which
+	 * defines the functions to use.
+	 * 
+	 * @return
+	 */
+	public void setFunctionObject(Object userObject) {
+		this.functionObject = userObject;
 	}
 
 }

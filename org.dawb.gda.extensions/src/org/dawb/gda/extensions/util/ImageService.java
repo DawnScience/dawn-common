@@ -23,6 +23,7 @@ import org.eclipse.ui.services.IServiceLocator;
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.Stats;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
+import uk.ac.diamond.scisoft.analysis.rcp.plotting.utils.SWTImageUtils;
 
 public class ImageService extends AbstractServiceFactory implements IImageService {
 	
@@ -44,6 +45,7 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 		final ImageData data = getImageData(bean);
 		return new Image(Display.getCurrent(), data);
 	}
+	
 	/**
 	 * getImageData(...) provides an image in a given palette data and origin.
 	 * Faster than getting a resolved image
@@ -52,111 +54,104 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
         
 		final AbstractDataset image    = bean.getImage();
 		final ImageOrigin     origin   = bean.getOrigin();
-		final PaletteData     palette  = bean.getPalette();
+		PaletteData     palette  = bean.getPalette();
+		
+		int depth = bean.getDepth();
+		final int size  = (int)Math.round(Math.pow(2, depth));
+		createMaxMin(bean);
+		final float max = bean.getMax().floatValue();
+		final float min = bean.getMin().floatValue();
+		
+		if (bean.getFunctionObject()!=null && bean.getFunctionObject() instanceof FunctionContainer) {
+			final FunctionContainer fc = (FunctionContainer)bean.getFunctionObject();
+			return SWTImageUtils.createImageData(image, min, max, fc.getRedFunc(), 
+					                                              fc.getGreenFunc(), 
+					                                              fc.getBlueFunc(), 
+					                                              fc.isInverseRed(), 
+					                                              fc.isInverseGreen(), 
+					                                              fc.isInverseBlue());
+		}
+		
+		if (depth>8) { // We use the 24-bit processing of SWTImageUtils
+			// Normally it will not do this as depth>8 will use SWTImageUtils
+			if (depth == 16) palette = new PaletteData(0x7C00, 0x3E0, 0x1F);
+			if (depth == 24) palette = new PaletteData(0xFF, 0xFF00, 0xFF0000);
+			if (depth == 32) palette = new PaletteData(0xFF00, 0xFF0000, 0xFF000000);
+		}
 		
 		final int[]   shape = image.getShape();
 		if (bean.isCancelled()) return null;
-		
- 		
-		if (bean.isCancelled()) return null;
-		// Above seems to be faster than using stats in AbstractDataset
-		
-		float[] stats  = null;
-		float min = 0f;
-		if (bean.getMin()!=null) {
-			min = bean.getMin().floatValue();
-		} else {
-			if (stats==null) stats = getFastStatistics(bean); // do not get unless have to
-			min = stats[0];
-			bean.setMin(min);
-		}
-		
-		float max = 0f;
-		if (bean.getMax()!=null) {
-			max = bean.getMax().floatValue();
-		} else {
-			if (stats==null) stats = getFastStatistics(bean); // do not get unless have to
-			max = 3*stats[2];
-			if (max > stats[1])	max = stats[1];
-			bean.setMax(max);
-		}
+				
 				
 		int len = image.getSize();
 		if (len == 0) return null;
 
-		float scale_8bit;
+		float scale;
 		float maxPixel;
 		if (max > min) {
-			scale_8bit = 255f / (max - min);
+			scale = Float.valueOf(size-1) / (max - min);
 			maxPixel = max - min;
 		} else {
-			scale_8bit = 1f;
+			scale = 1f;
 			maxPixel = 0xFF;
 		}
-		
 		if (bean.isCancelled()) return null;
-		byte[] scaledImageAsByte = new byte[len];
-
-		ImageData imageData = null;
+		
+ 		ImageData imageData = null;
 		if (origin==ImageOrigin.TOP_LEFT) { 
 			
-			int byteIndex = 0;
+			imageData = new ImageData(shape[1], shape[0], depth, palette);
 			// This loop is usually the same as the image is read in but not always depending on loader.
 			for (int i = 0; i<shape[0]; ++i) {
 				for (int j = 0; j<shape[1]; ++j) {
 					
 					if (bean.isCancelled()) return null;
 					final float val = image.getFloat(i, j);
-					addByte(val, min, max, scale_8bit, maxPixel, scaledImageAsByte, byteIndex);
-					++byteIndex;
+					imageData.setPixel(j, i, getPixelValue(val, min, max, scale, maxPixel));
 				}
 			}
-			imageData = new ImageData(shape[1], shape[0], 8, palette, 1, scaledImageAsByte);
-		
+	
 		} else if (origin==ImageOrigin.BOTTOM_LEFT) {
-			int byteIndex = 0;
+
+			imageData = new ImageData(shape[0], shape[1], depth, palette);
 			// This loop is slower than looping over all data and using image.getElementDoubleAbs(...)
 			// However it reorders data for the axes
-			for (int i = shape[1]-1; i>=0; --i) {
+			for (int i = 0; i<shape[1]; ++i) {
 				for (int j = 0; j<shape[0]; ++j) {
 					
 					if (bean.isCancelled()) return null;
 					final float val = image.getFloat(j, i);
-					addByte(val, min, max, scale_8bit, maxPixel, scaledImageAsByte, byteIndex);
-					++byteIndex;
+					imageData.setPixel(j, shape[1]-i-1, getPixelValue(val, min, max, scale, maxPixel));
 				}
 			}
-			imageData = new ImageData(shape[0], shape[1], 8, palette, 1, scaledImageAsByte);
 			
 		} else if (origin==ImageOrigin.BOTTOM_RIGHT) {
-			int byteIndex = 0;
+
+			imageData = new ImageData(shape[1], shape[0], depth, palette);
 			// This loop is slower than looping over all data and using image.getElementDoubleAbs(...)
 			// However it reorders data for the axes
-			for (int i = shape[0]-1; i>=0; --i) {
-			    for (int j = shape[1]-1; j>=0; --j) {
-					
+			for (int i = 0; i<shape[0]; ++i) {
+				for (int j = 0; j<shape[1]; ++j) {
+				
 					if (bean.isCancelled()) return null;
 					final float val = image.getFloat(i, j);
-					addByte(val, min, max, scale_8bit, maxPixel, scaledImageAsByte, byteIndex);
-					++byteIndex;
+					imageData.setPixel(shape[1]-j-1, shape[0]-i-1, getPixelValue(val, min, max, scale, maxPixel));
 				}
 			}
-			imageData = new ImageData(shape[1], shape[0], 8, palette, 1, scaledImageAsByte);
 			
 		} else if (origin==ImageOrigin.TOP_RIGHT) {
-			int byteIndex = 0;
+
+			imageData = new ImageData(shape[0], shape[1], depth, palette);
 			// This loop is slower than looping over all data and using image.getElementDoubleAbs(...)
 			// However it reorders data for the axes
 			for (int i = 0; i<shape[1]; ++i) {
-				for (int j = shape[0]-1; j>=0; --j) {
+				for (int j = 0; j<shape[0]; ++j) {
 					
 					if (bean.isCancelled()) return null;
 					final float val = image.getFloat(j, i);
-					addByte(val, min, max, scale_8bit, maxPixel, scaledImageAsByte, byteIndex);
-					++byteIndex;
+					imageData.setPixel(shape[0]-j-1, i, getPixelValue(val, min, max, scale, maxPixel));
 				}
 			}
-			imageData = new ImageData(shape[0], shape[1], 8, palette, 1, scaledImageAsByte);
 		}
 		
 		if (bean.isCancelled()) return null;
@@ -164,22 +159,34 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 
 	}
 
+	private void createMaxMin(ImageServiceBean bean) {
+		
+		float[] stats  = null;
+		if (bean.getMin()==null) {
+			if (stats==null) stats = getFastStatistics(bean); // do not get unless have to
+			bean.setMin(stats[0]);
+		}
+		
+		if (bean.getMax()==null) {
+			if (stats==null) stats = getFastStatistics(bean); // do not get unless have to
+		    bean.setMax(stats[1]);
+		}		
+	}
+
 	/**
 	 * private finals inline well by the compiler.
 	 * @param val
 	 * @param min
 	 * @param max
-	 * @param scale_8bit
+	 * @param scale
 	 * @param maxPixel
 	 * @param scaledImageAsByte
 	 */
-	private final void addByte( final float  val, 
-								final float  min, 
-								final float  max, 
-								final float  scale_8bit, 
-								final float  maxPixel, 
-								final byte[] scaledImageAsByte,
-								final int    index) {
+	private final int getPixelValue(final float  val, 
+									final float  min, 
+									final float  max, 
+									final float  scale, 
+									final float  maxPixel) {
 		
 		float scaled_pixel;
 		if (val < min) {
@@ -189,11 +196,10 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 		} else {
 			scaled_pixel = val - min;
 		}
-		scaled_pixel = scaled_pixel * scale_8bit;
-		// Keep it in bounds
-		final byte pixel = (byte) (0x000000FF & ((int) scaled_pixel));
-
-		scaledImageAsByte[index] = pixel;
+		scaled_pixel = scaled_pixel * scale;
+		
+		return (int)scaled_pixel;		
+		
 	}
 	
 	/**
@@ -214,7 +220,14 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 			
 			final double dv = image.getElementDoubleAbs(index);
 			if (Double.isNaN(dv))      continue;
-			if (Double.isInfinite(dv)) continue; // TODO Should use a bound number with ||
+			if (Double.isInfinite(dv)) continue;
+			
+			if (bean.getMaximumCutBound()!=null) {
+				if (dv>=bean.getMaximumCutBound().getBound().doubleValue()) continue;
+			}
+			if (bean.getMinimumCutBound()!=null) {
+				if (dv<=bean.getMinimumCutBound().getBound().doubleValue()) continue;
+			}
 			
 			final float val = (float)dv;
 			sum += val;
@@ -254,6 +267,10 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 			return new ImageService();
 		} 
 		return null;
+	}
+	
+	public static final class SDAFunctionBean {
+		
 	}
 
 }
