@@ -36,13 +36,10 @@ import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
  */
 public class ImageServiceBean {
 	
-	public static HistogramBound DEFAULT_MAXIMUM = new HistogramBound(Double.POSITIVE_INFINITY, Display.getDefault().getSystemColor(SWT.COLOR_RED).getRGB());
-	public static HistogramBound DEFAULT_MINIMUM = new HistogramBound(Double.NEGATIVE_INFINITY, Display.getDefault().getSystemColor(SWT.COLOR_BLUE).getRGB());
-	public static HistogramBound DEFAULT_NAN     = new HistogramBound(Double.NaN, Display.getDefault().getSystemColor(SWT.COLOR_GREEN).getRGB());
 	
-	private HistogramBound  maximumCutBound = DEFAULT_MAXIMUM;
-	private HistogramBound  minimumCutBound = DEFAULT_MINIMUM;
-	private HistogramBound  nanBound        = DEFAULT_NAN;
+	private HistogramBound  maximumCutBound = HistogramBound.DEFAULT_MAXIMUM;
+	private HistogramBound  minimumCutBound = HistogramBound.DEFAULT_MINIMUM;
+	private HistogramBound  nanBound        = HistogramBound.DEFAULT_NAN;
 	private AbstractDataset image;
 	private PaletteData     palette;
 	private ImageOrigin     origin;
@@ -175,6 +172,10 @@ public class ImageServiceBean {
 	 */
 	public static class HistogramBound {
 
+		public static HistogramBound DEFAULT_MAXIMUM = new HistogramBound(Double.POSITIVE_INFINITY, Display.getDefault().getSystemColor(SWT.COLOR_RED).getRGB());
+		public static HistogramBound DEFAULT_MINIMUM = new HistogramBound(Double.NEGATIVE_INFINITY, Display.getDefault().getSystemColor(SWT.COLOR_BLUE).getRGB());
+		public static HistogramBound DEFAULT_NAN     = new HistogramBound(Double.NaN, Display.getDefault().getSystemColor(SWT.COLOR_GREEN).getRGB());
+
 		private Number bound;
 		private RGB  color;
 		
@@ -225,8 +226,47 @@ public class ImageServiceBean {
 				return false;
 			return true;
 		}
-		
-		
+		@Override
+		public String toString() {
+			final StringBuilder buf = new StringBuilder();
+			buf.append(bound);
+			buf.append(",");
+			if (color!=null) {
+				buf.append(color.red);
+				buf.append(",");
+				buf.append(color.green);
+				buf.append(",");
+				buf.append(color.blue);
+				
+			} else{
+				buf.append("null");
+			}
+			return buf.toString();
+		}
+
+		public static HistogramBound fromString(String encoded) {
+			
+			if (encoded == null || "null".equals(encoded) || "null,null".equals(encoded) || "".equals(encoded)) {
+				return null;
+			}
+
+			final String[] sa = encoded.split(",");
+			
+			Number bound = null;
+			if (sa[0].equals("null")) {
+				bound = null;
+			} else {
+				bound = Double.parseDouble(sa[0]);
+			}
+			
+			RGB color = null;
+			if (sa[1].equals("null")) {
+				color = null;
+			} else {
+				color = new RGB(Integer.parseInt(sa[1]), Integer.parseInt(sa[2]), Integer.parseInt(sa[3]));
+			}
+			return new HistogramBound(bound, color);
+		}
 	}
 	
 	public enum HistoType {
@@ -256,6 +296,7 @@ public class ImageServiceBean {
 			}
 			return null;
 		}
+		
 	}
 
 	
