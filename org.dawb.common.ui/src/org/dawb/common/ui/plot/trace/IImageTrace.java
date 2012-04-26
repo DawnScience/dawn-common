@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.dawb.common.services.ImageServiceBean;
 import org.dawb.common.services.ImageServiceBean.HistoType;
+import org.dawb.common.services.ImageServiceBean.HistogramBound;
 import org.dawb.common.services.ImageServiceBean.ImageOrigin;
 import org.eclipse.swt.graphics.PaletteData;
 
@@ -15,7 +16,33 @@ import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
  * In the LightWeightPlotter this is called ImageTrace.
  * 
  * @author fcp94556
- *
+ * 
+   Histogramming Explanation
+   ---------------------------
+   Image intensity distribution:
+
+                ++----------------------**---------------
+                +                      *+ *              
+                ++                    *    *             
+                |                     *    *             
+                ++                    *     *            
+                *                    *       *            
+                +*                   *       *            
+                |*                  *        *            
+                +*                  *        *           
+                |                  *          *         
+                ++                 *          *          
+                |                  *           *        
+                ++                 *           *        
+                |                 *            *        
+                ++                *            *       
+                                 *              *      
+        Min Cut           Min    *              *      Max                     Max cut
+ Red <- |   (min colour)  |    (color range, palette)  |      (max color)      | -> Blue
+                                *                 *  
+                |              *        +         *  
+----------------++------------**---------+----------**----+---------------**+---------------++
+              
  */
 public interface IImageTrace extends ITrace {
 
@@ -189,4 +216,40 @@ public interface IImageTrace extends ITrace {
 	 */
 	public int getDownsampleBin();
 	
+	/**
+	 * Gets the min cut, a RGB and a bound.
+	 * @return
+	 */
+	public HistogramBound getMinCut();
+	
+	/**
+	 * Gets the min cut, a RGB and a bound.
+	 * @return
+	 */
+	public void setMinCut(HistogramBound bound);
+
+	/**
+	 * Gets the max cut, a RGB and a bound.
+	 * @return
+	 */
+	public HistogramBound getMaxCut();
+
+	/**
+	 * Gets the min cut, a RGB and a bound.
+	 * @return
+	 */
+	public void setMaxCut(HistogramBound bound);
+	
+	/**
+	 * Gets the Nan cut
+	 * @return
+	 */
+	public HistogramBound getNanBound();
+	
+	/**
+	 * Gets the Nan cut
+	 * @return
+	 */
+	public void setNanBound(HistogramBound bound);
+
 }
