@@ -30,14 +30,15 @@ public class MenuAction extends Action implements IMenuCreator {
 	private Menu fMenu;
 	private List<IAction> actions;
 	private Action selectedAction;
-	private int menuSeparators;
-	private int separatorIndex;
+	private List<Integer> indexes;
+	private int iSeparator;
 
 	public MenuAction(final String text) {
 		super(text, IAction.AS_DROP_DOWN_MENU);
 		setMenuCreator(this);
 		this.actions = new ArrayList<IAction>(7);
-		this.menuSeparators = 0;
+		this.iSeparator = 0;
+		this.indexes = new ArrayList<Integer>();
 	}
 
 
@@ -59,8 +60,8 @@ public class MenuAction extends Action implements IMenuCreator {
 		for (IAction action : actions) {
 			addActionToMenu(fMenu, action);
 		}
-		for (int i=0; i<menuSeparators;i++)
-			addSeparatorToMenu(fMenu);
+		for (int i=0; i<iSeparator;i++)
+			addSeparatorToMenu(fMenu, i);
 		return fMenu;
 	}
 
@@ -77,8 +78,8 @@ public class MenuAction extends Action implements IMenuCreator {
 		for (IAction action : actions) {
 			addActionToMenu(fMenu, action);
 		}
-		for (int i=0; i<menuSeparators;i++)
-			addSeparatorToMenu(fMenu);
+		for (int i=0; i<iSeparator;i++)
+			addSeparatorToMenu(fMenu, i);
 		return fMenu;
 	}
 
@@ -114,12 +115,12 @@ public class MenuAction extends Action implements IMenuCreator {
 	}
 
 	public void addSeparator() {
-		separatorIndex = actions.size();
-		menuSeparators++;
+		indexes.add(actions.size()+iSeparator);
+		iSeparator++;
 	}
 
-	protected void addSeparatorToMenu(Menu parent) {
-		new MenuItem(parent, SWT.SEPARATOR, separatorIndex);
+	protected void addSeparatorToMenu(Menu parent, int index) {
+		new MenuItem(parent, SWT.SEPARATOR, indexes.get(index));
 	}
 
 	public void run() {
