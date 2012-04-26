@@ -21,21 +21,28 @@ import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.PaletteData;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 
+/**
+ * As histogramming has become more complex and gained more options, this class has become more
+ * complex. As much optional information as possible has been defaulted to reduce the values which must be set.
+ * 
+ * See ImageTrace for how to use the bean. For some calls, only 
+ * 
+ */
 public class ImageServiceBean {
 	
-	private static HistogramBound DEFAULT_MAXIMUM = new HistogramBound(Double.POSITIVE_INFINITY, Display.getDefault().getSystemColor(SWT.COLOR_BLUE));
-	private static HistogramBound DEFAULT_MINIMUM = new HistogramBound(Double.NEGATIVE_INFINITY, Display.getDefault().getSystemColor(SWT.COLOR_RED));
-	private static HistogramBound DEFAULT_NAN     = new HistogramBound(Double.NaN, Display.getDefault().getSystemColor(SWT.COLOR_GREEN));
+	private static HistogramBound DEFAULT_MAXIMUM = new HistogramBound(Double.POSITIVE_INFINITY, Display.getDefault().getSystemColor(SWT.COLOR_BLUE).getRGB());
+	private static HistogramBound DEFAULT_MINIMUM = new HistogramBound(Double.NEGATIVE_INFINITY, Display.getDefault().getSystemColor(SWT.COLOR_RED).getRGB());
+	private static HistogramBound DEFAULT_NAN     = new HistogramBound(Double.NaN, Display.getDefault().getSystemColor(SWT.COLOR_GREEN).getRGB());
 	
 	private HistogramBound  maximumCutBound = DEFAULT_MAXIMUM;
 	private HistogramBound  minimumCutBound = DEFAULT_MINIMUM;
-	private HistogramBound  nanBound     = DEFAULT_NAN;
+	private HistogramBound  nanBound        = DEFAULT_NAN;
 	private AbstractDataset image;
 	private PaletteData     palette;
 	private ImageOrigin     origin;
@@ -82,6 +89,14 @@ public class ImageServiceBean {
 	public PaletteData getPalette() {
 		return palette;
 	}
+	/**
+	 * *IMPORTANT* - remember to give the bean a copy of a palette which 
+	 * you do not mind it changing. This potentially dangerous way the 
+	 * bean works (rather than always making a copy for instance) is 
+	 * for efficiency reasons.
+	 * 
+	 * @param palette
+	 */
 	public void setPalette(PaletteData palette) {
 		this.palette = palette;
 	}
@@ -161,15 +176,24 @@ public class ImageServiceBean {
 	public static class HistogramBound {
 
 		private Number bound;
-		private Color  color;
-		public HistogramBound(Number bound, Color color) {
+		private RGB  color;
+		
+		/**
+		 * RGB may be null. If it is the last three colours in the palette
+		 * are used for the bound directly. For instance RGBs can be set to 
+		 * null to avoid special cut bounds colors at all.
+		 * 
+		 * @param bound
+		 * @param color
+		 */
+		public HistogramBound(Number bound, RGB color) {
 			this.bound = bound;
 			this.color = color;
 		}
 		public Number getBound() {
 			return bound;
 		}
-		public Color getColor() {
+		public RGB getColor() {
 			return color;
 		}
 		@Override
@@ -301,4 +325,30 @@ public class ImageServiceBean {
 		this.functionObject = userObject;
 	}
 
+	public boolean isInBounds(double dv) {
+		if (!isInsideMinCut(dv)) return false;
+		if (!isInsideMaxCut(dv)) return false;
+        return true;
+	}
+	
+	public boolean isInsideMinCut(double dv) {
+		if (getMinimumCutBound()!=null) {
+			if (dv<=getMinimumCutBound().getBound().doubleValue()) return false;
+		}
+		return true;
+	}
+	public boolean isInsideMaxCut(double dv) {
+		if (getMaximumCutBound()!=null) {
+			if (dv>=getMaximumCutBound().getBound().doubleValue()) return false;
+		}
+		return true;
+	}
+	public boolean isValidNumber(double dv) {
+		if (getNanBound()!=null) {
+			if (Double.isNaN(dv)) return false;
+		}
+		return true;
+	}
+	
+	
 }

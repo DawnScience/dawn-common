@@ -12,6 +12,7 @@ package org.dawb.common.ui.image;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.dawb.common.util.object.ObjectUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.swt.SWT;
@@ -2307,14 +2308,18 @@ public class PaletteFactory {
 	 * Uses the users preferred choice for the palette
 	 * @return
 	 */
-	public static PaletteData getPalette() {
+	public static PaletteData getPalette() throws Exception {
 		
 		final ScopedPreferenceStore store = new ScopedPreferenceStore(InstanceScope.INSTANCE, "org.dawb.fable.imageviewer");
 		final int index = store.getInt("palettePreference");
 		return getPalette(index);
 	}
 
-	public static PaletteData getPalette(int index) {
+	public static PaletteData getPalette(int index) throws Exception{
+        return PaletteFactory.getPalette(index, false);
+	}
+	
+	public static PaletteData getPalette(int index, final boolean createCopy) throws Exception {
 		if (index < 0 || index >= PALETTES.size()) {
 			return null;
 		}
@@ -2361,7 +2366,11 @@ public class PaletteFactory {
 				break;
 			}
 		}
-		return palettes[index];
+		PaletteData ret = palettes[index];
+		if (createCopy) {
+			ret = new PaletteData((RGB[])ObjectUtils.deepCopy(ret.colors, RGB.class.getClassLoader()));
+		}
+		return ret;
 	}
 	
 	public static Map<String, Integer> getPaletteNames() {

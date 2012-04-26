@@ -72,10 +72,11 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 					                                              fc.isInverseBlue());
 		}
 		
-		if (depth>8) { // Depth > 8 will not work properly at the moment but this will help:
-			if (depth == 16) palette = new PaletteData(0x7C00, 0x3E0, 0x1F);
-			if (depth == 24) palette = new PaletteData(0xFF, 0xFF00, 0xFF0000);
-			if (depth == 32) palette = new PaletteData(0xFF00, 0xFF0000, 0xFF000000);
+		if (depth>8) { // Depth > 8 will not work properly at the moment.
+			throw new RuntimeException(getClass().getSimpleName()+" only supports 8-bit images unless we a FunctionContainer has been set!");
+			//if (depth == 16) palette = new PaletteData(0x7C00, 0x3E0, 0x1F);
+			//if (depth == 24) palette = new PaletteData(0xFF, 0xFF00, 0xFF0000);
+			//if (depth == 32) palette = new PaletteData(0xFF00, 0xFF0000, 0xFF000000);
 		}
 		
 		final int[]   shape = image.getShape();
@@ -84,10 +85,14 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 		int len = image.getSize();
 		if (len == 0) return null;
 
+		// The last three indices of the palette are always taken up with bound colours
+		createCutColours(bean); // Modifys the palette data and sets the withheld indices
+		
 		float scale;
 		float maxPixel;
 		if (max > min) {
-			scale = Float.valueOf(size-1) / (max - min);
+			// 4 because 1 less than size and then 1 for each bound color is lost.
+			scale = Float.valueOf(size-4) / (max - min);
 			maxPixel = max - min;
 		} else {
 			scale = 1f;
@@ -105,7 +110,7 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 					
 					if (bean.isCancelled()) return null;
 					final float val = image.getFloat(i, j);
-					imageData.setPixel(j, i, getPixelValue(val, min, max, scale, maxPixel));
+					imageData.setPixel(j, i, getPixelColorIndex(val, min, max, scale, maxPixel, bean));
 				}
 			}
 	
@@ -119,7 +124,7 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 					
 					if (bean.isCancelled()) return null;
 					final float val = image.getFloat(j, i);
-					imageData.setPixel(j, shape[1]-i-1, getPixelValue(val, min, max, scale, maxPixel));
+					imageData.setPixel(j, shape[1]-i-1, getPixelColorIndex(val, min, max, scale, maxPixel, bean));
 				}
 			}
 			
@@ -133,7 +138,7 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 				
 					if (bean.isCancelled()) return null;
 					final float val = image.getFloat(i, j);
-					imageData.setPixel(shape[1]-j-1, shape[0]-i-1, getPixelValue(val, min, max, scale, maxPixel));
+					imageData.setPixel(shape[1]-j-1, shape[0]-i-1, getPixelColorIndex(val, min, max, scale, maxPixel, bean));
 				}
 			}
 			
@@ -147,7 +152,7 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 					
 					if (bean.isCancelled()) return null;
 					final float val = image.getFloat(j, i);
-					imageData.setPixel(shape[0]-j-1, i, getPixelValue(val, min, max, scale, maxPixel));
+					imageData.setPixel(shape[0]-j-1, i, getPixelColorIndex(val, min, max, scale, maxPixel, bean));
 				}
 			}
 		}
@@ -155,6 +160,34 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 		if (bean.isCancelled()) return null;
 		return imageData;
 
+	}
+
+	/**
+	 * Calling this wipes out the last three RGBs. Even if you set max
+	 * @param bean
+	 */
+	private void createCutColours(ImageServiceBean bean) {
+		
+		// We *DO NOT* copy the palete here so up to 3 of the original
+		// colors can be changed. Instead whenever a palette is given to an
+		// ImageService bean it should be original.
+		
+		
+		// We have three special values, those which are greater than the max cut,
+		// less than the min cut and the NaN number. For these we use special pixel
+		// values in the palette as defined by the cut bound if it is set.
+		if (bean.getMinimumCutBound()!=null && bean.getMinimumCutBound().getColor()!=null) {
+			bean.getPalette().colors[253] = bean.getMinimumCutBound().getColor();
+		}
+		
+		if (bean.getNanBound()!=null && bean.getNanBound().getColor()!=null) {
+			bean.getPalette().colors[254] = bean.getNanBound().getColor();
+		}
+		
+		if (bean.getMaximumCutBound()!=null && bean.getMaximumCutBound().getColor()!=null) {
+			bean.getPalette().colors[255] = bean.getMaximumCutBound().getColor();
+		}
+		
 	}
 
 	private void createMaxMin(ImageServiceBean bean) {
@@ -180,11 +213,23 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 	 * @param maxPixel
 	 * @param scaledImageAsByte
 	 */
-	private final int getPixelValue(final float  val, 
-									final float  min, 
-									final float  max, 
-									final float  scale, 
-									final float  maxPixel) {
+	private final int getPixelColorIndex(final float  val, 
+										 final float  min, 
+										 final float  max, 
+										 final float  scale, 
+										 final float  maxPixel,
+										 final ImageServiceBean bean) {
+	    
+		// Deal with bounds
+		if (!bean.isInsideMinCut(val)) {
+			return 253;
+		}
+		if (!bean.isValidNumber(val))  {
+			return 254;
+		}
+		if (!bean.isInsideMaxCut(val)) {
+			return 255;
+		}
 		
 		float scaled_pixel;
 		if (val < min) {
@@ -196,8 +241,11 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 		}
 		scaled_pixel = scaled_pixel * scale;
 		
-		return (int)scaled_pixel;		
-		
+		int pixelIndex = (int)scaled_pixel;		
+		if (pixelIndex>=253) {
+			throw new RuntimeException("Unexpected pixel index: "+pixelIndex);
+		}
+		return pixelIndex;
 	}
 	
 	/**
@@ -219,14 +267,8 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 			final double dv = image.getElementDoubleAbs(index);
 			if (Double.isNaN(dv))      continue;
 			if (Double.isInfinite(dv)) continue;
-			
-			if (bean.getMaximumCutBound()!=null) {
-				if (dv>=bean.getMaximumCutBound().getBound().doubleValue()) continue;
-			}
-			if (bean.getMinimumCutBound()!=null) {
-				if (dv<=bean.getMinimumCutBound().getBound().doubleValue()) continue;
-			}
-			
+			if (!bean.isInBounds(dv))  continue;
+						
 			final float val = (float)dv;
 			sum += val;
 			if (val < min) min = val;
