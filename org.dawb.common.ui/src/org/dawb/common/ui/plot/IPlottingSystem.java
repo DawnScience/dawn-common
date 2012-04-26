@@ -1,4 +1,4 @@
-/*
+/*-
  * Copyright (c) 2012 European Synchrotron Radiation Facility,
  *                    Diamond Light Source Ltd.
  *
@@ -36,7 +36,7 @@ import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
  * @author gerring
  *
  */
-public interface IPlottingSystem extends ITraceSystem, IRegionSystem, IAxisSystem, IAnnotationSystem {
+public interface IPlottingSystem extends ITraceSystem, IRegionSystem, IAxisSystem, IAnnotationSystem, IPrintablePlotting{
 
 	/**
 	 * Call to create the UI component dealing with the plotting.

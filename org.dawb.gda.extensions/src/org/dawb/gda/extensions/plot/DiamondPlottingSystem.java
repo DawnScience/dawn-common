@@ -182,4 +182,22 @@ public class DiamondPlottingSystem extends AbstractPlottingSystem {
 		}
         return null;
 	}
+
+	@Override
+	public void printPlotting() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void copyPlotting() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void savePlotting(String filename) {
+		// TODO Auto-generated method stub
+		
+	}
 }

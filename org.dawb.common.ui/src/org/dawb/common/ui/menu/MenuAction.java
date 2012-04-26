@@ -1,4 +1,4 @@
-/*
+/*-
  * Copyright (c) 2012 European Synchrotron Radiation Facility,
  *                    Diamond Light Source Ltd.
  *
@@ -17,8 +17,10 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuCreator;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 
 /**
  * Simple action which will have other actions in a drop down menu.
@@ -28,11 +30,14 @@ public class MenuAction extends Action implements IMenuCreator {
 	private Menu fMenu;
 	private List<IAction> actions;
 	private Action selectedAction;
+	private int menuSeparators;
+	private int separatorIndex;
 
 	public MenuAction(final String text) {
 		super(text, IAction.AS_DROP_DOWN_MENU);
 		setMenuCreator(this);
 		this.actions = new ArrayList<IAction>(7);
+		this.menuSeparators = 0;
 	}
 
 
@@ -54,7 +59,8 @@ public class MenuAction extends Action implements IMenuCreator {
 		for (IAction action : actions) {
 			addActionToMenu(fMenu, action);
 		}
-
+		for (int i=0; i<menuSeparators;i++)
+			addSeparatorToMenu(fMenu);
 		return fMenu;
 	}
 
@@ -71,7 +77,8 @@ public class MenuAction extends Action implements IMenuCreator {
 		for (IAction action : actions) {
 			addActionToMenu(fMenu, action);
 		}
-
+		for (int i=0; i<menuSeparators;i++)
+			addSeparatorToMenu(fMenu);
 		return fMenu;
 	}
 
@@ -105,7 +112,16 @@ public class MenuAction extends Action implements IMenuCreator {
 		//setToolTipText(action.getToolTipText());
 		this.selectedAction = (Action)action;
 	}
-	
+
+	public void addSeparator() {
+		separatorIndex = actions.size();
+		menuSeparators++;
+	}
+
+	protected void addSeparatorToMenu(Menu parent) {
+		new MenuItem(parent, SWT.SEPARATOR, separatorIndex);
+	}
+
 	public void run() {
 		if (selectedAction!=null) selectedAction.run();
 	}
