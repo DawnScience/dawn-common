@@ -3,7 +3,35 @@ package org.dawb.common.services;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 
+/**
+ * 
+   Histogramming Explanation
+   ---------------------------
+   Image intensity distribution:
 
+                ++----------------------**---------------
+                +                      *+ *              
+                ++                    *    *             
+                |                     *    *             
+                ++                    *     *            
+                *                    *       *            
+                +*                   *       *            
+                |*                  *        *            
+                +*                  *        *           
+                |                  *          *         
+                ++                 *          *          
+                |                  *           *        
+                ++                 *           *        
+                |                 *            *        
+                ++                *            *       
+                                 *              *      
+        Min Cut           Min    *              *      Max                     Max cut
+ Red <- |   (min colour)  |    (color range, palette)  |      (max color)      | -> Blue
+                                *                 *  
+                |              *        +         *  
+----------------++------------**---------+----------**----+---------------**+---------------++
+
+ */
 public interface IImageService {
 
 	
