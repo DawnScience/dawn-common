@@ -36,9 +36,9 @@ import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
  */
 public class ImageServiceBean {
 	
-	private static HistogramBound DEFAULT_MAXIMUM = new HistogramBound(Double.POSITIVE_INFINITY, Display.getDefault().getSystemColor(SWT.COLOR_BLUE).getRGB());
-	private static HistogramBound DEFAULT_MINIMUM = new HistogramBound(Double.NEGATIVE_INFINITY, Display.getDefault().getSystemColor(SWT.COLOR_RED).getRGB());
-	private static HistogramBound DEFAULT_NAN     = new HistogramBound(Double.NaN, Display.getDefault().getSystemColor(SWT.COLOR_GREEN).getRGB());
+	public static HistogramBound DEFAULT_MAXIMUM = new HistogramBound(Double.POSITIVE_INFINITY, Display.getDefault().getSystemColor(SWT.COLOR_RED).getRGB());
+	public static HistogramBound DEFAULT_MINIMUM = new HistogramBound(Double.NEGATIVE_INFINITY, Display.getDefault().getSystemColor(SWT.COLOR_BLUE).getRGB());
+	public static HistogramBound DEFAULT_NAN     = new HistogramBound(Double.NaN, Display.getDefault().getSystemColor(SWT.COLOR_GREEN).getRGB());
 	
 	private HistogramBound  maximumCutBound = DEFAULT_MAXIMUM;
 	private HistogramBound  minimumCutBound = DEFAULT_MINIMUM;
@@ -346,6 +346,7 @@ public class ImageServiceBean {
 	public boolean isValidNumber(double dv) {
 		if (getNanBound()!=null) {
 			if (Double.isNaN(dv)) return false;
+			if (Float.isNaN((float)dv)) return false;
 		}
 		return true;
 	}

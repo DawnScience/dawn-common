@@ -25,6 +25,39 @@ import uk.ac.diamond.scisoft.analysis.dataset.Stats;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 import uk.ac.diamond.scisoft.analysis.rcp.plotting.utils.SWTImageUtils;
 
+/**
+ * 
+ 
+   Histogramming Explanation
+   ---------------------------
+   Image intensity distribution:
+
+                ++----------------------**---------------
+                +                      *+ *              
+                ++                    *    *             
+                |                     *    *             
+                ++                    *     *            
+                *                    *       *            
+                +*                   *       *            
+                |*                  *        *            
+                +*                  *        *           
+                |                  *          *         
+                ++                 *          *          
+                |                  *           *        
+                ++                 *           *        
+                |                 *            *        
+                ++                *            *       
+                                 *              *      
+        Min Cut           Min    *              *      Max                     Max cut
+ Red <- |   (min colour)  |    (color range, palette)  |      (max color)      | -> Blue
+                                *                 *  
+                |              *        +         *  
+----------------++------------**---------+----------**----+---------------**+---------------++
+
+ 
+ * @author fcp94556
+ *
+ */
 public class ImageService extends AbstractServiceFactory implements IImageService {
 	
 	
@@ -270,6 +303,8 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 			if (!bean.isInBounds(dv))  continue;
 						
 			final float val = (float)dv;
+			if (Float.isNaN(val))       continue;
+			
 			sum += val;
 			if (val < min) min = val;
 			if (val > max) max = val;
