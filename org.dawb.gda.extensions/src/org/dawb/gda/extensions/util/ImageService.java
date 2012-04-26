@@ -72,16 +72,14 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 					                                              fc.isInverseBlue());
 		}
 		
-		if (depth>8) { // We use the 24-bit processing of SWTImageUtils
-			// Normally it will not do this as depth>8 will use SWTImageUtils
+		if (depth>8) { // Depth > 8 will not work properly at the moment but this will help:
 			if (depth == 16) palette = new PaletteData(0x7C00, 0x3E0, 0x1F);
 			if (depth == 24) palette = new PaletteData(0xFF, 0xFF00, 0xFF0000);
 			if (depth == 32) palette = new PaletteData(0xFF00, 0xFF0000, 0xFF000000);
 		}
 		
 		final int[]   shape = image.getShape();
-		if (bean.isCancelled()) return null;
-				
+		if (bean.isCancelled()) return null;	
 				
 		int len = image.getSize();
 		if (len == 0) return null;
