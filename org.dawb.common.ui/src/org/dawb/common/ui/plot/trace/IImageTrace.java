@@ -9,6 +9,7 @@ import org.dawb.common.services.ImageServiceBean.ImageOrigin;
 import org.eclipse.swt.graphics.PaletteData;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.BooleanDataset;
 
 /**
  * Interface used for the plotting system to plot images.
@@ -252,4 +253,22 @@ public interface IImageTrace extends ITrace {
 	 */
 	public void setNanBound(HistogramBound bound);
 
+	/**
+	 * The masking dataset of there is one, normally null.
+	 * false to mask the pixel, true to leave as is.
+	 * 
+	 * @return
+	 */
+	public AbstractDataset getMask();
+	
+	/**
+	 * The masking dataset of there is one, normally null.
+	 * false to mask the pixel, true to leave as is.
+	 * 
+	 * If you don't send a BooleanDataset the system may attempt a cast
+	 * and throw an exception.
+	 * 
+	 * @return
+	 */
+	public void setMask(AbstractDataset bd);
 }

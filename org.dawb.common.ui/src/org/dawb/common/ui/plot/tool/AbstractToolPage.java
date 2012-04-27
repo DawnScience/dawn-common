@@ -1,6 +1,10 @@
 package org.dawb.common.ui.plot.tool;
 
+import java.util.Collection;
+
 import org.dawb.common.ui.plot.IPlottingSystem;
+import org.dawb.common.ui.plot.trace.IImageTrace;
+import org.dawb.common.ui.plot.trace.ITrace;
 import org.dawb.common.util.text.StringUtils;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -141,5 +145,17 @@ public abstract class AbstractToolPage extends Page implements IToolPage, IAdapt
 
 	public void setViewPart(IViewPart viewPart) {
 		this.viewPart = viewPart;
+	}
+	
+	/**
+	 * this method gives access to the image trace plotted in the
+	 * main plotter or null if one is not plotted.
+	 * @return
+	 */
+	public IImageTrace getImageTrace() {
+		final Collection<ITrace> traces = getPlottingSystem().getTraces(IImageTrace.class);
+		if (traces==null || traces.size()<0) return null;
+		final ITrace trace = traces.iterator().next();
+		return trace instanceof IImageTrace ? (IImageTrace)trace : null;
 	}
 }

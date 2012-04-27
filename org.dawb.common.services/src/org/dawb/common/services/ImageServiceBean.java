@@ -41,6 +41,7 @@ public class ImageServiceBean {
 	private HistogramBound  minimumCutBound = HistogramBound.DEFAULT_MINIMUM;
 	private HistogramBound  nanBound        = HistogramBound.DEFAULT_NAN;
 	private AbstractDataset image;
+	private AbstractDataset mask;
 	private PaletteData     palette;
 	private ImageOrigin     origin;
 	private Number          min;
@@ -390,6 +391,22 @@ public class ImageServiceBean {
 			if (Float.isNaN((float)dv)) return false;
 		}
 		return true;
+	}
+	
+	/**
+	 * The mask is false to mask and true to do nothing
+	 * @return
+	 */
+	public AbstractDataset getMask() {
+		return mask;
+	}
+	
+	/**
+	 * The mask is false to mask and true to do nothing
+	 * @return
+	 */
+	public void setMask(AbstractDataset mask) {
+		this.mask = mask;
 	}
 	
 	

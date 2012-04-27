@@ -21,6 +21,8 @@ import org.eclipse.ui.services.AbstractServiceFactory;
 import org.eclipse.ui.services.IServiceLocator;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.BooleanDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.DatasetUtils;
 import uk.ac.diamond.scisoft.analysis.dataset.Stats;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 import uk.ac.diamond.scisoft.analysis.rcp.plotting.utils.SWTImageUtils;
@@ -79,6 +81,10 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 		return new Image(Display.getCurrent(), data);
 	}
 	
+	private static final int MIN_PIX_INDEX = 253;
+	private static final int NAN_PIX_INDEX = 254;
+	private static final int MAX_PIX_INDEX = 255;
+	
 	/**
 	 * getImageData(...) provides an image in a given palette data and origin.
 	 * Faster than getting a resolved image
@@ -91,12 +97,14 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 		
 		int depth = bean.getDepth();
 		final int size  = (int)Math.round(Math.pow(2, depth));
+		
 		createMaxMin(bean);
 		final float max = bean.getMax().floatValue();
 		final float min = bean.getMin().floatValue();
 		
 		if (bean.getFunctionObject()!=null && bean.getFunctionObject() instanceof FunctionContainer) {
 			final FunctionContainer fc = (FunctionContainer)bean.getFunctionObject();
+			// TODO This does not support masking or cut bounds for zingers and dead pixels.
 			return SWTImageUtils.createImageData(image, min, max, fc.getRedFunc(), 
 					                                              fc.getGreenFunc(), 
 					                                              fc.getBlueFunc(), 
@@ -133,6 +141,10 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 		}
 		if (bean.isCancelled()) return null;
 		
+		BooleanDataset mask = bean.getMask()!=null
+				            ? (BooleanDataset)DatasetUtils.cast(bean.getMask(), AbstractDataset.BOOL)
+				            : null;
+				            
  		ImageData imageData = null;
 		if (origin==ImageOrigin.TOP_LEFT) { 
 			
@@ -141,9 +153,12 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 			for (int i = 0; i<shape[0]; ++i) {
 				for (int j = 0; j<shape[1]; ++j) {
 					
-					if (bean.isCancelled()) return null;
-					final float val = image.getFloat(i, j);
-					imageData.setPixel(j, i, getPixelColorIndex(val, min, max, scale, maxPixel, bean));
+					if (bean.isCancelled()) return null;				
+					// This saves a value lookup when the pixel is certainly masked.
+					final int   pix = mask==null || mask.getBoolean(i,j)
+						            ? getPixelColorIndex(image.getFloat(i, j), min, max, scale, maxPixel, bean)
+					                : NAN_PIX_INDEX;
+					imageData.setPixel(j, i, pix);
 				}
 			}
 	
@@ -156,8 +171,11 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 				for (int j = 0; j<shape[0]; ++j) {
 					
 					if (bean.isCancelled()) return null;
-					final float val = image.getFloat(j, i);
-					imageData.setPixel(j, shape[1]-i-1, getPixelColorIndex(val, min, max, scale, maxPixel, bean));
+					// This saves a value lookup when the pixel is certainly masked.
+					final int   pix = mask==null || mask.getBoolean(j,i)
+				                    ? getPixelColorIndex(image.getFloat(j, i), min, max, scale, maxPixel, bean)
+			                        : NAN_PIX_INDEX;
+					imageData.setPixel(j, shape[1]-i-1, pix);
 				}
 			}
 			
@@ -170,8 +188,12 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 				for (int j = 0; j<shape[1]; ++j) {
 				
 					if (bean.isCancelled()) return null;
-					final float val = image.getFloat(i, j);
-					imageData.setPixel(shape[1]-j-1, shape[0]-i-1, getPixelColorIndex(val, min, max, scale, maxPixel, bean));
+
+					// This saves a value lookup when the pixel is certainly masked.
+					final int   pix = mask==null || mask.getBoolean(i,j)
+						            ? getPixelColorIndex(image.getFloat(i, j), min, max, scale, maxPixel, bean)
+					                : NAN_PIX_INDEX;
+					imageData.setPixel(shape[1]-j-1, shape[0]-i-1, pix);
 				}
 			}
 			
@@ -184,15 +206,17 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 				for (int j = 0; j<shape[0]; ++j) {
 					
 					if (bean.isCancelled()) return null;
-					final float val = image.getFloat(j, i);
-					imageData.setPixel(shape[0]-j-1, i, getPixelColorIndex(val, min, max, scale, maxPixel, bean));
+					final int   pix = mask==null || mask.getBoolean(j,i)
+		                            ? getPixelColorIndex(image.getFloat(j, i), min, max, scale, maxPixel, bean)
+	                                : NAN_PIX_INDEX;
+					imageData.setPixel(shape[0]-j-1, i, pix);
 				}
 			}
 		}
 		
 		if (bean.isCancelled()) return null;
+		
 		return imageData;
-
 	}
 
 	/**
@@ -210,15 +234,15 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 		// less than the min cut and the NaN number. For these we use special pixel
 		// values in the palette as defined by the cut bound if it is set.
 		if (bean.getMinimumCutBound()!=null && bean.getMinimumCutBound().getColor()!=null) {
-			bean.getPalette().colors[253] = bean.getMinimumCutBound().getColor();
+			bean.getPalette().colors[MIN_PIX_INDEX] = bean.getMinimumCutBound().getColor();
 		}
 		
 		if (bean.getNanBound()!=null && bean.getNanBound().getColor()!=null) {
-			bean.getPalette().colors[254] = bean.getNanBound().getColor();
+			bean.getPalette().colors[NAN_PIX_INDEX] = bean.getNanBound().getColor();
 		}
 		
 		if (bean.getMaximumCutBound()!=null && bean.getMaximumCutBound().getColor()!=null) {
-			bean.getPalette().colors[255] = bean.getMaximumCutBound().getColor();
+			bean.getPalette().colors[MAX_PIX_INDEX] = bean.getMaximumCutBound().getColor();
 		}
 		
 	}
@@ -246,22 +270,22 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 	 * @param maxPixel
 	 * @param scaledImageAsByte
 	 */
-	private final int getPixelColorIndex(final float  val, 
-										 final float  min, 
-										 final float  max, 
-										 final float  scale, 
-										 final float  maxPixel,
-										 final ImageServiceBean bean) {
+	private final static int getPixelColorIndex(final float  val, 
+												final float  min, 
+												final float  max, 
+												final float  scale, 
+												final float  maxPixel,
+												final ImageServiceBean bean) {
 	    
 		// Deal with bounds
 		if (!bean.isInsideMinCut(val)) {
-			return 253;
+			return MIN_PIX_INDEX;
 		}
 		if (!bean.isValidNumber(val))  {
-			return 254;
+			return NAN_PIX_INDEX;
 		}
 		if (!bean.isInsideMaxCut(val)) {
-			return 255;
+			return MAX_PIX_INDEX;
 		}
 		
 		float scaled_pixel;
@@ -273,12 +297,7 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 			scaled_pixel = val - min;
 		}
 		scaled_pixel = scaled_pixel * scale;
-		
-		int pixelIndex = (int)scaled_pixel;		
-		if (pixelIndex>=253) {
-			throw new RuntimeException("Unexpected pixel index: "+pixelIndex);
-		}
-		return pixelIndex;
+		return (int)scaled_pixel;		
 	}
 	
 	/**
@@ -295,9 +314,16 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 		float max = -Float.MAX_VALUE;
 		float sum = 0.0f;
 		final int size = image.getSize();
+		
+		BooleanDataset mask = bean.getMask()!=null
+	                        ? (BooleanDataset)DatasetUtils.cast(bean.getMask(), AbstractDataset.BOOL)
+	                        : null;
+
 		for (int index = 0; index<size; ++index) {
 			
 			final double dv = image.getElementDoubleAbs(index);
+			if (mask!=null && !mask.getElementBooleanAbs(index)) continue; // Masked!
+			
 			if (Double.isNaN(dv))      continue;
 			if (Double.isInfinite(dv)) continue;
 			if (!bean.isInBounds(dv))  continue;
