@@ -35,21 +35,21 @@ public abstract class AbstractRegion extends Figure implements IRegion, IRegionC
 		roiListeners.clear();
 	}
 	
-	protected void fireROIDragged(ROIBase bounds) {
+	protected void fireROIDragged(ROIBase roi) {
 		if (roiListeners==null) return;
 		if (!regionEventsActive) return;
 		
-		final ROIEvent evt = new ROIEvent(this, bounds);
+		final ROIEvent evt = new ROIEvent(this, roi);
 		for (IROIListener l : roiListeners) {
 			l.roiDragged(evt);
 		}
 	}
 	
-	protected void fireROIChanged(ROIBase bounds) {
+	protected void fireROIChanged(ROIBase roi) {
 		if (roiListeners==null) return;
 		if (!regionEventsActive) return;
 		
-		final ROIEvent evt = new ROIEvent(this, bounds);
+		final ROIEvent evt = new ROIEvent(this, roi);
 		for (IROIListener l : roiListeners) {
 			l.roiChanged(evt);
 		}
@@ -63,10 +63,10 @@ public abstract class AbstractRegion extends Figure implements IRegion, IRegionC
 	}
 
 	@Override
-	public void setROI(ROIBase bounds) {
-		this.roi = bounds;
+	public void setROI(ROIBase roi) {
+		this.roi = roi;
 		updateROI();
-		fireROIChanged(bounds);
+		fireROIChanged(roi);
 	}
 
 	/**
@@ -93,9 +93,9 @@ public abstract class AbstractRegion extends Figure implements IRegion, IRegionC
 	/**
 	 * Implement this method to redraw the figure to the axis coordinates (only).
 	 * 
-	 * @param bounds
+	 * @param roi
 	 */
-	protected abstract void updateROI(ROIBase bounds);
+	protected abstract void updateROI(ROIBase roi);
 
 	public String toString() {
 		if (getName()!=null) return getName();
