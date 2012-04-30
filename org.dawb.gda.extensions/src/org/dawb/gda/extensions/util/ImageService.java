@@ -85,6 +85,10 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 	private static final int NAN_PIX_INDEX = 254;
 	private static final int MAX_PIX_INDEX = 255;
 	
+	private static final byte MIN_PIX_BYTE = (byte)(MIN_PIX_INDEX & 0xFF);
+	private static final byte NAN_PIX_BYTE = (byte)(NAN_PIX_INDEX & 0xFF);
+	private static final byte MAX_PIX_BYTE = (byte)(MAX_PIX_INDEX & 0xFF);
+	
 	/**
 	 * getImageData(...) provides an image in a given palette data and origin.
 	 * Faster than getting a resolved image
@@ -146,72 +150,90 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 				            : null;
 				            
  		ImageData imageData = null;
+ 		
+ 		// We use a byte array directly as this is faster than using setPixel(...)
+ 		// on image data. Set pixel does extra floating point operations. The downside
+ 		// is that by doing this we certainly have to have 8 bit as getPixelColorIndex(...)
+ 		// forces the use of on byte.
+		final byte[] scaledImageAsByte = new byte[len];
+
+		// NOTE: get1DIndex(...) is slow
+		if (mask!=null) mask.setExtendible(false);
+		image.setExtendible(false);
+
 		if (origin==ImageOrigin.TOP_LEFT) { 
 			
-			imageData = new ImageData(shape[1], shape[0], depth, palette);
+			int index = 0;
 			// This loop is usually the same as the image is read in but not always depending on loader.
 			for (int i = 0; i<shape[0]; ++i) {
 				for (int j = 0; j<shape[1]; ++j) {
 					
 					if (bean.isCancelled()) return null;				
 					// This saves a value lookup when the pixel is certainly masked.
-					final int   pix = mask==null || mask.getBoolean(i,j)
-						            ? getPixelColorIndex(image.getFloat(i, j), min, max, scale, maxPixel, bean)
-					                : NAN_PIX_INDEX;
-					imageData.setPixel(j, i, pix);
+					int dIndex = image.get1DIndex(i, j);
+					scaledImageAsByte[index] = mask==null || mask.getElementBooleanAbs(dIndex)
+						            ? getPixelColorIndex(image.getElementDoubleAbs(dIndex), min, max, scale, maxPixel, bean)
+					                : NAN_PIX_BYTE;
+					index++;
 				}
 			}
+			imageData = new ImageData(shape[1], shape[0], 8, palette, 1, scaledImageAsByte);
 	
 		} else if (origin==ImageOrigin.BOTTOM_LEFT) {
 
-			imageData = new ImageData(shape[0], shape[1], depth, palette);
+			int index = 0;
 			// This loop is slower than looping over all data and using image.getElementDoubleAbs(...)
 			// However it reorders data for the axes
-			for (int i = 0; i<shape[1]; ++i) {
+			for (int i = shape[1]-1; i>=0; --i) {
 				for (int j = 0; j<shape[0]; ++j) {
 					
 					if (bean.isCancelled()) return null;
 					// This saves a value lookup when the pixel is certainly masked.
-					final int   pix = mask==null || mask.getBoolean(j,i)
-				                    ? getPixelColorIndex(image.getFloat(j, i), min, max, scale, maxPixel, bean)
-			                        : NAN_PIX_INDEX;
-					imageData.setPixel(j, shape[1]-i-1, pix);
+					int dIndex = image.get1DIndex(j, i);
+					scaledImageAsByte[index]  = mask==null || mask.getElementBooleanAbs(dIndex)
+				                    ? getPixelColorIndex(image.getElementDoubleAbs(dIndex), min, max, scale, maxPixel, bean)
+			                        : NAN_PIX_BYTE;
+					index++;
 				}
 			}
+			imageData = new ImageData(shape[0], shape[1], 8, palette, 1, scaledImageAsByte);
 			
 		} else if (origin==ImageOrigin.BOTTOM_RIGHT) {
 
-			imageData = new ImageData(shape[1], shape[0], depth, palette);
+			int index = 0;
 			// This loop is slower than looping over all data and using image.getElementDoubleAbs(...)
 			// However it reorders data for the axes
-			for (int i = 0; i<shape[0]; ++i) {
-				for (int j = 0; j<shape[1]; ++j) {
+			for (int i = shape[0]-1; i>=0; --i) {
+			    for (int j = shape[1]-1; j>=0; --j) {
 				
 					if (bean.isCancelled()) return null;
 
 					// This saves a value lookup when the pixel is certainly masked.
-					final int   pix = mask==null || mask.getBoolean(i,j)
-						            ? getPixelColorIndex(image.getFloat(i, j), min, max, scale, maxPixel, bean)
-					                : NAN_PIX_INDEX;
-					imageData.setPixel(shape[1]-j-1, shape[0]-i-1, pix);
+					int dIndex = image.get1DIndex(i, j);
+					scaledImageAsByte[index] = mask==null || mask.getElementBooleanAbs(dIndex)
+						            ? getPixelColorIndex(image.getElementDoubleAbs(dIndex), min, max, scale, maxPixel, bean)
+					                : NAN_PIX_BYTE;
+						index++;
 				}
 			}
+			imageData = new ImageData(shape[1], shape[0], 8, palette, 1, scaledImageAsByte);
 			
 		} else if (origin==ImageOrigin.TOP_RIGHT) {
 
-			imageData = new ImageData(shape[0], shape[1], depth, palette);
+			int index = 0;
 			// This loop is slower than looping over all data and using image.getElementDoubleAbs(...)
 			// However it reorders data for the axes
 			for (int i = 0; i<shape[1]; ++i) {
-				for (int j = 0; j<shape[0]; ++j) {
+				for (int j = shape[0]-1; j>=0; --j) {
 					
 					if (bean.isCancelled()) return null;
-					final int   pix = mask==null || mask.getBoolean(j,i)
+					scaledImageAsByte[index]  = mask==null || mask.getBoolean(j,i)
 		                            ? getPixelColorIndex(image.getFloat(j, i), min, max, scale, maxPixel, bean)
-	                                : NAN_PIX_INDEX;
-					imageData.setPixel(shape[0]-j-1, i, pix);
+	                                : NAN_PIX_BYTE;
+		        	index++;
 				}
 			}
+			imageData = new ImageData(shape[0], shape[1], 8, palette, 1, scaledImageAsByte);
 		}
 		
 		if (bean.isCancelled()) return null;
@@ -270,22 +292,22 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 	 * @param maxPixel
 	 * @param scaledImageAsByte
 	 */
-	private final static int getPixelColorIndex(final float  val, 
-												final float  min, 
-												final float  max, 
-												final float  scale, 
-												final float  maxPixel,
-												final ImageServiceBean bean) {
+	private final static byte getPixelColorIndex(final double  val, 
+												 final float  min, 
+												 final float  max, 
+												 final float  scale, 
+												 final float  maxPixel,
+												 final ImageServiceBean bean) {
 	    
 		// Deal with bounds
 		if (!bean.isInsideMinCut(val)) {
-			return MIN_PIX_INDEX;
+			return MIN_PIX_BYTE;
 		}
 		if (!bean.isValidNumber(val))  {
-			return NAN_PIX_INDEX;
+			return NAN_PIX_BYTE;
 		}
 		if (!bean.isInsideMaxCut(val)) {
-			return MAX_PIX_INDEX;
+			return MAX_PIX_BYTE;
 		}
 		
 		float scaled_pixel;
@@ -294,10 +316,11 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 		} else if (val >= max) {
 			scaled_pixel = maxPixel;
 		} else {
-			scaled_pixel = val - min;
+			scaled_pixel = (float)val - min;
 		}
 		scaled_pixel = scaled_pixel * scale;
-		return (int)scaled_pixel;		
+		
+		return (byte)((int)scaled_pixel & 0xFF);	
 	}
 	
 	/**
@@ -319,17 +342,16 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 	                        ? (BooleanDataset)DatasetUtils.cast(bean.getMask(), AbstractDataset.BOOL)
 	                        : null;
 
+	    // Big loop warning:
 		for (int index = 0; index<size; ++index) {
 			
 			final double dv = image.getElementDoubleAbs(index);
 			if (mask!=null && !mask.getElementBooleanAbs(index)) continue; // Masked!
 			
 			if (Double.isNaN(dv))      continue;
-			if (Double.isInfinite(dv)) continue;
 			if (!bean.isInBounds(dv))  continue;
 						
 			final float val = (float)dv;
-			if (Float.isNaN(val))       continue;
 			
 			sum += val;
 			if (val < min) min = val;

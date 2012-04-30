@@ -374,22 +374,20 @@ public class ImageServiceBean {
 	}
 	
 	public boolean isInsideMinCut(double dv) {
-		if (getMinimumCutBound()!=null) {
-			if (dv<=getMinimumCutBound().getBound().doubleValue()) return false;
-		}
+		if (getMinimumCutBound()==null) return true;
+	    if (dv<=getMinimumCutBound().getBound().doubleValue()) return false;
 		return true;
 	}
 	public boolean isInsideMaxCut(double dv) {
-		if (getMaximumCutBound()!=null) {
-			if (dv>=getMaximumCutBound().getBound().doubleValue()) return false;
-		}
+		if (getMaximumCutBound()==null) return true;
+	    if (dv>=getMaximumCutBound().getBound().doubleValue()) return false;
 		return true;
 	}
 	public boolean isValidNumber(double dv) {
-		if (getNanBound()!=null) {
-			if (Double.isNaN(dv)) return false;
-			if (Float.isNaN((float)dv)) return false;
-		}
+		if (getNanBound()==null) return true;
+		if (Double.isNaN(dv)) return false;
+		if (Float.isNaN((float)dv)) return false;
+
 		return true;
 	}
 	
