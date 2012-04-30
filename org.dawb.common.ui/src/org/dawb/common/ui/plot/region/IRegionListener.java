@@ -24,6 +24,12 @@ public interface IRegionListener extends EventListener {
 
 		}
 
+		@Override
+		public void regionsRemoved(RegionEvent evt) {
+			// TODO Auto-generated method stub
+			
+		}
+
 	}
 
 	/**
@@ -44,5 +50,11 @@ public interface IRegionListener extends EventListener {
 	 * @param evt
 	 */
 	void regionRemoved(final RegionEvent evt);
+
+    /**
+     * Fired when all the regions are removed in one go.
+     * @param evt
+     */
+	void regionsRemoved(RegionEvent evt);
 
 }

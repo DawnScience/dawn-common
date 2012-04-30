@@ -132,4 +132,12 @@ public class MenuAction extends Action implements IMenuCreator {
 		if (getToolTipText()!=null) return getToolTipText();
 		return super.toString();
 	}
+
+
+	public IAction findAction(String id) {
+		for (IAction action : actions) {
+			if (id.equals(action.getId())) return action;
+		}
+		return null;
+	}
 }

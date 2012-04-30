@@ -198,6 +198,10 @@ public interface IRegion {
 			}
 			return null;
 		}
+
+		public String getId() {
+			return IRegion.class.getPackage().getName()+"."+toString();
+		}
 	}
 
 	/**
