@@ -23,6 +23,7 @@ import org.eclipse.ui.services.IServiceLocator;
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.BooleanDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.DatasetUtils;
+import uk.ac.diamond.scisoft.analysis.dataset.IndexIterator;
 import uk.ac.diamond.scisoft.analysis.dataset.Stats;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 import uk.ac.diamond.scisoft.analysis.rcp.plotting.utils.SWTImageUtils;
@@ -157,7 +158,7 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
  		// forces the use of on byte.
 		final byte[] scaledImageAsByte = new byte[len];
 
-		// NOTE: get1DIndex(...) is slow
+		// NOTE: getBoolean(...) and getFloat(...) are SLOW
 		if (mask!=null) mask.setExtendible(false);
 		image.setExtendible(false);
 
@@ -170,11 +171,10 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 					
 					if (bean.isCancelled()) return null;				
 					// This saves a value lookup when the pixel is certainly masked.
-					int dIndex = image.get1DIndex(i, j);
-					scaledImageAsByte[index] = mask==null || mask.getElementBooleanAbs(dIndex)
-						            ? getPixelColorIndex(image.getElementDoubleAbs(dIndex), min, max, scale, maxPixel, bean)
+					scaledImageAsByte[index] = mask==null || mask.getBoolean(i,j)
+						            ? getPixelColorIndex(image.getFloat(i,j), min, max, scale, maxPixel, bean)
 					                : NAN_PIX_BYTE;
-					index++;
+					++index;
 				}
 			}
 			imageData = new ImageData(shape[1], shape[0], 8, palette, 1, scaledImageAsByte);
@@ -189,9 +189,8 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 					
 					if (bean.isCancelled()) return null;
 					// This saves a value lookup when the pixel is certainly masked.
-					int dIndex = image.get1DIndex(j, i);
-					scaledImageAsByte[index]  = mask==null || mask.getElementBooleanAbs(dIndex)
-				                    ? getPixelColorIndex(image.getElementDoubleAbs(dIndex), min, max, scale, maxPixel, bean)
+					scaledImageAsByte[index]  = mask==null || mask.getBoolean(j,i)
+				                    ? getPixelColorIndex(image.getFloat(j,i), min, max, scale, maxPixel, bean)
 			                        : NAN_PIX_BYTE;
 					index++;
 				}
@@ -209,9 +208,8 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 					if (bean.isCancelled()) return null;
 
 					// This saves a value lookup when the pixel is certainly masked.
-					int dIndex = image.get1DIndex(i, j);
-					scaledImageAsByte[index] = mask==null || mask.getElementBooleanAbs(dIndex)
-						            ? getPixelColorIndex(image.getElementDoubleAbs(dIndex), min, max, scale, maxPixel, bean)
+					scaledImageAsByte[index] = mask==null || mask.getBoolean(i,j)
+						            ? getPixelColorIndex(image.getFloat(i,j), min, max, scale, maxPixel, bean)
 					                : NAN_PIX_BYTE;
 						index++;
 				}
@@ -334,7 +332,7 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 		}
 		scaled_pixel = scaled_pixel * scale;
 		
-		return (byte)((int)scaled_pixel & 0xFF);	
+		return (byte) (0x000000FF & ((int) scaled_pixel));
 	}
 	
 	/**
