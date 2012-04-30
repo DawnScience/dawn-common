@@ -103,8 +103,8 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 		final int size  = (int)Math.round(Math.pow(2, depth));
 		
 		createMaxMin(bean);
-		final float max = bean.getMax().floatValue();
-		final float min = bean.getMin().floatValue();
+		final float max = getMax(bean);
+		final float min = getMin(bean);
 		
 		if (bean.getFunctionObject()!=null && bean.getFunctionObject() instanceof FunctionContainer) {
 			final FunctionContainer fc = (FunctionContainer)bean.getFunctionObject();
@@ -239,6 +239,20 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 		if (bean.isCancelled()) return null;
 		
 		return imageData;
+	}
+
+	private float getMax(ImageServiceBean bean) {
+		if (bean.getMaximumCutBound()==null ||  bean.getMaximumCutBound().getBound()==null) {
+			return bean.getMax().floatValue();
+		}
+		return Math.min(bean.getMax().floatValue(), bean.getMaximumCutBound().getBound().floatValue());
+	}
+	
+	private float getMin(ImageServiceBean bean) {
+		if (bean.getMinimumCutBound()==null ||  bean.getMinimumCutBound().getBound()==null) {
+			return bean.getMin().floatValue();
+		}
+		return Math.max(bean.getMin().floatValue(), bean.getMinimumCutBound().getBound().floatValue());
 	}
 
 	/**
