@@ -167,9 +167,9 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 			int index = 0;
 			// This loop is usually the same as the image is read in but not always depending on loader.
 			for (int i = 0; i<shape[0]; ++i) {
+				if (bean.isCancelled()) return null;				
 				for (int j = 0; j<shape[1]; ++j) {
 					
-					if (bean.isCancelled()) return null;				
 					// This saves a value lookup when the pixel is certainly masked.
 					scaledImageAsByte[index] = mask==null || mask.getBoolean(i,j)
 						            ? getPixelColorIndex(image.getFloat(i,j), min, max, scale, maxPixel, bean)
@@ -185,9 +185,9 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 			// This loop is slower than looping over all data and using image.getElementDoubleAbs(...)
 			// However it reorders data for the axes
 			for (int i = shape[1]-1; i>=0; --i) {
+				if (bean.isCancelled()) return null;
 				for (int j = 0; j<shape[0]; ++j) {
 					
-					if (bean.isCancelled()) return null;
 					// This saves a value lookup when the pixel is certainly masked.
 					scaledImageAsByte[index]  = mask==null || mask.getBoolean(j,i)
 				                    ? getPixelColorIndex(image.getFloat(j,i), min, max, scale, maxPixel, bean)
@@ -203,9 +203,9 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 			// This loop is slower than looping over all data and using image.getElementDoubleAbs(...)
 			// However it reorders data for the axes
 			for (int i = shape[0]-1; i>=0; --i) {
+				if (bean.isCancelled()) return null;
 			    for (int j = shape[1]-1; j>=0; --j) {
 				
-					if (bean.isCancelled()) return null;
 
 					// This saves a value lookup when the pixel is certainly masked.
 					scaledImageAsByte[index] = mask==null || mask.getBoolean(i,j)
@@ -222,9 +222,9 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 			// This loop is slower than looping over all data and using image.getElementDoubleAbs(...)
 			// However it reorders data for the axes
 			for (int i = 0; i<shape[1]; ++i) {
+				if (bean.isCancelled()) return null;
 				for (int j = shape[0]-1; j>=0; --j) {
 					
-					if (bean.isCancelled()) return null;
 					scaledImageAsByte[index]  = mask==null || mask.getBoolean(j,i)
 		                            ? getPixelColorIndex(image.getFloat(j, i), min, max, scale, maxPixel, bean)
 	                                : NAN_PIX_BYTE;
@@ -233,9 +233,7 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 			}
 			imageData = new ImageData(shape[0], shape[1], 8, palette, 1, scaledImageAsByte);
 		}
-		
-		if (bean.isCancelled()) return null;
-		
+				
 		return imageData;
 	}
 
