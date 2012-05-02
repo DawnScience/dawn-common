@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.HashSet;
 
 import org.eclipse.draw2d.Figure;
+import org.eclipse.swt.graphics.Color;
 
 import uk.ac.diamond.scisoft.analysis.roi.ROIBase;
 
@@ -18,6 +19,7 @@ public abstract class AbstractRegion extends Figure implements IRegion, IRegionC
 	private Collection<IROIListener> roiListeners;
 	private boolean regionEventsActive = true;
 	private boolean maskRegion         = false;
+	private Color labelColour;
 
 	@Override
 	public boolean addROIListener(final IROIListener l) {
@@ -142,4 +144,13 @@ public abstract class AbstractRegion extends Figure implements IRegion, IRegionC
 	public void setMaskRegion(boolean maskRegion) {
 		this.maskRegion = maskRegion;
 	}
+	
+	public void setLabelColour(Color colour) {
+		labelColour = colour;
+	}
+
+	public Color getLabelColour() {
+		return labelColour;
+	}
+	
 }

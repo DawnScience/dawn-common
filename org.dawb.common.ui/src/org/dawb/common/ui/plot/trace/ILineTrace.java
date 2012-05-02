@@ -88,6 +88,7 @@ public interface ILineTrace extends ITrace {
 		NONE("None"),
 		POINT("point(" + (char)7 + ")"),
 		CIRCLE("Circle(o)"),
+		FILLED_CIRCLE("Filled Circle"),
 		TRIANGLE("Triangle"),
 		FILLED_TRIANGLE("Filled Triangle"),
 		SQUARE("Square"),
@@ -104,6 +105,7 @@ public interface ILineTrace extends ITrace {
 			tmp.add(NONE);
 			tmp.add(POINT);
 			tmp.add(CIRCLE);
+			tmp.add(FILLED_CIRCLE);
 			tmp.add(TRIANGLE);
 			tmp.add(FILLED_TRIANGLE);
 			tmp.add(SQUARE);
