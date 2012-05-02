@@ -17,6 +17,7 @@ public abstract class AbstractRegion extends Figure implements IRegion, IRegionC
 
 	private Collection<IROIListener> roiListeners;
 	private boolean regionEventsActive = true;
+	private boolean maskRegion         = false;
 
 	@Override
 	public boolean addROIListener(final IROIListener l) {
@@ -132,5 +133,13 @@ public abstract class AbstractRegion extends Figure implements IRegion, IRegionC
 
 	public void setRegion(IRegion region) {
 		// Does nothing
+	}
+
+	public boolean isMaskRegion() {
+		return maskRegion;
+	}
+
+	public void setMaskRegion(boolean maskRegion) {
+		this.maskRegion = maskRegion;
 	}
 }

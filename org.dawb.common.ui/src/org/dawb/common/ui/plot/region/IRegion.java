@@ -142,16 +142,16 @@ public interface IRegion {
 	public enum RegionType {
 		
 		LINE("Line",               0, Display.getDefault().getSystemColor(SWT.COLOR_CYAN)), 
-		BOX("Box",                 1, Display.getDefault().getSystemColor(SWT.COLOR_GREEN)), 
-		RING("Ring",               2, Display.getDefault().getSystemColor(SWT.COLOR_DARK_YELLOW)), 
-		XAXIS("X-Axis",            3, Display.getDefault().getSystemColor(SWT.COLOR_BLUE)), 
-		YAXIS("Y-Axis",            4, Display.getDefault().getSystemColor(SWT.COLOR_BLUE)), 
-		SECTOR("Sector",           5, Display.getDefault().getSystemColor(SWT.COLOR_RED)),
-		XAXIS_LINE("X-Axis Line",  6, Display.getDefault().getSystemColor(SWT.COLOR_BLUE)), 
-		YAXIS_LINE("Y-Axis Line",  7, Display.getDefault().getSystemColor(SWT.COLOR_BLUE)), 
-		FREE_DRAW("Free draw",     8, Display.getDefault().getSystemColor(SWT.COLOR_DARK_YELLOW)),
-		POINT("Point",             9, Display.getDefault().getSystemColor(SWT.COLOR_DARK_MAGENTA)),
-		POLYLINE("Polyline",       10, Display.getDefault().getSystemColor(SWT.COLOR_CYAN));
+		POLYLINE("Polyline",       1, Display.getDefault().getSystemColor(SWT.COLOR_CYAN)),
+		BOX("Box",                 2, Display.getDefault().getSystemColor(SWT.COLOR_GREEN)), 
+		RING("Ring",               3, Display.getDefault().getSystemColor(SWT.COLOR_DARK_YELLOW)), 
+		XAXIS("X-Axis",            4, Display.getDefault().getSystemColor(SWT.COLOR_BLUE)), 
+		YAXIS("Y-Axis",            5, Display.getDefault().getSystemColor(SWT.COLOR_BLUE)), 
+		SECTOR("Sector",           6, Display.getDefault().getSystemColor(SWT.COLOR_RED)),
+		XAXIS_LINE("X-Axis Line",  7, Display.getDefault().getSystemColor(SWT.COLOR_BLUE)), 
+		YAXIS_LINE("Y-Axis Line",  8, Display.getDefault().getSystemColor(SWT.COLOR_BLUE)), 
+		FREE_DRAW("Free draw",     9, Display.getDefault().getSystemColor(SWT.COLOR_DARK_YELLOW)),
+		POINT("Point",             10, Display.getDefault().getSystemColor(SWT.COLOR_DARK_MAGENTA));
 
 		private int    index;
 		private String name;
@@ -161,6 +161,7 @@ public interface IRegion {
 		static {
 			ALL_TYPES = new ArrayList<RegionType>(5);
 			ALL_TYPES.add(LINE);
+			ALL_TYPES.add(POLYLINE);
 			ALL_TYPES.add(BOX);
 			ALL_TYPES.add(RING);
 			ALL_TYPES.add(XAXIS);
@@ -170,7 +171,6 @@ public interface IRegion {
 			ALL_TYPES.add(YAXIS_LINE);
 			ALL_TYPES.add(FREE_DRAW);
 			ALL_TYPES.add(POINT);
-			ALL_TYPES.add(POLYLINE);
 		}
 	
 		RegionType(String name, int index, Color defaultColor) {
@@ -287,4 +287,27 @@ public interface IRegion {
 	 */
 	public void toFront();
 
+	/**
+	 *
+	 * @return true if the region should be used in a mask operation.
+	 */
+	public boolean isMaskRegion();
+	
+	/**
+	 * Set the mask boolean. By default this will be false but when true the region
+	 * is marked as being part of mask operations.
+	 * 
+	 * @param isMaskRegion
+	 */
+	public void setMaskRegion(boolean isMaskRegion);
+	
+	
+	/**
+	 * Converts the x and y location in the axis coordinate to 
+	 * pixels and checks if the region is covering this location.
+	 * 
+	 * @param x
+	 * @param y
+	 */
+	public boolean containsPoint(double x, double y);
 }
