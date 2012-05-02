@@ -217,6 +217,17 @@ public interface IRegion {
 	public void setLineWidth(int i);
 
 	/**
+	 * set the colour of the label drawn.
+	 */
+	public void setLabelColour(Color colour);
+
+	/**
+	 * get the colour of the label drawn.
+	 * @return colour of label
+	 */
+	public Color getLabelColour();
+
+	/**
 	 * The type of this region
 	 * @return
 	 */
