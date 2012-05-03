@@ -28,13 +28,11 @@ public class EmptyActionBars implements IActionBars {
 
 	@Override
 	public IAction getGlobalActionHandler(String actionId) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public IMenuManager getMenuManager() {
-		// TODO Auto-generated method stub
 		return menuManager;
 	}
 
@@ -46,13 +44,11 @@ public class EmptyActionBars implements IActionBars {
 
 	@Override
 	public IStatusLineManager getStatusLineManager() {
-		// TODO Auto-generated method stub
 		return statusLineManager;
 	}
 
 	@Override
 	public IToolBarManager getToolBarManager() {
-		// TODO Auto-generated method stub
 		return toolBarManager;
 	}
 
