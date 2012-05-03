@@ -15,6 +15,7 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.IContributionManager;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPart;
@@ -34,7 +35,7 @@ import org.slf4j.LoggerFactory;
  * @author fcp94556
  *
  */
-public class PlottingActionBarManager {
+public class PlottingActionBarManager implements IPlotActionSystem {
 
 	private static final Logger logger = LoggerFactory.getLogger(PlottingActionBarManager.class);
 	
@@ -221,6 +222,48 @@ public class PlottingActionBarManager {
 	    }
 	    
 	    return false;
+	}
+
+
+	@Override
+	public void fillZoomActions(IContributionManager man) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void fillRegionActions(IContributionManager man) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void fillUndoActions(IContributionManager man) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void fillPrintActions(IContributionManager man) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void fillAnnotationActions(IContributionManager man) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void fillToolActions(IContributionManager man, ToolPageRole role) {
+		// TODO Auto-generated method stub
+		
 	}
 
 

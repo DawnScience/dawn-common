@@ -727,4 +727,20 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	public boolean setToolVisible(final String toolId, final ToolPageRole role, final String viewId) throws Exception {
 		return actionBarManager.setToolVisible(toolId, role, viewId);
 	}
+	
+	/**
+	 * Provides access to the plotting action system for those 
+	 * that would prefer to fill their own actions into custom IContribtionManager(s)
+	 * 
+	 * 
+	   We contain the action bars in an internal object
+	   if the API user said they were null. This allows the API
+	   user to say null for action bars and then use:
+	   getPlotActionSystem().fillXXX() to add their own actions.
+	 * 
+	 * @return
+	 */
+	public IPlotActionSystem getPlotActionSystem() {
+		return this.actionBarManager;
+	}
 }
