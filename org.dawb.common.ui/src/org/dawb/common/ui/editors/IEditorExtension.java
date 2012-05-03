@@ -27,7 +27,9 @@ public interface IEditorExtension extends IEditorPart {
 	 *                    </code>
 	 *                    This hard coded approach is simple and understandable from
 	 *                    the code, therefore preferred.
-	 *                    
+	 *  @param perspectiveId - the current perspective id, or the last one that this part was
+	 *                         used with if the editor is opening during startup. This string MAY
+	 *                         be null.
 	 * NOTE when using IEditorExtension your editor part must have a title. For instance:
 	 * 
 	
@@ -43,7 +45,7 @@ public interface IEditorExtension extends IEditorPart {
 	 *                    
 	 * @return true if part should be shown.
 	 */
-	public boolean isApplicable(final String filePath, final String extension);
+	public boolean isApplicable(final String filePath, final String extension, final String perspectiveId);
 	
 	/**
 	 * The preferred editor index in the multi-editor stack.

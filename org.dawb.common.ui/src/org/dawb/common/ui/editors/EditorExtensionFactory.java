@@ -2,13 +2,26 @@ package org.dawb.common.ui.editors;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Properties;
 
 import org.dawb.common.ui.util.EclipseUtils;
 import org.dawb.common.util.io.FileUtils;
+import org.dawb.common.util.io.PropUtils;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IEditorSite;
+import org.eclipse.ui.IPerspectiveDescriptor;
+import org.eclipse.ui.IWorkbenchPreferenceConstants;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.internal.Perspective;
+import org.eclipse.ui.internal.WorkbenchPage;
+import org.eclipse.ui.internal.tweaklets.Tweaklets;
+import org.eclipse.ui.internal.tweaklets.WorkbenchImplementation;
+import org.eclipse.ui.preferences.ScopedPreferenceStore;
 
 public class EditorExtensionFactory {
 
@@ -17,21 +30,39 @@ public class EditorExtensionFactory {
 	 * @param input
 	 * @return list of editors - may be empty or null
 	 */
-	public static final Collection<IEditorPart> getEditors(final IEditorInput input) throws Exception {
+	public static final Collection<IEditorPart> getEditors(final IEditorPart part) throws Exception {
+		
+	    final String path = EclipseUtils.getFilePath(part.getEditorInput());
+	    final String ext  = FileUtils.getFileExtension(path);
+
+	    final IPerspectiveDescriptor des = part.getSite().getPage().getPerspective();
+		final String perspectiveId;
+		final Properties props = PropUtils.loadProperties(getPropertiesPath());
+		if (des==null) {
+			// We get the id the last time we opened this editor.
+			perspectiveId = props.getProperty(path);
+		} else {
+			perspectiveId = des.getId();
+			props.put(path, perspectiveId);
+			PropUtils.storeProperties(props, getPropertiesPath());
+		}
 		
 	    final IConfigurationElement[] configs = Platform.getExtensionRegistry().getConfigurationElementsFor("org.dawb.common.ui.editorExtension");
 	    if (configs==null || configs.length<1) return null;
 	    
-	    final String path = EclipseUtils.getFilePath(input);
-	    final String ext  = FileUtils.getFileExtension(path);
 	    
 	    final Collection<IEditorPart> editors = new ArrayList<IEditorPart>(3);
 	    for (IConfigurationElement e : configs) {
 			final IEditorExtension extension = (IEditorExtension)e.createExecutableExtension("class");
-			if (!extension.isApplicable(path, ext)) continue;
+			if (!extension.isApplicable(path, ext, perspectiveId)) continue;
 			editors.add(extension);
 		}
 
 	    return editors;
+	}
+	
+	
+	private static final String getPropertiesPath() {
+		return ResourcesPlugin.getWorkspace().getRoot().getLocation().toOSString()+"/.metadata/.dawn/perspective.properties";
 	}
 }
