@@ -17,8 +17,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.BlockingDeque;
-import java.util.concurrent.LinkedBlockingDeque;
 
 import org.dawb.common.ui.Activator;
 import org.dawb.common.ui.DawbUtils;
@@ -51,14 +49,12 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
@@ -87,30 +83,27 @@ public class SliceComponent {
 	private static final List<String> COLUMN_PROPERTIES = Arrays.asList(new String[]{"Dimension","Axis","Slice"});
 	
 	private SliceObject     sliceObject;
-	private SliceObject     currentSlice;
 	private int[]           dataShape;
 	private IPlottingSystem plottingSystem;
 	private boolean         autoUpdate=true;
 
-	private TableViewer                        viewer;
-	private DimsDataList                       dimsDataList;
+	private TableViewer     viewer;
+	private DimsDataList    dimsDataList;
 
-	private CLabel                             errorLabel, explain;
-	private Button                             updateAutomatically;
-	private Button                             rangeMode;
-	private Composite                          area;
-	
-	protected final BlockingDeque<SliceObject> sliceQueue;
-	private Thread                             sliceServiceThread;
-
-	private String sliceReceiverId;
+	private CLabel          errorLabel, explain;
+	private Button          updateAutomatically;
+	private Button          rangeMode;
+	private Composite       area;
+	private boolean         isErrorCondition=false;
+    private SliceJob        sliceJob;
+    private String          sliceReceiverId;
 
 	private PlotType imagePlotType = PlotType.IMAGE; // Could also be PlotType.PT1D_MULTI
 
 	
 	public SliceComponent(final String sliceReceiverId) {
-		this.sliceQueue    = new LinkedBlockingDeque<SliceObject>(7);
 		this.sliceReceiverId = sliceReceiverId;
+		this.sliceJob        = new SliceJob();
 	}
 	
 	public Control createPartControl(Composite parent) {
@@ -203,7 +196,7 @@ public class SliceComponent {
 		viewer.setContentProvider(new IStructuredContentProvider() {
 			@Override
 			public void dispose() {
-				interrupt();
+				sliceJob.cancel();
 			}
 			@Override
 			public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
@@ -264,15 +257,15 @@ public class SliceComponent {
 					}
 					
 				} catch (Exception ne) {
-					logger.debug("Cannot load slice data from last settings!", ne);
-					dimsDataList = null;
+					// This might not always be an error.
+					logger.debug("Cannot load slice data from last settings!");
 				} finally {
 					if (decoder!=null) decoder.close();
 				}
 			}
 		}
 		
-		if (dimsDataList==null) {
+		if (dimsDataList==null || dimsDataList.size()!=dataShape.length) {
 			try {
 				this.dimsDataList = new DimsDataList(dataShape, sliceObject);
 			} catch (Exception e) {
@@ -303,7 +296,7 @@ public class SliceComponent {
 			errorLabel.setText("Please set a X axis.");
 		}
 		GridUtils.setVisible(errorLabel,         !(isX));
-		//getButton(IDialogConstants.OK_ID).setEnabled(isX&&isY);
+		this.isErrorCondition = errorLabel.isVisible();
 		GridUtils.setVisible(updateAutomatically, (isX&&plottingSystem!=null));
 		errorLabel.getParent().layout(new Control[]{errorLabel,updateAutomatically});
 		
@@ -435,10 +428,8 @@ public class SliceComponent {
 	private class SliceColumnLabelProvider extends ColumnLabelProvider implements IStyledLabelProvider {
 
 		private int col;
-		private Image spinnerButtons;
 		public SliceColumnLabelProvider(int i) {
 			this.col = i;
-			this.spinnerButtons = Activator.getImageDescriptor("icons/spinner_buttons.png").createImage();
 		}
 		@Override
 		public StyledString getStyledText(Object element) {
@@ -470,19 +461,7 @@ public class SliceComponent {
 			
 			return ret;
 		}
-		
-		@Override
-		public void dispose() {
-	        spinnerButtons.dispose();
-		}
-		
-		public Image getImage(Object element) {
-//			if (col==2) {
-//				return spinnerButtons;
-//			}
-			return null;
-		}
-
+				
 	}
 	
 	/**
@@ -496,7 +475,7 @@ public class SliceComponent {
 				        final int[]      dataShape,
 				        final IPlottingSystem plotWindow) {
 		
-		interrupt();
+		sliceJob.cancel();
 		saveSettings();
 
 		final SliceObject object = new SliceObject();
@@ -514,7 +493,6 @@ public class SliceComponent {
 		}
 		
 		createDimsData();
-    	createSliceQueue();
     	viewer.refresh();
     	
 		synchronizeSliceData(null);
@@ -535,26 +513,20 @@ public class SliceComponent {
 		    if (!autoUpdate) return;
 		}
 
-		// Generate the slice info and record it.
-		try {
-			final SliceObject cs = SliceUtils.createSliceObject(dimsDataList, dataShape, sliceObject);
-			if (currentSlice!=null && currentSlice.equals(cs)) return;
-			sliceQueue.clear();
-			if (cs!=null) sliceQueue.add(cs);
-		} catch (Exception e) {
-			logger.error("Cannot generate slices", e);
-		}
+		final SliceObject cs = SliceUtils.createSliceObject(dimsDataList, dataShape, sliceObject);
+		sliceJob.schedule(cs);
 	}
 	
 	public void dispose() {
 			
-		interrupt();
+		sliceJob.cancel();
 		saveSettings();
 	}
 	
 	private void saveSettings() {
 		
-		if (sliceObject == null) return;
+		if (sliceObject == null || isErrorCondition) return;
+		
 		final File dataFile     = new File(sliceObject.getPath());
 		final File lastSettings = new File(DawbUtils.getDawbHome()+dataFile.getName()+"."+sliceObject.getName()+".xml");
 		if (!lastSettings.getParentFile().exists()) lastSettings.getParentFile().mkdirs();
@@ -564,119 +536,12 @@ public class SliceComponent {
 			encoder = new XMLEncoder(new FileOutputStream(lastSettings));
 			for (int i = 0; i < dimsDataList.size(); i++) encoder.writeObject(dimsDataList.getDimsData(i));
 		} catch (Exception ne) {
-			logger.error("Cannot load slice data from last settings!", ne);
+			logger.error("Cannot save slice data from last settings!", ne);
 		} finally  {
 			if (encoder!=null) encoder.close();
 		}
 	}
-
-	private void interrupt() {
-		
-		if (sliceQueue!=null) sliceQueue.clear();
-		if (sliceServiceThread!=null) {
-			if (sliceQueue!=null) sliceQueue.add(new SliceObject()); // Add nameless slice to stop the queue.
-			try {
-				if (sliceServiceThread!=null) sliceServiceThread.join();
-			} catch (InterruptedException e) {
-				logger.error("Cannot join", e);
-			}
-		}
-		sliceServiceThread   = null;
-	}
 	
-	/**
-	 * A queue to protect the nexus API from lots of thread updates, it will fall over @see NexusLoaderSliceThreadTest 
-	 */
-	private void createSliceQueue() {
-
-		if (plottingSystem==null)     return;
-		if (sliceServiceThread!=null) return;
-		/**
-		 * Tricky to get right thread stuff here. Want to make slice fast to change
-		 * but also leave last slice plotted. Change only after testing and running
-		 * the regression tests. The use of a queue also minimizes threads (there's only
-		 * one) and multiple threads break nexus and are inefficient.
-		 */
-		this.sliceServiceThread = new Thread(new Runnable() {
-
-			@Override
-			public void run() {
-
-				try {
-					logger.debug("Slice service started.");
-					while (viewer!=null && !viewer.getControl().isDisposed()) {
-						
-						final SliceObject slice = sliceQueue.take(); // Blocks when no slice.
-						if (slice.getName()==null) return;
-						
-						final Job job = createSliceJob(slice);
-						currentSlice = slice;
-						job.schedule();
-						
-                        try {
-    						EclipseUtils.setBusy(true);
-						    job.join(); // Wait for it to be done 
-                        } finally {
-                        	EclipseUtils.setBusy(false);
-                        }
-					}
-					
-				} catch (InterruptedException ne) {
-					logger.error("Slice queue exiting ", ne);
-				} finally {
-					logger.debug("Slice service exited.");
-				}
-			}
-
-		}, "Slice Service");
-		
-		sliceServiceThread.setPriority(Thread.NORM_PRIORITY-1);
-		sliceServiceThread.setDaemon(true);
-		sliceServiceThread.start();
-	}
-	
-	protected Job createSliceJob(final SliceObject slice) throws InterruptedException {
-			
-		if (plottingSystem==null) return null;
-		Job sliceJob = new Job("Slice of "+slice.getName()) {
-
-			@Override
-			protected IStatus run(final IProgressMonitor monitor) {
-				
-				monitor.beginTask("Slice "+slice.getName(), 10);
-				try {
-					monitor.worked(1);
-					if (monitor.isCanceled()) return Status.CANCEL_STATUS;
-					
-					PlotType type = PlotType.PT1D;
-					if (slice.getAxes().size()==1) {
-						type = PlotType.PT1D;
-					} else  if (slice.getAxes().size()==2) {
-						type = imagePlotType;
-					} else {
-						throw new Exception("Only 1D and images supported currently!");
-					}
-					
-					SliceUtils.plotSlice(slice, 
-							             dataShape, 
-							             type, 
-							             plottingSystem, 
-							             monitor);
-				} catch (Exception e) {
-					logger.error("Cannot slice "+slice.getName(), e);
-				} finally {
-					monitor.done();
-				}	
-				
-				return Status.OK_STATUS;
-			}
-			
-		};
-		sliceJob.setPriority(Job.LONG);
-		sliceJob.setUser(false);
-		return sliceJob;
-	}
-
 	public void setSliceObject(SliceObject sliceObject) {
 		this.sliceObject = sliceObject;
 	}
@@ -698,7 +563,7 @@ public class SliceComponent {
 		area.getParent().layout(new Control[]{area});
 		
 		if (!vis) {
-			interrupt();
+			sliceJob.cancel();
 			saveSettings();
 		}
 	}
@@ -724,4 +589,49 @@ public class SliceComponent {
 		this.imagePlotType  = pt;
 	}
 
+	private class SliceJob extends Job {
+		
+		private SliceObject slice;
+		public SliceJob() {
+			super("Slice");
+		}
+
+		@Override
+		protected IStatus run(IProgressMonitor monitor) {
+			
+			monitor.beginTask("Slice "+slice.getName(), 10);
+			try {
+				monitor.worked(1);
+				if (monitor.isCanceled()) return Status.CANCEL_STATUS;
+				
+				PlotType type = PlotType.PT1D;
+				if (slice.getAxes().size()==1) {
+					type = PlotType.PT1D;
+				} else  if (slice.getAxes().size()==2) {
+					type = imagePlotType;
+				} else {
+					throw new Exception("Only 1D and images supported currently!");
+				}
+				
+				SliceUtils.plotSlice(slice, 
+						             dataShape, 
+						             type, 
+						             plottingSystem, 
+						             monitor);
+			} catch (Exception e) {
+				logger.error("Cannot slice "+slice.getName(), e);
+			} finally {
+				monitor.done();
+			}	
+			
+			return Status.OK_STATUS;
+		}
+
+		public void schedule(SliceObject cs) {
+			if (slice!=null && slice.equals(cs)) return;
+			cancel();
+			this.slice = cs;
+			schedule();
+		}	
+	}
 }

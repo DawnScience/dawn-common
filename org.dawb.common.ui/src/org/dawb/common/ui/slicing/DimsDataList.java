@@ -22,7 +22,8 @@ public class DimsDataList implements Serializable {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = -5902704017223885965L;
+	
 	
 	private List<DimsData> dimsData;
 		
@@ -35,7 +36,7 @@ public class DimsDataList implements Serializable {
 	
 	public DimsDataList(int[] dataShape, SliceObject slice) throws Exception {
 		
-		// TODO Read axis maybe
+		// TODO Read axis maybe from nexus data?
 		//final IHierarchicalDataFile file = HierarchicalDataFactory.getReader(slice.getPath());
 		try {
 			
@@ -46,23 +47,29 @@ public class DimsDataList implements Serializable {
 			// For now we just assume the first dimensions are the slow ones to make an axis out
 			// of. Later read the axis from the meta list but we do not have examples of this so
 			// far.
-			boolean setX=false,setY=false;
+			int xaxis=-1,yaxis=-1;
 			for (int i = 0; i<dataShape.length; ++i) {
 				add(new DimsData(i));
 			}
 			for (int i = dataShape.length-1; i>=0; i--) {
 				
 				if (dataShape[i]>1) {
-					if (!setY) {
+					if (yaxis<0) {
 						getDimsData(i).setAxis(1);
-						setY = true;
+						yaxis = i;
 						continue;
-					} else  if (!setX) {
+					} else  if (xaxis<0) {
 						getDimsData(i).setAxis(0);
-						setX = true;
+						xaxis = i;
 						continue;
 					}
 				}
+			}
+			
+			// If we only found a y it may be a multiple-dimension set with only 1D possible.
+			// In that case change y to x.
+			if (yaxis>-1 && xaxis<0) {
+				getDimsData(yaxis).setAxis(0);
 			}
 		} finally {
 			//file.close();
