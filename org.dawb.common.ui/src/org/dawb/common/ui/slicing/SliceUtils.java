@@ -47,6 +47,9 @@ public class SliceUtils {
     		                                    final int[]        dataShape,
     		                                    final SliceObject  sliceObject)  {
 
+    	
+    	if (dimsDataHolder.size()!=dataShape.length) throw new RuntimeException("The dims data and the data shape are not equal!");
+    	
     	final SliceObject currentSlice = sliceObject!=null ? sliceObject.clone() : new SliceObject();
 
     	// This ugly code results from the ugly API to the slicing.
