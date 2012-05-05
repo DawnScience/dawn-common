@@ -104,7 +104,7 @@ public class LoaderService extends AbstractServiceFactory implements ILoaderServ
         final String eclipseDir = BundleUtils.getEclipseHome();
 		return (new File(eclipseDir+"/fabio")).exists();
 	}
-	
+
 	private AbstractDataset getDataset(final File f, final IProgressMonitor monitor) throws Throwable {
 		
 		AbstractDataset set = null;
@@ -129,8 +129,7 @@ public class LoaderService extends AbstractServiceFactory implements ILoaderServ
 			try {
 				FabioFile     file = new FabioFile(f.getAbsolutePath());
 				final float[] fa   = file.getImageAsFloat();
-
-				set = new FloatDataset( fa, new int[] { file.getHeight(), file.getWidth() } );
+				set = new FloatDataset(fa, new int[]{file.getHeight(), file.getWidth()});
 				set.setName(f.getName());
 				
 			} finally {
