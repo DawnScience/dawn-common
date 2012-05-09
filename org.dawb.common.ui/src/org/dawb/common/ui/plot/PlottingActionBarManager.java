@@ -105,8 +105,14 @@ public class PlottingActionBarManager implements IPlotActionSystem {
 	    final IConfigurationElement[] configs = Platform.getExtensionRegistry().getConfigurationElementsFor("org.dawb.common.ui.toolPage");
 	    boolean foundSomeActions = false;
 	    for (IConfigurationElement e : configs) {
-			
-	    	final IToolPage page  = (IToolPage)e.createExecutableExtension("class");
+	    	IToolPage toolPage = null;
+	    	try {
+	    		toolPage  = (IToolPage)e.createExecutableExtension("class");
+	    	} catch (Throwable ne) {
+	    		logger.error("Cannot create tool page "+e.getAttribute("class"), ne);
+	    		continue;
+	    	}
+	    	final IToolPage page = toolPage;
 	    	if (page.getToolPageRole()!=role) continue;
 		    
 	    	foundSomeActions = true;
