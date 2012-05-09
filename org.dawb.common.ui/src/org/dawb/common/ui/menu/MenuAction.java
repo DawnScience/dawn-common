@@ -140,4 +140,9 @@ public class MenuAction extends Action implements IMenuCreator {
 		}
 		return null;
 	}
+
+
+	public boolean isEmpty() {
+		return actions==null || actions.isEmpty();
+	}
 }

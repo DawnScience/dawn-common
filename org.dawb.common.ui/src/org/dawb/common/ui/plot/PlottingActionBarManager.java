@@ -171,9 +171,10 @@ public class PlottingActionBarManager implements IPlotActionSystem {
     			
     			final IToolPage old = system.getCurrentToolPage(role);
     			
-    			system.setCurrentToolPage(system.getEmptyTool());
+    			final EmptyTool empty = system.getEmptyTool(role);
+    			system.setCurrentToolPage(empty);
     			system.clearRegionTool();
-    			system.fireToolChangeListeners(new ToolChangeEvent(this, old, system.getEmptyTool(), system.getPart()));
+    			system.fireToolChangeListeners(new ToolChangeEvent(this, old, empty, system.getPart()));
      			
     			toolActions.setSelectedAction(this);
     		}
