@@ -210,6 +210,12 @@ public interface IImageTrace extends ITrace {
 	 */
 	public AbstractDataset getDownsampled();
 
+	/**
+	 * 
+	 * @return the current downsampled mask or null if there is no mask.
+	 */
+	public AbstractDataset getDownsampledMask();
+
 	
 	/**
 	 * @return the bin side in pixels which will be used when drawing the image. 
@@ -271,4 +277,5 @@ public interface IImageTrace extends ITrace {
 	 * @return
 	 */
 	public void setMask(AbstractDataset bd);
+
 }
