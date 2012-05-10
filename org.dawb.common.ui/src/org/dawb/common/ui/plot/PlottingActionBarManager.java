@@ -1,7 +1,9 @@
 package org.dawb.common.ui.plot;
 
 import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.dawb.common.ui.Activator;
 import org.dawb.common.ui.menu.MenuAction;
@@ -10,14 +12,17 @@ import org.dawb.common.ui.plot.tool.IToolPage;
 import org.dawb.common.ui.plot.tool.IToolPage.ToolPageRole;
 import org.dawb.common.ui.plot.tool.ToolChangeEvent;
 import org.dawb.common.ui.util.EclipseUtils;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IContributionManager;
+import org.eclipse.jface.dialogs.DialogMessageArea;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PartInitException;
 import org.osgi.framework.Bundle;
@@ -42,6 +47,7 @@ public class PlottingActionBarManager implements IPlotActionSystem {
 	// Extrac actions for 1D and image viewing
 	protected List<IAction> extraImageActions;
 	protected List<IAction> extra1DActions;
+	protected Map<String, IToolPage> toolPages;
 	protected AbstractPlottingSystem system;
 	
 	public PlottingActionBarManager(AbstractPlottingSystem system) {
@@ -74,6 +80,8 @@ public class PlottingActionBarManager implements IPlotActionSystem {
 		if (extra1DActions!=null) extra1DActions.clear();
 		extra1DActions = null;
 
+		if (toolPages!=null) toolPages.clear();
+		toolPages = null;
 	}
 	
 	private boolean isToolsRequired = true;
@@ -112,18 +120,34 @@ public class PlottingActionBarManager implements IPlotActionSystem {
 	    		logger.error("Cannot create tool page "+e.getAttribute("class"), ne);
 	    		continue;
 	    	}
-	    	final IToolPage page = toolPage;
-	    	if (page.getToolPageRole()!=role) continue;
+	    	final IToolPage tool = toolPage;
+	    	if (tool.getToolPageRole()!=role) continue;
 		    
 	    	foundSomeActions = true;
 	    	final String    label = e.getAttribute("label");
-	    	page.setToolSystem(system);
-	    	page.setPlottingSystem(system);
-	    	page.setTitle(label);
-	    	page.setPart(system.getPart());
+	    	tool.setToolSystem(system);
+	    	tool.setPlottingSystem(system);
+	    	tool.setTitle(label);
+	    	tool.setPart(system.getPart());
+	    	tool.setToolId(e.getAttribute("id"));
+	    	
+	    	// Save tool page
+	    	if (toolPages==null) toolPages = new HashMap<String, IToolPage>(7);
+	    	toolPages.put(tool.getToolId(), tool);
 	    	
 	    	final Action    action= new Action(label) {
 	    		public void run() {		
+	    			
+	    			// If we have a dedicated tool for this tool, we do not open another
+	    			String toolId  = tool.getToolId();
+	    			if (toolId!=null) {
+	    				IViewReference ref = EclipseUtils.getPage().findViewReference("org.dawb.workbench.plotting.views.toolPageView.fixed", toolId);
+	    			    if (ref!=null) {
+	    			    	final IViewPart view = ref.getView(true);
+	    			    	EclipseUtils.getPage().activate(view);
+	    			    	return;
+	    			    }
+	    			}
 	    			
 	    			IViewPart viewPart=null;
 	    			try {
@@ -137,9 +161,9 @@ public class PlottingActionBarManager implements IPlotActionSystem {
 					}
 	    			
 	    			final IToolPage old = system.getCurrentToolPage(role);
-	    			system.setCurrentToolPage(page);
+	    			system.setCurrentToolPage(tool);
 	    			system.clearRegionTool();
-	    			system.fireToolChangeListeners(new ToolChangeEvent(this, old, page, system.getPart()));
+	    			system.fireToolChangeListeners(new ToolChangeEvent(this, old, tool, system.getPart()));
 	    			
 	    			toolActions.setSelectedAction(this);
 	    			
@@ -154,7 +178,7 @@ public class PlottingActionBarManager implements IPlotActionSystem {
 		    	final URL      entry = bundle.getEntry(icon);
 		    	final ImageDescriptor des = ImageDescriptor.createFromURL(entry);
 		    	action.setImageDescriptor(des);
-		    	page.setImageDescriptor(des);
+		    	tool.setImageDescriptor(des);
 	    	}
 	    	
 	    	final String    tooltip = e.getAttribute("tooltip");
@@ -186,6 +210,10 @@ public class PlottingActionBarManager implements IPlotActionSystem {
 	    return toolActions;
 	}
 	
+	protected IToolPage getToolPage(final String id) {
+		if (toolPages==null) return null;
+		return toolPages.get(id);
+	}
 	
 	/**
 	 * returns false if no tool was shown

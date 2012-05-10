@@ -560,6 +560,14 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 		currentToolPageMap.put(page.getToolPageRole(), page);
 	}
 	
+	public IToolPage getToolPage(String toolId) {
+		return actionBarManager.getToolPage(toolId);
+	}
+	
+	public IToolPage createToolPage(String toolId) throws Exception {
+		return getToolPage(toolId).cloneTool();
+	}
+	
 	/**
 	 * Add a tool change listener. If the user changes preferred tool
 	 * this listener will be called so that any views showing the current
