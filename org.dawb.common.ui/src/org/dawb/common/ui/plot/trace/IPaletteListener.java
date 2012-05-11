@@ -34,7 +34,7 @@ import java.util.EventListener;
  * @author fcp94556
  *
  */
-public interface PaletteListener extends EventListener {
+public interface IPaletteListener extends EventListener {
 
 	/**
 	 * Called when palette data changed
@@ -72,8 +72,17 @@ public interface PaletteListener extends EventListener {
 	 * @param evt
 	 */
 	public void nanBoundsChanged(PaletteEvent evt);
+	
+	/**
+	 * To get the new mask the source of the event should be 
+	 * cast to IImageTrace and the getMask() method used on that
+	 * object.
+	 * 
+	 * @param evt
+	 */
+	public void maskChanged(PaletteEvent evt);
 
-	public class Stub implements PaletteListener {
+	public class Stub implements IPaletteListener {
 
 		@Override
 		public void paletteChanged(PaletteEvent evt) {
@@ -107,6 +116,12 @@ public interface PaletteListener extends EventListener {
 
 		@Override
 		public void nanBoundsChanged(PaletteEvent evt) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void maskChanged(PaletteEvent evt) {
 			// TODO Auto-generated method stub
 			
 		}

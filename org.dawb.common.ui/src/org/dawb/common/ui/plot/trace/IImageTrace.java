@@ -151,14 +151,14 @@ public interface IImageTrace extends ITrace {
 	 * Call to add a palette listener
 	 * @param pl
 	 */
-	public void addPaletteListener(PaletteListener pl);
+	public void addPaletteListener(IPaletteListener pl);
 	
 	
 	/**
 	 * Call to remove a palette listener
 	 * @param pl
 	 */
-	public void removePaletteListener(PaletteListener pl);
+	public void removePaletteListener(IPaletteListener pl);
 	
 	/**
 	 * 
