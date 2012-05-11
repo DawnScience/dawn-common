@@ -125,7 +125,7 @@ public class LoaderService extends AbstractServiceFactory implements ILoaderServ
 			
 		}
 		
-		if (isFabioOnly  && isFabioAvailable() ) {
+		if (isFabioOnly && isFabioAvailable() ) {
 			try {
 				FabioFile     file = new FabioFile(f.getAbsolutePath());
 				final float[] fa   = file.getImageAsFloat();
