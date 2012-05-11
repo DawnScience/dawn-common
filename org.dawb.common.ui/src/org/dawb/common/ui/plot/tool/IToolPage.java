@@ -183,4 +183,22 @@ public interface IToolPage extends IPageBookViewPage {
 	 * @param viewPart
 	 */
 	public void setViewPart(IViewPart viewPart);
+	
+	/**
+	 * The unique id of the tool, used for opening it in a static page.
+	 * @return
+	 */
+	public String getToolId();
+	
+	/**
+	 * Designed to be used when the tool is created only.
+	 * @return
+	 */
+	public void setToolId(String id);
+
+	/**
+	 * Used to clone a tool when the tool is opened in its own view.
+	 * @return
+	 */
+	public IToolPage cloneTool()  throws Exception;
 }

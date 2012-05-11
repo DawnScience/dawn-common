@@ -1,5 +1,6 @@
 package org.dawb.common.ui.plot;
 
+import org.dawb.common.ui.Activator;
 import org.dawb.common.ui.plot.tool.AbstractToolPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
@@ -8,9 +9,12 @@ import org.eclipse.swt.widgets.Control;
 public class EmptyTool extends AbstractToolPage {
 
 	private Composite composite;
+	private ToolPageRole role;
 
-	public EmptyTool() {
-		setTitle("Empty Tool"); 
+	public EmptyTool(ToolPageRole role) {
+		setTitle("Empty Tool");
+		this.role = role;
+		setImageDescriptor(Activator.getImageDescriptor("icons/axis.png"));
 	}
 	@Override
 	public void createControl(Composite parent) {
@@ -30,7 +34,7 @@ public class EmptyTool extends AbstractToolPage {
 	
 	@Override
 	public ToolPageRole getToolPageRole() {
-		return ToolPageRole.ROLE_1D_AND_2D;
+		return role;
 	}
 
 }

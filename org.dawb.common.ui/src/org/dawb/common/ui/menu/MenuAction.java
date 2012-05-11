@@ -106,6 +106,10 @@ public class MenuAction extends Action implements IMenuCreator {
 	public IAction getAction(int iAction) {
 		return actions.get(iAction);
 	}
+	public int size() {
+		if (actions==null) return 0;
+		return actions.size();
+	}
 
 	public void setSelectedAction(IAction action) {
 		if (action.getImageDescriptor()!=null) this.setImageDescriptor(action.getImageDescriptor());
@@ -139,5 +143,10 @@ public class MenuAction extends Action implements IMenuCreator {
 			if (id.equals(action.getId())) return action;
 		}
 		return null;
+	}
+
+
+	public boolean isEmpty() {
+		return actions==null || actions.isEmpty();
 	}
 }

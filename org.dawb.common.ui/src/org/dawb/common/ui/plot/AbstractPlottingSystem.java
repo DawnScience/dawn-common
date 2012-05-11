@@ -549,7 +549,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 		if(currentToolPageMap!=null)
 			toolPage = currentToolPageMap.get(role);
 		if (toolPage==null) {
-			toolPage = getEmptyTool();
+			toolPage = getEmptyTool(role);
 			if(currentToolPageMap!=null)
 				currentToolPageMap.put(role, toolPage);
 		}
@@ -558,6 +558,14 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	
 	protected void setCurrentToolPage(IToolPage page) {
 		currentToolPageMap.put(page.getToolPageRole(), page);
+	}
+	
+	public IToolPage getToolPage(String toolId) {
+		return actionBarManager.getToolPage(toolId);
+	}
+	
+	public IToolPage createToolPage(String toolId) throws Exception {
+		return getToolPage(toolId).cloneTool();
 	}
 	
 	/**
@@ -594,17 +602,14 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 		}
 	}
 	
-	private EmptyTool emptyTool;
-
-	protected EmptyTool getEmptyTool() {
+	protected EmptyTool getEmptyTool(ToolPageRole role) {
 		
-		if (emptyTool==null) {
-			emptyTool = new EmptyTool();
-			emptyTool.setToolSystem(this);
-			emptyTool.setPlottingSystem(this);
-			emptyTool.setTitle("No tool");
-			emptyTool.setPart(part);
-		}
+		EmptyTool emptyTool = new EmptyTool(role);
+		emptyTool.setToolSystem(this);
+		emptyTool.setPlottingSystem(this);
+		emptyTool.setTitle("No tool");
+		emptyTool.setPart(part);
+
 		return emptyTool;
 	}
 

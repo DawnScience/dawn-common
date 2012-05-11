@@ -36,4 +36,19 @@ public interface IToolPageSystem {
 	 * @param l
 	 */
 	public void removeToolChangeListener(IToolChangeListener l);
+
+	/**
+	 * Get a tool page by id for this tool page system.
+	 * @param toolId
+	 * @return
+	 */
+	public IToolPage getToolPage(String toolId);
+	
+	/**
+	 * Creates a new tool page using the id.
+	 * @param toolId
+	 * @return
+	 */
+	public IToolPage createToolPage(String toolId) throws Exception;
+
 }

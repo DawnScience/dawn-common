@@ -153,9 +153,35 @@ public abstract class AbstractToolPage extends Page implements IToolPage, IAdapt
 	 * @return
 	 */
 	public IImageTrace getImageTrace() {
-		final Collection<ITrace> traces = getPlottingSystem().getTraces(IImageTrace.class);
-		if (traces==null || traces.size()<0) return null;
-		final ITrace trace = traces.iterator().next();
-		return trace instanceof IImageTrace ? (IImageTrace)trace : null;
+		try {
+			final Collection<ITrace> traces = getPlottingSystem().getTraces(IImageTrace.class);
+			if (traces==null || traces.size()<0) return null;
+			final ITrace trace = traces.iterator().next();
+			return trace instanceof IImageTrace ? (IImageTrace)trace : null;
+		} catch (Exception ne) {
+			return null;
+		}
+	}
+	
+	private String toolId; // You can only set this once!
+	public String getToolId() {
+		return toolId;
+	}
+	public void setToolId(String id) {
+		if (toolId!=null) throw new RuntimeException("The tool id is already set and cannot be changed!");
+		this.toolId = id;
+	}
+		
+	public IToolPage cloneTool() throws Exception {
+		
+		final IToolPage clone = getClass().newInstance();
+		clone.setToolSystem(getToolSystem());
+		clone.setPlottingSystem(getPlottingSystem());
+		clone.setTitle(getTitle());
+		clone.setPart(getPart());
+		clone.setToolId(getToolId());
+		clone.setImageDescriptor(getImageDescriptor());
+	    
+		return clone;
 	}
 }
