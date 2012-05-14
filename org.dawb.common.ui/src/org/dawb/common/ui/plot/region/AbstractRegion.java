@@ -4,7 +4,11 @@ import java.util.Collection;
 import java.util.HashSet;
 
 import org.eclipse.draw2d.Figure;
-import org.eclipse.swt.graphics.Color;
+import org.eclipse.draw2d.Label;
+import org.eclipse.draw2d.geometry.Dimension;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.widgets.Display;
 
 import uk.ac.diamond.scisoft.analysis.roi.ROIBase;
 
@@ -19,7 +23,8 @@ public abstract class AbstractRegion extends Figure implements IRegion, IRegionC
 	private Collection<IROIListener> roiListeners;
 	private boolean regionEventsActive = true;
 	private boolean maskRegion         = false;
-	private Color labelColour;
+	protected Label label = null;
+	protected Dimension labeldim;
 
 	@Override
 	public boolean addROIListener(final IROIListener l) {
@@ -145,12 +150,13 @@ public abstract class AbstractRegion extends Figure implements IRegion, IRegionC
 		this.maskRegion = maskRegion;
 	}
 	
-	public void setLabelColour(Color colour) {
-		labelColour = colour;
-	}
-
-	public Color getLabelColour() {
-		return labelColour;
+	public Label getLabel() {
+		return label;
 	}
 	
+	public void setLabel(Label label) {
+		this.label = label ;
+		this.label.setFont(new Font(Display.getCurrent(), "Dialog", 10, SWT.NORMAL));
+		this.labeldim = label.getTextUtilities().getTextExtents(getName(), label.getFont());
+	}
 }

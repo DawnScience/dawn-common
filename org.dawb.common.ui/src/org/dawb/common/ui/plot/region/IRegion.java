@@ -3,6 +3,7 @@ package org.dawb.common.ui.plot.region;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.MouseListener;
 import org.eclipse.draw2d.MouseMotionListener;
 import org.eclipse.swt.SWT;
@@ -30,6 +31,19 @@ public interface IRegion {
 	 */
 	public void setName(String name);
 
+	/**
+	 * @return the name of the region
+	 */
+	public Label getLabel();
+
+	/**
+	 * The name of the region
+	 * 
+	 * @param name
+	 */
+	public void setLabel(Label label);
+
+	
 	/**
 	 * @return the colour of the region
 	 */
@@ -91,18 +105,6 @@ public interface IRegion {
 	 * @param mobile
 	 */
 	public void setMobile(boolean mobile);
-
-	/**
-	 * @return true if label is shown
-	 */
-	public boolean isShowLabel();
-
-	/**
-	 * Label shown or not
-	 * 
-	 * @param label
-	 */
-	public void setShowLabel(boolean label);
 
 	/**
 	 * Get the region of interest (in coordinate frame of the axis that region is added to)
@@ -215,17 +217,6 @@ public interface IRegion {
 	 * @return
 	 */
 	public void setLineWidth(int i);
-
-	/**
-	 * set the colour of the label drawn.
-	 */
-	public void setLabelColour(Color colour);
-
-	/**
-	 * get the colour of the label drawn.
-	 * @return colour of label
-	 */
-	public Color getLabelColour();
 
 	/**
 	 * The type of this region
