@@ -167,7 +167,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 		if (selectionProvider!=null) selectionProvider.clear();
 		selectionProvider = null;
 		
-		currentToolPageMap.clear();
+		if (currentToolPageMap!=null) currentToolPageMap.clear();
 		currentToolPageMap = null;
 	}
 

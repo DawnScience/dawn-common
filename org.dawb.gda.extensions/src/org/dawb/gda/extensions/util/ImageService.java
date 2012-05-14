@@ -13,6 +13,7 @@ import org.dawb.common.services.IImageService;
 import org.dawb.common.services.ImageServiceBean;
 import org.dawb.common.services.ImageServiceBean.HistoType;
 import org.dawb.common.services.ImageServiceBean.ImageOrigin;
+import org.dawb.common.ui.image.PaletteFactory;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.PaletteData;
@@ -260,7 +261,13 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 		// We *DO NOT* copy the palete here so up to 3 of the original
 		// colors can be changed. Instead whenever a palette is given to an
 		// ImageService bean it should be original.
-		
+		if (bean.getPalette()==null) {
+			try {
+				bean.setPalette(PaletteFactory.getPalette(0));
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		}
 		
 		// We have three special values, those which are greater than the max cut,
 		// less than the min cut and the NaN number. For these we use special pixel
