@@ -10,7 +10,9 @@
 package org.dawb.common.ui.plot;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -20,6 +22,9 @@ import org.eclipse.ui.preferences.ScopedPreferenceStore;
 
 public class PlottingFactory {
 
+	private PlottingFactory() {
+		// Singleton
+	}
 	
 	/**
 	 * Reads the extension points for the plotting systems registered and returns
@@ -34,7 +39,7 @@ public class PlottingFactory {
 		if (plotType==null) plotType = System.getProperty("org.dawb.plotting.system.choice");// For Geoff et. al. can override.
 		if (plotType==null) plotType = "org.dawb.workbench.editors.plotting.lightWeightPlottingSystem"; // That is usually around
 		
-        AbstractPlottingSystem system = getPlottingSystem(plotType);
+        AbstractPlottingSystem system = createPlottingSystem(plotType);
         if (system!=null) return system;
 		
         IConfigurationElement[] systems = Platform.getExtensionRegistry().getConfigurationElementsFor("org.dawb.common.ui.plottingClass");
@@ -51,14 +56,14 @@ public class PlottingFactory {
 	 */
 	public static AbstractPlottingSystem getLightWeightPlottingSystem() throws Exception {
 				
-		return  getPlottingSystem("org.dawb.workbench.editors.plotting.lightWeightPlottingSystem");		
+		return  createPlottingSystem("org.dawb.workbench.editors.plotting.lightWeightPlottingSystem");		
 	}
 	
-	private static final AbstractPlottingSystem getPlottingSystem(final String plotType) throws CoreException {
+	private static final AbstractPlottingSystem createPlottingSystem(final String plottingSystemId) throws CoreException {
 		
         IConfigurationElement[] systems = Platform.getExtensionRegistry().getConfigurationElementsFor("org.dawb.common.ui.plottingClass");
         for (IConfigurationElement ia : systems) {
-			if (ia.getAttribute("id").equals(plotType)) return (AbstractPlottingSystem)ia.createExecutableExtension("class");
+			if (ia.getAttribute("id").equals(plottingSystemId)) return (AbstractPlottingSystem)ia.createExecutableExtension("class");
 		}
 		
         return null;
@@ -78,5 +83,49 @@ public class PlottingFactory {
         	ret[i] = choices.get(i);
 		}
         return ret;
+	}
+
+	private static Map<String, AbstractPlottingSystem> plottingSystems;
+	
+	public static void clear() {
+		if (plottingSystems!=null) plottingSystems.clear();
+	}
+	
+	/**
+	 * Removes a plot system from the registered names.
+	 * @param plotName
+	 * @return
+	 */
+	public static AbstractPlottingSystem removePlottingSystem(String plotName) {
+		if (plottingSystems==null) return null;
+		return plottingSystems.remove(plotName);
+	}
+
+	/**
+	 * Registers a plotting system by name. NOTE if the name is already used this
+	 * will overwrite the old one!
+	 * 
+	 * @param plotName
+	 * @param abstractPlottingSystem
+	 */
+	public static void registerPlottingSystem(final String                 plotName,
+			                                  final AbstractPlottingSystem abstractPlottingSystem) {
+		
+		if (plottingSystems==null) plottingSystems = new HashMap<String, AbstractPlottingSystem>(7);
+		plottingSystems.put(plotName, abstractPlottingSystem);
+	}
+	
+	/**
+	 * Get a plotting system by name. NOTE if more than one plotting system has the same name the
+	 * last one registered with this name is returned.
+	 * 
+	 * NOTE an AbstractPlottingSystem is also a IToolPageSystem, you can get tool pages here.
+	 * 
+	 * @param plotName
+	 * @return AbstractPlottingSystem or null
+	 */
+	public static AbstractPlottingSystem getPlottingSystem(String plotName) {
+		if (plottingSystems==null) return null;
+		return plottingSystems.get(plotName);
 	}
 }

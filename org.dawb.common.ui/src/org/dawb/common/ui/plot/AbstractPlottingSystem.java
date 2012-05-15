@@ -149,6 +149,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 
 	public void dispose() {
 
+		PlottingFactory.removePlottingSystem(plotName);
 		if (part!=null) {
 			@SuppressWarnings("unchecked")
 			final ISystemService<IPlottingSystem> service = (ISystemService<IPlottingSystem>)PlatformUI.getWorkbench().getService(ISystemService.class);
@@ -310,10 +311,13 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	 * have specific methods for 1D, 2D etc.
 	 */
 	protected PlotType       defaultPlotType;
+
+	protected String plotName;
 	
 	/**
 	 * This simply assigns the part, subclasses should override this
-	 * and call super.createPlotPart(...) to assign the part.
+	 * and call super.createPlotPart(...) to assign the part. Also registers the plot
+	 * with the PlottingFactory.
 	 */
 	@Override
 	public void createPlotPart(final Composite      parent,
@@ -322,9 +326,11 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 							   final PlotType       hint,
 							   final IWorkbenchPart part) {
 
+		this.plotName = plotName;
 		this.defaultPlotType = hint;
 		this.part = part;
 		this.bars = bars;
+		PlottingFactory.registerPlottingSystem(plotName, this);
 		
 		if (part!=null) {
 			@SuppressWarnings("unchecked")
