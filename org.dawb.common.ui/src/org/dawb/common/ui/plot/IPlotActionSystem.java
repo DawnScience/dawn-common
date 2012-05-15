@@ -13,6 +13,15 @@ import org.eclipse.jface.action.IContributionManager;
  *
  */
 public interface IPlotActionSystem {
+	
+	/**
+	 * Removes this id from the action bars and from the caches of actions by plot type.
+	 * 
+	 * Effectively permanently removes this id.
+	 * 
+	 * @param id
+	 */
+	public void remove(String id);
 
 	/**
 	 * Gets the zoom actions and fills them into this contribution manager.

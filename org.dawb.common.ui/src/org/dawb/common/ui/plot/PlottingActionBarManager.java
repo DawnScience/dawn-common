@@ -2,6 +2,7 @@ package org.dawb.common.ui.plot;
 
 import java.net.URL;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -299,6 +300,19 @@ public class PlottingActionBarManager implements IPlotActionSystem {
 	public void fillToolActions(IContributionManager man, ToolPageRole role) {
 		// TODO Auto-generated method stub
 		
+	}
+
+
+	@Override
+	public void remove(String id) {
+		if (extraImageActions!=null) for (Iterator<IAction> it= this.extraImageActions.iterator(); it.hasNext(); ) {
+			IAction action = it.next();
+			if (action.getId()!=null && action.getId().equals(id)) it.remove();
+		}
+		if (extra1DActions!=null) for (Iterator<IAction> it= this.extra1DActions.iterator(); it.hasNext(); ) {
+			IAction action = it.next();
+			if (action.getId()!=null && action.getId().equals(id)) it.remove();
+		}
 	}
 
 

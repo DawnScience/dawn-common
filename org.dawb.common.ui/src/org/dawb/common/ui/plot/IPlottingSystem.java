@@ -210,5 +210,9 @@ public interface IPlottingSystem extends ITraceSystem, IRegionSystem, IAxisSyste
 	 */
 	public IActionBars getActionBars();
 
-
+    /**
+     * Gives access to the action manager for removing and filling different actions.
+     * @return
+     */
+	public IPlotActionSystem getPlotActionSystem();
 }
