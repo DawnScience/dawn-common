@@ -27,7 +27,7 @@ public class PlottingFactory {
 	 * 
 	 * @return
 	 */
-	public static AbstractPlottingSystem getPlottingSystem() throws Exception {
+	public static AbstractPlottingSystem createPlottingSystem() throws Exception {
 				
 		final ScopedPreferenceStore store = new ScopedPreferenceStore(InstanceScope.INSTANCE,"org.dawb.workbench.ui");
 		String plotType = store.getString("org.dawb.plotting.system.choice");
