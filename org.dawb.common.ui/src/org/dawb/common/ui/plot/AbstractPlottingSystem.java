@@ -453,6 +453,23 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	public IRegion getRegion(final String name) {
 		return null; // TODO
 	}
+	
+	@Override
+	public Collection<IRegion> getRegions(final RegionType type) {
+		
+		final Collection<IRegion> regions = getRegions();
+		if (regions==null) return null;
+		
+		final Collection<IRegion> ret= new ArrayList<IRegion>();
+		for (IRegion region : regions) {
+			if (region.getRegionType()==type) {
+				ret.add(region);
+			}
+		}
+		
+		return ret; // may be empty
+	}
+
 	/**
 	 * Get a region by name.
 	 * @param name
@@ -462,6 +479,8 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	public Collection<IRegion> getRegions() {
 		return null; // TODO
 	}
+	
+	
 
 	protected void fireRegionRemoved(RegionEvent evt) {
 		if (regionListeners==null) return;

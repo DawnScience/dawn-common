@@ -20,6 +20,16 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
 
+/**
+ * PlottingFactory is the preferred way to get an AbstractPlottingSystem. Also
+ * consider just using the IPlottingSystem interface as this is more likely to 
+ * be persistent when declaring the type in the calling code.
+ * 
+ * 
+ * 
+ * @author fcp94556
+ *
+ */
 public class PlottingFactory {
 
 	private PlottingFactory() {
@@ -94,7 +104,7 @@ public class PlottingFactory {
 	/**
 	 * Removes a plot system from the registered names.
 	 * @param plotName
-	 * @return
+	 * @return the removed system
 	 */
 	public static AbstractPlottingSystem removePlottingSystem(String plotName) {
 		if (plottingSystems==null) return null;
@@ -107,12 +117,13 @@ public class PlottingFactory {
 	 * 
 	 * @param plotName
 	 * @param abstractPlottingSystem
+	 * @return the replaced system if any or null otherwise.
 	 */
-	public static void registerPlottingSystem(final String                 plotName,
-			                                  final AbstractPlottingSystem abstractPlottingSystem) {
+	public static AbstractPlottingSystem registerPlottingSystem(final String                 plotName,
+			                                                   final AbstractPlottingSystem abstractPlottingSystem) {
 		
 		if (plottingSystems==null) plottingSystems = new HashMap<String, AbstractPlottingSystem>(7);
-		plottingSystems.put(plotName, abstractPlottingSystem);
+		return plottingSystems.put(plotName, abstractPlottingSystem);
 	}
 	
 	/**

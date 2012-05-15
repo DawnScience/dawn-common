@@ -48,6 +48,15 @@ public interface IRegionSystem {
 	 * @return
 	 */
 	public IRegion getRegion(final String name);
+	
+	/**
+	 * Get all the regions for a given region type, null if there are no regions, empty list if there
+	 * are regions but not of this type.
+	 * 
+	 * @param type
+	 * @return
+	 */
+	public Collection<IRegion> getRegions(RegionType type);
 
 	/**
 	 * 
