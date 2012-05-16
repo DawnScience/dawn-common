@@ -10,7 +10,9 @@
 package org.dawb.hdf5;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -22,11 +24,13 @@ public class HierarchicalInfo {
 	private List<String>         dataSetNames;
 	private Map<String, Integer> dataSetSizes;
 	private Map<String, int[]>   dataSetShapes;
+	private Map<String, String>  attributeValues;
 	
 	protected HierarchicalInfo() {
 		dataSetNames  = new ArrayList<String>(31);
 		dataSetSizes  = new HashMap<String,Integer>(31);
 		dataSetShapes = new HashMap<String,int[]>(31);
+		attributeValues = new LinkedHashMap<String, String>(89);
 	}
 	
 	public List<String> getDataSetNames() {
@@ -96,6 +100,22 @@ public class HierarchicalInfo {
 
 	public void putSize(String fullName, int size) {
 		this.dataSetSizes.put(fullName, size);
+	}
+	
+	public void putAttribute(String fullAttributePath, String value) {
+		this.attributeValues.put(fullAttributePath, value);
+	}
+
+	/**
+	 * Returns a list of all the full paths to all the attributes.
+	 * @return
+	 */
+	public Collection<String> getAttributes() {
+		return attributeValues.keySet();
+	}
+	
+	public String getAttributeValue(String key) {
+		return attributeValues.get(key);
 	}
 
 }

@@ -22,6 +22,7 @@ import ncsa.hdf.object.Dataset;
 
 import org.dawb.common.util.io.FileUtils;
 import org.dawb.hdf5.HierarchicalDataFactory;
+import org.dawb.hdf5.HierarchicalDataUtils;
 import org.dawb.hdf5.HierarchicalInfo;
 import org.dawb.hdf5.IHierarchicalDataFile;
 
@@ -211,9 +212,7 @@ public class H5Loader extends AbstractFileLoader implements IMetaLoader, IDataSe
 
 
 
-	private List<String>         allDataSetNames;
-	private Map<String, Integer> allDataSetSizes;
-	private Map<String, int[]>   allDataSetShapes;
+	private HierarchicalInfo metaInfo;
 
 	@Override
 	public void loadMetaData(IMonitor mon) throws Exception {
@@ -223,13 +222,7 @@ public class H5Loader extends AbstractFileLoader implements IMetaLoader, IDataSe
 			file = HierarchicalDataFactory.getReader(filePath);
 			if (mon!=null) mon.worked(1);
 			
-			final HierarchicalInfo info = file.getDatasetInformation(IHierarchicalDataFile.NUMBER_ARRAY);
-			if (mon!=null) mon.worked(1);
-			allDataSetNames  = info.getDataSetNames();
-			if (mon!=null) mon.worked(1);
-			allDataSetSizes  = info.getDataSetSizes();
-			if (mon!=null) mon.worked(1);
-			allDataSetShapes = info.getDataSetShapes();
+			metaInfo = file.getDatasetInformation(IHierarchicalDataFile.NUMBER_ARRAY);
 		} finally {
 			if (file!=null) file.close();
 		}
@@ -238,26 +231,56 @@ public class H5Loader extends AbstractFileLoader implements IMetaLoader, IDataSe
 
 	@Override
 	public IMetaData getMetaData() {
-		return new MetaDataAdapter() {
+		
+ 		return new MetaDataAdapter() {
+ 			
+ 	        private Map<String, Object> attributeValues;
 			
 			@Override
-			public String getMetaValue(String key) {
-				return null; // not implemented as yet
+			public Collection<String> getMetaNames() throws Exception{
+				/**
+				 * We lazy load the meta data attributes as it's not always needed.
+				 */
+				if (attributeValues==null) readAttributes();
+				return attributeValues.keySet();
+			}
+
+			@Override
+			public String getMetaValue(String fullAttributeKey) throws Exception{
+				/**
+				 * We lazy load the meta data attributes as it's not always needed.
+				 */
+				if (attributeValues==null) readAttributes();
+				return HierarchicalDataUtils.extractValue(attributeValues.get(fullAttributeKey));
 			}
 			
 			@Override
 			public Collection<String> getDataNames() {
-				return Collections.unmodifiableCollection(allDataSetNames);
+				return Collections.unmodifiableCollection(metaInfo.getDataSetNames());
 			}
 
 			@Override
 			public Map<String, Integer> getDataSizes() {
-				return allDataSetSizes;
+				return metaInfo.getDataSetSizes();
 			}
 
 			@Override
 			public Map<String, int[]> getDataShapes() {
-				return allDataSetShapes;
+				return metaInfo.getDataSetShapes();
+			}
+			
+			private void readAttributes() throws Exception {
+				if (attributeValues==null) {
+					IHierarchicalDataFile file = null;
+					try {
+						file = HierarchicalDataFactory.getReader(filePath);
+						
+						attributeValues = file.getAttributeValues();
+					} finally {
+						if (file!=null) file.close();
+					}
+				
+				}
 			}
 		};
 	}

@@ -19,6 +19,7 @@ import java.util.Map;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 
+import ncsa.hdf.object.Attribute;
 import ncsa.hdf.object.Dataset;
 import ncsa.hdf.object.Datatype;
 import ncsa.hdf.object.FileFormat;
@@ -192,6 +193,64 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 	}
 	
 	/**
+	 * Reads the attribute from the file.
+	 * 
+	 * @throws Exception 
+	 * 
+	 */
+	public String getAttributeValue(String fullAttributeKey) throws Exception {
+		
+		final String[] sa    = fullAttributeKey.split("@");
+		final HObject object = getData(sa[0]);
+		List attributes = object.getMetadata();
+		if (attributes==null || attributes.isEmpty()) return null;
+
+		for (Object attribute : attributes) {
+			if (attribute instanceof Attribute) {
+				Attribute a = (Attribute)attribute;
+				if (!sa[1].equals(a.getName())) continue;
+				return HierarchicalDataUtils.extractValue(a.getValue());
+			}
+		}
+		return null;
+	}
+	
+	@Override
+	public Map<String, Object> getAttributeValues() {
+		return getAttributeValues(getRoot(), new HashMap<String, Object>(89));
+	}
+
+    private Map<String, Object> getAttributeValues(HObject object, Map<String, Object> allAttributes) {
+    	
+    	try {
+	    	final List attributes = object.getMetadata();
+	    	if (attributes!=null && !attributes.isEmpty()) {
+	    		for (Object attribute : attributes) {
+	    			if (attribute instanceof Attribute) {
+	    				Attribute a = (Attribute)attribute;
+	    				final StringBuilder buf = new StringBuilder();
+	    				buf.append(object.getFullName());
+	    				buf.append("@");
+	    				buf.append(a.getName());
+	    				allAttributes.put(buf.toString(), a.getValue());
+	    			}
+	    		}
+	    	}
+    	} catch (Exception ignored) {
+    		// We try and read other attributes anyway!
+    	}
+
+		List<HObject> members = object instanceof Group ? ((Group)object).getMemberList() : null;
+		if (members!=null && !members.isEmpty()) {
+			for (HObject member : members) {
+				getAttributeValues(member, allAttributes);
+			}
+		}
+   	       
+        return allAttributes;
+    }
+
+	/**
 	 * 
 	 * @return a list of the full paths of the data sets.
 	 */
@@ -224,11 +283,14 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 				info.addName(set.getFullName());
 				info.putShape(set.getFullName(), (int[])intShape);
 				info.putSize(set.getFullName(), (int)size);
+				
 			}
 		
 			if (object instanceof Group) {
 				getDatasetInformation((Group)object, info, dataType);
 			}
+			
+			
 		}
 	}
 

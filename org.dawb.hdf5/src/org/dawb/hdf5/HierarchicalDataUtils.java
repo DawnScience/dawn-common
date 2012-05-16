@@ -17,6 +17,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -196,6 +197,62 @@ public class HierarchicalDataUtils {
         return  bpi*size;
          
          
+	}
+
+	/**
+	 * Extract the value of an attribute.
+	 * @param value
+	 * @return
+	 */
+	public static String extractValue(Object value) {
+		if (value == null) {
+			return "";
+			
+		} else if (value.getClass().isArray()) {
+			return toString(value);
+
+		} else {
+			return value.toString();
+		}
+	}
+
+	/**
+	 * Deals with primitive arrays
+	 * @param value
+	 */
+	private static String toString(Object value) {
+		
+		if (value==null) return null;
+		
+        if (value instanceof short[]) {
+        	return Arrays.toString((short[])value);
+        	
+        } else if  (value instanceof int[]) {
+        	return Arrays.toString((int[])value);
+        	
+        } else if  (value instanceof long[]) {
+        	return Arrays.toString((long[])value);
+        	
+        } else if  (value instanceof char[]) {
+        	return Arrays.toString((char[])value);
+        	
+        } else if  (value instanceof float[]) {
+        	return Arrays.toString((float[])value);
+        	
+        } else if  (value instanceof double[]) {
+        	return Arrays.toString((double[])value);
+        	
+        } else if  (value instanceof boolean[]) {
+        	return Arrays.toString((boolean[])value);
+        	
+        } else if  (value instanceof byte[]) {
+        	return Arrays.toString((byte[])value);
+        	
+        } else if  (value instanceof Object[]) {
+        	return Arrays.toString((Object[])value);
+        }
+        
+        return value.toString();
 	}
 
 }

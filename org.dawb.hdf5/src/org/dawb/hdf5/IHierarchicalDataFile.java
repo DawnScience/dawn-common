@@ -71,6 +71,22 @@ public interface IHierarchicalDataFile {
 	public HObject getData(String fullPath) throws Exception;
 	
 	/**
+	 * The full attribute key is: <node full path>@<attribute name>
+	 * e.g. /entry1/data@napimount
+	 * @param fullAttributeKey
+	 * @return
+	 */
+	public String getAttributeValue(String fullAttributeKey) throws Exception;
+
+	/**
+	 * Reads all the attribute Lists from the object and puts it in a map of the full paths
+	 * to the attributes using paths of the form: <node full path>@<attribute name>
+	 * @return Map<String, Object>
+	 */
+	public Map<String, Object> getAttributeValues();
+
+	
+	/**
 	 * Extracts names, sizes and shapes in one pass.
 	 * @param dataType
 	 * @return

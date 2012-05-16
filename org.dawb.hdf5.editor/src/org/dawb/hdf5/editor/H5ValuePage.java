@@ -21,6 +21,7 @@ import ncsa.hdf.object.Group;
 import ncsa.hdf.object.HObject;
 
 import org.dawb.hdf5.HierarchicalDataFactory;
+import org.dawb.hdf5.HierarchicalDataUtils;
 import org.dawb.hdf5.IHierarchicalDataFile;
 import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.jface.viewers.ISelection;
@@ -260,24 +261,13 @@ public class H5ValuePage extends Page  implements ISelectionListener, IPartListe
 				Attribute a = (Attribute)attribute;
 				buf.append(a.getName());
 				buf.append(" = ");
-				buf.append(extractValue(a.getValue()));
+				buf.append(HierarchicalDataUtils.extractValue(a.getValue()));
 				buf.append("\n");
 			}
 		}
 	}
 
 
-	private Object extractValue(Object value) {
-		if (value == null) {
-			return "";
-			
-		} else if (value.getClass().isArray()) {
-			return toString(value);
-
-		} else {
-			return value.toString();
-		}
-	}
 
 	private static IWorkbenchPage getActivePage() {
 		final IWorkbench bench = PlatformUI.getWorkbench();
@@ -287,44 +277,5 @@ public class H5ValuePage extends Page  implements ISelectionListener, IPartListe
 		return window.getActivePage();
 	}
 	
-
-	/**
-	 * Deals with primitive arrays
-	 * @param value
-	 */
-	private static Object toString(Object value) {
-		
-		if (value==null) return null;
-		
-        if (value instanceof short[]) {
-        	return Arrays.toString((short[])value);
-        	
-        } else if  (value instanceof int[]) {
-        	return Arrays.toString((int[])value);
-        	
-        } else if  (value instanceof long[]) {
-        	return Arrays.toString((long[])value);
-        	
-        } else if  (value instanceof char[]) {
-        	return Arrays.toString((char[])value);
-        	
-        } else if  (value instanceof float[]) {
-        	return Arrays.toString((float[])value);
-        	
-        } else if  (value instanceof double[]) {
-        	return Arrays.toString((double[])value);
-        	
-        } else if  (value instanceof boolean[]) {
-        	return Arrays.toString((boolean[])value);
-        	
-        } else if  (value instanceof byte[]) {
-        	return Arrays.toString((byte[])value);
-        	
-        } else if  (value instanceof Object[]) {
-        	return Arrays.toString((Object[])value);
-        }
-        
-        return value.toString();
-	}
 
 }
