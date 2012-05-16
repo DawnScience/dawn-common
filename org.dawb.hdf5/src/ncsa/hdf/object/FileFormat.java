@@ -25,6 +25,8 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeNode;
 
+import ncsa.hdf.hdf5lib.exceptions.HDF5Exception;
+
 
 /**
  * FileFormat defines general interfaces for working with files whose data is

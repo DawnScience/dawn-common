@@ -18,7 +18,6 @@ import ncsa.hdf.object.FileFormat;
 import ncsa.hdf.object.Group;
 import ncsa.hdf.object.HObject;
 import ncsa.hdf.object.h5.H5Datatype;
-import ncsa.hdf.object.h5.H5File;
 
 /**
  * Class used to mark groups in the hdf5 tree with nexus attributes.

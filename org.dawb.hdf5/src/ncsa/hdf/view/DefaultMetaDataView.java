@@ -27,7 +27,6 @@ import java.lang.reflect.Array;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.StringTokenizer;
-//import java.util.Vector;
 
 import javax.swing.BorderFactory;
 import javax.swing.CellEditor;
@@ -51,7 +50,6 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
-//import javax.swing.tree.TreeNode;
 
 import ncsa.hdf.object.Attribute;
 import ncsa.hdf.object.CompoundDS;
