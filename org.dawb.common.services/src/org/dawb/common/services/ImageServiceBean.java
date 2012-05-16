@@ -51,6 +51,7 @@ public class ImageServiceBean {
 	private int             depth=8; // Either 8 or 16 usually. If function object !=null then 
 	                                 // this is assumed to override the depth
 	private Object          functionObject;
+	private boolean         logColorScale=false; // Normally linear, can switch to log color scale.
 
 	public ImageServiceBean() {
 		
@@ -405,6 +406,12 @@ public class ImageServiceBean {
 	 */
 	public void setMask(AbstractDataset mask) {
 		this.mask = mask;
+	}
+	public boolean isLogColorScale() {
+		return logColorScale;
+	}
+	public void setLogColorScale(boolean logColorScale) {
+		this.logColorScale = logColorScale;
 	}
 	
 	
