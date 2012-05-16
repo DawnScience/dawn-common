@@ -1,14 +1,14 @@
 package org.dawb.common.ui.plot.region;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 
+import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.MouseListener;
 import org.eclipse.draw2d.MouseMotionListener;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.widgets.Display;
 
 import uk.ac.diamond.scisoft.analysis.roi.ROIBase;
 
@@ -136,53 +136,46 @@ public interface IRegion {
 	 */
 	public void remove();
 
+	// some missing colours from draw2d
+	static final Color darkYellow  = new Color(null, 128, 128, 0);
+	static final Color darkMagenta = new Color(null, 128, 0, 128);
+	static final Color darkCyan    = new Color(null, 0, 128, 128);
+
 	/**
 	 * Class packages types of regions, their default names, colours and indices.
 	 * @author fcp94556
 	 *
 	 */
 	public enum RegionType {
-		
-		LINE("Line",               0, Display.getDefault().getSystemColor(SWT.COLOR_CYAN)), 
-		POLYLINE("Polyline",       1, Display.getDefault().getSystemColor(SWT.COLOR_CYAN)),
-		BOX("Box",                 2, Display.getDefault().getSystemColor(SWT.COLOR_GREEN)), 
-		RING("Ring",               3, Display.getDefault().getSystemColor(SWT.COLOR_DARK_YELLOW)), 
-		XAXIS("X-Axis",            4, Display.getDefault().getSystemColor(SWT.COLOR_BLUE)), 
-		YAXIS("Y-Axis",            5, Display.getDefault().getSystemColor(SWT.COLOR_BLUE)), 
-		SECTOR("Sector",           6, Display.getDefault().getSystemColor(SWT.COLOR_RED)),
-		XAXIS_LINE("X-Axis Line",  7, Display.getDefault().getSystemColor(SWT.COLOR_BLUE)), 
-		YAXIS_LINE("Y-Axis Line",  8, Display.getDefault().getSystemColor(SWT.COLOR_BLUE)), 
-		FREE_DRAW("Free draw",     9, Display.getDefault().getSystemColor(SWT.COLOR_DARK_YELLOW)),
-		POINT("Point",             10, Display.getDefault().getSystemColor(SWT.COLOR_DARK_MAGENTA));
+		LINE("Line",               ColorConstants.cyan),
+		POLYLINE("Polyline",       ColorConstants.cyan),
+		BOX("Box",                 ColorConstants.green),
+		RING("Ring",               darkYellow), 
+		XAXIS("X-Axis",            ColorConstants.blue), 
+		YAXIS("Y-Axis",            ColorConstants.blue), 
+		SECTOR("Sector",           ColorConstants.red),
+		XAXIS_LINE("X-Axis Line",  ColorConstants.blue), 
+		YAXIS_LINE("Y-Axis Line",  ColorConstants.blue), 
+		FREE_DRAW("Free draw",     darkYellow),
+		POINT("Point",             darkMagenta),
+		ELLIPSE("Ellipse",         ColorConstants.red);
 
-		private int    index;
 		private String name;
 		private Color defaultColor;
 		
-		public static List<RegionType> ALL_TYPES;
+		public static List<RegionType> ALL_TYPES = new ArrayList<RegionType>(12);
 		static {
-			ALL_TYPES = new ArrayList<RegionType>(5);
-			ALL_TYPES.add(LINE);
-			ALL_TYPES.add(POLYLINE);
-			ALL_TYPES.add(BOX);
-			ALL_TYPES.add(RING);
-			ALL_TYPES.add(XAXIS);
-			ALL_TYPES.add(YAXIS);
-			ALL_TYPES.add(SECTOR);
-			ALL_TYPES.add(XAXIS_LINE);
-			ALL_TYPES.add(YAXIS_LINE);
-			ALL_TYPES.add(FREE_DRAW);
-			ALL_TYPES.add(POINT);
+			for (RegionType t : EnumSet.allOf(RegionType.class))
+				ALL_TYPES.add(t);
 		}
-	
-		RegionType(String name, int index, Color defaultColor) {
+
+		RegionType(String name, Color defaultColor) {
 			this.name = name;
-			this.index = index;
 			this.defaultColor = defaultColor;
 		}
 
 		public int getIndex() {
-			return index;
+			return ALL_TYPES.indexOf(this);
 		}
 
 		public String getName() {
@@ -194,11 +187,7 @@ public interface IRegion {
 		}
 
 		public static RegionType getRegion(int index) {
-			for (RegionType r : ALL_TYPES) {
-				if (r.getIndex() == index)
-					return r;
-			}
-			return null;
+			return ALL_TYPES.get(index);
 		}
 
 		public String getId() {
