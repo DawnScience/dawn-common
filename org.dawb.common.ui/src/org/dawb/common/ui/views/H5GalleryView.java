@@ -275,7 +275,7 @@ public class H5GalleryView extends ViewPart implements MouseListener, SelectionL
 
 	@Override
 	public void mouseDoubleClick(MouseEvent e) {
-		System.out.println("Open slice!");
+		//System.out.println("Open slice!");
 	}
 	
 	@Override

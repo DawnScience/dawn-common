@@ -17,9 +17,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import ncsa.hdf.object.Attribute;
 import ncsa.hdf.object.Dataset;
 import ncsa.hdf.object.Datatype;
+import ncsa.hdf.object.HObject;
 
 public class HierarchicalDataUtils {
 
@@ -43,8 +48,7 @@ public class HierarchicalDataUtils {
 	 * @param buffer
 	 * @throws IOException
 	 */
-	public final static void copy(final File source_file, final File destination_file, final byte[] buffer)
-			throws IOException {
+	public final static void copy(final File source_file, final File destination_file, final byte[] buffer) throws IOException {
 
 		if (!source_file.exists()) {
 			return;
@@ -103,6 +107,68 @@ public class HierarchicalDataUtils {
         }
 
         return requiredType==type;
+	}
+	
+
+	/**
+	 * Returns the link in another file if this is a linked file.
+	 * @param set
+	 * @param original
+	 * @return
+	 * @throws OutOfMemoryError
+	 * @throws Exception
+	 */
+	public static HObject getDataLink(HObject set, HierarchicalDataFile original) {
+
+		try {  	
+			// To make things faster, we only check for Datasets
+			if (!(set instanceof Dataset)) return null;
+			
+			List attributes = set.getMetadata();
+			if (attributes==null || attributes.isEmpty()) return null;
+
+			for (Object attribute : attributes) {
+				if (attribute instanceof Attribute) {
+					Attribute a = (Attribute)attribute;
+					if (a.getName().equals(HierarchicalInfo.NAPIMOUNT)) {
+						return  getDataLink(set, a, original);			
+					}
+				}
+			}
+		} catch (Throwable ne) {
+			return null;
+		}
+		
+		return null;
+	}
+
+	private static final Pattern LINK_ATTR = Pattern.compile("nxfile\\:\\/\\/(.+)\\#(entry.+)");
+
+	private static final HObject getDataLink(HObject set, Attribute a, HierarchicalDataFile original) throws Exception {
+		
+		final String[] vals = (String[])a.getValue();
+		final Matcher matcher = LINK_ATTR.matcher(vals[0]);
+		if (matcher.matches()) {
+			
+			final String path     = matcher.group(1);
+			final String fullPath = matcher.group(2);
+			
+			File file = new File(path);
+			if (!file.exists()) {
+				// Look in same directory.
+				final File parent = set.getFileFormat().getAbsoluteFile().getParentFile();
+				file = new File(parent, file.getName());
+			}
+			
+			if (!file.exists()) return null;
+			
+			IHierarchicalDataFile hFile = original.getLinkedFile(file.getAbsolutePath());
+			HObject link = hFile.getData(fullPath);
+			link.getMetadata(); // Ensure that meta data is read.
+			return link;
+		} 
+		
+		return null;
 	}
 
 	public static long[] getDims(final Dataset set) throws Exception {

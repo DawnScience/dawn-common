@@ -187,7 +187,9 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 	 * @throws Exception 
 	 */
 	public HObject getData(final String path) throws Exception {	
-		return file.get(path);
+		HObject object = file.get(path);
+		HObject link   = HierarchicalDataUtils.getDataLink(object, this);
+		return link!=null ? link : object;
 	}
 	
 	/**
@@ -205,12 +207,14 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 		
 		List<HObject> members = g.getMemberList();
 		for (HObject object : members) {
-			
 			if (object instanceof Dataset) {
-				final Dataset set = (Dataset)object;
-				if (!HierarchicalDataUtils.isDataType(set, dataType)) continue;
+				final Dataset set  = (Dataset)object;
+				final Dataset link = (Dataset)HierarchicalDataUtils.getDataLink(set, this);
+				final Dataset data = link!=null ? link : set;
+				
+				if (!HierarchicalDataUtils.isDataType(data, dataType)) continue;
 
-				final long[] longShape= (long[])set.getDims();
+				final long[] longShape= (long[])data.getDims();
 				final int[]  intShape = new int[longShape.length];
 				
 				long size = longShape[0];
@@ -245,8 +249,11 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 		for (HObject object : members) {
 			
 			if (object instanceof Dataset) {
-				final Dataset set = (Dataset)object;
-				if (!HierarchicalDataUtils.isDataType(set, dataType)) continue;
+				final Dataset set  = (Dataset)object;
+				final Dataset link = (Dataset)HierarchicalDataUtils.getDataLink(set, this);
+				final Dataset data = link!=null ? link : set;
+
+				if (!HierarchicalDataUtils.isDataType(data, dataType)) continue;
 				names.add(set.getFullName());
 			}
 		
@@ -271,10 +278,12 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 		for (HObject object : members) {
 			
 			if (object instanceof Dataset) {
-				final Dataset set = (Dataset)object;
-				if (!HierarchicalDataUtils.isDataType(set, dataType)) continue;
+				final Dataset set  = (Dataset)object;
+				final Dataset link = (Dataset)HierarchicalDataUtils.getDataLink(set, this);
+				final Dataset data = link!=null ? link : set;
+				if (!HierarchicalDataUtils.isDataType(data, dataType)) continue;
 				
-				final long[] shape = (long[])set.getDims();
+				final long[] shape = (long[])data.getDims();
 				if (shape!=null) {
 					long size = shape[0];
 					for (int i = 1; i < shape.length; i++) size*=shape[i];
@@ -304,10 +313,12 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 		for (HObject object : members) {
 			
 			if (object instanceof Dataset) {
-				final Dataset set = (Dataset)object;
-				if (!HierarchicalDataUtils.isDataType(set, dataType)) continue;
+				final Dataset set  = (Dataset)object;
+				final Dataset link = (Dataset)HierarchicalDataUtils.getDataLink(set, this);
+				final Dataset data = link!=null ? link : set;
+				if (!HierarchicalDataUtils.isDataType(data, dataType)) continue;
 
-				final long[] longShape= (long[])set.getDims();
+				final long[] longShape= (long[])data.getDims();
 				final int[]  intShape = new int[longShape.length];
 				for (int i = 0; i < intShape.length; i++) intShape[i] = (int)longShape[i];
 				shapes.put(set.getFullName(), (int[])intShape);
@@ -330,6 +341,15 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 	 * @throws Exception
 	 */
 	public synchronized void close() throws Exception {
+		
+		// Close links
+		if (linkReferences!=null) {
+			for (String aPath : linkReferences.keySet()) {
+				((IHierarchicalDataFile)linkReferences.get(aPath)).close();
+			}
+			linkReferences.clear();
+		}
+		
 		if (openType == FileFormat.READ) {
 			count--;
 			if (count<=0) {
@@ -341,6 +361,23 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 			file.close();
 			writeCache.remove(path);
 		}
+	}
+	
+	private Map<String,IHierarchicalDataFile> linkReferences;
+	
+    /**
+     * 
+     * @param aPath
+     * @return
+     * @throws Exception
+     */
+	protected IHierarchicalDataFile getLinkedFile(String aPath) throws Exception {
+		if (linkReferences==null) linkReferences = new HashMap<String, IHierarchicalDataFile>(3);
+		if (linkReferences.containsKey(aPath)) return linkReferences.get(aPath);
+		
+		IHierarchicalDataFile linkFile = HierarchicalDataFactory.getReader(aPath);			
+		linkReferences.put(aPath, linkFile);
+		return linkFile;
 	}
 	
 	/**
@@ -531,6 +568,7 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 	public static boolean isWriting(final String absolutePath) {
 		return writeCache!=null && writeCache.contains(absolutePath);
 	}
+
 
 
 }

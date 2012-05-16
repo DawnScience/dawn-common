@@ -16,6 +16,9 @@ import java.util.Map;
 
 public class HierarchicalInfo {
 	
+	public static final String NAPIMOUNT = "napimount";
+	public static final String NAPISCHEME = "nxfile";
+
 	private List<String>         dataSetNames;
 	private Map<String, Integer> dataSetSizes;
 	private Map<String, int[]>   dataSetShapes;

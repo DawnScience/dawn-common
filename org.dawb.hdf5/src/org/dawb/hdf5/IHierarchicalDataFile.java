@@ -63,7 +63,7 @@ public interface IHierarchicalDataFile {
 	public void print() throws Exception;
 
 	/**
-	 * 
+	 * This call can also be used to get links out of the data by the path in the link file.
 	 * @param fullPath
 	 * @return
 	 * @throws Exception
