@@ -200,4 +200,10 @@ public class DiamondPlottingSystem extends AbstractPlottingSystem {
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public List<ITrace> updatePlot1D(AbstractDataset x, List<AbstractDataset> ys, IProgressMonitor monitor) {
+		// TODO A bit wrong...
+		return createPlot1D(x, ys, monitor);
+	}
 }
