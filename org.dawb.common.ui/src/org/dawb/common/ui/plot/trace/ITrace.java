@@ -42,4 +42,17 @@ public interface ITrace {
 	 * @return
 	 */
 	public void setVisible(boolean isVisible);
+	
+	/**
+	 * True if user trace (normally is)
+	 * @return
+	 */
+	public boolean isUserTrace();
+
+	/**
+	 * True if visible
+	 * @return
+	 */
+	public void setUserTrace(boolean isUserTrace);
+
 }

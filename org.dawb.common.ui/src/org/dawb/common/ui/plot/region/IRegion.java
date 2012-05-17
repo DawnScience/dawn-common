@@ -158,7 +158,7 @@ public interface IRegion {
 		YAXIS_LINE("Y-Axis Line",  ColorConstants.blue), 
 		FREE_DRAW("Free draw",     darkYellow),
 		POINT("Point",             darkMagenta),
-		ELLIPSE("Ellipse",         ColorConstants.red);
+		ELLIPSE("Ellipse",         ColorConstants.lightGreen);
 
 		private String name;
 		private Color defaultColor;
