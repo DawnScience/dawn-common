@@ -24,7 +24,6 @@ import org.eclipse.ui.services.IServiceLocator;
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.BooleanDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.DatasetUtils;
-import uk.ac.diamond.scisoft.analysis.dataset.IndexIterator;
 import uk.ac.diamond.scisoft.analysis.dataset.Stats;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 import uk.ac.diamond.scisoft.analysis.rcp.plotting.utils.SWTImageUtils;
@@ -96,8 +95,8 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 	 * Faster than getting a resolved image
 	 */
 	public ImageData getImageData(ImageServiceBean bean) {
-        
-		final AbstractDataset image    = bean.getImage();
+		
+		AbstractDataset image    = bean.getImage();
 		final ImageOrigin     origin   = bean.getOrigin();
 		PaletteData     palette  = bean.getPalette();
 		
@@ -105,8 +104,11 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 		final int size  = (int)Math.round(Math.pow(2, depth));
 		
 		createMaxMin(bean);
-		final float max = getMax(bean);
-		final float min = getMin(bean);
+		float max = getMax(bean);
+		float min = getMin(bean);
+		
+		float maxCut = getMaxCut(bean);
+		float minCut = getMinCut(bean);		
 		
 		if (bean.getFunctionObject()!=null && bean.getFunctionObject() instanceof FunctionContainer) {
 			final FunctionContainer fc = (FunctionContainer)bean.getFunctionObject();
@@ -173,7 +175,7 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 					
 					// This saves a value lookup when the pixel is certainly masked.
 					scaledImageAsByte[index] = mask==null || mask.getBoolean(i,j)
-						            ? getPixelColorIndex(image.getFloat(i,j), min, max, scale, maxPixel, bean)
+						            ? getPixelColorIndex(image.getFloat(i,j), min, max, scale, maxPixel, minCut, maxCut)
 					                : NAN_PIX_BYTE;
 					++index;
 				}
@@ -191,7 +193,7 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 					
 					// This saves a value lookup when the pixel is certainly masked.
 					scaledImageAsByte[index]  = mask==null || mask.getBoolean(j,i)
-				                    ? getPixelColorIndex(image.getFloat(j,i), min, max, scale, maxPixel, bean)
+				                    ? getPixelColorIndex(image.getFloat(j,i), min, max, scale, maxPixel, minCut, maxCut)
 			                        : NAN_PIX_BYTE;
 					index++;
 				}
@@ -210,7 +212,7 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 
 					// This saves a value lookup when the pixel is certainly masked.
 					scaledImageAsByte[index] = mask==null || mask.getBoolean(i,j)
-						            ? getPixelColorIndex(image.getFloat(i,j), min, max, scale, maxPixel, bean)
+						            ? getPixelColorIndex(image.getFloat(i,j), min, max, scale, maxPixel, minCut, maxCut)
 					                : NAN_PIX_BYTE;
 						index++;
 				}
@@ -227,7 +229,7 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 				for (int j = shape[0]-1; j>=0; --j) {
 					
 					scaledImageAsByte[index]  = mask==null || mask.getBoolean(j,i)
-		                            ? getPixelColorIndex(image.getFloat(j, i), min, max, scale, maxPixel, bean)
+		                            ? getPixelColorIndex(image.getFloat(j, i), min, max, scale, maxPixel, minCut, maxCut)
 	                                : NAN_PIX_BYTE;
 		        	index++;
 				}
@@ -250,6 +252,20 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 			return bean.getMin().floatValue();
 		}
 		return Math.max(bean.getMin().floatValue(), bean.getMinimumCutBound().getBound().floatValue());
+	}
+	
+	private float getMaxCut(ImageServiceBean bean) {
+		if (bean.getMaximumCutBound()==null ||  bean.getMaximumCutBound().getBound()==null) {
+			return Float.POSITIVE_INFINITY;
+		}
+		return bean.getMaximumCutBound().getBound().floatValue();
+	}
+	
+	private float getMinCut(ImageServiceBean bean) {
+		if (bean.getMinimumCutBound()==null ||  bean.getMinimumCutBound().getBound()==null) {
+			return Float.NEGATIVE_INFINITY;
+		}
+		return bean.getMinimumCutBound().getBound().floatValue();
 	}
 
 	/**
@@ -314,19 +330,19 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 												 final float  max, 
 												 final float  scale, 
 												 final float  maxPixel,
-												 final ImageServiceBean bean) {
+												 final float  minCut,
+												 final float  maxCut) {
 	    
 		// Deal with bounds
-		if (!bean.isInsideMinCut(val)) {
-			return MIN_PIX_BYTE;
-		}
-		if (!bean.isValidNumber(val))  {
-			return NAN_PIX_BYTE;
-		}
-		if (!bean.isInsideMaxCut(val)) {
-			return MAX_PIX_BYTE;
-		}
+	    if (val<=minCut) return MIN_PIX_BYTE;		
 		
+		if (Double.isNaN(val)) return NAN_PIX_BYTE;
+		//TODO is this necessary??
+		if (Float.isNaN((float)val)) return NAN_PIX_BYTE;
+	    
+		if (val>=maxCut) return MAX_PIX_BYTE;	
+		
+		// If the pixel is within the bounds		
 		float scaled_pixel;
 		if (val < min) {
 			scaled_pixel = 0;
