@@ -135,7 +135,8 @@ public abstract class AbstractToolPage extends Page implements IToolPage, IAdapt
 	/**
 	 * Default does nothing
 	 */
-	public Object getAdapter(Class key) {
+	@Override
+	public Object getAdapter(@SuppressWarnings("rawtypes") Class key) {
 		return null;
 	}
 

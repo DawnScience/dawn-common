@@ -138,7 +138,7 @@ public interface IToolPage extends IPageBookViewPage {
 	public void activate();
 	
 	/**
-	 * Called if the tool swapped for another but it not disposed.
+	 * Called if the tool swapped for another but is not disposed.
 	 */
 	public void deactivate();
 

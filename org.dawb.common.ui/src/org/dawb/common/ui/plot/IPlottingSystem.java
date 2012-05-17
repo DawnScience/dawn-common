@@ -81,6 +81,19 @@ public interface IPlottingSystem extends ITraceSystem, IRegionSystem, IAxisSyste
 							         IProgressMonitor      monitor);
 	
 	/**
+	 * Attempts to update any ILineTraces with the same name as the ys pass in, otherwise
+	 * will call createPlot1D(...)
+	 * 
+	 * @param x  - may be null, if null indices of y are used
+	 * @param ys -  must not be null
+	 * @param monitor
+	 * @return
+	 */
+	public List<ITrace> updatePlot1D(AbstractDataset       x, 
+							         List<AbstractDataset> ys,
+							         IProgressMonitor      monitor);
+
+	/**
 	 * See also ITraceSystem for flexible trace manipulation.
      *
 	 * For 2D - x is the image dataset, ys is the axes.
