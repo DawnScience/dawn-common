@@ -18,10 +18,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IContributionManager;
-import org.eclipse.jface.dialogs.DialogMessageArea;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbenchPart;
@@ -113,34 +110,21 @@ public class PlottingActionBarManager implements IPlotActionSystem {
 		// This list will not be large so we loop over it more than once for each ToolPageRole type
 	    final IConfigurationElement[] configs = Platform.getExtensionRegistry().getConfigurationElementsFor("org.dawb.common.ui.toolPage");
 	    boolean foundSomeActions = false;
-	    for (IConfigurationElement e : configs) {
-	    	IToolPage toolPage = null;
-	    	try {
-	    		toolPage  = (IToolPage)e.createExecutableExtension("class");
-	    	} catch (Throwable ne) {
-	    		logger.error("Cannot create tool page "+e.getAttribute("class"), ne);
-	    		continue;
-	    	}
-	    	final IToolPage tool = toolPage;
-	    	if (tool.getToolPageRole()!=role) continue;
-		    
+	    for (final IConfigurationElement e : configs) {
+	    	
 	    	foundSomeActions = true;
-	    	final String    label = e.getAttribute("label");
-	    	tool.setToolSystem(system);
-	    	tool.setPlottingSystem(system);
-	    	tool.setTitle(label);
-	    	tool.setPart(system.getPart());
-	    	tool.setToolId(e.getAttribute("id"));
+
+	    	final IToolPage tool = createToolPage(e, role);
+	    	if (tool==null) continue;
 	    	
-	    	// Save tool page
-	    	if (toolPages==null) toolPages = new HashMap<String, IToolPage>(7);
-	    	toolPages.put(tool.getToolId(), tool);
-	    	
-	    	final Action    action= new Action(label) {
+	    	final Action    action= new Action(tool.getTitle()) {
 	    		public void run() {		
 	    			
+	    			IToolPage registeredTool = toolPages.get(tool.getToolId());
+	    			if (registeredTool==null || registeredTool.isDisposed()) registeredTool = createToolPage(e, role);
+	    			 
 	    			// If we have a dedicated tool for this tool, we do not open another
-	    			String toolId  = tool.getToolId();
+	    			String toolId  = registeredTool.getToolId();
 	    			if (toolId!=null) {
 	    				IViewReference ref = EclipseUtils.getPage().findViewReference("org.dawb.workbench.plotting.views.toolPageView.fixed", toolId);
 	    			    if (ref!=null) {
@@ -162,9 +146,9 @@ public class PlottingActionBarManager implements IPlotActionSystem {
 					}
 	    			
 	    			final IToolPage old = system.getCurrentToolPage(role);
-	    			system.setCurrentToolPage(tool);
+	    			system.setCurrentToolPage(registeredTool);
 	    			system.clearRegionTool();
-	    			system.fireToolChangeListeners(new ToolChangeEvent(this, old, tool, system.getPart()));
+	    			system.fireToolChangeListeners(new ToolChangeEvent(this, old, registeredTool, system.getPart()));
 	    			
 	    			toolActions.setSelectedAction(this);
 	    			
@@ -211,9 +195,57 @@ public class PlottingActionBarManager implements IPlotActionSystem {
 	    return toolActions;
 	}
 	
+	/**
+	 * 
+	 * @param e
+	 * @param role, may be null
+	 * @return
+	 */
+	private IToolPage createToolPage(IConfigurationElement e, ToolPageRole role) {
+    	
+		IToolPage tool = null;
+    	try {
+    		tool  = (IToolPage)e.createExecutableExtension("class");
+    	} catch (Throwable ne) {
+    		logger.error("Cannot create tool page "+e.getAttribute("class"), ne);
+    		return null;
+    	}
+    	if (role==null) role = tool.getToolPageRole();
+    	if (tool.getToolPageRole()!=role) return null;
+	    
+    	tool.setToolSystem(system);
+    	tool.setPlottingSystem(system);
+    	tool.setTitle(e.getAttribute("label"));
+    	tool.setPart(system.getPart());
+    	tool.setToolId(e.getAttribute("id"));
+    	
+    	// Save tool page
+    	if (toolPages==null) toolPages = new HashMap<String, IToolPage>(7);
+    	toolPages.put(tool.getToolId(), tool);
+    	
+    	return tool;
+	}
+
+
 	protected IToolPage getToolPage(final String id) {
 		if (toolPages==null) return null;
-		return toolPages.get(id);
+		IToolPage page = toolPages.get(id);
+		if (page==null) {
+		    final IConfigurationElement[] configs = Platform.getExtensionRegistry().getConfigurationElementsFor("org.dawb.common.ui.toolPage");
+		    for (final IConfigurationElement e : configs) {
+		    	if (id.equals(e.getAttribute("id"))) {
+		    		page = createToolPage(e, null);
+		    		break;
+		    	}
+		    }
+			
+		}
+		return page;
+	}
+	
+	protected void clearCachedTools() {
+		if (toolPages==null) return;
+		toolPages.clear();
 	}
 	
 	/**

@@ -589,6 +589,10 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 		return actionBarManager.getToolPage(toolId);
 	}
 	
+	public void clearCachedTools() {
+		actionBarManager.clearCachedTools();
+	}
+	
 	public IToolPage createToolPage(String toolId) throws Exception {
 		return getToolPage(toolId).cloneTool();
 	}

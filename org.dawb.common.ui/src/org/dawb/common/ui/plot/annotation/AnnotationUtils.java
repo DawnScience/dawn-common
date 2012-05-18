@@ -19,4 +19,19 @@ public class AnnotationUtils {
 		return nameStub+" "+i;
 	}
 
+	/**
+	 * 
+	 * @param system
+	 * @param name
+	 * @return
+	 * @throws Exception 
+	 */
+	public static final IAnnotation replaceCreateAnnotation(IPlottingSystem system, String name) throws Exception {
+		
+        if (system.getAnnotation(name)!=null) {
+        	system.removeAnnotation(system.getAnnotation(name));
+        }
+		return system.createAnnotation(name);
+	}
+
 }

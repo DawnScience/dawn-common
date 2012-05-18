@@ -51,4 +51,9 @@ public interface IToolPageSystem {
 	 */
 	public IToolPage createToolPage(String toolId) throws Exception;
 
+	/**
+	 * Clears any cached tools, can be used during dispose methods.
+	 */
+	public void clearCachedTools();
+
 }

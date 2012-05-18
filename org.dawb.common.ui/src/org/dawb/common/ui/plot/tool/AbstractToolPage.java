@@ -77,11 +77,17 @@ public abstract class AbstractToolPage extends Page implements IToolPage, IAdapt
 		isActive = false;
 	}
 	
+	private boolean isDisposed = false;
 	public void dispose() {
 		super.dispose();
 		toolSystem = null;
 	    plotSystem = null;
 		part       = null;
+		isDisposed = true;
+	}
+	
+	public boolean isDisposed() {
+		return isDisposed;
 	}
 	
 	@Override
@@ -111,6 +117,7 @@ public abstract class AbstractToolPage extends Page implements IToolPage, IAdapt
 	}
 
 	public String toString(){
+		if (isDisposed) return "Disposed '"+getTitle()+"'";
 		if (getTitle()!=null) return getTitle();
 		return super.toString();
 	}

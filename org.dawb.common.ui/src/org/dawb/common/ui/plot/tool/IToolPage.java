@@ -201,4 +201,10 @@ public interface IToolPage extends IPageBookViewPage {
 	 * @return
 	 */
 	public IToolPage cloneTool()  throws Exception;
+
+	/**
+	 * 
+	 * @return true if this one got disposed.
+	 */
+	public boolean isDisposed();
 }

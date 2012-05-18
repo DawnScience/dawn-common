@@ -23,4 +23,17 @@ public class TraceUtils {
 		}
 		return nameStub+" "+i;
 	}
+
+	/**
+	 * Removes a trace of this name if it is already there.
+	 * @param plottingSystem
+	 * @param string
+	 * @return
+	 */
+	public static final ILineTrace replaceCreateLineTrace(IPlottingSystem system, String name) {
+		if (system.getTrace(name)!=null) {
+			system.removeTrace(system.getTrace(name));
+		}
+		return system.createLineTrace(name);
+	}
 }

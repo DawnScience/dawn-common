@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.HashSet;
 
 import org.dawb.common.ui.plot.IPlottingSystem;
+import org.dawb.common.ui.plot.region.IRegion.RegionType;
 import org.eclipse.swt.graphics.Color;
 
 /**
@@ -45,5 +46,20 @@ public class RegionUtils {
 			if (!used.contains(color)) return color;
 		}
 		return colours.iterator().next();
+	}
+
+	/**
+	 * Creates a region (first deleting it if one with that name exists)
+	 * @param string
+	 * @param xaxis
+	 * @return
+	 * @throws Exception 
+	 */
+	public static final IRegion replaceCreateRegion(final IPlottingSystem system, final String name, final RegionType type) throws Exception {
+		
+		if (system.getRegion(name)!=null) {
+			system.removeRegion(system.getRegion(name));
+		}
+		return system.createRegion(name, type);
 	}
 }
