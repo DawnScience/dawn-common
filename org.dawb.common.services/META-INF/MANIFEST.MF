@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Services
 Bundle-SymbolicName: org.dawb.common.services
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 1.2.0.qualifier
 Bundle-Activator: org.dawb.common.services.Activator
 Bundle-Vendor: Diamond Light Source
 Require-Bundle: org.eclipse.core.runtime,

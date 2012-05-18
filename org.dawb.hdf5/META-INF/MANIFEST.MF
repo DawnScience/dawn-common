@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Hdf5
 Bundle-SymbolicName: org.dawb.hdf5
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 1.2.0.qualifier
 Bundle-Activator: org.dawb.hdf5.Activator
 Bundle-Vendor: ESRF
 Require-Bundle: org.eclipse.core.runtime,
