@@ -68,7 +68,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	protected boolean rescale = true;
 
 	// True if first data set should be plotted as x axis
-	protected boolean xfirst = true;
+	protected boolean xfirst = true; // NOTE Currently must always be true or some tools start in a bad state.
 	
 	// Manager for actions
 	protected PlottingActionBarManager actionBarManager;
