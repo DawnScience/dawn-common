@@ -210,170 +210,6 @@ public class ImageServiceBean {
 	}
 
 	
-	/**
-	 * Immutable HistogramBound class. Keep immutable so that static
-	 * bound defaults cannot be modified.
-	 */
-	public static class HistogramBound {
-
-		public static HistogramBound DEFAULT_MAXIMUM = new HistogramBound(Double.POSITIVE_INFINITY, Display.getDefault().getSystemColor(SWT.COLOR_RED).getRGB());
-		public static HistogramBound DEFAULT_MINIMUM = new HistogramBound(Double.NEGATIVE_INFINITY, Display.getDefault().getSystemColor(SWT.COLOR_BLUE).getRGB());
-		public static HistogramBound DEFAULT_NAN     = new HistogramBound(Double.NaN, Display.getDefault().getSystemColor(SWT.COLOR_GREEN).getRGB());
-
-		private Number bound;
-		private RGB  color;
-		
-		/**
-		 * RGB may be null. If it is the last three colours in the palette
-		 * are used for the bound directly. For instance RGBs can be set to 
-		 * null to avoid special cut bounds colors at all.
-		 * 
-		 * @param bound
-		 * @param color
-		 */
-		public HistogramBound(Number bound, RGB color) {
-			this.bound = bound;
-			this.color = color;
-		}
-		public Number getBound() {
-			return bound;
-		}
-		public RGB getColor() {
-			return color;
-		}
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + ((bound == null) ? 0 : bound.hashCode());
-			result = prime * result + ((color == null) ? 0 : color.hashCode());
-			return result;
-		}
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			HistogramBound other = (HistogramBound) obj;
-			if (bound == null) {
-				if (other.bound != null)
-					return false;
-			} else if (!bound.equals(other.bound))
-				return false;
-			if (color == null) {
-				if (other.color != null)
-					return false;
-			} else if (!color.equals(other.color))
-				return false;
-			return true;
-		}
-		@Override
-		public String toString() {
-			final StringBuilder buf = new StringBuilder();
-			buf.append(bound);
-			buf.append(",");
-			if (color!=null) {
-				buf.append(color.red);
-				buf.append(",");
-				buf.append(color.green);
-				buf.append(",");
-				buf.append(color.blue);
-				
-			} else{
-				buf.append("null");
-			}
-			return buf.toString();
-		}
-
-		public static HistogramBound fromString(String encoded) {
-			
-			if (encoded == null || "null".equals(encoded) || "null,null".equals(encoded) || "".equals(encoded)) {
-				return null;
-			}
-
-			final String[] sa = encoded.split(",");
-			
-			Number bound = null;
-			if (sa[0].equals("null")) {
-				bound = null;
-			} else {
-				bound = Double.parseDouble(sa[0]);
-			}
-			
-			RGB color = null;
-			if (sa[1].equals("null")) {
-				color = null;
-			} else {
-				color = new RGB(Integer.parseInt(sa[1]), Integer.parseInt(sa[2]), Integer.parseInt(sa[3]));
-			}
-			return new HistogramBound(bound, color);
-		}
-	}
-	
-	public enum HistoType {
-		MEAN(0, "Mean based"), MEDIAN(1, "Median based");
-		
-		public final String label;
-		public final int    index;
-		HistoType(int index, String label) {
-			this.index = index;
-			this.label = label;
-		}
-		public String getLabel() {
-			return label;
-		}
-		public int getIndex() {
-			return index;
-		}
-		public static List<HistoType> histoTypes;
-		static {
-			histoTypes = new ArrayList<HistoType>();
-			histoTypes.add(MEAN);
-			histoTypes.add(MEDIAN);
-		}
-		public static HistoType forLabel(String label) {
-			for (HistoType t : histoTypes) {
-				if (t.label.equals(label)) return t;
-			}
-			return null;
-		}
-		
-	}
-
-	
-
-	public enum ImageOrigin {
-		TOP_LEFT("Top left"), TOP_RIGHT("Top right"), BOTTOM_LEFT("Bottom left"), BOTTOM_RIGHT("Bottom right");
-		
-		public static List<ImageOrigin> origins;
-		static {
-			origins = new ArrayList<ImageOrigin>();
-			origins.add(TOP_LEFT);
-			origins.add(TOP_RIGHT);
-			origins.add(BOTTOM_LEFT);
-			origins.add(BOTTOM_RIGHT);
-		}
-
-		private String label;
-		public String getLabel() {
-			return label;
-		}
-		
-		ImageOrigin(String label) {
-			this.label = label;
-		}
-		
-		public static ImageOrigin forLabel(String label) {
-			for (ImageOrigin o : origins) {
-				if (o.label.equals(label)) return o;
-			}
-			return null;
-		}
-	}
-
 
 
 	public int getDepth() {
@@ -456,5 +292,66 @@ public class ImageServiceBean {
 		this.logColorScale = logColorScale;
 	}
 	
-	
+
+	public enum HistoType {
+		MEAN(0, "Mean based"), MEDIAN(1, "Median based");
+
+		public final String label;
+		public final int    index;
+		HistoType(int index, String label) {
+			this.index = index;
+			this.label = label;
+		}
+		public String getLabel() {
+			return label;
+		}
+		public int getIndex() {
+			return index;
+		}
+		public static List<HistoType> histoTypes;
+		static {
+			histoTypes = new ArrayList<HistoType>();
+			histoTypes.add(MEAN);
+			histoTypes.add(MEDIAN);
+		}
+		public static HistoType forLabel(String label) {
+			for (HistoType t : histoTypes) {
+				if (t.label.equals(label)) return t;
+			}
+			return null;
+		}
+
+	}
+
+
+
+	public enum ImageOrigin {
+		TOP_LEFT("Top left"), TOP_RIGHT("Top right"), BOTTOM_LEFT("Bottom left"), BOTTOM_RIGHT("Bottom right");
+
+		public static List<ImageOrigin> origins;
+		static {
+			origins = new ArrayList<ImageOrigin>();
+			origins.add(TOP_LEFT);
+			origins.add(TOP_RIGHT);
+			origins.add(BOTTOM_LEFT);
+			origins.add(BOTTOM_RIGHT);
+		}
+
+		private String label;
+		public String getLabel() {
+			return label;
+		}
+
+		ImageOrigin(String label) {
+			this.label = label;
+		}
+
+		public static ImageOrigin forLabel(String label) {
+			for (ImageOrigin o : origins) {
+				if (o.label.equals(label)) return o;
+			}
+			return null;
+		}
+	}
+
 }

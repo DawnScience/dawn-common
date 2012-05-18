@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.dawb.common.services.ImageServiceBean;
 import org.dawb.common.services.ImageServiceBean.HistoType;
-import org.dawb.common.services.ImageServiceBean.HistogramBound;
+import org.dawb.common.services.HistogramBound;
 import org.dawb.common.services.ImageServiceBean.ImageOrigin;
 import org.eclipse.swt.graphics.PaletteData;
 
