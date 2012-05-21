@@ -88,7 +88,7 @@ public abstract class AbstractRegion extends Figure implements IRegion, IRegionC
 	 * region should be updated. Does not fire events.
 	 */
 	protected void updateROI() {
-		if (roi !=null) {
+		if (roi != null) {
 			try {
 				this.regionEventsActive = false;
 				updateROI(roi);
