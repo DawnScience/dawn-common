@@ -206,4 +206,10 @@ public class DiamondPlottingSystem extends AbstractPlottingSystem {
 		// TODO A bit wrong...
 		return createPlot1D(x, ys, monitor);
 	}
+
+	@Override
+	public void savePlotting(String filename, String filetype) {
+		// TODO Auto-generated method stub
+		
+	}
 }
