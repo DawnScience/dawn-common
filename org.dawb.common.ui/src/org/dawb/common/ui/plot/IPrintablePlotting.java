@@ -29,9 +29,16 @@ public interface IPrintablePlotting {
 	public void copyPlotting();
 
 	/**
-	 * Export/Save the plotting to an image format (PostScript, JPEG, PNG)
+	 * Export/Save the plotting to an image format (PostScript, JPEG, PNG) through a dialog box
 	 * 
 	 * @param filename
 	 */
 	public void savePlotting(String filename);
+
+	/**
+	 * Export/Save the plotting to an image format without a dialog box
+	 * 
+	 * @param filename
+	 */
+	public void savePlotting(String filename, String filetype);
 }
