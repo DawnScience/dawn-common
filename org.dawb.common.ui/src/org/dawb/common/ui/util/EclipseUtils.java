@@ -54,6 +54,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.ISelectionService;
 import org.eclipse.ui.IURIEditorInput;
+import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -200,7 +201,7 @@ public class EclipseUtils {
 	}
 
 	/**
-	 * Delcare a builder id in a project, this is then called to build it.
+	 * Declare a builder id in a project, this is then called to build it.
 	 * @param project
 	 * @param id
 	 * @throws CoreException 
@@ -251,6 +252,19 @@ public class EclipseUtils {
 	 *            the number of milliseconds
 	 */
 	public static void delay(long waitTimeMillis) {
+		delay(waitTimeMillis, false);
+	}
+
+	/**
+	 * Process UI input but do not return for the specified time interval.
+	 * 
+	 * @param waitTimeMillis
+	 *            the number of milliseconds
+	 * @param returnInsteadOfSleep
+	 *            Once there is nothing left to do return instead of sleep. In practice this means that async messages
+	 *            should be complete before this method returns (unless it times out first)
+	 */
+	public static void delay(long waitTimeMillis, boolean returnInsteadOfSleep) {
 		
 		if (PlatformUI.isWorkbenchRunning()) {
 
@@ -261,8 +275,14 @@ public class EclipseUtils {
 			long endTimeMillis = System.currentTimeMillis() + waitTimeMillis;
 			while (System.currentTimeMillis() < endTimeMillis) {
 				try {
-					if (!display.readAndDispatch()) display.sleep();
+					if (!display.readAndDispatch()) {
+						if (returnInsteadOfSleep)
+							return;
+						display.sleep();
+					}
 				} catch (Exception ne) {
+					if (returnInsteadOfSleep)
+						return;
 					try {
 						Thread.sleep(waitTimeMillis);
 					} catch (InterruptedException e) {
@@ -274,6 +294,8 @@ public class EclipseUtils {
 			display.update();
 			
 		} else {
+			if (returnInsteadOfSleep)
+				return;
 			try {
 				Thread.sleep(waitTimeMillis);
 			} catch (InterruptedException e) {
@@ -281,7 +303,40 @@ public class EclipseUtils {
 			}
 		}
 	}
-	
+
+	/**
+	 * Perform like a normal {@link Thread#join(long)} but process UI events while waiting for join
+	 * 
+	 * @param thread
+	 *            Thread to "join" on
+	 * @param waitTimeMillis
+	 *            the number of milliseconds
+	 */
+	public static void threadJoin(Thread thread, long waitTimeMillis) {
+		Display display = Display.getCurrent();
+
+		// If this is the UI thread,
+		// then process input.
+
+		if (display != null) {
+			long endTimeMillis = System.currentTimeMillis() + waitTimeMillis;
+			while (System.currentTimeMillis() < endTimeMillis && thread.isAlive()) {
+				if (!display.readAndDispatch()) {
+					display.sleep();
+				}
+			}
+			display.update();
+		}
+		// Otherwise, perform a simple join.
+
+		else {
+			try {
+				thread.join(waitTimeMillis);
+			} catch (InterruptedException e) {
+				// Ignored.
+			}
+		}
+	}
 	/**
 	 * Gets a unique file. The file must have a parent of IFolder.
 	 * @param file
@@ -473,6 +528,25 @@ public class EclipseUtils {
 		for (int i = 0; i < fData.length; i++) fData[i].setStyle(SWT.BOLD);
 		point.setFont(new Font(point.getDisplay(),fData));
 		
+	}
+
+	/**
+	 * Activate the view @ID if it exists, nothing if it does not
+	 */
+	public static boolean activateView(String ID){
+		IViewReference[] viewReferences = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
+				.getViewReferences();
+		boolean found = false;
+		for (IViewReference view : viewReferences) {
+			if (view.getId().equals(ID)) {
+				PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
+						.activate(view.getView(true).getViewSite().getPart());
+				found = true;
+				break;
+			}
+		}
+
+		return found;
 	}
 
 	/**
