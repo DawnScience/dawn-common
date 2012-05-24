@@ -13,6 +13,7 @@ import java.io.File;
 import java.util.Collection;
 
 import org.dawb.common.services.ILoaderService;
+import org.dawb.common.ui.monitor.ProgressMonitorWrapper;
 import org.dawb.common.util.eclipse.BundleUtils;
 import org.dawb.fabio.FabioFile;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -28,7 +29,6 @@ import uk.ac.diamond.scisoft.analysis.io.DataHolder;
 import uk.ac.diamond.scisoft.analysis.io.IMetaData;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 import uk.ac.diamond.scisoft.analysis.io.MetaDataAdapter;
-import uk.ac.gda.monitor.ProgressMonitorWrapper;
 
 /**
  * Provides a class which will use any loaders available to load a particular file
@@ -164,7 +164,7 @@ public class LoaderService extends AbstractServiceFactory implements ILoaderServ
 	}
 
 	@Override
-	public Object create(Class serviceInterface, 
+	public Object create(@SuppressWarnings("rawtypes") Class serviceInterface, 
 			             IServiceLocator parentLocator,
 			             IServiceLocator locator) {
 		
