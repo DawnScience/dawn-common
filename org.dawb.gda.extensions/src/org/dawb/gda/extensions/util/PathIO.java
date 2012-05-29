@@ -9,7 +9,7 @@
  */ 
 package org.dawb.gda.extensions.util;
 
-import uk.ac.gda.util.io.IPathConstructor;
+import org.dawb.common.util.io.IPathConstructor;
 
 /**
  *   PathIO

@@ -27,7 +27,6 @@ import org.dawb.common.util.list.SortNatural;
  * @author fcp94556
  *
  */
-@SuppressWarnings("unchecked")
 public class SortingUtils {
 
 	/**
@@ -127,6 +126,48 @@ public class SortingUtils {
 	    Collections.sort(files, comp);
 
 	    return files;
+	}
+
+	/**
+	 * Lists folders before files
+	 * @param dir
+	 * @return List<File>
+	 */
+	public static List<File> getSortedFileList(final File dir, final boolean dirsFirst) {
+		return getSortedFileList(dir, DEFAULT_COMPARATOR, dirsFirst);
+	}
+
+	private static List<File> getSortedFileList(final File dir, final Comparator<File> comp, final boolean dirsFirst) {
+		if (!dir.isDirectory())    return null;
+	    if (dir.listFiles()==null) return null;
+
+	    final List<File> ret;
+	    if (dirsFirst) {
+			ret = new ArrayList<File>(dir.listFiles().length);
+			
+			final List<File> dirs = getSortedFileList(dir.listFiles(new FileFilter() {		
+				@Override
+				public boolean accept(File pathname) {
+					return pathname.isDirectory();
+				}
+			}), comp);
+			if (dirs!=null) ret.addAll(dirs);
+			
+			final List<File> files = getSortedFileList(dir.listFiles(new FileFilter() {		
+				@Override
+				public boolean accept(File pathname) {
+					return !pathname.isDirectory();
+				}
+			}), comp);
+			if (files!=null) ret.addAll(files);
+		
+	    } else {
+	    	ret = getSortedFileList(dir.listFiles(), comp);
+	    }
+			
+		if (ret.isEmpty()) return null;
+		return ret;
+
 	}
 
 	public static void removeIgnoredNames(Collection<String> sets, Collection<Pattern> patterns) {

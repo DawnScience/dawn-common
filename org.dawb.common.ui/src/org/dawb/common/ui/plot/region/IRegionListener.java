@@ -55,6 +55,6 @@ public interface IRegionListener extends EventListener {
      * Fired when all the regions are removed in one go.
      * @param evt
      */
-	void regionsRemoved(RegionEvent evt);
+	void regionsRemoved(final RegionEvent evt);
 
 }
