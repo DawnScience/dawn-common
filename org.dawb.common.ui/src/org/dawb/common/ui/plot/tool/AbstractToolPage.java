@@ -163,7 +163,7 @@ public abstract class AbstractToolPage extends Page implements IToolPage, IAdapt
 	public IImageTrace getImageTrace() {
 		try {
 			final Collection<ITrace> traces = getPlottingSystem().getTraces(IImageTrace.class);
-			if (traces==null || traces.size()<0) return null;
+			if (traces==null || traces.size()<=0) return null;
 			final ITrace trace = traces.iterator().next();
 			return trace instanceof IImageTrace ? (IImageTrace)trace : null;
 		} catch (Exception ne) {
