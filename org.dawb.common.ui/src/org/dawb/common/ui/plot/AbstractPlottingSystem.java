@@ -777,4 +777,11 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	public IPlotActionSystem getPlotActionSystem() {
 		return this.actionBarManager;
 	}
+
+	/**
+	 * Set Axis and title visibility
+	 */
+	public void setAxisAndTitleVisibility(boolean isVisible, String title) {
+		// TODO Does nothing
+	}
 }
