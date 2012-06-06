@@ -18,6 +18,7 @@ import java.util.Map;
 
 import org.dawb.common.services.ISystemService;
 import org.dawb.common.ui.plot.annotation.IAnnotation;
+import org.dawb.common.ui.plot.axis.IAxis;
 import org.dawb.common.ui.plot.region.IRegion;
 import org.dawb.common.ui.plot.region.IRegion.RegionType;
 import org.dawb.common.ui.plot.region.IRegionListener;
@@ -715,7 +716,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	
 	/**
 	 * (non-Javadoc)
-	 * @see org.dawb.common.ui.plot.IAxisSystem#autoscaleAxes()
+	 * @see org.dawb.common.ui.plot.axis.IAxisSystem#autoscaleAxes()
 	 */
 	@Override
 	public void autoscaleAxes() {

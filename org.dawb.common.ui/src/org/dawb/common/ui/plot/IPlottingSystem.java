@@ -12,6 +12,7 @@ package org.dawb.common.ui.plot;
 import java.util.List;
 
 import org.dawb.common.ui.plot.annotation.IAnnotationSystem;
+import org.dawb.common.ui.plot.axis.IAxisSystem;
 import org.dawb.common.ui.plot.region.IRegionSystem;
 import org.dawb.common.ui.plot.trace.ITrace;
 import org.dawb.common.ui.plot.trace.ITraceSystem;

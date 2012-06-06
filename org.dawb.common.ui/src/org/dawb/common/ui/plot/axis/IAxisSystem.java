@@ -1,4 +1,4 @@
-package org.dawb.common.ui.plot;
+package org.dawb.common.ui.plot.axis;
 
 /**
  * No methods in this interface are thread safe.

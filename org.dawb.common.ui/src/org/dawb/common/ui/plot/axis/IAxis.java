@@ -1,4 +1,4 @@
-package org.dawb.common.ui.plot;
+package org.dawb.common.ui.plot.axis;
 
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
@@ -188,5 +188,17 @@ public interface IAxis {
 	 * @return
 	 */
 	public double getPositionValue(int position);
+
+	/**
+	 * Add a listener notified when the axis changes.
+	 * @param listener
+	 */
+	public void addAxisListener(IAxisListener listener);
+	
+	/**
+	 * Add a listener notified when the axis changes.
+	 * @param listener
+	 */
+	public void removeAxisListener(IAxisListener listener);
 
 }
