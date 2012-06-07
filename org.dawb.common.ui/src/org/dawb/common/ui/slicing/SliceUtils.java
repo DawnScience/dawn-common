@@ -235,7 +235,11 @@ public class SliceUtils {
 			sum = sum.squeeze();
 			slice = sum;
 		} else {
-			slice.setShape(currentSlice.getSlicedShape());
+
+			slice = slice.squeeze();		
+			if (currentSlice.getX() > currentSlice.getY() && slice.getShape().length==2) {
+				slice = slice.transpose();
+			}
 		}
 		return slice;
 	}
