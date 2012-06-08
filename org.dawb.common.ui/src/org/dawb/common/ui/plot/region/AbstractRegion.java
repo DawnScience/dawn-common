@@ -157,6 +157,6 @@ public abstract class AbstractRegion extends Figure implements IRegion, IRegionC
 	public void setLabel(Label label) {
 		this.label = label ;
 		this.label.setFont(new Font(Display.getCurrent(), "Dialog", 10, SWT.NORMAL));
-		this.labeldim = label.getTextUtilities().getTextExtents(getName(), label.getFont());
+		this.labeldim = label.getTextUtilities().getTextExtents(label.getText(), label.getFont());
 	}
 }
