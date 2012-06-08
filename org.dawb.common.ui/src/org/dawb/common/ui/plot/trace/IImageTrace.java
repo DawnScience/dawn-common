@@ -22,7 +22,7 @@ import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
    Image intensity distribution:
 
                 ++----------------------**---------------
-                +                      *+ *              
+                +                      *  *              
                 ++                    *    *             
                 |                     *    *             
                 ++                    *     *            
@@ -41,7 +41,7 @@ import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
  Red <- |   (min colour)  |    (color range, palette)  |      (max color)      | -> Blue
                                 *                 *  
                 |              *        +         *  
-----------------++------------**---------+----------**----+---------------**+---------------++
+----------------++------------**--------+----------**----+---------------**+---------------++
               
  */
 public interface IImageTrace extends ITrace {
