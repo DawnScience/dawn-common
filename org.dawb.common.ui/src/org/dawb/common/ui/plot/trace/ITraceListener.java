@@ -23,6 +23,14 @@ public interface ITraceListener extends EventListener{
 	public void traceCreated(final TraceEvent evt);
 	
 	/**
+	 * Fired whenever an existing trace is updated, the source of TraceEvent
+	 * is the ITrace created.
+	 * 
+	 * @param evt
+	 */
+	public void traceUpdated(final TraceEvent evt);
+
+	/**
 	 * Fired whenever a new trace is added, the source of TraceEvent
 	 * is the ITrace added.
 	 * 
@@ -93,6 +101,12 @@ public interface ITraceListener extends EventListener{
 
 		@Override
 		public void traceCreated(TraceEvent evt) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void traceUpdated(TraceEvent evt) {
 			// TODO Auto-generated method stub
 			
 		}
