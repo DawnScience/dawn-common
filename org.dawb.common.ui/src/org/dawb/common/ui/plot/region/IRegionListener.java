@@ -8,28 +8,27 @@ public interface IRegionListener extends EventListener {
 
 		@Override
 		public void regionCreated(RegionEvent evt) {
-			// TODO Auto-generated method stub
-
+			update(evt);
 		}
 
 		@Override
 		public void regionAdded(RegionEvent evt) {
-			// TODO Auto-generated method stub
-
+			update(evt);
 		}
 
 		@Override
 		public void regionRemoved(RegionEvent evt) {
-			// TODO Auto-generated method stub
-
+			update(evt);
 		}
 
 		@Override
 		public void regionsRemoved(RegionEvent evt) {
-			// TODO Auto-generated method stub
-			
+			update(evt);
 		}
 
+		protected void update(RegionEvent evt) {
+			// Nothing
+		}
 	}
 
 	/**
