@@ -238,6 +238,12 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 			l.traceCreated(evt);
 		}
 	}
+	protected void fireTraceUpdated(final TraceEvent evt) {
+		if (traceListeners==null) return;
+		for (ITraceListener l : traceListeners) {
+			l.traceUpdated(evt);
+		}
+	}
 	protected void fireTraceAdded(final TraceEvent evt) {
 		if (traceListeners==null) return;
 		for (ITraceListener l : traceListeners) {
