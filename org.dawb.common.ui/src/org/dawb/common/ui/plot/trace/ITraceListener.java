@@ -83,44 +83,41 @@ public interface ITraceListener extends EventListener{
 
 		@Override
 		public void tracesAltered(TraceEvent evt) {
-			// TODO Auto-generated method stub
-			
+			update(evt);
 		}
 
 		@Override
-		public void tracesCleared(TraceEvent evet) {
-			// TODO Auto-generated method stub
-			
+		public void tracesCleared(TraceEvent evt) {
+			update(evt);
 		}
 
 		@Override
 		public void tracesPlotted(TraceEvent evt) {
-			// TODO Auto-generated method stub
-			
+			update(evt);
 		}
 
 		@Override
 		public void traceCreated(TraceEvent evt) {
-			// TODO Auto-generated method stub
-			
+			update(evt);
 		}
 
 		@Override
 		public void traceUpdated(TraceEvent evt) {
-			// TODO Auto-generated method stub
-			
+			update(evt);
 		}
 
 		@Override
 		public void traceAdded(TraceEvent evt) {
-			// TODO Auto-generated method stub
-			
+			update(evt);
 		}
 
 		@Override
 		public void traceRemoved(TraceEvent evt) {
-			// TODO Auto-generated method stub
-			
+			update(evt);
+		}
+		
+		protected void update(TraceEvent evt) {
+			// Nothing
 		}
 		
 	}
