@@ -55,7 +55,9 @@ public class RegionUtils {
 	 * @return
 	 * @throws Exception 
 	 */
-	public static final IRegion replaceCreateRegion(final IPlottingSystem system, final String name, final RegionType type) throws Exception {
+	public static final IRegion replaceCreateRegion(final IPlottingSystem system, 
+			                                        final String          name, 
+			                                        final RegionType      type) throws Exception {
 		
 		if (system.getRegion(name)!=null) {
 			system.removeRegion(system.getRegion(name));
