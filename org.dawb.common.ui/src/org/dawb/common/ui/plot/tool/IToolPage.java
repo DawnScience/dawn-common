@@ -1,6 +1,7 @@
 package org.dawb.common.ui.plot.tool;
 
 import org.dawb.common.ui.plot.IPlottingSystem;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPart;
@@ -36,7 +37,7 @@ import org.eclipse.ui.part.IPageBookViewPage;
  * @author fcp94556
  *
  */
-public interface IToolPage extends IPageBookViewPage {
+public interface IToolPage extends IPageBookViewPage, IAdaptable {
 	
 	public enum ToolPageRole {
 		ROLE_2D("org.dawb.common.ui.plot.tool.ROLE_2D", false, true, "icons/plot-tool-2d.png", "Image tools", "Image tools used to profile and inspect images."),  // For instance LineProfile, Profile
