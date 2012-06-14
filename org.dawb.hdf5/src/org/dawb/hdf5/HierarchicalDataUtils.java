@@ -114,7 +114,7 @@ public class HierarchicalDataUtils {
 	/**
 	 * Returns the link in another file if this is a linked file.
 	 * @param set
-	 * @param original
+	 * @param original - may be null
 	 * @return
 	 * @throws OutOfMemoryError
 	 * @throws Exception
@@ -163,7 +163,10 @@ public class HierarchicalDataUtils {
 			
 			if (!file.exists()) return null;
 			
-			IHierarchicalDataFile hFile = original.getLinkedFile(file.getAbsolutePath());
+			IHierarchicalDataFile hFile = original!=null
+					                    ? original.getLinkedFile(file.getAbsolutePath())
+					                    // Causes a memory leak I think:
+					                    : HierarchicalDataFactory.getReader(file.getAbsolutePath());
 			HObject link = hFile.getData(fullPath);
 			link.getMetadata(); // Ensure that meta data is read.
 			return link;

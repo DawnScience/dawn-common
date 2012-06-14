@@ -11,6 +11,7 @@ import ncsa.hdf.object.HObject;
 import ncsa.hdf.object.h5.H5Group;
 import ncsa.hdf.object.h5.H5ScalarDS;
 
+import org.dawb.hdf5.HierarchicalDataUtils;
 import org.dawb.hdf5.editor.IH5DoubleClickSelectionProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -61,6 +62,8 @@ public class HDF5SelectionProvider implements IH5DoubleClickSelectionProvider {
                     }
 
 					object   = (HObject)((DefaultMutableTreeNode)treeNode).getUserObject();
+					HObject link   = HierarchicalDataUtils.getDataLink(object, null);
+					object = link != null ? link : object;
 					
                     if (object instanceof Dataset) {
                     	Dataset ds = (Dataset)object;
