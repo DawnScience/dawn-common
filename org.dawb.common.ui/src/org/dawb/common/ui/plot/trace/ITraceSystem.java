@@ -77,5 +77,11 @@ public interface ITraceSystem {
 	 */
 	public void removeTraceListener(final ITraceListener l);
 	
+	/**
+	 * Renames the trace, better than calling setName on the ITrace as the
+	 * collection of traces is updated properly. No event will be fired.
+	 */
+	public void renameTrace(ITrace trace, String name) throws Exception;
 
+	
 }

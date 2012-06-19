@@ -80,4 +80,10 @@ public interface IRegionSystem {
 	 * @return
 	 */
 	public Collection<IRegion> getRegions();
+	
+	/**
+	 * Renames the region, better than calling setName on the IRegion as the
+	 * collection of regions is updated properly. No event will be fired.
+	 */
+	public void renameRegion(IRegion region, String name) throws Exception;
 }

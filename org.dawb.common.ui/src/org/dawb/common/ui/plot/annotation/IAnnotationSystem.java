@@ -1,5 +1,7 @@
 package org.dawb.common.ui.plot.annotation;
 
+import org.dawb.common.ui.plot.trace.ITrace;
+
 
 /**
  * No methods in this interface are thread safe.
@@ -48,4 +50,9 @@ public interface IAnnotationSystem {
 	 */
 	public void clearAnnotations();
 
+	/**
+	 * Renames the annotation; better than calling setName on the IAnnotation as the
+	 * collection of annotations is updated properly. No event will be fired.
+	 */
+	public void renameAnnotation(IAnnotation annotation, String name) throws Exception;
 }

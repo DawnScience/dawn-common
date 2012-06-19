@@ -29,7 +29,8 @@ public abstract class AbstractRegion extends Figure implements IRegion, IRegionC
 	@Override
 	public boolean addROIListener(final IROIListener l) {
 		if (roiListeners==null) roiListeners = new HashSet<IROIListener>(11);
-		return roiListeners.add(l);
+		if (!roiListeners.contains(l)) return roiListeners.add(l);
+		return false;
 	}
 	
 	@Override
