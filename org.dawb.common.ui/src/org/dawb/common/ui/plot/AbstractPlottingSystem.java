@@ -211,7 +211,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	 */
 	public void addTraceListener(final ITraceListener l) {
 		if (traceListeners==null) traceListeners = new ArrayList<ITraceListener>(7);
-		traceListeners.add(l);
+		if (!traceListeners.contains(l)) traceListeners.add(l);
 	}
 	
 	/**
@@ -446,6 +446,10 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	public void removeRegion(final IRegion region) {
 		fireRegionRemoved(new RegionEvent(region));
 	}
+	@Override
+	public void renameRegion(final IRegion region, String name) {
+		// Do nothing
+	}
 	public void clearRegions() {
 		//TODO
 	}
@@ -499,7 +503,8 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	 */
 	public boolean addRegionListener(final IRegionListener l) {
 		if (regionListeners == null) regionListeners = new HashSet<IRegionListener>(7);
-		return regionListeners.add(l);
+		if (!regionListeners.contains(l)) return regionListeners.add(l);
+		return false;
 	}
 	
 	/**
@@ -543,10 +548,13 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	 * @param region
 	 */
 	@Override
-	public void removeAnnotation(final IAnnotation region) {
+	public void removeAnnotation(final IAnnotation ann) {
 		//TODO 
 	}
-	
+	@Override
+	public void renameAnnotation(final IAnnotation ann, String name) {
+		// Do nothing
+	}	
 	/**
 	 * Get an annotation by name.
 	 * @param name
@@ -700,7 +708,10 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 		// TODO
 		fireTraceRemoved(new TraceEvent(trace));
 	}
-
+	@Override
+	public void renameTrace(final ITrace trace, String name) {
+		// Do nothing
+	}	
 	protected IWorkbenchPart getPart() {
 		return part;
 	}
