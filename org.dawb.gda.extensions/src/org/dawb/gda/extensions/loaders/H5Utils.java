@@ -101,6 +101,16 @@ public class H5Utils {
 	}
 
 	/**
+	 * Get a long[] from a int[]
+	 * @param longShape
+	 * @return
+	 */
+	public static long[] getLong(int[] intShape) {
+		final long[] longShape  = new long[intShape.length];
+		for (int i = 0; i < intShape.length; i++) longShape[i] = (long)intShape[i];
+		return longShape;
+	}
+	/**
 	 * Determines the HDF5 Datatype for an abstract dataset.
 	 * @param a
 	 * @return
