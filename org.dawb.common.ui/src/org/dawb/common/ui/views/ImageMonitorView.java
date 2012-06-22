@@ -594,6 +594,12 @@ public class ImageMonitorView extends ViewPart implements MouseListener, Selecti
 		queue.add(new ImageItem()); // stops queue.
 	
 		if (gallery!=null&&!gallery.isDisposed()) {
+			// Dispose images, may be a lot!
+			for (int i = 0; i<gallery.getItemCount() ; ++i) {
+				if (gallery.getItem(i).getImage()!=null) {
+					gallery.getItem(i).getImage().dispose();
+				}
+			}
 			gallery.removeSelectionListener(this);
 			gallery.removeMouseListener(this);
 			gallery.dispose();
@@ -608,6 +614,8 @@ public class ImageMonitorView extends ViewPart implements MouseListener, Selecti
 		directoryPath=null;
 		fileList=null;
 		this.editor=null;
+		
+		super.dispose();
 	}
 	
 	private void createImageThread() throws Exception {
@@ -635,6 +643,8 @@ public class ImageMonitorView extends ViewPart implements MouseListener, Selecti
 						final int    size = store.getInt("org.dawb.workbench.views.image.monitor.thumbnail.size");
 
 						final Image     image     = service.createImage(ii.getFile(), size);
+						// This image must be disposed later!
+						
                         final ImageItem imageItem = ii;
 						Display.getDefault().asyncExec(new Runnable() {
 							@Override

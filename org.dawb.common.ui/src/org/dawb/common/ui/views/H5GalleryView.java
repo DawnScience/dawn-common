@@ -344,6 +344,12 @@ public class H5GalleryView extends ViewPart implements MouseListener, SelectionL
 		queue.add(new ImageItem()); // stops queue.
 		
 		if (gallery!=null&&!gallery.isDisposed()) {
+			// Dispose images, may be a lot!
+			for (int i = 0; i<gallery.getItemCount() ; ++i) {
+				if (gallery.getItem(i).getImage()!=null) {
+					gallery.getItem(i).getImage().dispose();
+				}
+			}
 			gallery.removeSelectionListener(this);
 			gallery.removeMouseListener(this);
 			gallery.dispose();
@@ -355,6 +361,9 @@ public class H5GalleryView extends ViewPart implements MouseListener, SelectionL
 		queue=null;
 		imageThread=null;
 		info=null;
+		
+		super.dispose();
+
 	}
 	
 	private void createImageThread() {
