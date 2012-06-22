@@ -9,10 +9,15 @@
  */ 
 package org.dawb.hdf5;
 
+import java.io.File;
+import java.util.Random;
+
 import ncsa.hdf.hdf5lib.H5;
 import ncsa.hdf.hdf5lib.HDF5Constants;
 import ncsa.hdf.object.Dataset;
+import ncsa.hdf.object.Datatype;
 import ncsa.hdf.object.Group;
+import ncsa.hdf.object.h5.H5Datatype;
 
 import org.junit.Test;
 
@@ -24,6 +29,55 @@ public class Hdf5Test {
 	private static final int DIM_X = 4;
 	private static final int DIM_Y = 6;
 	
+	@Test
+	public void writeH5Example() throws Exception {
+		
+		IHierarchicalDataFile file = null;
+		try {
+			
+			final File tmp = File.createTempFile("Test", "h5");
+			tmp.deleteOnExit();
+			tmp.createNewFile();
+			
+			// Throws exception if already writing to this file
+			// on another thread. 
+			// writeH5Example is synchronized to here to avoid this write
+			// (but not others!) interfering.
+			file = HierarchicalDataFactory.getWriter(tmp.getAbsolutePath());
+					
+			final Group myDataGroup = file.group("myData");
+			
+			final double[] random = new double[2048*2048];
+			for (int i = 0; i < 2048*2048; i++) {
+				random[i] = Math.random();
+			}
+			Dataset s = file.createDataset("data", 
+					new H5Datatype(Datatype.CLASS_FLOAT, 64/8, Datatype.NATIVE, Datatype.NATIVE), 
+					new long[]{2048,2048},
+					random, 
+					myDataGroup);
+			file.setNexusAttribute(s, Nexus.SDS);
+			file.close();
+			
+			file = HierarchicalDataFactory.getReader(tmp.getAbsolutePath());
+			final Dataset set = (Dataset)file.getData("myData/data");
+			
+			set.getMetadata();
+			
+			final long[] size = set.getDims();
+			if (size[0]!=2048 || size[1]!=2048) throw new Exception("Unexpected read data set size!");
+			
+			final double[] data = (double[])set.getData();
+			
+			for (int i = 0; i < data.length; i++) {
+				if (data[i]!=random[i]) throw new Exception("Unexpected data value!");
+			}
+			
+		} finally {
+			if (file!=null) file.close();
+		}
+	}
+
 	@Test
 	public void testOpenFile() throws Exception {
 		
