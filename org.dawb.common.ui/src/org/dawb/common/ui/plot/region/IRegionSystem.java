@@ -16,7 +16,7 @@ public interface IRegionSystem {
 	
 	/**
 	 * Creates a selection region by type. This does not create any user interface
-	 * for the region. You can then call methods on the region to set color and 
+	 * for the region. You can then call methods on the region to set colour and 
 	 * position for the selection. Use addRegion(...) and removeRegion(...) to control
 	 * if the selection is active on the graph.
 	 * 

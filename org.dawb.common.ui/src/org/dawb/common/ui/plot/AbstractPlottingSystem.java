@@ -80,19 +80,18 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	// Color option for 1D plots, if needed.
 	protected ColorOption colorOption=ColorOption.BY_DATA;
 
-    protected String   rootName;
-	
-    /**
-     * The action bars on the part using the plotting system, may be null
-     */
-    protected IActionBars    bars;
+	protected String rootName;
 
-    
+	/**
+	 * The action bars on the part using the plotting system, may be null
+	 */
+	protected IActionBars bars;
+
 	public AbstractPlottingSystem() {
 		this.actionBarManager = createActionBarManager();
 		this.currentToolPageMap = new HashMap<ToolPageRole, IToolPage>(3);
 	}
-	
+
 	public static enum ColorOption {
 		BY_DATA, BY_NAME, NONE
 	}
@@ -198,6 +197,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	 * 
 	 * @return
 	 */
+	@Override
 	public Collection<ITrace> getTraces() {
 		return null; // TODO
 	}
@@ -210,6 +210,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	 * 
 	 * @param l
 	 */
+	@Override
 	public void addTraceListener(final ITraceListener l) {
 		if (traceListeners==null) traceListeners = new ArrayList<ITraceListener>(7);
 		if (!traceListeners.contains(l)) traceListeners.add(l);
@@ -221,6 +222,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	 * 
 	 * @param l
 	 */
+	@Override
 	public void removeTraceListener(final ITraceListener l) {
 		if (traceListeners==null) return;
 		traceListeners.remove(l);
@@ -348,47 +350,31 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 			}
 		}
 	}
-		
+
 	@Override
 	public IAxis createAxis(final String title, final boolean isYAxis, int side) {
 		//TODO
 		throw new RuntimeException("Cannot create an axis with "+getClass().getName());
 	}
-	
-	/**
-	 * The current y axis to plot to. Intended for 1D plotting with multiple axes.
-	 * @return
-	 */
+
 	@Override
 	public IAxis getSelectedYAxis(){
 		//TODO
 		throw new RuntimeException("Cannot have multiple axes with "+getClass().getName());
 	}
-	
-	/**
-	 * Set the current plotting yAxis. Intended for 1D plotting with multiple axes.
-	 * @param yAxis
-	 */
+
 	@Override
 	public void setSelectedYAxis(IAxis yAxis){
 		//TODO
 		throw new RuntimeException("Cannot have multiple axes with "+getClass().getName());
 	}
-	
-	/**
-	 * The current x axis to plot to. Intended for 1D plotting with multiple axes.
-	 * @return
-	 */
+
 	@Override
 	public IAxis getSelectedXAxis(){
 		//TODO
 		throw new RuntimeException("Cannot have multiple axes with "+getClass().getName());
 	}
-	
-	/**
-	 * Set the current plotting xAxis. Intended for 1D plotting with multiple axes.
-	 * @param xAxis
-	 */
+
 	@Override
 	public void setSelectedXAxis(IAxis xAxis){
 		//TODO
@@ -396,75 +382,61 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	}
 	
 	protected PlottingSelectionProvider selectionProvider;
-	
+
 	public ISelectionProvider getSelectionProvider() {
 		if (selectionProvider==null) selectionProvider = new PlottingSelectionProvider();
 		return selectionProvider;
 	}
 	
 	private Collection<IRegionListener> regionListeners;
-	
-	/**
-	 * Creates a selection region by type. This does not create any user interface
-	 * for the region. You can then call methods on the region to set color and 
-	 * position for the selection. Use addRegion(...) and removeRegion(...) to control
-	 * if the selection is active on the graph.
-	 * 
-	 * @param name
-	 * @param regionType
-	 * @return
-	 */
+
+	protected void fireRegionCreated(RegionEvent evt) {
+		if (regionListeners==null) return;
+		for (IRegionListener l : regionListeners) l.regionCreated(evt);
+	}
+
+	protected void fireRegionAdded(RegionEvent evt) {
+		if (regionListeners==null) return;
+		for (IRegionListener l : regionListeners) l.regionAdded(evt);
+	}
+
+
+	protected void fireRegionRemoved(RegionEvent evt) {
+		if (regionListeners==null) return;
+		for (IRegionListener l : regionListeners) l.regionRemoved(evt);
+	}
+
 	@Override
 	public IRegion createRegion(final String name, final RegionType regionType)  throws Exception {
 		//TODO Please implement creation of region here.
 		return null;
 	}
-	
-	protected void fireRegionCreated(RegionEvent evt) {
-		if (regionListeners==null) return;
-		for (IRegionListener l : regionListeners) l.regionCreated(evt);
-	}
-	
-	/**
-	 * Add a selection region to the graph.
-	 * @param region
-	 */
+
 	@Override
 	public void addRegion(final IRegion region) {
 		fireRegionAdded(new RegionEvent(region));
 	}
-	protected void fireRegionAdded(RegionEvent evt) {
-		if (regionListeners==null) return;
-		for (IRegionListener l : regionListeners) l.regionAdded(evt);
-	}
-	
-	
-	/**
-	 * Remove a selection region to the graph.
-	 * @param region
-	 */
+
 	@Override
 	public void removeRegion(final IRegion region) {
 		fireRegionRemoved(new RegionEvent(region));
 	}
+
 	@Override
 	public void renameRegion(final IRegion region, String name) {
 		// Do nothing
 	}
+
+	@Override
 	public void clearRegions() {
 		//TODO
 	}
-	
-	/**
-	 * Get a region by name.
-	 * @param name
-	 * @return
-	 */
+
 	@Override
 	public IRegion getRegion(final String name) {
 		return null; // TODO
 	}
-	
+
 	@Override
 	public Collection<IRegion> getRegions(final RegionType type) {
 		
@@ -481,110 +453,59 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 		return ret; // may be empty
 	}
 
-	/**
-	 * Get a region by name.
-	 * @param name
-	 * @return
-	 */
 	@Override
 	public Collection<IRegion> getRegions() {
 		return null; // TODO
 	}
-	
-	
 
-	protected void fireRegionRemoved(RegionEvent evt) {
-		if (regionListeners==null) return;
-		for (IRegionListener l : regionListeners) l.regionRemoved(evt);
-	}
-
-	/**
-	 * 
-	 * @param l
-	 */
+	@Override
 	public boolean addRegionListener(final IRegionListener l) {
 		if (regionListeners == null) regionListeners = new HashSet<IRegionListener>(7);
 		if (!regionListeners.contains(l)) return regionListeners.add(l);
 		return false;
 	}
-	
-	/**
-	 * 
-	 * @param l
-	 */
+
+	@Override
 	public boolean removeRegionListener(final IRegionListener l) {
 		if (regionListeners == null) return true;
 		return regionListeners.remove(l);
 	}
-	
-	
-	/**
-	 * Creates an annotation. This does not create any user interface
-	 * for the annotation. You can then call methods on the annoation.
-	 * Use addAnnotation(...) and removeAnnotation(...) to control
-	 * if the selection is active on the graph.
-	 * 
-	 * @param name
-	 * @param regionType
-	 * @return
-	 * @throws Exception if name exists already.
-	 */
+
 	@Override
 	public IAnnotation createAnnotation(final String name) throws Exception {
-		return null;//TODO 
+		return null;// TODO
 	}
-	
-	/**
-	 * Add an annotation to the graph.
-	 * @param region
-	 */
+
 	@Override
 	public void addAnnotation(final IAnnotation region) {
-		//TODO 
+		// TODO
 	}
-	
-	
-	/**
-	 * Remove an annotation to the graph.
-	 * @param region
-	 */
+
 	@Override
 	public void removeAnnotation(final IAnnotation ann) {
-		//TODO 
+		// TODO
 	}
+
 	@Override
 	public void renameAnnotation(final IAnnotation ann, String name) {
 		// Do nothing
-	}	
-	/**
-	 * Get an annotation by name.
-	 * @param name
-	 * @return
-	 */
+	}
+
 	@Override
 	public IAnnotation getAnnotation(final String name) {
 		return null;
 	}
 
-	/**
-	 * Remove all annotations
-	 */
 	@Override
-	public void clearAnnotations(){
-		//TODO 
+	public void clearAnnotations() {
+		// TODO
 	}
 
 	private Map<ToolPageRole, IToolPage> currentToolPageMap;
 	private Collection<IToolChangeListener> toolChangeListeners;
 
-	/**
-	 * Get the current tool page that the user would like to use.
-	 * Fitting, profile, derivative etc. Null if no selection has been made.
-	 * @return
-	 */
 	@Override
 	public IToolPage getCurrentToolPage(ToolPageRole role) {
-		
 		IToolPage toolPage = null; 
 		if(currentToolPageMap!=null)
 			toolPage = currentToolPageMap.get(role);
@@ -595,59 +516,56 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 		}
 		return toolPage;
 	}
-	
+
 	protected void setCurrentToolPage(IToolPage page) {
 		currentToolPageMap.put(page.getToolPageRole(), page);
 	}
-	
+
+	@Override
 	public IToolPage getToolPage(String toolId) {
 		return actionBarManager.getToolPage(toolId);
 	}
-	
+
+	@Override
 	public void clearCachedTools() {
 		actionBarManager.clearCachedTools();
 	}
-	
+
+	@Override
 	public IToolPage createToolPage(String toolId) throws Exception {
 		return getToolPage(toolId).cloneTool();
 	}
-	
-	/**
-	 * Add a tool change listener. If the user changes preferred tool
-	 * this listener will be called so that any views showing the current
-	 * tool are updated.
-	 * 
-	 * @param l
-	 */
+
 	@Override
 	public void addToolChangeListener(IToolChangeListener l) {
-		if (toolChangeListeners==null) toolChangeListeners = new HashSet<IToolChangeListener>(7);
+		if (toolChangeListeners == null)
+			toolChangeListeners = new HashSet<IToolChangeListener>(7);
 		toolChangeListeners.add(l);
 	}
-	
-	/**
-	 * Remove a tool change listener if one has been addded.
-	 * @param l
-	 */
+
 	@Override
 	public void removeToolChangeListener(IToolChangeListener l) {
-		if (toolChangeListeners==null) return;
+		if (toolChangeListeners == null)
+			return;
 		toolChangeListeners.remove(l);
 	}
-	
+
 	protected void fireToolChangeListeners(final ToolChangeEvent evt) {
-		if (toolChangeListeners==null) return;
-		
-		if (evt.getOldPage()!=null) evt.getOldPage().deactivate();
-		if (evt.getNewPage()!=null) evt.getNewPage().activate();
-		
-	    for (IToolChangeListener l : toolChangeListeners) {
+		if (toolChangeListeners == null)
+			return;
+
+		if (evt.getOldPage() != null)
+			evt.getOldPage().deactivate();
+		if (evt.getNewPage() != null)
+			evt.getNewPage().activate();
+
+		for (IToolChangeListener l : toolChangeListeners) {
 			l.toolChanged(evt);
 		}
 	}
-	
+
 	protected EmptyTool getEmptyTool(ToolPageRole role) {
-		
+
 		EmptyTool emptyTool = new EmptyTool(role);
 		emptyTool.setToolSystem(this);
 		emptyTool.setPlottingSystem(this);
@@ -658,69 +576,49 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	}
 
 	protected void clearRegionTool() {
-		// TODO Implement to clear any region tool which the plotting system may be adding if createRegion(...) has been called.
+		// TODO Implement to clear any region tool which the plotting system may
+		// be adding if createRegion(...) has been called.
 	}
 
-	/**
-	 * Creates a line trace used for 1D plotting.
-	 * @param traceName
-	 * @return
-	 */
 	@Override
 	public ILineTrace createLineTrace(String traceName) {
 		// TODO
 		return null;
 	}
-	/**
-	 * Creates an image trace used for 1D plotting.
-	 * @param traceName
-	 * @return
-	 */
+
 	@Override
 	public IImageTrace createImageTrace(String traceName) {
 		// TODO
 		return null;
 	}
-	
+
 	@Override
 	public ITrace getTrace(String name) {
 		// TODO
 		return null;
 	}
 
-
-	/**
-	 * Adds trace, makes visible
-	 * @param traceName
-	 * @return
-	 */
 	@Override
 	public void addTrace(ITrace trace) {
 		// TODO
 		fireTraceAdded(new TraceEvent(trace));
 	}
-	/**
-	 * Removes a trace.
-	 * @param traceName
-	 * @return
-	 */
+
 	@Override
 	public void removeTrace(ITrace trace) {
 		// TODO
 		fireTraceRemoved(new TraceEvent(trace));
 	}
+
 	@Override
 	public void renameTrace(final ITrace trace, String name) {
 		// Do nothing
 	}	
+
 	protected IWorkbenchPart getPart() {
 		return part;
 	}
 
-	/**
-	 * 
-	 * @return true if some or all of the plotted data is 2D or images.
-	 */
 	@Override
 	public boolean is2D() {
 		final Collection<ITrace> traces = getTraces();
@@ -730,22 +628,13 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 		}
 		return false;
 	}
-	
-	/**
-	 * (non-Javadoc)
-	 * @see org.dawb.common.ui.plot.axis.IAxisSystem#autoscaleAxes()
-	 */
+
 	@Override
 	public void autoscaleAxes() {
 		// TODO Does nothing
 	}
-	
-	/**
-	 * Call this method to retrieve what is currently plotted by trace type
-	 * See all ITraceListener.
-	 * 
-	 * @return
-	 */
+
+	@Override
 	public Collection<ITrace> getTraces(Class<? extends ITrace> clazz) {
 		final Collection<ITrace> traces = getTraces();
 		if (traces==null) return null;
@@ -760,9 +649,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 		return ret; // may be empty
 	}
 
-	/**
-	 * @return IActionBars, may be null
-	 */
+	@Override
 	public IActionBars getActionBars() {
 		return bars;
 	}
@@ -792,6 +679,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	 * 
 	 * @return
 	 */
+	@Override
 	public IPlotActionSystem getPlotActionSystem() {
 		return this.actionBarManager;
 	}

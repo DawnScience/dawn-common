@@ -1,7 +1,5 @@
 package org.dawb.common.ui.plot.annotation;
 
-import org.dawb.common.ui.plot.trace.ITrace;
-
 
 /**
  * No methods in this interface are thread safe.
@@ -14,7 +12,7 @@ public interface IAnnotationSystem {
 	
 	/**
 	 * Creates an annotation. This does not create any user interface
-	 * for the annotation. You can then call methods on the annoation.
+	 * for the annotation. You can then call methods on the annotation.
 	 * Use addAnnotation(...) and removeAnnotation(...) to control
 	 * if the selection is active on the graph.
 	 * 
