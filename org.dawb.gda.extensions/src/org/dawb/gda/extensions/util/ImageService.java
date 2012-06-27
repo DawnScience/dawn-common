@@ -75,7 +75,7 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 	}
 	
 	/**
-	 * 
+	 * This method is not thread safe
 	 */
 	public Image getImage(ImageServiceBean bean) {
 		final ImageData data = getImageData(bean);
@@ -93,6 +93,8 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 	/**
 	 * getImageData(...) provides an image in a given palette data and origin.
 	 * Faster than getting a resolved image
+	 * 
+	 * This method should be thread safe.
 	 */
 	public ImageData getImageData(ImageServiceBean bean) {
 		
