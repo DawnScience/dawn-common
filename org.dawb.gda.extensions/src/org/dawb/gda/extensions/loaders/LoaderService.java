@@ -15,7 +15,7 @@ import java.util.Collection;
 import org.dawb.common.services.ILoaderService;
 import org.dawb.common.ui.monitor.ProgressMonitorWrapper;
 import org.dawb.common.util.eclipse.BundleUtils;
-import org.dawb.fabio.FabioFile;
+//import org.dawb.fabio.FabioFile;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.preferences.InstanceScope;
@@ -72,24 +72,25 @@ public class LoaderService extends AbstractServiceFactory implements ILoaderServ
 		}
 		if (isFabioOnly && isFabioAvailable()) {
 			
-			final FabioFile file = new FabioFile(filePath);
-			meta = new MetaDataAdapter() {
-				@Override
-				public String getMetaValue(String key) throws Exception {
-					return file.getValue(key);
-				}
-
-				@Override
-				public Collection<String> getMetaNames() throws Exception {
-					try {
-						return file.getKeysAsListedInHeader();
-					} catch (Exception ne) {
-						throw ne;
-					} catch (Throwable t) {
-						throw new Exception(t);
-					}
-				}
-			};
+			throw new Exception("Fabio is currently not supported in Dawn!");
+//			final FabioFile file = new FabioFile(filePath);
+//			meta = new MetaDataAdapter() {
+//				@Override
+//				public String getMetaValue(String key) throws Exception {
+//					return file.getValue(key);
+//				}
+//
+//				@Override
+//				public Collection<String> getMetaNames() throws Exception {
+//					try {
+//						return file.getKeysAsListedInHeader();
+//					} catch (Exception ne) {
+//						throw ne;
+//					} catch (Throwable t) {
+//						throw new Exception(t);
+//					}
+//				}
+//			};
 		}
 		
 		return meta;
@@ -127,10 +128,12 @@ public class LoaderService extends AbstractServiceFactory implements ILoaderServ
 		
 		if (isFabioOnly && isFabioAvailable() ) {
 			try {
-				FabioFile     file = new FabioFile(f.getAbsolutePath());
-				final float[] fa   = file.getImageAsFloat();
-				set = new FloatDataset(fa, new int[]{file.getHeight(), file.getWidth()});
-				set.setName(f.getName());
+				throw new Exception("Fabio is currently not supported in Dawn!");
+
+//				FabioFile     file = new FabioFile(f.getAbsolutePath());
+//				final float[] fa   = file.getImageAsFloat();
+//				set = new FloatDataset(fa, new int[]{file.getHeight(), file.getWidth()});
+//				set.setName(f.getName());
 				
 			} finally {
 				// FIXME TODO MASSIVEBODGE!! 
