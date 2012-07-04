@@ -44,11 +44,12 @@ public abstract class AbstractRegion extends Figure implements IRegion, IRegionC
 		roiListeners.clear();
 	}
 	
-	protected void fireROIDragged(ROIBase roi) {
+	protected void fireROIDragged(ROIBase roi, ROIEvent.DRAG_TYPE type) {
 		if (roiListeners==null) return;
 		if (!regionEventsActive) return;
 		
 		final ROIEvent evt = new ROIEvent(this, roi);
+		evt.setDragType(type);
 		for (IROIListener l : roiListeners) {
 			l.roiDragged(evt);
 		}

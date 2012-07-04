@@ -6,6 +6,10 @@ import uk.ac.diamond.scisoft.analysis.roi.ROIBase;
 
 public class ROIEvent extends EventObject {
 
+	public enum DRAG_TYPE{
+		RESIZE,
+		TRANSLATE;
+	}
 	/**
 	 * 
 	 */
@@ -21,4 +25,13 @@ public class ROIEvent extends EventObject {
 		return roi;
 	}
 
+	public DRAG_TYPE getDragType() {
+		return dragType;
+	}
+
+	public void setDragType(DRAG_TYPE dragType) {
+		this.dragType = dragType;
+	}
+
+	private DRAG_TYPE dragType;
 }
