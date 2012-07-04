@@ -174,6 +174,8 @@ public class PlottingActionBarManager implements IPlotActionSystem {
 	
 	    if (!foundSomeActions) return null;
 	    
+	    if (toolActions.size()<1) return null; // Nothing to show!
+	    
      	final Action    clear = new Action("Clear tool") {
 
 			public void run() {		
