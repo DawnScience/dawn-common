@@ -28,12 +28,14 @@ import java.util.Map;
 
 import org.dawb.common.util.eclipse.BundleUtils;
 import org.dawb.common.util.net.NetUtils;
+import org.eclipse.core.variables.VariablesPlugin;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import uk.ac.diamond.scisoft.analysis.rpc.AnalysisRpcClient;
 import uk.ac.gda.util.OSUtils;
 
 import com.isencia.util.commandline.ManagedCommandline;
-import org.eclipse.core.variables.VariablesPlugin;
 
 /**
  * This class encapsulates a system command to python used with the RPC service
@@ -43,6 +45,8 @@ import org.eclipse.core.variables.VariablesPlugin;
  * python commands in the way jep does.
  */
 public class PythonService {
+	
+	private static final Logger logger = LoggerFactory.getLogger(PythonService.class);
 	
 	private ManagedCommandline command;
 	private AnalysisRpcClient  client;
@@ -77,12 +81,10 @@ public class PythonService {
 		
 		final PythonService service = new PythonService();
 		
-	    String scisoftRpcPort; 
-	    try {
-	    	// TODO Ensure plotting is started programatically in the GUI.
-	    	scisoftRpcPort = VariablesPlugin.getDefault().getStringVariableManager().performStringSubstitution("${scisoft_rpc_port}");
-	    } catch (Exception ne) {
-	    	scisoftRpcPort = String.valueOf(0);
+	    String scisoftRpcPort = getSciSoftPlottingPort();
+	    if (scisoftRpcPort==null||"".equals(scisoftRpcPort)) {
+	    	scisoftRpcPort = "0";
+	    	logger.error("Cannot identify scisoft plotting port, leaving set as 0.\nShow view part 'Plot 1' if you would like to start the plotting.");
 	    }
 
 		// Find the location of python_service.py and
@@ -129,6 +131,30 @@ public class PythonService {
 		return service;
 	}
 	
+	/**
+	 * Call to get the scisoft plotting port, may be "", null or 0.
+	 * Will check temp variable set to dynamic port.
+	 * @return
+	 */
+	public static String getSciSoftPlottingPort() {
+	    String scisoftRpcPort; 
+	    try {
+	    	scisoftRpcPort = VariablesPlugin.getDefault().getStringVariableManager().performStringSubstitution("${scisoft_rpc_port}");
+	    } catch (Exception ne) {
+	    	scisoftRpcPort = "0";
+	    }
+	    
+	    if ("0".equals(scisoftRpcPort)) {
+		    try {
+		    	scisoftRpcPort = VariablesPlugin.getDefault().getStringVariableManager().performStringSubstitution("${scisoft_rpc_temp}");
+		    } catch (Exception ne) {
+		    	scisoftRpcPort = "0";
+		    }
+	    }
+    	// TODO Ensure plotting is started programatically in the GUI.
+	    return scisoftRpcPort;
+	}
+
 	/**
 	 * This call opens a client to the service already running. If you
 	 * want you can run the python_serice.py in pydev then debug the commands
