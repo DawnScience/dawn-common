@@ -144,7 +144,7 @@ public class PythonService {
 	    	scisoftRpcPort = "0";
 	    }
 	    
-	    if ("0".equals(scisoftRpcPort)) {
+	    if (scisoftRpcPort==null || "".equals(scisoftRpcPort) || "0".equals(scisoftRpcPort)) {
 		    try {
 		    	scisoftRpcPort = VariablesPlugin.getDefault().getStringVariableManager().performStringSubstitution("${scisoft_rpc_temp}");
 		    } catch (Exception ne) {
