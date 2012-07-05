@@ -80,7 +80,19 @@ public interface IPlottingSystem extends ITraceSystem, IRegionSystem, IAxisSyste
 	public List<ITrace> createPlot1D(AbstractDataset       x, 
 							         List<AbstractDataset> ys,
 							         IProgressMonitor      monitor);
-	
+	/**
+	 * @see createPlot1D(AbstractDataset, List<AbstractDataset>, IProgressMonitor)
+	 * @param x
+	 * @param ys
+	 * @param title - specifies the title instead of creating one.
+	 * @param monitor
+	 * @return
+	 */
+	public List<ITrace> createPlot1D(AbstractDataset       x, 
+							         List<AbstractDataset> ys,
+							         String title,
+							         IProgressMonitor      monitor);
+
 	/**
 	 * Attempts to update any ILineTraces with the same name as the ys pass in, otherwise
 	 * will call createPlot1D(...)

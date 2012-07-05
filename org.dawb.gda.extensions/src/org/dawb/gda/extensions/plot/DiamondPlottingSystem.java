@@ -106,6 +106,16 @@ public class DiamondPlottingSystem extends AbstractPlottingSystem {
 		PlotUtils.create1DPlot(x, ys, PlotMode.PM1D, plotWindow, monitor);
 		return null;
 	}
+	
+	@Override
+	public List<ITrace> createPlot1D(final AbstractDataset      x, 
+						               final List<AbstractDataset> ys,
+						               final String title_Ignored,
+						               final IProgressMonitor      monitor) {
+		
+		PlotUtils.create1DPlot(x, ys, PlotMode.PM1D, plotWindow, monitor);
+		return null;
+	}
 
 	/**
 	 * Just calls createPlot2D(...) directly.
