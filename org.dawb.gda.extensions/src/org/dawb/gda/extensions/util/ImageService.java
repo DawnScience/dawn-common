@@ -379,7 +379,15 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 		for (int index = 0; index<size; ++index) {
 			
 			final double dv = image.getElementDoubleAbs(index);
-			if (mask!=null && !mask.getElementBooleanAbs(index)) continue; // Masked!
+			try {
+			    if (mask!=null && index<mask.getSize()) {
+			    	if (!mask.getElementBooleanAbs(index)) {
+			    		continue; // Masked!
+			    	}
+			    }
+			} catch(java.lang.ArrayIndexOutOfBoundsException ignored) {
+				// Mask may be different size, continue if is.
+			}
 			
 			if (Double.isNaN(dv))      continue;
 			if (!bean.isInBounds(dv))  continue;
