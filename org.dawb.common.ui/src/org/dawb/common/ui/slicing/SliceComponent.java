@@ -599,6 +599,7 @@ public class SliceComponent {
 		@Override
 		protected IStatus run(IProgressMonitor monitor) {
 			
+			if (slice==null) return Status.CANCEL_STATUS;
 			monitor.beginTask("Slice "+slice.getName(), 10);
 			try {
 				monitor.worked(1);

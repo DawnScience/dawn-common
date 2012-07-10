@@ -9,6 +9,7 @@
  */ 
 package org.dawb.hdf5.editor;
 
+import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.List;
 
@@ -228,8 +229,22 @@ public class H5ValuePage extends Page  implements ISelectionListener, IPartListe
 				}
 			} else if (shape!=null) {
 				label.setText("Dataset name of '"+set.getName()+"' shape:");
-				buf.append(Arrays.toString(shape));
+				buf.append(Arrays.toString(shape).trim());
 				
+				long size = shape[0];
+				for (int i = 1; i < shape.length; i++) size*=shape[i];
+				if (size<10) {
+					buf.append("\n\nValue:\n");
+					
+					final Object data = set.getData();
+				    int length = Array.getLength(data);
+				    buf.append('[');
+				    for (int i = 0; i < length; ++i) {
+					    buf.append(Array.get(data, i));
+					    if (i<length-1) buf.append(',');
+				    }
+				    buf.append(']');
+				}
 				
 			} else {
 				label.setText("Dataset name of '"+set.getName()+"'");
