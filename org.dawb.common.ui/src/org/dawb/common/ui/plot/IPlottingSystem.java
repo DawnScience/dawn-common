@@ -53,6 +53,13 @@ public interface IPlottingSystem extends ITraceSystem, IRegionSystem, IAxisSyste
 			                   PlotType       hint,
 			                   IWorkbenchPart part);
 
+	/**
+	 * The plot name corresponding to the name used in the PlottingFactory.
+	 * For file plots in editors this will be the file name and for views such
+	 * as 'Plot 1' etc it will be the view name (Plot 1).
+	 * @return
+	 */
+	public String getPlotName();
 	
 	/**
 	 * See also ITraceSystem for flexible trace manipulation.
