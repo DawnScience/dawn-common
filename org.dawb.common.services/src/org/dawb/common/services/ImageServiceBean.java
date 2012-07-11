@@ -80,7 +80,6 @@ public class ImageServiceBean {
 	
 	public AbstractDataset getImage() {
 		if (logColorScale) {
-			logOffset = image.min().doubleValue()-1.0;
 			AbstractDataset result = Maths.subtract(image, logOffset);
 			result = Maths.log10(result);
 			return result;
@@ -119,7 +118,11 @@ public class ImageServiceBean {
 			return null;
 		}
 		if (logColorScale) {
-			return Math.log10(min.doubleValue() - logOffset);
+			double result = Math.log10(min.doubleValue() - logOffset);
+			if (Double.isNaN(result)) {
+				return 0.0;
+			}
+			return result;
 		}
 		return min;
 	}
@@ -291,6 +294,9 @@ public class ImageServiceBean {
 	}
 	public void setLogColorScale(boolean logColorScale) {
 		this.logColorScale = logColorScale;
+		if(logColorScale) {
+			logOffset = image.min().doubleValue()-1.0;
+		}
 	}
 	
 
