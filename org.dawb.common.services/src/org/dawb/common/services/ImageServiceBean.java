@@ -20,10 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.PaletteData;
-import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.widgets.Display;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.Maths;
@@ -53,6 +50,7 @@ public class ImageServiceBean {
 	                                 // this is assumed to override the depth
 	private Object          functionObject;
 	private boolean         logColorScale=false; // Normally linear, can switch to log color scale.
+	private double          logOffset=0.0;
 
 	public ImageServiceBean() {
 		
@@ -82,7 +80,9 @@ public class ImageServiceBean {
 	
 	public AbstractDataset getImage() {
 		if (logColorScale) {
-			return Maths.log10(Maths.subtract(image, image.min().doubleValue()-1.0));
+			AbstractDataset result = Maths.subtract(image, logOffset);
+			result = Maths.log10(result);
+			return result;
 		}
 		return image;
 	}
@@ -118,7 +118,11 @@ public class ImageServiceBean {
 			return null;
 		}
 		if (logColorScale) {
-			return Math.log10(min.doubleValue() - (image.min().doubleValue()-1.0));
+			double result = Math.log10(min.doubleValue() - logOffset);
+			if (Double.isNaN(result)) {
+				return 0.0;
+			}
+			return result;
 		}
 		return min;
 	}
@@ -138,7 +142,7 @@ public class ImageServiceBean {
 			return null;
 		}
 		if (logColorScale) {
-			return Math.log10(max.doubleValue() - (image.min().doubleValue()-1.0));
+			return Math.log10(max.doubleValue() - logOffset);
 		}
 		return max;
 	}
@@ -168,7 +172,7 @@ public class ImageServiceBean {
 	 */
 	public HistogramBound getMaximumCutBound() {
 		if (logColorScale) {
-			return new HistogramBound(Math.log10(maximumCutBound.bound.doubleValue() - (image.min().doubleValue()-1.0)),maximumCutBound.color);
+			return new HistogramBound(Math.log10(maximumCutBound.bound.doubleValue() - logOffset),maximumCutBound.color);
 		}
 		return maximumCutBound;
 	}
@@ -181,7 +185,7 @@ public class ImageServiceBean {
 	 */
 	public HistogramBound getMinimumCutBound() {
 		if (logColorScale) {
-			double value = Math.log10(minimumCutBound.bound.doubleValue() - (image.min().doubleValue()-1.0));
+			double value = Math.log10(minimumCutBound.bound.doubleValue() - logOffset);
 			if (Double.isNaN(value)) {
 				value = -1.0f;
 			}
@@ -290,6 +294,9 @@ public class ImageServiceBean {
 	}
 	public void setLogColorScale(boolean logColorScale) {
 		this.logColorScale = logColorScale;
+		if(logColorScale) {
+			logOffset = image.min().doubleValue()-1.0;
+		}
 	}
 	
 
