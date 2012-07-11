@@ -320,6 +320,11 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 
 	protected String plotName;
 	
+	@Override
+	public String getPlotName() {
+		return plotName;
+	}
+	
 	/**
 	 * This simply assigns the part, subclasses should override this
 	 * and call super.createPlotPart(...) to assign the part. Also registers the plot
