@@ -72,11 +72,10 @@ import org.eclipse.ui.wizards.IWizardDescriptor;
 public class EclipseUtils {
 
 	/**
-	 * Get the file path from a FileStoreEditorInput. Removes any "file:"
-	 * from the URI to the file path if it exists.
+	 * Get the URI from editor input if it's a URI editor input
 	 * 
 	 * @param fileInput
-	 * @return String
+	 * @return URI
 	 */
 	public static URI getFileURI(IEditorInput fileInput) {
 		if (fileInput instanceof IURIEditorInput) {
@@ -87,6 +86,7 @@ public class EclipseUtils {
 	}
 
 	/**
+	 * Get the file from editor input if it's a URI editor input
 	 * 
 	 * @param fileInput
 	 * @return File
@@ -96,6 +96,12 @@ public class EclipseUtils {
 		return uri == null ? null : new File(uri);
 	}
 	
+	/**
+	 * Get the file path from editor input if it's a URI editor input
+	 * 
+	 * @param fileInput
+	 * @return file path as string
+	 */
 	public static String getFilePath(IEditorInput fileInput) {
 		final File file = getFile(fileInput);
 		if (file==null) return null;
@@ -117,7 +123,12 @@ public class EclipseUtils {
 		}
 		return (IFile)input.getAdapter(IFile.class);
 	}
-	
+
+	/**
+	 * Get file name from editor input
+	 * @param input
+	 * @return
+	 */
 	public static String getFileName(IEditorInput input) {
 		return getFile(input).getName();
 		
@@ -126,8 +137,8 @@ public class EclipseUtils {
 	/**
 	 * Try to determine the IFile from the edit input
 	 * @param input
-	 * @return file
-	 * @throws CoreException 
+	 * @return file input stream
+	 * @throws CoreException or NullPointerException
 	 */
 	public static InputStream getInputStream(IEditorInput input) throws Exception {
 		if (input instanceof FileEditorInput) {
@@ -135,13 +146,19 @@ public class EclipseUtils {
 		}
 		return new FileInputStream(getFile(input));
 	}
+
+	/**
+	 * Try to determine the IFile from the edit input
+	 * @param input
+	 * @return file output stream
+	 * @throws CoreException or NullPointerException
+	 */
 	public static OutputStream getOutputStream(IEditorInput input)  throws Exception {
 		if (input instanceof FileEditorInput) {
 			return new FileOutputStream(((FileEditorInput)input).getFile().getLocation().toOSString());
 		}
 		return new FileOutputStream(getFile(input));
 	}
-
 	
 	/**
 	 * @param bundleUrl 
@@ -180,7 +197,7 @@ public class EclipseUtils {
 	}
 	
 	/**
-	 * @return IWorkbenchPage
+	 * @return IEditorPart
 	 */
 	public static IEditorPart getActiveEditor() {
 		final IWorkbenchPage page = EclipseUtils.getPage();
@@ -337,6 +354,7 @@ public class EclipseUtils {
 			}
 		}
 	}
+
 	/**
 	 * Gets a unique file. The file must have a parent of IFolder.
 	 * @param file
