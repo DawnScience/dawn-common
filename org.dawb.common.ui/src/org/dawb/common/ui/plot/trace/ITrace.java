@@ -55,4 +55,21 @@ public interface ITrace {
 	 */
 	public void setUserTrace(boolean isUserTrace);
 
+	/**
+	 * An object which may be set by API users to record information
+	 * about the plot. Ideally avoid objects containing large data
+	 * in this method.
+	 * 
+	 * @return
+	 */
+	public Object getUserObject();
+	
+	/**
+	 * An object which may be set by API users to record information
+	 * about the plot. Ideally avoid objects containing large data
+	 * in this method.
+	 * 
+	 * @return
+	 */
+	public void setUserObject(Object userObject);
 }
