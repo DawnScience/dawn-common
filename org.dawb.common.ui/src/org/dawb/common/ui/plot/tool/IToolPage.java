@@ -208,4 +208,15 @@ public interface IToolPage extends IPageBookViewPage, IAdaptable {
 	 * @return true if this one got disposed.
 	 */
 	public boolean isDisposed();
+	
+	/**
+	 * Override in your tool page. If the page is opened in a dedicated view,
+	 * a new version of the tool is created. However there may be data in the original
+	 * linked tool that you wish to sync. In this case override sync and a reference
+	 * to the original tool will be provided when it is opened in a dedicated view.
+	 * 
+	 * @param with
+	 */
+	public void sync(IToolPage with);
+
 }

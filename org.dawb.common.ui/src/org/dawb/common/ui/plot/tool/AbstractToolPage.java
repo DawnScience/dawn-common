@@ -192,4 +192,17 @@ public abstract class AbstractToolPage extends Page implements IToolPage, IAdapt
 	    
 		return clone;
 	}
+	
+	/**
+	 * Override in your tool page. If the page is opened in a dedicated view,
+	 * a new version of the tool is created. However there may be data in the original
+	 * linked tool that you wish to sync. In this case override sync and a reference
+	 * to the original tool will be provided when it is opened in a dedicated view.
+	 * 
+	 * @param with
+	 */
+	@Override
+	public void sync(IToolPage with) {
+		
+	}
 }
