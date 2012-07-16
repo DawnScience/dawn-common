@@ -57,39 +57,39 @@
       <menuContribution
             locationURI="toolbar:org.dawb.common.ui.views.dashboardView">
          <command
-               commandId="uk.ac.gda.client.RefreshDashCommand"
+               commandId="org.dawb.common.ui.RefreshDashCommand"
                icon="icons/page_refresh.png"
                label="Refresh"
                style="push"
                tooltip="Refresh all values and reconnect">
          </command>
          <separator
-               name="uk.ac.gda.client.separator1"
+               name="org.dawb.common.ui.separator1"
                visible="true">
          </separator>
          <command
-               commandId="uk.ac.gda.client.AddScannableCommand"
+               commandId="org.dawb.common.ui.AddScannableCommand"
                icon="icons/monitor_add.png"
                label="Add monitor"
                style="push"
                tooltip="Add scannable">
          </command>
          <command
-               commandId="uk.ac.gda.client.DeleteServerObjectCommand"
+               commandId="org.dawb.common.ui.DeleteServerObjectCommand"
                icon="icons/cross.png"
                label="Delete monitor"
                style="push"
                tooltip="Delete monitor">
          </command>
          <command
-               commandId="uk.ac.gda.client.DashUpCommand"
+               commandId="org.dawb.common.ui.DashUpCommand"
                icon="icons/arrow_up.png"
                label="Move Up"
                style="push"
                tooltip="Move selected motor up">
          </command>
          <command
-               commandId="uk.ac.gda.client.DashDownCommand"
+               commandId="org.dawb.common.ui.DashDownCommand"
                icon="icons/arrow_down.png"
                label="Move Down"
                style="push"
@@ -99,55 +99,55 @@
       <menuContribution
             locationURI="popup:org.dawb.common.ui.views.dashboardView">
          <command
-               commandId="uk.ac.gda.client.RefreshDashCommand"
+               commandId="org.dawb.common.ui.RefreshDashCommand"
                icon="icons/page_refresh.png"
                label="Refresh"
                style="push"
                tooltip="Refresh all values and reconnect">
          </command>
          <separator
-               name="uk.ac.gda.client.separator1"
+               name="org.dawb.common.ui.separator1"
                visible="true">
          </separator>
          <command
-               commandId="uk.ac.gda.client.AddScannableCommand"
+               commandId="org.dawb.common.ui.AddScannableCommand"
                icon="icons/monitor_add.png"
                label="Add monitor"
                style="push"
                tooltip="Add scannable">
          </command>
          <command
-               commandId="uk.ac.gda.client.DeleteServerObjectCommand"
+               commandId="org.dawb.common.ui.DeleteServerObjectCommand"
                icon="icons/cross.png"
                label="Delete monitor"
                style="push"
                tooltip="Delete monitor">
          </command>
          <command
-               commandId="uk.ac.gda.client.DashUpCommand"
+               commandId="org.dawb.common.ui.DashUpCommand"
                icon="icons/arrow_up.png"
                label="Move Up"
                style="push"
                tooltip="Move selected motor up">
          </command>
          <command
-               commandId="uk.ac.gda.client.DashDownCommand"
+               commandId="org.dawb.common.ui.DashDownCommand"
                icon="icons/arrow_down.png"
                label="Move Down"
                style="push"
                tooltip="Move selected motor down">
          </command>
          <separator
-               name="uk.ac.gda.client.separator3"
+               name="org.dawb.common.ui.separator3"
                visible="true">
          </separator>
          <command
-               commandId="uk.ac.gda.client.dashboard.DashboardPreferences"
+               commandId="org.dawb.common.ui.dashboard.DashboardPreferences"
                label="Monitor Preferences..."
                style="push">
          </command>
          <command
-               commandId="uk.ac.gda.client.dashboard.TangoPreferences"
+               commandId="org.dawb.common.ui.dashboard.TangoPreferences"
                label="Tango Preferences..."
                style="push">
          </command>
@@ -155,29 +155,29 @@
       <menuContribution
             locationURI="menu:org.dawb.common.ui.views.dashboardView">
          <command
-               commandId="uk.ac.gda.client.ResetServerObjectsCommand"
+               commandId="org.dawb.common.ui.ResetServerObjectsCommand"
                label="Reset"
                style="push"
                tooltip="Reset to default view">
          </command>
          <command
-               commandId="uk.ac.gda.client.ClearServerObjectsCommand"
+               commandId="org.dawb.common.ui.ClearServerObjectsCommand"
                icon="icons/page_delete.png"
                label="Clear"
                style="push"
                tooltip="Clear all objects">
          </command>
          <separator
-               name="uk.ac.gda.client.exafs.separator1"
+               name="org.dawb.common.ui.exafs.separator1"
                visible="true">
          </separator>
          <command
-               commandId="uk.ac.gda.client.dashboard.DashboardPreferences"
+               commandId="org.dawb.common.ui.dashboard.DashboardPreferences"
                label="Monitor Preferences..."
                style="push">
          </command>
          <command
-               commandId="uk.ac.gda.client.dashboard.TangoPreferences"
+               commandId="org.dawb.common.ui.dashboard.TangoPreferences"
                label="Tango Preferences..."
                style="push">
          </command>
@@ -323,47 +323,47 @@
          point="org.eclipse.ui.commands">
       <command
             defaultHandler="org.dawb.common.ui.views.monitor.actions.AddHardwareObjectHandler"
-            id="uk.ac.gda.client.AddScannableCommand"
+            id="org.dawb.common.ui.AddScannableCommand"
             name="Add motor">
       </command>
       <command
             defaultHandler="org.dawb.common.ui.views.monitor.actions.DeleteHardwareObjectHandler"
-            id="uk.ac.gda.client.DeleteServerObjectCommand"
+            id="org.dawb.common.ui.DeleteServerObjectCommand"
             name="Remove motor">
       </command>
       <command
             defaultHandler="org.dawb.common.ui.views.monitor.actions.DashboardPreferencesAction"
-            id="uk.ac.gda.client.dashboard.DashboardPreferences"
+            id="org.dawb.common.ui.dashboard.DashboardPreferences"
             name="Preferences">
       </command>
       <command
             defaultHandler="org.dawb.common.ui.views.monitor.actions.ResetHardwareObjectsHandler"
-            id="uk.ac.gda.client.ResetServerObjectsCommand"
+            id="org.dawb.common.ui.ResetServerObjectsCommand"
             name="Reset">
       </command>
       <command
             defaultHandler="org.dawb.common.ui.views.monitor.actions.RefreshDashHandler"
-            id="uk.ac.gda.client.RefreshDashCommand"
+            id="org.dawb.common.ui.RefreshDashCommand"
             name="Refresh Dash">
       </command>
       <command
             defaultHandler="org.dawb.common.ui.views.monitor.actions.ClearHardwareObjectsHandler"
-            id="uk.ac.gda.client.ClearServerObjectsCommand"
+            id="org.dawb.common.ui.ClearServerObjectsCommand"
             name="Clear">
       </command>
       <command
             defaultHandler="org.dawb.common.ui.views.monitor.actions.MoveUpHandler"
-            id="uk.ac.gda.client.DashUpCommand"
+            id="org.dawb.common.ui.DashUpCommand"
             name="Dash Item Up">
       </command>
       <command
             defaultHandler="org.dawb.common.ui.views.monitor.actions.MoveDownHandler"
-            id="uk.ac.gda.client.DashDownCommand"
+            id="org.dawb.common.ui.DashDownCommand"
             name="Dash Item Down">
       </command>
       <command
             defaultHandler="org.dawb.common.ui.views.monitor.actions.TangoPreferencesAction"
-            id="uk.ac.gda.client.dashboard.TangoPreferences"
+            id="org.dawb.common.ui.dashboard.TangoPreferences"
             name="Tango Preferences">
       </command>
    </extension>
