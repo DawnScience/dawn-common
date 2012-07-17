@@ -155,7 +155,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 			final ISystemService<IPlottingSystem> service = (ISystemService<IPlottingSystem>)PlatformUI.getWorkbench().getService(ISystemService.class);
 			if (service!=null) {
 				service.removeSystem(part.getTitle());
-				logger.debug("Plotting sytem for '"+part.getTitle()+"' removed.");
+				logger.debug("Plotting system for '"+part.getTitle()+"' removed.");
 			}
 		}
 
@@ -351,7 +351,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 			final ISystemService<IPlottingSystem> service = (ISystemService<IPlottingSystem>)PlatformUI.getWorkbench().getService(ISystemService.class);
 			if (service!=null) {
 				service.putSystem(part.getTitle(), this);
-				logger.debug("Plotting sytem for '"+part.getTitle()+"' registered.");
+				logger.debug("Plotting system for '"+part.getTitle()+"' registered.");
 			}
 		}
 	}
