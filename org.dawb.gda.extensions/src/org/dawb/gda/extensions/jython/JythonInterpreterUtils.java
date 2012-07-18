@@ -18,6 +18,9 @@ import org.dawb.common.util.eclipse.BundleUtils;
 import org.python.core.PyString;
 import org.python.core.PyStringMap;
 import org.python.core.PySystemState;
+import org.python.pydev.plugin.PydevPlugin;
+import org.python.pydev.ui.interpreters.JythonInterpreterManager;
+import org.python.pydev.ui.pythonpathconf.InterpreterInfo;
 import org.python.util.PythonInterpreter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,10 +28,6 @@ import org.slf4j.LoggerFactory;
 import uk.ac.diamond.scisoft.analysis.PlotServer;
 import uk.ac.diamond.scisoft.python.PythonUtils;
 import uk.ac.gda.util.OSUtils;
-import org.python.pydev.plugin.PydevPlugin;
-import org.python.pydev.ui.interpreters.JythonInterpreterManager;
-import org.python.pydev.ui.pythonpathconf.InterpreterInfo;
-import org.python.pydev.core.IInterpreterManager;
 
 import com.thoughtworks.xstream.core.util.CompositeClassLoader;
 
@@ -129,8 +128,6 @@ public class JythonInterpreterUtils {
 		
 		PythonInterpreter interpreter = new PythonInterpreter(new PyStringMap(), state);
 		interpreter.exec("import scisoftpy as dnp");
-		interpreter.exec("import scisoftpy.jython.jycore as jycore");
-		interpreter.exec("import scisoftpy.maths as maths");
 		
 		final long end = System.currentTimeMillis();
 		
