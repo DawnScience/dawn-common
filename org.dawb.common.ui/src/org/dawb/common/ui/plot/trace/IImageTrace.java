@@ -292,4 +292,19 @@ public interface IImageTrace extends ITrace {
 	 *         is unknown.
 	 */
 	public ROIBase getRegionInAxisCoordinates(final ROIBase roi) throws Exception;
+	
+	
+	/**
+	 * If the axis data set has been set, this method will return 
+	 * a point in the coordinates of the axes labels rather
+	 * than the indices. If no axes are set, then the original point is
+	 * returned.
+	 * 
+	 * @return point in label coordinates. 
+	 * 
+	 * @throws Exception if the point could not be transformed or the point type
+	 *         is unknown.
+	 */
+	public double[] getPointInAxisCoordinates(final double[] point) throws Exception;
+
 }
