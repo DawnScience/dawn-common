@@ -9,6 +9,7 @@ import org.dawb.common.services.ImageServiceBean.ImageOrigin;
 import org.eclipse.swt.graphics.PaletteData;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.roi.ROIBase;
 
 /**
  * Interface used for the plotting system to plot images.
@@ -277,4 +278,18 @@ public interface IImageTrace extends ITrace {
 	 */
 	public void setMask(AbstractDataset bd);
 
+	
+	/**
+	 * If the axis data set has been set, this method will return 
+	 * a selection region in the coordinates of the axes labels rather
+	 * than the indices. If no axes are set, then the original roi is
+	 * returned.
+	 * 
+	 * @return ROI in label coordinates. This roi is not that useful after it
+	 *         is created. The data processing needs rois with indices.
+	 *         
+	 * @throws Exception if the roi could not be transformed or the roi type
+	 *         is unknown.
+	 */
+	public ROIBase getRegionInAxisCoordinates(final ROIBase roi) throws Exception;
 }
