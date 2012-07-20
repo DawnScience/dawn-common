@@ -2,7 +2,6 @@
 # You will need to show the view 'Plot 1' to see the results of this script.
 
 import scisoftpy as dnp
-import scisoftpy.random as drd
 from time import sleep
 
 def plotLine():
@@ -12,9 +11,8 @@ def plotLine():
     dnp.plot.line(x,y)
 
 def plotRandom():
-    a  = drd.rand((256,256))
+    a  = dnp.random.rand(256,256)
     dnp.plot.image(a)
-    
 
 plotLine()
 sleep(4)
