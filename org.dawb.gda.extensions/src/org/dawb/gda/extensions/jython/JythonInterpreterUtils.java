@@ -46,7 +46,6 @@ public class JythonInterpreterUtils {
 	
 	/**
 	 * scisoftpy is imported as dnp
-	 * scisoftpy.core as scp
 	 * 
 	 * @return a new PythonInterpreter with scisoft scripts loaded.
 	 * @throws IOException 
@@ -59,6 +58,7 @@ public class JythonInterpreterUtils {
 		logger.debug("Starting new Jython Interpreter.");
 		
 		PySystemState.add_package("uk.ac.diamond.scisoft.analysis.plotserver");
+		PySystemState.add_package("uk.ac.diamond.scisoft.analysis.roi");
 		PySystemState.add_package("uk.ac.diamond.scisoft.python");
 		// Force class to load
 		PySystemState     state       = new PySystemState();
@@ -67,6 +67,8 @@ public class JythonInterpreterUtils {
 		loader.add(PlotServer.class.getClassLoader());
 		loader.add(PythonUtils.class.getClassLoader());
 		state.setClassLoader(loader);
+		state.path.clear(); // need to remove PyDev's additions to PYTHONPATH
+
 		File libsLocation;
 		try {
 			libsLocation = BundleUtils.getBundleLocation("uk.ac.gda.libs");
@@ -77,7 +79,7 @@ public class JythonInterpreterUtils {
 			if (System.getProperty("test.libs.location")==null) throw new Exception("Please set the property 'test.libs.location' for this test to work!");
 			libsLocation = new File(System.getProperty("test.libs.location"));
 		}
-		
+
 		String jyLib = libsLocation.getAbsolutePath()+"/jython2.5.1/Lib/";
 		state.path.append(new PyString(jyLib));
 		state.path.append(new PyString(jyLib+"dist-utils"));
