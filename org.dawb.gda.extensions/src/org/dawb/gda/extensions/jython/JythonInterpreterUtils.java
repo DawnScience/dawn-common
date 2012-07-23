@@ -56,8 +56,9 @@ public class JythonInterpreterUtils {
 		final long start = System.currentTimeMillis();
 				
 		logger.debug("Starting new Jython Interpreter.");
-		
-		PySystemState.add_package("uk.ac.diamond.scisoft.analysis.plotserver");
+
+		PySystemState.add_package("uk.ac.diamond.scisoft.analysis.diffraction");
+		PySystemState.add_package("uk.ac.diamond.scisoft.analysis.crystallography");
 		PySystemState.add_package("uk.ac.diamond.scisoft.analysis.roi");
 		PySystemState.add_package("uk.ac.diamond.scisoft.python");
 		// Force class to load
