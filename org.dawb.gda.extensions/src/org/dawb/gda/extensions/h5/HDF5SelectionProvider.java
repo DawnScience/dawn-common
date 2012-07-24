@@ -7,6 +7,7 @@ import javax.swing.tree.TreeNode;
 
 import ncsa.hdf.object.Dataset;
 import ncsa.hdf.object.Datatype;
+import ncsa.hdf.object.Group;
 import ncsa.hdf.object.HObject;
 import ncsa.hdf.object.h5.H5Group;
 import ncsa.hdf.object.h5.H5ScalarDS;
@@ -43,7 +44,7 @@ public class HDF5SelectionProvider implements IH5DoubleClickSelectionProvider {
         	if (oa == null) return null;
 
         	HDF5File     file      = null;
-        	HDF5Node     dataset   = null;
+        	HDF5Node     dest      = null;
         	HDF5Node     parent    = null;
         	String      fullName   = null;
         	for (int i = 0; i < oa.length; i++) {
@@ -58,6 +59,7 @@ public class HDF5SelectionProvider implements IH5DoubleClickSelectionProvider {
                     if (parNode!=null) {
                     	object  = (HObject)((DefaultMutableTreeNode)parNode).getUserObject();
                     	file = new HDF5File(root.getOID()[0], filePath);
+                    	
                     	parent  = createGroup(object, file);
                     }
 
@@ -67,15 +69,19 @@ public class HDF5SelectionProvider implements IH5DoubleClickSelectionProvider {
 					
                     if (object instanceof Dataset) {
                     	Dataset ds = (Dataset)object;
-                     	dataset    = createDataset(ds, filePath, new HDF5File(root.getOID()[0], filePath));
+                     	dest    = createDataset(ds, filePath, new HDF5File(root.getOID()[0], filePath));
                     	fullName   = ds.getFullName();
-                  
+                    } else if (object instanceof Group) {
+                    	Group g = (Group) object;
+                    	dest = createGroup(g, file);
+                    	fullName = g.getFullName();
                     }
-                    
 				}
 			}
-        	
-        	final HDF5NodeLink link = new HDF5NodeLink(file, filePath, fullName, parent, dataset);
+        	if (dest == null)
+        		return null;
+
+        	final HDF5NodeLink link = new HDF5NodeLink(file, filePath, fullName, parent, dest);
         	return HDF5Utils.createDatasetSelection(link, false);
        
         }
