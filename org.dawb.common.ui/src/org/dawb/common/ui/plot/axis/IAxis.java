@@ -201,4 +201,15 @@ public interface IAxis {
 	 */
 	public void removeAxisListener(IAxisListener listener);
 
+	/**
+	 * Sets if the date format should be formatting this axis.
+	 * @param dateEnabled
+	 */
+	public void setDateFormatEnabled(boolean dateEnabled);
+
+	/**
+	 * @return true if in date/time mode, false normally.
+	 */
+	public boolean isDateFormatEnabled();
+	
 }

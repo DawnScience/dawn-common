@@ -34,6 +34,7 @@ import org.dawb.common.ui.plot.trace.ITrace;
 import org.dawb.common.ui.plot.trace.ITraceListener;
 import org.dawb.common.ui.plot.trace.TraceEvent;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
@@ -695,4 +696,24 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	public void setAxisAndTitleVisibility(boolean isVisible, String title) {
 		// TODO Does nothing
 	}
+	
+	/**
+	 * NOTE This listener is *not* notified once for each configuration setting made on 
+	 * the configuration but once whenever the form is applied by the user (and many things
+	 * are changed) 
+	 * 
+	 * You then have to read the property you require from the object (for instance the axis
+	 * format) in case it has changed. This is not ideal, later there may be more events fired and
+	 * it will be possible to check property name, for now it is always set to "Graph Configuration".
+	 * 
+	 * @param listener
+	 */
+	public void addPropertyChangeListener(IPropertyChangeListener listener) {
+		// TODO Does nothing
+	}
+	
+	public void removePropertyChangeListener(IPropertyChangeListener listener) {
+		// TODO Does nothing
+	}
+
 }
