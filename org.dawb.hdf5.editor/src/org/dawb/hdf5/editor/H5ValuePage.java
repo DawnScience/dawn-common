@@ -180,15 +180,14 @@ public class H5ValuePage extends Page  implements ISelectionListener, IPartListe
 	}
 
 	public void updateObjectSelection(Object sel)  throws Exception{
-		
+
 		if (sel instanceof DefaultMutableTreeNode) {
 			final DefaultMutableTreeNode node = (DefaultMutableTreeNode)sel;
 			final Object                 ob   = node.getUserObject();
 			if (ob instanceof HObject) {
 				createH5Value((HObject)ob);
 			}
- 		} else if (sel instanceof H5Path || sel instanceof HDF5NodeLink) { // Might be nexus part.
-			
+ 		} else if (sel instanceof H5Path) { // Might be nexus part.
 			try {
 				final String path   = sel instanceof H5Path ? ((H5Path)sel).getPath() : ((HDF5NodeLink)sel).getPath();
 				final IEditorPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
@@ -198,12 +197,18 @@ public class H5ValuePage extends Page  implements ISelectionListener, IPartListe
 					final HObject ob = file.getData(path);
 					createH5Value(ob);
 				}
-				
 			} catch (Exception ne) {
 				logger.error(ne.getMessage()); // Not serious, no need for stack.
 			}
-			
-		}  	else if (sel instanceof HDF5Attribute) { // Might be nexus part.
+ 		} else if (sel instanceof HDF5NodeLink) {
+ 			HDF5NodeLink nl = (HDF5NodeLink) sel;
+ 			if (nl.isDestinationAGroup())
+ 				label.setText("Group name of '" + nl.getName() + "' children:");
+ 			else if (nl.isDestinationADataset())
+ 				label.setText("Dataset name of '" + nl.getName() + "' value:");
+
+ 			sourceViewer.getTextWidget().setText(nl.getDestination().toString());
+		} else if (sel instanceof HDF5Attribute) { // Might be nexus part.
 			sourceViewer.getTextWidget().setText(sel.toString());
 		}
 	}
