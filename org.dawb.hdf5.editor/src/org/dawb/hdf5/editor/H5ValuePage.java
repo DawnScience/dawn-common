@@ -193,9 +193,15 @@ public class H5ValuePage extends Page  implements ISelectionListener, IPartListe
 				final IEditorPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
 				if (part instanceof IH5Editor) {
 					final String filePath = ((IH5Editor)part).getFilePath();
-					final IHierarchicalDataFile file = HierarchicalDataFactory.getReader(filePath);
-					final HObject ob = file.getData(path);
-					createH5Value(ob);
+					
+					IHierarchicalDataFile file = null;
+					try {
+						file = HierarchicalDataFactory.getReader(filePath);
+						final HObject ob = file.getData(path);
+						createH5Value(ob);
+					} finally {
+						if (file!=null) file.close();
+					}
 				}
 			} catch (Exception ne) {
 				logger.error(ne.getMessage()); // Not serious, no need for stack.
