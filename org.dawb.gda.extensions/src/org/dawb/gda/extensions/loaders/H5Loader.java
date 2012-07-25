@@ -35,7 +35,6 @@ import uk.ac.diamond.scisoft.analysis.io.IDataSetLoader;
 import uk.ac.diamond.scisoft.analysis.io.IMetaData;
 import uk.ac.diamond.scisoft.analysis.io.IMetaLoader;
 import uk.ac.diamond.scisoft.analysis.io.ISliceLoader;
-import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 import uk.ac.diamond.scisoft.analysis.io.MetaDataAdapter;
 import uk.ac.diamond.scisoft.analysis.io.SliceObject;
 import uk.ac.gda.monitor.IMonitor;
@@ -51,24 +50,7 @@ public class H5Loader extends AbstractFileLoader implements IMetaLoader, IDataSe
 		EXT.add("hdf5");
 		EXT.add("hdf");
 		EXT.add("nexus");
-	}
-	/**
-	 * Called to ensure that the loader for h5 and nxs is this one.
-	 * @throws Exception
-	 */
-	public static void setLoaderInFactory() throws Exception {
-		LoaderFactory.getSupportedExtensions();
-		
-		/**
-		 * Warning DataImportSource assumes LoaderFactory will return
-		 * H5LazyDatasets in order to then get full data for the pipeline.
-		 */
-		for (String ext : EXT) {
-			LoaderFactory.clearLoader(ext);
-			LoaderFactory.registerLoader(ext, H5Loader.class);
-		}
-	}
-	
+	}	
 
 	public static boolean isH5(final String filePath) {
 		final String ext = FileUtils.getFileExtension(filePath);
