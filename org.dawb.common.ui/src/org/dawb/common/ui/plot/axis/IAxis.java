@@ -12,7 +12,7 @@ import org.eclipse.swt.graphics.Font;
  * @author fcp94556
  *
  */
-public interface IAxis {
+public interface IAxis extends ICoordinate {
 
 	/**
 	 * 
@@ -175,20 +175,6 @@ public interface IAxis {
 	 */
 	public void setRange(double start, double end);
 	
-	/**
-	 * The position in pixels of a given value.
-	 * @param value
-	 * @return
-	 */
-	public int getValuePosition(double value);
-	
-	/**
-	 * The value for a position in pixels.
-	 * @param value
-	 * @return
-	 */
-	public double getPositionValue(int position);
-
 	/**
 	 * Add a listener notified when the axis changes.
 	 * @param listener
