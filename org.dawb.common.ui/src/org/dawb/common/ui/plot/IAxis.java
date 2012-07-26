@@ -1,5 +1,6 @@
 package org.dawb.common.ui.plot;
 
+import org.dawb.common.ui.plot.axis.ICoordinateSystem;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 
@@ -12,7 +13,7 @@ import org.eclipse.swt.graphics.Font;
  * @author fcp94556
  *
  */
-public interface IAxis extends ICoordinate{
+public interface IAxis extends ICoordinateSystem{
 
 	/**
 	 * 
