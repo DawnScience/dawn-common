@@ -7,7 +7,7 @@ package org.dawb.common.ui.plot.axis;
  * @author fcp94556
  *
  */
-public interface ICoordinate {
+public interface ICoordinateSystem {
 
 	
 	/**
@@ -25,4 +25,15 @@ public interface ICoordinate {
 	public double getPositionValue(int position);
 
 
+	/**
+	 * Listen to the coordinates changing, zoom in or image rotated usually.
+	 * @param l
+	 */
+	public void addCoordinateSystemListener(ICoordinateSystemListener l);
+	
+	/**
+	 * Removing listening to the coordinates changing, zoom in or image rotated usually.
+	 * @param l
+	 */
+	public void removeCoordinateSystemListener(ICoordinateSystemListener l);
 }

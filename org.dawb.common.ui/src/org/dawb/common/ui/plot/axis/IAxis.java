@@ -12,7 +12,7 @@ import org.eclipse.swt.graphics.Font;
  * @author fcp94556
  *
  */
-public interface IAxis extends ICoordinate {
+public interface IAxis extends ICoordinateSystem {
 
 	/**
 	 * 
