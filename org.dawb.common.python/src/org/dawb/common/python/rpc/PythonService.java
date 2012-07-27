@@ -33,7 +33,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.ac.diamond.scisoft.analysis.rpc.AnalysisRpcClient;
-import uk.ac.gda.util.OSUtils;
 
 import com.isencia.util.commandline.ManagedCommandline;
 
@@ -41,7 +40,7 @@ import com.isencia.util.commandline.ManagedCommandline;
  * This class encapsulates a system command to python used with the RPC service
  * and drives python using the diamond RPC link.
  * 
- * It is a subset of the RPC interface availble by diamond pertinent to running
+ * It is a subset of the RPC interface available by diamond pertinent to running
  * python commands in the way jep does.
  */
 public class PythonService {
@@ -51,7 +50,7 @@ public class PythonService {
 	private ManagedCommandline command;
 	private AnalysisRpcClient  client;
 	private Thread             stopThread;
-	
+
 	/**
 	 * Must use openConnection()
 	 */
@@ -91,8 +90,14 @@ public class PythonService {
 		// ensure uk.ac.diamond.scisoft.python in PYTHONPATH
 		final Map<String,String> env = new HashMap<String,String>(System.getenv());
 		String pythonPath = env.get("PYTHONPATH");
-		StringBuilder pyBuf = pythonPath==null ? new StringBuilder() : new StringBuilder(pythonPath);
-		if (OSUtils.isWindowsOS()) pyBuf.append(";"); else pyBuf.append(":");
+
+		StringBuilder pyBuf;
+		if (pythonPath==null) {
+			pyBuf = new StringBuilder();
+		} else {
+			pyBuf = new StringBuilder(pythonPath);
+			pyBuf.append(File.pathSeparatorChar);
+		}
 	    final int    port   = NetUtils.getFreePort(getServiceStartPort());
 		final File   path   = BundleUtils.getBundleLocation("org.dawb.common.python");
 		String script = path.getAbsolutePath()+"/org/dawb/common/python/rpc/python_service.py";;
@@ -151,7 +156,7 @@ public class PythonService {
 		    	scisoftRpcPort = "0";
 		    }
 	    }
-    	// TODO Ensure plotting is started programatically in the GUI.
+    	// TODO Ensure plotting is started programmatically in the GUI.
 	    return scisoftRpcPort;
 	}
 
@@ -250,12 +255,13 @@ public class PythonService {
 	 * @return
 	 * @throws Exception
 	 */
+	@SuppressWarnings("unchecked")
 	public Map<String,? extends Object> runScript(String scriptFullPath, Map<String, ?> data, Collection<String> outputNames) throws Exception {
 		
 		final List<String> additionalPaths = new ArrayList<String>(1);
 		additionalPaths.add(BundleUtils.getEclipseHome());
 		if (System.getenv("PYTHONPATH")!=null) {
-			additionalPaths.addAll(Arrays.asList(System.getenv("PYTHONPATH").split(":")));
+			additionalPaths.addAll(Arrays.asList(System.getenv("PYTHONPATH").split(File.pathSeparator)));
 		}
         
 		final Object out = client.request("runScript", new Object[]{scriptFullPath, data, outputNames, additionalPaths}); 
@@ -281,7 +287,7 @@ public class PythonService {
 		final List<String> additionalPaths = new ArrayList<String>(1);
 		additionalPaths.add(BundleUtils.getEclipseHome());
 		if (System.getenv("PYTHONPATH")!=null) {
-			additionalPaths.addAll(Arrays.asList(System.getenv("PYTHONPATH").split(":")));
+			additionalPaths.addAll(Arrays.asList(System.getenv("PYTHONPATH").split(File.pathSeparator)));
 		}
 		
 		final Object out = client.request("runEdnaPlugin", new Object[]{execDir, pluginName, ednaDebugMode, xmlInputString, additionalPaths}); 
