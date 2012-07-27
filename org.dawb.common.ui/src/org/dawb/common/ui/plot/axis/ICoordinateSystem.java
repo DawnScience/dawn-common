@@ -15,14 +15,14 @@ public interface ICoordinateSystem {
 	 * @param value
 	 * @return
 	 */
-	public int getValuePosition(double value);
+	public int[] getValuePosition(double... value);
 	
 	/**
 	 * The value for a position in pixels.
 	 * @param value
 	 * @return
 	 */
-	public double getPositionValue(int position);
+	public double[] getPositionValue(int... position);
 
 
 	/**
@@ -36,4 +36,18 @@ public interface ICoordinateSystem {
 	 * @param l
 	 */
 	public void removeCoordinateSystemListener(ICoordinateSystemListener l);
+
+	/**
+	 * Get x-axis when the orientation is standard.
+	 * @return
+	 */
+	public IAxis getX();
+	
+	
+	/**
+	 * Get x-axis when the orientation is standard.
+	 * @return
+	 */
+	public IAxis getY();
+
 }
