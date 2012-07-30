@@ -74,6 +74,12 @@ public interface IPaletteListener extends EventListener {
 	public void nanBoundsChanged(PaletteEvent evt);
 	
 	/**
+	 * Called when the image origin is changed by the user.
+	 * @param evt
+	 */
+	public void imageOriginChanged(PaletteEvent evt);
+	
+	/**
 	 * To get the new mask the source of the event should be 
 	 * cast to IImageTrace and the getMask() method used on that
 	 * object.
@@ -126,6 +132,11 @@ public interface IPaletteListener extends EventListener {
 			
 		}
 		
+		@Override
+		public void imageOriginChanged(PaletteEvent evt) {
+			// TODO Auto-generated method stub
+			
+		}
 	}
 
 }
