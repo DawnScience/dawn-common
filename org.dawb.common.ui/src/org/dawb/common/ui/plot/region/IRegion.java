@@ -298,6 +298,8 @@ public interface IRegion {
 	 * Converts the x and y location in the axis coordinate to 
 	 * pixels and checks if the region is covering this location.
 	 * 
+	 * NOT Thread safe!
+	 * 
 	 * @param x
 	 * @param y
 	 */
