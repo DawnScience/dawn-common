@@ -60,4 +60,18 @@ public interface ICoordinateSystem {
 	 */
 	public void dispose();
 
+	/**
+	 * True if the x axis goes from high in the left to low in the right
+	 * (Ie opposite to the way it is in TOP_LEFT orientation)
+	 * @return
+	 */
+	public boolean isXReversed();
+
+	/**
+	 * True if the y axis goes from low in the bottom to high in the top.
+	 * (Ie opposite to the way it is in TOP_LEFT orientation)
+	 * @return
+	 */
+	public boolean isYReversed();
+
 }
