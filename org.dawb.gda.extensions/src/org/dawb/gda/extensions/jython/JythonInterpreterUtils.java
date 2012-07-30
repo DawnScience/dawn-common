@@ -115,11 +115,7 @@ public class JythonInterpreterUtils {
 			for (String path : paths) state.path.append(new PyString(path));
 		}
 		
-
-		String home = System.getProperty("eclipse.home.location");
-		if (home.startsWith("file:")) home = home.substring("file:".length());
-		if (home.startsWith("/")&&OSUtils.isWindowsOS()) home = home.substring(1);
-		state.path.append(new PyString(home+"/plugins"));
+		state.path.append(new PyString(BundleUtils.getEclipseHome()+"/plugins"));
 		
 		try {
 			File analysisPlugin = BundleUtils.getBundleLocation("uk.ac.diamond.scisoft.analysis");
