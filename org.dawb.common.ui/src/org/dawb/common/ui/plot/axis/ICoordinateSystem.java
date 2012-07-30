@@ -4,6 +4,10 @@ package org.dawb.common.ui.plot.axis;
  * Interface for converting between real value and coordinate in plotting system
  * (which is screen pixels).
  * 
+ * Each region receives their own copy of ICoordinateSystem and this is
+ * disposed when the region is. This avoids memory leaks on any listeners added
+ * to the axes.
+ * 
  * @author fcp94556
  *
  */
@@ -49,5 +53,11 @@ public interface ICoordinateSystem {
 	 * @return
 	 */
 	public IAxis getY();
+
+	/**
+	 * Called when the region is removed. This assumes each ICoordinateSystem instance is unique
+	 * to each region.
+	 */
+	public void dispose();
 
 }
