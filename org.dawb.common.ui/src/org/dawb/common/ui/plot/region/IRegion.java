@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 
+import org.dawb.common.ui.plot.axis.ICoordinateSystem;
 import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.MouseListener;
@@ -304,4 +305,12 @@ public interface IRegion {
 	 * @param y
 	 */
 	public boolean containsPoint(double x, double y);
+	
+	
+	/**
+	 * The coordinate system for the region (this allows for the image to be in 
+	 * any orientation).
+	 * @return
+	 */
+	public ICoordinateSystem getCoordinateSystem();
 }
