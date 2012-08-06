@@ -28,7 +28,8 @@ import java.util.Map;
 
 import org.dawb.common.util.eclipse.BundleUtils;
 import org.dawb.common.util.net.NetUtils;
-import org.eclipse.core.variables.VariablesPlugin;
+import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,10 +82,9 @@ public class PythonService {
 		
 		final PythonService service = new PythonService();
 		
-	    String scisoftRpcPort = getSciSoftPlottingPort();
-	    if (scisoftRpcPort==null||"".equals(scisoftRpcPort)) {
-	    	scisoftRpcPort = "0";
-	    	logger.error("Cannot identify scisoft plotting port, leaving set as 0.\nShow view part 'Plot 1' if you would like to start the plotting.");
+	    int scisoftRpcPort = getSciSoftPlottingPort();
+	    if (scisoftRpcPort<=0) {
+	    	logger.error("Cannot identify scisoft plotting port.\nShow view part 'Plot 1' if you would like to start the plotting.");
 	    }
 
 		// Find the location of python_service.py and
@@ -109,7 +109,7 @@ public class PythonService {
 		}
 		
 		service.command = new ManagedCommandline();
-		service.command.addArguments(new String[]{pythonInterpreter, "-u", script, String.valueOf(port), scisoftRpcPort});
+		service.command.addArguments(new String[]{pythonInterpreter, "-u", script, String.valueOf(port), String.valueOf(scisoftRpcPort)});
 		
 		env.put("PYTHONPATH", pyBuf.toString());
 		service.command.setEnv(env);
@@ -136,19 +136,21 @@ public class PythonService {
 	 * Will check temp variable set to dynamic port.
 	 * @return
 	 */
-	public static String getSciSoftPlottingPort() {
-	    String scisoftRpcPort; 
+	public static int getSciSoftPlottingPort() {
+	    
+		final ScopedPreferenceStore store = new ScopedPreferenceStore(InstanceScope.INSTANCE, "uk.ac.diamond.scisoft.analysis.rcp");
+		int scisoftRpcPort=0; 
 	    try {
-	    	scisoftRpcPort = VariablesPlugin.getDefault().getStringVariableManager().performStringSubstitution("${scisoft_rpc_port}");
+	    	scisoftRpcPort = store.getInt("rmi.server.port");
 	    } catch (Exception ne) {
-	    	scisoftRpcPort = "0";
+	    	scisoftRpcPort = 0;
 	    }
 	    
-	    if (scisoftRpcPort==null || "".equals(scisoftRpcPort) || "0".equals(scisoftRpcPort)) {
+	    if (scisoftRpcPort<=0) {
 		    try {
-		    	scisoftRpcPort = VariablesPlugin.getDefault().getStringVariableManager().performStringSubstitution("${scisoft_rpc_temp}");
+		    	scisoftRpcPort = store.getInt("rmi.server.port.auto");
 		    } catch (Exception ne) {
-		    	scisoftRpcPort = "0";
+		    	scisoftRpcPort = 0;
 		    }
 	    }
     	// TODO Ensure plotting is started programatically in the GUI.
