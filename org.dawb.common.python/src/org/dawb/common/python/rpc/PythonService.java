@@ -140,6 +140,7 @@ public class PythonService {
 	    
 		final ScopedPreferenceStore store = new ScopedPreferenceStore(InstanceScope.INSTANCE, "uk.ac.diamond.scisoft.analysis.rcp");
 		int scisoftRpcPort=0; 
+
 	    try {
 	    	scisoftRpcPort = store.getInt("analysisrpc.server.port");
 	    	if (scisoftRpcPort>0) {
