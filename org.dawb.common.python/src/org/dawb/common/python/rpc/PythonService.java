@@ -141,19 +141,29 @@ public class PythonService {
 		final ScopedPreferenceStore store = new ScopedPreferenceStore(InstanceScope.INSTANCE, "uk.ac.diamond.scisoft.analysis.rcp");
 		int scisoftRpcPort=0; 
 	    try {
-	    	scisoftRpcPort = store.getInt("rmi.server.port");
+	    	scisoftRpcPort = store.getInt("analysisrpc.server.port");
+	    	if (scisoftRpcPort>0) {
+	    		logger.info("Found RPC plotting port set to value of "+scisoftRpcPort);
+	    		return scisoftRpcPort;
+	    	}
 	    } catch (Exception ne) {
 	    	scisoftRpcPort = 0;
 	    }
 	    
+	    
 	    if (scisoftRpcPort<=0) {
 		    try {
-		    	scisoftRpcPort = store.getInt("rmi.server.port.auto");
+		    	scisoftRpcPort = store.getInt("analysisrpc.server.port.auto");
+		    	if (scisoftRpcPort>0) {
+		    		logger.info("Found RPC plotting port set to temporary value of "+scisoftRpcPort);
+		    		return scisoftRpcPort;
+		    	}
 		    } catch (Exception ne) {
 		    	scisoftRpcPort = 0;
 		    }
 	    }
-    	// TODO Ensure plotting is started programatically in the GUI.
+    	// TODO Ensure plotting is started programmatically in the GUI.
+
 	    return scisoftRpcPort;
 	}
 
