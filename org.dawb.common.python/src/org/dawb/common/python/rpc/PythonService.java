@@ -147,6 +147,10 @@ public class PythonService {
 		int scisoftRpcPort=0; 
 	    try {
 	    	scisoftRpcPort = store.getInt("rmi.server.port");
+	    	if (scisoftRpcPort>0) {
+	    		logger.info("Found RMI plotting port set to fixed value of "+scisoftRpcPort);
+	    		return scisoftRpcPort;
+	    	}
 	    } catch (Exception ne) {
 	    	scisoftRpcPort = 0;
 	    }
@@ -154,6 +158,10 @@ public class PythonService {
 	    if (scisoftRpcPort<=0) {
 		    try {
 		    	scisoftRpcPort = store.getInt("rmi.server.port.auto");
+		    	if (scisoftRpcPort>0) {
+		    		logger.info("Found RMI plotting port set to temporary value of "+scisoftRpcPort);
+		    		return scisoftRpcPort;
+		    	}
 		    } catch (Exception ne) {
 		    	scisoftRpcPort = 0;
 		    }
