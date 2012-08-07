@@ -206,9 +206,8 @@ public class DiamondPlottingSystem extends AbstractPlottingSystem {
 	}
 
 	@Override
-	public void savePlotting(String filename) {
-		// TODO Auto-generated method stub
-		
+	public String savePlotting(String filename) {
+		return null;
 	}
 
 	@Override

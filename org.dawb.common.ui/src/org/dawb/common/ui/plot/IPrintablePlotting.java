@@ -33,7 +33,7 @@ public interface IPrintablePlotting {
 	 * 
 	 * @param filename
 	 */
-	public void savePlotting(String filename);
+	public String savePlotting(String filename);
 
 	/**
 	 * Export/Save the plotting to an image format without a dialog box
