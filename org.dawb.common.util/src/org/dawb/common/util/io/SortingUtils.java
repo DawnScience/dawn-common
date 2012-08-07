@@ -71,11 +71,20 @@ public class SortingUtils {
 
 
 	public static final Comparator<File> DEFAULT_COMPARATOR = new Comparator<File>() {
-			@Override
-			public int compare(File one, File two) {
-				return one.compareTo(two);
-			}
-		};
+		@Override
+		public int compare(File one, File two) {
+			return one.compareTo(two);
+		}
+	};
+
+	public static final Comparator<File> DEFAULT_COMPARATOR_DIRS_FIRST = new Comparator<File>() {
+		@Override
+		public int compare(File one, File two) {
+			if (one.isDirectory() && !two.isDirectory())  return -1;
+			if (two.isDirectory() && !one.isDirectory())  return 1;
+			return one.compareTo(two);
+		}
+	};
 
 	/**
 	 * @param dir
@@ -134,40 +143,18 @@ public class SortingUtils {
 	 * @return List<File>
 	 */
 	public static List<File> getSortedFileList(final File dir, final boolean dirsFirst) {
-		return getSortedFileList(dir, DEFAULT_COMPARATOR, dirsFirst);
-	}
+		if (!dir.isDirectory()) return null;
 
-	private static List<File> getSortedFileList(final File dir, final Comparator<File> comp, final boolean dirsFirst) {
-		if (!dir.isDirectory())    return null;
-	    if (dir.listFiles()==null) return null;
-
-	    final List<File> ret;
-	    if (dirsFirst) {
-			ret = new ArrayList<File>(dir.listFiles().length);
-			
-			final List<File> dirs = getSortedFileList(dir.listFiles(new FileFilter() {		
-				@Override
-				public boolean accept(File pathname) {
-					return pathname.isDirectory();
-				}
-			}), comp);
-			if (dirs!=null) ret.addAll(dirs);
-			
-			final List<File> files = getSortedFileList(dir.listFiles(new FileFilter() {		
-				@Override
-				public boolean accept(File pathname) {
-					return !pathname.isDirectory();
-				}
-			}), comp);
-			if (files!=null) ret.addAll(files);
+		Comparator<File> comp =  !dirsFirst?DEFAULT_COMPARATOR:DEFAULT_COMPARATOR_DIRS_FIRST;
 		
-	    } else {
-	    	ret = getSortedFileList(dir.listFiles(), comp);
-	    }
-			
-		if (ret.isEmpty()) return null;
-		return ret;
+        final File[] fa = dir.listFiles();
+	    if (fa == null || fa.length<1) return null;
+	    
+	    final List<File> files = new ArrayList<File>(fa.length);
+	    files.addAll(Arrays.asList(fa));
+	    Collections.sort(files, comp);
 
+	    return files;
 	}
 
 	public static void removeIgnoredNames(Collection<String> sets, Collection<Pattern> patterns) {
