@@ -46,12 +46,13 @@ public class HDF5SelectionProvider implements IH5DoubleClickSelectionProvider {
         	HDF5Node     dest      = null;
         	HDF5Node     parent    = null;
         	String      fullName   = null;
+            TreeNode parNode  = null;
         	for (int i = 0; i < oa.length; i++) {
 				
 				if (oa[i] instanceof TreeNode) { // HDF5Tree
 					
 					final TreeNode treeNode = (TreeNode)oa[i];
-                    final TreeNode parNode  = treeNode.getParent();
+                    parNode  = treeNode.getParent();
                    	final HObject root = (HObject)((DefaultMutableTreeNode)((DefaultMutableTreeNode)treeNode).getRoot()).getUserObject();
                     
                     HObject object = null;
@@ -78,13 +79,42 @@ public class HDF5SelectionProvider implements IH5DoubleClickSelectionProvider {
         		return null;
 
         	final HDF5NodeLink link = new HDF5NodeLink(file, filePath, fullName, parent, dest);
-        	return HDF5Utils.createDatasetSelection(link, false);
-       
+
+        	// find out if it is a GDA NeXus tree by looking for the top-level group that
+        	// contains the node and then seeing if has a string dataset called program_name
+        	TreeNode root = null;
+        	TreeNode prev = null;
+        	TreeNode n = parNode;
+        	while (n != null) {
+        		prev = root;
+        		root = n;
+        		n = n.getParent();
+        	}
+        	boolean isGDA = false;
+			HObject object = (HObject) ((DefaultMutableTreeNode) prev).getUserObject();
+			if (object instanceof Group) {
+				for (HObject o : ((Group) object).getMemberList()) {
+					if (o instanceof Dataset) {
+						String name = o.getName();
+						if ("program_name".equals(name)) {
+							Dataset d = (Dataset) o;
+							d.setConvertByteToString(true);
+							Object obj = d.getData();
+							if (obj instanceof String[]) {
+								isGDA = ((String[]) obj)[0].startsWith("GDA ");
+							}
+							break;
+						}
+					}
+				}
+			}
+        	
+        	return HDF5Utils.createDatasetSelection(link, isGDA);
         }
         
         return null;
 	}
-	
+
 	private HDF5Dataset createDataset(final Dataset oo, final String path, HDF5File file) throws Exception {
 
 		final long oid = oo.getOID()[0];
@@ -110,7 +140,7 @@ public class HDF5SelectionProvider implements IH5DoubleClickSelectionProvider {
 			// An attribute called "data_filename" is defined and refers to 
 			// an external file and acts like a group
 			osd.setConvertByteToString(true);
-			if (nd.containsAttribute(HDF5Loader.DATA_FILENAME_ATTR_NAME)) {
+			if (nd.containsAttribute(HDF5Loader.DATA_FILENAME_ATTR_NAME)) { // FIXME how can this ever be true??? (no attributes have been set)
 				// interpret set of strings as the full path names to a group of external files that are stacked together
 				ExternalFiles ef = HDF5Loader.extractExternalFileNames(osd);
 				try{
