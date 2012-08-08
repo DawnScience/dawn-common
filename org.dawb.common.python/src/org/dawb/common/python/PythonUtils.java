@@ -38,7 +38,7 @@ public class PythonUtils {
 	 */
 	public static String getProbablePythonPath() {
 		
-		final String pythonDefinition = System.getenv("PYTHON");
+		final String pythonDefinition = System.getenv("PYTHON"); // defined before EDNA plugin launcher
 		if (pythonDefinition == null) {
 			
 			String path = System.getenv("PATH");
@@ -53,7 +53,7 @@ public class PythonUtils {
 		// Sometimes can find old default interpreter on linux
 		if (PythonUtils.isLinuxOS()) {
 			final File python =  new File("/usr/bin/python");
-			if (python.exists()) return  "/usr/bin/python";
+			if (python.exists()) return  python.getAbsolutePath();
 		}
 		
 		// Some kind of default which we hope works.
@@ -69,10 +69,7 @@ public class PythonUtils {
 	 * @return
 	 */
 	private static String searchPath(final String path, final String execName) {
-		
-		String pathSep = ":";
-		if (PythonUtils.isWindowsOS()) pathSep = ";";
-		final StringTokenizer toker = new StringTokenizer(path, pathSep);
+		final StringTokenizer toker = new StringTokenizer(path, File.pathSeparator);
 		while(toker.hasMoreTokens()) {
 			final String execPath = getExecutable(toker.nextToken(), execName);
 			if (execPath!=null) return execPath;
@@ -165,12 +162,6 @@ public class PythonUtils {
 	private static boolean isLinuxOS() {
 		String os = System.getProperty("os.name");
 		return os != null && os.startsWith("Linux");
-	}
-	/**
-	 * @return true if windows
-	 */
-	static private boolean isWindowsOS() {
-		return (System.getProperty("os.name").indexOf("Windows") == 0);
 	}
 
 	/**
