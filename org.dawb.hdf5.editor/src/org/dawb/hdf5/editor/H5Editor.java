@@ -178,7 +178,6 @@ public class H5Editor extends EditorPart implements IReusableEditor, IH5Editor {
 		
 		final TreeNode root = file.getNode();
 		tree.getTree().setItemCount(root.getChildCount());
-		tree.setUseHashlookup(true);
 		tree.setContentProvider(new H5ContentProvider());
 		tree.setLabelProvider(new H5LabelProvider());
 		tree.setInput(root);
