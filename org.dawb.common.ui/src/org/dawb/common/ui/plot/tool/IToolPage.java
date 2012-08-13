@@ -210,6 +210,18 @@ public interface IToolPage extends IPageBookViewPage, IAdaptable {
 	public boolean isDisposed();
 	
 	/**
+	 * May be null
+	 * @return
+	 */
+	public String getCheatSheetId();
+	
+	/**
+	 * May be null
+	 * @return
+	 */
+	public void setCheatSheetId(String cheatId);
+
+	/**
 	 * Override in your tool page. If the page is opened in a dedicated view,
 	 * a new version of the tool is created. However there may be data in the original
 	 * linked tool that you wish to sync. In this case override sync and a reference

@@ -24,6 +24,7 @@ public abstract class AbstractToolPage extends Page implements IToolPage, IAdapt
 	private IWorkbenchPart  part;
 	private String          title;
 	private String          unique_id;
+	private String          cheatSheetId;
 	private ImageDescriptor imageDescriptor;
 	private IViewPart       viewPart;
 
@@ -204,5 +205,13 @@ public abstract class AbstractToolPage extends Page implements IToolPage, IAdapt
 	@Override
 	public void sync(IToolPage with) {
 		
+	}
+
+	public String getCheatSheetId() {
+		return cheatSheetId;
+	}
+
+	public void setCheatSheetId(String cheatSheetId) {
+		this.cheatSheetId = cheatSheetId;
 	}
 }

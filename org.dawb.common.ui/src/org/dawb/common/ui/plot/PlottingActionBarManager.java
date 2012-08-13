@@ -220,6 +220,7 @@ public class PlottingActionBarManager implements IPlotActionSystem {
     	tool.setTitle(e.getAttribute("label"));
     	tool.setPart(system.getPart());
     	tool.setToolId(e.getAttribute("id"));
+    	tool.setCheatSheetId(e.getAttribute("cheat_sheet_id"));
     	
     	// Save tool page
     	if (toolPages==null) toolPages = new HashMap<String, IToolPage>(7);

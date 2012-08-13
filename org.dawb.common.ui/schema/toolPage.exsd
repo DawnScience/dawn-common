@@ -93,6 +93,13 @@
                </documentation>
             </annotation>
          </attribute>
+         <attribute name="cheat_sheet_id" type="string">
+            <annotation>
+               <documentation>
+                  The id of a cheat sheet explaining how to use the tool.
+               </documentation>
+            </annotation>
+         </attribute>
       </complexType>
    </element>
 
