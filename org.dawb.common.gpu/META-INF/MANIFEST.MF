@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Gpu
+Bundle-SymbolicName: org.dawb.common.gpu
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: org.dawb.common.gpu.Activator
+Bundle-Vendor: DLS
+Require-Bundle: org.eclipse.core.runtime
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy
+Import-Package: com.amd.aparapi;version="1.0.0",
+ uk.ac.diamond.scisoft.analysis.dataset
+Export-Package: org.dawb.common.gpu
