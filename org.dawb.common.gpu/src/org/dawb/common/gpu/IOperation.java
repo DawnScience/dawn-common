@@ -6,7 +6,7 @@ public interface IOperation {
 
 	/**
 	 * Processes the operator on the GPU making a Kernel if required and
-	 * storing it as local data. Call dispose on this IOperation to 
+	 * storing it as local data. Call deactivate on this IOperation to 
 	 * clean up memory being used by the kernel
 	 * 
 	 * @param a
@@ -18,7 +18,7 @@ public interface IOperation {
 
 	/**
 	 * Processes the operator on the GPU making a Kernel if required and
-	 * storing it as local data. Call dispose on this IOperation to 
+	 * storing it as local data. Call deactivate on this IOperation to 
 	 * clean up memory being used by the kernel
 	 * 
 	 * @param a
