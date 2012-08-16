@@ -1,4 +1,4 @@
-# An exmple jython script able to interact with the graph.
+# An example jython script able to interact with the graph.
 # You will need to show the view 'Plot 1' to see the results of this script.
 
 import scisoftpy as dnp
