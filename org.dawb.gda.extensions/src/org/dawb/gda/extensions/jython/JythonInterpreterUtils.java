@@ -27,7 +27,6 @@ import org.slf4j.LoggerFactory;
 
 import uk.ac.diamond.scisoft.analysis.PlotServer;
 import uk.ac.diamond.scisoft.python.PythonUtils;
-import uk.ac.gda.util.OSUtils;
 
 import com.thoughtworks.xstream.core.util.CompositeClassLoader;
 
