@@ -222,6 +222,9 @@ public class HeaderTableView extends ViewPart implements ISelectionListener, IPa
 				}
 				@Override
 				public Object[] getElements(Object inputElement) {
+					if (meta == null)
+						return new Object[]{""};
+
 					try {
 						return meta.getMetaNames().toArray(new Object[meta.getMetaNames().size()]);
 					} catch (Exception e) {
@@ -259,7 +262,8 @@ public class HeaderTableView extends ViewPart implements ISelectionListener, IPa
 		if (part instanceof IMetadataProvider)
 			try {
 				meta = ((IMetadataProvider) part).getMetadata();
-				updateTable.schedule();
+				if (meta != null)
+					updateTable.schedule();
 			} catch (Exception e) {
 				logger.error("There was a error reading the metadata from the selection", e);
 			}
@@ -347,7 +351,7 @@ public class HeaderTableView extends ViewPart implements ISelectionListener, IPa
 		
 		public String getText(final Object element) {
 			if (column==0) return element.toString();
-			if (column==1)
+			if (column==1 && meta != null)
 				try {
 					return meta.getMetaValue(element.toString()).toString();
 				} catch (Exception ignored) {
