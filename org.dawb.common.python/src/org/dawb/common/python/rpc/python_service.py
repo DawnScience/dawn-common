@@ -63,7 +63,7 @@ def runScript(scriptPath, sets, outputs, additionalPaths=None):
     Run the script
     '''
     result = {}
-    execfile(scriptPath)
+    execfile(scriptPath, globals()) # need to place locals from script in globals
     
     '''
     Read required results back from globals and locals,
