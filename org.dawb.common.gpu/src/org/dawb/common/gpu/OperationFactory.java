@@ -9,7 +9,20 @@ package org.dawb.common.gpu;
  */
 public class OperationFactory {
 
-	public static IOperation getBasicOperation() {
-		return new BasicOperation();
+	/**
+	 * Probably not worth it for O(N) maths.
+	 * @return
+	 */
+	public static IOperation getBasicGpuOperation() {
+		return new BasicGPUOperation();
 	}
+	
+	/**
+	 * Probably better than getBasicGpuOperation() for O(N)
+	 * @return
+	 */
+	public static IOperation getBasicCpuOperation() {
+		return new BasicCPUOperation();
+	}
+
 }

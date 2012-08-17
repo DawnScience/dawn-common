@@ -8,6 +8,7 @@ import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.DatasetUtils;
 import uk.ac.diamond.scisoft.analysis.dataset.DoubleDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.IntegerDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.Maths;
 
 /**
  * Operation which supports basic operators.
@@ -15,15 +16,28 @@ import uk.ac.diamond.scisoft.analysis.dataset.IntegerDataset;
  * @author fcp94556
  *
  */
-class BasicOperation implements IOperation {
+class BasicGPUOperation implements IOperation {
 
 	private ArrayOperationKernel  arrayKernel;
 	private ScalarOperationKernel scalarKernel;
 	
 	@Override
-	public AbstractDataset process(AbstractDataset data, double b, Operator operation) {
+	public AbstractDataset process(AbstractDataset a, double b, Operator operation) {
 		
-		Object[] prims = getPrimitives(data);
+		if (Boolean.getBoolean("org.dawb.common.gpu.operation.use.cpu")) {
+			switch (operation) {
+			case ADD:
+				return Maths.add(a,b);
+			case SUBTRACT:
+				return Maths.subtract(a,b);
+			case MULTIPLY:
+				return Maths.multiply(a,b);
+			case DIVIDE:
+				return Maths.divide(a,b);
+			}
+		}
+		
+		Object[] prims = getPrimitives(a);
 	    int[]    ia    = (int[])prims[0];
 	    double[] da    = (double[])prims[1];
 
@@ -37,14 +51,27 @@ class BasicOperation implements IOperation {
 		scalarKernel.setDa(da!=null?da:new double[]{1}); // Not allowed nulls
 		scalarKernel.setB(b);
 
-		Range range = Range.create(data.getSize()); 
+		Range range = Range.create(a.getSize()); 
 		scalarKernel.execute(range);
 
-		return new DoubleDataset(scalarKernel.getResult(), data.getShape());
+		return new DoubleDataset(scalarKernel.getResult(), a.getShape());
 	}
 
 	@Override
 	public AbstractDataset process(AbstractDataset a, AbstractDataset b, Operator operation) {
+		
+		if (Boolean.getBoolean("org.dawb.common.gpu.operation.use.cpu")) {
+			switch (operation) {
+			case ADD:
+				return Maths.add(a,b);
+			case SUBTRACT:
+				return Maths.subtract(a,b);
+			case MULTIPLY:
+				return Maths.multiply(a,b);
+			case DIVIDE:
+				return Maths.divide(a,b);
+			}
+		}
 		
 		Object[] prims = getPrimitives(a);
 	    int[]    ia    = (int[])prims[0];
