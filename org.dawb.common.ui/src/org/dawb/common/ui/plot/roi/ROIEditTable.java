@@ -87,9 +87,10 @@ public class ROIEditTable  {
 	public void setRegion(final ROIBase roi, final RegionType regionType) {
 		
 		this.regionType  = regionType;
-		this.originalRoi = roi!=null ? roi.copy() : null;
+		this.originalRoi = roi!=null ? roi : null;
+		this.roi         = roi!=null ? roi.copy() : null;
 				
-		this.rows = createRegionRows(originalRoi);
+		this.rows = createRegionRows(roi);
 		
 		regionTable.setContentProvider(new IStructuredContentProvider() {
 			
@@ -406,7 +407,11 @@ public class ROIEditTable  {
 	}
 
 	public void dispose() {
-    	
+		roi=null;
+		originalRoi=null;
+		regionType=null;
+		rows.clear();
+		rows=null;
     }
     
     private final static class RegionRow {
