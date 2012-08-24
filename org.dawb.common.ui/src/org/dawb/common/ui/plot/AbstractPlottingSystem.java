@@ -309,6 +309,10 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 		//TODO
 	}
 	
+	public void repaint(boolean autoscale) {
+		//TODO
+	}
+	
 	protected IWorkbenchPart part;
 	
 	/**
