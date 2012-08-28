@@ -214,4 +214,5 @@ public abstract class AbstractToolPage extends Page implements IToolPage, IAdapt
 	public void setCheatSheetId(String cheatSheetId) {
 		this.cheatSheetId = cheatSheetId;
 	}
+
 }
