@@ -9,8 +9,12 @@
  */ 
 package org.dawb.gda.extensions.loaders;
 
+import org.dawb.hdf5.IHierarchicalDataFile;
+import org.dawb.hdf5.Nexus;
+
 import ncsa.hdf.object.Dataset;
 import ncsa.hdf.object.Datatype;
+import ncsa.hdf.object.Group;
 import ncsa.hdf.object.h5.H5Datatype;
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ByteDataset;
@@ -139,6 +143,21 @@ public class H5Utils {
         }
         
         throw new Exception("Cannot deal with data type "+a.getClass().getName());
+	}
+
+	/**
+	 * Appends a to a dataset of the same name as a and parent Group of parent.
+	 * 
+	 * @param file
+	 * @param parent
+	 * @param a
+	 * @throws Exception
+	 */
+	public static void appendDataset(IHierarchicalDataFile file, Group parent, AbstractDataset a) throws Exception {
+
+		long[] shape = H5Utils.getLong(a.getShape());
+		Dataset s = file.appendDataset(a.getName(),  H5Utils.getDatatype(a), shape, a.getBuffer(), parent);
+		file.setNexusAttribute(s, Nexus.SDS);			
 	}
 
 }
