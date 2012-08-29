@@ -3,6 +3,8 @@ package org.dawb.common.ui.plot.tool;
 import ncsa.hdf.object.Group;
 
 import org.dawb.hdf5.IHierarchicalDataFile;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 
@@ -29,6 +31,10 @@ public interface IDataReductionToolPage extends IToolPage {
 	 * @param group
 	 * @param set -  the data to run the tool on.
 	 */
-	public void export(IHierarchicalDataFile hf, Group parent, AbstractDataset set) throws Exception;
+	public IStatus export(IHierarchicalDataFile hf, Group parent, AbstractDataset set, IProgressMonitor monitor) throws Exception;
 
+	/**
+	 * TODO May add a method here to define extra wizard pages if a tool requires it.
+	 * public IWizardPage getToolExportWizardPage(...) {
+	 */
 }
