@@ -4,9 +4,10 @@ import java.util.Collection;
 import java.util.HashSet;
 
 import org.eclipse.draw2d.Figure;
-import org.eclipse.draw2d.Label;
+import org.eclipse.draw2d.FigureUtilities;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.widgets.Display;
 
@@ -23,7 +24,9 @@ public abstract class AbstractRegion extends Figure implements IRegion, IRegionC
 	private Collection<IROIListener> roiListeners;
 	private boolean regionEventsActive = true;
 	private boolean maskRegion         = false;
-	protected Label label = null;
+	protected String label = null;
+	protected Color labelColour = null;
+	protected Font labelFont = new Font(Display.getCurrent(), "Dialog", 10, SWT.NORMAL);
 	protected Dimension labeldim;
 
 	@Override
@@ -152,13 +155,12 @@ public abstract class AbstractRegion extends Figure implements IRegion, IRegionC
 		this.maskRegion = maskRegion;
 	}
 	
-	public Label getLabel() {
+	public String getLabel() {
 		return label;
 	}
 	
-	public void setLabel(Label label) {
+	public void setLabel(String label) {
 		this.label = label ;
-		this.label.setFont(new Font(Display.getCurrent(), "Dialog", 10, SWT.NORMAL));
-		this.labeldim = label.getTextUtilities().getTextExtents(label.getText(), label.getFont());
+		this.labeldim = FigureUtilities.getTextExtents(label, labelFont);
 	}
 }

@@ -33,16 +33,16 @@ public interface IRegion {
 	public void setName(String name);
 
 	/**
-	 * @return the name of the region
+	 * @return the label of the region
 	 */
-	public Label getLabel();
+	public String getLabel();
 
 	/**
-	 * The name of the region
+	 * The label of the region
 	 * 
-	 * @param name
+	 * @param label
 	 */
-	public void setLabel(Label label);
+	public void setLabel(String label);
 
 	
 	/**
