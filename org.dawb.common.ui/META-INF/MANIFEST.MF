@@ -14,7 +14,8 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.jface.text;bundle-version="3.7.1",
  uk.ac.gda.common;bundle-version="1.0.0",
  uk.ac.gda.common.rcp;bundle-version="1.0.0",
- org.dawb.common.util;bundle-version="1.0.0"
+ org.dawb.common.util;bundle-version="1.0.0",
+ uk.ac.diamond.scisoft.analysis
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Export-Package: org.dawb.common.ui,
@@ -27,6 +28,7 @@ Export-Package: org.dawb.common.ui,
  org.dawb.common.ui.plot,
  org.dawb.common.ui.plot.annotation,
  org.dawb.common.ui.plot.axis,
+ org.dawb.common.ui.plot.function,
  org.dawb.common.ui.plot.region,
  org.dawb.common.ui.plot.roi,
  org.dawb.common.ui.plot.tool,
