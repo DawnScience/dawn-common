@@ -18,7 +18,7 @@ package org.dawb.common.ui.plot.function;
 
 import uk.ac.diamond.scisoft.analysis.fitting.functions.AFunction;
 //import uk.ac.diamond.scisoft.analysis.fitting.functions.Box;
-//import uk.ac.diamond.scisoft.analysis.fitting.functions.Cubic;
+import uk.ac.diamond.scisoft.analysis.fitting.functions.Cubic;
 //import uk.ac.diamond.scisoft.analysis.fitting.functions.CubicSpline;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.Fermi;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.Gaussian;
@@ -26,7 +26,7 @@ import uk.ac.diamond.scisoft.analysis.fitting.functions.Gaussian;
 //import uk.ac.diamond.scisoft.analysis.fitting.functions.Lorentzian;
 //import uk.ac.diamond.scisoft.analysis.fitting.functions.Offset;
 //import uk.ac.diamond.scisoft.analysis.fitting.functions.PearsonVII;
-//import uk.ac.diamond.scisoft.analysis.fitting.functions.PseudoVoigt;
+import uk.ac.diamond.scisoft.analysis.fitting.functions.PseudoVoigt;
 //import uk.ac.diamond.scisoft.analysis.fitting.functions.Quadratic;
 //import uk.ac.diamond.scisoft.analysis.fitting.functions.Step;
 //import uk.ac.diamond.scisoft.analysis.fitting.functions.StraightLine;
@@ -35,15 +35,15 @@ import uk.ac.diamond.scisoft.analysis.fitting.functions.Gaussian;
 public enum FunctionType {
 
 //	BOX(Box.class),
-//	CUBIC(Cubic.class),
+	CUBIC(Cubic.class),
 //	CUBIC_SPLINE(CubicSpline.class),
 	FERMI(Fermi.class),
-	GAUSSIAN(Gaussian.class);
+	GAUSSIAN(Gaussian.class),
 //	GAUSSIAN_ND(GaussianND.class),
 //	LORENTZIAN(Lorentzian.class),
 //	OFFSET(Offset.class),
 //	PEARSON_VII(PearsonVII.class),
-//	PSEUDO_VOIGT(PseudoVoigt.class),
+	PSEUDO_VOIGT(PseudoVoigt.class);
 //	QUADRATIC(Quadratic.class),
 //	STEP(Step.class),
 //	STRAIGHT_LINE(StraightLine.class);

@@ -51,6 +51,7 @@ import uk.ac.diamond.scisoft.analysis.fitting.functions.CubicSpline;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.Fermi;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.Gaussian;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.GaussianND;
+import uk.ac.diamond.scisoft.analysis.fitting.functions.IParameter;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.Lorentzian;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.Offset;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.PearsonVII;
@@ -82,7 +83,7 @@ public class FunctionEditTable {
 		
 		this.functionTable = new TableViewer(parent, SWT.FULL_SELECTION | SWT.SINGLE | SWT.V_SCROLL | SWT.BORDER);
 		GridData tableData = new GridData(SWT.FILL, SWT.FILL, true, false, 4, 1);
-		tableData.heightHint=100;
+		tableData.heightHint=200;
 		functionTable.getTable().setLayoutData(tableData);
 		
 		createColumns(functionTable);
@@ -326,7 +327,17 @@ public class FunctionEditTable {
 			ret = box;
 			
 		} else if (function instanceof Cubic) {
-			Cubic cubic = new Cubic();
+			Cubic cubic = new Cubic(rows.get(0).getParameter(0), 
+					rows.get(1).getParameter(0),
+					rows.get(2).getParameter(0),
+					rows.get(3).getParameter(0));
+			cubic.getParameter(0).setLowerLimit(rows.get(0).getParameter(1));
+			cubic.getParameter(1).setLowerLimit(rows.get(1).getParameter(1));
+			cubic.getParameter(1).setUpperLimit(rows.get(1).getParameter(2));
+			cubic.getParameter(2).setLowerLimit(rows.get(2).getParameter(1));
+			cubic.getParameter(2).setUpperLimit(rows.get(2).getParameter(2));
+			cubic.getParameter(3).setLowerLimit(rows.get(3).getParameter(1));
+			cubic.getParameter(3).setUpperLimit(rows.get(3).getParameter(2));
 			ret = cubic;
 			
 		} else if (function instanceof CubicSpline) {
@@ -372,7 +383,21 @@ public class FunctionEditTable {
 			PearsonVII pearson = (PearsonVII)function;
 			ret = pearson;
 		}else if (function instanceof PseudoVoigt) {
-			PseudoVoigt pseudoVoigt = (PseudoVoigt)function;
+			PseudoVoigt pseudoVoigt = new PseudoVoigt(rows.get(0).getParameter(0), 
+									rows.get(1).getParameter(0),
+									rows.get(2).getParameter(0),
+									rows.get(3).getParameter(0),
+									rows.get(4).getParameter(0));
+			pseudoVoigt.getParameter(0).setLowerLimit(rows.get(0).getParameter(1));
+			pseudoVoigt.getParameter(0).setUpperLimit(rows.get(0).getParameter(2));
+			pseudoVoigt.getParameter(1).setLowerLimit(rows.get(1).getParameter(1));
+			pseudoVoigt.getParameter(1).setUpperLimit(rows.get(1).getParameter(2));
+			pseudoVoigt.getParameter(2).setLowerLimit(rows.get(2).getParameter(1));
+			pseudoVoigt.getParameter(2).setUpperLimit(rows.get(2).getParameter(2));
+			pseudoVoigt.getParameter(3).setLowerLimit(rows.get(3).getParameter(1));
+			pseudoVoigt.getParameter(3).setUpperLimit(rows.get(3).getParameter(2));
+			pseudoVoigt.getParameter(4).setLowerLimit(rows.get(4).getParameter(1));
+			pseudoVoigt.getParameter(4).setUpperLimit(rows.get(4).getParameter(2));
 			ret = pseudoVoigt;
 		}else if (function instanceof Quadratic) {
 			Quadratic quadratic = (Quadratic)function;
