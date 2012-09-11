@@ -384,7 +384,16 @@ public class FunctionEditTable {
 			PearsonVII pearson = (PearsonVII)function;
 			ret = pearson;
 		}else if (function instanceof Polynomial){
-			Polynomial polynom = new Polynomial();
+			double[] params = new double[function.getNoOfParameters()];
+			for (int i = 0; i < params.length; i++) {
+				params[i] = rows.get(i).getParameter(0);
+			}
+			Polynomial polynom = new Polynomial(params);
+			for(int i=0;i<polynom.getNoOfParameters(); i++){
+				polynom.getParameter(0).setLowerLimit(rows.get(i).getParameter(1));
+				polynom.getParameter(0).setUpperLimit(rows.get(i).getParameter(2));
+			}
+			ret = polynom;
 		}else if (function instanceof PseudoVoigt) {
 		
 			PseudoVoigt pseudoVoigt = new PseudoVoigt(rows.get(0).getParameter(0), 
