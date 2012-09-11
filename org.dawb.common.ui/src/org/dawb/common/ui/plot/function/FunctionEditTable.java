@@ -37,6 +37,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -61,6 +62,7 @@ import uk.ac.diamond.scisoft.analysis.fitting.functions.Step;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.StraightLine;
 
 import uk.ac.gda.richbeans.components.cell.FieldComponentCellEditor;
+import uk.ac.gda.richbeans.components.wrappers.BooleanWrapper;
 import uk.ac.gda.richbeans.components.wrappers.FloatSpinnerWrapper;
 import uk.ac.gda.richbeans.components.wrappers.SpinnerWrapper;
 
@@ -131,7 +133,7 @@ public class FunctionEditTable {
 		viewer.getTable().setLinesVisible(true);
 		viewer.getTable().setHeaderVisible(true);
 		
-		viewer.setColumnProperties(new String[] { "Name", "value", "min", "max"});
+		viewer.setColumnProperties(new String[] { "Name", "value", "min", "max", "Fixed"});
 		
 		TableViewerColumn var = new TableViewerColumn(viewer, SWT.LEFT, 0);
 		var.getColumn().setText("Name");
@@ -159,12 +161,13 @@ public class FunctionEditTable {
 		var.setEditingSupport(functionEditor);
 		var.setLabelProvider(new DelegatingStyledCellLabelProvider(new FunctionLabelProvider(3, functionEditor)));
 		
-//		var = new TableViewerColumn(viewer, SWT.LEFT, 4);
-//		var.getColumn().setText("Fixed");
-//		var.getColumn().setWidth(120);
-//		functionEditor = new FunctionEditingSupport(viewer, 4);
-//		var.setEditingSupport(functionEditor);
-//		var.setLabelProvider(new DelegatingStyledCellLabelProvider(new FunctionLabelProvider(4, functionEditor)));
+		// column 4 = checkbox
+		var = new TableViewerColumn(viewer, SWT.LEFT, 4);
+		var.getColumn().setText("Fixed");
+		var.getColumn().setWidth(120);
+		functionEditor = new FunctionEditingSupport(viewer, 4);
+		var.setEditingSupport(functionEditor);
+		var.setLabelProvider(new DelegatingStyledCellLabelProvider(new FunctionLabelProvider(4, functionEditor)));
 
 		//functionTable.getTable().setHeaderVisible(false);
 
@@ -186,44 +189,73 @@ public class FunctionEditTable {
 		protected CellEditor getCellEditor(final Object element) {
 			
 			FieldComponentCellEditor ed = null;
-			try {
-				ed = new FieldComponentCellEditor(((TableViewer)getViewer()).getTable(), 
+			
+			if(column<4){
+				try {
+					ed = new FieldComponentCellEditor(((TableViewer)getViewer()).getTable(), 
 						                     FloatSpinnerWrapper.class.getName(), SWT.RIGHT);
-			} catch (ClassNotFoundException e) {
-				logger.error("Cannot get FieldComponentCellEditor for "+SpinnerWrapper.class.getName(), e);
-				return null;
-			}
-			
-			final FloatSpinnerWrapper rb = (FloatSpinnerWrapper)ed.getFieldWidget();
-					
-			rb.setMaximum(Double.MAX_VALUE);
-			rb.setMinimum(-Double.MAX_VALUE);
-			
-			rb.setButtonVisible(false);
-			rb.setActive(true);
-			((Spinner)rb.getControl()).addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(SelectionEvent e) {
-					setValue(element, rb.getValue(), false);
+				} catch (ClassNotFoundException e) {
+					logger.error("Cannot get FieldComponentCellEditor for "+SpinnerWrapper.class.getName(), e);
+					return null;
 				}
-			});
+			
+				final FloatSpinnerWrapper rb = (FloatSpinnerWrapper)ed.getFieldWidget();
+					
+				rb.setMaximum(Double.MAX_VALUE);
+				rb.setMinimum(-Double.MAX_VALUE);
+			
+				rb.setButtonVisible(false);
+				rb.setActive(true);
+				((Spinner)rb.getControl()).addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(SelectionEvent e) {
+						setValue(element, rb.getValue(), false);
+					}
+				});
+			}else{
+				try{
+					ed = new FieldComponentCellEditor(((TableViewer)getViewer()).getTable(), BooleanWrapper.class.getName(), SWT.LEFT);
+				}catch (ClassNotFoundException e) {
+					logger.error("Cannot get FieldComponentCellEditor for "+BooleanWrapper.class.getName(), e);
+					return null;
+				}
+				final BooleanWrapper bw = (BooleanWrapper)ed.getFieldWidget();
+				bw.setVisible(true);
+				bw.setActive(true);
+				((Button)bw.getControl()).addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(SelectionEvent e) {
+						setValue(element, bw.getValue(), false);
+					}
+				});
+			}
 			
 			return ed;
 		}
 
 		@Override
 		protected boolean canEdit(Object element) {
-			double val = 0;
 			final FunctionRow row = (FunctionRow)element;
-			if (!row.isEnabled()) return false;
-			val = row.getParameter(column-1);
-			return !Double.isNaN(val);
+			if(column<4){
+				double val = 0;
+				
+				if (!row.isEnabled()) return false;
+				val = row.getParameter(column-1);
+				return !Double.isNaN(val);
+			}else{
+				return true;
+			}
 		}
 
 		@Override
 		protected Object getValue(Object element) {
 			final FunctionRow row = (FunctionRow)element;
-			return (int)row.getParameter(column-1);
+			if(column<4){
+				return (int)row.getParameter(column-1);
+			}else{
+				return row.isFixed();
+			}
+			
 		}
 
 		@Override
@@ -232,17 +264,29 @@ public class FunctionEditTable {
 		}
 		
 		protected void setValue(Object element, Object value, boolean tableRefresh) {
-			
 			final FunctionRow row = (FunctionRow)element;
-			final Number    val = (Number)value;
-			
-			row.setParameter(val.doubleValue(), column-1);
-			
-			if (tableRefresh) {
-				getViewer().refresh();
+			if(column<4){
+				final Number    val = (Number)value;
+				
+				row.setParameter(val.doubleValue(), column-1);
+				
+				if (tableRefresh) {
+					getViewer().refresh();
+				}
+				
+				function = createFunction(rows, row);
+			}else{ // for the last column (checkbox)
+				final boolean    fixed = (Boolean)value;
+				
+				row.setIsFixed(fixed);
+				
+				if (tableRefresh) {
+					getViewer().refresh();
+				}
+				
+				function = createFunction(rows, row);
 			}
 			
-			function = createFunction(rows, row);
 		}
 
 	}
@@ -266,22 +310,25 @@ public class FunctionEditTable {
 			
 			final FunctionRow row = (FunctionRow)element;
 			switch (column) {
-			case 0:
-				return row.getParamName();
-			case 1:
-				if (Double.isNaN(row.getParameter(0))) return "-";
-				return format.format(row.getParameter(0));
+				case 0:
+					return row.getParamName();
+				case 1:
+					if (Double.isNaN(row.getParameter(0))) return "-";
+					return format.format(row.getParameter(0));
 				
-			case 2:
-				if (Double.isNaN(row.getParameter(1))) return "-";
-				return format.format(row.getParameter(1));
+				case 2:
+					if (Double.isNaN(row.getParameter(1))) return "-";
+					return format.format(row.getParameter(1));
 				
-			case 3:
-				if (Double.isNaN(row.getParameter(2))) return "-";
-				return format.format(row.getParameter(2));
-			
+				case 3:
+					if (Double.isNaN(row.getParameter(2))) return "-";
+					return format.format(row.getParameter(2));
+				case 4:
+					if(row.isFixed())
+						return "true";
+					else
+						return "false";
 			}
-			
 			return "";
 		}
 
@@ -290,12 +337,12 @@ public class FunctionEditTable {
 			final FunctionRow row = (FunctionRow)element;
 			return row.getDescription();
 		}
-
+		
 		@Override
 		public StyledString getStyledText(Object element) {
 			final StyledString ret = new StyledString(getText(element));
 			if (editor!=null && editor.canEdit(element)) {
-			    ret.append(new StyledString("*", StyledString.QUALIFIER_STYLER));
+				ret.append(new StyledString("*", StyledString.QUALIFIER_STYLER));
 			}
 			return ret;
 		}
@@ -332,15 +379,12 @@ public class FunctionEditTable {
 					rows.get(2).getParameter(0),
 					rows.get(3).getParameter(0)};
 			Cubic cubic = new Cubic(params);
-			cubic.getParameter(0).setLowerLimit(rows.get(0).getParameter(1));
-			cubic.getParameter(1).setLowerLimit(rows.get(1).getParameter(1));
-			cubic.getParameter(1).setUpperLimit(rows.get(1).getParameter(2));
-			cubic.getParameter(2).setLowerLimit(rows.get(2).getParameter(1));
-			cubic.getParameter(2).setUpperLimit(rows.get(2).getParameter(2));
-			cubic.getParameter(3).setLowerLimit(rows.get(3).getParameter(1));
-			cubic.getParameter(3).setUpperLimit(rows.get(3).getParameter(2));
+			for (int i = 0; i < params.length; i++) {
+				cubic.getParameter(i).setLowerLimit(rows.get(i).getParameter(1));
+				cubic.getParameter(i).setUpperLimit(rows.get(i).getParameter(2));
+				cubic.getParameter(i).setFixed(rows.get(i).isFixed());
+			}
 			ret = cubic;
-			
 		} else if (function instanceof CubicSpline) {
 			CubicSpline cubicSpline = (CubicSpline)function;
 			ret = cubicSpline;
@@ -349,25 +393,21 @@ public class FunctionEditTable {
 								rows.get(1).getParameter(0),
 								rows.get(2).getParameter(0),
 								rows.get(3).getParameter(0));
-			fermi.getParameter(0).setLowerLimit(rows.get(0).getParameter(1));
-			fermi.getParameter(0).setUpperLimit(rows.get(0).getParameter(2));
-			fermi.getParameter(1).setLowerLimit(rows.get(1).getParameter(1));
-			fermi.getParameter(1).setUpperLimit(rows.get(1).getParameter(2));
-			fermi.getParameter(2).setLowerLimit(rows.get(2).getParameter(1));
-			fermi.getParameter(2).setUpperLimit(rows.get(2).getParameter(2));
-			fermi.getParameter(3).setLowerLimit(rows.get(3).getParameter(1));
-			fermi.getParameter(3).setUpperLimit(rows.get(3).getParameter(2));
+			for (int i = 0; i < fermi.getNoOfParameters(); i++) {
+				fermi.getParameter(i).setLowerLimit(rows.get(i).getParameter(1));
+				fermi.getParameter(i).setUpperLimit(rows.get(i).getParameter(2));
+				fermi.getParameter(i).setFixed(rows.get(i).isFixed());
+			}
 			ret = fermi;
 		} else if (function instanceof Gaussian) {
 			Gaussian gaussian = new Gaussian(rows.get(0).getParameter(0), 
 								rows.get(1).getParameter(0),
 								rows.get(2).getParameter(0));
-			gaussian.getParameter(0).setLowerLimit(rows.get(0).getParameter(1));
-			gaussian.getParameter(0).setUpperLimit(rows.get(0).getParameter(2));
-			gaussian.getParameter(1).setLowerLimit(rows.get(1).getParameter(1));
-			gaussian.getParameter(1).setUpperLimit(rows.get(1).getParameter(2));
-			gaussian.getParameter(2).setLowerLimit(rows.get(2).getParameter(1));
-			gaussian.getParameter(2).setUpperLimit(rows.get(2).getParameter(2));
+			for (int i = 0; i < gaussian.getNoOfParameters(); i++) {
+				gaussian.getParameter(i).setLowerLimit(rows.get(i).getParameter(1));
+				gaussian.getParameter(i).setUpperLimit(rows.get(i).getParameter(2));
+				gaussian.getParameter(i).setFixed(rows.get(i).isFixed());
+			}
 			ret = gaussian;
 		}else if (function instanceof GaussianND) {
 			GaussianND gaussianND = new GaussianND(rows.get(1).getParameter(1), 
@@ -390,27 +430,22 @@ public class FunctionEditTable {
 			}
 			Polynomial polynom = new Polynomial(params);
 			for(int i=0;i<polynom.getNoOfParameters(); i++){
-				polynom.getParameter(0).setLowerLimit(rows.get(i).getParameter(1));
-				polynom.getParameter(0).setUpperLimit(rows.get(i).getParameter(2));
+				polynom.getParameter(i).setLowerLimit(rows.get(i).getParameter(1));
+				polynom.getParameter(i).setUpperLimit(rows.get(i).getParameter(2));
+				polynom.getParameter(i).setFixed(rows.get(i).isFixed());
 			}
 			ret = polynom;
 		}else if (function instanceof PseudoVoigt) {
-		
 			PseudoVoigt pseudoVoigt = new PseudoVoigt(rows.get(0).getParameter(0), 
 									rows.get(1).getParameter(0),
 									rows.get(2).getParameter(0),
 									rows.get(3).getParameter(0),
 									rows.get(4).getParameter(0));
-			pseudoVoigt.getParameter(0).setLowerLimit(rows.get(0).getParameter(1));
-			pseudoVoigt.getParameter(0).setUpperLimit(rows.get(0).getParameter(2));
-			pseudoVoigt.getParameter(1).setLowerLimit(rows.get(1).getParameter(1));
-			pseudoVoigt.getParameter(1).setUpperLimit(rows.get(1).getParameter(2));
-			pseudoVoigt.getParameter(2).setLowerLimit(rows.get(2).getParameter(1));
-			pseudoVoigt.getParameter(2).setUpperLimit(rows.get(2).getParameter(2));
-			pseudoVoigt.getParameter(3).setLowerLimit(rows.get(3).getParameter(1));
-			pseudoVoigt.getParameter(3).setUpperLimit(rows.get(3).getParameter(2));
-			pseudoVoigt.getParameter(4).setLowerLimit(rows.get(4).getParameter(1));
-			pseudoVoigt.getParameter(4).setUpperLimit(rows.get(4).getParameter(2));
+			for (int i = 0; i < pseudoVoigt.getNoOfParameters(); i++) {
+				pseudoVoigt.getParameter(i).setLowerLimit(rows.get(i).getParameter(1));
+				pseudoVoigt.getParameter(i).setUpperLimit(rows.get(i).getParameter(2));
+				pseudoVoigt.getParameter(i).setFixed(rows.get(i).isFixed());
+			}
 			ret = pseudoVoigt;
 		}else if (function instanceof Quadratic) {
 			Quadratic quadratic = (Quadratic)function;
@@ -422,7 +457,6 @@ public class FunctionEditTable {
 			StraightLine straightLine = new StraightLine();
 			ret = straightLine;
 		}
-		
 		return ret;
 	}
 
@@ -462,10 +496,15 @@ public class FunctionEditTable {
 		public double[] getParameters() {
 			return params;
 		}
-		@SuppressWarnings("unused")
+
 		public boolean isFixed() {
 			return fixed;
 		}
+		
+		public void setIsFixed(boolean value) {
+			fixed = value;
+		}
+
 		public double getParameter(int index) {
 			return params[index];
 		}
