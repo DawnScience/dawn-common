@@ -51,10 +51,10 @@ import uk.ac.diamond.scisoft.analysis.fitting.functions.CubicSpline;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.Fermi;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.Gaussian;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.GaussianND;
-import uk.ac.diamond.scisoft.analysis.fitting.functions.IParameter;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.Lorentzian;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.Offset;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.PearsonVII;
+import uk.ac.diamond.scisoft.analysis.fitting.functions.Polynomial;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.PseudoVoigt;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.Quadratic;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.Step;
@@ -327,10 +327,11 @@ public class FunctionEditTable {
 			ret = box;
 			
 		} else if (function instanceof Cubic) {
-			Cubic cubic = new Cubic(rows.get(0).getParameter(0), 
+			double[] params = new double[]{rows.get(0).getParameter(0), 
 					rows.get(1).getParameter(0),
 					rows.get(2).getParameter(0),
-					rows.get(3).getParameter(0));
+					rows.get(3).getParameter(0)};
+			Cubic cubic = new Cubic(params);
 			cubic.getParameter(0).setLowerLimit(rows.get(0).getParameter(1));
 			cubic.getParameter(1).setLowerLimit(rows.get(1).getParameter(1));
 			cubic.getParameter(1).setUpperLimit(rows.get(1).getParameter(2));
@@ -382,7 +383,10 @@ public class FunctionEditTable {
 		}else if (function instanceof PearsonVII) {
 			PearsonVII pearson = (PearsonVII)function;
 			ret = pearson;
+		}else if (function instanceof Polynomial){
+			Polynomial polynom = new Polynomial();
 		}else if (function instanceof PseudoVoigt) {
+		
 			PseudoVoigt pseudoVoigt = new PseudoVoigt(rows.get(0).getParameter(0), 
 									rows.get(1).getParameter(0),
 									rows.get(2).getParameter(0),

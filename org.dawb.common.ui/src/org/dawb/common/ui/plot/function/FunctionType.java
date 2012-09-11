@@ -26,6 +26,7 @@ import uk.ac.diamond.scisoft.analysis.fitting.functions.Gaussian;
 //import uk.ac.diamond.scisoft.analysis.fitting.functions.Lorentzian;
 //import uk.ac.diamond.scisoft.analysis.fitting.functions.Offset;
 //import uk.ac.diamond.scisoft.analysis.fitting.functions.PearsonVII;
+import uk.ac.diamond.scisoft.analysis.fitting.functions.Polynomial;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.PseudoVoigt;
 //import uk.ac.diamond.scisoft.analysis.fitting.functions.Quadratic;
 //import uk.ac.diamond.scisoft.analysis.fitting.functions.Step;
@@ -43,6 +44,7 @@ public enum FunctionType {
 //	LORENTZIAN(Lorentzian.class),
 //	OFFSET(Offset.class),
 //	PEARSON_VII(PearsonVII.class),
+	POLYNOMIAL(Polynomial.class),
 	PSEUDO_VOIGT(PseudoVoigt.class);
 //	QUADRATIC(Quadratic.class),
 //	STEP(Step.class),
@@ -92,6 +94,10 @@ public enum FunctionType {
 
 	public static AFunction createNew(int selectionIndex) throws InstantiationException, IllegalAccessException {
 		final FunctionType function = getType(selectionIndex);
+		return function.clazz.newInstance();
+	}
+
+	public static AFunction createNew(FunctionType function) throws InstantiationException, IllegalAccessException {
 		return function.clazz.newInstance();
 	}
 }
