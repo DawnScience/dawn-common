@@ -369,10 +369,17 @@ public class FunctionEditTable {
 				
 		AFunction ret = null; 
 		if (function instanceof Box) {
-			Box box = new Box();
-
+			Box box = new Box(rows.get(0).getParameter(0), 
+					rows.get(1).getParameter(0),
+					rows.get(2).getParameter(0),
+					rows.get(3).getParameter(0),
+					rows.get(4).getParameter(0));
+			for (int i = 0; i < box.getNoOfParameters(); i++){
+				box.getParameter(i).setLowerLimit(rows.get(i).getParameter(1));
+				box.getParameter(i).setUpperLimit(rows.get(i).getParameter(2));
+				box.getParameter(i).setFixed(rows.get(i).isFixed());
+			}
 			ret = box;
-			
 		} else if (function instanceof Cubic) {
 			double[] params = new double[]{rows.get(0).getParameter(0), 
 					rows.get(1).getParameter(0),
@@ -415,13 +422,28 @@ public class FunctionEditTable {
 				rows.get(3).getParameter(1));
 			ret = gaussianND;
 		}else if (function instanceof Lorentzian) {
-			Lorentzian lorentzian = (Lorentzian)function;
+			Lorentzian lorentzian = new Lorentzian(rows.get(0).getParameter(0), 
+					rows.get(1).getParameter(0),
+					rows.get(2).getParameter(0));
+			for (int i = 0; i < lorentzian.getNoOfParameters(); i++) {
+				lorentzian.getParameter(i).setLowerLimit(rows.get(i).getParameter(1));
+				lorentzian.getParameter(i).setUpperLimit(rows.get(i).getParameter(2));
+				lorentzian.getParameter(i).setFixed(rows.get(i).isFixed());
+			}
 			ret = lorentzian;
 		}else if (function instanceof Offset) {
 			Offset offset = (Offset)function;
 			ret = offset;
 		}else if (function instanceof PearsonVII) {
-			PearsonVII pearson = (PearsonVII)function;
+			PearsonVII pearson = new PearsonVII(rows.get(0).getParameter(0), 
+					rows.get(1).getParameter(0),
+					rows.get(2).getParameter(0),
+					rows.get(3).getParameter(0));
+			for (int i = 0; i < pearson.getNoOfParameters(); i++) {
+				pearson.getParameter(i).setLowerLimit(rows.get(i).getParameter(1));
+				pearson.getParameter(i).setUpperLimit(rows.get(i).getParameter(2));
+				pearson.getParameter(i).setFixed(rows.get(i).isFixed());
+			}
 			ret = pearson;
 		}else if (function instanceof Polynomial){
 			double[] params = new double[function.getNoOfParameters()];
@@ -448,13 +470,31 @@ public class FunctionEditTable {
 			}
 			ret = pseudoVoigt;
 		}else if (function instanceof Quadratic) {
-			Quadratic quadratic = (Quadratic)function;
+			double[] params = new double[function.getNoOfParameters()];
+			for (int i = 0; i < params.length; i++) {
+				params[i] = rows.get(i).getParameter(0);
+			}
+			Quadratic quadratic = new Quadratic(params);
+			for(int i=0;i<quadratic.getNoOfParameters(); i++){
+				quadratic.getParameter(i).setLowerLimit(rows.get(i).getParameter(1));
+				quadratic.getParameter(i).setUpperLimit(rows.get(i).getParameter(2));
+				quadratic.getParameter(i).setFixed(rows.get(i).isFixed());
+			}
 			ret = quadratic;
 		}else if (function instanceof Step) {
 			Step step = (Step)function;
 			ret = step;
 		}else if (function instanceof StraightLine) {
-			StraightLine straightLine = new StraightLine();
+			double[] params = new double[function.getNoOfParameters()];
+			for (int i = 0; i < params.length; i++) {
+				params[i] = rows.get(i).getParameter(0);
+			}
+			StraightLine straightLine = new StraightLine(params);
+			for(int i=0;i<straightLine.getNoOfParameters(); i++){
+				straightLine.getParameter(i).setLowerLimit(rows.get(i).getParameter(1));
+				straightLine.getParameter(i).setUpperLimit(rows.get(i).getParameter(2));
+				straightLine.getParameter(i).setFixed(rows.get(i).isFixed());
+			}
 			ret = straightLine;
 		}
 		return ret;
