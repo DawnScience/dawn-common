@@ -267,6 +267,7 @@ public class PythonService {
 		
 		final List<String> additionalPaths = new ArrayList<String>(1);
 		additionalPaths.add(BundleUtils.getEclipseHome());
+		additionalPaths.add(new File(scriptFullPath).getParent().toString());
 		if (System.getenv("PYTHONPATH")!=null) {
 			additionalPaths.addAll(Arrays.asList(System.getenv("PYTHONPATH").split(":")));
 		}
