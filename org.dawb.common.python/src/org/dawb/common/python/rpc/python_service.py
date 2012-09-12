@@ -63,7 +63,7 @@ def runScript(scriptPath, sets, outputs, additionalPaths=None):
     Run the script
     '''
     result = {}
-    execfile(scriptPath, globals()) # need to place locals from script in globals
+    execfile(scriptPath, globals(), locals()) # need to place locals from script in globals
     
     '''
     Read required results back from globals and locals,
@@ -155,6 +155,6 @@ rpcserver.add_handler("runEdnaPlugin", runEdnaPlugin)
 
 
 # Run the server's main loop
-print "Starting python service on port "+str(sys.argv[1])
+#print "Starting python service on port "+str(sys.argv[1])
 rpcserver.serve_forever()
 
