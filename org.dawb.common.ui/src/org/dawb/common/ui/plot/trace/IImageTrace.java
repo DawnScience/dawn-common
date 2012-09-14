@@ -307,4 +307,15 @@ public interface IImageTrace extends ITrace {
 	 */
 	public double[] getPointInAxisCoordinates(final double[] point) throws Exception;
 
+	/**
+	 * Is the imagetrace set to rescale the histogram when a new image update occurs
+	 * @return the current state.
+	 */
+	public boolean isRescaleHistogram();
+
+	/**
+	 * Set wheter an update to the image trace triggers a rehistogram
+	 * @param rescaleHistogram
+	 */
+	public void setRescaleHistogram(boolean rescaleHistogram);
 }
