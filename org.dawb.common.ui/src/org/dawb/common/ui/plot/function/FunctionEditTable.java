@@ -27,6 +27,7 @@ import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider;
 import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
 import org.eclipse.jface.viewers.EditingSupport;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TableViewer;
@@ -95,6 +96,14 @@ public class FunctionEditTable {
 		clickToEdit.setLayoutData(new GridData(SWT.FILL, SWT.NONE, true, false, 4, 1));
 		
 		return functionTable.getTable();
+	}
+
+	public void addSelectionChangedListener(ISelectionChangedListener listener){
+		functionTable.addSelectionChangedListener(listener);
+	}
+	
+	public void removeSelectionChangedListener(ISelectionChangedListener listener){
+		functionTable.removeSelectionChangedListener(listener);
 	}
 
 	/**
