@@ -50,6 +50,10 @@ public class ScaleCellEditor extends CellEditor {
 	public ScaleCellEditor() {
 		setStyle(defaultStyle);
 	}
+	
+	protected int getDoubleClickTimeout() {
+		return 0;
+	}
 
 	/**
 	 * Spinner Editor
@@ -85,7 +89,9 @@ public class ScaleCellEditor extends CellEditor {
 				ScaleCellEditor.this.focusLost();
 			}
 		};
-		scale.addFocusListener(focusListener);
+		if ((getStyle()&SWT.NO_FOCUS)==0) {
+			scale.addFocusListener(focusListener);
+		}
 		this.keyListener = new KeyListener() {
 			@Override
 			public void keyPressed(KeyEvent e) {
@@ -154,6 +160,10 @@ public class ScaleCellEditor extends CellEditor {
 			gc.dispose();
 		}
 		return layoutData;
+	}
+	
+	protected boolean dependsOnExternalFocusListener() {
+		return false;
 	}
 
 	/**
