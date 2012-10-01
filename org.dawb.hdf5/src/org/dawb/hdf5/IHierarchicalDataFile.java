@@ -37,6 +37,11 @@ public interface IHierarchicalDataFile {
 	 * @throws Exception
 	 */
 	public void close() throws Exception;
+	
+	/**
+	 * @return true if the file has been closed in an unfriendly closeAll(...) call.
+	 */
+	public boolean isClosed();
 
 	/**
 	 * Get the root TreeNode

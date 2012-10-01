@@ -21,7 +21,9 @@ import ncsa.hdf.object.Group;
 import ncsa.hdf.object.HObject;
 import ncsa.hdf.object.h5.H5Datatype;
 
+import org.dawb.hdf5.HierarchicalDataFactory;
 import org.dawb.hdf5.HierarchicalDataUtils;
+import org.dawb.hdf5.IHierarchicalDataFile;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.swt.graphics.Image;
@@ -31,6 +33,12 @@ import org.slf4j.LoggerFactory;
 public class H5LabelProvider extends ColumnLabelProvider implements ITableLabelProvider {
 
 	private static final Logger logger = LoggerFactory.getLogger(H5LabelProvider.class);
+	
+	private IHierarchicalDataFile file;
+
+	public H5LabelProvider(IHierarchicalDataFile file) {
+		this.file = file;
+	}
 	
 	@Override
 	public Image getColumnImage(Object element, int columnIndex) {
@@ -46,7 +54,23 @@ public class H5LabelProvider extends ColumnLabelProvider implements ITableLabelP
 		
 		if (!(element instanceof TreeNode)) return null;
 		final TreeNode node   = (TreeNode)element;
-		final HObject  object = (HObject)((DefaultMutableTreeNode)node).getUserObject();
+		
+		HObject  object = (HObject)((DefaultMutableTreeNode)node).getUserObject();
+		
+		if (file.isClosed()) {
+			try {
+				this.file = HierarchicalDataFactory.getReader(file.getPath());
+				
+			} catch (Exception e) {
+				logger.error("Cannot re-create link to "+file.getPath());
+			}
+		}
+		
+		try {
+			object = file.getData(object.getFullName());
+		} catch (Exception e) {
+			logger.error("Cannot re-create link to recorde "+object.getFullName());
+		}
 
 		switch(columnIndex) {
 		case 0:
@@ -107,6 +131,15 @@ public class H5LabelProvider extends ColumnLabelProvider implements ITableLabelP
             return df.format(size/KB) + " KB";
         }
         return "" + (int)size + " bytes";
+    }
+    
+    @Override
+    public void dispose() {
+    	try {
+    	    this.file.close();
+    	} catch (Exception ne) {
+    		logger.error("Cannot close file "+file, ne);
+    	}
     }
 
 }

@@ -44,7 +44,6 @@ public class H5Editor extends EditorPart implements IReusableEditor, IH5Editor {
 	
     private static final Logger logger = LoggerFactory.getLogger(H5Editor.class);
 	
-	private IHierarchicalDataFile  file;
 	private TreeViewer tree;
 	
 	@Override
@@ -53,31 +52,12 @@ public class H5Editor extends EditorPart implements IReusableEditor, IH5Editor {
 		setSite(site);
 		super.setInput(input);
         setPartName(input.getName());
-        try {
-        	// More than one thr
-			this.file = HierarchicalDataFactory.getReader(getFilePath(input));
-		} catch (Exception e) {
-			logger.error("Cannot open h5 file "+getFilePath(input), e);
-		}
 	}
 
 	@Override
 	public void setInput(final IEditorInput input) {
 		super.setInput(input);
 		setPartName(input.getName());
-		
-		try {
-			file.close();
-		} catch (Exception e) {
-			logger.error("Cannot close file "+file.getPath());
-		}
-		
-		try {
-        	// More than one thr
-			this.file = HierarchicalDataFactory.getReader(getFilePath(input));
-		} catch (Exception e) {
-			logger.error("Cannot open h5 file "+getFilePath(input), e);
-		}
 		refresh();
 	}	
 
@@ -149,19 +129,6 @@ public class H5Editor extends EditorPart implements IReusableEditor, IH5Editor {
 	}
 
 	@Override
-	public void dispose() {
-		try {
-		     super.dispose();
-		} finally {
-			try {
-				file.close();
-			} catch (Exception e) {
-				logger.error("Cannot close file "+file.getPath());
-			}
-		}
-	}
-
-	@Override
 	public void setFocus() {
 		
 		// We only give content when the UI is actually selected
@@ -176,12 +143,25 @@ public class H5Editor extends EditorPart implements IReusableEditor, IH5Editor {
 
 	private void refresh() {
 		
-		final TreeNode root = file.getNode();
-		tree.getTree().setItemCount(root.getChildCount());
-		tree.setContentProvider(new H5ContentProvider());
-		tree.setLabelProvider(new H5LabelProvider());
-		tree.setInput(root);
-		tree.expandToLevel(1);
+		try {
+			// NOTE This file may get closed externally
+	    	IHierarchicalDataFile file = HierarchicalDataFactory.getReader(getFilePath(getEditorInput()));
+	        try {
+	
+				final TreeNode root = file.getNode();
+				tree.getTree().setItemCount(root.getChildCount());
+				tree.setContentProvider(new H5ContentProvider());
+				tree.setLabelProvider(new H5LabelProvider(file));
+				tree.setInput(root);
+				tree.expandToLevel(1);
+				        	
+			} catch (Exception e) {
+				logger.error("Cannot open h5 file "+getFilePath(getEditorInput()), e);
+	        } 
+		} catch (Exception neOther) {
+			logger.error("Cannot open H5 file!", neOther);
+		}
+
 	}
 
 	@Override

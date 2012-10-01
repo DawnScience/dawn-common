@@ -105,6 +105,20 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 	}
 	
 	/**
+	 * Used internally to close all open references.
+	 * @param path
+	 */
+	protected static void closeAll(String path) throws Exception{
+		if (readCache.containsKey(path)) {
+			readCache.get(path).close();
+		}
+	}
+	
+	public boolean isClosed() {
+		return !readCache.containsKey(this.path) && !writeCache.contains(this.path);
+	}
+	
+	/**
 	 * close the files and clear them from the cache.
 	 * @throws Exception
 	 */

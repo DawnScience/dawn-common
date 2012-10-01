@@ -41,6 +41,15 @@ public class HierarchicalDataFactory {
 		return HierarchicalDataFile.open(absolutePath, FileFormat.READ);
 	}
 	
+	/**
+	 * Expert use only. This will close all writers and reader references for a give
+	 * file path. Use with Caution because other references to the file may exist,
+	 * which will go dead.
+	 */
+	public static void closeAll(final String absolutePath) throws Exception { 
+		HierarchicalDataFile.closeAll(absolutePath);
+	}
+	
 	
 	/**
 	 * Call this method to get a reference to a HierarchicalDataFile
