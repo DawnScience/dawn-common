@@ -215,4 +215,13 @@ public abstract class AbstractToolPage extends Page implements IToolPage, IAdapt
 		this.cheatSheetId = cheatSheetId;
 	}
 
+	/**
+	 * Override to return true if the tool, when opened should always be
+	 * in a popped out view
+	 * @return
+	 */
+	public boolean isAlwaysSeparateView() {
+		return false;
+	}
+
 }

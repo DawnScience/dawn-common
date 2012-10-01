@@ -21,6 +21,7 @@ import org.eclipse.jface.action.IContributionManager;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PartInitException;
 import org.osgi.framework.Bundle;
@@ -131,6 +132,19 @@ public class PlottingActionBarManager implements IPlotActionSystem {
 	    			    	final IViewPart view = ref.getView(true);
 	    			    	EclipseUtils.getPage().activate(view);
 	    			    	return;
+	    			    }
+	    			    
+	    			    if (tool.isAlwaysSeparateView()) {
+	    					try {
+								final IViewPart view = EclipseUtils.getPage().showView("org.dawb.workbench.plotting.views.toolPageView.fixed",
+														    							tool.getToolId(),
+																						IWorkbenchPage.VIEW_ACTIVATE);
+		    			    	EclipseUtils.getPage().activate(view);
+								return;
+							} catch (PartInitException e1) {
+								logger.error("Cannot open fixed view for "+tool.getToolId(), e1);
+							}
+                            
 	    			    }
 	    			}
 	    			
