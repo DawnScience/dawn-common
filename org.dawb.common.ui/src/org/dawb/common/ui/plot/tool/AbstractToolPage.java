@@ -205,4 +205,24 @@ public abstract class AbstractToolPage extends Page implements IToolPage, IAdapt
 	public void sync(IToolPage with) {
 		
 	}
+
+
+	private String cheatSheetId;
+	public String getCheatSheetId() {
+		return cheatSheetId;
+	}
+
+	public void setCheatSheetId(String cheatSheetId) {
+		this.cheatSheetId = cheatSheetId;
+	}
+
+	/**
+	 * Override to return true if the tool, when opened should always be
+	 * in a popped out view
+	 * @return
+	 */
+	public boolean isAlwaysSeparateView() {
+		return false;
+	}
+
 }

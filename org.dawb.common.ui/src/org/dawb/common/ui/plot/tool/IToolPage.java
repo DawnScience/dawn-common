@@ -219,4 +219,9 @@ public interface IToolPage extends IPageBookViewPage, IAdaptable {
 	 */
 	public void sync(IToolPage with);
 
+	/**
+	 * @return true if the tool should be opened in a dedicated view always
+	 * @return
+	 */
+	public boolean isAlwaysSeparateView();
 }
