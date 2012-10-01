@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.dawb.common.ui.Activator;
 import org.dawb.common.ui.DawbUtils;
+import org.dawb.common.ui.components.cell.ScaleCellEditor;
 import org.dawb.common.ui.plot.IPlottingSystem;
 import org.dawb.common.ui.plot.PlotType;
 import org.dawb.common.ui.util.EclipseUtils;
@@ -38,6 +39,7 @@ import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelP
 import org.eclipse.jface.viewers.ICellModifier;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
@@ -54,10 +56,16 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Scale;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
+import org.eclipse.ui.progress.UIJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,11 +100,11 @@ public class SliceComponent {
 
 	private CLabel          errorLabel, explain;
 	private Button          updateAutomatically;
-	private Button          rangeMode;
 	private Composite       area;
 	private boolean         isErrorCondition=false;
     private SliceJob        sliceJob;
     private String          sliceReceiverId;
+    private CCombo          editorCombo;
 
 	private PlotType imagePlotType = PlotType.IMAGE; // Could also be PlotType.PT1D_MULTI
 
@@ -122,10 +130,22 @@ public class SliceComponent {
 	
 		this.viewer = new TableViewer(area, SWT.FULL_SELECTION | SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
 		viewer.getTable().setLayoutData(new GridData(GridData.FILL_BOTH));
+		viewer.getTable().addListener(SWT.MouseDoubleClick, new Listener() {
+			public void handleEvent(Event event) {
+				event.doit=false;
+				// Do nothing disabled
+			}
+		});		
+
 		
 		viewer.getTable().setLinesVisible(true);
 		viewer.getTable().setHeaderVisible(true);
-		
+		viewer.getTable().addListener(SWT.MeasureItem, new Listener() {
+			public void handleEvent(Event event) {
+				event.height = 45;
+			}
+		});
+
 		createColumns(viewer);
 		viewer.setUseHashlookup(true);
 		viewer.setColumnProperties(COLUMN_PROPERTIES.toArray(new String[COLUMN_PROPERTIES.size()]));
@@ -146,6 +166,38 @@ public class SliceComponent {
 		bRight.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		bRight.setLayout(new GridLayout(1, false));
 		
+		final Composite editorComp = new Composite(bRight, SWT.NONE);
+		editorComp.setLayout(new GridLayout(2, false));
+		editorComp.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+		
+		final Label label = new Label(editorComp, SWT.NONE);
+		label.setText("Edit slice with");
+		label.setLayoutData(new GridData(SWT.LEFT, SWT.FILL, false, false));
+		
+		this.editorCombo = new CCombo(editorComp, SWT.READ_ONLY|SWT.BORDER);
+		editorCombo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+		editorCombo.setText("Slice editor");
+		editorCombo.setItems(new String[]{"Scale", "Enter slice index"});// Later "Range"
+		editorCombo.select(0);
+		editorCombo.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				
+				final boolean editing = viewer.isCellEditorActive();
+				final Object edit = ((StructuredSelection)viewer.getSelection()).getFirstElement();
+				
+				final CellEditor[] editors = viewer.getCellEditors();
+				if (editorCombo.getSelectionIndex()==0) {
+					editors[2] = scaleEditor;
+				} else if (editorCombo.getSelectionIndex()==1) {
+					editors[2] = spinnerEditor;
+				}
+				if (editing) {
+					viewer.cancelEditing();
+					viewer.editElement(edit, 2);
+				}
+			}
+		});
+
 		this.updateAutomatically = new Button(bRight, SWT.CHECK);
 		updateAutomatically.setText("Automatic update");
 		updateAutomatically.setToolTipText("Update plot when slice changes");
@@ -159,18 +211,7 @@ public class SliceComponent {
 			}
 		});
 		
-		this.rangeMode = new Button(bRight, SWT.CHECK);
-		rangeMode.setText("Slice as range");
-		rangeMode.setToolTipText("Enter the slice as a range, which is summed.");
-		rangeMode.setSelection(false);
-		rangeMode.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, true, true));
-		rangeMode.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				updateRangeModeType();
-			}
-		});
-		
+      		
 		final Composite bLeft = new Composite(bottom, SWT.NONE);
 		bLeft.setLayoutData(new GridData(SWT.RIGHT, SWT.FILL, true, false));
 		bLeft.setLayout(new GridLayout(1, false));
@@ -230,12 +271,6 @@ public class SliceComponent {
 		
 	}
 
-	protected void updateRangeModeType() {
-		final SpinnerCellEditorWithPlayButton scewp = (SpinnerCellEditorWithPlayButton)viewer.getCellEditors()[2];
-		scewp.setRangeMode(rangeMode.getSelection());
-		scewp.setPlayButtonVisible(plottingSystem!=null);
-	}
-
 	private void createDimsData() {
 		
 		final int dims = dataShape.length;
@@ -250,10 +285,6 @@ public class SliceComponent {
 					decoder = new XMLDecoder(new FileInputStream(lastSettings));
 					for (int i = 0; i < dims; i++) {
 						dimsDataList.add((DimsData)decoder.readObject());
-						if (dimsDataList.getDimsData(i).getSliceRange()!=null) {
-							rangeMode.setSelection(true);
-							updateRangeModeType();
-						}
 					}
 					
 				} catch (Exception ne) {
@@ -275,6 +306,7 @@ public class SliceComponent {
 		}
 	}
 
+	private LabelJob labelJob;
 	/**
 	 * Method ensures that one x and on y are defined.
 	 * @param data
@@ -292,15 +324,39 @@ public class SliceComponent {
 		for (int i = 0; i < dimsDataList.size(); i++) {
 			if (dimsDataList.getDimsData(i).getAxis()==0) isX = true;
 		}
-		if (!isX) {
-			errorLabel.setText("Please set a X axis.");
-		}
-		GridUtils.setVisible(errorLabel,         !(isX));
-		this.isErrorCondition = errorLabel.isVisible();
-		GridUtils.setVisible(updateAutomatically, (isX&&plottingSystem!=null));
-		errorLabel.getParent().layout(new Control[]{errorLabel,updateAutomatically});
+
+        if (labelJob == null) labelJob = new LabelJob();
+		labelJob.update(isX);
 		
 		return isX;
+	}
+	
+	private class LabelJob extends UIJob {
+
+		private boolean isX;
+
+		public LabelJob() {
+			super("");
+		}
+		
+		public void update(boolean isX) {
+			cancel();
+			this.isX = isX;
+			schedule();
+		}
+
+		@Override
+		public IStatus runInUIThread(IProgressMonitor monitor) {
+			if (!isX) {
+				errorLabel.setText("Please set a X axis.");
+			}
+			GridUtils.setVisible(errorLabel,         !(isX));
+			isErrorCondition = errorLabel.isVisible();
+			GridUtils.setVisible(updateAutomatically, (isX&&plottingSystem!=null));
+			errorLabel.getParent().layout(new Control[]{errorLabel,updateAutomatically});
+			return Status.OK_STATUS;
+		}
+		
 	}
 
 	private ICellModifier createModifier(final TableViewer viewer) {
@@ -348,8 +404,17 @@ public class SliceComponent {
 				if (col==1) return data.getAxis();
 				if (col==2) {
 					// Set the bounds
-					final SpinnerCellEditorWithPlayButton editor = (SpinnerCellEditorWithPlayButton)viewer.getCellEditors()[2];
-					editor.setMaximum(dataShape[data.getDimension()]-1);
+					if (viewer.getCellEditors()[2] instanceof SpinnerCellEditorWithPlayButton) {
+						final SpinnerCellEditorWithPlayButton editor = (SpinnerCellEditorWithPlayButton)viewer.getCellEditors()[2];
+						editor.setMaximum(dataShape[data.getDimension()]-1);
+					} else if (viewer.getCellEditors()[2] instanceof ScaleCellEditor) {
+						final Scale scale = (Scale)((ScaleCellEditor)viewer.getCellEditors()[2]).getControl();
+						scale.setMaximum(dataShape[data.getDimension()]-1);
+						scale.setPageIncrement(scale.getMaximum()/10);
+
+						scale.setToolTipText(getScaleTooltip(scale.getMinimum(), scale.getMaximum()));
+
+					}
 					return data.getSliceRange() != null ? data.getSliceRange() : data.getSlice();
 				}
 				return null;
@@ -357,11 +422,18 @@ public class SliceComponent {
 		};
 	}
 
+	private ScaleCellEditor                 scaleEditor;
+	private SpinnerCellEditorWithPlayButton spinnerEditor;
+	
 	private CellEditor[] createCellEditors(final TableViewer viewer) {
 		
 		final CellEditor[] editors  = new CellEditor[3];
 		editors[0] = null;
-		editors[1] = new CComboCellEditor(viewer.getTable(), new String[]{"X","Y","(Slice)"}, SWT.READ_ONLY);
+		editors[1] = new CComboCellEditor(viewer.getTable(), new String[]{"X","Y","(Slice)"}, SWT.READ_ONLY) {
+			protected int getDoubleClickTimeout() {
+				return 0;
+			}			
+		};
 		final CCombo combo = ((CComboCellEditor)editors[1]).getCombo();
 		combo.addModifyListener(new ModifyListener() {
 			@Override
@@ -384,9 +456,26 @@ public class SliceComponent {
 			}
 		});
 
+		this.scaleEditor = new ScaleCellEditor((Composite)viewer.getControl(), SWT.NO_FOCUS);
+		final Scale scale = (Scale)scaleEditor.getControl();
+		scale.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
+		scaleEditor.setMinimum(0);
+		scale.setIncrement(1);
+		scaleEditor.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				final DimsData data  = (DimsData)((IStructuredSelection)viewer.getSelection()).getFirstElement();
+				final int value = scale.getSelection();
+				data.setSlice(value);
+				data.setSliceRange(null);
+				if (synchronizeSliceData(data)) slice(false);
+				scale.setToolTipText(getScaleTooltip(scale.getMinimum(), scale.getMaximum()));
+			}
+		});
+		
 		final ScopedPreferenceStore store = new ScopedPreferenceStore(InstanceScope.INSTANCE, "org.dawb.workbench.ui");
-		editors[2] = new SpinnerCellEditorWithPlayButton(viewer, "Play through slices", store.getInt("data.format.slice.play.speed"));
-		((SpinnerCellEditorWithPlayButton)editors[2]).addValueListener(new ValueAdapter() {
+		this.spinnerEditor = new SpinnerCellEditorWithPlayButton(viewer, "Play through slices", store.getInt("data.format.slice.play.speed"));
+		spinnerEditor.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
+		spinnerEditor.addValueListener(new ValueAdapter() {
 			@Override
 			public void valueChangePerformed(ValueEvent e) {
                 final DimsData data  = (DimsData)((IStructuredSelection)viewer.getSelection()).getFirstElement();
@@ -402,8 +491,22 @@ public class SliceComponent {
 			
 		});
 
-			
+		editors[2] = scaleEditor;
+		
 		return editors;
+	}
+
+	protected String getScaleTooltip(int minimum, int maximum) {
+		
+		final DimsData data  = (DimsData)((IStructuredSelection)viewer.getSelection()).getFirstElement();
+		int value = data.getSlice();
+        final StringBuffer buf = new StringBuffer();
+        buf.append(minimum);
+        buf.append(" <= ");
+        buf.append(value);
+        buf.append(" < ");
+        buf.append(maximum+1);
+        return buf.toString();
 	}
 
 	private void createColumns(final TableViewer viewer) {
@@ -486,11 +589,11 @@ public class SliceComponent {
 		setPlottingSystem(plotWindow);
 		
 		explain.setText("Create a slice of "+sliceObject.getName()+".\nIt has the shape "+Arrays.toString(dataShape));
-		((SpinnerCellEditorWithPlayButton)viewer.getCellEditors()[2]).setRangeDialogTitle("Range for slice in '"+sliceObject.getName()+"'");
-
-		if (plotWindow == null) {
+		if (viewer.getCellEditors()[2] instanceof SpinnerCellEditorWithPlayButton) {
+			((SpinnerCellEditorWithPlayButton)viewer.getCellEditors()[2]).setRangeDialogTitle("Range for slice in '"+sliceObject.getName()+"'");
 			((SpinnerCellEditorWithPlayButton)viewer.getCellEditors()[2]).setPlayButtonVisible(false);
 		}
+
 		
 		createDimsData();
     	viewer.refresh();
@@ -581,7 +684,6 @@ public class SliceComponent {
 
 	public void setDimsDataList(DimsDataList dimsDataList) {
 		this.dimsDataList = dimsDataList;
-		this.rangeMode.setSelection(dimsDataList.isRangeDefined());
 		viewer.refresh();
 	}
 
