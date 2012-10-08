@@ -100,7 +100,7 @@ public class NexusUtils {
 	 */
 	public static List<Dataset> getAxes(final Group dataNode, int dimension) throws Exception {
 		
-		final List<Dataset> axes = new ArrayList<Dataset>(3);
+		final List<Dataset>         axesTmp = new ArrayList<Dataset>(3);
         final Map<Integer, Dataset> axesMap = new TreeMap<Integer, Dataset>();
 		
         final List<HObject> children = dataNode.getMemberList();
@@ -125,18 +125,20 @@ public class NexusUtils {
 			
 			if (axis!=null) {
 				if (pos<0) {
-					axes.add(axis);
+					axesTmp.add(axis);
 				} else {
 					axesMap.put(pos, axis);
 				}
 			}
 		}
 		
+		final List<Dataset>         axes = new ArrayList<Dataset>(3);
 		if (!axesMap.isEmpty()) {
 			for (Integer pos : axesMap.keySet()) {
 				axes.add(axesMap.get(pos));
 			}
 		}
+		axes.addAll(axesTmp);
 		
 		if (axes.isEmpty()) return null;
 		

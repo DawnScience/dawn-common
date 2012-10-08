@@ -26,7 +26,6 @@ import org.dawb.common.ui.plot.PlotType;
 import org.dawb.common.ui.util.EclipseUtils;
 import org.dawb.common.ui.util.GridUtils;
 import org.dawb.hdf5.nexus.NexusUtils;
-
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -47,6 +46,7 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.SWTError;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.ModifyEvent;
@@ -136,7 +136,7 @@ public class SliceComponent {
 		top.setLayout(new GridLayout(2, false));
 	
 		this.viewer = new TableViewer(area, SWT.FULL_SELECTION | SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
-		viewer.getTable().setLayoutData(new GridData(GridData.FILL_BOTH));
+		viewer.getTable().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		viewer.getTable().addListener(SWT.MouseDoubleClick, new Listener() {
 			public void handleEvent(Event event) {
 				event.doit=false;
@@ -167,7 +167,7 @@ public class SliceComponent {
 		
 		final Composite bottom = new Composite(area, SWT.NONE);
 		bottom.setLayout(new GridLayout(2, false));
-		bottom.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		bottom.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, true));
 
 		final Composite bRight = new Composite(bottom, SWT.NONE);
 		bRight.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
@@ -324,14 +324,14 @@ public class SliceComponent {
         updateAxis(xAxis, 3);
         updateAxis(yAxis, 1);
         updateAxis(zAxis, 2);
-        
+        area.layout();
 	}
 
 	
 	private void updateAxis(CCombo axis, int iaxis) {
 		try {    	
 			final List<String> names = NexusUtils.getAxisNames(sliceObject.getPath(), sliceObject.getName(), iaxis);
-			final String[] items = names.toArray(new String[names.size()+1]);
+			final String[] items = names!=null ? names.toArray(new String[names.size()+1]) : new String[1];
 			items[items.length-1]= "indices";
 			int iselection = axis.getSelectionIndex();
 			axis.setItems(items);
@@ -415,8 +415,6 @@ public class SliceComponent {
 			}
 			
 		}
-		updateAxesChoices();
-		updateAxesVisibility();
 	}
 
 	private LabelJob labelJob;
@@ -687,12 +685,17 @@ public class SliceComponent {
 	 * 
 	 * This non-modal dialog allows the user to slice
 	 * data out of n-D data sets into a 2D plot.
+	 * 
+	 * This method is not thread safe, please call in the UI thread.
 	 */
 	public void setData(final String     name,
 				        final String     filePath,
 				        final int[]      dataShape,
 				        final IPlottingSystem plotWindow) {
 		
+		if (Display.getDefault().getThread()!=Thread.currentThread()) {
+			throw new SWTError("Please call setData(...) in slice component from the UI thread only!");
+		}
 		sliceJob.cancel();
 		saveSettings();
 
@@ -713,6 +716,7 @@ public class SliceComponent {
 		createDimsData();
     	viewer.refresh();
     	
+		updateAxesChoices();
 		synchronizeSliceData(null);
 		slice(true);
 		
