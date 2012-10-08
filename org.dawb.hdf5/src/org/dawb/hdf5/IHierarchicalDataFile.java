@@ -76,6 +76,14 @@ public interface IHierarchicalDataFile {
 	public HObject getData(String fullPath) throws Exception;
 	
 	/**
+	 * 
+	 * @param path
+	 * @return the parent of the node at this path
+	 * @throws Exception
+	 */
+	public Group getParent(final String path) throws Exception;
+	
+	/**
 	 * The full attribute key is: <node full path>@<attribute name>
 	 * e.g. /entry1/data@napimount
 	 * @param fullAttributeKey
@@ -141,6 +149,16 @@ public interface IHierarchicalDataFile {
 	public void setNexusAttribute(final HObject object, final String attribute) throws Exception;
 
 	/**
+	 * This method returns the dataset axes for a give data node. The nexus path may be either the
+	 * Dataset of the data or the parent node of the data and the axes.
+	 * 
+	 * @param nexusPath
+	 * @param iaxis
+	 * @return
+	 */
+	public List<Dataset> getNexusAxes(String nexusPath, int iaxis) throws Exception;
+	
+	/**
 	 * Creates and returns a new dataset with the given name and parent
 	 * If it already exists then an integer will be appended to the name and it will still be written.
 	 * 
@@ -179,5 +197,7 @@ public interface IHierarchicalDataFile {
 	 * @return
 	 */
 	public Dataset appendDataset(String datasetName, Datatype d, long[] bufferShape, Object buffer, Group group)  throws Exception;
+
+
 
 }

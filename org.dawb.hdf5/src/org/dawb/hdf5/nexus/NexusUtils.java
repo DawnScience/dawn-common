@@ -9,7 +9,13 @@
  */ 
 package org.dawb.hdf5.nexus;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
+import org.dawb.hdf5.HierarchicalDataFactory;
+import org.dawb.hdf5.IHierarchicalDataFile;
 
 import ncsa.hdf.object.Attribute;
 import ncsa.hdf.object.Dataset;
@@ -30,6 +36,11 @@ import ncsa.hdf.object.h5.H5Datatype;
 public class NexusUtils {
 
 	private static String NXCLASS = "NX_class";	
+	
+	private static String AXIS   = "axis";	
+	private static String LABEL  = "label";	
+	private static String PRIM   = "primary";	
+	private static String UNIT   = "unit";	
 
 	/**
 	 * Sets the nexus attribute so that if something is looking for them,
@@ -75,6 +86,113 @@ public class NexusUtils {
 		} finally {
 			entry.close(id);
 		}
+	}
+	
+	/**
+	 * Gets the nexus axes from the data node, if there are any there
+	 * 
+	 * TODO Deal with label attribute?
+	 * 
+	 * @param dataNode
+	 * @param dimension - 1 is y, 2 is z, 3 is x
+	 * @return
+	 * @throws Exception 
+	 */
+	public static List<Dataset> getAxes(final Group dataNode, int dimension) throws Exception {
+		
+		final List<Dataset> axes = new ArrayList<Dataset>(3);
+        final Map<Integer, Dataset> axesMap = new TreeMap<Integer, Dataset>();
+		
+        final List<HObject> children = dataNode.getMemberList();
+		for (HObject hObject : children) {
+			final List<?> att = hObject.getMetadata();
+			if (!(hObject instanceof Dataset)) continue;
+			
+			Dataset axis = null;
+			int     pos  = -1;
+			for (Object object : att) {
+				if (object instanceof Attribute) {
+					Attribute attribute = (Attribute)object;
+					if (AXIS.equals(attribute.getName())) {
+						int iaxis = getAttributeIntValue(attribute);
+						if (iaxis == dimension) axis = (Dataset)hObject;
+						
+					} else if (PRIM.equals(attribute.getName())) {
+						pos = getAttributeIntValue(attribute);
+					}
+				}
+			}
+			
+			if (axis!=null) {
+				if (pos<0) {
+					axes.add(axis);
+				} else {
+					axesMap.put(pos, axis);
+				}
+			}
+		}
+		
+		if (!axesMap.isEmpty()) {
+			for (Integer pos : axesMap.keySet()) {
+				axes.add(axesMap.get(pos));
+			}
+		}
+		
+		if (axes.isEmpty()) return null;
+		
+		return axes;
+	}
+
+	/**
+	 * Gets the int value or returns -1 (Can only be used for values which are not allowed to be -1!)
+	 * @param attribute
+	 * @return
+	 */
+	private static int getAttributeIntValue(Attribute attribute) {
+		final Object ob = attribute.getValue();
+		if (ob instanceof int[]) {
+			int[] ia = (int[])ob;
+			return ia[0];
+		} else if (ob instanceof String[]) {
+			String[] sa = (String[])ob;
+			try {
+				return Integer.parseInt(sa[0]);
+			} catch (Throwable ne) {
+				return -1;
+			}
+		}
+
+		return -1;
+	}
+
+	/**
+	 * Returns names of axes in group at same level as name passed in.
+	 * 
+	 * This opens and safely closes a nexus file if one is not already open for
+	 * this location.
+	 * 
+	 * @param filePath
+	 * @param nexusPath
+	 * @param dimension
+	 * @return
+	 * @throws Exception
+	 */
+	public static List<String> getAxisNames(String filePath, String nexusPath, int dimension) throws Exception {
+
+		if (filePath==null || nexusPath==null) return null;
+       	IHierarchicalDataFile file = null;
+        try {
+        	file = HierarchicalDataFactory.getReader(filePath);
+        	final List<Dataset> axes = file.getNexusAxes(nexusPath, dimension);
+        	if (axes==null) return null;
+       
+        	final List<String> names = new ArrayList<String>(axes.size());
+        	for (Dataset ds : axes) names.add(ds.getName());
+        	
+        	return names;
+        } finally {
+        	if (file!=null) file.close();
+        }
 	}
 
 }

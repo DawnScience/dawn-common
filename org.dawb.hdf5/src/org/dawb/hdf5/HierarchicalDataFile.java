@@ -206,6 +206,11 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 		return link!=null ? link : object;
 	}
 	
+	public Group getParent(final String path) throws Exception {
+    	final String parentPath = path.substring(0, path.lastIndexOf("/"));
+        return (Group)getData(parentPath);
+	}
+	
 	/**
 	 * Reads the attribute from the file.
 	 * 
@@ -642,6 +647,19 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 
 	public static boolean isWriting(final String absolutePath) {
 		return writeCache!=null && writeCache.contains(absolutePath);
+	}
+
+	@Override
+	public List<Dataset> getNexusAxes(String nexusPath, int iaxis) throws Exception {
+
+		HObject group = file.get(nexusPath);
+		if (group instanceof Dataset) { // They gave us the data node and would like the axes for it
+	    	final String parentPath = nexusPath.substring(0, nexusPath.lastIndexOf("/"));
+	    	group= file.get(parentPath);
+		}
+    	if (group==null) return null;
+    	
+    	return NexusUtils.getAxes((Group)group, iaxis);
 	}
 
 

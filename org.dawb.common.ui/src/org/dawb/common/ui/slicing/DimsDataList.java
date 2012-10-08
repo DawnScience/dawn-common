@@ -172,4 +172,12 @@ public class DimsDataList implements Serializable {
 		}
 		return false;
 	}
+	
+	public int getAxisCount() {
+		int count = 0;
+		for (DimsData dd : dimsData) {
+			if (dd.getAxis()>-1) count++;
+		}
+		return count;
+	}
 }

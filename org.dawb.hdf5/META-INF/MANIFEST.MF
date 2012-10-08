@@ -38,6 +38,7 @@ Export-Package: ncsa.hdf.hdf5lib,
  nom.tam.fits,
  nom.tam.image,
  nom.tam.util,
- org.dawb.hdf5
+ org.dawb.hdf5,
+ org.dawb.hdf5.nexus
 Import-Package: org.junit,
  org.junit.runner

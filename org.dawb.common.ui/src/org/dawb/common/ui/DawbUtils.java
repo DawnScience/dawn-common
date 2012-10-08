@@ -16,5 +16,8 @@ public class DawbUtils {
 	public static String getDawbHome() {
 		return ResourcesPlugin.getWorkspace().getRoot().getLocation().toOSString()+"/.metadata/.dawb/";
 	}
+	public static String getDawnHome() {
+		return ResourcesPlugin.getWorkspace().getRoot().getLocation().toOSString()+"/.metadata/.dawn/";
+	}
 
 }

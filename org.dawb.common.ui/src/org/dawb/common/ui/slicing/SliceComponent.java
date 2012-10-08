@@ -25,6 +25,8 @@ import org.dawb.common.ui.plot.IPlottingSystem;
 import org.dawb.common.ui.plot.PlotType;
 import org.dawb.common.ui.util.EclipseUtils;
 import org.dawb.common.ui.util.GridUtils;
+import org.dawb.hdf5.nexus.NexusUtils;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -58,6 +60,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
@@ -107,6 +110,10 @@ public class SliceComponent {
     private CCombo          editorCombo;
 
 	private PlotType imagePlotType = PlotType.IMAGE; // Could also be PlotType.PT1D_MULTI
+
+	private Group axes;
+	private Label  xLabel, yLabel, zLabel;
+	private CCombo xAxis, yAxis, zAxis;
 
 	
 	public SliceComponent(final String sliceReceiverId) {
@@ -172,10 +179,10 @@ public class SliceComponent {
 		
 		final Label label = new Label(editorComp, SWT.NONE);
 		label.setText("Edit slice with");
-		label.setLayoutData(new GridData(SWT.LEFT, SWT.FILL, false, false));
+		label.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
 		
 		this.editorCombo = new CCombo(editorComp, SWT.READ_ONLY|SWT.BORDER);
-		editorCombo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+		editorCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 		editorCombo.setText("Slice editor");
 		editorCombo.setItems(new String[]{"Scale", "Enter slice index"});// Later "Range"
 		editorCombo.select(0);
@@ -225,6 +232,43 @@ public class SliceComponent {
 			}
 		});
 		
+		// Axes choice is available for nexus data formats
+		this.axes = new Group(bottom, SWT.NONE);
+		axes.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
+		axes.setLayout(new GridLayout(2, false));
+		axes.setText("Axes");
+		
+		this.xLabel = new Label(axes, SWT.NONE);
+		xLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
+		xLabel.setText("X          ");
+		
+		this.xAxis = new CCombo(axes, SWT.READ_ONLY|SWT.BORDER);
+		xAxis.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+		xAxis.setItems(new String[]{"indices"});
+		xAxis.select(0);
+		xAxis.addSelectionListener(new AxisListener(3));
+		
+		this.yLabel = new Label(axes, SWT.NONE);
+		yLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
+		yLabel.setText("Y          ");
+		
+		this.yAxis = new CCombo(axes, SWT.READ_ONLY|SWT.BORDER);
+		yAxis.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+		yAxis.setItems(new String[]{"indices"});
+		yAxis.select(0);
+		yAxis.addSelectionListener(new AxisListener(1));
+		
+		this.zLabel = new Label(axes, SWT.NONE);
+		zLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
+		zLabel.setText("Z          ");
+		
+		this.zAxis = new CCombo(axes, SWT.READ_ONLY|SWT.BORDER);
+		zAxis.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+		zAxis.setItems(new String[]{"indices"});
+		zAxis.select(0);
+		zAxis.addSelectionListener(new AxisListener(2));
+
+	
 		// Same action on slice table
 		final MenuManager man = new MenuManager();
 		final Action openGal  = new Action("Open data in gallery", Activator.getImageDescriptor("icons/imageStack.png")) {
@@ -253,6 +297,73 @@ public class SliceComponent {
 		return area;
 	}
 	
+	public void updateAxesVisibility() {
+		if (dimsDataList!=null) {
+			final int iaxes = dimsDataList.getAxisCount();
+			boolean xVis = iaxes>0;
+			GridUtils.setVisible(xLabel, xVis);
+			GridUtils.setVisible(xAxis,  xVis);
+			
+			boolean yVis = iaxes>1;
+			GridUtils.setVisible(yLabel, yVis);
+			GridUtils.setVisible(yAxis,  yVis);
+			
+			boolean zVis = iaxes>2;
+			GridUtils.setVisible(zLabel, zVis);
+			GridUtils.setVisible(zAxis,  zVis);
+			
+			this.axes.layout(axes.getChildren());
+		}
+	}
+	
+	/**
+	 * Extracts axes from nexus data.
+	 */
+	private void updateAxesChoices() {
+
+        updateAxis(xAxis, 3);
+        updateAxis(yAxis, 1);
+        updateAxis(zAxis, 2);
+        
+	}
+
+	
+	private void updateAxis(CCombo axis, int iaxis) {
+		try {    	
+			final List<String> names = NexusUtils.getAxisNames(sliceObject.getPath(), sliceObject.getName(), iaxis);
+			final String[] items = names.toArray(new String[names.size()+1]);
+			items[items.length-1]= "indices";
+			int iselection = axis.getSelectionIndex();
+			axis.setItems(items);
+			try {
+				axis.select(iselection);
+				sliceObject.setNexusAxis(iaxis, items[iselection]);
+			} catch (Throwable ne) {
+				axis.select(0);
+				sliceObject.setNexusAxis(iaxis, "indices");
+			}
+		} catch (Exception e) {
+			logger.info("Cannot assign axes!", e);
+			axis.setItems(new String[]{"indices"});
+			axis.select(0);
+			sliceObject.setNexusAxis(iaxis, "indices");
+		}		
+	}
+	
+	private class AxisListener extends SelectionAdapter {
+		
+		private int iaxis;
+		AxisListener(int iaxis) {
+			this.iaxis = iaxis;
+		}
+		public void widgetSelected(SelectionEvent e) {
+			final CCombo combo = (CCombo)e.getSource();
+			final String axis  = combo.getItem(combo.getSelectionIndex());
+			sliceObject.setNexusAxis(iaxis, axis);
+			slice(true);
+		}
+	}
+
 	protected void openGallery() {
 		
 		if (sliceReceiverId==null) return;
@@ -277,7 +388,7 @@ public class SliceComponent {
 		
 		if (plottingSystem!=null) {
 			final File dataFile     = new File(sliceObject.getPath());
-			final File lastSettings = new File(DawbUtils.getDawbHome()+dataFile.getName()+"."+sliceObject.getName()+".xml");
+			final File lastSettings = new File(DawbUtils.getDawnHome()+dataFile.getName()+"."+sliceObject.getName()+".xml");
 			if (lastSettings.exists()) {
 				XMLDecoder decoder = null;
 				try {
@@ -304,6 +415,8 @@ public class SliceComponent {
 			}
 			
 		}
+		updateAxesChoices();
+		updateAxesVisibility();
 	}
 
 	private LabelJob labelJob;
@@ -328,6 +441,8 @@ public class SliceComponent {
         if (labelJob == null) labelJob = new LabelJob();
 		labelJob.update(isX);
 		
+		updateAxesVisibility();
+
 		return isX;
 	}
 	

@@ -13,10 +13,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import ncsa.hdf.object.Group;
+
 import org.dawb.common.ui.monitor.ProgressMonitorWrapper;
 import org.dawb.common.ui.plot.IPlottingSystem;
 import org.dawb.common.ui.plot.PlotType;
+import org.dawb.hdf5.HierarchicalDataFactory;
+import org.dawb.hdf5.IHierarchicalDataFile;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.swt.widgets.Display;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -179,7 +184,14 @@ public class SliceUtils {
 		if (monitor!=null) monitor.worked(1);
 		if (mode==PlotType.PT1D) {
 			plottingSystem.clear();
-			plottingSystem.createPlot1D(slice, null, monitor);
+			final AbstractDataset x = getNexusAxisOrIndices(currentSlice, slice.getShape()[0], 3, monitor);
+			plottingSystem.createPlot1D(x, Arrays.asList(slice), monitor);
+			Display.getDefault().syncExec(new Runnable() {
+				public void run() {
+					plottingSystem.getSelectedXAxis().setTitle(x.getName());
+				}
+			});
+			
 		} else if (mode==PlotType.PT1D_MULTI || mode==PlotType.PT1D_STACKED) {
 			
 			plottingSystem.clear();
@@ -201,9 +213,42 @@ public class SliceUtils {
 			plottingSystem.createPlot1D(ys.get(0), ys, monitor);
 
 		} else {
-			plottingSystem.updatePlot2D(slice, null, monitor);
+			final AbstractDataset x = getNexusAxisOrIndices(currentSlice, slice.getShape()[1], 3, monitor);
+			final AbstractDataset y = getNexusAxisOrIndices(currentSlice, slice.getShape()[0], 1, monitor);
+			plottingSystem.updatePlot2D(slice, Arrays.asList(x,y), monitor);
+			Display.getDefault().syncExec(new Runnable() {
+				public void run() {
+					plottingSystem.getSelectedXAxis().setTitle(x.getName());
+					plottingSystem.getSelectedYAxis().setTitle(y.getName());
+				}
+			});
+			plottingSystem.repaint();
+ 			
 		}
 
+	}
+
+
+	private static AbstractDataset getNexusAxisOrIndices(SliceObject currentSlice, int length, int inexusAxis, final IProgressMonitor  monitor) throws Exception {
+		
+		String axisName = currentSlice.getNexusAxis(inexusAxis);
+		if ("indices".equals(axisName) || axisName==null) {
+			return IntegerDataset.arange(length, IntegerDataset.INT);
+		}
+		IHierarchicalDataFile file = null;
+		try {
+			file = HierarchicalDataFactory.getReader(currentSlice.getPath());
+			final Group  group    = file.getParent(currentSlice.getName());
+			final String fullName = group.getFullName()+"/"+axisName;
+			AbstractDataset axis = LoaderFactory.getDataSet(currentSlice.getPath(), fullName, new ProgressMonitorWrapper(monitor));
+		    axis.setName(axisName);
+		    return axis;
+		} catch (Throwable ne) {
+			logger.error("Cannot get nexus axis during slice!", ne);
+			return IntegerDataset.arange(length, IntegerDataset.INT);
+		} finally {
+			if (file!=null) file.close();
+		}
 	}
 
 
