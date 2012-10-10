@@ -34,6 +34,10 @@ public class DimsData implements Serializable {
 	private String    sliceRange;
 
 	private int       dimension=-1;
+	
+	/**
+	 * 0=x, 1=y, 2=z
+	 */
 	private int       axis=-1;
 	private int       slice=0;
 
@@ -96,6 +100,9 @@ public class DimsData implements Serializable {
 		this.dimension = dimension;
 	}
 
+	/**
+	 * -1=slice, 0=x, 1=y, 2=z
+	 */	
 	public int getAxis() {
 		return axis;
 	}

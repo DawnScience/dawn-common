@@ -104,6 +104,8 @@ public interface IPlottingSystem extends ITraceSystem, IRegionSystem, IAxisSyste
 	 * Attempts to update any ILineTraces with the same name as the ys pass in, otherwise
 	 * will call createPlot1D(...)
 	 * 
+	 * NOTE This will not update the title at the moment if the traces exist.
+	 * 
 	 * @param x  - may be null, if null indices of y are used
 	 * @param ys -  must not be null
 	 * @param monitor

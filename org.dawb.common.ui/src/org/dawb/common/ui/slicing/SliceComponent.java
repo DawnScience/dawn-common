@@ -16,13 +16,22 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.dawb.common.services.ImageServiceBean.ImageOrigin;
 import org.dawb.common.ui.Activator;
 import org.dawb.common.ui.DawbUtils;
 import org.dawb.common.ui.components.cell.ScaleCellEditor;
 import org.dawb.common.ui.plot.IPlottingSystem;
 import org.dawb.common.ui.plot.PlotType;
+import org.dawb.common.ui.plot.trace.IImageTrace;
+import org.dawb.common.ui.plot.trace.IPaletteListener;
+import org.dawb.common.ui.plot.trace.ITraceListener;
+import org.dawb.common.ui.plot.trace.ITraceListener.Stub;
+import org.dawb.common.ui.plot.trace.PaletteEvent;
+import org.dawb.common.ui.plot.trace.TraceEvent;
 import org.dawb.common.ui.util.EclipseUtils;
 import org.dawb.common.ui.util.GridUtils;
 import org.dawb.hdf5.nexus.NexusUtils;
@@ -110,10 +119,17 @@ public class SliceComponent {
     private CCombo          editorCombo;
 
 	private PlotType imagePlotType = PlotType.IMAGE; // Could also be PlotType.PT1D_MULTI
+	
+	/**
+	 * 0=x, 1=y, 2=z
+	 */
+	private Map<Integer,Label>  dimensionLabels;
+	/**
+	 * 0=x, 1=y, 2=z
+	 */
+	private Map<Integer,CCombo> dimensionChoice;
 
-	private Group axes;
-	private Label  xLabel, yLabel, zLabel;
-	private CCombo xAxis, yAxis, zAxis;
+	private Stub traceListener;
 
 	
 	public SliceComponent(final String sliceReceiverId) {
@@ -121,6 +137,13 @@ public class SliceComponent {
 		this.sliceJob        = new SliceJob();
 	}
 	
+	/**
+	 * Please call setPlottingSystem(...) before createPartControl(...) if
+	 * you would like the part to show controls for images.
+	 * 
+	 * @param parent
+	 * @return
+	 */
 	public Control createPartControl(Composite parent) {
 		
 		this.area = new Composite(parent, SWT.NONE);
@@ -231,44 +254,72 @@ public class SliceComponent {
 				openGallery();
 			}
 		});
-		
+				
 		// Axes choice is available for nexus data formats
-		this.axes = new Group(bottom, SWT.NONE);
+		Group axes = new Group(bottom, SWT.NONE);
 		axes.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
 		axes.setLayout(new GridLayout(2, false));
 		axes.setText("Axes");
+		dimensionLabels = new HashMap<Integer, Label>(3);
+		dimensionChoice  = new HashMap<Integer, CCombo>(3);
 		
-		this.xLabel = new Label(axes, SWT.NONE);
-		xLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
-		xLabel.setText("X          ");
+		Label dim1Label = new Label(axes, SWT.NONE);
+		dim1Label.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
+		dim1Label.setText("Dimension 1 ");
+		dimensionLabels.put(0, dim1Label);
 		
-		this.xAxis = new CCombo(axes, SWT.READ_ONLY|SWT.BORDER);
-		xAxis.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-		xAxis.setItems(new String[]{"indices"});
-		xAxis.select(0);
-		xAxis.addSelectionListener(new AxisListener(3));
+		CCombo dim1Choice = new CCombo(axes, SWT.READ_ONLY|SWT.BORDER);
+		dim1Choice.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+		dim1Choice.setItems(new String[]{"indices"});
+		dim1Choice.select(0);
+		dim1Choice.addSelectionListener(new AxisListener(3));
+		dimensionChoice.put(0, dim1Choice);
 		
-		this.yLabel = new Label(axes, SWT.NONE);
-		yLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
-		yLabel.setText("Y          ");
+		Label dim2Label = new Label(axes, SWT.NONE);
+		dim2Label.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
+		dim2Label.setText("Dimension 2 ");
+		dimensionLabels.put(1, dim2Label);
 		
-		this.yAxis = new CCombo(axes, SWT.READ_ONLY|SWT.BORDER);
-		yAxis.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-		yAxis.setItems(new String[]{"indices"});
-		yAxis.select(0);
-		yAxis.addSelectionListener(new AxisListener(1));
+		CCombo dim2Choice = new CCombo(axes, SWT.READ_ONLY|SWT.BORDER);
+		dim2Choice.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+		dim2Choice.setItems(new String[]{"indices"});
+		dim2Choice.select(0);
+		dim2Choice.addSelectionListener(new AxisListener(1));
+		dimensionChoice.put(1, dim2Choice);
 		
-		this.zLabel = new Label(axes, SWT.NONE);
-		zLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
-		zLabel.setText("Z          ");
-		
-		this.zAxis = new CCombo(axes, SWT.READ_ONLY|SWT.BORDER);
-		zAxis.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-		zAxis.setItems(new String[]{"indices"});
-		zAxis.select(0);
-		zAxis.addSelectionListener(new AxisListener(2));
-
+		Label dim3Label = new Label(axes, SWT.NONE);
+		dim3Label.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
+		dim3Label.setText("Dimension 3 ");
+		dimensionLabels.put(2, dim3Label);
 	
+		CCombo dim3Choice = new CCombo(axes, SWT.READ_ONLY|SWT.BORDER);
+		dim3Choice.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+		dim3Choice.setItems(new String[]{"indices"});
+		dim3Choice.select(0);
+		dim3Choice.addSelectionListener(new AxisListener(2));
+		dimensionChoice.put(2, dim3Choice);
+
+		// Something to tell them their image orientation (X and Y may be mixed up!)
+		if (plottingSystem!=null) {
+			final Label imageOrientation = new Label(bottom, SWT.NONE);
+			imageOrientation.setText("Image Orientation:  "+getImageOrientation());
+			imageOrientation.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
+			GridUtils.setVisible(imageOrientation, plottingSystem.is2D());
+			
+			addImageOrientationListener(imageOrientation);
+			
+			this.traceListener = new ITraceListener.Stub() {
+				protected void update(TraceEvent evt) {
+					imageOrientation.setText("Image Orientation:  "+getImageOrientation());
+					GridUtils.setVisible(imageOrientation, plottingSystem.is2D());
+					area.layout();
+					addImageOrientationListener(imageOrientation);
+				}
+			};
+			imageOrientation.setToolTipText("The image orientation may mean that X and Y are reversed.");
+			plottingSystem.addTraceListener(traceListener);
+		}
+
 		// Same action on slice table
 		final MenuManager man = new MenuManager();
 		final Action openGal  = new Action("Open data in gallery", Activator.getImageDescriptor("icons/imageStack.png")) {
@@ -297,50 +348,94 @@ public class SliceComponent {
 		return area;
 	}
 	
+	private String getImageOrientation() {
+		try {
+			final IImageTrace trace  = (IImageTrace)plottingSystem.getTraces(IImageTrace.class).iterator().next();
+            final ImageOrigin io     = trace.getImageOrigin();
+            StringBuffer buf = new StringBuffer(io.getLabel());
+            if (io==ImageOrigin.TOP_LEFT || io==ImageOrigin.BOTTOM_RIGHT) {
+            	buf.append("    (X and Y are reversed)");
+            }
+            return buf.toString();
+		} catch (Exception ne) {
+			return "";
+		}
+	}
+	
+	private IPaletteListener orientationListener;
+	private void addImageOrientationListener(final Label imageOrientation) {
+		try {
+			final IImageTrace trace  = (IImageTrace)plottingSystem.getTraces(IImageTrace.class).iterator().next();
+            if (orientationListener == null) {
+            	orientationListener = new IPaletteListener.Stub() {
+            		@Override
+            		public void imageOriginChanged(PaletteEvent evt) {
+    					imageOrientation.setText("Image Orientation:  "+getImageOrientation());
+           		    }      
+            	};
+            }
+            // PaletteListeners are cleared when traces are removed.
+            trace.addPaletteListener(orientationListener);
+
+		} catch (Exception ne) {
+			return;
+		}
+	}
+
+
 	public void updateAxesVisibility() {
 		if (dimsDataList!=null) {
 			final int iaxes = dimsDataList.getAxisCount();
-			boolean xVis = iaxes>0;
-			GridUtils.setVisible(xLabel, xVis);
-			GridUtils.setVisible(xAxis,  xVis);
+			boolean vis = iaxes>0;
+			GridUtils.setVisible(dimensionLabels.get(0), vis);
+			GridUtils.setVisible(dimensionChoice.get(0),  vis);
 			
-			boolean yVis = iaxes>1;
-			GridUtils.setVisible(yLabel, yVis);
-			GridUtils.setVisible(yAxis,  yVis);
+			vis = iaxes>1;
+			GridUtils.setVisible(dimensionLabels.get(1), vis);
+			GridUtils.setVisible(dimensionChoice.get(1),  vis);
 			
-			boolean zVis = iaxes>2;
-			GridUtils.setVisible(zLabel, zVis);
-			GridUtils.setVisible(zAxis,  zVis);
+			vis = iaxes>2;
+			GridUtils.setVisible(dimensionLabels.get(2), vis);
+			GridUtils.setVisible(dimensionChoice.get(2),  vis);
 			
-			this.axes.layout(axes.getChildren());
+			this.area.layout();
 		}
 	}
 	
 	/**
 	 * Extracts axes from nexus data.
 	 */
-	private void updateAxesChoices() {
+	private void updateAxesChoices(boolean clearOldSelection) {
 
-        updateAxis(xAxis, 3);
-        updateAxis(yAxis, 1);
-        updateAxis(zAxis, 2);
-        area.layout();
+		for (CCombo combo : dimensionChoice.values()) {
+			combo.setItems(new String[]{"indices"});
+		}
+		// We now match the dim in the table with the axes choices for that dim.
+		// Dim 1,2 and 3 can be assigned by the user 
+		int index = 0;
+		int[] nexusIndices = new int[]{3,1,2};
+		for (DimsData dd : dimsDataList.getDimsData()) {
+			if (dd.getAxis()<0) continue;
+			updateAxis(dimensionChoice.get(dd.getAxis()), nexusIndices[index], clearOldSelection);
+			++index;
+		}
+		area.layout();
 	}
 
 	
-	private void updateAxis(CCombo axis, int iaxis) {
+	private void updateAxis(CCombo axis, int iaxis, boolean clearOldSelection) {
 		try {    	
 			final List<String> names = NexusUtils.getAxisNames(sliceObject.getPath(), sliceObject.getName(), iaxis);
 			final String[] items = names!=null ? names.toArray(new String[names.size()+1]) : new String[1];
 			items[items.length-1]= "indices";
-			int iselection = axis.getSelectionIndex();
+			int iselection = !clearOldSelection ? axis.getSelectionIndex() : 0;
 			axis.setItems(items);
 			try {
 				axis.select(iselection);
 				sliceObject.setNexusAxis(iaxis, items[iselection]);
 			} catch (Throwable ne) {
 				axis.select(0);
-				sliceObject.setNexusAxis(iaxis, "indices");
+				sliceObject.setNexusAxis(iaxis, items[0]);
 			}
 		} catch (Exception e) {
 			logger.info("Cannot assign axes!", e);
@@ -494,7 +589,10 @@ public class SliceComponent {
 				final DimsData data  = (DimsData)((IStructuredSelection)viewer.getSelection()).getFirstElement();
 				final int       col   = COLUMN_PROPERTIES.indexOf(property);
 				if (col==0) return;
-				if (col==1) data.setAxis((Integer)value);
+				if (col==1) {
+					data.setAxis((Integer)value);
+					updateAxesChoices(true);
+				}
 				if (col==2) {
 					if (value instanceof Integer) {
 						data.setSlice((Integer)value);
@@ -506,7 +604,9 @@ public class SliceComponent {
 				viewer.cancelEditing();
 				viewer.refresh();
 				
-				if (isValidData) slice(false);
+				if (isValidData) {
+					slice(false);
+				}
 			}
 			
 			@Override
@@ -690,8 +790,7 @@ public class SliceComponent {
 	 */
 	public void setData(final String     name,
 				        final String     filePath,
-				        final int[]      dataShape,
-				        final IPlottingSystem plotWindow) {
+				        final int[]      dataShape) {
 		
 		if (Display.getDefault().getThread()!=Thread.currentThread()) {
 			throw new SWTError("Please call setData(...) in slice component from the UI thread only!");
@@ -704,7 +803,6 @@ public class SliceComponent {
 		object.setName(name);
 		setSliceObject(object);
 		setDataShape(dataShape);
-		setPlottingSystem(plotWindow);
 		
 		explain.setText("Create a slice of "+sliceObject.getName()+".\nIt has the shape "+Arrays.toString(dataShape));
 		if (viewer.getCellEditors()[2] instanceof SpinnerCellEditorWithPlayButton) {
@@ -716,7 +814,7 @@ public class SliceComponent {
 		createDimsData();
     	viewer.refresh();
     	
-		updateAxesChoices();
+		updateAxesChoices(false);
 		synchronizeSliceData(null);
 		slice(true);
 		
@@ -740,7 +838,9 @@ public class SliceComponent {
 	}
 	
 	public void dispose() {
-			
+		if (plottingSystem!=null && traceListener!=null) {
+			plottingSystem.removeTraceListener(traceListener);	
+		}
 		sliceJob.cancel();
 		saveSettings();
 	}
@@ -772,6 +872,10 @@ public class SliceComponent {
 		this.dataShape = shape;
 	}
 
+	/**
+	 * Normally call before createPartControl(...)
+	 * @param plotWindow
+	 */
 	public void setPlottingSystem(IPlottingSystem plotWindow) {
 		this.plottingSystem = plotWindow;
 	}
@@ -799,6 +903,9 @@ public class SliceComponent {
 	
 	public DimsDataList getDimsDataList() {
 		return dimsDataList;
+	}
+	public Map<Integer,String> getNexusAxes() {
+		return sliceObject.getNexusAxes();
 	}
 
 	public void setDimsDataList(DimsDataList dimsDataList) {

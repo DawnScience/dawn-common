@@ -15,13 +15,17 @@ import java.util.List;
 
 import ncsa.hdf.object.Group;
 
+import org.dawb.common.services.ImageServiceBean.ImageOrigin;
 import org.dawb.common.ui.monitor.ProgressMonitorWrapper;
 import org.dawb.common.ui.plot.IPlottingSystem;
 import org.dawb.common.ui.plot.PlotType;
+import org.dawb.common.ui.plot.trace.IImageTrace;
 import org.dawb.hdf5.HierarchicalDataFactory;
 import org.dawb.hdf5.IHierarchicalDataFile;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -184,11 +188,12 @@ public class SliceUtils {
 		if (monitor!=null) monitor.worked(1);
 		if (mode==PlotType.PT1D) {
 			plottingSystem.clear();
-			final AbstractDataset x = getNexusAxisOrIndices(currentSlice, slice.getShape()[0], 3, monitor);
+			final AbstractDataset x = getNexusAxis(currentSlice, slice.getShape()[0], 3, true, monitor);
 			plottingSystem.createPlot1D(x, Arrays.asList(slice), monitor);
 			Display.getDefault().syncExec(new Runnable() {
 				public void run() {
 					plottingSystem.getSelectedXAxis().setTitle(x.getName());
+					plottingSystem.getSelectedYAxis().setTitle("");
 				}
 			});
 			
@@ -213,13 +218,24 @@ public class SliceUtils {
 			plottingSystem.createPlot1D(ys.get(0), ys, monitor);
 
 		} else {
-			final AbstractDataset x = getNexusAxisOrIndices(currentSlice, slice.getShape()[1], 3, monitor);
-			final AbstractDataset y = getNexusAxisOrIndices(currentSlice, slice.getShape()[0], 1, monitor);
+			AbstractDataset x = getNexusAxis(currentSlice, slice.getShape()[1], 3, true, monitor);
+			AbstractDataset y = getNexusAxis(currentSlice, slice.getShape()[0], 1, true, monitor);
+			// If the image is rotated because they set the origin in another corner, we should reverse 
+			// the x and y data sets (there may also be an issue with reversing them - arg)
+			final ImageOrigin origin = getImageOrientation(plottingSystem);
+			if (origin==ImageOrigin.TOP_LEFT || origin==ImageOrigin.BOTTOM_RIGHT) {
+				AbstractDataset xtmp = x;
+				x = y;
+				y = xtmp;
+			}
+			
+			final AbstractDataset xAxis = x;
+			final AbstractDataset yAxis = y;
 			plottingSystem.updatePlot2D(slice, Arrays.asList(x,y), monitor);
 			Display.getDefault().syncExec(new Runnable() {
 				public void run() {
-					plottingSystem.getSelectedXAxis().setTitle(x.getName());
-					plottingSystem.getSelectedYAxis().setTitle(y.getName());
+					plottingSystem.getSelectedXAxis().setTitle(xAxis.getName());
+					plottingSystem.getSelectedYAxis().setTitle(yAxis.getName());
 				}
 			});
 			plottingSystem.repaint();
@@ -229,11 +245,24 @@ public class SliceUtils {
 	}
 
 
-	private static AbstractDataset getNexusAxisOrIndices(SliceObject currentSlice, int length, int inexusAxis, final IProgressMonitor  monitor) throws Exception {
+	private static ImageOrigin getImageOrientation( IPlottingSystem plottingSystem) {
+		try {
+			IImageTrace trace = (IImageTrace)plottingSystem.getTraces(IImageTrace.class).iterator().next();
+			return trace.getImageOrigin();
+		} catch (Throwable ne) {
+			final ScopedPreferenceStore store = new ScopedPreferenceStore(InstanceScope.INSTANCE, "org.dawb.workbench.plotting");
+			return ImageOrigin.forLabel(store.getString("org.dawb.plotting.system.originChoice"));
+		}
+	}
+
+
+	public static AbstractDataset getNexusAxis(SliceObject currentSlice, int length, int inexusAxis, boolean requireIndicesOnError, final IProgressMonitor  monitor) throws Exception {
 		
 		String axisName = currentSlice.getNexusAxis(inexusAxis);
 		if ("indices".equals(axisName) || axisName==null) {
-			return IntegerDataset.arange(length, IntegerDataset.INT);
+			AbstractDataset indices = IntegerDataset.arange(length, IntegerDataset.INT); // Save time
+			indices.setName("");
+			return indices;
 		}
 		IHierarchicalDataFile file = null;
 		try {
@@ -245,7 +274,14 @@ public class SliceUtils {
 		    return axis;
 		} catch (Throwable ne) {
 			logger.error("Cannot get nexus axis during slice!", ne);
-			return IntegerDataset.arange(length, IntegerDataset.INT);
+			if (requireIndicesOnError) {
+				AbstractDataset indices = IntegerDataset.arange(length, IntegerDataset.INT); // Save time
+				indices.setName("");
+				return indices;
+
+			} else {
+				return null;
+			}
 		} finally {
 			if (file!=null) file.close();
 		}
