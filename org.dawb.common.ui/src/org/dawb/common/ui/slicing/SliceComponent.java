@@ -30,7 +30,6 @@ import org.dawb.common.ui.plot.PlotType;
 import org.dawb.common.ui.plot.trace.IImageTrace;
 import org.dawb.common.ui.plot.trace.IPaletteListener;
 import org.dawb.common.ui.plot.trace.ITraceListener;
-import org.dawb.common.ui.plot.trace.ITraceListener.Stub;
 import org.dawb.common.ui.plot.trace.PaletteEvent;
 import org.dawb.common.ui.plot.trace.TraceEvent;
 import org.dawb.common.ui.util.EclipseUtils;
@@ -261,7 +260,7 @@ public class SliceComponent {
 					addImageOrientationListener(imageOrientation);
 				}
 			};
-			imageOrientation.setToolTipText("The image orientation may mean that X and Y are reversed.");
+			imageOrientation.setToolTipText("The image orientation currently set by the plotting.");
 			plottingSystem.addTraceListener(traceListener);
 		}
 
@@ -305,7 +304,8 @@ public class SliceComponent {
             	int len = text.getText().length();
             	text.append(reverseLabel);
                 text.setStyleRange(new StyleRange(len, reverseLabel.length(), null, null, SWT.BOLD));
-           }
+            }
+
 		} catch (Exception ne) {
 			text.setStyleRange(null);
 			text.setText("");
@@ -332,7 +332,7 @@ public class SliceComponent {
 			return;
 		}
 	}
-	
+
 	private void updateAxesChoices() {
 		dimensionNames.clear();
 		for (int idim =1; idim<=dimsDataList.size(); ++idim) {
@@ -588,7 +588,7 @@ public class SliceComponent {
 		editors[1] = new CComboCellEditor(viewer.getTable(), new String[]{"X","Y","(Slice)"}, SWT.READ_ONLY) {
 			protected int getDoubleClickTimeout() {
 				return 0;
-			}			
+			}	
 		};
 		final CCombo combo = ((CComboCellEditor)editors[1]).getCombo();
 		combo.addModifyListener(new ModifyListener() {
@@ -787,7 +787,7 @@ public class SliceComponent {
 		
 		createDimsData();
 		updateAxesChoices();
-    	viewer.refresh();
+		viewer.refresh();
     	
 		synchronizeSliceData(null);
 		slice(true);
@@ -795,6 +795,22 @@ public class SliceComponent {
 		if (plottingSystem==null) {
 			GridUtils.setVisible(updateAutomatically, false);
 			viewer.getTable().getColumns()[2].setText("Start Index or Slice Range");
+		}
+	}
+	
+
+	protected boolean isReversedImage() {
+		try {
+			final IImageTrace trace = (IImageTrace)plottingSystem.getTraces(IImageTrace.class).iterator().next();
+			return trace.getImageOrigin()==ImageOrigin.TOP_LEFT || trace.getImageOrigin()==ImageOrigin.BOTTOM_RIGHT;
+		} catch (Throwable ne) {
+			try {
+				final ScopedPreferenceStore store = new ScopedPreferenceStore(InstanceScope.INSTANCE, "org.dawb.workbench.plotting");
+				ImageOrigin origin = ImageOrigin.forLabel(store.getString("org.dawb.plotting.system.originChoice"));
+				return origin==ImageOrigin.TOP_LEFT || origin==ImageOrigin.BOTTOM_RIGHT;
+			} catch (Throwable e) {
+				return true;
+			}
 		}
 	}
 	

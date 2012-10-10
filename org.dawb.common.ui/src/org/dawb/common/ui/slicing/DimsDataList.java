@@ -180,4 +180,8 @@ public class DimsDataList implements Serializable {
 		}
 		return count;
 	}
+
+	public boolean is2D() {
+		return getAxisCount()==2;
+	}
 }
