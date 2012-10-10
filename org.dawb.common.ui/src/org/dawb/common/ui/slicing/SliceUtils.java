@@ -188,7 +188,7 @@ public class SliceUtils {
 		if (monitor!=null) monitor.worked(1);
 		if (mode==PlotType.PT1D) {
 			plottingSystem.clear();
-			final AbstractDataset x = getNexusAxis(currentSlice, slice.getShape()[0], 3, true, monitor);
+			final AbstractDataset x = getNexusAxis(currentSlice, slice.getShape()[0], currentSlice.getX()+1, true, monitor);
 			plottingSystem.createPlot1D(x, Arrays.asList(slice), monitor);
 			Display.getDefault().syncExec(new Runnable() {
 				public void run() {
@@ -218,16 +218,16 @@ public class SliceUtils {
 			plottingSystem.createPlot1D(ys.get(0), ys, monitor);
 
 		} else {
-			AbstractDataset x = getNexusAxis(currentSlice, slice.getShape()[1], 3, true, monitor);
-			AbstractDataset y = getNexusAxis(currentSlice, slice.getShape()[0], 1, true, monitor);
+			AbstractDataset x = getNexusAxis(currentSlice, slice.getShape()[1], currentSlice.getX()+1, true, monitor);
+			AbstractDataset y = getNexusAxis(currentSlice, slice.getShape()[0], currentSlice.getY()+1, true, monitor);
 			// If the image is rotated because they set the origin in another corner, we should reverse 
 			// the x and y data sets (there may also be an issue with reversing them - arg)
-			final ImageOrigin origin = getImageOrientation(plottingSystem);
-			if (origin==ImageOrigin.TOP_LEFT || origin==ImageOrigin.BOTTOM_RIGHT) {
-				AbstractDataset xtmp = x;
-				x = y;
-				y = xtmp;
-			}
+//			final ImageOrigin origin = getImageOrientation(plottingSystem);
+//			if (origin==ImageOrigin.TOP_LEFT || origin==ImageOrigin.BOTTOM_RIGHT) {
+//				AbstractDataset xtmp = x;
+//				x = y;
+//				y = xtmp;
+//			}
 			
 			final AbstractDataset xAxis = x;
 			final AbstractDataset yAxis = y;
@@ -256,6 +256,16 @@ public class SliceUtils {
 	}
 
 
+	/**
+	 * 
+	 * @param currentSlice
+	 * @param length of axis
+	 * @param inexusAxis nexus dimension (starting with 1)
+	 * @param requireIndicesOnError
+	 * @param monitor
+	 * @return
+	 * @throws Exception
+	 */
 	public static AbstractDataset getNexusAxis(SliceObject currentSlice, int length, int inexusAxis, boolean requireIndicesOnError, final IProgressMonitor  monitor) throws Exception {
 		
 		String axisName = currentSlice.getNexusAxis(inexusAxis);

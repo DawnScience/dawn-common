@@ -149,14 +149,14 @@ public interface IHierarchicalDataFile {
 	public void setNexusAttribute(final HObject object, final String attribute) throws Exception;
 
 	/**
-	 * This method returns the dataset axes for a give data node. The nexus path may be either the
-	 * Dataset of the data or the parent node of the data and the axes.
+	 * This method returns the dataset axes for a given signal node. The nexus path must be the path
+	 * to the signal
 	 * 
-	 * @param nexusPath
-	 * @param iaxis
+	 * @param signalPath
+	 * @param dimension
 	 * @return
 	 */
-	public List<Dataset> getNexusAxes(String nexusPath, int iaxis) throws Exception;
+	public List<Dataset> getNexusAxes(String signalPath, int dimension) throws Exception;
 	
 	/**
 	 * Creates and returns a new dataset with the given name and parent

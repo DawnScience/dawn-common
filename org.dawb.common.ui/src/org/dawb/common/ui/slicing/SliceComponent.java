@@ -15,6 +15,7 @@ import java.beans.XMLEncoder;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -69,7 +70,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
@@ -100,7 +100,7 @@ public class SliceComponent {
 	
 	private static final Logger logger = LoggerFactory.getLogger(SliceComponent.class);
 
-	private static final List<String> COLUMN_PROPERTIES = Arrays.asList(new String[]{"Dimension","Axis","Slice"});
+	private static final List<String> COLUMN_PROPERTIES = Arrays.asList(new String[]{"Dimension","Axis","Slice","Axis Data"});
 	
 	private SliceObject     sliceObject;
 	private int[]           dataShape;
@@ -119,22 +119,18 @@ public class SliceComponent {
     private CCombo          editorCombo;
 
 	private PlotType imagePlotType = PlotType.IMAGE; // Could also be PlotType.PT1D_MULTI
+	private Stub traceListener;
 	
 	/**
-	 * 0=x, 1=y, 2=z
+	 * 1 is first dimension, map of names available for axis, including indices.
 	 */
-	private Map<Integer,Label>  dimensionLabels;
-	/**
-	 * 0=x, 1=y, 2=z
-	 */
-	private Map<Integer,CCombo> dimensionChoice;
-
-	private Stub traceListener;
+	private Map<Integer, List<String>> dimensionNames;
 
 	
 	public SliceComponent(final String sliceReceiverId) {
 		this.sliceReceiverId = sliceReceiverId;
 		this.sliceJob        = new SliceJob();
+		this.dimensionNames  = new HashMap<Integer,List<String>>(5);
 	}
 	
 	/**
@@ -255,49 +251,6 @@ public class SliceComponent {
 			}
 		});
 				
-		// Axes choice is available for nexus data formats
-		Group axes = new Group(bottom, SWT.NONE);
-		axes.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
-		axes.setLayout(new GridLayout(2, false));
-		axes.setText("Axes");
-		dimensionLabels = new HashMap<Integer, Label>(3);
-		dimensionChoice  = new HashMap<Integer, CCombo>(3);
-		
-		Label dim1Label = new Label(axes, SWT.NONE);
-		dim1Label.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
-		dim1Label.setText("Dimension 1 ");
-		dimensionLabels.put(0, dim1Label);
-		
-		CCombo dim1Choice = new CCombo(axes, SWT.READ_ONLY|SWT.BORDER);
-		dim1Choice.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-		dim1Choice.setItems(new String[]{"indices"});
-		dim1Choice.select(0);
-		dim1Choice.addSelectionListener(new AxisListener(3));
-		dimensionChoice.put(0, dim1Choice);
-		
-		Label dim2Label = new Label(axes, SWT.NONE);
-		dim2Label.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
-		dim2Label.setText("Dimension 2 ");
-		dimensionLabels.put(1, dim2Label);
-		
-		CCombo dim2Choice = new CCombo(axes, SWT.READ_ONLY|SWT.BORDER);
-		dim2Choice.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-		dim2Choice.setItems(new String[]{"indices"});
-		dim2Choice.select(0);
-		dim2Choice.addSelectionListener(new AxisListener(1));
-		dimensionChoice.put(1, dim2Choice);
-		
-		Label dim3Label = new Label(axes, SWT.NONE);
-		dim3Label.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
-		dim3Label.setText("Dimension 3 ");
-		dimensionLabels.put(2, dim3Label);
-	
-		CCombo dim3Choice = new CCombo(axes, SWT.READ_ONLY|SWT.BORDER);
-		dim3Choice.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-		dim3Choice.setItems(new String[]{"indices"});
-		dim3Choice.select(0);
-		dim3Choice.addSelectionListener(new AxisListener(2));
-		dimensionChoice.put(2, dim3Choice);
 
 		// Something to tell them their image orientation (X and Y may be mixed up!)
 		if (plottingSystem!=null) {
@@ -381,84 +334,37 @@ public class SliceComponent {
 			return;
 		}
 	}
-
-
-	public void updateAxesVisibility() {
-		if (dimsDataList!=null) {
-			final int iaxes = dimsDataList.getAxisCount();
-			boolean vis = iaxes>0;
-			GridUtils.setVisible(dimensionLabels.get(0), vis);
-			GridUtils.setVisible(dimensionChoice.get(0),  vis);
-			
-			vis = iaxes>1;
-			GridUtils.setVisible(dimensionLabels.get(1), vis);
-			GridUtils.setVisible(dimensionChoice.get(1),  vis);
-			
-			vis = iaxes>2;
-			GridUtils.setVisible(dimensionLabels.get(2), vis);
-			GridUtils.setVisible(dimensionChoice.get(2),  vis);
-			
-			this.area.layout();
+	
+	private void updateAxesChoices() {
+		dimensionNames.clear();
+		for (int idim =1; idim<=dimsDataList.size(); ++idim) {
+			updateAxis(idim);
 		}
 	}
 	
 	/**
-	 * Extracts axes from nexus data.
+	 * 
+	 * @param idim 1 based index of axis.
 	 */
-	private void updateAxesChoices(boolean clearOldSelection) {
-
-		for (CCombo combo : dimensionChoice.values()) {
-			combo.setItems(new String[]{"indices"});
-		}
-		// We now match the dim in the table with the axes choices for that dim.
-		// Dim 1,2 and 3 can be assigned by the user 
-		int index = 0;
-		int[] nexusIndices = new int[]{3,1,2};
-		for (DimsData dd : dimsDataList.getDimsData()) {
-			if (dd.getAxis()<0) continue;
-			updateAxis(dimensionChoice.get(dd.getAxis()), nexusIndices[index], clearOldSelection);
-			++index;
-		}
-		area.layout();
-	}
-
-	
-	private void updateAxis(CCombo axis, int iaxis, boolean clearOldSelection) {
+	private void updateAxis(int idim) {
 		try {    	
-			final List<String> names = NexusUtils.getAxisNames(sliceObject.getPath(), sliceObject.getName(), iaxis);
-			final String[] items = names!=null ? names.toArray(new String[names.size()+1]) : new String[1];
-			items[items.length-1]= "indices";
-			int iselection = !clearOldSelection ? axis.getSelectionIndex() : 0;
-			axis.setItems(items);
-			try {
-				axis.select(iselection);
-				sliceObject.setNexusAxis(iaxis, items[iselection]);
-			} catch (Throwable ne) {
-				axis.select(0);
-				sliceObject.setNexusAxis(iaxis, items[0]);
+			List<String> names = NexusUtils.getAxisNames(sliceObject.getPath(), sliceObject.getName(), idim);
+			names = names!=null ? names : new ArrayList<String>(1);
+			names.add("indices");
+			dimensionNames.put(idim, names);
+			
+			final String dimensionName = sliceObject.getNexusAxis(idim);
+			if (!names.contains(dimensionName)) {
+				sliceObject.setNexusAxis(idim, names.get(0));
 			}
+			
 		} catch (Exception e) {
 			logger.info("Cannot assign axes!", e);
-			axis.setItems(new String[]{"indices"});
-			axis.select(0);
-			sliceObject.setNexusAxis(iaxis, "indices");
+			sliceObject.setNexusAxis(idim, "indices");
+			dimensionNames.put(idim, Arrays.asList("indices"));
 		}		
 	}
 	
-	private class AxisListener extends SelectionAdapter {
-		
-		private int iaxis;
-		AxisListener(int iaxis) {
-			this.iaxis = iaxis;
-		}
-		public void widgetSelected(SelectionEvent e) {
-			final CCombo combo = (CCombo)e.getSource();
-			final String axis  = combo.getItem(combo.getSelectionIndex());
-			sliceObject.setNexusAxis(iaxis, axis);
-			slice(true);
-		}
-	}
-
 	protected void openGallery() {
 		
 		if (sliceReceiverId==null) return;
@@ -534,8 +440,6 @@ public class SliceComponent {
         if (labelJob == null) labelJob = new LabelJob();
 		labelJob.update(isX);
 		
-		updateAxesVisibility();
-
 		return isX;
 	}
 	
@@ -580,6 +484,7 @@ public class SliceComponent {
 					if (dataShape[data.getDimension()]<2) return false;
 					return data.getAxis()<0;
 				}
+				if (col==3) return true;
 				return false;
 			}
 
@@ -591,7 +496,7 @@ public class SliceComponent {
 				if (col==0) return;
 				if (col==1) {
 					data.setAxis((Integer)value);
-					updateAxesChoices(true);
+					updateAxesChoices();
 				}
 				if (col==2) {
 					if (value instanceof Integer) {
@@ -599,6 +504,22 @@ public class SliceComponent {
 					} else {
 						data.setSliceRange((String)value);
 					}
+				}
+				if (col==2) {
+					if (value instanceof Integer) {
+						data.setSlice((Integer)value);
+					} else {
+						data.setSliceRange((String)value);
+					}
+				}
+				if (col==3) {
+					final int idim  = data.getDimension()+1;
+					if (value instanceof Integer) {
+						final List<String> names = dimensionNames.get(idim);
+						sliceObject.setNexusAxis(idim, names.get(((Integer)value).intValue()));
+					} else {
+						sliceObject.setNexusAxis(idim, (String)value);
+				    }
 				}
 				final boolean isValidData = synchronizeSliceData(data);
 				viewer.cancelEditing();
@@ -630,6 +551,14 @@ public class SliceComponent {
 					}
 					return data.getSliceRange() != null ? data.getSliceRange() : data.getSlice();
 				}
+				if (col==3) {
+					final int idim  = data.getDimension()+1;
+					final String dimensionDataName = sliceObject.getNexusAxis(idim);
+					final List<String> names = dimensionNames.get(idim);
+					int selection = names.indexOf(dimensionDataName);
+					return selection>-1 ? selection : 0;
+				}
+
 				return null;
 			}
 		};
@@ -638,9 +567,16 @@ public class SliceComponent {
 	private ScaleCellEditor                 scaleEditor;
 	private SpinnerCellEditorWithPlayButton spinnerEditor;
 	
+	/**
+	 * A better way than this is to use the EditingSupport functionality 
+	 * of TableViewerColumn.
+	 * 
+	 * @param viewer
+	 * @return
+	 */
 	private CellEditor[] createCellEditors(final TableViewer viewer) {
 		
-		final CellEditor[] editors  = new CellEditor[3];
+		final CellEditor[] editors  = new CellEditor[4];
 		editors[0] = null;
 		editors[1] = new CComboCellEditor(viewer.getTable(), new String[]{"X","Y","(Slice)"}, SWT.READ_ONLY) {
 			protected int getDoubleClickTimeout() {
@@ -706,6 +642,27 @@ public class SliceComponent {
 
 		editors[2] = scaleEditor;
 		
+		
+		CComboCellEditor axisDataEditor = new CComboCellEditor(viewer.getTable(), new String[]{"indices"}, SWT.READ_ONLY) {
+			protected int getDoubleClickTimeout() {
+				return 0;
+			}		
+			
+			public void activate() {
+				final DimsData     data  = (DimsData)((IStructuredSelection)viewer.getSelection()).getFirstElement();
+				final int idim  = data.getDimension()+1;
+				final List<String> names = dimensionNames.get(idim);
+				setItems(names.toArray(new String[names.size()]));
+				
+				final int isel = names.indexOf(sliceObject.getNexusAxis(idim));
+				if (isel>-1) this.getCombo().select(isel);
+				super.activate();
+			}
+		};
+		
+		
+		editors[3] = axisDataEditor;
+		
 		return editors;
 	}
 
@@ -724,21 +681,25 @@ public class SliceComponent {
 
 	private void createColumns(final TableViewer viewer) {
 		
-		final TableViewerColumn dim   = new TableViewerColumn(viewer, SWT.CENTER, 0);
+		final TableViewerColumn dim   = new TableViewerColumn(viewer, SWT.LEFT, 0);
 		dim.getColumn().setText("Dim");
 		dim.getColumn().setWidth(48);
 		dim.setLabelProvider(new DelegatingStyledCellLabelProvider(new SliceColumnLabelProvider(0)));
 		
-		final TableViewerColumn axis   = new TableViewerColumn(viewer, SWT.CENTER, 1);
+		final TableViewerColumn axis   = new TableViewerColumn(viewer, SWT.LEFT, 1);
 		axis.getColumn().setText("Axis");
-		axis.getColumn().setWidth(120);
+		axis.getColumn().setWidth(60);
 		axis.setLabelProvider(new DelegatingStyledCellLabelProvider(new SliceColumnLabelProvider(1)));
 
 		final TableViewerColumn slice   = new TableViewerColumn(viewer, SWT.LEFT, 2);
 		slice.getColumn().setText("Slice Index");
-		slice.getColumn().setWidth(200);
+		slice.getColumn().setWidth(160);
 		slice.setLabelProvider(new DelegatingStyledCellLabelProvider(new SliceColumnLabelProvider(2)));
 		
+		final TableViewerColumn data   = new TableViewerColumn(viewer, SWT.LEFT, 3);
+		data.getColumn().setText("Axis Data");
+		data.getColumn().setWidth(160);
+		data.setLabelProvider(new DelegatingStyledCellLabelProvider(new SliceColumnLabelProvider(3)));
 	}
 
 	private class SliceColumnLabelProvider extends ColumnLabelProvider implements IStyledLabelProvider {
@@ -770,6 +731,12 @@ public class SliceComponent {
 					ret.append(new StyledString("        (click to change)", StyledString.QUALIFIER_STYLER));
 				}
 				break;
+			case 3:
+				if (sliceObject!=null) {
+					Map<Integer,String> dims = sliceObject.getNexusAxes();
+					String name = dims.get(data.getDimension()+1); // The data used for this axis
+	                if (name!=null) ret.append(name);
+				}
 			default:
 				ret.append( "" );
 				break;
@@ -812,9 +779,9 @@ public class SliceComponent {
 
 		
 		createDimsData();
+		updateAxesChoices();
     	viewer.refresh();
     	
-		updateAxesChoices(false);
 		synchronizeSliceData(null);
 		slice(true);
 		

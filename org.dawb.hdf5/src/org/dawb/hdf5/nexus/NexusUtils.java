@@ -93,20 +93,29 @@ public class NexusUtils {
 	 * 
 	 * TODO Deal with label attribute?
 	 * 
-	 * @param dataNode
-	 * @param dimension we want the axis for 1, 2, 3 etc.
+	 * @param FileFormat - the file
+	 * @param dataNode - the node with the signal
+	 * @param dimension, we want the axis for 1, 2, 3 etc.
 	 * @return
-	 * @throws Exception 
+	 * @throws Exception especially if dims are ask for which the signal does not have.
 	 */
-	public static List<Dataset> getAxes(final Group dataNode, int dimension) throws Exception {
+	public static List<Dataset> getAxes(final FileFormat file, final Dataset signal, int dimension) throws Exception {
 		
 		final List<Dataset>         axesTmp = new ArrayList<Dataset>(3);
         final Map<Integer, Dataset> axesMap = new TreeMap<Integer, Dataset>();
 		
-        final List<HObject> children = dataNode.getMemberList();
+        signal.getMetadata();
+        final long size = signal.getDims()[dimension-1];
+
+        final String parentPath = signal.getFullName().substring(0, signal.getFullName().lastIndexOf("/"));
+        
+        final Group parent = (Group)file.get(parentPath);
+        
+        final List<HObject> children = parent.getMemberList();
 		for (HObject hObject : children) {
 			final List<?> att = hObject.getMetadata();
 			if (!(hObject instanceof Dataset)) continue;
+			if (hObject.getFullName().equals(signal.getFullName())) continue;
 			
 			Dataset axis = null;
 			int     pos  = -1;
@@ -120,6 +129,15 @@ public class NexusUtils {
 					} else if (PRIM.equals(attribute.getName())) {
 						pos = getAttributeIntValue(attribute);
 					}
+				}
+			}
+			
+			// Add any the same shape as this dimension
+			// Some nexus files set axis wrong
+			if (axis==null) {
+				final long[] dims = ((Dataset)hObject).getDims();
+				if (dims[0]==size) {
+					axis = (Dataset)hObject;
 				}
 			}
 			
@@ -174,8 +192,8 @@ public class NexusUtils {
 	 * this location.
 	 * 
 	 * @param filePath
-	 * @param nexusPath
-	 * @param dimension, the dimension we want the axis for.
+	 * @param nexusPath - path to signal dataset
+	 * @param dimension, the dimension we want the axis for starting with 1
 	 * @return
 	 * @throws Exception
 	 */

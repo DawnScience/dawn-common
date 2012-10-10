@@ -650,16 +650,11 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 	}
 
 	@Override
-	public List<Dataset> getNexusAxes(String nexusPath, int iaxis) throws Exception {
+	public List<Dataset> getNexusAxes(String signalPath, int dimension) throws Exception {
 
-		HObject group = file.get(nexusPath);
-		if (group instanceof Dataset) { // They gave us the data node and would like the axes for it
-	    	final String parentPath = nexusPath.substring(0, nexusPath.lastIndexOf("/"));
-	    	group= file.get(parentPath);
-		}
-    	if (group==null) return null;
+		HObject signal = file.get(signalPath);
     	
-    	return NexusUtils.getAxes((Group)group, iaxis);
+    	return NexusUtils.getAxes(file, (Dataset)signal, dimension);
 	}
 
 
