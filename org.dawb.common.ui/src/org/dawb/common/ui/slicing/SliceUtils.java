@@ -218,41 +218,13 @@ public class SliceUtils {
 			plottingSystem.createPlot1D(ys.get(0), ys, monitor);
 
 		} else {
-			AbstractDataset x = getNexusAxis(currentSlice, slice.getShape()[1], currentSlice.getX()+1, true, monitor);
-			AbstractDataset y = getNexusAxis(currentSlice, slice.getShape()[0], currentSlice.getY()+1, true, monitor);
-			// If the image is rotated because they set the origin in another corner, we should reverse 
-			// the x and y data sets (there may also be an issue with reversing them - arg)
-			final ImageOrigin origin = getImageOrientation(plottingSystem);
-			if (origin==ImageOrigin.TOP_LEFT || origin==ImageOrigin.BOTTOM_RIGHT) {
-				AbstractDataset xtmp = x;
-				x = y;
-				y = xtmp;
-			}
-			
-			final AbstractDataset xAxis = x;
-			final AbstractDataset yAxis = y;
+			AbstractDataset y = getNexusAxis(currentSlice, slice.getShape()[1], currentSlice.getX()+1, true, monitor);
+			AbstractDataset x = getNexusAxis(currentSlice, slice.getShape()[0], currentSlice.getY()+1, true, monitor);		
 			plottingSystem.updatePlot2D(slice, Arrays.asList(x,y), monitor);
-			Display.getDefault().syncExec(new Runnable() {
-				public void run() {
-					plottingSystem.getSelectedXAxis().setTitle(xAxis.getName());
-					plottingSystem.getSelectedYAxis().setTitle(yAxis.getName());
-				}
-			});
 			plottingSystem.repaint();
  			
 		}
 
-	}
-
-
-	private static ImageOrigin getImageOrientation( IPlottingSystem plottingSystem) {
-		try {
-			IImageTrace trace = (IImageTrace)plottingSystem.getTraces(IImageTrace.class).iterator().next();
-			return trace.getImageOrigin();
-		} catch (Throwable ne) {
-			final ScopedPreferenceStore store = new ScopedPreferenceStore(InstanceScope.INSTANCE, "org.dawb.workbench.plotting");
-			return ImageOrigin.forLabel(store.getString("org.dawb.plotting.system.originChoice"));
-		}
 	}
 
 
