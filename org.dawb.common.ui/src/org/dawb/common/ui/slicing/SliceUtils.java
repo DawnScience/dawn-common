@@ -222,12 +222,12 @@ public class SliceUtils {
 			AbstractDataset y = getNexusAxis(currentSlice, slice.getShape()[0], currentSlice.getY()+1, true, monitor);
 			// If the image is rotated because they set the origin in another corner, we should reverse 
 			// the x and y data sets (there may also be an issue with reversing them - arg)
-//			final ImageOrigin origin = getImageOrientation(plottingSystem);
-//			if (origin==ImageOrigin.TOP_LEFT || origin==ImageOrigin.BOTTOM_RIGHT) {
-//				AbstractDataset xtmp = x;
-//				x = y;
-//				y = xtmp;
-//			}
+			final ImageOrigin origin = getImageOrientation(plottingSystem);
+			if (origin==ImageOrigin.TOP_LEFT || origin==ImageOrigin.BOTTOM_RIGHT) {
+				AbstractDataset xtmp = x;
+				x = y;
+				y = xtmp;
+			}
 			
 			final AbstractDataset xAxis = x;
 			final AbstractDataset yAxis = y;

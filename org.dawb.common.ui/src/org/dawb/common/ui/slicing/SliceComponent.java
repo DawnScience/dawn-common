@@ -59,6 +59,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTError;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.custom.StyleRange;
+import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -94,7 +96,7 @@ import uk.ac.gda.richbeans.event.ValueEvent;
  * 
  * Copied from nexus tree viewer but in a simpler to use UI.
  *  
- * TODO Perhaps move this dialog to top level GUI
+ *
  */
 public class SliceComponent {
 	
@@ -119,7 +121,7 @@ public class SliceComponent {
     private CCombo          editorCombo;
 
 	private PlotType imagePlotType = PlotType.IMAGE; // Could also be PlotType.PT1D_MULTI
-	private Stub traceListener;
+	private ITraceListener.Stub traceListener;
 	
 	/**
 	 * 1 is first dimension, map of names available for axis, including indices.
@@ -185,25 +187,17 @@ public class SliceComponent {
 		GridUtils.setVisible(errorLabel,         false);
 		
 		final Composite bottom = new Composite(area, SWT.NONE);
-		bottom.setLayout(new GridLayout(2, false));
+		bottom.setLayout(new GridLayout(4, false));
 		bottom.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, true));
-
-		final Composite bRight = new Composite(bottom, SWT.NONE);
-		bRight.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-		bRight.setLayout(new GridLayout(1, false));
 		
-		final Composite editorComp = new Composite(bRight, SWT.NONE);
-		editorComp.setLayout(new GridLayout(2, false));
-		editorComp.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-		
-		final Label label = new Label(editorComp, SWT.NONE);
+		final Label label = new Label(bottom, SWT.NONE);
 		label.setText("Edit slice with");
 		label.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
 		
-		this.editorCombo = new CCombo(editorComp, SWT.READ_ONLY|SWT.BORDER);
+		this.editorCombo = new CCombo(bottom, SWT.READ_ONLY|SWT.BORDER);
 		editorCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 		editorCombo.setText("Slice editor");
-		editorCombo.setItems(new String[]{"Scale", "Enter slice index"});// Later "Range"
+		editorCombo.setItems(new String[]{"Sliding scale", "Slice index"});// Later "Range"
 		editorCombo.select(0);
 		editorCombo.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -224,8 +218,8 @@ public class SliceComponent {
 			}
 		});
 
-		this.updateAutomatically = new Button(bRight, SWT.CHECK);
-		updateAutomatically.setText("Automatic update");
+		this.updateAutomatically = new Button(bottom, SWT.CHECK);
+		updateAutomatically.setText("Update");
 		updateAutomatically.setToolTipText("Update plot when slice changes");
 		updateAutomatically.setSelection(true);
 		updateAutomatically.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false));
@@ -237,12 +231,9 @@ public class SliceComponent {
 			}
 		});
 		
-      		
-		final Composite bLeft = new Composite(bottom, SWT.NONE);
-		bLeft.setLayoutData(new GridData(SWT.RIGHT, SWT.FILL, true, false));
-		bLeft.setLayout(new GridLayout(1, false));
 		
-		Button openGallery = new Button(bLeft, SWT.NONE);
+		Button openGallery = new Button(bottom, SWT.NONE);
+		openGallery.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false));
 		openGallery.setToolTipText("Open data set in a gallery.");
 		openGallery.setImage(Activator.getImageDescriptor("icons/imageStack.png").createImage());
 		openGallery.addSelectionListener(new SelectionAdapter() {
@@ -254,17 +245,18 @@ public class SliceComponent {
 
 		// Something to tell them their image orientation (X and Y may be mixed up!)
 		if (plottingSystem!=null) {
-			final Label imageOrientation = new Label(bottom, SWT.NONE);
-			imageOrientation.setText("Image Orientation:  "+getImageOrientation());
-			imageOrientation.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
+			final StyledText imageOrientation = new StyledText(bottom, SWT.NONE);
+			imageOrientation.setEditable(false);
+			imageOrientation.setBackground(bottom.getBackground());
+			imageOrientation.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 4, 1));
 			GridUtils.setVisible(imageOrientation, plottingSystem.is2D());
 			
 			addImageOrientationListener(imageOrientation);
 			
 			this.traceListener = new ITraceListener.Stub() {
 				protected void update(TraceEvent evt) {
-					imageOrientation.setText("Image Orientation:  "+getImageOrientation());
 					GridUtils.setVisible(imageOrientation, plottingSystem.is2D());
+					setImageOrientationText(imageOrientation);
 					area.layout();
 					addImageOrientationListener(imageOrientation);
 				}
@@ -301,29 +293,35 @@ public class SliceComponent {
 		return area;
 	}
 	
-	private String getImageOrientation() {
+	private void setImageOrientationText(final StyledText text) {
 		try {
+			text.setText("");
+			text.append("Image Orientation: ");
 			final IImageTrace trace  = (IImageTrace)plottingSystem.getTraces(IImageTrace.class).iterator().next();
             final ImageOrigin io     = trace.getImageOrigin();
-            StringBuffer buf = new StringBuffer(io.getLabel());
+            text.append(io.getLabel());
             if (io==ImageOrigin.TOP_LEFT || io==ImageOrigin.BOTTOM_RIGHT) {
-            	buf.append("    (X and Y are reversed)");
-            }
-            return buf.toString();
+            	String reverseLabel = "    (X and Y are reversed)";
+            	int len = text.getText().length();
+            	text.append(reverseLabel);
+                text.setStyleRange(new StyleRange(len, reverseLabel.length(), null, null, SWT.BOLD));
+           }
 		} catch (Exception ne) {
-			return "";
+			text.setStyleRange(null);
+			text.setText("");
 		}
 	}
 	
 	private IPaletteListener orientationListener;
-	private void addImageOrientationListener(final Label imageOrientation) {
+	private void addImageOrientationListener(final StyledText text) {
 		try {
 			final IImageTrace trace  = (IImageTrace)plottingSystem.getTraces(IImageTrace.class).iterator().next();
             if (orientationListener == null) {
             	orientationListener = new IPaletteListener.Stub() {
             		@Override
             		public void imageOriginChanged(PaletteEvent evt) {
-    					imageOrientation.setText("Image Orientation:  "+getImageOrientation());
+    					setImageOrientationText(text);
+    					slice(true);
            		    }      
             	};
             }
@@ -355,7 +353,14 @@ public class SliceComponent {
 			
 			final String dimensionName = sliceObject.getNexusAxis(idim);
 			if (!names.contains(dimensionName)) {
-				sliceObject.setNexusAxis(idim, names.get(0));
+				// We get an axis not used elsewhere for the default
+				final Map<Integer,String> others = new HashMap<Integer,String>(sliceObject.getNexusAxes());
+				others.keySet().removeAll(Arrays.asList(idim));
+				int index = 0;
+				while(others.values().contains(names.get(index))) {
+					index++;
+				}
+				sliceObject.setNexusAxis(idim, names.get(index));
 			}
 			
 		} catch (Exception e) {
@@ -484,7 +489,9 @@ public class SliceComponent {
 					if (dataShape[data.getDimension()]<2) return false;
 					return data.getAxis()<0;
 				}
-				if (col==3) return true;
+				if (col==3) {
+					return data.getAxis()>-1;
+				}
 				return false;
 			}
 
@@ -693,7 +700,7 @@ public class SliceComponent {
 
 		final TableViewerColumn slice   = new TableViewerColumn(viewer, SWT.LEFT, 2);
 		slice.getColumn().setText("Slice Index");
-		slice.getColumn().setWidth(160);
+		slice.getColumn().setWidth(180);
 		slice.setLabelProvider(new DelegatingStyledCellLabelProvider(new SliceColumnLabelProvider(2)));
 		
 		final TableViewerColumn data   = new TableViewerColumn(viewer, SWT.LEFT, 3);
@@ -732,7 +739,7 @@ public class SliceComponent {
 				}
 				break;
 			case 3:
-				if (sliceObject!=null) {
+				if (sliceObject!=null && data.getAxis()>-1) {
 					Map<Integer,String> dims = sliceObject.getNexusAxes();
 					String name = dims.get(data.getDimension()+1); // The data used for this axis
 	                if (name!=null) ret.append(name);
