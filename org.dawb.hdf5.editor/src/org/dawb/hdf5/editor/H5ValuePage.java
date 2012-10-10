@@ -265,22 +265,31 @@ public class H5ValuePage extends Page  implements ISelectionListener, IPartListe
 			
 		} if (ob instanceof Group) {
 			final Group  grp   = (Group)ob;
+			
 			label.setText("Group name of '"+grp.getName()+"' children:");
 			final List members = grp.getMemberList();
 			
 			final StringBuilder buf = (members!=null) ? new StringBuilder(members.toString()) : new StringBuilder();
-			appendAttributes(grp, buf);
+			final Group par = grp.getParent();
+			if (par.isRoot())  appendAttributes("\nFile Attributes", par, buf);
+			
+			appendAttributes(par.isRoot() ? "Attributes" : "\nAttributes", grp, buf);
 			sourceViewer.getTextWidget().setText(buf.toString());
 
 		}
 	}
 	
 	private void appendAttributes(HObject set, StringBuilder buf) throws Exception {
+
+		appendAttributes("\nAttributes", set, buf);
+	}
+	
+	private void appendAttributes(String title, HObject set, StringBuilder buf) throws Exception {
 		
 		final List meta = set.getMetadata();
 		if (meta==null || meta.isEmpty()) return;
 		
-		buf.append("\n\nAttributes:\n");
+		buf.append("\n"+title+":\n");
 		for (Object attribute : meta) {
 			
 			if (attribute instanceof Attribute) {
