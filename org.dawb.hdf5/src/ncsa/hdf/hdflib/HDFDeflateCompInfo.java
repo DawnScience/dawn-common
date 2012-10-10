@@ -29,7 +29,12 @@ public class HDFDeflateCompInfo extends HDFNewCompInfo {
 
     public HDFDeflateCompInfo() {
         ctype = HDFConstants.COMP_CODE_DEFLATE;
-    } ;
+    } 
+    
+    public HDFDeflateCompInfo(int l) {
+        ctype = HDFConstants.COMP_CODE_DEFLATE;
+        level = l;
+    } 
 }
 
 

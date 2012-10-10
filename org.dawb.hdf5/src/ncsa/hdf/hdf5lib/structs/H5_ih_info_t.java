@@ -17,6 +17,7 @@ import java.io.Serializable;
 
 //Information struct for group (for H5Gget_info/H5Gget_info_by_name/H5Gget_info_by_idx)
 public class H5_ih_info_t implements Serializable {
+    private static final long serialVersionUID = -142238015615462707L;
     public long     index_size;     /* btree and/or list */
     public long     heap_size;
     

@@ -41,6 +41,11 @@ import java.util.List;
  */
 public abstract class Datatype extends HObject {
     /**
+     * 
+     */
+    private static final long serialVersionUID = -581324710549963177L;
+
+    /**
      * The default definition for datatype size, order, and sign.
      */
     public static final int NATIVE = -1;
@@ -218,7 +223,7 @@ public abstract class Datatype extends HObject {
      *             Using {@link #Datatype(FileFormat, String, String)}
      */
     @Deprecated
-	public Datatype(FileFormat theFile, String name, String path, long[] oid) {
+    public Datatype(FileFormat theFile, String name, String path, long[] oid) {
         super(theFile, name, path, oid);
     }
 
@@ -509,7 +514,7 @@ public abstract class Datatype extends HObject {
      *         value.
      */
     @Override
-	public int open() {
+    public int open() {
         return -1;
     }
 
@@ -522,7 +527,7 @@ public abstract class Datatype extends HObject {
      *            the datatype identifier to close.
      */
     @Override
-	public abstract void close(int id);
+    public abstract void close(int id);
 
     /*
      * (non-Javadoc)

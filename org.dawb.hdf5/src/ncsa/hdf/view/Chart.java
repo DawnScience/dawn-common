@@ -32,8 +32,6 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 
-import ncsa.hdf.object.HObject;
-
 /**
  * ChartView displays histogram/line chart of selected row/column of table data
  * or image. There are two types of chart, histogram and line plot.
@@ -42,7 +40,11 @@ import ncsa.hdf.object.HObject;
  * @version 2.4 9/6/2007
  */
 public class Chart extends JDialog implements ActionListener {
-    public static final long serialVersionUID = HObject.serialVersionUID;
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 6306479533747330357L;
 
     /** histogram style chart */
     public static final int HISTOGRAM = 0;
@@ -70,13 +72,13 @@ public class Chart extends JDialog implements ActionListener {
     /** the maximum value of the Y axis */
     private double ymax;
 
-    /** the minumum value of the Y axis */
+    /** the minimum value of the Y axis */
     private double ymin;
 
     /** the maximum value of the X axis */
     private double xmax;
 
-    /** the minumum value of the X axis */
+    /** the minimum value of the X axis */
     private double xmin;
 
     /** line labels */
@@ -258,13 +260,13 @@ public class Chart extends JDialog implements ActionListener {
 
     /** The canvas that paints the data lines. */
     private class ChartPanel extends JComponent {
-        public static final long serialVersionUID = HObject.serialVersionUID;
+        private static final long serialVersionUID = -3701826094727309097L;
 
         /**
          * Paints the plot components.
          */
         @Override
-		public void paint(Graphics g) {
+        public void paint(Graphics g) {
             if (numberOfLines <= 0) {
                 return; // no data
             }

@@ -35,11 +35,11 @@ import ncsa.hdf.object.HObject;
  */
 
 public class H5Link extends HObject {
-	 /**
-     * @see ncsa.hdf.object.HObject#serialVersionUID
+    /**
+     * 
      */
-    public static final long serialVersionUID = HObject.serialVersionUID;
-    
+    private static final long serialVersionUID = -8137277460521594367L;
+
     private H5O_info_t obj_info;
 
     /**
@@ -57,44 +57,44 @@ public class H5Link extends HObject {
        this (theFile, name, path, null);  
     }
 
-	public H5Link(FileFormat theFile, String theName, String thePath,
+    public H5Link(FileFormat theFile, String theName, String thePath,
             long[] oid) {
         super(theFile, theName, thePath, oid);
 
         obj_info = new H5O_info_t(-1L, -1L, -1, 0, -1L, 0L, 0L, 0L, 0L, null,null,null);
     }
     
-	@Override
-	public void close(int id) {		
-	}
+    @Override
+    public void close(int id) {        
+    }
 
-	@Override
-	public int open() {
-		return 0;
-	}
+    @Override
+    public int open() {
+        return 0;
+    }
 
-	public List getMetadata() throws Exception {
+    public List getMetadata() throws Exception {
 
-    	try{
-    		this.linkTargetObjName= H5File.getLinkTargetName(this);
-    	}catch(Exception ex){    	
-    	}
+        try{
+            this.linkTargetObjName= H5File.getLinkTargetName(this);
+        }catch(Exception ex){        
+        }
 
-    	return null;
-	}
+        return null;
+    }
 
-	public boolean hasAttribute() {
-		return false;
-	}
+    public boolean hasAttribute() {
+        return false;
+    }
 
-	public void removeMetadata(Object info) throws Exception {		
-	}
+    public void removeMetadata(Object info) throws Exception {        
+    }
 
-	public void writeMetadata(Object info) throws Exception {
-	}
+    public void writeMetadata(Object info) throws Exception {
+    }
 
-	public List getMetadata(int... attrPropList) throws Exception {
-		return null;
-	}
+    public List getMetadata(int... attrPropList) throws Exception {
+        return null;
+    }
 
 }

@@ -18,7 +18,6 @@ import java.util.List;
 
 import ncsa.hdf.object.FileFormat;
 import ncsa.hdf.object.Group;
-import ncsa.hdf.object.HObject;
 
 /**
  * An H5Group represents HDF5 group, inheriting from Group.
@@ -33,7 +32,7 @@ import ncsa.hdf.object.HObject;
  */
 public class FitsGroup extends Group
 {
-	public static final long serialVersionUID = HObject.serialVersionUID;
+    private static final long serialVersionUID = 4993155577664991838L;
 
     /**
      * The list of attributes of this data object. Members of the list are
@@ -105,14 +104,14 @@ public class FitsGroup extends Group
 
     // Implementing DataFormat
     @Override
-	public int open() {
+    public int open() {
         // not supported
         throw new UnsupportedOperationException("Unsupported operation for NetCDF.");
     }
 
     /** close group access */
     @Override
-	public void close(int gid) {
+    public void close(int gid) {
         // not supported
         throw new UnsupportedOperationException("Unsupported operation for NetCDF.");
     }
@@ -131,8 +130,8 @@ public class FitsGroup extends Group
     }
 
     //Implementing DataFormat
-	public List getMetadata(int... attrPropList) throws Exception {
-		throw new UnsupportedOperationException("getMetadata(int... attrPropList) is not supported");
-	}
+    public List getMetadata(int... attrPropList) throws Exception {
+        throw new UnsupportedOperationException("getMetadata(int... attrPropList) is not supported");
+    }
 
 }

@@ -69,15 +69,15 @@ import ncsa.hdf.object.ScalarDS;
  */
 public class NewDatasetDialog extends JDialog implements ActionListener,
         ItemListener, HyperlinkListener {
-    public static final long serialVersionUID = HObject.serialVersionUID;
+    private static final long serialVersionUID = 5381164938654184532L;
 
     private JTextField nameField, currentSizeField, maxSizeField,
-            chunkSizeField, stringLengthField;
+            chunkSizeField, stringLengthField, fillValueField;
 
     private JComboBox parentChoice, classChoice, sizeChoice, endianChoice,
             rankChoice, compressionLevel;
 
-    private JCheckBox checkUnsigned, checkCompression;
+    private JCheckBox checkUnsigned, checkCompression, checkFillValue;
 
     private JRadioButton checkContinguous, checkChunked;
 
@@ -160,11 +160,13 @@ public class NewDatasetDialog extends JDialog implements ActionListener,
         okButton.addActionListener(this);
 
         JButton cancelButton = new JButton("Cancel");
+        cancelButton.setName("Cancel");
         cancelButton.setMnemonic(KeyEvent.VK_C);
         cancelButton.setActionCommand("Cancel");
         cancelButton.addActionListener(this);
 
         JButton helplButton = new JButton("Help");
+        helplButton.setName("Help");
         helplButton.setMnemonic(KeyEvent.VK_H);
         helplButton.setActionCommand("Show help");
         helplButton.addActionListener(this);
@@ -196,7 +198,7 @@ public class NewDatasetDialog extends JDialog implements ActionListener,
         JPanel typePanel = new JPanel();
         typePanel.setLayout(new GridLayout(2, 4, 15, 3));
         TitledBorder border = new TitledBorder("Datatype");
-        border.setTitleColor(Color.blue);
+        border.setTitleColor(Color.gray);
         typePanel.setBorder(border);
 
         stringLengthField = new JTextField("String length");
@@ -243,7 +245,7 @@ public class NewDatasetDialog extends JDialog implements ActionListener,
         JPanel spacePanel = new JPanel();
         spacePanel.setLayout(new GridLayout(2, 3, 15, 3));
         border = new TitledBorder("Dataspace");
-        border.setTitleColor(Color.blue);
+        border.setTitleColor(Color.gray);
         spacePanel.setBorder(border);
 
         rankChoice = new JComboBox();
@@ -253,6 +255,7 @@ public class NewDatasetDialog extends JDialog implements ActionListener,
         rankChoice.setSelectedIndex(1);
 
         currentSizeField = new JTextField("1 x 1");
+        currentSizeField.setName("currentsize");
         maxSizeField = new JTextField("");
         spacePanel.add(new JLabel("No. of dimensions"));
         spacePanel.add(new JLabel("Current size"));
@@ -268,19 +271,19 @@ public class NewDatasetDialog extends JDialog implements ActionListener,
         // set storage layout and data compression
         JPanel layoutPanel = new JPanel();
         layoutPanel.setLayout(new BorderLayout());
-        border = new TitledBorder("Data Layout and Compression");
-        border.setTitleColor(Color.blue);
+        border = new TitledBorder("Storage Properties");
+        border.setTitleColor(Color.gray);
         layoutPanel.setBorder(border);
 
         checkContinguous = new JRadioButton("Contiguous");
         checkContinguous.setSelected(true);
-        checkChunked = new JRadioButton("Chunked");
+        checkChunked = new JRadioButton("Chunked (size) ");
         ButtonGroup bgroup = new ButtonGroup();
         bgroup.add(checkChunked);
         bgroup.add(checkContinguous);
         chunkSizeField = new JTextField("1 x 1");
         chunkSizeField.setEnabled(false);
-        checkCompression = new JCheckBox("gzip");
+        checkCompression = new JCheckBox("gzip (level) ");
 
         compressionLevel = new JComboBox();
         for (int i = 0; i < 10; i++) {
@@ -298,28 +301,44 @@ public class NewDatasetDialog extends JDialog implements ActionListener,
         tmpP = new JPanel();
         tmpP.setLayout(new GridLayout(2, 1));
 
+        // storage layout
         JPanel tmpP0 = new JPanel();
-        tmpP0.setLayout(new GridLayout(1, 2));
+        tmpP0.setLayout(new GridLayout(1,3, 0, 5));
         tmpP0.add(checkContinguous);
-
         JPanel tmpP00 = new JPanel();
-        tmpP00.setLayout(new GridLayout(1, 3));
-        tmpP00.add(checkChunked);
-        tmpP00.add(new JLabel("          Size: "));
-        tmpP00.add(chunkSizeField);
+        tmpP00.setLayout(new BorderLayout());
+        tmpP00.add(checkChunked, BorderLayout.WEST);
+        tmpP00.add(chunkSizeField, BorderLayout.CENTER);
         tmpP0.add(tmpP00);
-
+        tmpP0.add(new JLabel(""));
         tmpP.add(tmpP0);
 
         tmpP0 = new JPanel();
-        tmpP0.setLayout(new GridLayout(1, 7));
-        tmpP0.add(checkCompression);
-        tmpP0.add(new JLabel("      Level: "));
-        tmpP0.add(compressionLevel);
-        tmpP0.add(new JLabel(""));
-        tmpP0.add(new JLabel(""));
-        tmpP0.add(new JLabel(""));
-        tmpP0.add(new JLabel(""));
+        tmpP0.setLayout(new GridLayout(1,2, 30, 5));
+        
+        // compression
+        tmpP00 = new JPanel();
+        tmpP00.setLayout(new BorderLayout());
+        tmpP00.add(checkCompression, BorderLayout.WEST);
+        tmpP00.add(compressionLevel, BorderLayout.CENTER);
+        tmpP0.add(tmpP00);
+
+        
+        // fill values
+        checkFillValue = new JCheckBox("Fill Value ");
+        fillValueField = new JTextField("0");
+        fillValueField.setEnabled(false);
+        checkFillValue.setSelected(false);
+        tmpP00 = new JPanel();
+        tmpP00.setLayout(new BorderLayout());
+        tmpP00.add(checkFillValue, BorderLayout.WEST);
+        tmpP00.add(fillValueField, BorderLayout.CENTER);
+        
+        if (isH5)
+        	tmpP0.add(tmpP00);
+        else
+        	tmpP0.add(new JLabel(""));
+         
         tmpP.add(tmpP0);
 
         layoutPanel.add(tmpP, BorderLayout.CENTER);
@@ -335,6 +354,7 @@ public class NewDatasetDialog extends JDialog implements ActionListener,
         sizeChoice.addItemListener(this);
         rankChoice.addItemListener(this);
         checkCompression.addItemListener(this);
+        checkFillValue.addItemListener(this);
         checkContinguous.addItemListener(this);
         checkChunked.addItemListener(this);
 
@@ -481,10 +501,10 @@ public class NewDatasetDialog extends JDialog implements ActionListener,
             }
         }
         else if (cmd.equals("Set max size")) {
-        	String strMax = maxSizeField.getText();
-        	if (strMax == null || strMax.length() < 1)
-        		strMax = currentSizeField.getText();
-        	
+            String strMax = maxSizeField.getText();
+            if (strMax == null || strMax.length() < 1)
+                strMax = currentSizeField.getText();
+            
             String msg = JOptionPane
                     .showInputDialog(
                             this,
@@ -497,7 +517,7 @@ public class NewDatasetDialog extends JDialog implements ActionListener,
             if (msg == null || msg.length() < 1)
                 maxSizeField.setText(currentSizeField.getText());
             else
-            	maxSizeField.setText(msg);
+                maxSizeField.setText(msg);
             
             checkMaxSize();
         }
@@ -636,7 +656,7 @@ public class NewDatasetDialog extends JDialog implements ActionListener,
         else if (source.equals(checkCompression)) {
             boolean isCompressed = checkCompression.isSelected();
 
-            if (isCompressed) {
+            if (isCompressed && isH5) {
                 if (!checkChunked.isSelected()) {
                     String currentStr = currentSizeField.getText();
                     int idx = currentStr.lastIndexOf("x");
@@ -663,89 +683,108 @@ public class NewDatasetDialog extends JDialog implements ActionListener,
                 chunkSizeField.setEnabled(true);
             }
             else {
-                compressionLevel.setEnabled(false);
+                compressionLevel.setEnabled(isCompressed);
                 checkContinguous.setEnabled(true);
             }
         }
+        else if (source.equals(checkFillValue)) {
+        	fillValueField.setEnabled(checkFillValue.isSelected());
+        }        
     }
     
     /** check is the max size is valid */
     private void checkMaxSize() {
-    	boolean isChunkNeeded = false;
-    	String dimStr = currentSizeField.getText();
-    	String maxStr = maxSizeField.getText();
-    	StringTokenizer stMax = new StringTokenizer(maxStr, "x");
-    	StringTokenizer stDim = new StringTokenizer(dimStr, "x");
+        boolean isChunkNeeded = false;
+        String dimStr = currentSizeField.getText();
+        String maxStr = maxSizeField.getText();
+        StringTokenizer stMax = new StringTokenizer(maxStr, "x");
+        StringTokenizer stDim = new StringTokenizer(dimStr, "x");
 
-    	if (stMax.countTokens() != stDim.countTokens()) {
-    		toolkit.beep();
-    		JOptionPane.showMessageDialog(this,
-    				"Wrong number of values in the max dimension size "+maxStr,
-    				getTitle(), JOptionPane.ERROR_MESSAGE);
-    		maxSizeField.setText(null);
-    		return;
-    	}
+        if (stMax.countTokens() != stDim.countTokens()) {
+            toolkit.beep();
+            JOptionPane.showMessageDialog(this,
+                    "Wrong number of values in the max dimension size "+maxStr,
+                    getTitle(), JOptionPane.ERROR_MESSAGE);
+            maxSizeField.setText(null);
+            return;
+        }
 
-    	int rank = stDim.countTokens();
-    	long max=0, dim=0;
-    	long[] maxdims = new long[rank];
-    	long[] dims = new long[rank];
-    	for (int i = 0; i < rank; i++) {
-    		String token = stMax.nextToken().trim();
+        int rank = stDim.countTokens();
+        long max=0, dim=0;
+        long[] maxdims = new long[rank];
+        for (int i = 0; i < rank; i++) {
+            String token = stMax.nextToken().trim();
 
-    		token = token.toLowerCase();
-    		if (token.startsWith("unl")) {
-    			max = -1;
-    			isChunkNeeded = true;
-    		} else {
-    			try {
-    				max = Long.parseLong(token);
-    			}
-    			catch (NumberFormatException ex) {
-    				toolkit.beep();
-    				JOptionPane.showMessageDialog(this,
-    						"Invalid max dimension size: "
-    						+ maxStr, getTitle(),
-    						JOptionPane.ERROR_MESSAGE);
-    				maxSizeField.setText(null);;
-    				return;
-    			}
-    		}
-    		
-    		token = stDim.nextToken().trim();
-    		try {
-    			dim = Long.parseLong(token);
-    		}
-    		catch (NumberFormatException ex) {
-    			toolkit.beep();
-    			JOptionPane.showMessageDialog(this,
-    					"Invalid dimension size: "
-    					+ dimStr, getTitle(),
-    					JOptionPane.ERROR_MESSAGE);
-     			return;
-    		}
+            token = token.toLowerCase();
+            if (token.startsWith("u")) {
+                max = -1;
+                isChunkNeeded = true;
+            } else {
+                try {
+                    max = Long.parseLong(token);
+                }
+                catch (NumberFormatException ex) {
+                    toolkit.beep();
+                    JOptionPane.showMessageDialog(this,
+                            "Invalid max dimension size: "
+                            + maxStr, getTitle(),
+                            JOptionPane.ERROR_MESSAGE);
+                    maxSizeField.setText(null);;
+                    return;
+                }
+            }
+            
+            token = stDim.nextToken().trim();
+            try {
+                dim = Long.parseLong(token);
+            }
+            catch (NumberFormatException ex) {
+                toolkit.beep();
+                JOptionPane.showMessageDialog(this,
+                        "Invalid dimension size: "
+                        + dimStr, getTitle(),
+                        JOptionPane.ERROR_MESSAGE);
+                 return;
+            }
 
-    		if (max != -1 && max<dim) {
-				toolkit.beep();
-				JOptionPane.showMessageDialog(this,
-						"Invalid max dimension size: "
-						+ maxStr, getTitle(),
-						JOptionPane.ERROR_MESSAGE);
-				maxSizeField.setText(null);
-				return;
-    		} else if (max>dim) {
-    			isChunkNeeded = true;
-    		}
-    	} // for (int i = 0; i < rank; i++)
-    	
-    	if (isChunkNeeded && !checkChunked.isSelected()) {
-			toolkit.beep();
-			JOptionPane.showMessageDialog(this,
-					"Chunking is required for the max dimensions of "
-					+ maxStr, getTitle(),
-					JOptionPane.ERROR_MESSAGE);
-			checkChunked.setSelected(true);
-    	}
+            if (max != -1 && max<dim) {
+                toolkit.beep();
+                JOptionPane.showMessageDialog(this,
+                        "Invalid max dimension size: "
+                        + maxStr, getTitle(),
+                        JOptionPane.ERROR_MESSAGE);
+                maxSizeField.setText(null);
+                return;
+            } else if (max>dim) {
+                isChunkNeeded = true;
+            }
+            
+            maxdims[i] = max;
+        } // for (int i = 0; i < rank; i++)
+        
+        if (isH5) {
+            if (isChunkNeeded && !checkChunked.isSelected()) {
+                toolkit.beep();
+                JOptionPane.showMessageDialog(this,
+                        "Chunking is required for the max dimensions of "
+                        + maxStr, getTitle(),
+                        JOptionPane.ERROR_MESSAGE);
+                checkChunked.setSelected(true);
+            }
+        } else {
+            for (int i=1; i<rank; i++) {
+                if (maxdims[i] <=0) {
+                    maxSizeField.setText(currentSizeField.getText());
+                    toolkit.beep();
+                    JOptionPane.showMessageDialog(this,
+                            "Only dim[0] can be unlimited."
+                            + maxStr, getTitle(),
+                            JOptionPane.ERROR_MESSAGE);
+
+                    return;
+                }
+            }
+        }
     }
 
     /** Creates a dialog to show the help information. */
@@ -1004,50 +1043,50 @@ public class NewDatasetDialog extends JDialog implements ActionListener,
 
         String maxFieldStr = maxSizeField.getText();
         if (maxFieldStr!=null && maxFieldStr.length()>1) {
-        	st = new StringTokenizer(maxFieldStr, "x");
-        	if (st.countTokens() < rank) {
-        		toolkit.beep();
-        		JOptionPane.showMessageDialog(this,
-        				"Number of values in the max dimension size is less than "
-        				+ rank, getTitle(), JOptionPane.ERROR_MESSAGE);
-        		return null;
-        	}
+            st = new StringTokenizer(maxFieldStr, "x");
+            if (st.countTokens() < rank) {
+                toolkit.beep();
+                JOptionPane.showMessageDialog(this,
+                        "Number of values in the max dimension size is less than "
+                        + rank, getTitle(), JOptionPane.ERROR_MESSAGE);
+                return null;
+            }
 
-        	l = 0;
-        	maxdims = new long[rank];
-        	for (int i = 0; i < rank; i++) {
-        		token = st.nextToken().trim();
+            l = 0;
+            maxdims = new long[rank];
+            for (int i = 0; i < rank; i++) {
+                token = st.nextToken().trim();
 
-        		token = token.toLowerCase();
-        		if (token.startsWith("unl"))
-        			l = -1;
-        		else {
-        			try {
-        				l = Long.parseLong(token);
-        			}
-        			catch (NumberFormatException ex) {
-        				toolkit.beep();
-        				JOptionPane.showMessageDialog(this,
-        						"Invalid max dimension size: "
-        						+ maxSizeField.getText(), getTitle(),
-        						JOptionPane.ERROR_MESSAGE);
-        				return null;
-        			}
-        		}
+                token = token.toLowerCase();
+                if (token.startsWith("u"))
+                    l = -1;
+                else {
+                    try {
+                        l = Long.parseLong(token);
+                    }
+                    catch (NumberFormatException ex) {
+                        toolkit.beep();
+                        JOptionPane.showMessageDialog(this,
+                                "Invalid max dimension size: "
+                                + maxSizeField.getText(), getTitle(),
+                                JOptionPane.ERROR_MESSAGE);
+                        return null;
+                    }
+                }
 
-        		if (l < -1) {
-        			toolkit.beep();
-        			JOptionPane.showMessageDialog(this,
-        					"Dimension size cannot be less than -1.", getTitle(),
-        					JOptionPane.ERROR_MESSAGE);
-        			return null;
-        		}
-        		else if (l == 0) {
-        			l = dims[i];
-        		}
+                if (l < -1) {
+                    toolkit.beep();
+                    JOptionPane.showMessageDialog(this,
+                            "Dimension size cannot be less than -1.", getTitle(),
+                            JOptionPane.ERROR_MESSAGE);
+                    return null;
+                }
+                else if (l == 0) {
+                    l = dims[i];
+                }
 
-        		maxdims[i] = l;
-        	}
+                maxdims[i] = l;
+            }
         }
 
         chunks = null;
@@ -1138,8 +1177,12 @@ public class NewDatasetDialog extends JDialog implements ActionListener,
             if (tclass == Datatype.CLASS_ENUM) {
                 datatype.setEnumMembers(stringLengthField.getText());
             }
+            String fillValue = null;
+            if (fillValueField.isEnabled())
+            	fillValue = fillValueField.getText();
+            
             obj = fileFormat.createScalarDS(name, pgroup, datatype, dims,
-                    maxdims, chunks, gzip, null);
+                    maxdims, chunks, gzip, fillValue, null);
         }
         catch (Exception ex) {
             toolkit.beep();

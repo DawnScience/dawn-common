@@ -56,7 +56,7 @@ import ncsa.hdf.object.HObject;
  */
 public class NewDatatypeDialog extends JDialog implements ActionListener,
         ItemListener {
-    public static final long serialVersionUID = HObject.serialVersionUID;
+    private static final long serialVersionUID = -1930736056916611522L;
 
     private JTextField nameField, stringLengthField;
 

@@ -17,6 +17,7 @@ import java.io.Serializable;
 
 //Information struct for object (for H5Oget_info/H5Oget_info_by_name/H5Oget_info_by_idx)
 public class H5O_info_t implements Serializable{
+    private static final long serialVersionUID = 4691681163544054518L;
     public long   fileno;     /* File number that object is located in */
     public long   addr;       /* Object address in file   */
     public int    type;       /* Basic object type (group, dataset, etc.) */

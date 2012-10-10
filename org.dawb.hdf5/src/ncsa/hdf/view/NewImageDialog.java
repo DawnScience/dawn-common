@@ -58,7 +58,7 @@ import ncsa.hdf.object.ScalarDS;
  */
 public class NewImageDialog extends JDialog implements ActionListener,
         ItemListener {
-    public static final long serialVersionUID = HObject.serialVersionUID;
+    private static final long serialVersionUID = 6204900461720887966L;
 
     private JTextField nameField, widthField, heightField;
 

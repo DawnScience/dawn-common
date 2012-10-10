@@ -61,7 +61,7 @@ import ncsa.hdf.object.HObject;
  */
 public class NewAttributeDialog extends JDialog implements ActionListener,
         ItemListener, HyperlinkListener {
-    public static final long serialVersionUID = HObject.serialVersionUID;
+    private static final long serialVersionUID = 4883237570834215275L;
 
     /** the default length of a string attribute */
     public static final int DEFAULT_STRING_ATTRIBUTE_LENGTH = 256;
@@ -282,28 +282,28 @@ public class NewAttributeDialog extends JDialog implements ActionListener,
             }
         }
         else if (source.equals(objChoice)) {
-        	String objName = (String) objChoice.getSelectedItem();
-         	
-        	if (e.getStateChange()!=ItemEvent.SELECTED)
-        		return;
-        	
-        	long ref = -1;
-        	try {
-        		HObject obj = fileFormat.get(objName);
-        		ref = obj.getOID()[0];
-        	} catch (Exception ex) {}
-        	
-        	if (ref > 0) {
-        		if (valueField.getText().length()>1) {
+            String objName = (String) objChoice.getSelectedItem();
+             
+            if (e.getStateChange()!=ItemEvent.SELECTED)
+                return;
+            
+            long ref = -1;
+            try {
+                HObject obj = fileFormat.get(objName);
+                ref = obj.getOID()[0];
+            } catch (Exception ex) {}
+            
+            if (ref > 0) {
+                if (valueField.getText().length()>1) {
                     valueField.setText(valueField.getText()+","+ref);
                     StringTokenizer st = new StringTokenizer(valueField.getText(), ",");
                     lengthField.setText(String.valueOf(st.countTokens()));
-        		}
-        		else {
-        			valueField.setText(String.valueOf(ref));
-        			lengthField.setText("1");
-        		}
-        	}
+                }
+                else {
+                    valueField.setText(String.valueOf(ref));
+                    lengthField.setText("1");
+                }
+            }
         }
     }
 
@@ -550,19 +550,19 @@ public class NewAttributeDialog extends JDialog implements ActionListener,
             torder = Datatype.NATIVE;
         }
         else if (dt.startsWith("object reference")) {
-        	arraySize = st.countTokens();
-        	long[] ref = new long[arraySize]; 
-        	for (int j=0; j<arraySize; j++) {
-        		theToken = st.nextToken().trim(); 
-        		try { ref[j] = Long.parseLong(theToken); } 
-        		catch (NumberFormatException ex) {
-        			JOptionPane.showMessageDialog(this, ex.getMessage(), getTitle(),
-        						JOptionPane.ERROR_MESSAGE); 
-        			return false; 
-        		} 
-        	}
+            arraySize = st.countTokens();
+            long[] ref = new long[arraySize]; 
+            for (int j=0; j<arraySize; j++) {
+                theToken = st.nextToken().trim(); 
+                try { ref[j] = Long.parseLong(theToken); } 
+                catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(this, ex.getMessage(), getTitle(),
+                                JOptionPane.ERROR_MESSAGE); 
+                    return false; 
+                } 
+            }
 
-        	value = ref;
+            value = ref;
             tclass = Datatype.CLASS_REFERENCE;
             tsize = 8;
             torder = Datatype.NATIVE;

@@ -46,9 +46,9 @@ import ncsa.hdf.object.HObject;
  */
 public class H5Group extends Group {
     /**
-     * @see ncsa.hdf.object.HObject#serialVersionUID
+     * 
      */
-    public static final long serialVersionUID = HObject.serialVersionUID;
+    private static final long serialVersionUID = -951164512330444150L;
 
     /**
      * The list of attributes of this data object. Members of the list are
@@ -82,7 +82,7 @@ public class H5Group extends Group {
      *             Using {@link #H5Group(FileFormat, String, String, Group)}
      */
     @Deprecated
-	public H5Group(FileFormat theFile, String name, String path, Group parent,
+    public H5Group(FileFormat theFile, String name, String path, Group parent,
             long[] oid) {
         super(theFile, name, path, parent, oid);
         nMembersInFile = -1;
@@ -109,23 +109,23 @@ public class H5Group extends Group {
      * @see ncsa.hdf.object.DataFormat#hasAttribute()
      */
     public boolean hasAttribute() {
-    	obj_info.num_attrs = nAttributes;
+        obj_info.num_attrs = nAttributes;
 
-   	 if (obj_info.num_attrs< 0) {
+        if (obj_info.num_attrs< 0) {
            int gid = open();
            if (gid > 0) {
                try {
-               	obj_info = H5.H5Oget_info(gid);
-               	
+                   obj_info = H5.H5Oget_info(gid);
+                   
                }
                catch (Exception ex) {
-               	obj_info.num_attrs = 0;
+                   obj_info.num_attrs = 0;
                }
                close(gid);
            }
        }
 
-   	 return(obj_info.num_attrs >0);
+        return(obj_info.num_attrs >0);
     }
 
     /*
@@ -134,14 +134,14 @@ public class H5Group extends Group {
      * @see ncsa.hdf.object.Group#getNumberOfMembersInFile()
      */
     @Override
-	public int getNumberOfMembersInFile() {
+    public int getNumberOfMembersInFile() {
         if (nMembersInFile < 0) {
             int gid = open();
             if (gid > 0) {
                 try {
-                	H5G_info_t group_info = null;
-                	group_info = H5.H5Gget_info(gid);
-                	nMembersInFile = (int)group_info.nlinks;
+                    H5G_info_t group_info = null;
+                    group_info = H5.H5Gget_info(gid);
+                    nMembersInFile = (int)group_info.nlinks;
                 }
                 catch (Exception ex) {
                     nMembersInFile = 0;
@@ -158,7 +158,7 @@ public class H5Group extends Group {
      * @see ncsa.hdf.object.Group#clear()
      */
     @Override
-	public void clear() {
+    public void clear() {
         super.clear();
 
         if (attributeList != null) {
@@ -181,31 +181,31 @@ public class H5Group extends Group {
      * @see ncsa.hdf.object.DataFormat#getMetadata(int...)
      */
     public List getMetadata(int ...attrPropList) throws HDF5Exception {
-    	if (attributeList == null) {
-    		int gid = open();
-    		int indxType = HDF5Constants.H5_INDEX_NAME;
-    		int order = HDF5Constants.H5_ITER_INC;
-    		
-    		 if(attrPropList.length > 0) {
-    			 indxType = attrPropList[0];
-    	            if(attrPropList.length > 1) {
-    	            	order = attrPropList[1];
-    	            }
-    	        } 
-    		try {
-    			attributeList = H5File.getAttribute(gid, indxType, order);
-    		}
-    		finally {
-    			close(gid);
-    		} 
-    	}
+        if (attributeList == null) {
+            int gid = open();
+            int indxType = HDF5Constants.H5_INDEX_NAME;
+            int order = HDF5Constants.H5_ITER_INC;
+            
+             if(attrPropList.length > 0) {
+                 indxType = attrPropList[0];
+                    if(attrPropList.length > 1) {
+                        order = attrPropList[1];
+                    }
+                } 
+            try {
+                attributeList = H5File.getAttribute(gid, indxType, order);
+            }
+            finally {
+                close(gid);
+            } 
+        }
 
-    	try{
-    		this.linkTargetObjName= H5File.getLinkTargetName(this);
-    	}catch(Exception ex){    	
-    	}
+        try{
+            this.linkTargetObjName= H5File.getLinkTargetName(this);
+        }catch(Exception ex){        
+        }
 
-    	return attributeList;
+        return attributeList;
     }
 
     /*
@@ -228,7 +228,7 @@ public class H5Group extends Group {
         }
 
         if (attributeList != null)
-        	attrExisted = attributeList.contains(attr);
+            attrExisted = attributeList.contains(attr);
  
         getFileFormat().writeAttribute(this, attr, attrExisted);
         // add the new attribute into attribute list
@@ -268,12 +268,12 @@ public class H5Group extends Group {
      * @see ncsa.hdf.object.HObject#open()
      */
     @Override
-	public int open() {
+    public int open() {
         int gid = -1;
 
         try {
             if (isRoot()) {
-            	gid = H5.H5Gopen(getFID(), separator, HDF5Constants.H5P_DEFAULT);
+                gid = H5.H5Gopen(getFID(), separator, HDF5Constants.H5P_DEFAULT);
             }
             else {
                 gid = H5.H5Gopen(getFID(), getPath() + getName(), HDF5Constants.H5P_DEFAULT);
@@ -293,7 +293,7 @@ public class H5Group extends Group {
      * @see ncsa.hdf.object.HObject#close(int)
      */
     @Override
-	public void close(int gid) {
+    public void close(int gid) {
         try {
             H5.H5Gclose(gid);
         }
@@ -302,32 +302,32 @@ public class H5Group extends Group {
         }
     }
 
-	/**
-	 * Creates a new group with a name in a group and with the group creation
-	 * properties specified in gplist.
-	 * <p>
-	 * The gplist contains a sequence of group creation property list
-	 * identifiers, lcpl, gcpl, gapl. It allows the user to create a group with
-	 * group creation properties.
-	 * 
-	 * @see ncsa.hdf.hdf5lib.H5#H5Gcreate(int, String, int, int, int) for the
-	 *      order of property list identifiers.
-	 * 
-	 * @param name
-	 *            The name of a new group.
-	 * @param pgroup
-	 *            The parent group object.
-	 * @param gplist
-	 *            The group creation properties, in which the order of the properties conforms the
-	 *            HDF5 library API, H5Gcreate(), i.e. lcpl, gcpl and gapl, where
-	 *<ul>
-	 *    <li>lcpl : Property list for link creation
-	 *    <li>gcpl : Property list for group creation
-	 *    <li>gapl : Property list for group access
-	 *</ul> 
-	 *           
-	 * @return The new group if successful; otherwise returns null.
-	 */    
+    /**
+     * Creates a new group with a name in a group and with the group creation
+     * properties specified in gplist.
+     * <p>
+     * The gplist contains a sequence of group creation property list
+     * identifiers, lcpl, gcpl, gapl. It allows the user to create a group with
+     * group creation properties.
+     * 
+     * @see ncsa.hdf.hdf5lib.H5#H5Gcreate(int, String, int, int, int) for the
+     *      order of property list identifiers.
+     * 
+     * @param name
+     *            The name of a new group.
+     * @param pgroup
+     *            The parent group object.
+     * @param gplist
+     *            The group creation properties, in which the order of the properties conforms the
+     *            HDF5 library API, H5Gcreate(), i.e. lcpl, gcpl and gapl, where
+     *<ul>
+     *    <li>lcpl : Property list for link creation
+     *    <li>gcpl : Property list for group creation
+     *    <li>gapl : Property list for group access
+     *</ul> 
+     *           
+     * @return The new group if successful; otherwise returns null.
+     */    
     public static H5Group create(String name, Group pgroup, int ... gplist) throws Exception {
         H5Group group = null;
         String fullPath = null;
@@ -393,10 +393,10 @@ public class H5Group extends Group {
         }
 
         if(gcpl>0){
-        	try {
-        		H5.H5Pclose(gcpl);
-        	} catch (final Exception ex) {
-        	}
+            try {
+                H5.H5Pclose(gcpl);
+            } catch (final Exception ex) {
+            }
         }
         
         return group;
@@ -408,25 +408,8 @@ public class H5Group extends Group {
      * @see ncsa.hdf.object.HObject#setName(java.lang.String)
      */
     @Override
-	public void setName(String newName) throws Exception {
-        String currentFullPath = this.getPath() + this.getName();
-        String newFullPath = this.getPath() + newName;
-
-        currentFullPath = currentFullPath.replaceAll("//", "/");
-        newFullPath = newFullPath.replaceAll("//", "/");
-
-        if (currentFullPath.equals("/")) {
-            throw new HDF5Exception("Can't rename the root group.");
-        }
-
-        if (currentFullPath.equals(newFullPath)) {
-            throw new HDF5Exception(
-                    "The new name is the same as the current name.");
-        }
-
-        // Call the library to move things in the file
-        H5.H5Lmove(this.getFID(), currentFullPath, this.getFID(), newFullPath, HDF5Constants.H5P_DEFAULT, HDF5Constants.H5P_DEFAULT);
-      
+    public void setName(String newName) throws Exception {
+    	H5File.renameObject(this, newName);
         super.setName(newName);
     }
 
@@ -436,7 +419,7 @@ public class H5Group extends Group {
      * @see ncsa.hdf.object.HObject#setPath(java.lang.String)
      */
     @Override
-	public void setPath(String newPath) throws Exception {
+    public void setPath(String newPath) throws Exception {
         super.setPath(newPath);
 
         List members = this.getMemberList();

@@ -17,6 +17,7 @@ import java.io.Serializable;
 
 // Information struct for object header metadata (for H5Oget_info/H5Oget_info_by_name/H5Oget_info_by_idx)
 public class H5O_hdr_info_t implements Serializable{
+    private static final long serialVersionUID = 7883826382952577189L;
     public int version;       /* Version number of header format in file */
     public int nmesgs;        /* Number of object header messages */
     public int nchunks;       /* Number of object header chunks */

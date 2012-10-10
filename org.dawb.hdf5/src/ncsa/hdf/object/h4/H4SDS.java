@@ -100,7 +100,10 @@ import ncsa.hdf.object.ScalarDS;
  */
 public class H4SDS extends ScalarDS
 {
-	public static final long serialVersionUID = HObject.serialVersionUID;
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 2557157923292438696L;
 
     /** tag for netCDF datasets.
      *  HDF4 library supports netCDF version 2.3.2. It only supports SDS APIs.
@@ -128,7 +131,7 @@ public class H4SDS extends ScalarDS
     public H4SDS(FileFormat theFile, String name, String path)
     {
         this(theFile, name, path, null);
-    }
+    } 
 
     /**
      * Creates an H4SDS object with specific name and path.
@@ -174,15 +177,15 @@ public class H4SDS extends ScalarDS
 
     // ***** need to implement from ScalarDS *****
     @Override
-	public byte[][] readPalette(int idx) { return null;}
+    public byte[][] readPalette(int idx) { return null;}
 
     // ***** need to implement from ScalarDS *****
     @Override
-	public byte[] getPaletteRefs() { return null;}
+    public byte[] getPaletteRefs() { return null;}
 
     // implementing Dataset
     @Override
-	public Datatype getDatatype()
+    public Datatype getDatatype()
     {
         if (datatype == null)
         {
@@ -194,7 +197,7 @@ public class H4SDS extends ScalarDS
 
     // To do: Implementing Dataset
     @Override
-	public Dataset copy(Group pgroup, String dname, long[] dims, Object buff)
+    public Dataset copy(Group pgroup, String dname, long[] dims, Object buff)
     throws Exception
     {
         Dataset dataset = null;
@@ -289,7 +292,7 @@ public class H4SDS extends ScalarDS
 
     // Implementing Dataset
     @Override
-	public byte[] readBytes() throws HDFException
+    public byte[] readBytes() throws HDFException
     {
         byte[] theData = null;
 
@@ -335,7 +338,7 @@ public class H4SDS extends ScalarDS
 
     // Implementing DataFormat
     @Override
-	public Object read() throws HDFException
+    public Object read() throws HDFException
     {
         Object theData = null;
 
@@ -386,8 +389,8 @@ public class H4SDS extends ScalarDS
         }
         
         if (fillValue==null && isImageDisplay) {
-        	try { getMetadata(); } // need to set fillValue for images
-        	catch (Exception ex) {}
+            try { getMetadata(); } // need to set fillValue for images
+            catch (Exception ex) {}
         }
 
         if ((rank > 1) && (selectedIndex[0] > selectedIndex[1]))
@@ -400,7 +403,7 @@ public class H4SDS extends ScalarDS
 
     // Implementing DataFormat
     @Override
-	public void write(Object buf) throws HDFException
+    public void write(Object buf) throws HDFException
     {
         if (buf == null) {
             return;
@@ -503,8 +506,9 @@ public class H4SDS extends ScalarDS
                         (attrInfo[0] ==  HDFConstants.DFNT_UCHAR8))
                     {
                         buf = Dataset.byteToString((byte[])buf, attrInfo[1]);
-                    } else if (attrName[0].equalsIgnoreCase("fillValue")) {
-                    	fillValue = buf;
+                    } else if (attrName[0].equalsIgnoreCase("fillValue") || 
+                            attrName[0].equalsIgnoreCase("_fillValue")) {
+                        fillValue = buf;
                     }
 
                     attr.setValue(buf);
@@ -551,7 +555,7 @@ public class H4SDS extends ScalarDS
 
     // Implementing HObject
     @Override
-	public int open()
+    public int open()
     {
         int id=-1;
 
@@ -576,7 +580,7 @@ public class H4SDS extends ScalarDS
 
     // Implementing HObject
     @Override
-	public void close(int id)
+    public void close(int id)
     {
         try { HDFLibrary.SDendaccess(id); }
         catch (HDFException ex) { ; }
@@ -586,7 +590,7 @@ public class H4SDS extends ScalarDS
      * Initializes the H4SDS such as dimension size of this dataset.
      */
     @Override
-	public void init()
+    public void init()
     {
         if (rank>0) {
             return; // already called. Initialize only once
@@ -613,7 +617,7 @@ public class H4SDS extends ScalarDS
             }
 
             isUnlimited = HDFLibrary.SDisrecord(id);
-            
+           
             datatypeID = sdInfo[1];
             isText = ((datatypeID == HDFConstants.DFNT_CHAR) || (datatypeID == HDFConstants.DFNT_UCHAR8));
 
@@ -672,7 +676,7 @@ public class H4SDS extends ScalarDS
 
                 try {
                     boolean status = HDFLibrary.SDgetchunkinfo(id, chunkInfo, cflag);
-                } catch (Throwable ex) {}
+                } catch (Throwable ex) {ex.printStackTrace();}
 
                 if (cflag[0] == HDFConstants.HDF_NONE) {
                     chunkSize = null;
@@ -732,7 +736,7 @@ public class H4SDS extends ScalarDS
 
     // Implementing ScalarDS
     @Override
-	public byte[][] getPalette()
+    public byte[][] getPalette()
     {
         return palette;
     }
@@ -757,13 +761,13 @@ public class H4SDS extends ScalarDS
         long[] maxdims,
         long[] chunks,
         int gzip,
+        Object fillValue,
         Object data) throws Exception
     {
         H4SDS dataset = null;
         if ((pgroup == null) ||
             (name == null)||
-            (dims == null) ||
-            ((gzip>0) && (chunks==null))) {
+            (dims == null)) {
             return null;
         }
 
@@ -772,7 +776,7 @@ public class H4SDS extends ScalarDS
         if (file == null) {
             return null;
         }
-
+        
         String path = HObject.separator;
         if (!pgroup.isRoot()) {
             path = pgroup.getPath()+pgroup.getName()+HObject.separator;
@@ -793,7 +797,7 @@ public class H4SDS extends ScalarDS
         // the dimension of the lowest rank or the slowest-changing dimension)
         // can be assigned the value SD_UNLIMITED (or 0) to make the first
         // dimension unlimited.
-        if ((maxdims != null) && (maxdims[0]<0))
+        if ((maxdims != null) && (maxdims[0]<=0))
         {
             idims[0] = 0; // set to unlimited dimension.
         }
@@ -805,6 +809,11 @@ public class H4SDS extends ScalarDS
             for (int i=0; i<rank; i++) {
                 ichunks[i] = (int)chunks[i];
             }
+        }
+        
+        // unlimted cannot be used with chunking or compression for HDF 4.2.6 or earlier.
+        if (idims[0] == 0 && (ichunks != null || gzip>0)) {
+            throw new HDFException("Unlimted cannot be used with chunking or compression");
         }
 
         int sdid, sdsid, vgid;
@@ -829,7 +838,7 @@ public class H4SDS extends ScalarDS
 
             // comment out the following lines because SDwritedata fails when
             // try to write data into a zero dimension array. 05/25/05
-            // don't know why teh code was first put here ????
+            // don't know why the code was first put here ????
             /**
             if (idims[0] == 0 && data == null)
             {
@@ -845,25 +854,38 @@ public class H4SDS extends ScalarDS
             throw (new HDFException("Unable to create the new dataset."));
         }
 
-        if ((sdsid > 0) && (data != null))
+        HDFDeflateCompInfo compInfo = null;
+        if (gzip > 0)
         {
-            HDFLibrary.SDwritedata(sdsid, start, null, idims, data);
+            // set compression
+            compInfo = new HDFDeflateCompInfo();
+            compInfo.level = gzip;
+            if (chunks == null)
+                HDFLibrary.SDsetcompress(sdsid, HDFConstants.COMP_CODE_DEFLATE, compInfo);
         }
 
         if (chunks != null)
         {
             // set chunk
             HDFChunkInfo chunkInfo = new HDFChunkInfo(ichunks);
-            HDFLibrary.SDsetchunk (sdsid, chunkInfo, HDFConstants.HDF_CHUNK);
+            int flag = HDFConstants.HDF_CHUNK;
+
+            if (gzip > 0) {
+                flag = HDFConstants.HDF_CHUNK | HDFConstants.HDF_COMP;
+                chunkInfo = new HDFChunkInfo(ichunks, HDFConstants.COMP_CODE_DEFLATE, compInfo);
+            }
+            
+            try  {
+                HDFLibrary.SDsetchunk (sdsid, chunkInfo, flag);
+            } catch (Throwable err) {
+                err.printStackTrace();
+                throw new HDFException("SDsetchunk failed.");
+            }
         }
 
-        if (gzip > 0)
+        if ((sdsid > 0) && (data != null))
         {
-            // set compression
-            int compType = HDFConstants.COMP_CODE_DEFLATE;
-            HDFDeflateCompInfo compInfo = new HDFDeflateCompInfo();
-            compInfo.level = gzip;
-            HDFLibrary.SDsetcompress(sdsid, compType, compInfo);
+            HDFLibrary.SDwritedata(sdsid, start, null, idims, data);
         }
 
         int ref = HDFLibrary.SDidtoref(sdsid);
@@ -900,6 +922,19 @@ public class H4SDS extends ScalarDS
 
         return dataset;
     }
+    
+    public static H4SDS create(
+            String name,
+            Group pgroup,
+            Datatype type,
+            long[] dims,
+            long[] maxdims,
+            long[] chunks,
+            int gzip,
+            Object data) throws Exception
+   {
+        return create(name, pgroup, type, dims, maxdims, chunks, gzip, null, data);
+   }
 
     /**
      * copy attributes from one SDS to another SDS
@@ -943,8 +978,8 @@ public class H4SDS extends ScalarDS
     }
 
     //Implementing DataFormat
-	public List getMetadata(int... attrPropList) throws Exception {
-		throw new UnsupportedOperationException("getMetadata(int... attrPropList) is not supported");
-	}
+    public List getMetadata(int... attrPropList) throws Exception {
+        throw new UnsupportedOperationException("getMetadata(int... attrPropList) is not supported");
+    }
 
 }

@@ -58,7 +58,7 @@ import ncsa.hdf.object.HObject;
  * @version 2.4 9/6/2007
  */
 public class NewGroupDialog extends JDialog implements ActionListener, ItemListener, KeyListener {
-    public static final long serialVersionUID = HObject.serialVersionUID;
+    private static final long serialVersionUID = 7340860373483987075L;
 
     private JTextField nameField;
     
@@ -152,7 +152,7 @@ public class NewGroupDialog extends JDialog implements ActionListener, ItemListe
 
         orderFlags = new JComboBox();
         orderFlags.addItem("Tracked");
-		orderFlags.addItem("Tracked+Indexed");
+        orderFlags.addItem("Tracked+Indexed");
         
         contentPane = (JPanel) getContentPane();
         contentPane.setLayout(new BorderLayout(5, 5));
@@ -162,16 +162,19 @@ public class NewGroupDialog extends JDialog implements ActionListener, ItemListe
         contentPane.setPreferredSize(new Dimension(w, h));
 
         JButton okButton = new JButton("   Ok   ");
+        okButton.setName("OK");
         okButton.setActionCommand("Ok");
         okButton.setMnemonic(KeyEvent.VK_O);
         okButton.addActionListener(this);
 
         JButton cancelButton = new JButton("Cancel");
+        cancelButton.setName("Cancel");
         cancelButton.setMnemonic(KeyEvent.VK_C);
         cancelButton.setActionCommand("Cancel");
         cancelButton.addActionListener(this);
 
-        moreButton = new JButton("More" );
+        moreButton = new JButton("More");
+        moreButton.setName("More");
         moreButton.addActionListener(this);
         
         // set OK and CANCEL buttons
@@ -196,7 +199,7 @@ public class NewGroupDialog extends JDialog implements ActionListener, ItemListe
         textPanel.add(parentChoice);
         }
         else{
-        	labelPanel.setLayout(new GridLayout(3, 1));
+            labelPanel.setLayout(new GridLayout(3, 1));
             labelPanel.add(new JLabel("Group name: "));
             labelPanel.add(new JLabel("Parent group: "));
             labelPanel.add(moreButton); //if h5 format then add more button
@@ -205,6 +208,7 @@ public class NewGroupDialog extends JDialog implements ActionListener, ItemListe
             textPanel.add(parentChoice);
             textPanel.add(new JLabel("")); //for more button
         }
+        nameField.setName("groupname");
         
         creationOrderHelpButton = new JButton(ViewProperties.getHelpIcon());
         creationOrderHelpButton.setToolTipText("Help on Creation Order");
@@ -272,70 +276,70 @@ public class NewGroupDialog extends JDialog implements ActionListener, ItemListe
         String cmd = e.getActionCommand();
         
         if (cmd.equals("More")) { 
-        	moreButton.setText("Less");
-        	int w = 500 + (ViewProperties.getFontSize() - 12) * 15;
-        	int h = 280 + (ViewProperties.getFontSize() - 12) * 10;
-        	contentPane.setPreferredSize(new Dimension(w, h));
-        	labelPanel.setLayout(new GridLayout(5, 1));    	
-        	labelPanel.add(creationOrderHelpButton); 
-        	labelPanel.add(storageTypeHelpButton); 
-        	textPanel.setLayout(new GridLayout(5, 1));
-        	textPanel.add(useCreationOrderJPanel);
-        	textPanel.add(setLinkStorageJPanel);
-        	validate();
-        	pack();   	
+            moreButton.setText("Less");
+            int w = 500 + (ViewProperties.getFontSize() - 12) * 15;
+            int h = 280 + (ViewProperties.getFontSize() - 12) * 10;
+            contentPane.setPreferredSize(new Dimension(w, h));
+            labelPanel.setLayout(new GridLayout(5, 1));        
+            labelPanel.add(creationOrderHelpButton); 
+            labelPanel.add(storageTypeHelpButton); 
+            textPanel.setLayout(new GridLayout(5, 1));
+            textPanel.add(useCreationOrderJPanel);
+            textPanel.add(setLinkStorageJPanel);
+            validate();
+            pack();       
         }
         
-        if (cmd.equals("Less")) {   	
-        	moreButton.setText("More");
-        	int w = 400 + (ViewProperties.getFontSize() - 12) * 15;
-        	int h = 150 + (ViewProperties.getFontSize() - 12) * 10;
-        	contentPane.setPreferredSize(new Dimension(w, h));
-        	labelPanel.setLayout(new GridLayout(3, 1));    	
-        	labelPanel.remove(creationOrderHelpButton); 
-        	labelPanel.remove(storageTypeHelpButton); 
-        	textPanel.setLayout(new GridLayout(3, 1));
-        	textPanel.remove(useCreationOrderJPanel);
-        	textPanel.remove(setLinkStorageJPanel);
-        	useCreationOrder.setSelected(false);
-        	setLinkStorage.setSelected(false);
-        	validate();
-        	pack();  
+        if (cmd.equals("Less")) {       
+            moreButton.setText("More");
+            int w = 400 + (ViewProperties.getFontSize() - 12) * 15;
+            int h = 150 + (ViewProperties.getFontSize() - 12) * 10;
+            contentPane.setPreferredSize(new Dimension(w, h));
+            labelPanel.setLayout(new GridLayout(3, 1));        
+            labelPanel.remove(creationOrderHelpButton); 
+            labelPanel.remove(storageTypeHelpButton); 
+            textPanel.setLayout(new GridLayout(3, 1));
+            textPanel.remove(useCreationOrderJPanel);
+            textPanel.remove(setLinkStorageJPanel);
+            useCreationOrder.setSelected(false);
+            setLinkStorage.setSelected(false);
+            validate();
+            pack();  
         }
         
         if (cmd.equals("Help on Creation Order")) {
-        	final String msg = "Use Creation Order allows the user to set the creation order \n"
-        		+ "of links in a group, so that tracking, indexing, and iterating over links\n" 
-        		+ "in groups can be possible. \n\n"
-        		+ "If the order flag Tracked is selected, links in a group can now \n" 
-        		+ "be explicitly tracked by the order that they were created. \n\n" 
-        		+ "If the order flag Tracked+Indexed is selected, links in a group can \n" 
-        		+ "now be explicitly tracked and indexed in the order that they were created. \n\n"
-        		+ "The default order in which links in a group are listed is alphanumeric-by-name. \n\n\n";
-        	JOptionPane.showMessageDialog(this, msg);
+            final String msg = "Use Creation Order allows the user to set the creation order \n"
+                + "of links in a group, so that tracking, indexing, and iterating over links\n" 
+                + "in groups can be possible. \n\n"
+                + "If the order flag Tracked is selected, links in a group can now \n" 
+                + "be explicitly tracked by the order that they were created. \n\n" 
+                + "If the order flag Tracked+Indexed is selected, links in a group can \n" 
+                + "now be explicitly tracked and indexed in the order that they were created. \n\n"
+                + "The default order in which links in a group are listed is alphanumeric-by-name. \n\n\n";
+            JOptionPane.showMessageDialog(this, msg);
         }
         
         if (cmd.equals("Help on set Link Storage")) {
-        	final String msg = "Set Link Storage allows the users to explicitly set the storage  \n"  
-        		+ "type of a group to be Compact or Indexed. \n\n"
-        		+ "Compact Storage: For groups with only a few links, compact link storage\n"
-        		+ "allows groups containing only a few links to take up much less space \n"
-        		+ "in the file. \n\n"
-        		+ "Indexed Storage: For groups with large number of links, indexed link storage  \n"
-        		+ "provides a faster and more scalable method for storing and working with  \n"
-        		+ "large groups containing many links. \n\n" 
-        		+ "The threshold for switching between the compact and indexed storage   \n"
-        		+ "formats is either set to default values or can be set by the user. \n\n"
-        		+ "<html><b>Max Compact</b></html> \n"
-        		+ "Max Compact is the maximum number of links to store in the group in a  \n"
-        		+ "compact format, before converting the group to the Indexed format. Groups \n"
-        		+ "that are in compact format and in which the number of links rises above \n"
-        		+ " this threshold are automatically converted to indexed format. \n\n"
-        		+ "<html><b>Min Indexed</b></html> \n"
-        		+ "Min Indexed is the minimum number of links to store in the Indexed format.   \n"
-        		+ "Groups which are in indexed format and in which the number of links falls    \n"
-        		+ "below this threshold are automatically converted to compact format. \n\n\n";  	
-        	JOptionPane.showMessageDialog(this, msg);
+            final String msg = "Set Link Storage allows the users to explicitly set the storage  \n"  
+                + "type of a group to be Compact or Indexed. \n\n"
+                + "Compact Storage: For groups with only a few links, compact link storage\n"
+                + "allows groups containing only a few links to take up much less space \n"
+                + "in the file. \n\n"
+                + "Indexed Storage: For groups with large number of links, indexed link storage  \n"
+                + "provides a faster and more scalable method for storing and working with  \n"
+                + "large groups containing many links. \n\n" 
+                + "The threshold for switching between the compact and indexed storage   \n"
+                + "formats is either set to default values or can be set by the user. \n\n"
+                + "<html><b>Max Compact</b></html> \n"
+                + "Max Compact is the maximum number of links to store in the group in a  \n"
+                + "compact format, before converting the group to the Indexed format. Groups \n"
+                + "that are in compact format and in which the number of links rises above \n"
+                + " this threshold are automatically converted to indexed format. \n\n"
+                + "<html><b>Min Indexed</b></html> \n"
+                + "Min Indexed is the minimum number of links to store in the Indexed format.   \n"
+                + "Groups which are in indexed format and in which the number of links falls    \n"
+                + "below this threshold are automatically converted to compact format. \n\n\n";      
+            JOptionPane.showMessageDialog(this, msg);
         }
         
         if (cmd.equals("Ok")) {
@@ -383,46 +387,46 @@ public class NewGroupDialog extends JDialog implements ActionListener, ItemListe
         Group obj = null;
              
         if(orderFlags.isEnabled()){
-        	String order = (String) orderFlags.getSelectedItem();
-        	if(order.equals("Tracked"))
-        		creationOrder = Group.CRT_ORDER_TRACKED;
-        	else if(order.equals("Tracked+Indexed"))
-        		creationOrder = Group.CRT_ORDER_INDEXED;
-        	}
-        	else creationOrder = 0;
+            String order = (String) orderFlags.getSelectedItem();
+            if(order.equals("Tracked"))
+                creationOrder = Group.CRT_ORDER_TRACKED;
+            else if(order.equals("Tracked+Indexed"))
+                creationOrder = Group.CRT_ORDER_INDEXED;
+            }
+            else creationOrder = 0;
 
         if((orderFlags.isEnabled())||(setLinkStorage.isSelected())){ 
-        	int maxCompact = Integer.parseInt(compactField.getText());
-        	int minDense =  Integer.parseInt(indexedField.getText());
-        	
-        	if((maxCompact<=0)||(maxCompact>65536)||(minDense>65536)){
+            int maxCompact = Integer.parseInt(compactField.getText());
+            int minDense =  Integer.parseInt(indexedField.getText());
+            
+            if((maxCompact<=0)||(maxCompact>65536)||(minDense>65536)){
                 toolkit.beep();
                 JOptionPane.showMessageDialog(this, "Max Compact and Min Indexed should be > 0 and < 65536.",
                         getTitle(), JOptionPane.ERROR_MESSAGE);
                 return null;
             }
-        	
-        	if(maxCompact<minDense){
+            
+            if(maxCompact<minDense){
                 toolkit.beep();
                 JOptionPane.showMessageDialog(this, "Min Indexed should be <= Max Compact",
                         getTitle(), JOptionPane.ERROR_MESSAGE);
                 return null;
             }
-        	
             
-        	try{
-        		gcpl = fileFormat.createGcpl(creationOrder, maxCompact, minDense);
-        	}
-        	catch (Exception ex) {
-        		ex.printStackTrace();
-        	}
+            
+            try{
+                gcpl = fileFormat.createGcpl(creationOrder, maxCompact, minDense);
+            }
+            catch (Exception ex) {
+                ex.printStackTrace();
+            }
         }
      
         try {
-        	if(isH5)
+            if(isH5)
             obj = fileFormat.createGroup(name, pgroup, 0, gcpl);
-        	else
-        		obj = fileFormat.createGroup(name, pgroup);
+            else
+                obj = fileFormat.createGroup(name, pgroup);
         }
         catch (Exception ex) {
             toolkit.beep();
@@ -444,68 +448,68 @@ public class NewGroupDialog extends JDialog implements ActionListener, ItemListe
         return groupList.get(parentChoice.getSelectedIndex());
     }
 
-	public void itemStateChanged(ItemEvent e) {
-		Object source = e.getSource();	
+    public void itemStateChanged(ItemEvent e) {
+        Object source = e.getSource();    
 
-		  if (source.equals(useCreationOrder)) {
-	            boolean isOrder = useCreationOrder.isSelected();
+          if (source.equals(useCreationOrder)) {
+                boolean isOrder = useCreationOrder.isSelected();
 
-	            if (isOrder) 
-	            	orderFlags.setEnabled(true);
-	            else 
-	            	orderFlags.setEnabled(false);
-	        }
-		  
-		  if (source.equals(setLinkStorage)) {
-	            boolean setStorage = setLinkStorage.isSelected();
+                if (isOrder) 
+                    orderFlags.setEnabled(true);
+                else 
+                    orderFlags.setEnabled(false);
+            }
+          
+          if (source.equals(setLinkStorage)) {
+                boolean setStorage = setLinkStorage.isSelected();
 
-	            if (setStorage) {
-	            	compactField.setEnabled(true);
-	            	indexedField.setEnabled(true);
-	            }	            	
-	            else {
-	            	compactField.setText("8");
-	            	compactField.setEnabled(false); 
-	            	indexedField.setText("6");
-	            	indexedField.setEnabled(false);
-	            }
-	        }
-	}
+                if (setStorage) {
+                    compactField.setEnabled(true);
+                    indexedField.setEnabled(true);
+                }                    
+                else {
+                    compactField.setText("8");
+                    compactField.setEnabled(false); 
+                    indexedField.setText("6");
+                    indexedField.setEnabled(false);
+                }
+            }
+    }
 
-	 //Setting the length of the text fields.
-	 class JTextFieldLimit extends PlainDocument {
-        private static final long serialVersionUID = 1L;
+     //Setting the length of the text fields.
+     class JTextFieldLimit extends PlainDocument {
+        private static final long serialVersionUID = -5131438789797052658L;
         private int limit;
-		  JTextFieldLimit(int limit) {
-		    super();
-		    this.limit = limit;
-		  }
+          JTextFieldLimit(int limit) {
+            super();
+            this.limit = limit;
+          }
 
-		  JTextFieldLimit(int limit, boolean upper) {
-		    super();
-		    this.limit = limit;
-		  }
-		  
-		  public void insertString(int offset, String str, AttributeSet attr) throws BadLocationException {
-			    if (str == null)
-			      return;
+          JTextFieldLimit(int limit, boolean upper) {
+            super();
+            this.limit = limit;
+          }
+          
+          public void insertString(int offset, String str, AttributeSet attr) throws BadLocationException {
+                if (str == null)
+                  return;
 
-			    if ((getLength() + str.length()) <= limit) {
-			      super.insertString(offset, str, attr);
-			    }
-			  }
-	 }
+                if ((getLength() + str.length()) <= limit) {
+                  super.insertString(offset, str, attr);
+                }
+              }
+     }
 
     public void keyPressed(java.awt.event.KeyEvent arg0) {
-	}
+    }
 
-	public void keyReleased(java.awt.event.KeyEvent arg0) {
-	}
+    public void keyReleased(java.awt.event.KeyEvent arg0) {
+    }
 
-	public void keyTyped(java.awt.event.KeyEvent arg0) {
-		char c = arg0.getKeyChar();
-		if (!Character.isDigit(c))
-			arg0.consume(); // prevent event propagation
-		}
-	
+    public void keyTyped(java.awt.event.KeyEvent arg0) {
+        char c = arg0.getKeyChar();
+        if (!Character.isDigit(c))
+            arg0.consume(); // prevent event propagation
+        }
+    
 }

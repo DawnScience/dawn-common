@@ -32,10 +32,11 @@ import javax.swing.tree.DefaultMutableTreeNode;
  * @author Peter X. Cao
  */
 public abstract class Group extends HObject {
+
     /**
      * 
      */
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 3913174542591568052L;
 
     /**
      * The list of members (Groups and Datasets) of this group in memory.
@@ -92,7 +93,7 @@ public abstract class Group extends HObject {
      *             Using {@link #Group(FileFormat, String, String, Group)}
      */
     @Deprecated
-	public Group(FileFormat theFile, String name, String path, Group parent,
+    public Group(FileFormat theFile, String name, String path, Group parent,
             long[] oid) {
         super(theFile, name, path, oid);
 
@@ -217,7 +218,7 @@ public abstract class Group extends HObject {
      *            The new name of the group.
      */
     @Override
-	public void setName(String newName) throws Exception {
+    public void setName(String newName) throws Exception {
         super.setName(newName);
 
         if (memberList != null) {

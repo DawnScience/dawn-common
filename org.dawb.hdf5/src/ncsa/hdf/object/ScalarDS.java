@@ -35,6 +35,11 @@ public abstract class ScalarDS extends Dataset {
     // to make the defination consistent with the image specs.
 
     /**
+     * 
+     */
+    private static final long serialVersionUID = 8925371455928203981L;
+
+    /**
      * Indicates that the pixel RGB values are contiguous.
      */
     public final static int INTERLACE_PIXEL = 0;
@@ -133,7 +138,7 @@ public abstract class ScalarDS extends Dataset {
      *             Using {@link #ScalarDS(FileFormat, String, String)}
      */
     @Deprecated
-	public ScalarDS(FileFormat theFile, String theName, String thePath,
+    public ScalarDS(FileFormat theFile, String theName, String thePath,
             long[] oid) {
         super(theFile, theName, thePath, oid);
 
@@ -156,7 +161,7 @@ public abstract class ScalarDS extends Dataset {
      * @see ncsa.hdf.object.Dataset#clearData()
      */
     @Override
-	public void clearData() {
+    public void clearData() {
         super.clearData();
         unsignedConverted = false;
     }
@@ -180,12 +185,12 @@ public abstract class ScalarDS extends Dataset {
             unsignedConverted = true;
             
             if (fillValue != null) {
-            	if(!isFillValueConverted){
-            	fillValue = convertFromUnsignedC(fillValue, null);
-            	isFillValueConverted = true;
-            	}
+                if(!isFillValueConverted){
+                fillValue = convertFromUnsignedC(fillValue, null);
+                isFillValueConverted = true;
+                }
             }
-            	
+                
         }
 
         return data;
@@ -275,10 +280,10 @@ public abstract class ScalarDS extends Dataset {
      * @return The name of the palette
      */
     public String getPaletteName(int idx){
-    	String paletteName = "Default ";
-    	if (idx !=0)
-    		paletteName = "Default " + idx;
-    	return paletteName;
+        String paletteName = "Default ";
+        if (idx !=0)
+            paletteName = "Default " + idx;
+        return paletteName;
     }
 
     /**
@@ -318,6 +323,7 @@ public abstract class ScalarDS extends Dataset {
      *         false.
      */
     public final boolean isImageDisplay() {
+
         return isImageDisplay;
     }
 

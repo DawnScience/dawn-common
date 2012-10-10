@@ -18,7 +18,6 @@ import java.util.List;
 
 import ncsa.hdf.hdflib.HDFConstants;
 import ncsa.hdf.object.Datatype;
-import ncsa.hdf.object.HObject;
 
 /**
  * This class defines HDF4 data type characteristics and APIs for a data type.
@@ -34,9 +33,9 @@ import ncsa.hdf.object.HObject;
 public class H4Datatype extends Datatype
 {
     /**
-     * @see ncsa.hdf.object.HObject#serialVersionUID
+     * 
      */
-	public static final long serialVersionUID = HObject.serialVersionUID;
+    private static final long serialVersionUID = -1342029403385521874L;
 
     /**
      * Constructs a H4Datatype with specified class, size, byte order and sign.
@@ -93,7 +92,7 @@ public class H4Datatype extends Datatype
      * @see ncsa.hdf.object.Datatype#fromNative(int)
      */
     @Override
-	public void fromNative(int tid)
+    public void fromNative(int tid)
     {
         datatypeOrder = NATIVE;
         datatypeSign = NATIVE;
@@ -215,7 +214,7 @@ public class H4Datatype extends Datatype
      * @see ncsa.hdf.object.Datatype#getDatatypeDescription()
      */
     @Override
-	public String getDatatypeDescription()
+    public String getDatatypeDescription()
     {
         return getDatatypeDescription(toNative());
     }
@@ -278,7 +277,7 @@ public class H4Datatype extends Datatype
      * @see ncsa.hdf.object.Datatype#isUnsigned()
      */
     @Override
-	public boolean isUnsigned()
+    public boolean isUnsigned()
     {
         return isUnsigned(toNative());
     }
@@ -315,7 +314,7 @@ public class H4Datatype extends Datatype
      * @see ncsa.hdf.object.Datatype#toNative()
      */
     @Override
-	public int toNative()
+    public int toNative()
     {
         int tid = -1;
         int tclass = getDatatypeClass();
@@ -389,12 +388,12 @@ public class H4Datatype extends Datatype
      * @see ncsa.hdf.object.Datatype#close(int)
      */
     @Override
-	public void close(int id) {;}
+    public void close(int id) {;}
 
     //Implementing DataFormat
-	public List getMetadata(int... attrPropList) throws Exception {
-		throw new UnsupportedOperationException("getMetadata(int... attrPropList) is not supported");
-	}    
+    public List getMetadata(int... attrPropList) throws Exception {
+        throw new UnsupportedOperationException("getMetadata(int... attrPropList) is not supported");
+    }    
     
 
 }

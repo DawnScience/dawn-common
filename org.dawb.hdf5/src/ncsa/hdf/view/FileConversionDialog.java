@@ -37,7 +37,6 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import ncsa.hdf.object.FileFormat;
-import ncsa.hdf.object.HObject;
 
 /**
  * FileConversionDialog shows a message dialog requesting user input for
@@ -47,7 +46,7 @@ import ncsa.hdf.object.HObject;
  * @version 2.4 9/6/2007
  */
 public class FileConversionDialog extends JDialog implements ActionListener {
-    public static final long serialVersionUID = HObject.serialVersionUID;
+    private static final long serialVersionUID = 2645021913986116744L;
 
     private String fileTypeFrom, fileTypeTo;
 

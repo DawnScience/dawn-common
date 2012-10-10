@@ -17,7 +17,7 @@ import java.io.File;
  *  This is the Java interface for the HDF 4.1 library.
  *  <p>
  *  This code is the called by Java programs to access the
- *  entry points of the HDF 4.1 library.
+ *  entry points of the HDF 4.2 library.
  *  Each routine wraps a single HDF entry point, generally with the
  *  arguments and return codes analogous to the C interface.
  * <p>
@@ -214,11 +214,16 @@ import java.io.File;
  *  <p>
  *  <hr>
  */
-public class HDFLibrary 
+public class HDFLibrary implements java.io.Serializable 
 {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -1695429510319126910L;
+
     public final static String HDFPATH_PROPERTY_KEY = "ncsa.hdf.hdflib.HDFLibrary.hdflib";
 
-    private final static String JHI_VERSION= "2.5";
+    private final static String JHI_VERSION= "2.6";
     private static boolean isLibraryLoaded = false;
 
     static { loadH4Lib(); }

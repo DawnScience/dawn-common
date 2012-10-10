@@ -39,7 +39,11 @@ import ucar.nc2.Variable;
  * @author Peter X. Cao
  */
 public class NC2File extends FileFormat {
-    public static final long serialVersionUID = HObject.serialVersionUID;
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 6941235662108358451L;
 
     /**
      * file identifier for the open file.
@@ -94,7 +98,7 @@ public class NC2File extends FileFormat {
      *         false.
      */
     @Override
-	public boolean isThisType(FileFormat fileformat) {
+    public boolean isThisType(FileFormat fileformat) {
         return (fileformat instanceof NC2File);
     }
 
@@ -108,7 +112,7 @@ public class NC2File extends FileFormat {
      *         false.
      */
     @Override
-	public boolean isThisType(String filename) {
+    public boolean isThisType(String filename) {
         boolean is_netcdf = false;
         RandomAccessFile raf = null;
 
@@ -164,14 +168,14 @@ public class NC2File extends FileFormat {
      * @see ncsa.hdf.object.FileFormat#createInstance(java.lang.String, int)
      */
     @Override
-	public FileFormat createInstance(String filename, int access)
+    public FileFormat createInstance(String filename, int access)
             throws Exception {
         return new NC2File(filename);
     }
 
     // Implementing FileFormat
     @Override
-	public int open() throws Exception {
+    public int open() throws Exception {
         if (!isFileOpen) {
             isFileOpen = true;
             rootNode = loadTree();
@@ -183,17 +187,22 @@ public class NC2File extends FileFormat {
     private MutableTreeNode loadTree() {
 
         long[] oid = { 0 };
-        NC2Group rootGroup = new NC2Group(this, getName(), // set the node name
-                                                           // to the file name
+        NC2Group rootGroup = new NC2Group(
+        		this, 
+        		"/",
                 null, // root node does not have a parent path
                 null, // root node does not have a parent node
                 oid);
 
         DefaultMutableTreeNode root = new DefaultMutableTreeNode(rootGroup) {
-            public static final long serialVersionUID = HObject.serialVersionUID;
+
+            /**
+             * 
+             */
+            private static final long serialVersionUID = -9190644912409119072L;
 
             @Override
-			public boolean isLeaf() {
+            public boolean isLeaf() {
                 return false;
             }
         };
@@ -220,7 +229,7 @@ public class NC2File extends FileFormat {
 
     // Implementing FileFormat
     @Override
-	public void close() throws IOException {
+    public void close() throws IOException {
         if (ncFile != null) {
             ncFile.close();
         }
@@ -228,7 +237,7 @@ public class NC2File extends FileFormat {
 
     // Implementing FileFormat
     @Override
-	public TreeNode getRootNode() {
+    public TreeNode getRootNode() {
         return rootNode;
     }
 
@@ -238,37 +247,37 @@ public class NC2File extends FileFormat {
 
     // implementing FileFormat
     @Override
-	public Group createGroup(String name, Group pgroup) throws Exception {
+    public Group createGroup(String name, Group pgroup) throws Exception {
         // not supported
         throw new UnsupportedOperationException("Unsupported operation.");
     }
 
     // implementing FileFormat
     @Override
-	public Datatype createDatatype(int tclass, int tsize, int torder, int tsign)
+    public Datatype createDatatype(int tclass, int tsize, int torder, int tsign)
             throws Exception {
         // not supported
         throw new UnsupportedOperationException("Unsupported operation.");
     }
 
     @Override
-	public Datatype createDatatype(int tclass, int tsize, int torder,
+    public Datatype createDatatype(int tclass, int tsize, int torder,
             int tsign, String name) throws Exception {
         throw new UnsupportedOperationException("Unsupported operation.");
     }
 
     // implementing FileFormat
     @Override
-	public Dataset createScalarDS(String name, Group pgroup, Datatype type,
-            long[] dims, long[] maxdims, long[] chunks, int gzip, Object data)
-            throws Exception {
+    public Dataset createScalarDS(String name, Group pgroup, Datatype type,
+            long[] dims, long[] maxdims, long[] chunks, int gzip, Object fillValue,
+            Object data) throws Exception {
         // not supported
         throw new UnsupportedOperationException("Unsupported operation.");
     }
 
     // implementing FileFormat
     @Override
-	public Dataset createImage(String name, Group pgroup, Datatype type,
+    public Dataset createImage(String name, Group pgroup, Datatype type,
             long[] dims, long[] maxdims, long[] chunks, int gzip, int ncomp,
             int intelace, Object data) throws Exception {
         // not supported
@@ -277,14 +286,14 @@ public class NC2File extends FileFormat {
 
     // implementing FileFormat
     @Override
-	public void delete(HObject obj) throws Exception {
+    public void delete(HObject obj) throws Exception {
         // not supported
         throw new UnsupportedOperationException("Unsupported operation.");
     }
 
     // implementing FileFormat
     @Override
-	public TreeNode copy(HObject srcObj, Group dstGroup, String dstName)
+    public TreeNode copy(HObject srcObj, Group dstGroup, String dstName)
             throws Exception {
         // not supported
         throw new UnsupportedOperationException("Unsupported operation.");
@@ -343,7 +352,7 @@ public class NC2File extends FileFormat {
      * @return true if successful and false otherwise.
      */
     @Override
-	public void writeAttribute(HObject obj, ncsa.hdf.object.Attribute attr,
+    public void writeAttribute(HObject obj, ncsa.hdf.object.Attribute attr,
             boolean attrExisted) throws Exception {
         // not supported
         throw new UnsupportedOperationException("Unsupported operation.");
@@ -371,7 +380,7 @@ public class NC2File extends FileFormat {
      * Returns the version of the library.
      */
     @Override
-	public String getLibversion() {
+    public String getLibversion() {
         String ver = "NetCDF Java (version 2.4)";
 
         return ver;
@@ -379,7 +388,7 @@ public class NC2File extends FileFormat {
     
     // implementing FileFormat
     @Override
-	public HObject get(String path) throws Exception
+    public HObject get(String path) throws Exception
     {
         throw new UnsupportedOperationException("get() is not supported");
     }    

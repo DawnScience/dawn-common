@@ -31,7 +31,6 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
 import ncsa.hdf.object.FileFormat;
-import ncsa.hdf.object.HObject;
 
 /**
  * The ViewProperties holds all the HDFView static information.
@@ -40,10 +39,10 @@ import ncsa.hdf.object.HObject;
  * @version 2.4 9/6/2007
  */
 public class ViewProperties extends Properties {
-    public static final long serialVersionUID = HObject.serialVersionUID;
+    private static final long serialVersionUID = -6411465283887959066L;
 
     /** the version of the HDFViewer */
-    public static final String VERSION = "2.7";
+    public static final String VERSION = "2.8";
 
     /** the local property file name */
     private static final String USER_PROPERTY_FILE = ".hdfview"
@@ -63,6 +62,18 @@ public class ViewProperties extends Properties {
 
     /** name of the tab delimiter */
     public static final String DELIMITER_COLON = "Colon";
+    
+    /** image origin: UpperLeft */
+    public static final String ORIGIN_UL = "UpperLeft";
+
+    /** image origin: LowerLeft */
+    public static final String ORIGIN_LL = "LowerLeft";
+
+    /** image origin: UpperRight */
+    public static final String ORIGIN_UR = "UpperRight";
+
+    /** image origin: LowerRight */
+    public static final String ORIGIN_LR = "LowerRight";
 
     /** name of the tab delimiter */
     public static final String DELIMITER_SEMI_COLON = "Semi-Colon";
@@ -70,9 +81,15 @@ public class ViewProperties extends Properties {
     /**
      * Property keys how how the data is displayed.
      */
-    public static enum DATA_VIEW_KEY {
-        CHAR, CONVERTBYTE, TRANSPOSED, READONLY, OBJECT, BITMASK, BORDER, INFO
-    };
+    public static enum DATA_VIEW_KEY 
+    {
+        CHAR, CONVERTBYTE, TRANSPOSED, READONLY, OBJECT, BITMASK, BITMASKOP, BORDER, INFO, INDEXBASE1
+    }
+
+    /**
+     * Property keys how how the data is displayed.
+     */
+    public static enum BITMASK_OP {AND, EXTRACT}
 
     /** user's guide */
     private static String usersGuide = System.getProperty("user.dir")
@@ -89,6 +106,10 @@ public class ViewProperties extends Properties {
 
     /** data delimiter */
     private static String delimiter = DELIMITER_TAB;
+    
+    /** image origin */
+    private static String origin = ORIGIN_UL;
+    
     
     //------For the feature:To display groups/attributes in creation order
     //    /** Display index */
@@ -116,6 +137,8 @@ public class ViewProperties extends Properties {
      * autocontrast by default (2.6 change).
      */
     private static boolean isAutoContrast = false;
+    
+    private static boolean showImageValues = false;
 
     /**
      * flag to indicate if default open file is read only. By default, use
@@ -128,6 +151,9 @@ public class ViewProperties extends Properties {
 
     /** flag to indicate if enum data is converted to strings */
     private static boolean convertEnum = true;
+
+    /** flag to indicate if data is 1-based index */
+    private static boolean isIndexBase1 = false;
 
     /**
      * Current Java application such as HDFView cannot handle files with large
@@ -993,6 +1019,11 @@ public class ViewProperties extends Properties {
         if (propVal != null) {
             isAutoContrast = ("auto".equalsIgnoreCase(propVal));
         }
+        
+        propVal = (String) get("image.showvalues");
+        if (propVal != null) {
+            showImageValues = ("true".equalsIgnoreCase(propVal));
+        }
 
         propVal = (String) get("file.mode");
         if (propVal != null) {
@@ -1003,11 +1034,21 @@ public class ViewProperties extends Properties {
         if (propVal != null) {
             convertEnum = ("true".equalsIgnoreCase(propVal));
         }
+        
+        propVal = (String) get("index.base1");
+        if (propVal != null) {
+            isIndexBase1 = ("true".equalsIgnoreCase(propVal));
+        }        
 
         propVal = (String) get("data.delimiter");
         if ((propVal != null) && (propVal.length() > 0)) {
             delimiter = propVal;
         }
+        
+        propVal = (String) get("image.origin");
+        if ((propVal != null) && (propVal.length() > 0)) {
+            origin = propVal;
+        }        
         
         //------For the feature:To display groups/attributes in creation order
         //        propVal = (String) get("data.indexType");
@@ -1074,7 +1115,10 @@ public class ViewProperties extends Properties {
         theFile = null;
         for (int i = 0; i < MAX_RECENT_FILES; i++) {
             theFile = getProperty("palette.file" + i);
-            if ((theFile != null) && !paletteList.contains(theFile)) {
+            if (theFile!=null)
+                theFile = theFile.trim();
+            
+            if ((theFile != null && theFile.length()>0) && !paletteList.contains(theFile)) {
                 if ((new File(theFile)).exists()) {
                     paletteList.addElement(theFile);
                 }
@@ -1118,12 +1162,12 @@ public class ViewProperties extends Properties {
         
         // set default modules from user property files
         for (int i=0; i<6; i++) {
-        	String moduleName = (String)get(moduleKeys[i]);
-        	if ((moduleName !=null) && (moduleName.length()>0)) {
-        		if (moduleList[i].contains(moduleName))
-        			moduleList[i].remove(moduleName);
-        		moduleList[i].add(0, moduleName);
-        	}
+            String moduleName = (String)get(moduleKeys[i]);
+            if ((moduleName !=null) && (moduleName.length()>0)) {
+                if (moduleList[i].contains(moduleName))
+                    moduleList[i].remove(moduleName);
+                moduleList[i].add(0, moduleName);
+            }
         }         
     }
 
@@ -1143,6 +1187,13 @@ public class ViewProperties extends Properties {
         else {
             put("data.delimiter", delimiter);
         }
+        
+        if (origin == null) {
+            put("image.origin", ORIGIN_UL);
+        }
+        else {
+            put("image.origin", origin);
+        }        
         
         //--For the feature:To display groups/attributes in creation order
         //        if (indexType == null) {
@@ -1179,6 +1230,12 @@ public class ViewProperties extends Properties {
         else {
             put("image.contrast", "general");
         }
+        
+        if (showImageValues)
+        	put("image.showvalues", "true");
+        else
+        	put("image.showvalues", "false");
+       	
 
         if (isReadOnly) {
             put("file.mode", "r");
@@ -1188,7 +1245,8 @@ public class ViewProperties extends Properties {
         }
 
         put("enum.conversion", String.valueOf(convertEnum));
-
+        put("index.base1", String.valueOf(isIndexBase1));
+ 
         // save the list of most recent files
         String theFile;
         int size = mrf.size();
@@ -1308,6 +1366,11 @@ public class ViewProperties extends Properties {
     public static String getDataDelimiter() {
         return delimiter;
     }
+    
+    /** returns the image origin */
+    public static String getImageOrigin() {
+        return origin;
+    }    
 
     //--For the feature:To display groups/attributes in creation order
     //    /** returns the Index type for Display */
@@ -1428,6 +1491,11 @@ public class ViewProperties extends Properties {
         delimiter = delim;
     }
     
+    /** set the image origin */
+    public static void setImageOrigin(String o) {
+        origin = o;
+    }
+        
     //---For the feature:To display groups/attributes in creation order
     //    /** set the Index Type */
     //    public static void setIndexType(String idxType) {
@@ -1489,6 +1557,17 @@ public class ViewProperties extends Properties {
     public static boolean isAutoContrast() {
         return isAutoContrast;
     }
+    
+    /**
+     * Returns true if "show image values" is set.
+     * 
+     * @return true if "show image values" is set; otherwise,
+     *         returns false.
+     */
+    public static boolean showImageValues() {
+        return showImageValues;
+    }
+    
 
     /**
      * Set the flag to indicate if auto contrast is used in image process.
@@ -1500,6 +1579,16 @@ public class ViewProperties extends Properties {
     public static void setAutoContrast(boolean b) {
         isAutoContrast = b;
     }
+    
+    /**
+     * Set the flag to indicate if "show image values" is set.
+     * 
+     * @param b
+     *            the flag to indicate if if "show image values" is set.
+     */
+    public static void setShowImageValue(boolean b) {
+        showImageValues = b;
+    }    
 
     /**
      * Returns true if default file access is read only.
@@ -1527,6 +1616,13 @@ public class ViewProperties extends Properties {
     public static boolean isConvertEnum() {
         return convertEnum;
     }
+    
+    /**
+     * @return the convertEnum
+     */
+    public static boolean isIndexBase1() {
+        return isIndexBase1;
+    }
 
     /**
      * @param convertEnum
@@ -1535,5 +1631,13 @@ public class ViewProperties extends Properties {
     public static void setConvertEnum(boolean convertEnum) {
         ViewProperties.convertEnum = convertEnum;
     }
+    
+    /**
+     * @param convertEnum
+     *            the convertEnum to set
+     */
+    public static void setIndexBase1(boolean b) {
+        ViewProperties.isIndexBase1 = b;
+    }    
 
 }

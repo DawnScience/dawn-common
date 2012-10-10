@@ -94,7 +94,7 @@ public class NexusUtils {
 	 * TODO Deal with label attribute?
 	 * 
 	 * @param dataNode
-	 * @param dimension - 1 is y, 2 is z, 3 is x
+	 * @param dimension we want the axis for 1, 2, 3 etc.
 	 * @return
 	 * @throws Exception 
 	 */
@@ -175,13 +175,14 @@ public class NexusUtils {
 	 * 
 	 * @param filePath
 	 * @param nexusPath
-	 * @param dimension
+	 * @param dimension, the dimension we want the axis for.
 	 * @return
 	 * @throws Exception
 	 */
 	public static List<String> getAxisNames(String filePath, String nexusPath, int dimension) throws Exception {
 
 		if (filePath==null || nexusPath==null) return null;
+		if (dimension<1) return  null;
        	IHierarchicalDataFile file = null;
         try {
         	file = HierarchicalDataFactory.getReader(filePath);

@@ -38,7 +38,10 @@ import ncsa.hdf.object.HObject;
  */
 public class H4Group extends Group
 {
-	public static final long serialVersionUID = HObject.serialVersionUID;
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 3785240955078867900L;
 
     /**
      * The list of attributes of this data object. Members of the list are
@@ -185,7 +188,7 @@ public class H4Group extends Group
 
    // Implementing HObject
     @Override
-	public int open()
+    public int open()
     {
         int vgid = -1;
 
@@ -213,7 +216,7 @@ public class H4Group extends Group
 
     /** close group access. */
     @Override
-	public void close(int vgid)
+    public void close(int vgid)
     {
         try { HDFLibrary.Vdetach(vgid); }
         catch (Exception ex) { ; }
@@ -285,8 +288,8 @@ public class H4Group extends Group
     }
 
     //Implementing DataFormat
-	public List getMetadata(int... attrPropList) throws Exception {
-		throw new UnsupportedOperationException("getMetadata(int... attrPropList) is not supported");
-	}
+    public List getMetadata(int... attrPropList) throws Exception {
+        throw new UnsupportedOperationException("getMetadata(int... attrPropList) is not supported");
+    }
 
 }

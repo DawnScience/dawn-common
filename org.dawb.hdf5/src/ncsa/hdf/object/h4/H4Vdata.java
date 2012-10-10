@@ -25,7 +25,6 @@ import ncsa.hdf.object.CompoundDS;
 import ncsa.hdf.object.Dataset;
 import ncsa.hdf.object.Datatype;
 import ncsa.hdf.object.FileFormat;
-import ncsa.hdf.object.HObject;
 
 /**
  * H4Vdata describes a multi-dimension array of HDF4 vdata, inheriting CompoundDS.
@@ -90,7 +89,10 @@ import ncsa.hdf.object.HObject;
  */
 public class H4Vdata extends CompoundDS
 {
-	public static final long serialVersionUID = HObject.serialVersionUID;
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -5978700886955419959L;
 
     /**
      * The list of attributes of this data object. Members of the list are
@@ -155,7 +157,7 @@ public class H4Vdata extends CompoundDS
     
     // implementing Dataset
     @Override
-	public Datatype getDatatype()
+    public Datatype getDatatype()
     {
         if (datatype == null)
         {
@@ -167,7 +169,7 @@ public class H4Vdata extends CompoundDS
 
     // Implementing Dataset
     @Override
-	public byte[] readBytes() throws HDFException
+    public byte[] readBytes() throws HDFException
     {
         byte[] theData = null;
 
@@ -212,7 +214,7 @@ public class H4Vdata extends CompoundDS
 
     // Implementing DataFormat
     @Override
-	public Object read() throws HDFException
+    public Object read() throws HDFException
     {
         List list = null;
 
@@ -301,7 +303,7 @@ public class H4Vdata extends CompoundDS
 
     // Implementing DataFormat
     @Override
-	public void write(Object buf) throws HDFException
+    public void write(Object buf) throws HDFException
     {
         //For writing to a vdata, VSsetfields can only be called once, to set
         //up the fields in a vdata. Once the vdata fields are set, they may
@@ -458,7 +460,7 @@ public class H4Vdata extends CompoundDS
 
     // Implementing DataFormat
     @Override
-	public int open()
+    public int open()
     {
         int vsid = -1;
 
@@ -486,7 +488,7 @@ public class H4Vdata extends CompoundDS
 
     // Implementing DataFormat
     @Override
-	public void close(int vsid)
+    public void close(int vsid)
     {
         try { HDFLibrary.VSdetach(vsid); }
         catch (Exception ex) { ; }
@@ -496,7 +498,7 @@ public class H4Vdata extends CompoundDS
      * Initializes the H4Vdata such as dimension sizes of this dataset.
      */
     @Override
-	public void init()
+    public void init()
     {
         if (rank>0) {
             return; // already called. Initialize only once
@@ -583,7 +585,7 @@ public class H4Vdata extends CompoundDS
     }
 
     //Implementing DataFormat
-	public List getMetadata(int... attrPropList) throws Exception {
-		throw new UnsupportedOperationException("getMetadata(int... attrPropList) is not supported");
-	}
+    public List getMetadata(int... attrPropList) throws Exception {
+        throw new UnsupportedOperationException("getMetadata(int... attrPropList) is not supported");
+    }
 }

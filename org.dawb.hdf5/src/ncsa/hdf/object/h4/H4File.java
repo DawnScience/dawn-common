@@ -44,7 +44,10 @@ import ncsa.hdf.object.HObject;
  */
 public class H4File extends FileFormat
 {
-    public static final long serialVersionUID = HObject.serialVersionUID;
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 8985533001471224030L;
 
     // make sure that the library is loaded.
     static { HDFLibrary.loadH4Lib(); }
@@ -166,7 +169,7 @@ public class H4File extends FileFormat
      * @return true if the given file is an HDF4 file; otherwise returns false.
      */
     @Override
-	public boolean isThisType(FileFormat fileformat)
+    public boolean isThisType(FileFormat fileformat)
     {
         return (fileformat instanceof H4File);
     }
@@ -179,7 +182,7 @@ public class H4File extends FileFormat
      * @return true if the given file is an HDF4 file; otherwise returns false.
      */
     @Override
-	public boolean isThisType(String filename)
+    public boolean isThisType(String filename)
     {
         boolean isH4 = false;
 
@@ -208,7 +211,7 @@ public class H4File extends FileFormat
      * @see #H4File(String, int)
      */
     @Override
-	public FileFormat createFile(String filename, int createFlag)
+    public FileFormat createFile(String filename, int createFlag)
                                                         throws Exception
     {
         // Flag if we need to create or truncate the file.
@@ -225,9 +228,9 @@ public class H4File extends FileFormat
         if (doCreateFile) {
             int fileid = HDFLibrary.Hopen(filename, HDFConstants.DFACC_CREATE);
             try { 
-		HDFLibrary.Hclose(fileid); 
-	    } catch (HDFException ex) {}
-	}
+        HDFLibrary.Hclose(fileid); 
+        } catch (HDFException ex) {}
+    }
 
         return new H4File(filename, WRITE);
     }
@@ -239,15 +242,15 @@ public class H4File extends FileFormat
      * @see #H4File(String, int)
      */
     @Override
-	public FileFormat createInstance(String filename, int access) 
-							throws Exception
+    public FileFormat createInstance(String filename, int access) 
+                            throws Exception
     {
         return new H4File(filename, access);
     }
 
     // Implementing FileFormat
     @Override
-	public int open() throws Exception
+    public int open() throws Exception
     {
         if ( fid >=0 ) {
             return fid; // file is openned already
@@ -297,7 +300,7 @@ public class H4File extends FileFormat
 
     // Implementing FileFormat
     @Override
-	public void close() throws HDFException
+    public void close() throws HDFException
     {
         // clean unused objects
         if (rootNode != null)
@@ -329,20 +332,20 @@ public class H4File extends FileFormat
 
     // Implementing FileFormat
     @Override
-	public TreeNode getRootNode()
+    public TreeNode getRootNode()
     {
         return rootNode;
     }
 
 
     @Override
-	public Group createGroup(String name, Group pgroup) throws Exception
+    public Group createGroup(String name, Group pgroup) throws Exception
     {
         return H4Group.create(name, pgroup);
     }
 
     @Override
-	public Datatype createDatatype(
+    public Datatype createDatatype(
         int tclass,
         int tsize,
         int torder,
@@ -352,7 +355,7 @@ public class H4File extends FileFormat
     }
 
     @Override
-	public Datatype createDatatype(
+    public Datatype createDatatype(
         int tclass,
         int tsize,
         int torder,
@@ -363,7 +366,7 @@ public class H4File extends FileFormat
     }
 
     @Override
-	public Dataset createScalarDS(
+    public Dataset createScalarDS(
         String name,
         Group pgroup,
         Datatype type,
@@ -371,14 +374,15 @@ public class H4File extends FileFormat
         long[] maxdims,
         long[] chunks,
         int gzip,
+        Object fillValue,
         Object data) throws Exception
     {
-        return H4SDS.create(name, pgroup, type, dims, maxdims, chunks, gzip, data);
+        return H4SDS.create(name, pgroup, type, dims, maxdims, chunks, gzip, fillValue, data);
     }
 
 
     @Override
-	public Dataset createImage(
+    public Dataset createImage(
         String name,
         Group pgroup,
         Datatype type,
@@ -400,7 +404,7 @@ public class H4File extends FileFormat
      * @param obj the data object to delete.
      */
     @Override
-	public void delete(HObject obj) throws Exception
+    public void delete(HObject obj) throws Exception
     {
         throw (new UnsupportedOperationException(
             "Cannot delete HDF4 object."));
@@ -413,7 +417,7 @@ public class H4File extends FileFormat
      * @return the new node containing the new object.
      */
     @Override
-	public TreeNode copy(HObject srcObj, Group dstGroup, String dstName) throws Exception
+    public TreeNode copy(HObject srcObj, Group dstGroup, String dstName) throws Exception
     {
         TreeNode newNode = null;
 
@@ -457,7 +461,7 @@ public class H4File extends FileFormat
      * @param isSDglobalAttr The indicator if the given attribute exists.
      */
     @Override
-	public void writeAttribute(HObject obj, Attribute attr,
+    public void writeAttribute(HObject obj, Attribute attr,
         boolean isSDglobalAttr) throws HDFException
     {
         String attrName = attr.getName();
@@ -576,10 +580,10 @@ public class H4File extends FileFormat
 
         DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(group)
         {
-        	public static final long serialVersionUID = HObject.serialVersionUID;
+            private static final long serialVersionUID = -8601910527549035409L;
 
             @Override
-			public boolean isLeaf() { return false; }
+            public boolean isLeaf() { return false; }
         };
         pgroup.addToMemberList(group);
 
@@ -625,17 +629,17 @@ public class H4File extends FileFormat
 
         H4Group rootGroup = new H4Group(
             this,
-            getName(), // set the node name to the file name
+            "/", 
             null, // root node does not have a parent path
             null, // root node does not have a parent node
             oid);
 
         DefaultMutableTreeNode root = new DefaultMutableTreeNode(rootGroup)
         {
-        	public static final long serialVersionUID = HObject.serialVersionUID;
+            private static final long serialVersionUID = 3507473044690724650L;
 
             @Override
-			public boolean isLeaf() { return false; }
+            public boolean isLeaf() { return false; }
         };
 
         // get top level VGroup
@@ -669,10 +673,10 @@ public class H4File extends FileFormat
             {
                 node = new DefaultMutableTreeNode(g)
                 {
-                	public static final long serialVersionUID = HObject.serialVersionUID;
+                    private static final long serialVersionUID = 8927502967802143369L;
 
                     @Override
-					public boolean isLeaf() { return false; }
+                    public boolean isLeaf() { return false; }
                 };
                 root.add( node );
                 rootGroup.addToMemberList(g);
@@ -900,10 +904,10 @@ public class H4File extends FileFormat
                     {
                         node = new DefaultMutableTreeNode(vgroup)
                         {
-                        	public static final long serialVersionUID = HObject.serialVersionUID;
+                            private static final long serialVersionUID = -8774836537322039221L;
 
                             @Override
-							public boolean isLeaf() { return false; }
+                            public boolean isLeaf() { return false; }
                         };
 
                         pnode.add( node );
@@ -1472,7 +1476,7 @@ public class H4File extends FileFormat
      *  Returns the version of the HDF4 library.
      */
     @Override
-	public String getLibversion()
+    public String getLibversion()
     {
         int[] vers = new int[3];
         String ver = "HDF ";
@@ -1531,7 +1535,7 @@ public class H4File extends FileFormat
      * file structure.
      */
     @Override
-	public HObject get(String path) throws Exception
+    public HObject get(String path) throws Exception
     {
         if (objList == null) {
             objList = new Vector();

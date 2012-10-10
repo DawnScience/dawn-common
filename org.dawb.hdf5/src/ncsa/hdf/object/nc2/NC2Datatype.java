@@ -17,7 +17,6 @@ package ncsa.hdf.object.nc2;
 import java.util.List;
 
 import ncsa.hdf.object.Datatype;
-import ncsa.hdf.object.HObject;
 import ucar.ma2.DataType;
 
 /**
@@ -29,8 +28,7 @@ import ucar.ma2.DataType;
  * @author Peter X. Cao
  */
 public class NC2Datatype extends Datatype {
-    public static final long serialVersionUID = HObject.serialVersionUID;
-
+    private static final long serialVersionUID = 5399364372073889764L;
     DataType nativeType = null;
 
     /**
@@ -137,7 +135,7 @@ public class NC2Datatype extends Datatype {
      *            the netcdf native datatype.
      */
     @Override
-	public void fromNative(int tid) {
+    public void fromNative(int tid) {
         if (nativeType == null) {
             return;
         }
@@ -176,7 +174,7 @@ public class NC2Datatype extends Datatype {
 
     // implementing Datatype
     @Override
-	public String getDatatypeDescription() {
+    public String getDatatypeDescription() {
         if (nativeType == null) {
             return "Unknown data type.";
         }
@@ -186,13 +184,13 @@ public class NC2Datatype extends Datatype {
 
     // implementing Datatype
     @Override
-	public boolean isUnsigned() {
+    public boolean isUnsigned() {
         return false;
     }
 
     // implementing Datatype
     @Override
-	public int toNative() {
+    public int toNative() {
         if (datatypeClass == CLASS_INTEGER) {
             if (datatypeSize == 1) {
                 nativeType = DataType.BYTE;
@@ -228,13 +226,13 @@ public class NC2Datatype extends Datatype {
      * @see ncsa.hdf.object.Datatype#close(int)
      */
     @Override
-	public void close(int id) {
+    public void close(int id) {
         ;
     }
 
     //Implementing DataFormat
-	public List getMetadata(int... attrPropList) throws Exception {
-		throw new UnsupportedOperationException("getMetadata(int... attrPropList) is not supported");
-	}
+    public List getMetadata(int... attrPropList) throws Exception {
+        throw new UnsupportedOperationException("getMetadata(int... attrPropList) is not supported");
+    }
 
 }

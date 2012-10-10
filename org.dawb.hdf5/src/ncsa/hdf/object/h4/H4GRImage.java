@@ -102,7 +102,10 @@ import ncsa.hdf.object.ScalarDS;
  */
 public class H4GRImage extends ScalarDS
 {
-	public static final long serialVersionUID = HObject.serialVersionUID;
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1029672744963360976L;
 
     /**
      * The list of attributes of this data object. Members of the list are
@@ -177,7 +180,7 @@ public class H4GRImage extends ScalarDS
 
     // To do: Implementing Dataset
     @Override
-	public Dataset copy(Group pgroup, String dname, long[] dims, Object buff) throws Exception
+    public Dataset copy(Group pgroup, String dname, long[] dims, Object buff) throws Exception
     {
         Dataset dataset = null;
         int srcdid=-1, dstdid=-1;
@@ -275,15 +278,15 @@ public class H4GRImage extends ScalarDS
 
     // ***** need to implement from ScalarDS *****
     @Override
-	public byte[][] readPalette(int idx) { return null;}
+    public byte[][] readPalette(int idx) { return null;}
 
     // ***** need to implement from ScalarDS *****
     @Override
-	public byte[] getPaletteRefs() { return null;}
+    public byte[] getPaletteRefs() { return null;}
 
     // implementing ScalarDS
     @Override
-	public Datatype getDatatype()
+    public Datatype getDatatype()
     {
         if (datatype == null)
         {
@@ -295,7 +298,7 @@ public class H4GRImage extends ScalarDS
 
     // Implementing Dataset
     @Override
-	public byte[] readBytes() throws HDFException
+    public byte[] readBytes() throws HDFException
     {
         byte[] theData = null;
 
@@ -337,7 +340,7 @@ public class H4GRImage extends ScalarDS
 
     // ***** need to implement from DataFormat *****
     @Override
-	public Object read() throws HDFException
+    public Object read() throws HDFException
     {
         Object theData = null;
 
@@ -391,7 +394,7 @@ public class H4GRImage extends ScalarDS
 
     // Implementing DataFormat
     @Override
-	public void write(Object buf) throws HDFException
+    public void write(Object buf) throws HDFException
     {
         if (buf == null) {
             return;
@@ -527,7 +530,7 @@ public class H4GRImage extends ScalarDS
 
     // Implementing HObject.
     @Override
-	public int open()
+    public int open()
     {
 
         int id = -1;
@@ -544,7 +547,7 @@ public class H4GRImage extends ScalarDS
 
     // Implementing HObject.
     @Override
-	public void close(int grid)
+    public void close(int grid)
     {
         try { HDFLibrary.GRendaccess(grid); }
         catch (HDFException ex) {;}
@@ -552,7 +555,7 @@ public class H4GRImage extends ScalarDS
 
     // Implementing Dataset.
     @Override
-	public void init()
+    public void init()
     {
         if (rank>0) {
             return; // already called. Initialize only once
@@ -637,7 +640,7 @@ public class H4GRImage extends ScalarDS
 
     // ***** need to implement from ScalarDS *****
     @Override
-	public byte[][] getPalette()
+    public byte[][] getPalette()
     {
         if (palette != null) {
             return palette;
@@ -900,8 +903,8 @@ public class H4GRImage extends ScalarDS
     }
 
     //Implementing DataFormat
-	public List getMetadata(int... attrPropList) throws Exception {
-		throw new UnsupportedOperationException("getMetadata(int... attrPropList) is not supported");
-	}
+    public List getMetadata(int... attrPropList) throws Exception {
+        throw new UnsupportedOperationException("getMetadata(int... attrPropList) is not supported");
+    }
 
 }

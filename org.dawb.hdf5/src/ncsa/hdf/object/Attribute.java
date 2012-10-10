@@ -57,10 +57,7 @@ import java.lang.reflect.Array;
  * @author Peter X. Cao
  */
 public class Attribute implements Metadata {
-    /**
-     * @see ncsa.hdf.object.HObject#serialVersionUID
-     */
-    public static final long serialVersionUID = HObject.serialVersionUID;
+    private static final long serialVersionUID = 2072473407027648309L;
 
     /** The name of the attribute. */
     private final String name;
@@ -79,6 +76,9 @@ public class Attribute implements Metadata {
 
     /** Flag to indicate if the datatype is an unsigned integer. */
     private boolean isUnsigned;
+    
+    /** flag to indicate if the dataset is a single scalar point */
+    protected boolean isScalar = false;    
 
     /**
      * Create an attribute with specified name, data type and dimension sizes.
@@ -157,8 +157,12 @@ public class Attribute implements Metadata {
 
         if (dims != null) {
             rank = dims.length;
+        } else {
+        	isScalar = true;
+        	rank = 1;
+        	dims = new long[] {1};
         }
-
+        	
         if (attrValue != null) {
             value = attrValue;
         }
@@ -230,6 +234,13 @@ public class Attribute implements Metadata {
     public Datatype getType() {
         return type;
     }
+    
+    /**
+     * @return true if the data is a single scalar point; otherwise, returns false.
+     */
+    public boolean isScalar() {
+    	return isScalar;
+    }
 
     /**
      * Checks if the data type of this attribute is an unsigned integer.
@@ -247,7 +258,7 @@ public class Attribute implements Metadata {
      * @see toString(String delimiter)
      */
     @Override
-	public String toString() {
+    public String toString() {
         return name;
     }
 

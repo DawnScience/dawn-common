@@ -40,7 +40,7 @@ import ucar.nc2.Variable;
  * @author Peter X. Cao
  */
 public class NC2Dataset extends ScalarDS {
-    public static final long serialVersionUID = HObject.serialVersionUID;
+    private static final long serialVersionUID = -6031051694304457461L;
 
     /**
      * The list of attributes of this data object. Members of the list are
@@ -78,7 +78,7 @@ public class NC2Dataset extends ScalarDS {
 
     // Implementing Dataset
     @Override
-	public Dataset copy(Group pgroup, String dstName, long[] dims, Object buff)
+    public Dataset copy(Group pgroup, String dstName, long[] dims, Object buff)
             throws Exception {
         // not supported
         throw new UnsupportedOperationException(
@@ -87,7 +87,7 @@ public class NC2Dataset extends ScalarDS {
 
     // implementing Dataset
     @Override
-	public byte[] readBytes() throws Exception {
+    public byte[] readBytes() throws Exception {
         // not supported
         throw new UnsupportedOperationException(
                 "Unsupported operation for NetCDF.");
@@ -95,7 +95,7 @@ public class NC2Dataset extends ScalarDS {
 
     // Implementing DataFormat
     @Override
-	public Object read() throws Exception {
+    public Object read() throws Exception {
         Object theData = null;
 
         if (nativeDataset == null) {
@@ -148,7 +148,7 @@ public class NC2Dataset extends ScalarDS {
 
     // Implementing DataFormat
     @Override
-	public void write(Object buf) throws Exception {
+    public void write(Object buf) throws Exception {
         // not supported
         throw new UnsupportedOperationException(
                 "Unsupported operation for NetCDF.");
@@ -196,20 +196,20 @@ public class NC2Dataset extends ScalarDS {
 
     // Implementing HObject
     @Override
-	public int open() {
+    public int open() {
         return -1;
     }
 
     // Implementing HObject
     @Override
-	public void close(int did) {
+    public void close(int did) {
     }
 
     /**
      * Retrieve and initialize dimensions and member information.
      */
     @Override
-	public void init() {
+    public void init() {
         if (nativeDataset == null) {
             return;
         }
@@ -268,7 +268,7 @@ public class NC2Dataset extends ScalarDS {
 
     // Implementing ScalarDS
     @Override
-	public byte[][] getPalette() {
+    public byte[][] getPalette() {
         if (palette == null) {
             palette = readPalette(0);
         }
@@ -284,7 +284,7 @@ public class NC2Dataset extends ScalarDS {
      * @return the palette data into two-dimension byte array, byte[3][256]
      */
     @Override
-	public byte[][] readPalette(int idx) {
+    public byte[][] readPalette(int idx) {
         return null;
     }
 
@@ -322,13 +322,13 @@ public class NC2Dataset extends ScalarDS {
      * palette attribute attached to this dataset.
      */
     @Override
-	public byte[] getPaletteRefs() {
+    public byte[] getPaletteRefs() {
         return null;
     }
 
     // implementing ScalarDS
     @Override
-	public Datatype getDatatype() {
+    public Datatype getDatatype() {
         if (datatype == null) {
             datatype = new NC2Datatype(nativeDataset.getDataType());
         }
@@ -344,15 +344,15 @@ public class NC2Dataset extends ScalarDS {
      *            the new name of the object.
      */
     @Override
-	public void setName(String newName) throws Exception {
+    public void setName(String newName) throws Exception {
         // not supported
         throw new UnsupportedOperationException(
                 "Unsupported operation for NetCDF.");
     }
 
     //Implementing DataFormat
-	public List getMetadata(int... attrPropList) throws Exception {
-		throw new UnsupportedOperationException("getMetadata(int... attrPropList) is not supported");
-	}
+    public List getMetadata(int... attrPropList) throws Exception {
+        throw new UnsupportedOperationException("getMetadata(int... attrPropList) is not supported");
+    }
 
 }

@@ -62,12 +62,15 @@ import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ListSelectionEvent;
+import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
 import ncsa.hdf.object.Dataset;
+import ncsa.hdf.object.Datatype;
 import ncsa.hdf.object.FileFormat;
 import ncsa.hdf.object.HObject;
 import ncsa.hdf.object.ScalarDS;
@@ -80,7 +83,7 @@ import ncsa.hdf.object.ScalarDS;
  */
 public class DefaultTextView extends JInternalFrame implements TextView,
         ActionListener, KeyListener {
-    public static final long serialVersionUID = HObject.serialVersionUID;
+    private static final long serialVersionUID = 3892752752951438428L;
 
     /**
      * The main HDFView.
@@ -110,6 +113,8 @@ public class DefaultTextView extends JInternalFrame implements TextView,
     private TextAreaEditor textEditor = null;
 
     private RowHeader rowHeaders = null;
+    
+    private int indexBase = 0;
 
     /**
      * Constructs an TextView.
@@ -141,6 +146,9 @@ public class DefaultTextView extends JInternalFrame implements TextView,
         table = null;
         dataset = null;
         textEditor = new TextAreaEditor(this);
+        
+        if (ViewProperties.isIndexBase1())
+            indexBase = 1;
 
         HObject hobject = null;
         if (map != null)
@@ -172,16 +180,33 @@ public class DefaultTextView extends JInternalFrame implements TextView,
             dataset = null;
             return;
         }
-
+        
         String fname = new java.io.File(dataset.getFile()).getName();
         this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         this.setTitle("TextView  -  " + dataset.getName() + "  -  "
                 + dataset.getPath() + "  -  " + fname);
         this.setFrameIcon(ViewProperties.getTextIcon());
+        
+        int rank = dataset.getRank();
+        long start[] = dataset.getStartDims();
+        long count[] = dataset.getSelectedDims();
+        
+        String colName = "Data selection:   ["+start[0];
+        for (int i=1; i<rank; i++) {
+        	colName += ", "+start[i];
+        }
+        colName += "] ~ ["+(start[0]+count[0]-1);
+        for (int i=1; i<rank; i++) {
+        	colName += ", "+(start[i]+count[i]-1);
+        }  
+        colName += "]";
 
-        table = createTable();
-        table.getTableHeader().setReorderingAllowed(false);
-        table.getTableHeader().setBackground(Color.black);
+        table = createTable(colName);
+        
+        JTableHeader colHeader = table.getTableHeader();
+        colHeader.setReorderingAllowed(false);
+        //colHeader.setBackground(Color.black);
+        
         rowHeaders = new RowHeader(table, dataset);
 
         // add the table to a scroller
@@ -232,25 +257,39 @@ public class DefaultTextView extends JInternalFrame implements TextView,
     /**
      * Creates a JTable to hold a compound dataset.
      */
-    private JTable createTable() {
+    private JTable createTable(final String colName) {
         JTable theTable = null;
-
-        int rows = text.length;
-        theTable = new JTable(rows, 1) {
-            public static final long serialVersionUID = HObject.serialVersionUID;
-
-            @Override
-			public Object getValueAt(int row, int col) {
-                return text[row];
+        
+        AbstractTableModel tm =  new AbstractTableModel()
+        {
+            public int getColumnCount() {
+                return 1;
             }
 
+            public int getRowCount() {
+                return text.length;
+            }
+
+            public String getColumnName(int col) {
+                return colName;
+            }
+
+            public Object getValueAt(int row, int column)
+            {
+            	return text[row];
+            }
+        };
+        
+        theTable = new JTable(tm) {
+            private static final long serialVersionUID = -6571266777012522255L;
+
             @Override
-			public boolean isCellEditable(int row, int column) {
+            public boolean isCellEditable(int row, int column) {
                 return !isReadOnly;
             }
 
             @Override
-			public void editingStopped(ChangeEvent e) {
+            public void editingStopped(ChangeEvent e) {
                 int row = getEditingRow();
                 int col = getEditingColumn();
                 super.editingStopped(e);
@@ -263,7 +302,6 @@ public class DefaultTextView extends JInternalFrame implements TextView,
                     text[row] = cellValue;
                 } // if (source instanceof CellEditor)
             }
-
         };
 
         return theTable;
@@ -421,7 +459,7 @@ public class DefaultTextView extends JInternalFrame implements TextView,
     }
 
     @Override
-	public void dispose() {
+    public void dispose() {
         if (isTextChanged && !isReadOnly) {
             int op = JOptionPane.showConfirmDialog(this, "\""
                     + dataset.getName() + "\" has changed.\n"
@@ -489,7 +527,7 @@ public class DefaultTextView extends JInternalFrame implements TextView,
 
     private class TextAreaRenderer extends JTextArea implements
             TableCellRenderer {
-        public static final long serialVersionUID = HObject.serialVersionUID;
+        private static final long serialVersionUID = -5869975162678521978L;
 
         private final DefaultTableCellRenderer adaptee = new DefaultTableCellRenderer();
 
@@ -580,7 +618,7 @@ public class DefaultTextView extends JInternalFrame implements TextView,
     }
 
     private class TextAreaEditor extends DefaultCellEditor {
-        public static final long serialVersionUID = HObject.serialVersionUID;
+        private static final long serialVersionUID = 1721646779892184957L;
 
         public TextAreaEditor(KeyListener keyListener) {
             super(new JTextField());
@@ -594,15 +632,15 @@ public class DefaultTextView extends JInternalFrame implements TextView,
             scrollPane.setBorder(null);
             editorComponent = scrollPane;
             delegate = new DefaultCellEditor.EditorDelegate() {
-                public static final long serialVersionUID = HObject.serialVersionUID;
+                private static final long serialVersionUID = 7662356579385373160L;
 
                 @Override
-				public void setValue(Object value) {
+                public void setValue(Object value) {
                     textArea.setText((value != null) ? value.toString() : "");
                 }
 
                 @Override
-				public Object getCellEditorValue() {
+                public Object getCellEditorValue() {
                     return textArea.getText();
                 }
             };
@@ -611,8 +649,7 @@ public class DefaultTextView extends JInternalFrame implements TextView,
 
     /** RowHeader defines the row header component of the Spreadsheet. */
     private class RowHeader extends JTable {
-        public static final long serialVersionUID = HObject.serialVersionUID;
-
+        private static final long serialVersionUID = 2572539746584274419L;
         private int currentRowIndex = -1;
         private int lastRowIndex = -1;
         private JTable parentTable;
@@ -634,7 +671,7 @@ public class DefaultTextView extends JInternalFrame implements TextView,
             // Set the values of the row headers starting at 0.
             int n = parentTable.getRowCount();
             for (int i = 0; i < n; i++) {
-                setValueAt(new Integer(start + i * stride), i, 0);
+                setValueAt(new Integer(start + indexBase+ i * stride), i, 0);
             }
 
             // Get the only table column.
@@ -646,13 +683,13 @@ public class DefaultTextView extends JInternalFrame implements TextView,
 
         /** Overridden to return false since the headers are not editable. */
         @Override
-		public boolean isCellEditable(int row, int col) {
+        public boolean isCellEditable(int row, int col) {
             return false;
         }
 
         /** This is called when the selection changes in the row headers. */
         @Override
-		public void valueChanged(ListSelectionEvent e) {
+        public void valueChanged(ListSelectionEvent e) {
             if (parentTable == null) {
                 return;
             }
@@ -669,7 +706,7 @@ public class DefaultTextView extends JInternalFrame implements TextView,
         }
 
         @Override
-		protected void processMouseMotionEvent(MouseEvent e) {
+        protected void processMouseMotionEvent(MouseEvent e) {
             if (e.getID() == MouseEvent.MOUSE_DRAGGED) {
                 int colEnd = rowAtPoint(e.getPoint());
 
@@ -697,7 +734,7 @@ public class DefaultTextView extends JInternalFrame implements TextView,
         }
 
         @Override
-		protected void processMouseEvent(MouseEvent e) {
+        protected void processMouseEvent(MouseEvent e) {
             int mouseID = e.getID();
 
             if (mouseID == MouseEvent.MOUSE_CLICKED) {
@@ -747,7 +784,7 @@ public class DefaultTextView extends JInternalFrame implements TextView,
      * buttons.
      */
     private class RowHeaderRenderer extends JLabel implements TableCellRenderer {
-        public static final long serialVersionUID = HObject.serialVersionUID;
+        private static final long serialVersionUID = 3081275694689434654L;
 
         public RowHeaderRenderer() {
             super();

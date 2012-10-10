@@ -66,7 +66,7 @@ import ncsa.hdf.object.HObject;
  */
 public class NewTableDataDialog extends JDialog implements ActionListener,
         ItemListener {
-    public static final long serialVersionUID = HObject.serialVersionUID;
+    private static final long serialVersionUID = -6786877503226330821L;
 
     private static final String[] DATATYPE_NAMES = { "byte (8-bit)", // 0
             "short (16-bit)", // 1
@@ -138,12 +138,11 @@ public class NewTableDataDialog extends JDialog implements ActionListener,
                 "Array size / String length / Enum names" };
         tableModel = new DefaultTableModel(colNames, numberOfMembers);
         table = new JTable(tableModel) {
-            public static final long serialVersionUID = HObject.serialVersionUID;
-
+            private static final long serialVersionUID = 7141605060652738476L;
             RowEditorModel rm = rowEditorModel;
 
             @Override
-			public TableCellEditor getCellEditor(int row, int col) {
+            public TableCellEditor getCellEditor(int row, int col) {
                 TableCellEditor cellEditor = rm.getEditor(row);
 
                 if ((cellEditor == null) || !(col == 1)) {

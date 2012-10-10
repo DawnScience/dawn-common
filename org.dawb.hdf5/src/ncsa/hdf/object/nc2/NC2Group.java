@@ -19,7 +19,6 @@ import java.util.Vector;
 
 import ncsa.hdf.object.FileFormat;
 import ncsa.hdf.object.Group;
-import ncsa.hdf.object.HObject;
 import ucar.nc2.NetcdfFile;
 
 /**
@@ -35,7 +34,7 @@ import ucar.nc2.NetcdfFile;
  * @author Peter X. Cao
  */
 public class NC2Group extends Group {
-    public static final long serialVersionUID = HObject.serialVersionUID;
+    private static final long serialVersionUID = -1261533010442193447L;
 
     /**
      * The list of attributes of this data object. Members of the list are
@@ -136,7 +135,7 @@ public class NC2Group extends Group {
 
     // Implementing DataFormat
     @Override
-	public int open() {
+    public int open() {
         // not supported
         throw new UnsupportedOperationException(
                 "Unsupported operation for NetCDF.");
@@ -144,7 +143,7 @@ public class NC2Group extends Group {
 
     /** close group access */
     @Override
-	public void close(int gid) {
+    public void close(int gid) {
         // not supported
         throw new UnsupportedOperationException(
                 "Unsupported operation for NetCDF.");
@@ -168,8 +167,8 @@ public class NC2Group extends Group {
     }
 
     //Implementing DataFormat
-	public List getMetadata(int... attrPropList) throws Exception {
-		throw new UnsupportedOperationException("getMetadata(int... attrPropList) is not supported");
-	}
+    public List getMetadata(int... attrPropList) throws Exception {
+        throw new UnsupportedOperationException("getMetadata(int... attrPropList) is not supported");
+    }
 
 }

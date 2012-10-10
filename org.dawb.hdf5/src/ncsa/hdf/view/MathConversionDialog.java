@@ -40,8 +40,6 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import ncsa.hdf.object.HObject;
-
 /**
  * MathConversionDialog shows a message dialog requesting user input for math
  * conversion.
@@ -51,7 +49,7 @@ import ncsa.hdf.object.HObject;
  */
 public class MathConversionDialog extends JDialog implements ActionListener,
         ListSelectionListener {
-    public static final long serialVersionUID = HObject.serialVersionUID;
+    private static final long serialVersionUID = 5136554941147830371L;
 
     private JTextField aField, bField;
 

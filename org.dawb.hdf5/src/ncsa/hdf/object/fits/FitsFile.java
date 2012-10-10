@@ -45,8 +45,8 @@ import nom.tam.fits.TableHDU;
  */
 public class FitsFile extends FileFormat
 {
-    public static final long serialVersionUID = HObject.serialVersionUID;
-	
+    private static final long serialVersionUID = -1965689032980605791L;
+
     /**
      * The root node of the file hierearchy.
      */
@@ -85,7 +85,7 @@ public class FitsFile extends FileFormat
      * @return true if the given file is an Fits file; otherwise returns false.
      */
     @Override
-	public boolean isThisType(FileFormat fileformat) {
+    public boolean isThisType(FileFormat fileformat) {
         return (fileformat instanceof FitsFile);
     }
 
@@ -96,7 +96,7 @@ public class FitsFile extends FileFormat
      * @return true if the given file is an Fits file; otherwise returns false.
      */
     @Override
-	public boolean isThisType(String filename)
+    public boolean isThisType(String filename)
     {
         boolean is_fits = false;
         RandomAccessFile raf = null;
@@ -146,15 +146,15 @@ public class FitsFile extends FileFormat
      * @see ncsa.hdf.object.FileFormat@createInstance(java.lang.String, int)
      */
     @Override
-	public FileFormat createInstance(String filename, int access) 
-							  throws Exception {
+    public FileFormat createInstance(String filename, int access) 
+                              throws Exception {
         return new FitsFile(filename);
     }
 
 
     // Implementing FileFormat
     @Override
-	public int open() throws Exception {
+    public int open() throws Exception {
         if (!isFileOpen) {
             isFileOpen = true;
             rootNode = loadTree();
@@ -168,16 +168,16 @@ public class FitsFile extends FileFormat
         long[] oid = {0};
         FitsGroup rootGroup = new FitsGroup(
             this,
-            getName(), // set the node name to the file name
+            "/",
             null, // root node does not have a parent path
             null, // root node does not have a parent node
             oid);
 
         DefaultMutableTreeNode root = new DefaultMutableTreeNode(rootGroup) {
-        	public static final long serialVersionUID = HObject.serialVersionUID;
+            private static final long serialVersionUID = 5556789624491863365L;
 
             @Override
-			public boolean isLeaf() { return false; }
+            public boolean isLeaf() { return false; }
         };
 
         if (fitsFile == null) {
@@ -230,7 +230,7 @@ public class FitsFile extends FileFormat
 
     // Implementing FileFormat
     @Override
-	public void close() throws IOException {
+    public void close() throws IOException {
         if (fitsFile == null) {
             return;
         }
@@ -243,7 +243,7 @@ public class FitsFile extends FileFormat
 
     // Implementing FileFormat
     @Override
-	public TreeNode getRootNode() {
+    public TreeNode getRootNode() {
         return rootNode;
     }
 
@@ -253,14 +253,14 @@ public class FitsFile extends FileFormat
 
     // implementign FileFormat
     @Override
-	public Group createGroup(String name, Group pgroup) throws Exception {
+    public Group createGroup(String name, Group pgroup) throws Exception {
         // not supported
         throw new UnsupportedOperationException("Unsupported operation for Fits.");
     }
 
     // implementign FileFormat
     @Override
-	public Datatype createDatatype(
+    public Datatype createDatatype(
         int tclass,
         int tsize,
         int torder,
@@ -271,7 +271,7 @@ public class FitsFile extends FileFormat
 
     // implementign FileFormat
     @Override
-	public Datatype createDatatype(
+    public Datatype createDatatype(
         int tclass,
         int tsize,
         int torder,
@@ -283,7 +283,7 @@ public class FitsFile extends FileFormat
 
     // implementign FileFormat
     @Override
-	public Dataset createScalarDS(
+    public Dataset createScalarDS(
         String name,
         Group pgroup,
         Datatype type,
@@ -291,6 +291,7 @@ public class FitsFile extends FileFormat
         long[] maxdims,
         long[] chunks,
         int gzip,
+        Object fillValue,
         Object data) throws Exception {
         // not supported
         throw new UnsupportedOperationException("Unsupported operation.");
@@ -298,7 +299,7 @@ public class FitsFile extends FileFormat
 
     // implementign FileFormat
     @Override
-	public Dataset createImage(
+    public Dataset createImage(
         String name,
         Group pgroup,
         Datatype type,
@@ -315,14 +316,14 @@ public class FitsFile extends FileFormat
 
     // implementign FileFormat
     @Override
-	public void delete(HObject obj) throws Exception {
+    public void delete(HObject obj) throws Exception {
         // not supported
         throw new UnsupportedOperationException("Unsupported operation.");
     }
 
     // implementign FileFormat
     @Override
-	public TreeNode copy(HObject srcObj, Group dstGroup, String dstName) throws Exception {
+    public TreeNode copy(HObject srcObj, Group dstGroup, String dstName) throws Exception {
         // not supported
         throw new UnsupportedOperationException("Unsupported operation.");
     }
@@ -372,7 +373,7 @@ public class FitsFile extends FileFormat
      * @return true if successful and false otherwise.
      */
     @Override
-	public void writeAttribute(HObject obj, ncsa.hdf.object.Attribute attr,
+    public void writeAttribute(HObject obj, ncsa.hdf.object.Attribute attr,
         boolean attrExisted) throws Exception {
         // not supported
         throw new UnsupportedOperationException("Unsupported operation.");
@@ -382,7 +383,7 @@ public class FitsFile extends FileFormat
      *  Returns the version of the library.
      */
     @Override
-	public String getLibversion()
+    public String getLibversion()
     {
         String ver = "Fits Java (version 2.4)";
 
@@ -391,7 +392,7 @@ public class FitsFile extends FileFormat
 
     // implementing FileFormat
     @Override
-	public HObject get(String path) throws Exception
+    public HObject get(String path) throws Exception
     {
         throw new UnsupportedOperationException("get() is not supported");
     }

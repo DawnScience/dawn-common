@@ -50,6 +50,11 @@ package ncsa.hdf.object;
  */
 public abstract class CompoundDS extends Dataset {
     /**
+     * 
+     */
+    private static final long serialVersionUID = -4880399929644095662L;
+
+    /**
      * A single character to separate the names of nested compound fields. An
      * extended ASCII character, 0x95, is used to avoid common characters in
      * compound names.
@@ -144,7 +149,7 @@ public abstract class CompoundDS extends Dataset {
      *             Using {@link #CompoundDS(FileFormat, String, String)}
      */
     @Deprecated
-	public CompoundDS(FileFormat theFile, String name, String path, long[] oid) {
+    public CompoundDS(FileFormat theFile, String name, String path, long[] oid) {
         super(theFile, name, path, oid);
 
         numberOfMembers = 0;
@@ -375,8 +380,8 @@ public abstract class CompoundDS extends Dataset {
      * @deprecated Not implemented for compound dataset.
      */
     @Deprecated
-	@Override
-	public Dataset copy(Group pgroup, String name, long[] dims, Object data)
+    @Override
+    public Dataset copy(Group pgroup, String name, long[] dims, Object data)
             throws Exception {
         throw new UnsupportedOperationException(
                 "Writing a subset of a compound dataset to a new dataset is not implemented.");
