@@ -312,7 +312,7 @@ public class ROIEditTable  {
 			
 		} else if (roi instanceof PolylineROI) {
 			final PolylineROI pr = (PolylineROI)roi;
-			for (int i = 0; i < pr.getSides(); i++) {
+			for (int i = 0, imax = pr.getNumberOfPoints(); i < imax; i++) {
 				ret.add(new RegionRow("Point "+(i+1)+"  (x,y)", "pixel", pr.getPointX(i), pr.getPointY(i)));
 			}
 			
@@ -343,7 +343,7 @@ public class ROIEditTable  {
 			ret.add(new RegionRow("Rotation (°)",             "°",     er.getAngleDegrees(), Double.NaN));
 			if (er instanceof EllipticalFitROI) {
 				final PolylineROI pr = ((EllipticalFitROI) er).getPoints();
-				for (int i = 0; i < pr.getSides(); i++) {
+				for (int i = 0, imax = pr.getNumberOfPoints(); i < imax; i++) {
 					ret.add(new RegionRow("Point "+(i+1)+"  (x,y)", "pixel", pr.getPointX(i), pr.getPointY(i)));
 				}
 			}

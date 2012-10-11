@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.dawb.common.ui.plot.axis.ICoordinateSystem;
 import org.eclipse.draw2d.ColorConstants;
-import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.MouseListener;
 import org.eclipse.draw2d.MouseMotionListener;
 import org.eclipse.swt.graphics.Color;
@@ -150,8 +149,10 @@ public interface IRegion {
 	public enum RegionType {
 		LINE("Line",               ColorConstants.cyan),
 		POLYLINE("Polyline",       ColorConstants.cyan),
+		POLYGON("Polygon",         ColorConstants.cyan),
 		BOX("Box",                 ColorConstants.green),
 		RING("Ring",               darkYellow), 
+		CIRCLE("Circle",           darkYellow), 
 		XAXIS("X-Axis",            ColorConstants.blue), 
 		YAXIS("Y-Axis",            ColorConstants.blue), 
 		SECTOR("Sector",           ColorConstants.red),
@@ -159,7 +160,7 @@ public interface IRegion {
 		YAXIS_LINE("Y-Axis Line",  ColorConstants.blue), 
 		FREE_DRAW("Free draw",     darkYellow),
 		POINT("Point",             darkMagenta),
-//		ELLIPSE("Ellipse",         ColorConstants.lightGreen),
+		ELLIPSE("Ellipse",         ColorConstants.lightGreen),
 		ELLIPSEFIT("Ellipse fit",  ColorConstants.lightGreen);
 
 		private String name;
