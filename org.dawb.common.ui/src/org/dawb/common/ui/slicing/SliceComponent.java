@@ -25,6 +25,8 @@ import org.dawb.common.services.ImageServiceBean.ImageOrigin;
 import org.dawb.common.ui.Activator;
 import org.dawb.common.ui.DawbUtils;
 import org.dawb.common.ui.components.cell.ScaleCellEditor;
+import org.dawb.common.ui.menu.CheckableActionGroup;
+import org.dawb.common.ui.menu.MenuAction;
 import org.dawb.common.ui.plot.IPlottingSystem;
 import org.dawb.common.ui.plot.PlotType;
 import org.dawb.common.ui.plot.trace.IImageTrace;
@@ -41,7 +43,10 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider;
@@ -58,7 +63,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTError;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.CLabel;
-import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -66,19 +70,17 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Scale;
+import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
-import org.eclipse.ui.progress.UIJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -106,20 +108,19 @@ public class SliceComponent {
 	private SliceObject     sliceObject;
 	private int[]           dataShape;
 	private IPlottingSystem plottingSystem;
-	private boolean         autoUpdate=true;
 
 	private TableViewer     viewer;
 	private DimsDataList    dimsDataList;
 
 	private CLabel          errorLabel, explain;
-	private Button          updateAutomatically;
 	private Composite       area;
 	private boolean         isErrorCondition=false;
     private SliceJob        sliceJob;
     private String          sliceReceiverId;
-    private CCombo          editorCombo;
+     
+    private PlotType        plotType=PlotType.IMAGE;
+    private Action          updateAutomatically;
 
-	private PlotType imagePlotType = PlotType.IMAGE; // Could also be PlotType.PT1D_MULTI
 	private ITraceListener.Stub traceListener;
 	
 	/**
@@ -150,11 +151,11 @@ public class SliceComponent {
 		final GridData eData = new GridData(SWT.FILL, SWT.CENTER, true, false);
 		eData.heightHint=44;
 		explain.setLayoutData(eData);
-
-		final Composite top = new Composite(area, SWT.NONE);
-		top.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
-		top.setLayout(new GridLayout(2, false));
 	
+		final ToolBarManager toolMan = createSliceActions();
+		final ToolBar        tool    = toolMan.createControl(area);
+		tool.setLayoutData(new GridData(SWT.RIGHT, SWT.TOP, true, false));
+		
 		this.viewer = new TableViewer(area, SWT.FULL_SELECTION | SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
 		viewer.getTable().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		viewer.getTable().addListener(SWT.MouseDoubleClick, new Listener() {
@@ -180,67 +181,14 @@ public class SliceComponent {
 		viewer.setCellModifier(createModifier(viewer));
 			
 		
-		this.errorLabel = new CLabel(area, SWT.NONE);
+		this.errorLabel = new CLabel(area, SWT.WRAP);
 		errorLabel.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false));
 		errorLabel.setImage(Activator.getImageDescriptor("icons/error.png").createImage());
 		GridUtils.setVisible(errorLabel,         false);
 		
 		final Composite bottom = new Composite(area, SWT.NONE);
 		bottom.setLayout(new GridLayout(4, false));
-		bottom.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, true));
-		
-		final Label label = new Label(bottom, SWT.NONE);
-		label.setText("Edit slice with");
-		label.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
-		
-		this.editorCombo = new CCombo(bottom, SWT.READ_ONLY|SWT.BORDER);
-		editorCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-		editorCombo.setText("Slice editor");
-		editorCombo.setItems(new String[]{"Sliding scale", "Slice index"});// Later "Range"
-		editorCombo.select(0);
-		editorCombo.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				
-				final boolean editing = viewer.isCellEditorActive();
-				final Object edit = ((StructuredSelection)viewer.getSelection()).getFirstElement();
-				
-				final CellEditor[] editors = viewer.getCellEditors();
-				if (editorCombo.getSelectionIndex()==0) {
-					editors[2] = scaleEditor;
-				} else if (editorCombo.getSelectionIndex()==1) {
-					editors[2] = spinnerEditor;
-				}
-				if (editing) {
-					viewer.cancelEditing();
-					viewer.editElement(edit, 2);
-				}
-			}
-		});
-
-		this.updateAutomatically = new Button(bottom, SWT.CHECK);
-		updateAutomatically.setText("Update");
-		updateAutomatically.setToolTipText("Update plot when slice changes");
-		updateAutomatically.setSelection(true);
-		updateAutomatically.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false));
-		updateAutomatically.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				autoUpdate = updateAutomatically.getSelection();
-				slice(false);
-			}
-		});
-		
-		
-		Button openGallery = new Button(bottom, SWT.NONE);
-		openGallery.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false));
-		openGallery.setToolTipText("Open data set in a gallery.");
-		openGallery.setImage(Activator.getImageDescriptor("icons/imageStack.png").createImage());
-		openGallery.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				openGallery();
-			}
-		});
-				
+		bottom.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, true));					
 
 		// Something to tell them their image orientation (X and Y may be mixed up!)
 		if (plottingSystem!=null) {
@@ -288,10 +236,122 @@ public class SliceComponent {
 			}
 		});
 		viewer.setInput(new Object());
+		
+		toolMan.update(true);
     	
 		return area;
 	}
 	
+	private Map<PlotType, Action> plotTypeActions;
+	/**
+	 * Creates the actions for 
+	 * @return
+	 */
+	private ToolBarManager createSliceActions() {
+
+		plotTypeActions= new HashMap<PlotType, Action>();
+		
+		final ToolBarManager man = new ToolBarManager(SWT.FLAT|SWT.RIGHT);
+		man.add(new Separator("group1"));
+		
+        final CheckableActionGroup grp = new CheckableActionGroup();
+        final Action xyPlot = new Action("Slice as line plots", IAction.AS_CHECK_BOX) {
+        	public void run() {
+        		plotType = PlotType.PT1D;
+        		// Loop over DimsData to ensure 1X only.
+        		if (dimsDataList!=null) dimsDataList.setSingleAxisOnly(0);   		
+        		plottingTypeChanged();
+        	}
+		};
+		man.add(xyPlot);
+		xyPlot.setImageDescriptor(Activator.getImageDescriptor("icons/TraceLine.png"));
+		grp.add(xyPlot);
+		plotTypeActions.put(PlotType.PT1D, xyPlot);
+		
+        final Action imagePlot = new Action("Slice as images", IAction.AS_CHECK_BOX) {
+        	public void run() {
+        		plotType = PlotType.IMAGE;
+        		if (dimsDataList!=null) dimsDataList.setTwoAxisOnly(0, 1);   		
+        		viewer.refresh();
+        		plottingTypeChanged();
+        	}
+		};
+		man.add(imagePlot);
+		imagePlot.setImageDescriptor(Activator.getImageDescriptor("icons/TraceImage.png"));
+		grp.add(imagePlot);
+		plotTypeActions.put(PlotType.IMAGE, imagePlot);
+		man.add(new Separator("group2"));
+		
+		this.updateAutomatically = new Action("Update plot when slice changes", IAction.AS_CHECK_BOX) {
+			public void run() {
+				slice(false);
+			}
+		};
+		updateAutomatically.setToolTipText("Update plot when slice changes");
+		updateAutomatically.setChecked(true);
+		updateAutomatically.setImageDescriptor(Activator.getImageDescriptor("icons/refresh.png"));
+		man.add(updateAutomatically);
+		
+		man.add(new Separator("group3"));
+		Action openGallery = new Action("Open data set in a gallery.\nFor instance a gallery of images.", Activator.getImageDescriptor("icons/imageStack.png")) {
+			public void run() {
+				openGallery();
+			}
+		};
+		man.add(openGallery);
+		man.add(new Separator("group4"));
+
+		final CheckableActionGroup grp2 = new CheckableActionGroup();
+		final MenuAction editorMenu = new MenuAction("Edit the slice with different editors.");
+		man.add(editorMenu);
+		editorMenu.setImageDescriptor(Activator.getImageDescriptor("icons/spinner_buttons.png"));
+		
+		final Action asScale = new Action("Sliding Scale", IAction.AS_CHECK_BOX) {
+			public void run () {
+				updateSliceEditor(0);
+			}
+		};
+		grp2.add(asScale);
+		asScale.setChecked(true);
+		editorMenu.add(asScale);
+		
+		final Action asSpinner = new Action("Slice index", IAction.AS_CHECK_BOX) {
+			public void run () {
+				updateSliceEditor(1);
+			}
+		};
+		grp2.add(asSpinner);
+		editorMenu.add(asSpinner);
+
+		return man;
+	}
+	
+	public void updateSliceEditor(int index) {
+		final boolean editing = viewer.isCellEditorActive();
+		final Object edit = ((StructuredSelection)viewer.getSelection()).getFirstElement();
+		
+		final CellEditor[] editors = viewer.getCellEditors();
+		if (index==0) {
+			editors[2] = scaleEditor;
+		} else if (index==1) {
+			editors[2] = spinnerEditor;
+		}
+		if (editing) {
+			viewer.cancelEditing();
+			viewer.editElement(edit, 2);
+		}
+
+	}
+	
+	private void plottingTypeChanged() {
+		viewer.refresh();
+		
+		// Save preference
+		Activator.getDefault().getPreferenceStore().setValue(SliceConstants.PLOT_CHOICE, plotType.toString());
+   		boolean isOk = updateErrorLabel();
+   		if (isOk) slice(true);
+   	}
+
 	private void setImageOrientationText(final StyledText text) {
 		try {
 			text.setText("");
@@ -299,13 +359,14 @@ public class SliceComponent {
 			final IImageTrace trace  = (IImageTrace)plottingSystem.getTraces(IImageTrace.class).iterator().next();
             final ImageOrigin io     = trace.getImageOrigin();
             text.append(io.getLabel());
+            /*  Might be need if users get confused.
             if (io==ImageOrigin.TOP_LEFT || io==ImageOrigin.BOTTOM_RIGHT) {
             	String reverseLabel = "    (X and Y are reversed)";
             	int len = text.getText().length();
             	text.append(reverseLabel);
                 text.setStyleRange(new StyleRange(len, reverseLabel.length(), null, null, SWT.BOLD));
             }
-
+            */
 		} catch (Exception ne) {
 			text.setStyleRange(null);
 			text.setText("");
@@ -421,12 +482,18 @@ public class SliceComponent {
 			}
 			
 		}
+		
+		if (dimsDataList!=null) {
+			plotType = dimsDataList.getAxisCount()>1 ? PlotType.IMAGE : PlotType.PT1D;
+			plotTypeActions.get(plotType).setChecked(true);
+		}
+
 	}
 
-	private LabelJob labelJob;
 	/**
 	 * Method ensures that one x and on y are defined.
 	 * @param data
+	 * @return true if no error
 	 */
 	protected boolean synchronizeSliceData(final DimsData data) {
 				
@@ -437,43 +504,49 @@ public class SliceComponent {
 			if (dimsDataList.getDimsData(i).getAxis()==usedAxis) dimsDataList.getDimsData(i).setAxis(-1);
 		}
 		
+		Display.getCurrent().syncExec(new Runnable() {
+			public void run() {
+		        updateErrorLabel();
+			}
+		});
+		return !errorLabel.isVisible();
+	}
+	
+	/**
+	 * returns true if there is no error
+	 * @return
+	 */
+	private boolean updateErrorLabel() {
+				
 		boolean isX = false;
 		for (int i = 0; i < dimsDataList.size(); i++) {
 			if (dimsDataList.getDimsData(i).getAxis()==0) isX = true;
 		}
-
-        if (labelJob == null) labelJob = new LabelJob();
-		labelJob.update(isX);
-		
-		return isX;
-	}
-	
-	private class LabelJob extends UIJob {
-
-		private boolean isX;
-
-		public LabelJob() {
-			super("");
-		}
-		
-		public void update(boolean isX) {
-			cancel();
-			this.isX = isX;
-			schedule();
+		boolean isY = false;
+		for (int i = 0; i < dimsDataList.size(); i++) {
+			if (dimsDataList.getDimsData(i).getAxis()==1) isY = true;
 		}
 
-		@Override
-		public IStatus runInUIThread(IProgressMonitor monitor) {
-			if (!isX) {
-				errorLabel.setText("Please set a X axis.");
-			}
-			GridUtils.setVisible(errorLabel,         !(isX));
-			isErrorCondition = errorLabel.isVisible();
-			GridUtils.setVisible(updateAutomatically, (isX&&plottingSystem!=null));
-			errorLabel.getParent().layout(new Control[]{errorLabel,updateAutomatically});
-			return Status.OK_STATUS;
+		String errorMessage = "";
+		boolean ok = false;
+		if (plotType.is1D()) {
+			ok = isX;
+			errorMessage = "Please set an X axis.";
+		} else {
+			ok = isX&&isY;
+			errorMessage = "Please set an X and Y axis or switch to 'Slice as line plot'.";
 		}
 		
+		
+		if (!ok) {
+			errorLabel.setText(errorMessage);
+		}
+		GridUtils.setVisible(errorLabel,         !(ok));
+		isErrorCondition = errorLabel.isVisible();
+		updateAutomatically.setEnabled(ok&&plottingSystem!=null);
+		errorLabel.getParent().layout(new Control[]{errorLabel});
+
+		return ok;
 	}
 
 	private ICellModifier createModifier(final TableViewer viewer) {
@@ -499,10 +572,14 @@ public class SliceComponent {
 			public void modify(Object item, String property, Object value) {
 
 				final DimsData data  = (DimsData)((IStructuredSelection)viewer.getSelection()).getFirstElement();
+				if (data==null) return;
+				
 				final int       col   = COLUMN_PROPERTIES.indexOf(property);
 				if (col==0) return;
 				if (col==1) {
-					data.setAxis((Integer)value);
+					int axis = (Integer)value;
+					if (plotType.is1D()) axis = axis>-1 ? 0 : -1;
+					data.setAxis(axis);
 					updateAxesChoices();
 				}
 				if (col==2) {
@@ -511,13 +588,7 @@ public class SliceComponent {
 					} else {
 						data.setSliceRange((String)value);
 					}
-				}
-				if (col==2) {
-					if (value instanceof Integer) {
-						data.setSlice((Integer)value);
-					} else {
-						data.setSliceRange((String)value);
-					}
+					// If there is only one other axis, set it to X
 				}
 				if (col==3) {
 					final int idim  = data.getDimension()+1;
@@ -589,6 +660,22 @@ public class SliceComponent {
 			protected int getDoubleClickTimeout() {
 				return 0;
 			}	
+
+			public void activate() {
+				String[] items = null;
+				if (plotType.is1D()) {
+					items = new String[]{"X","(Slice)"};
+				} else {
+					if (isReversedImage()) {
+						items = new String[]{"Y","X","(Slice)"};
+					} else {
+						items = new String[]{"X","Y","(Slice)"};
+					}
+				}
+				setItems(items);
+				super.activate();
+			}
+
 		};
 		final CCombo combo = ((CComboCellEditor)editors[1]).getCombo();
 		combo.addModifyListener(new ModifyListener() {
@@ -724,8 +811,7 @@ public class SliceComponent {
 				ret.append((data.getDimension()+1)+"");
 				break;
 			case 1:
-				final int axis = data.getAxis();
-				ret.append( axis==0 ? "X" : axis==1 ? "Y" : "(Slice)" );
+				ret.append( getAxisLabel(data) );
 				break;
 			case 2:
 				if (data.getSliceRange()!=null) {
@@ -793,11 +879,25 @@ public class SliceComponent {
 		slice(true);
 		
 		if (plottingSystem==null) {
-			GridUtils.setVisible(updateAutomatically, false);
+			updateAutomatically.setEnabled(false);
 			viewer.getTable().getColumns()[2].setText("Start Index or Slice Range");
 		}
 	}
 	
+	public String getAxisLabel(DimsData data) {
+
+		if (plotType.is1D()) {
+			return data.getAxis()>-1 ? "X" : "(Slice)";
+		}
+		final int axis = data.getAxis();
+		if (plottingSystem!=null) {
+			if (isReversedImage()) {
+				return axis==0 ? "Y" : axis==1 ? "X" : "(Slice)";				
+			}
+		}
+		return axis==0 ? "X" : axis==1 ? "Y" : "(Slice)";
+	}
+
 
 	protected boolean isReversedImage() {
 		try {
@@ -820,7 +920,7 @@ public class SliceComponent {
 	public void slice(final boolean force) {
 		
 		if (!force) {
-		    if (!autoUpdate) return;
+		    if (updateAutomatically!=null && !updateAutomatically.isChecked()) return;
 		}
 
 		final SliceObject cs = SliceUtils.createSliceObject(dimsDataList, dataShape, sliceObject);
@@ -846,7 +946,9 @@ public class SliceComponent {
 		XMLEncoder encoder=null;
 		try {
 			encoder = new XMLEncoder(new FileOutputStream(lastSettings));
-			for (int i = 0; i < dimsDataList.size(); i++) encoder.writeObject(dimsDataList.getDimsData(i));
+			if (dimsDataList!=null) {
+				for (int i = 0; i < dimsDataList.size(); i++) encoder.writeObject(dimsDataList.getDimsData(i));
+			}
 		} catch (Exception ne) {
 			logger.error("Cannot save slice data from last settings!", ne);
 		} finally  {
@@ -903,10 +1005,6 @@ public class SliceComponent {
 		viewer.refresh();
 	}
 
-	public void setImagePlotType(PlotType pt) {
-		this.imagePlotType  = pt;
-	}
-
 	private class SliceJob extends Job {
 		
 		private SliceObject slice;
@@ -922,19 +1020,10 @@ public class SliceComponent {
 			try {
 				monitor.worked(1);
 				if (monitor.isCanceled()) return Status.CANCEL_STATUS;
-				
-				PlotType type = PlotType.PT1D;
-				if (slice.getAxes().size()==1) {
-					type = PlotType.PT1D;
-				} else  if (slice.getAxes().size()==2) {
-					type = imagePlotType;
-				} else {
-					throw new Exception("Only 1D and images supported currently!");
-				}
-				
+			
 				SliceUtils.plotSlice(slice, 
 						             dataShape, 
-						             type, 
+						             plotType, 
 						             plottingSystem, 
 						             monitor);
 			} catch (Exception e) {

@@ -174,6 +174,7 @@ public class DimsDataList implements Serializable {
 	}
 	
 	public int getAxisCount() {
+		if (dimsData==null) return -1;
 		int count = 0;
 		for (DimsData dd : dimsData) {
 			if (dd.getAxis()>-1) count++;
@@ -183,5 +184,121 @@ public class DimsDataList implements Serializable {
 
 	public boolean is2D() {
 		return getAxisCount()==2;
+	}
+	
+	public DimsDataList clone() {
+		final DimsDataList clone = new DimsDataList();
+		for (DimsData dd : getDimsData()) {
+			DimsData dnew = dd.clone();
+			add(dnew);
+		}
+		return clone;
+	}
+
+	/**
+	 * Sets any axes there are to  the axis passed in
+	 */
+	public void normalise(int iaxis) {
+		for (DimsData dd : getDimsData()) {
+			if (dd.getAxis()>-1) dd.setAxis(iaxis);
+		}
+	}
+
+	/**
+	 * Probably not best algorithm but we are dealing with very small arrays here.
+	 * 
+	 * @param iaxisToSet
+	 */
+	public void setSingleAxisOnly(int iaxisToSet) {
+		boolean foundAxis = false;
+		for (DimsData dd : getDimsData()) {
+			if (dd.getAxis()==iaxisToSet) {
+				foundAxis = true;
+			}
+		}
+		
+		if (foundAxis) {
+			for (DimsData dd : getDimsData()) {
+				if (dd.getAxis()==iaxisToSet) continue;
+				dd.setAxis(-1);
+			}
+			return;
+		} else { // We have to decide which of the others is x
+			
+			for (DimsData dd : getDimsData()) {
+				if (dd.getAxis()>-1) {
+				    dd.setAxis(iaxisToSet);
+				    break;
+				}
+			}
+			for (DimsData dd : getDimsData()) {
+				if (dd.getAxis()==iaxisToSet) continue;
+				dd.setAxis(-1);
+			}
+		}
+	}
+
+	public void setTwoAxisOnly(int firstAxis, int secondAxis) {
+		boolean foundFirst = false, foundSecond = false;
+		for (DimsData dd : getDimsData()) {
+			if (dd.getAxis()==firstAxis)  foundFirst  = true;
+			if (dd.getAxis()==secondAxis) foundSecond = true;
+		}
+		
+		if (foundFirst&&foundSecond) {
+			for (DimsData dd : getDimsData()) {
+				if (dd.getAxis()==firstAxis)  continue;
+				if (dd.getAxis()==secondAxis) continue;
+				dd.setAxis(-1);
+			}
+			return;
+		} else { // We have to decide which of the others is first and second
+			
+			if (!foundFirst) {
+				for (DimsData dd : getDimsData()) {
+					if (dd.getAxis()>-1 && dd.getAxis()!=secondAxis) {
+					    dd.setAxis(firstAxis);
+					    foundFirst = true;
+					    break;
+					}
+				}	
+				if (!foundFirst) {
+					for (DimsData dd : getDimsData()) {
+						if (dd.getAxis()!=secondAxis) {
+						    dd.setAxis(firstAxis);
+						    foundFirst = true;
+						    break;
+						}
+					}						
+				}
+			}
+			if (!foundSecond) {
+				for (DimsData dd : getDimsData()) {
+					if (dd.getAxis()>-1 && dd.getAxis()!=firstAxis) {
+					    dd.setAxis(secondAxis);
+					    foundSecond = true;
+					    break;
+					}
+				}	
+				if (!foundSecond) {
+					for (DimsData dd : getDimsData()) {
+						if (dd.getAxis()!=firstAxis) {
+						    dd.setAxis(secondAxis);
+						    foundSecond = true;
+						    break;
+						}
+					}	
+				}
+			}
+			
+			for (DimsData dd : getDimsData()) {
+				if (dd.getAxis()==firstAxis)  continue;
+				if (dd.getAxis()==secondAxis) continue;
+				dd.setAxis(-1);
+			}
+			return;
+				
+		}
+		
 	}
 }

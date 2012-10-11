@@ -165,4 +165,14 @@ public class DimsData implements Serializable {
 		return ret;
 	}
 
+	
+	public DimsData clone() {
+		final DimsData clone = new DimsData();
+		clone.sliceRange = this.sliceRange;
+
+		clone.dimension  = this.dimension;
+		clone.axis       = this.axis;
+		clone.slice      = this.slice;
+        return clone;
+	}
 }
