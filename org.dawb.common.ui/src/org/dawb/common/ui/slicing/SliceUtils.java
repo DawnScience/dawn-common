@@ -15,17 +15,13 @@ import java.util.List;
 
 import ncsa.hdf.object.Group;
 
-import org.dawb.common.services.ImageServiceBean.ImageOrigin;
 import org.dawb.common.ui.monitor.ProgressMonitorWrapper;
 import org.dawb.common.ui.plot.IPlottingSystem;
 import org.dawb.common.ui.plot.PlotType;
-import org.dawb.common.ui.plot.trace.IImageTrace;
 import org.dawb.hdf5.HierarchicalDataFactory;
 import org.dawb.hdf5.IHierarchicalDataFile;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -218,8 +214,8 @@ public class SliceUtils {
 			plottingSystem.createPlot1D(ys.get(0), ys, monitor);
 
 		} else {
-			AbstractDataset y = getNexusAxis(currentSlice, slice.getShape()[1], currentSlice.getX()+1, true, monitor);
-			AbstractDataset x = getNexusAxis(currentSlice, slice.getShape()[0], currentSlice.getY()+1, true, monitor);		
+			AbstractDataset y = getNexusAxis(currentSlice, slice.getShape()[0], currentSlice.getX()+1, true, monitor);
+			AbstractDataset x = getNexusAxis(currentSlice, slice.getShape()[1], currentSlice.getY()+1, true, monitor);		
 			plottingSystem.updatePlot2D(slice, Arrays.asList(x,y), monitor);
 			plottingSystem.repaint();
  			
@@ -252,7 +248,10 @@ public class SliceUtils {
 			final Group  group    = file.getParent(currentSlice.getName());
 			final String fullName = group.getFullName()+"/"+axisName;
 			AbstractDataset axis = LoaderFactory.getDataSet(currentSlice.getPath(), fullName, new ProgressMonitorWrapper(monitor));
-		    axis.setName(axisName);
+			axis = axis.squeeze();
+			final String unit = file.getAttributeValue(fullName+"@unit");
+			if (unit!=null) axisName = axisName+" "+unit;
+			axis.setName(axisName);
 		    return axis;
 		} catch (Throwable ne) {
 			logger.error("Cannot get nexus axis during slice!", ne);

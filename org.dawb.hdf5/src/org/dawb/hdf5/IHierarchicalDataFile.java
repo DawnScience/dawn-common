@@ -149,6 +149,17 @@ public interface IHierarchicalDataFile {
 	public void setNexusAttribute(final HObject object, final String attribute) throws Exception;
 
 	/**
+	 * Set an integer attribute on an HObject, useful for nexus signal and axis calls.
+	 * Does not overwrite the value if it is already set.
+	 * 
+	 * @param entry
+	 * @param name
+	 * @param value
+	 * @throws Exception
+	 */
+	public void setIntAttribute(final HObject   entry, final String    name, final int       value) throws Exception;
+	
+	/**
 	 * This method returns the dataset axes for a given signal node. The nexus path must be the path
 	 * to the signal
 	 * 

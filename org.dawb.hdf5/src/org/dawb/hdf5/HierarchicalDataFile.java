@@ -529,6 +529,13 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 	}
 
 	@Override
+	public void setIntAttribute(final HObject   entry,
+					           final String    name,
+					           final int       value) throws Exception {
+		NexusUtils.setIntAttribute(file, entry, NexusUtils.SIGNAL, value);
+	}
+	
+	@Override
 	public void setNexusAttribute(HObject object, String attribute) throws Exception {
 		NexusUtils.setNexusAttribute(file, object, attribute);
 	}

@@ -14,9 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.dawb.hdf5.HierarchicalDataFactory;
-import org.dawb.hdf5.IHierarchicalDataFile;
-
 import ncsa.hdf.object.Attribute;
 import ncsa.hdf.object.Dataset;
 import ncsa.hdf.object.Datatype;
@@ -24,6 +21,9 @@ import ncsa.hdf.object.FileFormat;
 import ncsa.hdf.object.Group;
 import ncsa.hdf.object.HObject;
 import ncsa.hdf.object.h5.H5Datatype;
+
+import org.dawb.hdf5.HierarchicalDataFactory;
+import org.dawb.hdf5.IHierarchicalDataFile;
 
 /**
  * Class used to mark groups in the hdf5 tree with nexus attributes.
@@ -35,12 +35,12 @@ import ncsa.hdf.object.h5.H5Datatype;
  */
 public class NexusUtils {
 
-	private static String NXCLASS = "NX_class";	
-	
-	private static String AXIS   = "axis";	
-	private static String LABEL  = "label";	
-	private static String PRIM   = "primary";	
-	private static String UNIT   = "unit";	
+	public static final String NXCLASS = "NX_class";	
+	public static final String AXIS    = "axis";	
+	public static final String LABEL   = "label";	
+	public static final String PRIM    = "primary";	
+	public static final String SIGNAL  = "signal";	
+	public static final String UNIT    = "unit";	
 
 	/**
 	 * Sets the nexus attribute so that if something is looking for them,
@@ -71,6 +71,50 @@ public class NexusUtils {
 	        Datatype attrType = new H5Datatype(Datatype.CLASS_STRING, classValue[0].length()+1, -1, -1);
 	        Attribute attr = new Attribute(NXCLASS, attrType, new long[]{1});
 	        attr.setValue(classValue);
+			
+	        file.writeAttribute(entry, attr, false);
+
+	        if (entry instanceof Group) {
+	        	attrList.add(attr);
+				((Group)entry).writeMetadata(attrList);
+	        } else if (entry instanceof Dataset) {
+	        	attrList.add(attr);
+				((Dataset)entry).writeMetadata(attrList);
+	        }
+		        
+		    
+		} finally {
+			entry.close(id);
+		}
+	}
+
+	/**
+	 * Does not replace the attribute if it exists
+	 * @param file
+	 * @param entry
+	 * @param name
+	 * @param value
+	 * @throws Exception
+	 */
+	public static void setIntAttribute(final FileFormat file, 
+							           final HObject   entry,
+							           final String    name,
+							           final int       value) throws Exception {
+
+		
+		final List attrList = entry.getMetadata();
+		if (attrList!=null) for (Object object : attrList) {
+			if (object instanceof Attribute) {
+				final Attribute a      = (Attribute)object;
+				if (name.equals(a.getName())) return;
+			}
+		}
+		
+		final int id = entry.open();
+		try {
+	        Datatype attrType = new H5Datatype(Datatype.CLASS_INTEGER, 1, -1, -1);
+	        Attribute attr = new Attribute(name, attrType, new long[]{1});
+	        attr.setValue(new int[]{value});
 			
 	        file.writeAttribute(entry, attr, false);
 
@@ -119,6 +163,7 @@ public class NexusUtils {
 			
 			Dataset axis = null;
 			int     pos  = -1;
+			boolean isSignal = false;
 			for (Object object : att) {
 				if (object instanceof Attribute) {
 					Attribute attribute = (Attribute)object;
@@ -128,13 +173,19 @@ public class NexusUtils {
 						
 					} else if (PRIM.equals(attribute.getName())) {
 						pos = getAttributeIntValue(attribute);
+					} else if (SIGNAL.equals(attribute.getName())) {
+						isSignal = true;
+						axis     = null;
+						pos      = -1;
+						break;
 					}
 				}
 			}
 			
 			// Add any the same shape as this dimension
+			// providing that they are not signals
 			// Some nexus files set axis wrong
-			if (axis==null) {
+			if (axis==null && !isSignal) {
 				final long[] dims = ((Dataset)hObject).getDims();
 				if (dims[0]==size) {
 					axis = (Dataset)hObject;

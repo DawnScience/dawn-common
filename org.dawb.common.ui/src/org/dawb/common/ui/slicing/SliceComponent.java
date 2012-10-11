@@ -122,6 +122,7 @@ public class SliceComponent {
     private Action          updateAutomatically;
 
 	private ITraceListener.Stub traceListener;
+	private IAction dataReductionAction;
 	
 	/**
 	 * 1 is first dimension, map of names available for axis, including indices.
@@ -322,6 +323,11 @@ public class SliceComponent {
 		};
 		grp2.add(asSpinner);
 		editorMenu.add(asSpinner);
+		
+		if (dataReductionAction!=null) {
+			man.add(new Separator("group5"));
+			man.add(dataReductionAction);
+		}
 
 		return man;
 	}
@@ -777,7 +783,7 @@ public class SliceComponent {
 		
 		final TableViewerColumn dim   = new TableViewerColumn(viewer, SWT.LEFT, 0);
 		dim.getColumn().setText("Dim");
-		dim.getColumn().setWidth(48);
+		dim.getColumn().setWidth(42);
 		dim.setLabelProvider(new DelegatingStyledCellLabelProvider(new SliceColumnLabelProvider(0)));
 		
 		final TableViewerColumn axis   = new TableViewerColumn(viewer, SWT.LEFT, 1);
@@ -787,12 +793,12 @@ public class SliceComponent {
 
 		final TableViewerColumn slice   = new TableViewerColumn(viewer, SWT.LEFT, 2);
 		slice.getColumn().setText("Slice Index");
-		slice.getColumn().setWidth(180);
+		slice.getColumn().setWidth(140);
 		slice.setLabelProvider(new DelegatingStyledCellLabelProvider(new SliceColumnLabelProvider(2)));
 		
 		final TableViewerColumn data   = new TableViewerColumn(viewer, SWT.LEFT, 3);
 		data.getColumn().setText("Axis Data");
-		data.getColumn().setWidth(160);
+		data.getColumn().setWidth(140);
 		data.setLabelProvider(new DelegatingStyledCellLabelProvider(new SliceColumnLabelProvider(3)));
 	}
 
@@ -821,7 +827,7 @@ public class SliceComponent {
 					ret.append( slice>-1 ? slice+"" : "" );
 				}
 				if (data.getAxis()<0 && !errorLabel.isVisible()) {
-					ret.append(new StyledString("        (click to change)", StyledString.QUALIFIER_STYLER));
+					ret.append(new StyledString(" (click to change)", StyledString.QUALIFIER_STYLER));
 				}
 				break;
 			case 3:
@@ -1041,5 +1047,9 @@ public class SliceComponent {
 			this.slice = cs;
 			schedule();
 		}	
+	}
+
+	public void setDataReductionAction(IAction dataReductionAction) {
+		this.dataReductionAction = dataReductionAction;
 	}
 }
