@@ -137,12 +137,12 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 		if (len == 0) return null;
 
 		// The last three indices of the palette are always taken up with bound colours
-		createCutColours(bean); // Modifys the palette data and sets the withheld indices
+		createCutColours(bean); // Modifies the palette data and sets the withheld indices
 		
 		float scale;
 		float maxPixel;
 		if (max > min) {
-			// 4 because 1 less than size and then 1 for each bound color is lost.
+			// 4 because 1 less than size and then 1 for each bound colour is lost.
 			scale = Float.valueOf(size-4) / (max - min);
 			maxPixel = max - min;
 		} else {
@@ -276,8 +276,8 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 	 */
 	private void createCutColours(ImageServiceBean bean) {
 		
-		// We *DO NOT* copy the palete here so up to 3 of the original
-		// colors can be changed. Instead whenever a palette is given to an
+		// We *DO NOT* copy the palette here so up to 3 of the original
+		// colours can be changed. Instead whenever a palette is given to an
 		// ImageService bean it should be original.
 		if (bean.getPalette()==null) {
 			try {
@@ -427,7 +427,7 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 	}
 
 	@Override
-	public Object create(Class serviceInterface, IServiceLocator parentLocator, IServiceLocator locator) {
+	public Object create(@SuppressWarnings("rawtypes") Class serviceInterface, IServiceLocator parentLocator, IServiceLocator locator) {
 		
 		if (serviceInterface==IImageService.class) {
 			return new ImageService();
