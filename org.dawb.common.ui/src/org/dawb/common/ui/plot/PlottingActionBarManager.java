@@ -193,22 +193,24 @@ public class PlottingActionBarManager implements IPlotActionSystem {
      	final Action    clear = new Action("Clear tool") {
 
 			public void run() {		
-    			
-    			final IToolPage old = system.getCurrentToolPage(role);
-    			
-    			final EmptyTool empty = system.getEmptyTool(role);
-    			system.setCurrentToolPage(empty);
-    			system.clearRegionTool();
-    			system.fireToolChangeListeners(new ToolChangeEvent(this, old, empty, system.getPart()));
-     			
-    			toolActions.setSelectedAction(this);
-    		}
+    			clearTool(role);
+    			toolActions.setSelectedAction(this);		
+			}
     	};
     	clear.setImageDescriptor(Activator.getImageDescriptor("icons/axis.png"));
     	clear.setToolTipText("Clear tool previously used if any.");
 	    toolActions.add(clear);
 
 	    return toolActions;
+	}
+	
+	protected void clearTool(ToolPageRole role) {
+		final IToolPage old = system.getCurrentToolPage(role);
+		
+		final EmptyTool empty = system.getEmptyTool(role);
+		system.setCurrentToolPage(empty);
+		system.clearRegionTool();
+		system.fireToolChangeListeners(new ToolChangeEvent(this, old, empty, system.getPart()));		
 	}
 	
 	/**
