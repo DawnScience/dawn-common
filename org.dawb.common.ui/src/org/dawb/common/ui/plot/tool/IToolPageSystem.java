@@ -17,7 +17,8 @@ public interface IToolPageSystem {
 	/**
 	 * Get the current tool page that the user would like to use.
 	 * Fitting, profile, derivative etc. Null if no selection has been made.
-	 * @return
+	 * @param role, may be null to get last used page.
+	 * @return tool page with may be EmptyTool or null
 	 */
 	public IToolPage getCurrentToolPage(ToolPageRole role);
 	

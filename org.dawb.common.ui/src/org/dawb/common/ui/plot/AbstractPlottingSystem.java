@@ -171,6 +171,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 		
 		if (currentToolPageMap!=null) currentToolPageMap.clear();
 		currentToolPageMap = null;
+		lastUsedToolPage   = null;
 	}
 
 	/**
@@ -511,11 +512,16 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 		// TODO
 	}
 
+	private IToolPage lastUsedToolPage = null;
 	private Map<ToolPageRole, IToolPage> currentToolPageMap;
 	private Collection<IToolChangeListener> toolChangeListeners;
 
 	@Override
 	public IToolPage getCurrentToolPage(ToolPageRole role) {
+		
+		if (role==null) {
+			return lastUsedToolPage;
+		}
 		IToolPage toolPage = null; 
 		if(currentToolPageMap!=null)
 			toolPage = currentToolPageMap.get(role);
@@ -528,6 +534,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	}
 
 	protected void setCurrentToolPage(IToolPage page) {
+		lastUsedToolPage = page;
 		currentToolPageMap.put(page.getToolPageRole(), page);
 	}
 
