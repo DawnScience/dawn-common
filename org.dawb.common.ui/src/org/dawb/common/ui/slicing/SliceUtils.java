@@ -195,6 +195,7 @@ public class SliceUtils {
 			
 		} else if (mode==PlotType.PT1D_MULTI || mode==PlotType.PT1D_STACKED) {
 			
+			final AbstractDataset xAxis = getNexusAxis(currentSlice, slice.getShape()[0], currentSlice.getX()+1, true, monitor);
 			plottingSystem.clear();
 			// We separate the 2D image into several 1d plots
 			final int[]         shape = slice.getShape();
@@ -211,8 +212,13 @@ public class SliceUtils {
 			for (double[] da : sets) {
 				ys.add(new DoubleDataset(da, da.length));
 			}
-			plottingSystem.createPlot1D(ys.get(0), ys, monitor);
-
+			plottingSystem.createPlot1D(xAxis, ys, monitor);
+			Display.getDefault().syncExec(new Runnable() {
+				public void run() {
+					plottingSystem.getSelectedXAxis().setTitle(xAxis.getName());
+					plottingSystem.getSelectedYAxis().setTitle("");
+				}
+			});
 		} else {
 			AbstractDataset y = getNexusAxis(currentSlice, slice.getShape()[0], currentSlice.getX()+1, true, monitor);
 			AbstractDataset x = getNexusAxis(currentSlice, slice.getShape()[1], currentSlice.getY()+1, true, monitor);		

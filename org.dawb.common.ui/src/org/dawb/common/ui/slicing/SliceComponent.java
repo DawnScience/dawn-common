@@ -269,6 +269,20 @@ public class SliceComponent {
 		grp.add(xyPlot);
 		plotTypeActions.put(PlotType.PT1D, xyPlot);
 		
+        final Action stackPlot = new Action("Slice as a stack of line plots", IAction.AS_CHECK_BOX) {
+        	public void run() {
+        		plotType = PlotType.PT1D_STACKED;
+        		// Loop over DimsData to ensure 1X only.
+        		if (dimsDataList!=null) dimsDataList.setTwoAxisOnly(0, 1);   		
+        		plottingTypeChanged();
+        	}
+		};
+		man.add(stackPlot);
+		stackPlot.setImageDescriptor(Activator.getImageDescriptor("icons/TraceLines.png"));
+		grp.add(stackPlot);
+		plotTypeActions.put(PlotType.PT1D_STACKED, stackPlot);
+
+		
         final Action imagePlot = new Action("Slice as images", IAction.AS_CHECK_BOX) {
         	public void run() {
         		plotType = PlotType.IMAGE;
@@ -535,7 +549,7 @@ public class SliceComponent {
 
 		String errorMessage = "";
 		boolean ok = false;
-		if (plotType.is1D()) {
+		if (plotType==PlotType.PT1D) {
 			ok = isX;
 			errorMessage = "Please set an X axis.";
 		} else {
@@ -584,7 +598,7 @@ public class SliceComponent {
 				if (col==0) return;
 				if (col==1) {
 					int axis = (Integer)value;
-					if (plotType.is1D()) axis = axis>-1 ? 0 : -1;
+					if (plotType==PlotType.PT1D) axis = axis>-1 ? 0 : -1;
 					data.setAxis(axis);
 					updateAxesChoices();
 				}
@@ -669,8 +683,10 @@ public class SliceComponent {
 
 			public void activate() {
 				String[] items = null;
-				if (plotType.is1D()) {
+				if (plotType==PlotType.PT1D) {
 					items = new String[]{"X","(Slice)"};
+				} else if (plotType==PlotType.PT1D_STACKED) {
+					items = new String[]{"X","Y (Many)", "(Slice)"};
 				} else {
 					if (isReversedImage()) {
 						items = new String[]{"Y","X","(Slice)"};
@@ -788,7 +804,7 @@ public class SliceComponent {
 		
 		final TableViewerColumn axis   = new TableViewerColumn(viewer, SWT.LEFT, 1);
 		axis.getColumn().setText("Axis");
-		axis.getColumn().setWidth(60);
+		axis.getColumn().setWidth(65);
 		axis.setLabelProvider(new DelegatingStyledCellLabelProvider(new SliceColumnLabelProvider(1)));
 
 		final TableViewerColumn slice   = new TableViewerColumn(viewer, SWT.LEFT, 2);
@@ -892,10 +908,13 @@ public class SliceComponent {
 	
 	public String getAxisLabel(DimsData data) {
 
-		if (plotType.is1D()) {
-			return data.getAxis()>-1 ? "X" : "(Slice)";
-		}
 		final int axis = data.getAxis();
+		if (plotType==PlotType.PT1D) {
+			return axis>-1 ? "X" : "(Slice)";
+		}
+		if (plotType==PlotType.PT1D_STACKED) {
+			return axis==0 ? "X" : axis==1 ? "Y (Many)" : "(Slice)";
+		}
 		if (plottingSystem!=null) {
 			if (isReversedImage()) {
 				return axis==0 ? "Y" : axis==1 ? "X" : "(Slice)";				
