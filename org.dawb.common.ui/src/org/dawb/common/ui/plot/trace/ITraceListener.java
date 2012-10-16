@@ -74,6 +74,24 @@ public interface ITraceListener extends EventListener{
 	 */
 	public void tracesAdded(TraceEvent evt);
 	
+	
+	
+	
+	/**
+	 * Fired whenever a new trace is about to be plotted or replotted.
+	 * This is normally from add or update events. The event data will
+	 * always be the ITrace which is about to be plotted.
+	 * 
+	 * The source of TraceWillPlotEvent will be the Trace.
+	 * 
+	 * There are getter and setter methods for the data. Use the setter
+	 * methods to change the data in the trace which will be plotted.
+	 * 
+	 * @param evt
+	 */
+	public void traceWillPlot(final TraceWillPlotEvent evt);
+
+	
 	/**
 	 * Convenience class for creating listeners
 	 * @author fcp94556
@@ -81,6 +99,12 @@ public interface ITraceListener extends EventListener{
 	 */
 	public class Stub implements ITraceListener {
 
+
+		@Override
+		public void traceWillPlot(TraceWillPlotEvent evt) {
+			// Does not all update(...) intentionally.
+		}
+		
 		@Override
 		public void tracesUpdated(TraceEvent evt) {
 			update(evt);

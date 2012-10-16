@@ -33,6 +33,7 @@ import org.dawb.common.ui.plot.trace.ILineTrace;
 import org.dawb.common.ui.plot.trace.ITrace;
 import org.dawb.common.ui.plot.trace.ITraceListener;
 import org.dawb.common.ui.plot.trace.TraceEvent;
+import org.dawb.common.ui.plot.trace.TraceWillPlotEvent;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
@@ -242,10 +243,16 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 			l.traceCreated(evt);
 		}
 	}
-	protected void fireTraceUpdated(final TraceEvent evt) {
+	public void fireTraceUpdated(final TraceEvent evt) {
 		if (traceListeners==null) return;
 		for (ITraceListener l : traceListeners) {
 			l.traceUpdated(evt);
+		}
+	}
+	public void fireWillPlot(final TraceWillPlotEvent evt) {
+		if (traceListeners==null) return;
+		for (ITraceListener l : traceListeners) {
+			l.traceWillPlot(evt);
 		}
 	}
 	protected void fireTraceAdded(final TraceEvent evt) {
