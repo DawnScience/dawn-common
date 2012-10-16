@@ -66,7 +66,7 @@ public interface ITraceListener extends EventListener{
 	 * Called when all traces are cleared. Source of event is IPlottingSystem
 	 * @param evet
 	 */
-	public void tracesCleared(TraceEvent evet);
+	public void tracesRemoved(TraceEvent evet);
 	
 	/**
 	 * Fired when new traces are plotted. Source of event is ITrace or List<ITrace>
@@ -87,7 +87,7 @@ public interface ITraceListener extends EventListener{
 		}
 
 		@Override
-		public void tracesCleared(TraceEvent evt) {
+		public void tracesRemoved(TraceEvent evt) {
 			update(evt);
 		}
 
