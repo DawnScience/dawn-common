@@ -233,7 +233,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	public void fireTracesAltered(final TraceEvent evt) {
 		if (traceListeners==null) return;
 		for (ITraceListener l : traceListeners) {
-			l.tracesAltered(evt);
+			l.tracesUpdated(evt);
 		}
 	}
 	protected void fireTraceCreated(final TraceEvent evt) {
@@ -271,7 +271,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	public void fireTracesPlotted(final TraceEvent evt) {
 		if (traceListeners==null) return;
 		for (ITraceListener l : traceListeners) {
-			l.tracesPlotted(evt);
+			l.tracesAdded(evt);
 		}
 	}
 

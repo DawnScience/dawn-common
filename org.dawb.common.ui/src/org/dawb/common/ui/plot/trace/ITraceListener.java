@@ -60,7 +60,7 @@ public interface ITraceListener extends EventListener{
 	 * 
 	 * @param evt
 	 */
-	public void tracesAltered(final TraceEvent evt);
+	public void tracesUpdated(final TraceEvent evt);
 	
 	/**
 	 * Called when all traces are cleared. Source of event is IPlottingSystem
@@ -69,10 +69,10 @@ public interface ITraceListener extends EventListener{
 	public void tracesCleared(TraceEvent evet);
 	
 	/**
-	 * Fired when a new trace is plotted. Source of event is ITrace or List<ITrace>
+	 * Fired when new traces are plotted. Source of event is ITrace or List<ITrace>
 	 * @param evt
 	 */
-	public void tracesPlotted(TraceEvent evt);
+	public void tracesAdded(TraceEvent evt);
 	
 	/**
 	 * Convenience class for creating listeners
@@ -82,7 +82,7 @@ public interface ITraceListener extends EventListener{
 	public class Stub implements ITraceListener {
 
 		@Override
-		public void tracesAltered(TraceEvent evt) {
+		public void tracesUpdated(TraceEvent evt) {
 			update(evt);
 		}
 
@@ -92,7 +92,7 @@ public interface ITraceListener extends EventListener{
 		}
 
 		@Override
-		public void tracesPlotted(TraceEvent evt) {
+		public void tracesAdded(TraceEvent evt) {
 			update(evt);
 		}
 
