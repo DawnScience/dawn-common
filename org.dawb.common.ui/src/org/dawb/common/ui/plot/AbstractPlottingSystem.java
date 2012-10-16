@@ -297,7 +297,15 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	public void setTitle(final String title) {
 		//TODO
 	}
-	
+
+	/**
+	 * Override this method to provide an implementation of show legend setting.
+	 * @param b
+	 */
+	public void setShowLegend(boolean b) {
+		//TODO
+	}
+
 	/**
 	 * Please override if you allow your plotter to create images
 	 * @param size
