@@ -220,5 +220,10 @@ public interface IAxis {
 	 * @param labels
 	 */
 	public void setLabelDataAndTitle(AbstractDataset labels);
+	
+	/**
+	 * Call to set a maximum range for the axis 
+	 */
+	public void setMaximumRange(double lower, double upper);
 
 }
