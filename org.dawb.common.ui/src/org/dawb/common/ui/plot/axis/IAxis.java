@@ -3,6 +3,8 @@ package org.dawb.common.ui.plot.axis;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 
+import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+
 /**
  * Interface used to define an axis on the graph (multiple x and y are allowed).
  * 
@@ -212,5 +214,11 @@ public interface IAxis {
 	 */
 	public double getPositionValue(int position);
 
+	
+	/**
+	 * Sets an alternative dataset to use for the labels and the title
+	 * @param labels
+	 */
+	public void setLabelDataAndTitle(AbstractDataset labels);
 
 }
