@@ -17,7 +17,8 @@ Require-Bundle: org.eclipse.ui,
  org.python.pydev.core;bundle-version="2.2.4",
  org.dawb.hdf5.editor,
  uk.ac.gda.common;bundle-version="1.0.0",
- uk.ac.gda.common.rcp;bundle-version="1.0.0"
+ uk.ac.gda.common.rcp;bundle-version="1.0.0",
+ org.dawnsci.plotting.jreality;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Export-Package: org.dawb.gda.extensions.jython,
