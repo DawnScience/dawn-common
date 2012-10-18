@@ -226,4 +226,9 @@ public interface IAxis {
 	 */
 	public void setMaximumRange(double lower, double upper);
 
+	/**
+	 * Set axis scale so that there are ticks on the start and end
+	 * @param ticksAtEnds if true then place ticks on scale ends
+	 */
+	public void setTicksAtEnds(boolean ticksAtEnds);
 }
