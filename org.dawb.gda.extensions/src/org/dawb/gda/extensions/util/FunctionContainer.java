@@ -1,6 +1,6 @@
 package org.dawb.gda.extensions.util;
 
-import uk.ac.diamond.scisoft.analysis.rcp.histogram.mapfunctions.AbstractMapFunction;
+import uk.ac.diamond.scisoft.analysis.histogram.mapfunctions.AbstractMapFunction;
 
 /**
  * To be used as a function object in ImageServiceBean to override 
