@@ -62,7 +62,7 @@
       </serviceFactory>
    </extension>
    <extension
-         point="uk.ac.diamond.scisoft.introRegister">
+         point="org.dawnsci.introRegister">
       <introPageRegister
             class="org.dawb.gda.extensions.intro.WorkflowIntroLauncher"
             description="Designing scientific algorithms in a visual way."
