@@ -180,10 +180,12 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	 * system is notified that plot types are likely
 	 * to be of a certain type.
 	 * 
+	 * Do not call before createPlotPart(...)
+	 * 
 	 * @param image
 	 */
-	public void setDefaultPlotType(PlotType image) {
-		//TODO
+	public void setPlotType(PlotType plotType) {
+		this.plottingMode = plotType;
 	}
 
 	public boolean isXfirst() {
@@ -255,7 +257,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 			l.traceWillPlot(evt);
 		}
 	}
-	protected void fireTraceAdded(final TraceEvent evt) {
+	public void fireTraceAdded(final TraceEvent evt) {
 		if (traceListeners==null) return;
 		for (ITraceListener l : traceListeners) {
 			l.traceAdded(evt);
@@ -335,12 +337,8 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	
 	protected IWorkbenchPart part;
 	
-	/**
-	 * NOTE This field is partly deprecated. It is only
-	 * used for the initial plot and plots after that now
-	 * have specific methods for 1D, 2D etc.
-	 */
-	protected PlotType       defaultPlotType;
+	// The plotting mode, used for updates to data
+	protected PlotType plottingMode;
 
 	protected String plotName;
 	
@@ -362,7 +360,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 							   final IWorkbenchPart part) {
 
 		this.plotName = plotName;
-		this.defaultPlotType = hint;
+		this.plottingMode = hint;
 		this.part = part;
 		this.bars = bars;
 		PlottingFactory.registerPlottingSystem(plotName, this);

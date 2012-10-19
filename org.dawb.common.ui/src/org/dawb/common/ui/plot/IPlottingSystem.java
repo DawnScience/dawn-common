@@ -150,6 +150,16 @@ public interface IPlottingSystem extends ITraceSystem, IRegionSystem, IAxisSyste
 	public ITrace updatePlot2D(AbstractDataset       image, 
 							   List<AbstractDataset> axes,
 							   IProgressMonitor      monitor);
+	
+	/**
+	 * Set the plot type. For instance if requiring a 3D surface plot of an image
+	 * Call setPlotType(PlotType.SURFACE) followed by createPlot2D(...)
+	 * 
+	 * Do not call before createPlotPart(...)
+	 * 
+	 * @param plotType
+	 */
+	public void setPlotType(PlotType plotType);
 
 	/**
 	 * This method can be used to add a single plot data point to 

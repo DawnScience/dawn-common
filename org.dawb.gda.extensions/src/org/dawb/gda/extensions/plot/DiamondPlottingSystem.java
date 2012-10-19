@@ -14,6 +14,7 @@ import java.util.List;
 
 import org.dawb.common.ui.plot.AbstractPlottingSystem;
 import org.dawb.common.ui.plot.PlotType;
+import org.dawb.common.ui.plot.trace.ISurfaceTrace;
 import org.dawb.common.ui.plot.trace.ITrace;
 import org.dawb.common.ui.util.GridUtils;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -220,5 +221,11 @@ public class DiamondPlottingSystem extends AbstractPlottingSystem {
 	public void savePlotting(String filename, String filetype) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public ISurfaceTrace createSurfaceTrace(String traceName) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

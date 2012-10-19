@@ -13,7 +13,7 @@ public enum PlotType {
 
     IMAGE(false), 
     
-    SURFACE(false), 
+    SURFACE(false, true), 
     
     PT1D(true), 
     
@@ -21,13 +21,17 @@ public enum PlotType {
     
     PT1D_STACKED(true),
 
-    PT1D_3D(true);
+    PT1D_3D(true, true);
     
-	private final boolean is1D;
+	private final boolean is1D, is3D;
 
 	private PlotType(boolean is1D) {
-    	this.is1D = is1D;
+		this(is1D, false);
     }
+	private PlotType(boolean is1D, boolean is3D) {
+    	this.is1D = is1D;
+    	this.is3D = is3D;
+	}
 	
 	public static PlotType forSliceIndex(int type) {
 		switch(type) {
@@ -41,5 +45,9 @@ public enum PlotType {
 
 	public boolean is1D() {
 		return is1D;
+	}
+
+	public boolean is3D() {
+		return is3D;
 	}
 }

@@ -29,6 +29,17 @@ public interface ITraceSystem {
 	 */
 	public ILineTrace createLineTrace(String traceName);
 	
+	
+	/**
+	 * Creates a surface trace used for 3D plotting. This does not add the trace
+	 * or give it any data.
+	 * 
+	 * @param traceName
+	 * @return
+	 */
+	public ISurfaceTrace createSurfaceTrace(String traceName);
+
+	
 	/**
 	 * Adds and plots the trace.
 	 * @param trace
