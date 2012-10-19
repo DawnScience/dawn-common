@@ -219,7 +219,8 @@ public class SliceUtils {
 					plottingSystem.getSelectedYAxis().setTitle("");
 				}
 			});
-		} else {
+		} else if (mode==PlotType.IMAGE || mode==PlotType.SURFACE){
+			plottingSystem.setPlotType(mode);
 			AbstractDataset y = getNexusAxis(currentSlice, slice.getShape()[0], currentSlice.getX()+1, true, monitor);
 			AbstractDataset x = getNexusAxis(currentSlice, slice.getShape()[1], currentSlice.getY()+1, true, monitor);		
 			plottingSystem.updatePlot2D(slice, Arrays.asList(x,y), monitor);

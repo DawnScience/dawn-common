@@ -9,18 +9,12 @@ import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 public interface ISurfaceTrace extends ITrace {
 
 	/**
-	 * The data used to colour the trace.
-	 * @param palette
-	 */
-	public void setPalette(PaletteData palette);
-
-	/**
 	 * Set the data of the plot, will replot if called on an active plot.
 	 * @param data
 	 * @param axes
 	 * @throws Exception
 	 */
-	public void setData(final AbstractDataset data, final List<AbstractDataset> axes) throws Exception;
+	public void setData(final AbstractDataset data, final List<AbstractDataset> axes);
 	
 	/**
 	 * The 3D set of axes, may contain nulls (z is often null for intensity).
@@ -51,4 +45,16 @@ public interface ISurfaceTrace extends ITrace {
 	 * @return true if plot is currently plotting.
 	 */
 	public boolean isActive();
+	
+	/**
+	 * The palette using in colouring the image
+	 * @return
+	 */
+	public PaletteData getPalette();
+	
+	/**
+	 * The palette using in colouring the image
+	 * @param palette
+	 */
+	public void setPalette(PaletteData palette);
 }

@@ -283,7 +283,7 @@ public class SliceComponent {
 		plotTypeActions.put(PlotType.PT1D_STACKED, stackPlot);
 
 		
-        final Action imagePlot = new Action("Slice as images", IAction.AS_CHECK_BOX) {
+        final Action imagePlot = new Action("Slice as image", IAction.AS_CHECK_BOX) {
         	public void run() {
         		plotType = PlotType.IMAGE;
         		if (dimsDataList!=null) dimsDataList.setTwoAxisOnly(0, 1);   		
@@ -295,6 +295,20 @@ public class SliceComponent {
 		imagePlot.setImageDescriptor(Activator.getImageDescriptor("icons/TraceImage.png"));
 		grp.add(imagePlot);
 		plotTypeActions.put(PlotType.IMAGE, imagePlot);
+		
+        final Action surfacePlot = new Action("Slice as surface", IAction.AS_CHECK_BOX) {
+        	public void run() {
+        		plotType = PlotType.SURFACE;
+        		if (dimsDataList!=null) dimsDataList.setTwoAxisOnly(0, 1);   		
+        		viewer.refresh();
+        		plottingTypeChanged();
+        	}
+		};
+		man.add(surfacePlot);
+		surfacePlot.setImageDescriptor(Activator.getImageDescriptor("icons/TraceSurface.png"));
+		grp.add(surfacePlot);
+		plotTypeActions.put(PlotType.SURFACE, surfacePlot);
+		
 		man.add(new Separator("group2"));
 		
 		this.updateAutomatically = new Action("Update plot when slice changes", IAction.AS_CHECK_BOX) {
