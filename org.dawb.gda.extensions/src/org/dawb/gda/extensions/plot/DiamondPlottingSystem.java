@@ -10,10 +10,13 @@
 package org.dawb.gda.extensions.plot;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import org.dawb.common.ui.plot.AbstractPlottingSystem;
 import org.dawb.common.ui.plot.PlotType;
+import org.dawb.common.ui.plot.region.IRegion;
+import org.dawb.common.ui.plot.region.IRegion.RegionType;
 import org.dawb.common.ui.plot.trace.ISurfaceTrace;
 import org.dawb.common.ui.plot.trace.ITrace;
 import org.dawb.common.ui.util.GridUtils;
@@ -225,6 +228,12 @@ public class DiamondPlottingSystem extends AbstractPlottingSystem {
 
 	@Override
 	public ISurfaceTrace createSurfaceTrace(String traceName) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Collection<IRegion> getRegions(RegionType type) {
 		// TODO Auto-generated method stub
 		return null;
 	}

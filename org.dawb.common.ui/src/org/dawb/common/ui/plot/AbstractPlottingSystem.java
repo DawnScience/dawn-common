@@ -61,6 +61,11 @@ import org.slf4j.LoggerFactory;
  * The IToolPageSystem is implemented and populated by tools read from
  * extension point.
  * 
+ * 
+ * DO NOT CHANGE THIS CLASS TO IMPEMENT CUSTOM METHODS PLEASE. Instead use the 
+ * IPlottingSystem interface and keep your special methods in your class using the
+ * plotting system.
+ * 
  * @author fcp94556
  *
  */
@@ -106,6 +111,10 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
  
 	public void setRootName(String rootName) {
 		this.rootName = rootName;
+	}
+	
+	public String getRootName() {
+		return rootName;
 	}
 
 	/**
@@ -175,6 +184,9 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 		lastUsedToolPage   = null;
 	}
 
+	public PlotType getPlotType() {
+		return plottingMode;
+	}
 	/**
 	 * Override to define what should happen if the 
 	 * system is notified that plot types are likely
@@ -292,12 +304,20 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 		//TODO
 	}
 	
+	private String title;
 	/**
 	 * Override this method to provide an implementation of title setting.
 	 * @param title
 	 */
 	public void setTitle(final String title) {
-		//TODO
+		this.title = title;
+	}
+	/**
+	 * Override this method to provide an implementation of title setting.
+	 * @param title
+	 */
+	public String getTitle() {
+		return title;
 	}
 
 	/**
@@ -459,22 +479,6 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	@Override
 	public IRegion getRegion(final String name) {
 		return null; // TODO
-	}
-
-	@Override
-	public Collection<IRegion> getRegions(final RegionType type) {
-		
-		final Collection<IRegion> regions = getRegions();
-		if (regions==null) return null;
-		
-		final Collection<IRegion> ret= new ArrayList<IRegion>();
-		for (IRegion region : regions) {
-			if (region.getRegionType()==type) {
-				ret.add(region);
-			}
-		}
-		
-		return ret; // may be empty
 	}
 
 	@Override
@@ -645,7 +649,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 		// Do nothing
 	}	
 
-	protected IWorkbenchPart getPart() {
+	public IWorkbenchPart getPart() {
 		return part;
 	}
 
@@ -712,13 +716,6 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	@Override
 	public IPlotActionSystem getPlotActionSystem() {
 		return this.actionBarManager;
-	}
-
-	/**
-	 * Set Axis and title visibility
-	 */
-	public void setAxisAndTitleVisibility(boolean isVisible, String title) {
-		// TODO Does nothing
 	}
 	
 	/**
