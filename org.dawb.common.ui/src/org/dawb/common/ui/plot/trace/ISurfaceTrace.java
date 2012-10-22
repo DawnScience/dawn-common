@@ -2,11 +2,9 @@ package org.dawb.common.ui.plot.trace;
 
 import java.util.List;
 
-import org.eclipse.swt.graphics.PaletteData;
-
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 
-public interface ISurfaceTrace extends ITrace {
+public interface ISurfaceTrace extends IPaletteTrace {
 
 	/**
 	 * Set the data of the plot, will replot if called on an active plot.
@@ -45,16 +43,5 @@ public interface ISurfaceTrace extends ITrace {
 	 * @return true if plot is currently plotting.
 	 */
 	public boolean isActive();
-	
-	/**
-	 * The palette using in colouring the image
-	 * @return
-	 */
-	public PaletteData getPalette();
-	
-	/**
-	 * The palette using in colouring the image
-	 * @param palette
-	 */
-	public void setPalette(PaletteData palette);
+
 }

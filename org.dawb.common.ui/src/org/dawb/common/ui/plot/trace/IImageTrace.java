@@ -2,11 +2,10 @@ package org.dawb.common.ui.plot.trace;
 
 import java.util.List;
 
+import org.dawb.common.services.HistogramBound;
 import org.dawb.common.services.ImageServiceBean;
 import org.dawb.common.services.ImageServiceBean.HistoType;
-import org.dawb.common.services.HistogramBound;
 import org.dawb.common.services.ImageServiceBean.ImageOrigin;
-import org.eclipse.swt.graphics.PaletteData;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.roi.ROIBase;
@@ -45,7 +44,7 @@ import uk.ac.diamond.scisoft.analysis.roi.ROIBase;
 ----------------++------------**--------+----------**----+---------------**+---------------++
               
  */
-public interface IImageTrace extends ITrace {
+public interface IImageTrace extends IPaletteTrace {
 
 		
 	public enum DownsampleType {
@@ -83,17 +82,6 @@ public interface IImageTrace extends ITrace {
 	 */
 	public void setImageOrigin(final ImageOrigin origin);
 	
-	/**
-	 * PaletteData for creating the image from the AbstractDataset
-	 * @return
-	 */
-	public PaletteData getPaletteData();
-	
-	/**
-	 * Setting palette data causes the image to redraw with the new palette.
-	 * @param paletteData
-	 */
-	public void setPaletteData(PaletteData paletteData);
 	
 	/**
 	 * Call to set image data
@@ -139,26 +127,6 @@ public interface IImageTrace extends ITrace {
 	 */
 	public void setMax(Number max);
 	
-	/**
-	 * Returns the last image service bean sent to the service for getting
-	 * the image.
-	 * 
-	 * @return
-	 */
-	public ImageServiceBean getImageServiceBean();
-	
-	/**
-	 * Call to add a palette listener
-	 * @param pl
-	 */
-	public void addPaletteListener(IPaletteListener pl);
-	
-	
-	/**
-	 * Call to remove a palette listener
-	 * @param pl
-	 */
-	public void removePaletteListener(IPaletteListener pl);
 	
 	/**
 	 * 
