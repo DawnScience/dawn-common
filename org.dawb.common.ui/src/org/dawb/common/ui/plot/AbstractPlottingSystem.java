@@ -154,9 +154,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	 * 
 	 * @return
 	 */
-	protected PlottingActionBarManager createActionBarManager() {
-		return new PlottingActionBarManager(this);
-	}
+	protected abstract PlottingActionBarManager createActionBarManager();
 
 	public void dispose() {
 

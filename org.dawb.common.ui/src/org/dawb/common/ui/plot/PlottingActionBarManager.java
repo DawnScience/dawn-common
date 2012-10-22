@@ -2,8 +2,6 @@ package org.dawb.common.ui.plot;
 
 import java.net.URL;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import org.dawb.common.ui.Activator;
@@ -12,11 +10,11 @@ import org.dawb.common.ui.plot.tool.IToolChangeListener;
 import org.dawb.common.ui.plot.tool.IToolPage;
 import org.dawb.common.ui.plot.tool.IToolPage.ToolPageRole;
 import org.dawb.common.ui.plot.tool.ToolChangeEvent;
+import org.dawb.common.ui.plot.trace.ITrace;
 import org.dawb.common.ui.util.EclipseUtils;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IContributionManager;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IViewPart;
@@ -39,13 +37,11 @@ import org.slf4j.LoggerFactory;
  * @author fcp94556
  *
  */
-public class PlottingActionBarManager implements IPlotActionSystem {
+public abstract class PlottingActionBarManager implements IPlotActionSystem {
 
 	private static final Logger logger = LoggerFactory.getLogger(PlottingActionBarManager.class);
 	
 	// Extrac actions for 1D and image viewing
-	protected List<IAction> extraImageActions;
-	protected List<IAction> extra1DActions;
 	protected Map<String, IToolPage> toolPages;
 	protected AbstractPlottingSystem system;
 	
@@ -53,32 +49,9 @@ public class PlottingActionBarManager implements IPlotActionSystem {
 		this.system = system;
 	}
 	
-
-	public List<IAction> getExtraImageActions() {
-		return extraImageActions;
-	}
-
-	public void setExtraImageActions(List<IAction> extraImageActions) {
-		this.extraImageActions = extraImageActions;
-	}
-
-	public List<IAction> getExtra1DActions() {
-		return extra1DActions;
-	}
-
-	public void setExtra1DActions(List<IAction> extra1dActions) {
-		extra1DActions = extra1dActions;
-	}
-
 	
 	public void dispose() {
 		
-		if (extraImageActions!=null) extraImageActions.clear();
-		extraImageActions = null;
-		
-		if (extra1DActions!=null) extra1DActions.clear();
-		extra1DActions = null;
-
 		if (toolPages!=null) toolPages.clear();
 		toolPages = null;
 	}
@@ -355,18 +328,7 @@ public class PlottingActionBarManager implements IPlotActionSystem {
 	}
 
 
-	@Override
-	public void remove(String id) {
-		if (extraImageActions!=null) for (Iterator<IAction> it= this.extraImageActions.iterator(); it.hasNext(); ) {
-			IAction action = it.next();
-			if (action.getId()!=null && action.getId().equals(id)) it.remove();
-		}
-		if (extra1DActions!=null) for (Iterator<IAction> it= this.extra1DActions.iterator(); it.hasNext(); ) {
-			IAction action = it.next();
-			if (action.getId()!=null && action.getId().equals(id)) it.remove();
-		}
+	public void fillTraceActions(final IContributionManager manager, final ITrace trace, final IPlottingSystem sys) {
+		// TODO Override as needed
 	}
-
-
-
 }

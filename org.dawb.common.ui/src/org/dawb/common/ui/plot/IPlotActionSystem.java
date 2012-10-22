@@ -12,7 +12,7 @@ import org.eclipse.jface.action.IContributionManager;
  * @author fcp94556
  *
  */
-public interface IPlotActionSystem {
+public interface IPlotActionSystem extends ITraceActionProvider{
 	
 	/**
 	 * Removes this id from the action bars and from the caches of actions by plot type.

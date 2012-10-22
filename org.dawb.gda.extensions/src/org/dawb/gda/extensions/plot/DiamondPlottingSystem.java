@@ -15,6 +15,7 @@ import java.util.List;
 
 import org.dawb.common.ui.plot.AbstractPlottingSystem;
 import org.dawb.common.ui.plot.PlotType;
+import org.dawb.common.ui.plot.PlottingActionBarManager;
 import org.dawb.common.ui.plot.region.IRegion;
 import org.dawb.common.ui.plot.region.IRegion.RegionType;
 import org.dawb.common.ui.plot.trace.ISurfaceTrace;
@@ -234,6 +235,12 @@ public class DiamondPlottingSystem extends AbstractPlottingSystem {
 
 	@Override
 	public Collection<IRegion> getRegions(RegionType type) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	protected PlottingActionBarManager createActionBarManager() {
 		// TODO Auto-generated method stub
 		return null;
 	}
