@@ -28,11 +28,38 @@ import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 /**
  * Represents a bridge to the plotting system.
  * 
- * Currently this is the diamond hardware accelerated system
- * or the fable directly drawn one.
- * 
  * To get your plotting system use the class PlottingFactory. This
  * will return the user preferred plotting.
+ * 
+ * To use the plotting system follow this design (similar to RCP parts in 3.x):
+ * <code>
+ * IPlottingSystem system = PlottingFactory.createPlottingSystem(); // reads user preference if there are alternatives.
+ * 
+ * In UI code
+ * system.createPlotPart(...); // Note that the title here is the key used to retrieve the plotter in future.
+ * 
+ * Create some 1D plots in one go
+ * system.createPlot1D(...); // Does not have to be in the UI thread.
+ * 
+ * Configure a plot in detail, does have to be in UI thread
+ * ILineTrace trace = system.createLineTrace(...);
+ * trace.setTraceColor(...)
+ * trace.setLineWidth(...)
+ * trace.setXXX(...)
+ * 
+ * system.addTrace(trace);
+ * 
+ * This is true for any trace, the paradigm is 'create, modify, add' in the trace lifecycle.
+ * 
+ * 
+ * The plotting system uses listeners extensively to notify of the user doing things. It is likely that the
+ * events in future will increase as more features become available.
+ * 
+ * At the end:
+ * system.dispose(); // This should be called to clean up UI. Do not forget to remove listeners in the 
+ *                   // dispose as well.
+ *                   
+ * </code>
  * 
  * @author gerring
  *
@@ -118,7 +145,8 @@ public interface IPlottingSystem extends ITraceSystem, IRegionSystem, IAxisSyste
 	/**
 	 * See also ITraceSystem for flexible trace manipulation.
      *
-	 * For 2D - x is the image dataset, ys is the axes.
+	 * For 2D - x is the image dataset, ys is the axes. It will also plot in 3D
+	 * if the plotting mode is setting to surface first.
 	 * 
 	 * Does not have to be called in the UI thread. Should be called to switch the entire
 	 * plot contents. 
@@ -129,8 +157,9 @@ public interface IPlottingSystem extends ITraceSystem, IRegionSystem, IAxisSyste
 	 *               the second is the y-axis.
 	 * @param mode
 	 * @param monitor
-	 * @return Image trace plotted. You can normally cast this trace to an IImageTrace and
-	 *         use any image methods offered by this interface.
+	 * @return Image trace plotted. You can normally cast this trace to an IImageTrace for
+	 *         PlotType.IMAGE and and ISurfaceTrace for PlotType.SURFACE. You can
+	 *         use any image methods offered by these interface.
 	 */
 	public ITrace createPlot2D(AbstractDataset       image, 
 							   List<AbstractDataset> axes,
