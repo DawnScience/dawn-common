@@ -613,6 +613,13 @@ public class SliceComponent {
 				if (col==1) {
 					int axis = (Integer)value;
 					if (plotType==PlotType.PT1D) axis = axis>-1 ? 0 : -1;
+					if (plotType==PlotType.IMAGE || plotType==PlotType.SURFACE) {
+						if (axis==1) {
+							axis = 0;
+						} else if (axis==0) {
+							axis = 1;
+						}
+					}
 					data.setAxis(axis);
 					updateAxesChoices();
 				}
