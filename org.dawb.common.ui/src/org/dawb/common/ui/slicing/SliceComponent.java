@@ -380,6 +380,9 @@ public class SliceComponent {
 	private void plottingTypeChanged() {
 		viewer.refresh();
 		
+		final String[] items = getAxisItems();
+		((CComboCellEditor)viewer.getCellEditors()[1]).setItems(items);
+		
 		// Save preference
 		Activator.getDefault().getPreferenceStore().setValue(SliceConstants.PLOT_CHOICE, plotType.toString());
    		boolean isOk = updateErrorLabel();
@@ -703,18 +706,7 @@ public class SliceComponent {
 			}	
 
 			public void activate() {
-				String[] items = null;
-				if (plotType==PlotType.PT1D) {
-					items = new String[]{"X","(Slice)"};
-				} else if (plotType==PlotType.PT1D_STACKED) {
-					items = new String[]{"X","Y (Many)", "(Slice)"};
-				} else {
-					if (isReversedImage()) {
-						items = new String[]{"Y","X","(Slice)"};
-					} else {
-						items = new String[]{"X","Y","(Slice)"};
-					}
-				}
+				String[] items = getAxisItems();
 				if (!Arrays.equals(this.getCombo().getItems(), items)) {
 					this.getCombo().setItems(items);
 				}
@@ -791,10 +783,16 @@ public class SliceComponent {
 				final DimsData     data  = (DimsData)((IStructuredSelection)viewer.getSelection()).getFirstElement();
 				final int idim  = data.getDimension()+1;
 				final List<String> names = dimensionNames.get(idim);
-				this.getCombo().setItems(names.toArray(new String[names.size()]));
+				final String[] items = names.toArray(new String[names.size()]);
+				
+				if (!Arrays.equals(this.getCombo().getItems(), items)) {
+					this.getCombo().setItems(items);
+				}
 				
 				final int isel = names.indexOf(sliceObject.getNexusAxis(idim));
-				if (isel>-1) this.getCombo().select(isel);
+				if (isel>-1 && getCombo().getSelectionIndex()!=isel) {
+					this.getCombo().select(isel);
+				}
 				super.activate();
 			}
 		};
@@ -803,6 +801,22 @@ public class SliceComponent {
 		editors[3] = axisDataEditor;
 		
 		return editors;
+	}
+
+	protected String[] getAxisItems() {
+		String[] items = null;
+		if (plotType==PlotType.PT1D) {
+			items = new String[]{"X","(Slice)"};
+		} else if (plotType==PlotType.PT1D_STACKED) {
+			items = new String[]{"X","Y (Many)", "(Slice)"};
+		} else {
+			if (isReversedImage()) {
+				items = new String[]{"Y","X","(Slice)"};
+			} else {
+				items = new String[]{"X","Y","(Slice)"};
+			}
+		}
+		return items;
 	}
 
 	protected String getScaleTooltip(int minimum, int maximum) {
