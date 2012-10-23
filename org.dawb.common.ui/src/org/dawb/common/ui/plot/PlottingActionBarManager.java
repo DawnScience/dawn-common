@@ -90,7 +90,7 @@ public class PlottingActionBarManager implements IPlotActionSystem {
 	
 	private PlotType lastPlotTypeUpdate = null;
 	
-	protected boolean switchActions(final PlotType type) {
+	public boolean switchActions(final PlotType type) {
 		
 		if (type == lastPlotTypeUpdate) return false;
 		lastPlotTypeUpdate = type;
