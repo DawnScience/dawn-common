@@ -708,7 +708,9 @@ public class SliceComponent {
 						items = new String[]{"X","Y","(Slice)"};
 					}
 				}
-				this.getCombo().setItems(items);
+				if (!Arrays.equals(this.getCombo().getItems(), items)) {
+					this.getCombo().setItems(items);
+				}
 				super.activate();
 			}
 
