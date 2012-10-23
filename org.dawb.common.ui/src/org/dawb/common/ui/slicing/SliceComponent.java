@@ -378,10 +378,12 @@ public class SliceComponent {
 	}
 	
 	private void plottingTypeChanged() {
-		viewer.refresh();
+		viewer.cancelEditing();
 		
 		final String[] items = getAxisItems();
 		((CComboCellEditor)viewer.getCellEditors()[1]).setItems(items);
+		
+		viewer.refresh();
 		
 		// Save preference
 		Activator.getDefault().getPreferenceStore().setValue(SliceConstants.PLOT_CHOICE, plotType.toString());

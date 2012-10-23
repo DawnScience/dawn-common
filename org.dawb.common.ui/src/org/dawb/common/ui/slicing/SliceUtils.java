@@ -162,7 +162,11 @@ public class SliceUtils {
 	/**
 	 * Thread safe and time consuming part of the slice.
 	 * @param currentSlice
+	 * @param dataShape
+	 * @param mode
+	 * @param plottingSystem - may be null, but if so no plotting will happen.
 	 * @param monitor
+	 * @throws Exception
 	 */
 	public static void plotSlice(final SliceObject       currentSlice,
 			                     final int[]             dataShape,
@@ -170,6 +174,7 @@ public class SliceUtils {
 			                     final IPlottingSystem   plottingSystem,
 			                     final IProgressMonitor  monitor) throws Exception {
 
+		if (plottingSystem==null) return;
 		if (monitor!=null) monitor.worked(1);
 		if (monitor!=null&&monitor.isCanceled()) return;
 		
