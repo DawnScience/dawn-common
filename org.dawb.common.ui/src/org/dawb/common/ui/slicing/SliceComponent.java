@@ -378,6 +378,21 @@ public class SliceComponent {
 	}
 	
 	private void plottingTypeChanged() {
+		
+		String[] items = null;
+		if (plotType==PlotType.PT1D) {
+			items = new String[]{"X","(Slice)"};
+		} else if (plotType==PlotType.PT1D_STACKED) {
+			items = new String[]{"X","Y (Many)", "(Slice)"};
+		} else {
+			if (isReversedImage()) {
+				items = new String[]{"Y","X","(Slice)"};
+			} else {
+				items = new String[]{"X","Y","(Slice)"};
+			}
+		}
+		((CComboCellEditor)viewer.getCellEditors()[1]).setItems(items);
+
 		viewer.refresh();
 		
 		// Save preference
@@ -694,24 +709,6 @@ public class SliceComponent {
 			protected int getDoubleClickTimeout() {
 				return 0;
 			}	
-
-			public void activate() {
-				String[] items = null;
-				if (plotType==PlotType.PT1D) {
-					items = new String[]{"X","(Slice)"};
-				} else if (plotType==PlotType.PT1D_STACKED) {
-					items = new String[]{"X","Y (Many)", "(Slice)"};
-				} else {
-					if (isReversedImage()) {
-						items = new String[]{"Y","X","(Slice)"};
-					} else {
-						items = new String[]{"X","Y","(Slice)"};
-					}
-				}
-				setItems(items);
-				super.activate();
-			}
-
 		};
 		final CCombo combo = ((CComboCellEditor)editors[1]).getCombo();
 		combo.addModifyListener(new ModifyListener() {
@@ -782,7 +779,7 @@ public class SliceComponent {
 				final DimsData     data  = (DimsData)((IStructuredSelection)viewer.getSelection()).getFirstElement();
 				final int idim  = data.getDimension()+1;
 				final List<String> names = dimensionNames.get(idim);
-				setItems(names.toArray(new String[names.size()]));
+				this.getCombo().setItems(names.toArray(new String[names.size()]));
 				
 				final int isel = names.indexOf(sliceObject.getNexusAxis(idim));
 				if (isel>-1) this.getCombo().select(isel);
