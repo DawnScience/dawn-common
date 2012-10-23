@@ -1,7 +1,10 @@
 package org.dawb.common.ui.plot;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.dawb.common.ui.Activator;
@@ -12,11 +15,18 @@ import org.dawb.common.ui.plot.tool.IToolPage.ToolPageRole;
 import org.dawb.common.ui.plot.tool.ToolChangeEvent;
 import org.dawb.common.ui.plot.trace.ITrace;
 import org.dawb.common.ui.util.EclipseUtils;
+import org.dawb.common.ui.widgets.EmptyActionBars;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IContributionManager;
+import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.action.StatusLineManager;
+import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbenchPage;
@@ -28,40 +38,155 @@ import org.slf4j.LoggerFactory;
 
 
 /**
- * Class to deal with the extra actions we need in the plotting system.
+ * Class to deal with the actions we need in the plotting system.
  * 
- * Some actions are provided by the plotting system implementation, others are dealt with here.
+ * This class provides generic actions which are read from extension points, such as tool actions.
  * 
- * You may override this class to add additional actions.
+ * This class provides switching between actions registered in different roles.
  * 
  * @author fcp94556
  *
  */
-public abstract class PlottingActionBarManager implements IPlotActionSystem {
+public class PlottingActionBarManager implements IPlotActionSystem {
 
 	private static final Logger logger = LoggerFactory.getLogger(PlottingActionBarManager.class);
 	
 	// Extrac actions for 1D and image viewing
 	protected Map<String, IToolPage> toolPages;
 	protected AbstractPlottingSystem system;
+	protected List<ActionContainer>     oneDimensionalActions;
+	protected List<ActionContainer>     twoDimensionalActions;
+	protected MenuAction                imageMenu;
+	protected MenuAction                xyMenu;
+	protected ITraceActionProvider      traceActionProvider;
 	
 	public PlottingActionBarManager(AbstractPlottingSystem system) {
 		this.system = system;
+		oneDimensionalActions = new ArrayList<ActionContainer>();
+		twoDimensionalActions = new ArrayList<ActionContainer>();
 	}
 	
+	/**
+     * 
+     * @param traceActionProvider may be null
+     */
+	public void init(ITraceActionProvider traceActionProvider) {
+		
+		xyMenu =  new MenuAction("X/Y Plot");
+		if (system.getActionBars()!=null) {
+			system.getActionBars().getMenuManager().add(xyMenu);
+			system.getActionBars().getMenuManager().add(new Separator());
+		}
+
+		imageMenu = new MenuAction("Image");
+		if (system.getActionBars()!=null) {
+			system.getActionBars().getMenuManager().add(imageMenu);
+			system.getActionBars().getMenuManager().add(new Separator());
+		}
+		
+		this.traceActionProvider = traceActionProvider;
+	}       
+
 	
+	private PlotType lastPlotTypeUpdate = null;
+	
+	protected boolean switchActions(final PlotType type) {
+		
+		if (type == lastPlotTypeUpdate) return false;
+		lastPlotTypeUpdate = type;
+		
+		final IActionBars bars = system.getActionBars();
+    	if (bars==null) return false;
+    	
+    	imageMenu.setEnabled(type==PlotType.IMAGE);
+    	xyMenu.setEnabled(type.is1D());
+
+    	if (oneDimensionalActions!=null) for (ActionContainer ac : oneDimensionalActions) {
+    		if (type.is1D() && ac.getManager().find(ac.getId())==null) {
+    			ac.getManager().insertAfter(ac.getGroupName(), ac.getAction());
+    		} else if (!type.is1D()) {
+    			ac.getManager().remove(ac.getId());
+    		}
+		}
+    	
+    	final boolean is2D = !type.is1D();
+    	if (twoDimensionalActions!=null) for (ActionContainer ac : twoDimensionalActions) {
+    		if (is2D && ac.getManager().find(ac.getId())==null) {
+    			ac.getManager().insertAfter(ac.getGroupName(), ac.getAction());
+    		} else if (!is2D) {
+    			ac.getManager().remove(ac.getId());
+      		}
+		}
+    	
+    	if (bars.getToolBarManager()!=null)    bars.getToolBarManager().update(true);
+    	if (bars.getMenuManager()!=null)       bars.getMenuManager().update(true);
+    	if (bars.getStatusLineManager()!=null) bars.getStatusLineManager().update(true);
+    	bars.updateActionBars();
+    	
+    	// If we are 1D we must deactivate 2D tools. If we are 
+    	// 2D we must deactivate 1D tools.
+    	if (type.is1D()) {
+    		clearTool(ToolPageRole.ROLE_2D);
+    	} else if (is2D) {
+    		clearTool(ToolPageRole.ROLE_1D);
+    	}
+    	
+		return true;
+	}
+	
+	public IActionBars createEmptyActionBars() {
+		return new EmptyActionBars(new ToolBarManager(), new MenuManager(), new StatusLineManager());
+	}
+
 	public void dispose() {
 		
 		if (toolPages!=null) toolPages.clear();
 		toolPages = null;
+		
+	    if (oneDimensionalActions!=null) oneDimensionalActions.clear();
+	    oneDimensionalActions = null;
+	       
+	    if (twoDimensionalActions!=null) twoDimensionalActions.clear();
+	    twoDimensionalActions = null;
+
 	}
-	
+
 	private boolean isToolsRequired = true;
-	
+
 	public void setToolsRequired(boolean isToolsRequired) {
 		this.isToolsRequired = isToolsRequired;
 	}
-	
+
+	public void createToolDimensionalActions(final ToolPageRole role,
+			final String       viewId) {
+
+		final IActionBars bars = system.getActionBars();
+		if (bars!=null) {
+
+			try {
+				MenuAction toolSet = createToolActions(role, viewId);
+				if (toolSet==null) return;
+
+				final String groupName=role.getId()+".group";
+				bars.getToolBarManager().add(new Separator(groupName));
+				bars.getToolBarManager().insertAfter(groupName, toolSet);
+				if (role.is1D()&&!role.is2D()) oneDimensionalActions.add(new ActionContainer(groupName, toolSet, bars.getToolBarManager()));
+				if (role.is2D()&&!role.is1D()) twoDimensionalActions.add(new ActionContainer(groupName, toolSet, bars.getToolBarManager()));
+
+				if (role.is2D()) {
+					toolSet.addActionsTo(imageMenu);
+					this.imageMenu.addSeparator();
+				}
+				if (role.is1D()) {
+					toolSet.addActionsTo(xyMenu);
+					this.xyMenu.addSeparator();
+				}
+
+			} catch (Exception e) {
+				logger.error("Reading extensions for plotting tools", e);
+			}
+		}	
+	}
 
 	/**
 	 * Return a MenuAction which can be attached to the part using the plotting system.
@@ -284,6 +409,52 @@ public abstract class PlottingActionBarManager implements IPlotActionSystem {
 	    
 	    return false;
 	}
+	
+
+	public void addXYAction(IAction a) {
+		xyMenu.add(a);
+	}
+	public void addXYSeparator() {
+		xyMenu.addSeparator();
+	}
+	public void addImageAction(IAction a) {
+		imageMenu.add(a);
+	}
+	public void addImageSeparator() {
+		imageMenu.addSeparator();
+	}
+	
+	
+	/**
+	 * Registers with the toolbar
+	 * @param groupName
+	 * @param action
+	 * @return
+	 */
+	public ActionContainer register1DAction(String groupName, IAction action) {
+		final IActionBars bars = getActionBars();
+		final ActionContainer ac = new ActionContainer(groupName, action, bars.getToolBarManager());
+		oneDimensionalActions.add(ac);
+		return ac;
+	}
+
+	/**
+	 * Registers with the toolbar
+	 * @param groupName
+	 * @param action
+	 * @return
+	 */
+	public ActionContainer register2DAction(String groupName, IAction action) {
+		final IActionBars bars = getActionBars();
+		final ActionContainer ac = new ActionContainer(groupName, action, bars!=null?bars.getToolBarManager():null);
+		twoDimensionalActions.add(ac);
+		return ac;
+	}
+
+
+	public IActionBars getActionBars() {
+		return system.getActionBars();
+	}
 
 
 	@Override
@@ -327,8 +498,32 @@ public abstract class PlottingActionBarManager implements IPlotActionSystem {
 		
 	}
 
+	@Override
+	public void fillTraceActions(IContributionManager toolBarManager, ITrace trace, IPlottingSystem system) {
+		if (traceActionProvider!=null) traceActionProvider.fillTraceActions(toolBarManager, trace, system);
+	}
 
-	public void fillTraceActions(final IContributionManager manager, final ITrace trace, final IPlottingSystem sys) {
-		// TODO Override as needed
+	@Override
+	public void remove(String id) {
+        //super.remove(id);
+		if (oneDimensionalActions!=null) for (Iterator<ActionContainer> it= this.oneDimensionalActions.iterator(); it.hasNext(); ) {
+			ActionContainer ac = it.next();
+			if (ac.getAction().getId()!=null && ac.getAction().getId().equals(id)) {
+				it.remove();
+				break;
+			}
+		}
+		if (twoDimensionalActions!=null) for (Iterator<ActionContainer> it= this.twoDimensionalActions.iterator(); it.hasNext(); ) {
+			ActionContainer ac = it.next();
+			if (ac.getAction().getId()!=null && ac.getAction().getId().equals(id)) {
+				it.remove();
+				break;
+			}
+		}
+		if (system.getActionBars()!=null) {
+			system.getActionBars().getToolBarManager().remove(id);
+			system.getActionBars().getMenuManager().remove(id);
+			system.getActionBars().getStatusLineManager().remove(id);
+		}
 	}
 }
