@@ -209,8 +209,12 @@ public class SliceUtils {
 				}
 			}
 			final List<AbstractDataset> ys = new ArrayList<AbstractDataset>(shape[1]);
+			int index = 0;
 			for (double[] da : sets) {
-				ys.add(new DoubleDataset(da, da.length));
+				final DoubleDataset dds = new DoubleDataset(da, da.length);
+				dds.setName(String.valueOf(index));
+				ys.add(dds);
+				++index;
 			}
 			plottingSystem.createPlot1D(xAxis, ys, monitor);
 			Display.getDefault().syncExec(new Runnable() {
