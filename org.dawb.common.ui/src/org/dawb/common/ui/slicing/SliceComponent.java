@@ -618,13 +618,6 @@ public class SliceComponent {
 				if (col==1) {
 					int axis = (Integer)value;
 					if (plotType==PlotType.PT1D) axis = axis>-1 ? 0 : -1;
-					if (plotType==PlotType.IMAGE || plotType==PlotType.SURFACE) {
-						if (axis==1) {
-							axis = 0;
-						} else if (axis==0) {
-							axis = 1;
-						}
-					}
 					data.setAxis(axis);
 					updateAxesChoices();
 				}
@@ -943,6 +936,10 @@ public class SliceComponent {
 			updateAutomatically.setEnabled(false);
 			viewer.getTable().getColumns()[2].setText("Start Index or Slice Range");
 		}
+		
+		final String[] items = getAxisItems();
+		((CComboCellEditor)viewer.getCellEditors()[1]).setItems(items);
+
 	}
 	
 	public String getAxisLabel(DimsData data) {
