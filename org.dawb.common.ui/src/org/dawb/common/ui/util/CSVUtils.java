@@ -12,8 +12,6 @@ package org.dawb.common.ui.util;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
@@ -35,8 +33,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
-import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
-import uk.ac.diamond.scisoft.analysis.io.DataHolder;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 
 /**
@@ -53,6 +49,8 @@ public class CSVUtils {
 	
 	/**
 	 * Constructs a csv file with a similar name in the same project.
+	 * 
+	 * Shows a message to the user if there was a failure
 	 * 
 	 * @param dataFile
 	 * @param data
@@ -75,7 +73,7 @@ public class CSVUtils {
 					if (set.getShape().length!=1) continue;
 					maxSize = Math.max(maxSize, set.getSize());
 				}
-				get1DDataSetCVS(contents, data, maxSize);
+				get1DDataSetCVS(contents, data, maxSize, null);
 			}
 			
 			InputStream stream = new ByteArrayInputStream(contents.toString().getBytes());
@@ -86,6 +84,7 @@ public class CSVUtils {
 			MessageDialog.openInformation(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), "CVS Exported", message);
 			
 		} catch (Exception ne) {
+			logger.error("Cannot convert!" , ne);
 			final String message = "The file '"+dataFile.getName()+"' was not converted to '"+csv.getName()+"'";
 			ErrorDialog.openError(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
 					              "File Not Converted", 
@@ -99,10 +98,12 @@ public class CSVUtils {
 	/**
 	 * Constructs a csv file with the same name in the same project.
 	 * 
+	 * Shows a message to the user if there was a failure
+
 	 * @param dataFile
 	 * @param dataSetNames
 	 */
-	public static void createCSV(final IFile dataFile, final Object[] dataSetNames) {
+	public static void createCSV(final IFile dataFile, final String[] dataSetNames) {
 
 		final IFile csv  = EclipseUtils.getUniqueFile(dataFile, "csv");
 		
@@ -114,8 +115,7 @@ public class CSVUtils {
 				public void run(IProgressMonitor monitor) throws InvocationTargetException,
 						                                         InterruptedException {
 			        try {
-						final DataHolder dh = LoaderFactory.getData(dataFile.getLocation().toOSString(), new ProgressMonitorWrapper(monitor));								
-						csv.create(getCVSStream(dh, dataSetNames), true, monitor);
+						csv.create(getCVSStream(dataFile.getLocation().toOSString(), dataSetNames,  monitor), true, monitor);
 						csv.getParent().refreshLocal(IResource.DEPTH_INFINITE, monitor);
 						
 						PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
@@ -136,6 +136,7 @@ public class CSVUtils {
 				}
 			});
 		} catch (Exception ne) {
+			logger.error("Cannot convert!" , ne);
 			final String message = "The file '"+dataFile.getName()+"' was not converted to '"+csv.getName()+"'";
 			ErrorDialog.openError(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
 					              "File Not Converted", 
@@ -146,20 +147,24 @@ public class CSVUtils {
 	}
 
 	
-	protected static InputStream getCVSStream(final DataHolder dh, final Object[] dataSetNames) throws Exception {
-		
-		final Collection<?> requiredNames = dataSetNames!=null
-		                                  ? Arrays.asList(dataSetNames)
-		                                  : null;
-		                                  
-		final Map<String, ILazyDataset> sortedData = new TreeMap<String, ILazyDataset>();
-		sortedData.putAll(dh.getMap());
-		if (requiredNames!=null) sortedData.keySet().retainAll(requiredNames);
+	public static InputStream getCVSStream(final String path, final String[] dataSetNames, final IProgressMonitor monitor) throws Exception {
+				                                  
+		final Map<String, IDataset> sortedData = new TreeMap<String, IDataset>();
+		for (String name : dataSetNames) {
+			final IDataset set = LoaderFactory.getDataSet(path, name, new ProgressMonitorWrapper(monitor));
+			if (dataSetNames.length>1 && set.getRank()!=1) {
+				logger.error("The dataset "+name+" is not a 1D dataset and cannot be converted to ascii!");
+				continue;
+			}
+			sortedData.put(name, set);
+
+			if (monitor!=null) monitor.worked(1);
+		}
 		
 		boolean is1DExport = false;
 	    int maxSize = Integer.MIN_VALUE;
 		for (String name : sortedData.keySet()) {
-			final ILazyDataset set = sortedData.get(name);
+			final IDataset set = sortedData.get(name);
 			if (set.getShape()==null)     continue;
 			if (set.getShape().length!=1) continue;
 			maxSize = Math.max(maxSize, set.getSize());
@@ -168,11 +173,11 @@ public class CSVUtils {
 
 		final StringBuilder contents = new StringBuilder();
 		if (is1DExport) {
-            get1DDataSetCVS(contents, sortedData, maxSize);
+            get1DDataSetCVS(contents, sortedData, maxSize, monitor);
 		} else if (sortedData.size()==1){
-			final ILazyDataset dataset2d = sortedData.values().iterator().next();
-			if (dataset2d.getShape()[0]*dataset2d.getShape()[1]>64000) {
-			    throw new Exception("The data contains an image "+dataset2d.getShape()[0]+"x"+dataset2d.getShape()[1]+" which cannot be converted to csv.");
+			final IDataset dataset2d = sortedData.values().iterator().next();
+			if (dataset2d.getShape()[0]*dataset2d.getShape()[1]>120000) {
+			    throw new Exception("The data contains an image "+dataset2d.getShape()[0]+"x"+dataset2d.getShape()[1]+" is too large to be converted to csv.");
 			}
 			get2DDataSetCVS(contents,dataset2d);
 		} else {
@@ -184,13 +189,13 @@ public class CSVUtils {
 	}
 
 
-	private static void get2DDataSetCVS(StringBuilder contents, ILazyDataset dataset2d) {
+	private static void get2DDataSetCVS(StringBuilder contents, IDataset dataset2d) {
 
 		final int xSize = dataset2d.getShape()[0];
 		final int ySize = dataset2d.getShape()[1];
 		for (int y = 0; y < ySize; y++) {
 			for (int x = 0; x < xSize; x++) {
-				contents.append(((IDataset)dataset2d).getDouble(x,y));
+				contents.append(dataset2d.getDouble(x,y));
 				if (x<xSize-1)contents.append(",");
 			}
 			contents.append("\r\n"); // Intentionally windows.
@@ -200,8 +205,9 @@ public class CSVUtils {
 
 
 	private static void get1DDataSetCVS(final StringBuilder        contents,
-			                            final Map<String, ? extends ILazyDataset> sortedData,
-			                            final int                  maxSize) {
+			                            final Map<String, ? extends IDataset> sortedData,
+			                            final int                  maxSize,
+			                            final IProgressMonitor     monitor) {
 		
 		for (Iterator<String> it = sortedData.keySet().iterator(); it.hasNext(); ) {
 			
@@ -218,10 +224,13 @@ public class CSVUtils {
 				
 				final String name = it.next();
 
-				final ILazyDataset set = sortedData.get(name);
+				final IDataset set = sortedData.get(name);
 				final String     value = (i<set.getSize()) ? String.valueOf(((IDataset)set).getDouble(i)) : " ";
 				contents.append(value);
 				if (it.hasNext()) contents.append(",");
+				
+				if (monitor!=null && i>=(maxSize-1))	monitor.worked(1);
+
 			}
 			contents.append("\r\n"); // Intentionally windows.
 		}
