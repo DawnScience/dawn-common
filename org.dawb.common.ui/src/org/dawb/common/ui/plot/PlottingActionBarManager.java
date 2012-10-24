@@ -54,23 +54,25 @@ public class PlottingActionBarManager implements IPlotActionSystem {
 	// Extrac actions for 1D and image viewing
 	protected Map<String, IToolPage> toolPages;
 	protected AbstractPlottingSystem system;
-	protected List<ActionContainer>     oneDimensionalActions;
-	protected List<ActionContainer>     twoDimensionalActions;
+	protected Map<ActionType, List<ActionContainer>> actionMap;
 	protected MenuAction                imageMenu;
 	protected MenuAction                xyMenu;
 	protected ITraceActionProvider      traceActionProvider;
 	
 	public PlottingActionBarManager(AbstractPlottingSystem system) {
 		this.system = system;
-		oneDimensionalActions = new ArrayList<ActionContainer>();
-		twoDimensionalActions = new ArrayList<ActionContainer>();
+		this.actionMap = new HashMap<ActionType, List<ActionContainer>>(ActionType.values().length);
 	}
 	
+	private final static String defaultGroupName = "org.dawb.common.ui.plot.groupAll";
 	/**
      * 
      * @param traceActionProvider may be null
      */
 	public void init(ITraceActionProvider traceActionProvider) {
+		
+		system.getActionBars().getToolBarManager().add(new Separator(defaultGroupName));
+		system.getActionBars().getMenuManager().add(new Separator(defaultGroupName));
 		
 		xyMenu =  new MenuAction("X/Y Plot");
 		if (system.getActionBars()!=null) {
@@ -101,23 +103,19 @@ public class PlottingActionBarManager implements IPlotActionSystem {
     	imageMenu.setEnabled(type==PlotType.IMAGE);
     	xyMenu.setEnabled(type.is1D());
 
-    	if (oneDimensionalActions!=null) for (ActionContainer ac : oneDimensionalActions) {
-    		if (type.is1D() && ac.getManager().find(ac.getId())==null) {
-    			ac.getManager().insertAfter(ac.getGroupName(), ac.getAction());
-    		} else if (!type.is1D()) {
-    			ac.getManager().remove(ac.getId());
+    	for (ActionType actionType : ActionType.values()) {
+    		
+    		final List<ActionContainer> actions = actionMap.get(actionType);
+        	if (actions!=null) for (ActionContainer ac : actions) {
+        		if (actionType.isCompatible(type)) {
+        			ac.insert();
+        		} else {
+        			ac.remove();
+        		}
     		}
-		}
-    	
-    	final boolean is2D = type.is2D();
-    	if (twoDimensionalActions!=null) for (ActionContainer ac : twoDimensionalActions) {
-    		if (is2D && ac.getManager().find(ac.getId())==null) {
-    			ac.getManager().insertAfter(ac.getGroupName(), ac.getAction());
-    		} else if (!is2D) {
-    			ac.getManager().remove(ac.getId());
-      		}
-		}
-    	
+
+    	}
+      	
     	if (bars.getToolBarManager()!=null)    bars.getToolBarManager().update(true);
     	if (bars.getMenuManager()!=null)       bars.getMenuManager().update(true);
     	if (bars.getStatusLineManager()!=null) bars.getStatusLineManager().update(true);
@@ -127,7 +125,7 @@ public class PlottingActionBarManager implements IPlotActionSystem {
     	// 2D we must deactivate 1D tools.
     	if (type.is1D()) {
     		clearTool(ToolPageRole.ROLE_2D);
-    	} else if (is2D) {
+    	} else if (type.is2D()) {
     		clearTool(ToolPageRole.ROLE_1D);
     	}
     	
@@ -143,11 +141,7 @@ public class PlottingActionBarManager implements IPlotActionSystem {
 		if (toolPages!=null) toolPages.clear();
 		toolPages = null;
 		
-	    if (oneDimensionalActions!=null) oneDimensionalActions.clear();
-	    oneDimensionalActions = null;
-	       
-	    if (twoDimensionalActions!=null) twoDimensionalActions.clear();
-	    twoDimensionalActions = null;
+	    actionMap.clear();
 
 	}
 
@@ -158,7 +152,7 @@ public class PlottingActionBarManager implements IPlotActionSystem {
 	}
 
 	public void createToolDimensionalActions(final ToolPageRole role,
-			final String       viewId) {
+			                                 final String       viewId) {
 
 		final IActionBars bars = system.getActionBars();
 		if (bars!=null) {
@@ -167,11 +161,16 @@ public class PlottingActionBarManager implements IPlotActionSystem {
 				MenuAction toolSet = createToolActions(role, viewId);
 				if (toolSet==null) return;
 
-				final String groupName=role.getId()+".group";
-				bars.getToolBarManager().add(new Separator(groupName));
-				bars.getToolBarManager().insertAfter(groupName, toolSet);
-				if (role.is1D()&&!role.is2D()) oneDimensionalActions.add(new ActionContainer(groupName, toolSet, bars.getToolBarManager()));
-				if (role.is2D()&&!role.is1D()) twoDimensionalActions.add(new ActionContainer(groupName, toolSet, bars.getToolBarManager()));
+				if (role.is1D()&&!role.is2D()) {
+					final String groupName=role.getId()+".group1D";
+					registerToolBarGroup(groupName);
+					registerAction(groupName, toolSet, ActionType.XY);
+				}
+				if (role.is2D()&&!role.is1D()) {
+					final String groupName=role.getId()+".group2D";
+					registerToolBarGroup(groupName);
+					registerAction(groupName, toolSet, ActionType.IMAGE);
+				}
 
 				if (role.is2D()) {
 					toolSet.addActionsTo(imageMenu);
@@ -424,18 +423,19 @@ public class PlottingActionBarManager implements IPlotActionSystem {
 		imageMenu.addSeparator();
 	}
 	
+	public void registerToolBarGroup(final String groupName) {
+		if (getActionBars()!=null) getActionBars().getToolBarManager().add(new Separator(groupName));
+	}
+	public void registerMenuBarGroup(final String groupName) {
+		if (getActionBars()!=null) getActionBars().getMenuManager().add(new Separator(groupName));
+	}
 	
-	/**
-	 * Registers with the toolbar
-	 * @param groupName
-	 * @param action
-	 * @return
-	 */
-	public ActionContainer register1DAction(String groupName, IAction action) {
-		final IActionBars bars = getActionBars();
-		final ActionContainer ac = new ActionContainer(groupName, action, bars.getToolBarManager());
-		oneDimensionalActions.add(ac);
-		return ac;
+	public void registerAction(IAction action, ActionType actionType) {
+		registerAction(defaultGroupName,  action, actionType);
+	}
+	
+	public void registerAction(IAction action, ActionType actionType, ManagerType manType) {
+		registerAction(defaultGroupName,  action, actionType, manType);
 	}
 
 	/**
@@ -444,15 +444,33 @@ public class PlottingActionBarManager implements IPlotActionSystem {
 	 * @param action
 	 * @return
 	 */
-	public ActionContainer register2DAction(String groupName, IAction action) {
-		final IActionBars bars = getActionBars();
-		final ActionContainer ac = new ActionContainer(groupName, action, bars!=null?bars.getToolBarManager():null);
-		twoDimensionalActions.add(ac);
-		return ac;
+	public void registerAction(String groupName, IAction action, ActionType actionType) {
+		registerAction(groupName, action, actionType, ManagerType.TOOLBAR);
 	}
 
 
-	public IActionBars getActionBars() {
+
+	public void registerAction(String groupName, IAction action, ActionType actionType, ManagerType manType) {
+
+		// We generate an id!
+		if (action.getId()==null) {
+			action.setId(groupName+action.getText());
+		}
+		final IContributionManager man = manType==ManagerType.MENUBAR 
+				                       ? getActionBars().getMenuManager() 
+				                       : getActionBars().getToolBarManager();
+				                       
+		final ActionContainer ac = new ActionContainer(groupName, action, man);
+		List<ActionContainer> actions = actionMap.get(actionType);
+		if (actions==null) {
+			actions = new ArrayList<ActionContainer>(7);
+			actionMap.put(actionType, actions);
+		}
+		actions.add(ac);
+		ac.insert();
+	}
+
+	private IActionBars getActionBars() {
 		return system.getActionBars();
 	}
 
@@ -506,20 +524,18 @@ public class PlottingActionBarManager implements IPlotActionSystem {
 	@Override
 	public void remove(String id) {
         //super.remove(id);
-		if (oneDimensionalActions!=null) for (Iterator<ActionContainer> it= this.oneDimensionalActions.iterator(); it.hasNext(); ) {
-			ActionContainer ac = it.next();
-			if (ac.getAction().getId()!=null && ac.getAction().getId().equals(id)) {
-				it.remove();
-				break;
+
+		for (ActionType actionType : ActionType.values()) {
+
+			final List<ActionContainer> actions = actionMap.get(actionType);
+			
+			for (Iterator<ActionContainer> it= actions.iterator(); it.hasNext(); ) {
+				ActionContainer ac = it.next();
+				if (ac.isId(id)) it.remove();
 			}
+
 		}
-		if (twoDimensionalActions!=null) for (Iterator<ActionContainer> it= this.twoDimensionalActions.iterator(); it.hasNext(); ) {
-			ActionContainer ac = it.next();
-			if (ac.getAction().getId()!=null && ac.getAction().getId().equals(id)) {
-				it.remove();
-				break;
-			}
-		}
+
 		if (system.getActionBars()!=null) {
 			system.getActionBars().getToolBarManager().remove(id);
 			system.getActionBars().getMenuManager().remove(id);

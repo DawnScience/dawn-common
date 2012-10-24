@@ -51,4 +51,7 @@ public enum PlotType {
 	public boolean is3D() {
 		return is3D;
 	}
+	public boolean is1Dor2D() {
+		return is1D()||is2D();
+	}
 }

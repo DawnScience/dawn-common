@@ -3,33 +3,21 @@ package org.dawb.common.ui.plot;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IContributionManager;
 
-public class ActionContainer {
+class ActionContainer {
 
-	private String  groupName;
+	private String  groupId;
 	private IAction action;
 	private IContributionManager manager;
 
 	public ActionContainer(String groupName, IAction action, IContributionManager manager) {
-		this.groupName = groupName;
+		this.groupId = groupName;
 		this.action  = action;
 		this.manager = manager;
-	}
-
-	public String getId() {
-		return action.getId();
-	}
-
-	public IAction getAction() {
-		return action;
 	}
 
 	@SuppressWarnings("unused")
 	public void setAction(IAction action) {
 		this.action = action;
-	}
-
-	public IContributionManager getManager() {
-		return manager;
 	}
 
 	@SuppressWarnings("unused")
@@ -41,12 +29,25 @@ public class ActionContainer {
 		return action.toString();
 	}
 
-	public String getGroupName() {
-		return groupName;
+	public void setGroupId(String groupName) {
+		this.groupId = groupName;
 	}
 
-	public void setGroupName(String groupName) {
-		this.groupName = groupName;
+	public void insert() {
+		if (isActive()) return;
+		manager.appendToGroup(groupId, action);
+	}
+	
+	public void remove() {
+		manager.remove(action.getId());
+	}
+
+	public boolean isActive() {
+		return manager.find(action.getId())!=null;
+	}
+
+	public boolean isId(String id) {
+		return this.action.getId()!=null && this.action.getId().equals(id);
 	}
 
 
