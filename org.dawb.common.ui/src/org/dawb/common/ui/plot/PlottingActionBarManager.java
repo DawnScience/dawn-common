@@ -424,10 +424,21 @@ public class PlottingActionBarManager implements IPlotActionSystem {
 	}
 	
 	public void registerToolBarGroup(final String groupName) {
-		if (getActionBars()!=null) getActionBars().getToolBarManager().add(new Separator(groupName));
+		registerGroup(groupName, ManagerType.TOOLBAR);
 	}
+
 	public void registerMenuBarGroup(final String groupName) {
-		if (getActionBars()!=null) getActionBars().getMenuManager().add(new Separator(groupName));
+		registerGroup(groupName, ManagerType.MENUBAR);
+	}
+	
+	public void registerGroup(String groupName, ManagerType type) {
+		if (getActionBars()!=null) {
+			if (type==ManagerType.TOOLBAR) {
+				getActionBars().getToolBarManager().add(new Separator(groupName));
+			} else {
+				getActionBars().getMenuManager().add(new Separator(groupName));
+			}
+		}
 	}
 	
 	public void registerAction(IAction action, ActionType actionType) {

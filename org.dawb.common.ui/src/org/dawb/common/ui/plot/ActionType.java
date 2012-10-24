@@ -17,6 +17,9 @@ public enum ActionType {
 		if ((type.is2D()||type.is1D()) && this==XYANDIMAGE) {
 			return true;
 		}
+		if (type.is3D() && this==THREED) {
+			return true;
+		}
 		
 		return false;
 	}

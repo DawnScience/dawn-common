@@ -64,10 +64,17 @@ import org.eclipse.swt.SWTError;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.events.DragDetectEvent;
+import org.eclipse.swt.events.DragDetectListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.TouchEvent;
+import org.eclipse.swt.events.TouchListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -736,14 +743,16 @@ public class SliceComponent {
 		scale.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
 		scaleEditor.setMinimum(0);
 		scale.setIncrement(1);
+		scale.addMouseListener(new MouseAdapter() {			
+			@Override
+			public void mouseUp(MouseEvent e) {
+				if (!plotType.is3D()) return;
+				updateSlice(true);
+			}
+		});
 		scaleEditor.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				final DimsData data  = (DimsData)((IStructuredSelection)viewer.getSelection()).getFirstElement();
-				final int value = scale.getSelection();
-				data.setSlice(value);
-				data.setSliceRange(null);
-				if (synchronizeSliceData(data)) slice(false);
-				scale.setToolTipText(getScaleTooltip(scale.getMinimum(), scale.getMaximum()));
+				updateSlice(!plotType.is3D());
 			}
 		});
 		
@@ -796,6 +805,16 @@ public class SliceComponent {
 		editors[3] = axisDataEditor;
 		
 		return editors;
+	}
+
+	protected void updateSlice(boolean doSlice) {
+		final DimsData data  = (DimsData)((IStructuredSelection)viewer.getSelection()).getFirstElement();
+		final Scale scale = (Scale)scaleEditor.getControl();
+		final int value = scale.getSelection();
+		data.setSlice(value);
+		data.setSliceRange(null);
+		scale.setToolTipText(getScaleTooltip(scale.getMinimum(), scale.getMaximum()));		
+		if (doSlice&&synchronizeSliceData(data)) slice(false);
 	}
 
 	protected String[] getAxisItems() {

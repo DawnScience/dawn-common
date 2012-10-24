@@ -232,6 +232,7 @@ public class SliceUtils {
 			plottingSystem.setPlotType(mode);
 			AbstractDataset y = getNexusAxis(currentSlice, slice.getShape()[0], currentSlice.getX()+1, true, monitor);
 			AbstractDataset x = getNexusAxis(currentSlice, slice.getShape()[1], currentSlice.getY()+1, true, monitor);		
+			if (monitor!=null&&monitor.isCanceled()) return;
 			plottingSystem.updatePlot2D(slice, Arrays.asList(x,y), monitor);
 			plottingSystem.repaint();
  			
