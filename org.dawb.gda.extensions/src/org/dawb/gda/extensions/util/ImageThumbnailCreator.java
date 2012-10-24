@@ -247,7 +247,7 @@ public class ImageThumbnailCreator extends AbstractServiceFactory implements ITh
 					final Shell   shell   = new Shell(display);
 					shell.setSize(600, 600);
 					final Composite plotter = new Composite(shell, SWT.NONE);
-					system.createPlotPart(plotter, "Thumbnail", null, PlotType.PT1D, null);
+					system.createPlotPart(plotter, "Thumbnail", null, PlotType.XY, null);
 					
 					// TODO set no title?
 					

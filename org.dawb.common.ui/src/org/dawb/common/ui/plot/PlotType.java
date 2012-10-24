@@ -10,26 +10,25 @@
 package org.dawb.common.ui.plot;
 
 public enum PlotType {
+    
+	IMAGE(false, true, false), 
+    
+    SURFACE(false, false, true), 
+    
+    XY(true, false, false), 
+        
+    XY_STACKED(true, false, false),
 
-    IMAGE(false), 
+    XY_STACKED_3D(false, false, true);
     
-    SURFACE(false, true), 
-    
-    PT1D(true), 
-    
-    PT1D_MULTI(true), 
-    
-    PT1D_STACKED(true),
+	
+	
+	
+	private final boolean is1D, is2D, is3D;
 
-    PT1D_3D(true, true);
-    
-	private final boolean is1D, is3D;
-
-	private PlotType(boolean is1D) {
-		this(is1D, false);
-    }
-	private PlotType(boolean is1D, boolean is3D) {
+	private PlotType(boolean is1D, boolean is2D, boolean is3D) {
     	this.is1D = is1D;
+    	this.is2D = is2D;
     	this.is3D = is3D;
 	}
 	
@@ -46,7 +45,9 @@ public enum PlotType {
 	public boolean is1D() {
 		return is1D;
 	}
-
+	public boolean is2D() {
+		return is2D;
+	}
 	public boolean is3D() {
 		return is3D;
 	}

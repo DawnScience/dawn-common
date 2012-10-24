@@ -258,7 +258,7 @@ public class SliceComponent {
         final CheckableActionGroup grp = new CheckableActionGroup();
         final Action xyPlot = new Action("Slice as line plots", IAction.AS_CHECK_BOX) {
         	public void run() {
-        		plotType = PlotType.PT1D;
+        		plotType = PlotType.XY;
         		// Loop over DimsData to ensure 1X only.
         		if (dimsDataList!=null) dimsDataList.setSingleAxisOnly(0);   		
         		plottingTypeChanged();
@@ -267,11 +267,11 @@ public class SliceComponent {
 		man.add(xyPlot);
 		xyPlot.setImageDescriptor(Activator.getImageDescriptor("icons/TraceLine.png"));
 		grp.add(xyPlot);
-		plotTypeActions.put(PlotType.PT1D, xyPlot);
+		plotTypeActions.put(PlotType.XY, xyPlot);
 		
         final Action stackPlot = new Action("Slice as a stack of line plots", IAction.AS_CHECK_BOX) {
         	public void run() {
-        		plotType = PlotType.PT1D_STACKED;
+        		plotType = PlotType.XY_STACKED;
         		// Loop over DimsData to ensure 1X only.
         		if (dimsDataList!=null) dimsDataList.setTwoAxisOnly(0, 1);   		
         		plottingTypeChanged();
@@ -280,7 +280,7 @@ public class SliceComponent {
 		man.add(stackPlot);
 		stackPlot.setImageDescriptor(Activator.getImageDescriptor("icons/TraceLines.png"));
 		grp.add(stackPlot);
-		plotTypeActions.put(PlotType.PT1D_STACKED, stackPlot);
+		plotTypeActions.put(PlotType.XY_STACKED, stackPlot);
 
 		
         final Action imagePlot = new Action("Slice as image", IAction.AS_CHECK_BOX) {
@@ -523,7 +523,7 @@ public class SliceComponent {
 		}
 		
 		if (dimsDataList!=null) {
-			plotType = dimsDataList.getAxisCount()>1 ? PlotType.IMAGE : PlotType.PT1D;
+			plotType = dimsDataList.getAxisCount()>1 ? PlotType.IMAGE : PlotType.XY;
 			plotTypeActions.get(plotType).setChecked(true);
 		}
 
@@ -568,7 +568,7 @@ public class SliceComponent {
 
 		String errorMessage = "";
 		boolean ok = false;
-		if (plotType==PlotType.PT1D) {
+		if (plotType==PlotType.XY) {
 			ok = isX;
 			errorMessage = "Please set an X axis.";
 		} else {
@@ -617,7 +617,7 @@ public class SliceComponent {
 				if (col==0) return;
 				if (col==1) {
 					int axis = (Integer)value;
-					if (plotType==PlotType.PT1D) axis = axis>-1 ? 0 : -1;
+					if (plotType==PlotType.XY) axis = axis>-1 ? 0 : -1;
 					data.setAxis(axis);
 					updateAxesChoices();
 				}
@@ -800,9 +800,9 @@ public class SliceComponent {
 
 	protected String[] getAxisItems() {
 		String[] items = null;
-		if (plotType==PlotType.PT1D) {
+		if (plotType==PlotType.XY) {
 			items = new String[]{"X","(Slice)"};
-		} else if (plotType==PlotType.PT1D_STACKED) {
+		} else if (plotType==PlotType.XY_STACKED) {
 			items = new String[]{"X","Y (Many)", "(Slice)"};
 		} else {
 			if (isReversedImage()) {
@@ -945,10 +945,10 @@ public class SliceComponent {
 	public String getAxisLabel(DimsData data) {
 
 		final int axis = data.getAxis();
-		if (plotType==PlotType.PT1D) {
+		if (plotType==PlotType.XY) {
 			return axis>-1 ? "X" : "(Slice)";
 		}
-		if (plotType==PlotType.PT1D_STACKED) {
+		if (plotType==PlotType.XY_STACKED) {
 			return axis==0 ? "X" : axis==1 ? "Y (Many)" : "(Slice)";
 		}
 		if (plottingSystem!=null) {

@@ -187,7 +187,7 @@ public class SliceUtils {
 		if (monitor!=null&&monitor.isCanceled()) return;
 		
 		if (monitor!=null) monitor.worked(1);
-		if (mode==PlotType.PT1D) {
+		if (mode==PlotType.XY) {
 			plottingSystem.clear();
 			final AbstractDataset x = getNexusAxis(currentSlice, slice.getShape()[0], currentSlice.getX()+1, true, monitor);
 			plottingSystem.createPlot1D(x, Arrays.asList(slice), monitor);
@@ -198,7 +198,7 @@ public class SliceUtils {
 				}
 			});
 			
-		} else if (mode==PlotType.PT1D_MULTI || mode==PlotType.PT1D_STACKED) {
+		} else if (mode==PlotType.XY_STACKED) {
 			
 			final AbstractDataset xAxis = getNexusAxis(currentSlice, slice.getShape()[0], currentSlice.getX()+1, true, monitor);
 			plottingSystem.clear();

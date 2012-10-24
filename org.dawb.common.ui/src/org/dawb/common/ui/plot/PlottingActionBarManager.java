@@ -109,7 +109,7 @@ public class PlottingActionBarManager implements IPlotActionSystem {
     		}
 		}
     	
-    	final boolean is2D = !type.is1D();
+    	final boolean is2D = type.is2D();
     	if (twoDimensionalActions!=null) for (ActionContainer ac : twoDimensionalActions) {
     		if (is2D && ac.getManager().find(ac.getId())==null) {
     			ac.getManager().insertAfter(ac.getGroupName(), ac.getAction());
