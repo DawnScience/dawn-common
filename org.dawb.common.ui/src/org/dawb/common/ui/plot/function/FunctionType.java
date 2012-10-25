@@ -17,43 +17,44 @@
 package org.dawb.common.ui.plot.function;
 
 import uk.ac.diamond.scisoft.analysis.fitting.functions.AFunction;
-import uk.ac.diamond.scisoft.analysis.fitting.functions.Box;
-import uk.ac.diamond.scisoft.analysis.fitting.functions.Cubic;
+import uk.ac.diamond.scisoft.analysis.fitting.functions.FunctionFactory;
 //import uk.ac.diamond.scisoft.analysis.fitting.functions.CubicSpline;
-import uk.ac.diamond.scisoft.analysis.fitting.functions.Fermi;
-import uk.ac.diamond.scisoft.analysis.fitting.functions.Gaussian;
 //import uk.ac.diamond.scisoft.analysis.fitting.functions.GaussianND;
-import uk.ac.diamond.scisoft.analysis.fitting.functions.Lorentzian;
 //import uk.ac.diamond.scisoft.analysis.fitting.functions.Offset;
-import uk.ac.diamond.scisoft.analysis.fitting.functions.PearsonVII;
-import uk.ac.diamond.scisoft.analysis.fitting.functions.Polynomial;
-import uk.ac.diamond.scisoft.analysis.fitting.functions.PseudoVoigt;
-import uk.ac.diamond.scisoft.analysis.fitting.functions.Quadratic;
 //import uk.ac.diamond.scisoft.analysis.fitting.functions.Step;
-import uk.ac.diamond.scisoft.analysis.fitting.functions.StraightLine;
 
-
+/**
+ * These are the functions editable with the edit table and as such 
+ * are not *all* those available from the FunctionFactory 
+ * 
+ * This class now uses FunctionFactory, although this does not actually
+ * make much difference as it was fine as it was. It does mean that 
+ * package private constructors could be used for functions and 
+ * package private classes to make functions truely swappable at some
+ * point in the future.
+ */
 public enum FunctionType {
 
-	BOX(Box.class),
-	CUBIC(Cubic.class),
+	BOX("Box"),
+	CUBIC("Cubic"),
 //	CUBIC_SPLINE(CubicSpline.class),
-	FERMI(Fermi.class),
-	GAUSSIAN(Gaussian.class),
+	FERMI("Fermi"),
+	FERMIGAUSS("FermiGauss"),
+	GAUSSIAN("Gaussian"),
 //	GAUSSIAN_ND(GaussianND.class),
-	LORENTZIAN(Lorentzian.class),
+	LORENTZIAN("Lorentzian"),
 //	OFFSET(Offset.class),
-	PEARSON_VII(PearsonVII.class),
-	POLYNOMIAL(Polynomial.class),
-	PSEUDO_VOIGT(PseudoVoigt.class),
-	QUADRATIC(Quadratic.class),
+	PEARSON_VII("PearsonVII"),
+	POLYNOMIAL("Polynomial"),
+	PSEUDO_VOIGT("PseudoVoigt"),
+	QUADRATIC("Quadratic"),
 //	STEP(Step.class),
-	STRAIGHT_LINE(StraightLine.class);
+	STRAIGHT_LINE("StraightLine");
 	
-	private Class<? extends AFunction> clazz;
+	private String functionName;
 
-	FunctionType(Class<? extends AFunction> clazz) {
-		this.clazz = clazz;
+	FunctionType(String functionName) {
+		this.functionName = functionName;
 	}
 	
 	public int getIndex() {
@@ -72,7 +73,7 @@ public enum FunctionType {
 	}
 
 	public String getName() {
-		return clazz.getSimpleName();
+		return FunctionFactory.getClass(functionName).getSimpleName();
 	}
 
 	public static FunctionType getType(int index) {
@@ -80,24 +81,30 @@ public enum FunctionType {
 		return ops[index];
 	}
 
-	public AFunction getFunction() throws InstantiationException, IllegalAccessException {
-		return clazz.newInstance();
+	public AFunction getFunction() throws Exception {
+		return FunctionFactory.getFunction(functionName);
 	}
 
 	public static int getIndex(Class<? extends AFunction> class1) {
-		final FunctionType[] ops = FunctionType.values();
-		for (FunctionType functionType : ops) {
-			if (functionType.clazz == class1) return functionType.getIndex();
+		
+		try {
+			String name = FunctionFactory.getName(class1);
+			final FunctionType[] ops = FunctionType.values();
+			for (FunctionType functionType : ops) {
+				if (functionType.functionName == name) return functionType.getIndex();
+			}
+		} catch (Exception e) {
+			return -1;
 		}
 		return -1;
 	}
 
-	public static AFunction createNew(int selectionIndex) throws InstantiationException, IllegalAccessException {
+	public static AFunction createNew(int selectionIndex) throws Exception {
 		final FunctionType function = getType(selectionIndex);
-		return function.clazz.newInstance();
+		return FunctionFactory.getFunction(function.functionName);
 	}
 
-	public static AFunction createNew(FunctionType function) throws InstantiationException, IllegalAccessException {
-		return function.clazz.newInstance();
+	public static AFunction createNew(FunctionType function) throws Exception {
+		return FunctionFactory.getFunction(function.functionName);
 	}
 }
