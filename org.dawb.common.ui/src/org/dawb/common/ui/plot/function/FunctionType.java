@@ -39,7 +39,7 @@ public enum FunctionType {
 	CUBIC("Cubic"),
 //	CUBIC_SPLINE(CubicSpline.class),
 	FERMI("Fermi"),
-	FERMIGAUSS("FermiGauss"),
+	FERMIGAUSS("Fermi * Gaussian"),
 	GAUSSIAN("Gaussian"),
 //	GAUSSIAN_ND(GaussianND.class),
 	LORENTZIAN("Lorentzian"),
@@ -49,7 +49,7 @@ public enum FunctionType {
 	PSEUDO_VOIGT("PseudoVoigt"),
 	QUADRATIC("Quadratic"),
 //	STEP(Step.class),
-	STRAIGHT_LINE("StraightLine");
+	STRAIGHT_LINE("Linear");
 	
 	private String functionName;
 
@@ -73,7 +73,7 @@ public enum FunctionType {
 	}
 
 	public String getName() {
-		return FunctionFactory.getClass(functionName).getSimpleName();
+		return functionName;
 	}
 
 	public static FunctionType getType(int index) {
