@@ -186,6 +186,7 @@ public class GridUtils {
 	 */
 	public static void removeMargins(Composite area) {
 		final GridLayout layout = (GridLayout)area.getLayout();
+		if (layout==null) return;
 		layout.horizontalSpacing=0;
 		layout.verticalSpacing  =0;
 		layout.marginBottom     =0;
