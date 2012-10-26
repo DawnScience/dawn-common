@@ -187,7 +187,7 @@ public class NexusUtils {
 			// Some nexus files set axis wrong
 			if (axis==null && !isSignal) {
 				final long[] dims = ((Dataset)hObject).getDims();
-				if (dims[0]==size) {
+				if (dims[0]==size && dims.length==1) {
 					axis = (Dataset)hObject;
 				}
 			}
