@@ -539,10 +539,11 @@ public class PlottingActionBarManager implements IPlotActionSystem {
 		for (ActionType actionType : ActionType.values()) {
 
 			final List<ActionContainer> actions = actionMap.get(actionType);
-			
-			for (Iterator<ActionContainer> it= actions.iterator(); it.hasNext(); ) {
-				ActionContainer ac = it.next();
-				if (ac.isId(id)) it.remove();
+			if (actions!=null) {
+				for (Iterator<ActionContainer> it= actions.iterator(); it.hasNext(); ) {
+					ActionContainer ac = it.next();
+					if (ac.isId(id)) it.remove();
+				}
 			}
 
 		}
