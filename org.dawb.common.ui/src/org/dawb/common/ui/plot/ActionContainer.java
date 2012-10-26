@@ -1,6 +1,7 @@
 package org.dawb.common.ui.plot;
 
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IContributionManager;
 
 class ActionContainer {
@@ -33,8 +34,8 @@ class ActionContainer {
 		this.groupId = groupName;
 	}
 
-	public void insert() {
-		if (isActive()) return;
+	public void insert(boolean force) {
+		if (!force && isActive()) return;
 		manager.appendToGroup(groupId, action);
 	}
 	
@@ -43,7 +44,9 @@ class ActionContainer {
 	}
 
 	public boolean isActive() {
-		return manager.find(action.getId())!=null;
+		IContributionItem act = manager.find(action.getId());
+		if (act==null) return false;
+		return true;
 	}
 
 	public boolean isId(String id) {

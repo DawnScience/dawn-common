@@ -108,7 +108,7 @@ public class PlottingActionBarManager implements IPlotActionSystem {
     		final List<ActionContainer> actions = actionMap.get(actionType);
         	if (actions!=null) for (ActionContainer ac : actions) {
         		if (actionType.isCompatible(type)) {
-        			ac.insert();
+        			ac.insert(false);
         		} else {
         			ac.remove();
         		}
@@ -142,7 +142,6 @@ public class PlottingActionBarManager implements IPlotActionSystem {
 		toolPages = null;
 		
 	    actionMap.clear();
-
 	}
 
 	private boolean isToolsRequired = true;
@@ -478,7 +477,7 @@ public class PlottingActionBarManager implements IPlotActionSystem {
 			actionMap.put(actionType, actions);
 		}
 		actions.add(ac);
-		ac.insert();
+		ac.insert(true);
 	}
 
 	private IActionBars getActionBars() {
