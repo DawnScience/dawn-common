@@ -424,10 +424,21 @@ public class PlottingActionBarManager implements IPlotActionSystem {
 	}
 	
 	public void registerToolBarGroup(final String groupName) {
-		if (getActionBars()!=null) getActionBars().getToolBarManager().add(new Separator(groupName));
+		registerGroup(groupName, ManagerType.TOOLBAR);
 	}
+
 	public void registerMenuBarGroup(final String groupName) {
-		if (getActionBars()!=null) getActionBars().getMenuManager().add(new Separator(groupName));
+		registerGroup(groupName, ManagerType.MENUBAR);
+	}
+	
+	public void registerGroup(String groupName, ManagerType type) {
+		if (getActionBars()!=null) {
+			if (type==ManagerType.TOOLBAR) {
+				getActionBars().getToolBarManager().add(new Separator(groupName));
+			} else {
+				getActionBars().getMenuManager().add(new Separator(groupName));
+			}
+		}
 	}
 	
 	public void registerAction(IAction action, ActionType actionType) {
@@ -528,10 +539,11 @@ public class PlottingActionBarManager implements IPlotActionSystem {
 		for (ActionType actionType : ActionType.values()) {
 
 			final List<ActionContainer> actions = actionMap.get(actionType);
-			
-			for (Iterator<ActionContainer> it= actions.iterator(); it.hasNext(); ) {
-				ActionContainer ac = it.next();
-				if (ac.isId(id)) it.remove();
+			if (actions!=null) {
+				for (Iterator<ActionContainer> it= actions.iterator(); it.hasNext(); ) {
+					ActionContainer ac = it.next();
+					if (ac.isId(id)) it.remove();
+				}
 			}
 
 		}

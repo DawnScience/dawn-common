@@ -47,21 +47,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.ac.diamond.scisoft.analysis.fitting.functions.AFunction;
-import uk.ac.diamond.scisoft.analysis.fitting.functions.Box;
-import uk.ac.diamond.scisoft.analysis.fitting.functions.Cubic;
-import uk.ac.diamond.scisoft.analysis.fitting.functions.CubicSpline;
-import uk.ac.diamond.scisoft.analysis.fitting.functions.Fermi;
-import uk.ac.diamond.scisoft.analysis.fitting.functions.Gaussian;
-import uk.ac.diamond.scisoft.analysis.fitting.functions.GaussianND;
-import uk.ac.diamond.scisoft.analysis.fitting.functions.Lorentzian;
-import uk.ac.diamond.scisoft.analysis.fitting.functions.Offset;
-import uk.ac.diamond.scisoft.analysis.fitting.functions.PearsonVII;
-import uk.ac.diamond.scisoft.analysis.fitting.functions.Polynomial;
-import uk.ac.diamond.scisoft.analysis.fitting.functions.PseudoVoigt;
-import uk.ac.diamond.scisoft.analysis.fitting.functions.Quadratic;
-import uk.ac.diamond.scisoft.analysis.fitting.functions.Step;
-import uk.ac.diamond.scisoft.analysis.fitting.functions.StraightLine;
-
+import uk.ac.diamond.scisoft.analysis.fitting.functions.FunctionFactory;
 import uk.ac.gda.richbeans.components.cell.FieldComponentCellEditor;
 import uk.ac.gda.richbeans.components.wrappers.BooleanWrapper;
 import uk.ac.gda.richbeans.components.wrappers.FloatSpinnerWrapper;
@@ -375,138 +361,24 @@ public class FunctionEditTable {
 	}
 
 	public AFunction createFunction(List<FunctionRow> rows, FunctionRow changed) {
-				
-		AFunction ret = null; 
-		if (function instanceof Box) {
-			Box box = new Box(rows.get(0).getParameter(0), 
-					rows.get(1).getParameter(0),
-					rows.get(2).getParameter(0),
-					rows.get(3).getParameter(0),
-					rows.get(4).getParameter(0));
-			for (int i = 0; i < box.getNoOfParameters(); i++){
-				box.getParameter(i).setLowerLimit(rows.get(i).getParameter(1));
-				box.getParameter(i).setUpperLimit(rows.get(i).getParameter(2));
-				box.getParameter(i).setFixed(rows.get(i).isFixed());
-			}
-			ret = box;
-		} else if (function instanceof Cubic) {
-			double[] params = new double[]{rows.get(0).getParameter(0), 
-					rows.get(1).getParameter(0),
-					rows.get(2).getParameter(0),
-					rows.get(3).getParameter(0)};
-			Cubic cubic = new Cubic(params);
-			for (int i = 0; i < params.length; i++) {
-				cubic.getParameter(i).setLowerLimit(rows.get(i).getParameter(1));
-				cubic.getParameter(i).setUpperLimit(rows.get(i).getParameter(2));
-				cubic.getParameter(i).setFixed(rows.get(i).isFixed());
-			}
-			ret = cubic;
-		} else if (function instanceof CubicSpline) {
-			CubicSpline cubicSpline = (CubicSpline)function;
-			ret = cubicSpline;
-		} else if (function instanceof Fermi) {
-			Fermi fermi = new Fermi(rows.get(0).getParameter(0), 
-								rows.get(1).getParameter(0),
-								rows.get(2).getParameter(0),
-								rows.get(3).getParameter(0));
-			for (int i = 0; i < fermi.getNoOfParameters(); i++) {
-				fermi.getParameter(i).setLowerLimit(rows.get(i).getParameter(1));
-				fermi.getParameter(i).setUpperLimit(rows.get(i).getParameter(2));
-				fermi.getParameter(i).setFixed(rows.get(i).isFixed());
-			}
-			ret = fermi;
-		} else if (function instanceof Gaussian) {
-			Gaussian gaussian = new Gaussian(rows.get(0).getParameter(0), 
-								rows.get(1).getParameter(0),
-								rows.get(2).getParameter(0));
-			for (int i = 0; i < gaussian.getNoOfParameters(); i++) {
-				gaussian.getParameter(i).setLowerLimit(rows.get(i).getParameter(1));
-				gaussian.getParameter(i).setUpperLimit(rows.get(i).getParameter(2));
-				gaussian.getParameter(i).setFixed(rows.get(i).isFixed());
-			}
-			ret = gaussian;
-		}else if (function instanceof GaussianND) {
-			GaussianND gaussianND = new GaussianND(rows.get(1).getParameter(1), 
-				rows.get(2).getParameter(1),
-				rows.get(3).getParameter(1));
-			ret = gaussianND;
-		}else if (function instanceof Lorentzian) {
-			Lorentzian lorentzian = new Lorentzian(rows.get(0).getParameter(0), 
-					rows.get(1).getParameter(0),
-					rows.get(2).getParameter(0));
-			for (int i = 0; i < lorentzian.getNoOfParameters(); i++) {
-				lorentzian.getParameter(i).setLowerLimit(rows.get(i).getParameter(1));
-				lorentzian.getParameter(i).setUpperLimit(rows.get(i).getParameter(2));
-				lorentzian.getParameter(i).setFixed(rows.get(i).isFixed());
-			}
-			ret = lorentzian;
-		}else if (function instanceof Offset) {
-			Offset offset = (Offset)function;
-			ret = offset;
-		}else if (function instanceof PearsonVII) {
-			PearsonVII pearson = new PearsonVII(rows.get(0).getParameter(0), 
-					rows.get(1).getParameter(0),
-					rows.get(2).getParameter(0),
-					rows.get(3).getParameter(0));
-			for (int i = 0; i < pearson.getNoOfParameters(); i++) {
-				pearson.getParameter(i).setLowerLimit(rows.get(i).getParameter(1));
-				pearson.getParameter(i).setUpperLimit(rows.get(i).getParameter(2));
-				pearson.getParameter(i).setFixed(rows.get(i).isFixed());
-			}
-			ret = pearson;
-		}else if (function instanceof Polynomial){
-			double[] params = new double[function.getNoOfParameters()];
-			for (int i = 0; i < params.length; i++) {
-				params[i] = rows.get(i).getParameter(0);
-			}
-			Polynomial polynom = new Polynomial(params);
-			for(int i=0;i<polynom.getNoOfParameters(); i++){
-				polynom.getParameter(i).setLowerLimit(rows.get(i).getParameter(1));
-				polynom.getParameter(i).setUpperLimit(rows.get(i).getParameter(2));
-				polynom.getParameter(i).setFixed(rows.get(i).isFixed());
-			}
-			ret = polynom;
-		}else if (function instanceof PseudoVoigt) {
-			PseudoVoigt pseudoVoigt = new PseudoVoigt(rows.get(0).getParameter(0), 
-									rows.get(1).getParameter(0),
-									rows.get(2).getParameter(0),
-									rows.get(3).getParameter(0),
-									rows.get(4).getParameter(0));
-			for (int i = 0; i < pseudoVoigt.getNoOfParameters(); i++) {
-				pseudoVoigt.getParameter(i).setLowerLimit(rows.get(i).getParameter(1));
-				pseudoVoigt.getParameter(i).setUpperLimit(rows.get(i).getParameter(2));
-				pseudoVoigt.getParameter(i).setFixed(rows.get(i).isFixed());
-			}
-			ret = pseudoVoigt;
-		}else if (function instanceof Quadratic) {
-			double[] params = new double[function.getNoOfParameters()];
-			for (int i = 0; i < params.length; i++) {
-				params[i] = rows.get(i).getParameter(0);
-			}
-			Quadratic quadratic = new Quadratic(params);
-			for(int i=0;i<quadratic.getNoOfParameters(); i++){
-				quadratic.getParameter(i).setLowerLimit(rows.get(i).getParameter(1));
-				quadratic.getParameter(i).setUpperLimit(rows.get(i).getParameter(2));
-				quadratic.getParameter(i).setFixed(rows.get(i).isFixed());
-			}
-			ret = quadratic;
-		}else if (function instanceof Step) {
-			Step step = (Step)function;
-			ret = step;
-		}else if (function instanceof StraightLine) {
-			double[] params = new double[function.getNoOfParameters()];
-			for (int i = 0; i < params.length; i++) {
-				params[i] = rows.get(i).getParameter(0);
-			}
-			StraightLine straightLine = new StraightLine(params);
-			for(int i=0;i<straightLine.getNoOfParameters(); i++){
-				straightLine.getParameter(i).setLowerLimit(rows.get(i).getParameter(1));
-				straightLine.getParameter(i).setUpperLimit(rows.get(i).getParameter(2));
-				straightLine.getParameter(i).setFixed(rows.get(i).isFixed());
-			}
-			ret = straightLine;
+			
+		try {
+			AFunction ret = FunctionFactory.getFunction(function.getName()); 
+			
+			final int count  = function.getNoOfParameters();
+			for (int i = 0; i < count; i++) {
+				ret.getParameter(i).setValue(rows.get(i).getParameter(0));
+				ret.getParameter(i).setLowerLimit(rows.get(i).getParameter(1));
+				ret.getParameter(i).setUpperLimit(rows.get(i).getParameter(2));
+				ret.getParameter(i).setFixed(rows.get(i).isFixed());
+			}	
+			return ret;
+			
+		} catch (Exception ne) {
+			logger.error("Unable to create function "+function.getName(), ne);
 		}
-		return ret;
+
+		return null;
 	}
 
 	public void dispose() {

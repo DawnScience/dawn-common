@@ -1,6 +1,7 @@
 package org.dawb.common.ui.plot;
 
 import org.dawb.common.ui.plot.tool.IToolPage.ToolPageRole;
+import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IContributionManager;
 
 /**
@@ -62,4 +63,28 @@ public interface IPlotActionSystem extends ITraceActionProvider{
 	 */
 	public void fillToolActions(IContributionManager man, ToolPageRole role);
 
+	
+	/**
+	 * Create tool actions for a given role.
+	 * @param role3d
+	 * @param string
+	 */
+	public void createToolDimensionalActions(ToolPageRole role3d, String viewId);
+
+	/**
+	 * Creates a group, generally do this before registerAction(...)
+	 * 
+	 * @param groupName
+	 * @param type
+	 */
+	public void registerGroup(String groupName, ManagerType type);
+	
+	/**
+	 * 
+	 * @param groupName
+	 * @param action
+	 * @param actionType
+	 * @param manType
+	 */
+	public void registerAction(String groupName, IAction action, ActionType actionType, ManagerType manType);
 }

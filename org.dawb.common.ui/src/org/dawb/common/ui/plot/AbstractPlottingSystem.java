@@ -293,14 +293,6 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 			l.tracesAdded(evt);
 		}
 	}
-
-	/**
-	 * Implement to turn off any actions relating to data set choosing
-	 * @param b
-	 */
-	public void setDatasetChoosingRequired(boolean b) {
-		//TODO
-	}
 	
 	private String title;
 	/**
