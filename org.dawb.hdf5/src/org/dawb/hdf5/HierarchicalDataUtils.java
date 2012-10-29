@@ -95,7 +95,7 @@ public class HierarchicalDataUtils {
 		if (requiredType<0) return true; // Numbers less than 0 are any dataset 
 		
         final int   type  = set.getDatatype().getDatatypeClass();
-        if (type==Datatype.CLASS_FLOAT || type==Datatype.CLASS_INTEGER) {
+        if (type==Datatype.CLASS_FLOAT || type==Datatype.CLASS_INTEGER || type==Datatype.CLASS_CHAR) {
         	if (IHierarchicalDataFile.NUMBER_ARRAY==requiredType) {
         		long[]shape = getDims(set);
                 if (shape==null) return true;
@@ -103,7 +103,7 @@ public class HierarchicalDataUtils {
         	}
         }
         
-        if (type==Datatype.CLASS_CHAR || type==Datatype.CLASS_STRING) {
+        if (type==Datatype.CLASS_STRING) {
         	return IHierarchicalDataFile.TEXT==requiredType;
         }
 

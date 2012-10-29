@@ -18,6 +18,7 @@ import ncsa.hdf.object.Group;
 import ncsa.hdf.object.h5.H5Datatype;
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ByteDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.DatasetUtils;
 import uk.ac.diamond.scisoft.analysis.dataset.DoubleDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.FloatDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.IntegerDataset;
@@ -76,21 +77,42 @@ public class H5Utils {
 
 		final int[] intShape  = getInt(longShape);
          
+		AbstractDataset ret = null;
         if (val instanceof byte[]) {
-         	return new ByteDataset((byte[])val, intShape);
+        	ret = new ByteDataset((byte[])val, intShape);
         } else if (val instanceof short[]) {
-        	return new ShortDataset((short[])val, intShape);
+        	ret = new ShortDataset((short[])val, intShape);
         } else if (val instanceof int[]) {
-        	return new IntegerDataset((int[])val, intShape);
+        	ret = new IntegerDataset((int[])val, intShape);
         } else if (val instanceof long[]) {
-        	return new LongDataset((long[])val, intShape);
+        	ret = new LongDataset((long[])val, intShape);
         } else if (val instanceof float[]) {
-        	return new FloatDataset((float[])val, intShape);
+        	ret = new FloatDataset((float[])val, intShape);
         } else if (val instanceof double[]) {
-       	    return new DoubleDataset((double[])val, intShape);
+        	ret = new DoubleDataset((double[])val, intShape);
+        } else {
+        	throw new Exception("Cannot deal with data type "+set.getDatatype().getDatatypeDescription());
         }
         
-        throw new Exception("Cannot deal with data type "+set.getDatatype().getDatatypeDescription());
+		if (set.getDatatype().isUnsigned()) {
+			switch (ret.getDtype()) {
+			case AbstractDataset.INT32:
+				ret = new LongDataset(ret);
+				DatasetUtils.unwrapUnsigned(ret, 32);
+				break;
+			case AbstractDataset.INT16:
+				ret = new IntegerDataset(ret);
+				DatasetUtils.unwrapUnsigned(ret, 16);
+				break;
+			case AbstractDataset.INT8:
+				ret = new ShortDataset(ret);
+				DatasetUtils.unwrapUnsigned(ret, 8);
+				break;
+			}
+		}
+
+        return ret;
+       
 	}
 
 	/**
