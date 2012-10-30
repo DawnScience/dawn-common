@@ -646,11 +646,12 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	@Override
 	public boolean is2D() {
 		final Collection<ITrace> traces = getTraces();
-		if (traces==null) return false;
-		for (ITrace iTrace : traces) {
-			if (iTrace instanceof IImageTrace) return true;
+		if (traces!=null && !traces.isEmpty()) {
+			for (ITrace iTrace : traces) {
+				if (iTrace instanceof IImageTrace) return true;
+			}
 		}
-		return false;
+		return plottingMode!=null ? plottingMode.is2D() : false;
 	}
 
 	@Override

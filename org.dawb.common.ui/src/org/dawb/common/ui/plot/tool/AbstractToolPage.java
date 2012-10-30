@@ -38,9 +38,10 @@ public abstract class AbstractToolPage extends Page implements IToolPage, IAdapt
 	}
 
 	@Override
-	public IPlottingSystem getPlottingSystem() {
-		return plotSystem;
-	}
+    public IPlottingSystem getPlottingSystem() {
+    	if (getLinkedToolPlot()!=null) return getLinkedToolPlot();
+    	return plotSystem;
+    }
 
 	@Override
 	public IToolPageSystem getToolSystem() {
@@ -227,6 +228,41 @@ public abstract class AbstractToolPage extends Page implements IToolPage, IAdapt
 	public boolean isDedicatedView() {
 		final String id = getViewPart().getSite().getId();
 		return "org.dawb.workbench.plotting.views.toolPageView.fixed".equals(id);
+	}
+	
+	/**
+	 * returns true if we are linked to an IToolPage
+	 * @return
+	 */
+	protected boolean isLinkedToolPage() {
+		return getLinkedToolPage()!=null;
+	}
+
+	/**
+	 * Returns tool page we are a sub tool of or null if we are not
+	 * @return
+	 */
+    protected IToolPage getLinkedToolPage() {
+    	final IWorkbenchPart part = getPart();
+        if (part instanceof IToolContainer) {
+    		// Go back up one so that history of profiles can be done.
+        	IToolContainer tView  = (IToolContainer)getPart();
+    		if (tView.getActiveTool() !=null) {
+    			final IToolPage tPage = (IToolPage)tView.getActiveTool();
+    			return tPage;
+    		}
+    	}
+   	    return null;
+    }
+    
+    protected IPlottingSystem getLinkedToolPlot() {
+    	IToolPage linkedTool = getLinkedToolPage();
+    	return linkedTool !=null ? linkedTool.getToolPlottingSystem() : null;
+    }
+    	
+	@Override
+	public IPlottingSystem getToolPlottingSystem() {
+		return null;
 	}
 
 }
