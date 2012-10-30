@@ -224,4 +224,12 @@ public interface IToolPage extends IPageBookViewPage, IAdaptable {
 	 * @return
 	 */
 	public boolean isAlwaysSeparateView();
+	
+	
+	/**
+	 * The PlottingSystem for the tool if there is one, otherwise null.
+	 * 
+	 * @return
+	 */
+	public IPlottingSystem getToolPlottingSystem();
 }

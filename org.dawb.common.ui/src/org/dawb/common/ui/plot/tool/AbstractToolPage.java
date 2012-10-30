@@ -225,4 +225,10 @@ public abstract class AbstractToolPage extends Page implements IToolPage, IAdapt
 		return false;
 	}
 
+	
+	@Override
+	public IPlottingSystem getToolPlottingSystem() {
+		return null;
+	}
+
 }
