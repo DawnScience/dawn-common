@@ -16,6 +16,7 @@ import java.util.List;
 import ncsa.hdf.object.Group;
 
 import org.dawb.common.ui.monitor.ProgressMonitorWrapper;
+import org.dawb.common.ui.plot.AbstractPlottingSystem;
 import org.dawb.common.ui.plot.IPlottingSystem;
 import org.dawb.common.ui.plot.PlotType;
 import org.dawb.hdf5.HierarchicalDataFactory;
@@ -190,6 +191,7 @@ public class SliceUtils {
 		if (mode==PlotType.XY) {
 			plottingSystem.clear();
 			final AbstractDataset x = getNexusAxis(currentSlice, slice.getShape()[0], currentSlice.getX()+1, true, monitor);
+			if (plottingSystem instanceof AbstractPlottingSystem) ((AbstractPlottingSystem)plottingSystem).setXfirst(true);
 			plottingSystem.createPlot1D(x, Arrays.asList(slice), monitor);
 			Display.getDefault().syncExec(new Runnable() {
 				public void run() {
@@ -221,6 +223,7 @@ public class SliceUtils {
 				ys.add(dds);
 				++index;
 			}
+			if (plottingSystem instanceof AbstractPlottingSystem) ((AbstractPlottingSystem)plottingSystem).setXfirst(true);
 			plottingSystem.createPlot1D(xAxis, ys, monitor);
 			Display.getDefault().syncExec(new Runnable() {
 				public void run() {
