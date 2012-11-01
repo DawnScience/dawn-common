@@ -47,8 +47,10 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.action.ToolBarManager;
+import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
+import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider;
 import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
 import org.eclipse.jface.viewers.ICellModifier;
@@ -164,8 +166,13 @@ public class SliceComponent {
 		final ToolBar        tool    = toolMan.createControl(area);
 		tool.setLayoutData(new GridData(SWT.RIGHT, SWT.TOP, true, false));
 		
-		this.viewer = new TableViewer(area, SWT.FULL_SELECTION | SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
-		viewer.getTable().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		final Composite tableComp = new Composite(area, SWT.NONE);
+		tableComp.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+
+		TableColumnLayout tableColumnLayout = new TableColumnLayout();
+		tableComp.setLayout(tableColumnLayout);
+
+		this.viewer = new TableViewer(tableComp, SWT.FULL_SELECTION | SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
 		viewer.getTable().addListener(SWT.MouseDoubleClick, new Listener() {
 			public void handleEvent(Event event) {
 				event.doit=false;
@@ -182,7 +189,7 @@ public class SliceComponent {
 			}
 		});
 
-		createColumns(viewer);
+		createColumns(viewer, tableColumnLayout);
 		viewer.setUseHashlookup(true);
 		viewer.setColumnProperties(COLUMN_PROPERTIES.toArray(new String[COLUMN_PROPERTIES.size()]));
 		viewer.setCellEditors(createCellEditors(viewer));
@@ -846,26 +853,26 @@ public class SliceComponent {
         return buf.toString();
 	}
 
-	private void createColumns(final TableViewer viewer) {
+	private void createColumns(final TableViewer viewer, TableColumnLayout layout) {
 		
 		final TableViewerColumn dim   = new TableViewerColumn(viewer, SWT.LEFT, 0);
 		dim.getColumn().setText("Dim");
-		dim.getColumn().setWidth(42);
+		layout.setColumnData(dim.getColumn(), new ColumnWeightData(42));
 		dim.setLabelProvider(new DelegatingStyledCellLabelProvider(new SliceColumnLabelProvider(0)));
 		
 		final TableViewerColumn axis   = new TableViewerColumn(viewer, SWT.LEFT, 1);
 		axis.getColumn().setText("Axis");
-		axis.getColumn().setWidth(65);
+		layout.setColumnData(axis.getColumn(), new ColumnWeightData(65));
 		axis.setLabelProvider(new DelegatingStyledCellLabelProvider(new SliceColumnLabelProvider(1)));
 
 		final TableViewerColumn slice   = new TableViewerColumn(viewer, SWT.LEFT, 2);
 		slice.getColumn().setText("Slice Index");
-		slice.getColumn().setWidth(140);
+		layout.setColumnData(slice.getColumn(), new ColumnWeightData(140));
 		slice.setLabelProvider(new DelegatingStyledCellLabelProvider(new SliceColumnLabelProvider(2)));
 		
 		final TableViewerColumn data   = new TableViewerColumn(viewer, SWT.LEFT, 3);
 		data.getColumn().setText("Axis Data");
-		data.getColumn().setWidth(140);
+		layout.setColumnData(data.getColumn(), new ColumnWeightData(140));
 		data.setLabelProvider(new DelegatingStyledCellLabelProvider(new SliceColumnLabelProvider(3)));
 	}
 
