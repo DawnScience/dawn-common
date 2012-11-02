@@ -34,6 +34,7 @@ import org.dawb.common.ui.plot.trace.IPaletteListener;
 import org.dawb.common.ui.plot.trace.ITraceListener;
 import org.dawb.common.ui.plot.trace.PaletteEvent;
 import org.dawb.common.ui.plot.trace.TraceEvent;
+import org.dawb.common.ui.preferences.ViewConstants;
 import org.dawb.common.ui.util.EclipseUtils;
 import org.dawb.common.ui.util.GridUtils;
 import org.dawb.hdf5.nexus.NexusUtils;
@@ -66,17 +67,12 @@ import org.eclipse.swt.SWTError;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.events.DragDetectEvent;
-import org.eclipse.swt.events.DragDetectListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.TouchEvent;
-import org.eclipse.swt.events.TouchListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -352,18 +348,21 @@ public class SliceComponent {
 		final Action asScale = new Action("Sliding Scale", IAction.AS_CHECK_BOX) {
 			public void run () {
 				updateSliceEditor(0);
+				Activator.getDefault().getPreferenceStore().setValue(ViewConstants.SLICE_EDITOR, 0);
 			}
 		};
 		grp2.add(asScale);
-		asScale.setChecked(true);
+		asScale.setChecked(Activator.getDefault().getPreferenceStore().getInt(ViewConstants.SLICE_EDITOR)==0);
 		editorMenu.add(asScale);
 		
 		final Action asSpinner = new Action("Slice index", IAction.AS_CHECK_BOX) {
 			public void run () {
 				updateSliceEditor(1);
+				Activator.getDefault().getPreferenceStore().setValue(ViewConstants.SLICE_EDITOR, 1);
 			}
 		};
 		grp2.add(asSpinner);
+		asSpinner.setChecked(Activator.getDefault().getPreferenceStore().getInt(ViewConstants.SLICE_EDITOR)==1);
 		editorMenu.add(asSpinner);
 		
 		if (dataReductionAction!=null) {
@@ -782,7 +781,12 @@ public class SliceComponent {
 			
 		});
 
-		editors[2] = scaleEditor;
+		if (Activator.getDefault().getPreferenceStore().getInt(ViewConstants.SLICE_EDITOR)==1) {
+		    editors[2] = spinnerEditor;
+		} else {
+		    editors[2] = scaleEditor;
+		}
+
 		
 		
 		CComboCellEditor axisDataEditor = new CComboCellEditor(viewer.getTable(), new String[]{"indices"}, SWT.READ_ONLY) {

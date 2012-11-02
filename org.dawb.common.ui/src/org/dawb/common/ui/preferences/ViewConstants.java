@@ -16,4 +16,7 @@ public class ViewConstants {
 	public static final String IMAGE_SIZE   = "org.dawb.workbench.views.image.monitor.thumbnail.size";
 	public static final String POLL_RATE    = "org.dawb.workbench.views.image.monitor.poll.rate";
 	
+	// Slice Component prefrences
+	public static final String SLICE_EDITOR = "org.dawb.workbench.slicing.component.editor.type";
+	
 }

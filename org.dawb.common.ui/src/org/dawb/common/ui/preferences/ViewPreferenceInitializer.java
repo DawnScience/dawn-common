@@ -20,6 +20,9 @@ public class ViewPreferenceInitializer extends AbstractPreferenceInitializer {
 		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
 		store.setDefault(ViewConstants.IMAGE_SIZE, 96);
 		store.setDefault(ViewConstants.POLL_RATE,  2);
+		
+		store.setDefault(ViewConstants.SLICE_EDITOR, 0);
+
 	}
 
 }
