@@ -36,6 +36,7 @@ import org.dawb.common.ui.plot.trace.TraceEvent;
 import org.dawb.common.ui.plot.trace.TraceWillPlotEvent;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
@@ -145,8 +146,31 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	}
 
 	public void setRescale(boolean rescale) {
+		final boolean oldRescale = rescale;
 		this.rescale = rescale;
+		firePropertyChangeListener(RESCALE_ID, oldRescale, rescale);
 	}
+	
+	private Collection<IPropertyChangeListener> propertyListeners;
+	
+	public void addPropertyChangeListener(IPropertyChangeListener pcl) {
+		if (propertyListeners==null) propertyListeners = new HashSet<IPropertyChangeListener>();
+		propertyListeners.add(pcl);
+	}
+	public void removePropertyChangeListener(IPropertyChangeListener listener) {
+		if (propertyListeners==null) return;
+		propertyListeners.remove(listener);
+	}
+	
+	protected void firePropertyChangeListener(String rescaleId, Object oldValue, Object newValue) {
+		if (propertyListeners==null) return;
+		final PropertyChangeEvent evt = new PropertyChangeEvent(this, rescaleId, oldValue, newValue);
+		for (IPropertyChangeListener l : propertyListeners) {
+			l.propertyChange(evt);
+		}
+	}
+
+
 	/**
 	 * Please override to provide a  PlottingActionBarManager or a class
 	 * subclassing it. This class deals with Actions to avoid this
@@ -169,6 +193,9 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 		}
 
 		actionBarManager.dispose();
+		
+		if (propertyListeners!=null) propertyListeners.clear();
+		propertyListeners = null;
 		
 		if (traceListeners!=null) traceListeners.clear();
 		traceListeners = null;
@@ -708,24 +735,6 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	public IPlotActionSystem getPlotActionSystem() {
 		return this.actionBarManager;
 	}
-	
-	/**
-	 * NOTE This listener is *not* notified once for each configuration setting made on 
-	 * the configuration but once whenever the form is applied by the user (and many things
-	 * are changed) 
-	 * 
-	 * You then have to read the property you require from the object (for instance the axis
-	 * format) in case it has changed. This is not ideal, later there may be more events fired and
-	 * it will be possible to check property name, for now it is always set to "Graph Configuration".
-	 * 
-	 * @param listener
-	 */
-	public void addPropertyChangeListener(IPropertyChangeListener listener) {
-		// TODO Does nothing
-	}
-	
-	public void removePropertyChangeListener(IPropertyChangeListener listener) {
-		// TODO Does nothing
-	}
+
 
 }

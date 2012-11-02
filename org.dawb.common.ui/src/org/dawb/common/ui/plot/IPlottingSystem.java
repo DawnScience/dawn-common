@@ -66,6 +66,8 @@ import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
  */
 public interface IPlottingSystem extends ITraceSystem, IRegionSystem, IAxisSystem, IAnnotationSystem, IPrintablePlotting{
 
+	public final static String RESCALE_ID = "org.dawb.common.ui.plot.rescale";
+
 	/**
 	 * Call to create the UI component dealing with the plotting.
 	 * @param parent

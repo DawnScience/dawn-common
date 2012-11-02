@@ -1,5 +1,6 @@
 package org.dawb.common.ui.plot;
 
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IContributionManager;
@@ -51,6 +52,10 @@ class ActionContainer {
 
 	public boolean isId(String id) {
 		return this.action.getId()!=null && this.action.getId().equals(id);
+	}
+
+	public IAction getAction() {
+		return action;
 	}
 
 

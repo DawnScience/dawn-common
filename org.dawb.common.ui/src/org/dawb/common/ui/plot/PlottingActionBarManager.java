@@ -553,4 +553,25 @@ public class PlottingActionBarManager implements IPlotActionSystem {
 			system.getActionBars().getStatusLineManager().remove(id);
 		}
 	}
+	
+	/**
+	 * Returns the first action with the id
+	 * @param string
+	 * @return
+	 */
+	public IAction findAction(String id) {
+		for (ActionType actionType : ActionType.values()) {
+
+			final List<ActionContainer> actions = actionMap.get(actionType);
+			if (actions!=null) {
+				for (Iterator<ActionContainer> it= actions.iterator(); it.hasNext(); ) {
+					ActionContainer ac = it.next();
+					if (ac.isId(id)) return ac.getAction();
+				}
+			}
+
+		}
+		return null;
+	}
+
 }
