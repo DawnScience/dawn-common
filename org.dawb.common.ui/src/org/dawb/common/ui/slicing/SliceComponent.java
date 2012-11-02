@@ -230,6 +230,7 @@ public class SliceComponent {
 			public void run() {openGallery();}
 		};
 		man.add(openGal);
+		man.add(reverse);
 		final Menu menu = man.createContextMenu(viewer.getTable());
 		viewer.getTable().setMenu(menu);
 
@@ -255,6 +256,8 @@ public class SliceComponent {
 	}
 	
 	private Map<PlotType, Action> plotTypeActions;
+
+	private Action reverse;
 	/**
 	 * Creates the actions for 
 	 * @return
@@ -379,6 +382,15 @@ public class SliceComponent {
 			man.add(dataReductionAction);
 		}
 
+		man.add(new Separator("group6"));
+		this.reverse = new Action("Reverse image axes", Activator.getImageDescriptor("icons/reverse_axes.png")) {
+			public void run () {
+				dimsDataList.reverseImage();
+				viewer.refresh();
+				slice(false);
+			}
+		};
+		man.add(reverse);
 		return man;
 	}
 	
@@ -406,6 +418,7 @@ public class SliceComponent {
 		((CComboCellEditor)viewer.getCellEditors()[1]).setItems(items);
 		
 		viewer.refresh();
+		reverse.setEnabled(plotType==PlotType.IMAGE||plotType==PlotType.SURFACE);
 		
 		// Save preference
 		Activator.getDefault().getPreferenceStore().setValue(SliceConstants.PLOT_CHOICE, plotType.toString());
@@ -572,6 +585,7 @@ public class SliceComponent {
 		}
 
 		if (plotType==null) plotType = PlotType.XY;
+		reverse.setEnabled(plotType==PlotType.IMAGE||plotType==PlotType.SURFACE);
 	}
 
 	/**

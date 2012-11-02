@@ -310,4 +310,18 @@ public class DimsDataList implements Serializable {
 		}
 		return false;
 	}
+
+	public void reverseImage() {
+		for (DimsData dd : getDimsData()) {
+			if (dd.getAxis()==0) {
+				dd.setAxis(1);
+				continue;
+			}
+			
+			if (dd.getAxis()==1) {
+				dd.setAxis(0);
+				continue;
+			}
+		}
+	}
 }
