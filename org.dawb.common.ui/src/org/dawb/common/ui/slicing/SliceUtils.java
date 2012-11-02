@@ -172,7 +172,7 @@ public class SliceUtils {
 	public static void plotSlice(final SliceObject       currentSlice,
 			                     final int[]             dataShape,
 			                     final PlotType          mode,
-			                     final IPlottingSystem   plottingSystem,
+			                     final AbstractPlottingSystem   plottingSystem,
 			                     final IProgressMonitor  monitor) throws Exception {
 
 		if (plottingSystem==null) return;
@@ -188,10 +188,14 @@ public class SliceUtils {
 		if (monitor!=null&&monitor.isCanceled()) return;
 		
 		if (monitor!=null) monitor.worked(1);
+		
+		boolean requireScale = plottingSystem.isRescale()
+				               || mode!=plottingSystem.getPlotType();
+		
 		if (mode==PlotType.XY) {
 			plottingSystem.clear();
 			final AbstractDataset x = getNexusAxis(currentSlice, slice.getShape()[0], currentSlice.getX()+1, true, monitor);
-			if (plottingSystem instanceof AbstractPlottingSystem) ((AbstractPlottingSystem)plottingSystem).setXfirst(true);
+			plottingSystem.setXfirst(true);
 			plottingSystem.createPlot1D(x, Arrays.asList(slice), monitor);
 			Display.getDefault().syncExec(new Runnable() {
 				public void run() {
@@ -223,7 +227,7 @@ public class SliceUtils {
 				ys.add(dds);
 				++index;
 			}
-			if (plottingSystem instanceof AbstractPlottingSystem) ((AbstractPlottingSystem)plottingSystem).setXfirst(true);
+			plottingSystem.setXfirst(true);
 			plottingSystem.createPlot1D(xAxis, ys, monitor);
 			Display.getDefault().syncExec(new Runnable() {
 				public void run() {
@@ -237,9 +241,10 @@ public class SliceUtils {
 			AbstractDataset x = getNexusAxis(currentSlice, slice.getShape()[1], currentSlice.getY()+1, true, monitor);		
 			if (monitor!=null&&monitor.isCanceled()) return;
 			plottingSystem.updatePlot2D(slice, Arrays.asList(x,y), monitor);
-			plottingSystem.repaint();
  			
 		}
+
+		plottingSystem.repaint(requireScale);
 
 	}
 

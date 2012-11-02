@@ -27,6 +27,7 @@ import org.dawb.common.ui.DawbUtils;
 import org.dawb.common.ui.components.cell.ScaleCellEditor;
 import org.dawb.common.ui.menu.CheckableActionGroup;
 import org.dawb.common.ui.menu.MenuAction;
+import org.dawb.common.ui.plot.AbstractPlottingSystem;
 import org.dawb.common.ui.plot.IPlottingSystem;
 import org.dawb.common.ui.plot.PlotType;
 import org.dawb.common.ui.plot.trace.IImageTrace;
@@ -112,7 +113,7 @@ public class SliceComponent {
 	
 	private SliceObject     sliceObject;
 	private int[]           dataShape;
-	private IPlottingSystem plottingSystem;
+	private AbstractPlottingSystem plottingSystem;
 
 	private TableViewer     viewer;
 	private DimsDataList    dimsDataList;
@@ -268,9 +269,16 @@ public class SliceComponent {
         final CheckableActionGroup grp = new CheckableActionGroup();
         final Action xyPlot = new Action("Slice as line plots", IAction.AS_CHECK_BOX) {
         	public void run() {
+        		boolean wasImage = plotType==PlotType.IMAGE || plotType==PlotType.SURFACE;
         		plotType = PlotType.XY;
         		// Loop over DimsData to ensure 1X only.
-        		if (dimsDataList!=null) dimsDataList.setSingleAxisOnly(1, 0);   		
+        		if (dimsDataList!=null) {
+        			if (wasImage&&dimsDataList.isXFirst()) {
+        				dimsDataList.setSingleAxisOnly(1, 0);   		
+        			} else {
+        				dimsDataList.setSingleAxisOnly(0, 0);
+        			}
+        		}
         		plottingTypeChanged();
         	}
 		};
@@ -318,6 +326,7 @@ public class SliceComponent {
 		surfacePlot.setImageDescriptor(Activator.getImageDescriptor("icons/TraceSurface.png"));
 		grp.add(surfacePlot);
 		plotTypeActions.put(PlotType.SURFACE, surfacePlot);
+		surfacePlot.setEnabled(false);
 		
 		man.add(new Separator("group2"));
 		
@@ -1086,7 +1095,7 @@ public class SliceComponent {
 	 * @param plotWindow
 	 */
 	public void setPlottingSystem(IPlottingSystem plotWindow) {
-		this.plottingSystem = plotWindow;
+		this.plottingSystem = (AbstractPlottingSystem)plotWindow;
 	}
 
 	/**

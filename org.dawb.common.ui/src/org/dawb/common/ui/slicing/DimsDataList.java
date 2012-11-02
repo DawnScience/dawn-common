@@ -302,4 +302,12 @@ public class DimsDataList implements Serializable {
 		}
 		
 	}
+
+	public boolean isXFirst() {
+		for (DimsData dd : getDimsData()) {
+			if (dd.getAxis()<0) continue;
+			return dd.getAxis()==0;
+		}
+		return false;
+	}
 }
