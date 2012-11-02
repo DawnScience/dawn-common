@@ -207,19 +207,20 @@ public class DimsDataList implements Serializable {
 	/**
 	 * Probably not best algorithm but we are dealing with very small arrays here.
 	 * 
-	 * @param iaxisToSet
+	 * @param iaxisToFind
 	 */
-	public void setSingleAxisOnly(int iaxisToSet) {
-		boolean foundAxis = false;
+	public void setSingleAxisOnly(int iaxisToFind, int iaxisValue) {
+		DimsData found = null;
 		for (DimsData dd : getDimsData()) {
-			if (dd.getAxis()==iaxisToSet) {
-				foundAxis = true;
+			if (dd.getAxis()==iaxisToFind) {
+				dd.setAxis(iaxisValue);
+				found=dd;
 			}
 		}
 		
-		if (foundAxis) {
+		if (found!=null) {
 			for (DimsData dd : getDimsData()) {
-				if (dd.getAxis()==iaxisToSet) continue;
+				if (dd==found) continue;
 				dd.setAxis(-1);
 			}
 			return;
@@ -227,12 +228,12 @@ public class DimsDataList implements Serializable {
 			
 			for (DimsData dd : getDimsData()) {
 				if (dd.getAxis()>-1) {
-				    dd.setAxis(iaxisToSet);
-				    break;
+				    dd.setAxis(iaxisValue);
+				    found=dd;
 				}
 			}
 			for (DimsData dd : getDimsData()) {
-				if (dd.getAxis()==iaxisToSet) continue;
+				if (dd==found) continue;
 				dd.setAxis(-1);
 			}
 		}

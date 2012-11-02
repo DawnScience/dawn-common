@@ -270,7 +270,7 @@ public class SliceComponent {
         	public void run() {
         		plotType = PlotType.XY;
         		// Loop over DimsData to ensure 1X only.
-        		if (dimsDataList!=null) dimsDataList.setSingleAxisOnly(1);   		
+        		if (dimsDataList!=null) dimsDataList.setSingleAxisOnly(1, 0);   		
         		plottingTypeChanged();
         	}
 		};
