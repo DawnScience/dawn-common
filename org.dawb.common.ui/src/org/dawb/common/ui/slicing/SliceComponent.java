@@ -270,7 +270,7 @@ public class SliceComponent {
         	public void run() {
         		plotType = PlotType.XY;
         		// Loop over DimsData to ensure 1X only.
-        		if (dimsDataList!=null) dimsDataList.setSingleAxisOnly(0);   		
+        		if (dimsDataList!=null) dimsDataList.setSingleAxisOnly(1);   		
         		plottingTypeChanged();
         	}
 		};
@@ -507,15 +507,26 @@ public class SliceComponent {
 		
 		if (plottingSystem!=null) {
 			final File dataFile     = new File(sliceObject.getPath());
-			final File lastSettings = new File(DawbUtils.getDawnHome()+dataFile.getName()+"."+sliceObject.getName()+".xml");
+			final File lastSettings = new File(DawbUtils.getDawnHome()+dataFile.getName()+sliceObject.getName()+".xml");
 			if (lastSettings.exists()) {
 				XMLDecoder decoder = null;
 				try {
 					this.dimsDataList = new DimsDataList();
 					decoder = new XMLDecoder(new FileInputStream(lastSettings));
-					for (int i = 0; i < dims; i++) {
+					
+					int from = 0;
+					Object firstObject = decoder.readObject();
+					try {
+						this.plotType = (PlotType)firstObject;
+					} catch (Throwable ne) {
+						dimsDataList.add((DimsData)firstObject);
+						from = 1;
+					}
+
+					for (int i = from; i < dims; i++) {
 						dimsDataList.add((DimsData)decoder.readObject());
 					}
+									
 					
 				} catch (Exception ne) {
 					// This might not always be an error.
@@ -536,10 +547,22 @@ public class SliceComponent {
 		}
 		
 		if (dimsDataList!=null) {
-			plotType = dimsDataList.getAxisCount()>1 ? PlotType.IMAGE : PlotType.XY;
+			if (plotType==null) plotType = dimsDataList.getAxisCount()>1 ? PlotType.IMAGE : PlotType.XY;
 			plotTypeActions.get(plotType).setChecked(true);
+			
+			// We make sure that the size is not outside
+			for (int i = 0; i < dims; i++) {
+				DimsData dd = dimsDataList.getDimsData(i);
+				if (dd!=null) {
+					if (dd.getSlice()>=dataShape[i]) {
+						dd.setSlice(0);
+					}
+				}
+			}
+
 		}
 
+		if (plotType==null) plotType = PlotType.XY;
 	}
 
 	/**
@@ -1031,16 +1054,19 @@ public class SliceComponent {
 		if (sliceObject == null || isErrorCondition) return;
 		
 		final File dataFile     = new File(sliceObject.getPath());
-		final File lastSettings = new File(DawbUtils.getDawbHome()+dataFile.getName()+"."+sliceObject.getName()+".xml");
+		final File lastSettings = new File(DawbUtils.getDawnHome()+dataFile.getName()+"."+sliceObject.getName()+".xml");
 		if (!lastSettings.getParentFile().exists()) lastSettings.getParentFile().mkdirs();
 	
 		XMLEncoder encoder=null;
 		try {
 			encoder = new XMLEncoder(new FileOutputStream(lastSettings));
+			encoder.writeObject(this.plotType);
 			if (dimsDataList!=null) {
-				for (int i = 0; i < dimsDataList.size(); i++) encoder.writeObject(dimsDataList.getDimsData(i));
+				for (int i = 0; i < dimsDataList.size(); i++) {
+					encoder.writeObject(dimsDataList.getDimsData(i));
+				}
 			}
-		} catch (Exception ne) {
+		} catch (Throwable ne) {
 			logger.error("Cannot save slice data from last settings!", ne);
 		} finally  {
 			if (encoder!=null) encoder.close();
