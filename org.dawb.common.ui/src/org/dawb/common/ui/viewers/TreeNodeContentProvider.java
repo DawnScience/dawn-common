@@ -37,9 +37,9 @@ public class TreeNodeContentProvider implements ITreeContentProvider {
 	@Override
 	public Object[] getChildren(Object parentElement) {
 		final TreeNode node = (TreeNode)parentElement;
-		if (node.getChildCount()<0) return null;
+		if (node.getChildCount()<1) return null;
 		
-		final Object[] oa   = new Object[]{node.getChildCount()};
+		final Object[] oa   = new Object[node.getChildCount()];
 		for (int i = 0; i < node.getChildCount(); i++) {
 			oa[i] = node.getChildAt(i);
 		}

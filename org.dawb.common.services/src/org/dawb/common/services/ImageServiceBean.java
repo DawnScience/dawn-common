@@ -301,7 +301,7 @@ public class ImageServiceBean {
 	
 
 	public enum HistoType {
-		MEAN(0, "Mean based"), MEDIAN(1, "Median based");
+		MEAN(0, "Mean"), MEDIAN(1, "Median");
 
 		public final String label;
 		public final int    index;

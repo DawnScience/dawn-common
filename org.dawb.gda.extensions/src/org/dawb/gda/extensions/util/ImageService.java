@@ -404,10 +404,12 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 		
 		float retMin = min;
 		float retMax = Float.NaN;
+		float retExtra = Float.NaN;
 		
 		if (bean.getHistogramType()==HistoType.MEAN) {
 			float mean = sum / size;
 			retMax = ((float)Math.E)*mean; // Not statistical, E seems to be better than 3...
+			retExtra=mean;
 			
 		} else if (bean.getHistogramType()==HistoType.MEDIAN) { 
 			
@@ -418,11 +420,12 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 				median = ((Number)Stats.median(image.cast(AbstractDataset.INT16))).floatValue();// SLOWER
 			}
 			retMax = 2f*median;
+			retExtra=median;
 		}
 		
 		if (retMax > max)	retMax = max;
 		
-		return new float[]{retMin, retMax};
+		return new float[]{retMin, retMax, retExtra};
 
 	}
 

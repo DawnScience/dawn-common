@@ -92,50 +92,52 @@ public interface IPaletteListener extends EventListener {
 
 		@Override
 		public void paletteChanged(PaletteEvent evt) {
-			// TODO Auto-generated method stub
+			updateEvent(evt);
 			
 		}
 
 		@Override
 		public void minChanged(PaletteEvent evt) {
-			// TODO Auto-generated method stub
+			updateEvent(evt);
 			
 		}
 
 		@Override
 		public void maxChanged(PaletteEvent evt) {
-			// TODO Auto-generated method stub
+			updateEvent(evt);
 			
 		}
 
 		@Override
 		public void maxCutChanged(PaletteEvent evt) {
-			// TODO Auto-generated method stub
+			updateEvent(evt);
 			
 		}
 
 		@Override
 		public void minCutChanged(PaletteEvent evt) {
-			// TODO Auto-generated method stub
+			updateEvent(evt);
 			
 		}
 
 		@Override
 		public void nanBoundsChanged(PaletteEvent evt) {
-			// TODO Auto-generated method stub
+			updateEvent(evt);
 			
 		}
 
 		@Override
 		public void maskChanged(PaletteEvent evt) {
-			// TODO Auto-generated method stub
-			
+			updateEvent(evt);
 		}
 		
 		@Override
 		public void imageOriginChanged(PaletteEvent evt) {
-			// TODO Auto-generated method stub
-			
+			updateEvent(evt);
+		}
+		
+		protected void updateEvent(PaletteEvent evt) {
+			// TODO
 		}
 	}
 
