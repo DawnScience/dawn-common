@@ -1,65 +1,67 @@
-/*
- * Copyright (c) 2012 European Synchrotron Radiation Facility,
- *                    Diamond Light Source Ltd.
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- */ 
 package org.dawb.common.ui.viewers;
 
 import javax.swing.tree.TreeNode;
 
-import org.eclipse.jface.viewers.ILazyTreeContentProvider;
-import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
-public class TreeNodeContentProvider implements ILazyTreeContentProvider {
+/**
+ * This class assumes that the root is the content and that the 
+ * children of the root are the top level to be shown.
+ * 
+ * @author fcp94556
+ *
+ */
+public class TreeNodeContentProvider implements ITreeContentProvider {
 
-	private final TreeViewer tree;
-
-	public TreeNodeContentProvider(TreeViewer tree) {
-		this.tree = tree;
-	}
+	protected Viewer   viewer;
+	protected TreeNode rootNode;
 
 	@Override
 	public void dispose() {
-		// TODO Auto-generated method stub
-
+		this.viewer   = null;
+        this.rootNode = null;
 	}
 
 	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-		// TODO Auto-generated method stub
-
+		this.viewer   = viewer;
+        this.rootNode = (TreeNode)newInput;
 	}
 
 	@Override
-	public void updateElement(Object parent, int index) {
+	public Object[] getElements(Object inputElement) {
+		return getChildren(inputElement);
+	}
+
+	@Override
+	public Object[] getChildren(Object parentElement) {
+		final TreeNode node = (TreeNode)parentElement;
+		if (node.getChildCount()<0) return null;
 		
-		TreeNode child = ((TreeNode) parent).getChildAt(index);
-		tree.replace(parent, index, child);
-		updateChildCount(child, -1);
+		final Object[] oa   = new Object[]{node.getChildCount()};
+		for (int i = 0; i < node.getChildCount(); i++) {
+			oa[i] = node.getChildAt(i);
+		}
+		return oa;
 	}
 
 	@Override
-	public void updateChildCount(Object element, int currentChildCount) {
-		int count = 0;
-		if (element instanceof TreeNode) {
-			count = ((TreeNode)element).getChildCount();
-		}
-		tree.setChildCount(element, count);
-	}
-
-	@Override
-	public Object getParent(Object element) {
-		if (element == null || !(element instanceof TreeNode)) {
-			return null;
-		}
-		
+	public Object getParent(Object element) {		
 		final TreeNode object = (TreeNode)element;
 		return object.getParent();
 	}
 
+	@Override
+	public boolean hasChildren(Object element) {
+		return ((TreeNode)element).getChildCount()>0;
+	}
+
+	public Viewer getViewer() {
+		return viewer;
+	}
+	
+	public TreeNode getRoot() {
+		return rootNode;
+	}
 }
