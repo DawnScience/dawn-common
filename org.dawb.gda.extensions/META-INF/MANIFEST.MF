@@ -7,8 +7,8 @@ Bundle-Activator: org.dawb.gda.extensions.Activator
 Bundle-Vendor: ESRF
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
- uk.ac.diamond.scisoft.analysis.rcp,
  uk.ac.diamond.scisoft.analysis,
+ uk.ac.diamond.scisoft.analysis.rcp,
  uk.ac.diamond.scisoft.python,
  org.dawb.hdf5,
  org.dawb.common.util,
