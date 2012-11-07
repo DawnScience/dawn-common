@@ -81,6 +81,7 @@ public abstract class AbstractToolPage extends Page implements IToolPage, IAdapt
 	
 	private boolean isDisposed = false;
 	public void dispose() {
+		deactivate();
 		super.dispose();
 		toolSystem = null;
 	    plotSystem = null;
