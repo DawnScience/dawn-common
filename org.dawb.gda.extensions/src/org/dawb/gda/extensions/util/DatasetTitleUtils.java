@@ -49,8 +49,10 @@ public class DatasetTitleUtils {
 		}
 		
 		final StringBuilder buf = new StringBuilder();
-		buf.append("Plot of");
+		buf.append("Plot of ");
 		final Set<String> used = new HashSet<String>(7);
+		int i=0;
+		int dataSetSize=ys.size();
 		for (IDataset dataSet : ys) {
 			String name = getName(dataSet,rootName);
 			
@@ -60,11 +62,14 @@ public class DatasetTitleUtils {
 				if (matcher.matches()) name = matcher.group(1);
 			}
 			
-			if (used.contains(name)) continue;
-			used.add(name);
-			buf.append(" ");
-			buf.append(name);
-			buf.append(",");
+			if (used.contains(name)) continue;			
+			if(i==0)
+				buf.append(name);
+			if(i==1 && 1==dataSetSize-1)
+				buf.append(","+name);
+			if(i==dataSetSize-1 && dataSetSize-1!=1)
+				buf.append("..."+name);
+			i++;
 		}
 		final int index = buf.length()-1;
 		buf.delete(index, index+1);
