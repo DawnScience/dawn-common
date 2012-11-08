@@ -201,6 +201,8 @@ public class FunctionEditTable {
 			
 				rb.setButtonVisible(false);
 				rb.setActive(true);
+				rb.setFormat(10, 5);
+				
 				((Spinner)rb.getControl()).addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(SelectionEvent e) {
@@ -375,7 +377,8 @@ public class FunctionEditTable {
 			return ret;
 			
 		} catch (Exception ne) {
-			logger.error("Unable to create function "+function.getName(), ne);
+			ne.printStackTrace();
+			//logger.error("Unable to create function "+function.getName(), ne);
 		}
 
 		return null;
