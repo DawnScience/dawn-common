@@ -115,9 +115,9 @@ public class SpecLoader extends AbstractFileLoader implements IMetaLoader {
 
 	@Override
 	public IMetaData getMetaData() {
-		return new ExtendedMetadataAdapter() {
-			
-			
+		return new ExtendedMetadataAdapter(new File(filePath)) {
+			private static final long serialVersionUID = IMetaData.serialVersionUID;
+
 			@Override
 			public Collection<String> getDataNames() {
 				return Collections.unmodifiableCollection(dataNames);

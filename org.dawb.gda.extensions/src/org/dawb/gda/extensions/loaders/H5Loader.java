@@ -216,8 +216,8 @@ public class H5Loader extends AbstractFileLoader implements IMetaLoader, IDataSe
 	public IMetaData getMetaData() {
 		
  		return new MetaDataAdapter() {
- 			
- 	        private Map<String, Object> attributeValues;
+			private static final long serialVersionUID = MetaDataAdapter.serialVersionUID;
+			private Map<String, Object> attributeValues;
 			
 			@Override
 			public Collection<String> getMetaNames() throws Exception{
@@ -225,7 +225,7 @@ public class H5Loader extends AbstractFileLoader implements IMetaLoader, IDataSe
 				 * We lazy load the meta data attributes as it's not always needed.
 				 */
 				if (attributeValues==null) readAttributes();
-				return attributeValues.keySet();
+				return Collections.unmodifiableCollection(attributeValues.keySet());
 			}
 
 			@Override
@@ -244,12 +244,12 @@ public class H5Loader extends AbstractFileLoader implements IMetaLoader, IDataSe
 
 			@Override
 			public Map<String, Integer> getDataSizes() {
-				return metaInfo.getDataSetSizes();
+				return Collections.unmodifiableMap(metaInfo.getDataSetSizes());
 			}
 
 			@Override
 			public Map<String, int[]> getDataShapes() {
-				return metaInfo.getDataSetShapes();
+				return Collections.unmodifiableMap(metaInfo.getDataSetShapes());
 			}
 			
 			private void readAttributes() throws Exception {
