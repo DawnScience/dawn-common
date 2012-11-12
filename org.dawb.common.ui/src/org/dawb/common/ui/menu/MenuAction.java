@@ -96,6 +96,8 @@ public class MenuAction extends Action implements IMenuCreator {
 	 */
 	public void clear() {
 		actions.clear();
+		indexes.clear();
+		this.iSeparator = 0;
 	}
 
 	public void setSelectedAction(int iAction) {
