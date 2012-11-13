@@ -37,7 +37,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
@@ -68,7 +67,10 @@ public class RROITableInfo implements IROIListener {
 	private String minStr = "";
 	private String maxStr = "";
 
+	private UpdateJob updateSumMinMax;
+
 	public RROITableInfo(final Composite parent, String labelName, AbstractPlottingSystem plottingSystem, boolean isProfile) {
+
 		Group roiGroup = new Group(parent, SWT.NONE);
 		roiGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		roiGroup.setLayout(new GridLayout(2, false));
@@ -140,6 +142,8 @@ public class RROITableInfo implements IROIListener {
 		this.isProfile = isProfile;
 		this.plottingSystem = plottingSystem;
 		this.plottingSystem.addRegionListener(regionListener);
+		
+		updateSumMinMax = new UpdateJob("Update Sum, Min and Max Values");
 	}
 
 	public void dispose(){
@@ -161,49 +165,77 @@ public class RROITableInfo implements IROIListener {
 			final int xInc = rroi.getPoint()[0]<rroi.getEndPoint()[0] ? 1 : -1;
 			final int yInc = rroi.getPoint()[1]<rroi.getEndPoint()[1] ? 1 : -1;
 			
-			final Collection<ITrace> traces = plottingSystem.getTraces();
-			
-			Display.getDefault().asyncExec(new Runnable() {
-				
-				@Override
-				public void run() {
-					Job updateMainRROI = new Job("Update Sum, Min and Max Values") {
+			updateSumMinMax.update(plottingSystem, xStartPt, xStopPt, yStartPt, yStopPt, xInc, yInc);
 
-						@Override
-						protected IStatus run(IProgressMonitor monitor) {
-							
-							Iterator<ITrace> it = traces.iterator();
-							while (it.hasNext()) {
-								ITrace iTrace = (ITrace) it.next();
-								if(iTrace instanceof IImageTrace){
-									IImageTrace image = (IImageTrace)iTrace;
-									
-									AbstractDataset dataRegion = image.getData();
-									try {
-										dataRegion = dataRegion.getSlice(
-												new int[] { yStartPt, xStartPt },
-												new int[] { yStopPt, xStopPt },
-												new int[] {yInc, xInc});
-									} catch (IllegalArgumentException e) {
-										logger.debug("Error getting region data:"+ e);
-									}
-									
-									if(showSum)
-										sumStr = dataRegion.sum(true).toString();
-									minStr = dataRegion.min().toString();
-									maxStr = dataRegion.max().toString();
-								}
-							}
-							return Status.OK_STATUS;
-						}
-					};
-					updateMainRROI.schedule();
-					
-				}
-			});
 			sumText.setText(sumStr);
 			minText.setText(minStr);
 			maxText.setText(maxStr);
+		}
+	}
+
+	private final class UpdateJob extends Job {
+
+		private AbstractPlottingSystem plottingSystem;
+		private int xStart;
+		private int xStop;
+		private int yStart;
+		private int yStop;
+		private int xInc;
+		private int yInc;
+
+		UpdateJob(String name) {
+			super(name);
+			setSystem(true);
+			setUser(false);
+			setPriority(Job.INTERACTIVE);
+		}
+
+		public void update(AbstractPlottingSystem plottingSystem, 
+				int xStart, int xStop, int yStart, int yStop, int xInc, int yInc) {
+			this.plottingSystem = plottingSystem;
+			this.xStart = xStart;
+			this.xStop = xStop;
+			this.yStart = yStart;
+			this.yStop = yStop;
+			this.xInc = xInc;
+			this.yInc = yInc;
+			
+			schedule();
+		}
+
+		@Override
+		protected IStatus run(IProgressMonitor monitor) {
+			
+			Collection<ITrace> traces = plottingSystem.getTraces();
+			
+			Iterator<ITrace> it = traces.iterator();
+			if (monitor.isCanceled()) return Status.CANCEL_STATUS;
+			while (it.hasNext()) {
+				ITrace iTrace = (ITrace) it.next();
+				if(iTrace instanceof IImageTrace){
+					IImageTrace image = (IImageTrace)iTrace;
+					
+					AbstractDataset dataRegion = image.getData();
+					try {
+						dataRegion = dataRegion.getSlice(
+								new int[] { yStart, xStart },
+								new int[] { yStop, xStop },
+								new int[] {yInc, xInc});
+						if (monitor.isCanceled()) return Status.CANCEL_STATUS;
+					} catch (IllegalArgumentException e) {
+						logger.debug("Error getting region data:"+ e);
+					}
+					
+					if(showSum)
+						sumStr = dataRegion.sum(true).toString();
+					if (monitor.isCanceled()) return Status.CANCEL_STATUS;
+					minStr = dataRegion.min().toString();
+					maxStr = dataRegion.max().toString();
+					
+				}
+			}
+			
+			return Status.OK_STATUS;
 		}
 	}
 
@@ -245,3 +277,4 @@ public class RROITableInfo implements IROIListener {
 		}
 	};
 }
+
