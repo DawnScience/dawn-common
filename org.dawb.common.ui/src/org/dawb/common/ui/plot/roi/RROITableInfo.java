@@ -158,12 +158,12 @@ public class RROITableInfo implements IROIListener {
 		xStartText.setText(String.valueOf(xStart));
 		xEndText.setText(String.valueOf(xEnd));
 		if(!isProfile){
-			final int xStartPt = (int) rroi.getPoint()[0];
-			final int yStartPt = (int) rroi.getPoint()[1];
-			final int xStopPt = (int) rroi.getEndPoint()[0];
-			final int yStopPt = (int) rroi.getEndPoint()[1];
-			final int xInc = rroi.getPoint()[0]<rroi.getEndPoint()[0] ? 1 : -1;
-			final int yInc = rroi.getPoint()[1]<rroi.getEndPoint()[1] ? 1 : -1;
+			int xStartPt = (int) rroi.getPoint()[0];
+			int yStartPt = (int) rroi.getPoint()[1];
+			int xStopPt = (int) rroi.getEndPoint()[0];
+			int yStopPt = (int) rroi.getEndPoint()[1];
+			int xInc = rroi.getPoint()[0]<rroi.getEndPoint()[0] ? 1 : -1;
+			int yInc = rroi.getPoint()[1]<rroi.getEndPoint()[1] ? 1 : -1;
 			
 			updateSumMinMax.update(plottingSystem, xStartPt, xStopPt, yStartPt, yStopPt, xInc, yInc);
 
@@ -264,9 +264,7 @@ public class RROITableInfo implements IROIListener {
 		}
 		@Override
 		public void regionAdded(RegionEvent evt) {
-//			if (evt.getRegion()!=null) {
-//				ROIMetadataComposite.this.update(evt.getRegion());
-//			}
+
 		}
 		
 		@Override
