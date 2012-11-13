@@ -394,6 +394,7 @@ public class NumericNode<E extends Quantity> extends LabelNode {
 	}
 
 	public void dispose() {
+		super.dispose();
 		if (listeners!=null) listeners.clear();
 		listeners = null;
 		if (unitListeners!=null) unitListeners.clear();

@@ -141,8 +141,8 @@ public class LabelNode implements TreeNode {
 		}
 	}
 	public void dispose() {
-		// TODO Auto-generated method stub
-		
+		if (children!=null) children.clear();
+		parent=null;
 	}
 	@Override
 	public int hashCode() {
