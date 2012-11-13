@@ -10,12 +10,10 @@
 package org.dawb.gda.extensions.loaders;
 
 import java.io.File;
-import java.util.Collection;
 
 import org.dawb.common.services.ILoaderService;
 import org.dawb.common.ui.monitor.ProgressMonitorWrapper;
 import org.dawb.common.util.eclipse.BundleUtils;
-//import org.dawb.fabio.FabioFile;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.preferences.InstanceScope;
@@ -24,11 +22,11 @@ import org.eclipse.ui.services.AbstractServiceFactory;
 import org.eclipse.ui.services.IServiceLocator;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
-import uk.ac.diamond.scisoft.analysis.dataset.FloatDataset;
 import uk.ac.diamond.scisoft.analysis.io.DataHolder;
+import uk.ac.diamond.scisoft.analysis.io.IDiffractionMetadata;
 import uk.ac.diamond.scisoft.analysis.io.IMetaData;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
-import uk.ac.diamond.scisoft.analysis.io.MetaDataAdapter;
+//import org.dawb.fabio.FabioFile;
 
 /**
  * Provides a class which will use any loaders available to load a particular file
@@ -175,5 +173,19 @@ public class LoaderService extends AbstractServiceFactory implements ILoaderServ
         	return new LoaderService();
         }
 		return null;
+	}
+	
+	private IDiffractionMetadata lockedDiffractionMetaData;
+
+	@Override
+	public IDiffractionMetadata getLockedDiffractionMetaData() {
+		return lockedDiffractionMetaData;
+	}
+
+	@Override
+	public IDiffractionMetadata setLockedDiffractionMetaData(IDiffractionMetadata diffMetaData) {
+		IDiffractionMetadata old = lockedDiffractionMetaData;
+		lockedDiffractionMetaData= diffMetaData;
+		return old;
 	}
 }
