@@ -80,6 +80,46 @@ public class PaletteFactory {
 		}
 		return new PaletteData(color);
 	}
+	
+	
+	/**
+	 * Make 256 Jet Palette
+	 */
+	public static PaletteData makeJetPalette() {
+		RGB jet[] = new RGB[256];
+		
+		double colorPos[] = new double[5];
+		int nb = 256;
+
+		for (int i = 0; i < nb; i++) {
+			
+			double value = (double)i/(double)255;
+
+			double outBlue = 0;
+			if (value <= 0.1) {outBlue  =  5*value + 0.5;}
+			if (value > 0.1 && value <= 1.0/3.0 ) {outBlue  =  1;}
+			if (value >1.0/3.0 && value <= 1.0/2.0) {outBlue  =  -6*value +3;}
+			
+			double outGreen = 0;
+			if (value > 1.0/3.0 && value < 2.0/3.0  ) {outGreen = 1;}
+			if (value <= 1.0/3.0 && value >= 1.0/8.0) {outGreen = 24.0/5*value - 0.6;}
+			if (value >= 2.0/3.0 && value <= 7.0/8.0) {outGreen = -24.0/5*value + 4.2;}
+			
+			double outRed = 0;
+			if (value >= 0.9) {outRed = -5*value +5.5;}
+			if (value > 2.0/3.0 && value <= 0.9 ) {outRed = 1;}
+			if (value >=1.0/2.0 && value <= 2.0/3.0 ) {outRed = 6*value -3;}
+			
+			jet[i] = new RGB((int)(outRed*255),
+					(int)(outGreen*255),
+					(int)(outBlue*255));
+			
+			System.out.println(i);
+
+		}
+		return new PaletteData(jet);
+	}
+	
 
 	/**
 	 * Make 256 rainbow color palette - Jean-Luc Pon's algorithm.
@@ -2364,6 +2404,9 @@ public class PaletteFactory {
 			case PaletteValues.PALETTE_WINTER:
 				palettes[index] = PaletteFactory.makeWinterPalette();
 				break;
+			case PaletteValues.PALETTE_JET:
+				palettes[index] = PaletteFactory.makeJetPalette();
+				break;
 			}
 		}
 		PaletteData ret = palettes[index];
@@ -2390,6 +2433,7 @@ public class PaletteFactory {
 		PALETTES.put( "Summer", PaletteValues.PALETTE_SUMMER);
 		PALETTES.put( "Autumn", PaletteValues.PALETTE_AUTUMN);
 		PALETTES.put( "Winter", PaletteValues.PALETTE_WINTER);
+		PALETTES.put( "Jet", PaletteValues.PALETTE_JET);
 
 		return PALETTES;
 	}

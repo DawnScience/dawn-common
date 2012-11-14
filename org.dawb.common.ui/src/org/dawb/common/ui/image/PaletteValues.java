@@ -22,5 +22,6 @@ public class PaletteValues {
 	public static final int PALETTE_SUMMER = 9;
 	public static final int PALETTE_AUTUMN = 10;
 	public static final int PALETTE_WINTER = 11;
-	public static final int PALETTE_GREY_INVERTED = 12;	
+	public static final int PALETTE_GREY_INVERTED = 12;
+	public static final int PALETTE_JET = 13;	
 }
