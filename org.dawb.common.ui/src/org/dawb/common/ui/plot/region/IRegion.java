@@ -314,4 +314,16 @@ public interface IRegion {
 	 * @return
 	 */
 	public ICoordinateSystem getCoordinateSystem();
+	
+	/**
+	 * 
+	 * @return last object
+	 */
+	public Object setUserObject(Object object);
+	
+	/**
+	 * 
+	 * @return object
+	 */
+	public Object getUserObject();
 }

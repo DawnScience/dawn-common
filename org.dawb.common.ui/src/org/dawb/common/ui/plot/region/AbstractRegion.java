@@ -163,4 +163,24 @@ public abstract class AbstractRegion extends Figure implements IRegion, IRegionC
 		this.label = label ;
 		this.labeldim = FigureUtilities.getTextExtents(label, labelFont);
 	}
+	
+	private Object userObject;
+	/**
+	 * 
+	 * @return last object
+	 */
+	public Object setUserObject(Object object) {
+		Object tmp = userObject;
+		userObject = object;
+		return tmp;
+	}
+	
+	/**
+	 * 
+	 * @return object
+	 */
+	public Object getUserObject() {
+		return userObject;
+	}
+
 }
