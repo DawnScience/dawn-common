@@ -141,6 +141,12 @@ public class LabelNode implements TreeNode {
 		}
 	}
 	public void dispose() {
+		
+		if (children!=null) for (TreeNode tn : children) {
+			if (tn instanceof LabelNode) {
+				((LabelNode)tn).dispose();
+			}
+		}
 		if (children!=null) children.clear();
 		parent=null;
 	}

@@ -313,7 +313,7 @@ public class NumericNode<E extends Quantity> extends LabelNode {
 	}
 	
 	public void setLowerBound(double lb) {
-		this.lowerBound = Amount.valueOf(lb, defaultValue.getUnit());
+		this.lowerBound = Amount.valueOf(lb, getUnit());
 	}
 
 	public Amount<E> getUpperBound() {
@@ -328,7 +328,7 @@ public class NumericNode<E extends Quantity> extends LabelNode {
 	}
 	
 	public void setUpperBound(double ub) {
-		this.upperBound = Amount.valueOf(ub, defaultValue.getUnit());
+		this.upperBound = Amount.valueOf(ub, getUnit());
 	}
 
 	public double getIncrement() {
@@ -399,6 +399,20 @@ public class NumericNode<E extends Quantity> extends LabelNode {
 		listeners = null;
 		if (unitListeners!=null) unitListeners.clear();
 		unitListeners = null;
+		
+		if (allowedUnits!=null) {
+			try {
+				allowedUnits.clear();
+			} catch (Throwable ne) {
+				// they are allowed unmodifiable units.
+			}
+		}
+		allowedUnits = null;
+		
+		value        =null;
+		defaultValue =null;
+		lowerBound   =null;
+		upperBound   =null;
 	}
 
 	@Override
