@@ -175,6 +175,20 @@ public abstract class AbstractRegion extends Figure implements IRegion, IRegionC
 		return tmp;
 	}
 	
+	
+	/**
+	 * Call to remove unused resources. Do not forget to use
+	 * super.dispose() in your override.
+	 */
+	public void dispose() {
+		if (labelFont!=null) labelFont.dispose();
+		labelFont   = null;
+		if (labelColour!=null) labelColour.dispose();
+		labelColour = null;
+		labeldim    = null;
+	}
+
+	
 	/**
 	 * 
 	 * @return object
