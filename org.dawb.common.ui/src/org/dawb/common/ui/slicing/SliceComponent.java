@@ -18,6 +18,7 @@ import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -32,6 +33,7 @@ import org.dawb.common.ui.plot.IPlottingSystem;
 import org.dawb.common.ui.plot.PlotType;
 import org.dawb.common.ui.plot.trace.IImageTrace;
 import org.dawb.common.ui.plot.trace.IPaletteListener;
+import org.dawb.common.ui.plot.trace.ITrace;
 import org.dawb.common.ui.plot.trace.ITraceListener;
 import org.dawb.common.ui.plot.trace.PaletteEvent;
 import org.dawb.common.ui.plot.trace.TraceEvent;
@@ -449,8 +451,9 @@ public class SliceComponent {
 	
 	private IPaletteListener orientationListener;
 	private void addImageOrientationListener(final StyledText text) {
-		try {
-			final IImageTrace trace  = (IImageTrace)plottingSystem.getTraces(IImageTrace.class).iterator().next();
+		Iterator<ITrace> it = plottingSystem.getTraces(IImageTrace.class).iterator();
+		if (it.hasNext()) {
+			final IImageTrace trace  = (IImageTrace) it.next();
             if (orientationListener == null) {
             	orientationListener = new IPaletteListener.Stub() {
             		@Override
@@ -462,9 +465,6 @@ public class SliceComponent {
             }
             // PaletteListeners are cleared when traces are removed.
             trace.addPaletteListener(orientationListener);
-
-		} catch (Exception ne) {
-			return;
 		}
 	}
 
@@ -1037,10 +1037,11 @@ public class SliceComponent {
 
 
 	protected boolean isReversedImage() {
-		try {
-			final IImageTrace trace = (IImageTrace)plottingSystem.getTraces(IImageTrace.class).iterator().next();
+		Iterator<ITrace> it = plottingSystem.getTraces(IImageTrace.class).iterator();
+		if (it.hasNext()) {
+			final IImageTrace trace = (IImageTrace) it.next();
 			return trace.getImageOrigin()==ImageOrigin.TOP_LEFT || trace.getImageOrigin()==ImageOrigin.BOTTOM_RIGHT;
-		} catch (Throwable ne) {
+		} else {
 			try {
 				final ScopedPreferenceStore store = new ScopedPreferenceStore(InstanceScope.INSTANCE, "org.dawb.workbench.plotting");
 				ImageOrigin origin = ImageOrigin.forLabel(store.getString("org.dawb.plotting.system.originChoice"));
