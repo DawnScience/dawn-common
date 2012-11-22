@@ -164,14 +164,14 @@ public abstract class AbstractToolPage extends Page implements IToolPage, IAdapt
 	 * @return
 	 */
 	public IImageTrace getImageTrace() {
-		try {
-			final Collection<ITrace> traces = getPlottingSystem().getTraces(IImageTrace.class);
-			if (traces==null || traces.size()<=0) return null;
-			final ITrace trace = traces.iterator().next();
-			return trace instanceof IImageTrace ? (IImageTrace)trace : null;
-		} catch (Exception ne) {
+		IPlottingSystem plotting = getPlottingSystem();
+		if (plotting == null)
 			return null;
-		}
+
+		final Collection<ITrace> traces = plotting.getTraces(IImageTrace.class);
+		if (traces==null || traces.size()==0) return null;
+		final ITrace trace = traces.iterator().next();
+		return trace instanceof IImageTrace ? (IImageTrace)trace : null;
 	}
 	
 	private String toolId; // You can only set this once!
