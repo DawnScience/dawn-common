@@ -82,7 +82,7 @@ public class NumericNode<E extends Quantity> extends LabelNode {
 	
 	public double getValue(Unit requiredUnit) {
 		Amount<E> val=getValue();
-		if (isAngstomDimenions(val, requiredUnit)) {	
+		if (isInAngstroms(val, requiredUnit)) {	
 			return Constants.ℎ.times(Constants.c).divide(val).doubleValue(requiredUnit);
 		} else {
 			if (val!=null) {
@@ -124,10 +124,21 @@ public class NumericNode<E extends Quantity> extends LabelNode {
 	
 	private Collection<AmountListener<E>> listeners;
 	
-	protected void fireAmountChanged(Amount<E> value) {
+	protected void fireAmountChanged(Amount<E> value, AmountListener<E>... ignored) {
 		if (listeners==null) return;
+
+		Collection<AmountListener<E>> informees;
+		if (ignored == null || ignored.length == 0) {
+			informees = listeners;
+		} else {
+			informees = new HashSet<AmountListener<E>>(listeners);
+			informees.removeAll(Arrays.asList(ignored));
+		}
+		if (informees.size() == 0)
+			return;
+
 		final AmountEvent<E> evt = new AmountEvent<E>(this, value);
-		for (AmountListener<E> l : listeners) {
+		for (AmountListener<E> l : informees) {
 			l.amountChanged(evt);
 		}
 	}
@@ -164,27 +175,77 @@ public class NumericNode<E extends Quantity> extends LabelNode {
 
 	/**
 	 * May be null
-	 * @param value
+	 * @param val
 	 */
-	public void setValue(Amount<E> value) {
-		this.value = value;
-		if (value!=null) fireAmountChanged(value);
-		if (value!=null) fireUnitChanged(value.getUnit());
+	public void setValueQuietly(Amount<E> val) {
+		value = val;
 	}
-	
+
+	/**
+	 * May be null
+	 * @param val
+	 */
+	public void setValue(Amount<E> val) {
+		setValue(val, (AmountListener<E>[]) null);
+	}
+
+	/**
+	 * May be null
+	 * @param val
+	 * @param ignored amount listeners
+	 */
+	public void setValue(Amount<E> val, AmountListener<E>... ignored) {
+		Amount oldValue = value;
+		setValueQuietly(val);
+		if (value != null) {
+			fireAmountChanged(val, ignored);
+			Unit oldUnit = oldValue != null ? oldValue.getUnit() : (defaultValue != null ? defaultValue.getUnit() : defaultUnit);
+			Unit unit = val.getUnit();
+			if (!oldUnit.equals(unit))
+				fireUnitChanged(unit);
+		}
+	}
+
+	/**
+	 * @param val
+	 * @param unit
+	 * @return unit used
+	 */
+	public void setValueQuietly(double val, Unit<E> unit) {
+		if (Double.isNaN(val)) {
+			value=null;
+			return;// The value is NaN, doing Amount.valueOf(...) would set to 0
+		}
+		if (unit==null) {
+			unit = value != null ? value.getUnit() : (defaultValue != null ? defaultValue.getUnit() : defaultUnit);
+		}
+		value = Amount.valueOf(val, unit);
+	}
+
 	/**
 	 * @param val
 	 * @param unit
 	 */
 	public void setValue(double val, Unit<E> unit) {
-		if (Double.isNaN(val)) {
-			value=null;
-			return;// The value is NaN, doing Amount.valueOf(...) would set to 0
-		}
-		if (unit==null && value!=null) unit = value.getUnit();
-		if (unit==null && defaultValue!=null) unit = defaultValue.getUnit();
-		this.value = Amount.valueOf(val, unit);
-		fireAmountChanged(value);
+		setValue(val, unit, (AmountListener<E>[]) null);
+	}
+
+	/**
+	 * @param val
+	 * @param unit
+	 * @param ignored amount listeners
+	 */
+	public void setValue(double val, Unit<E> unit, AmountListener<E>... ignored) {
+		Amount oldValue = value;
+		setValueQuietly(val, unit);
+		if (value == null)
+			return;
+
+		fireAmountChanged(value, ignored);
+		Unit oldUnit = oldValue != null ? oldValue.getUnit() : (defaultValue != null ? defaultValue.getUnit() : defaultUnit);
+		unit = value.getUnit();
+		if (!oldUnit.equals(unit))
+			fireUnitChanged(unit);
 	}
 
 	public boolean mergeValue(TreeNode node) throws Throwable {
@@ -266,6 +327,7 @@ public class NumericNode<E extends Quantity> extends LabelNode {
 		if (allowedUnits==null) return 0;
 		return allowedUnits.indexOf(getUnit());
 	}
+
 	public void setUnitIndex(int index) {
 		if (allowedUnits==null) return;
 		final Unit<E> to = allowedUnits.get(index);
@@ -274,7 +336,7 @@ public class NumericNode<E extends Quantity> extends LabelNode {
 		}
 		if (value!=null) {
 			// BODGE for A and eV !
-			if (isAngstomDimenions(value, to)) {	
+			if (isInAngstroms(value, to)) {	
 				value = Constants.ℎ.times(Constants.c).divide(value).to(to); 
 			} else {
 			    value = value.to(to);
@@ -283,10 +345,9 @@ public class NumericNode<E extends Quantity> extends LabelNode {
 		}
 	}
 
-
-	private boolean isAngstomDimenions(Amount val, Unit to) {
-		boolean isAngstom = allowedUnits!=null && allowedUnits.contains(NonSI.ANGSTROM) && allowedUnits.contains(NonSI.ELECTRON_VOLT);
-	    if (!isAngstom) return false;
+	private boolean isInAngstroms(Amount val, Unit to) {
+		boolean isAngstrom = allowedUnits!=null && allowedUnits.contains(NonSI.ANGSTROM) && allowedUnits.contains(NonSI.ELECTRON_VOLT);
+	    if (!isAngstrom) return false;
 	    return !val.getUnit().isCompatible(to); // Only convert incompatible.
 	}
 
@@ -295,7 +356,7 @@ public class NumericNode<E extends Quantity> extends LabelNode {
 		if (defaultValue!=null) defaultValue = Amount.valueOf(defaultValue.doubleValue(unit), unit);
 		fireUnitChanged(unit);
 	}
-	
+
 	public void reset() {
 		value = null;
 		fireAmountChanged(getValue());
