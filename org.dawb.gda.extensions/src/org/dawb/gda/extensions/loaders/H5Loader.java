@@ -88,6 +88,11 @@ public class H5Loader extends AbstractFileLoader implements IMetaLoader, IDataSe
 				holder.addDataset(fullPath, sets.get(fullPath));
 				if (mon!=null) mon.worked(1);
 			}
+
+			if (loadMetadata) {
+				metaInfo = file.getDatasetInformation(IHierarchicalDataFile.NUMBER_ARRAY);
+				holder.setMetadata(getMetaData());
+			}
 			return holder;
 			
 		} catch (Exception ne) {
