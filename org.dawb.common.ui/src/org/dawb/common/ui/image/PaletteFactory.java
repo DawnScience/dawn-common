@@ -113,8 +113,6 @@ public class PaletteFactory {
 			jet[i] = new RGB((int)(outRed*255),
 					(int)(outGreen*255),
 					(int)(outBlue*255));
-			
-			System.out.println(i);
 
 		}
 		return new PaletteData(jet);
