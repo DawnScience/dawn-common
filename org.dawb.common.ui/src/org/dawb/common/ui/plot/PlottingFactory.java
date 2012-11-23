@@ -32,8 +32,16 @@ import org.eclipse.ui.preferences.ScopedPreferenceStore;
  */
 public class PlottingFactory {
 
-	private PlottingFactory() {
-		// Singleton
+	/**
+	 * This class has a public constructor so that the squish tests can get a references using
+	 * the class loader. Really it should be private. 
+	 * 
+	 * In the squish tests there is a script called 'use_case_utils.py' with a def called getPlottingSystem(...)
+	 * which requires this to be there.
+	 * 
+	 */
+	public PlottingFactory() {
+		
 	}
 	
 	/**
