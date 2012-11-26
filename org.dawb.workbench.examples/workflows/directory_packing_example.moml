@@ -1,7 +1,7 @@
 <?xml version="1.0" standalone="no"?>
 <!DOCTYPE entity PUBLIC "-//UC Berkeley//DTD MoML 1//EN"
     "http://ptolemy.eecs.berkeley.edu/xml/dtd/MoML_1.dtd">
-<entity name="new_model" class="ptolemy.actor.TypedCompositeActor" source="C:\Work\debug_dawb_workspace\workflows\examples\directory_packing_example.moml">
+<entity name="new_model" class="ptolemy.actor.TypedCompositeActor" source="C:\Work\debug_dawn_workspace\workflows\examples\directory_packing_example.moml">
     <property name="_createdBy" class="ptolemy.kernel.attributes.VersionAttribute" value="7.0.1">
     </property>
     <property name="_workbenchVersion" class="ptolemy.kernel.attributes.VersionAttribute" value="0.9.0">
@@ -78,12 +78,12 @@
         <property name="width" class="ptolemy.data.expr.Parameter" value="1">
         </property>
     </relation>
-    <relation name="_R3" class="ptolemy.actor.TypedIORelation">
+    <relation name="_R" class="ptolemy.actor.TypedIORelation">
         <property name="width" class="ptolemy.data.expr.Parameter" value="1">
         </property>
     </relation>
-    <link port="Data Export.hasFinished" relation="_R3"/>
     <link port="Data Export.input" relation="_R2"/>
+    <link port="Data Export.output" relation="_R"/>
     <link port="Examples Folder.output" relation="_R2"/>
-    <link port="Open File.input" relation="_R3"/>
+    <link port="Open File.input" relation="_R"/>
 </entity>
