@@ -97,7 +97,6 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 
 	public AbstractPlottingSystem() {
 		this.actionBarManager = createActionBarManager();
-		this.currentToolPageMap = new HashMap<ToolPageRole, IToolPage>(3);
 	}
 
 	public static enum ColorOption {
@@ -204,9 +203,8 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 		if (selectionProvider!=null) selectionProvider.clear();
 		selectionProvider = null;
 		
-		if (currentToolPageMap!=null) currentToolPageMap.clear();
-		currentToolPageMap = null;
-		lastUsedToolPage   = null;
+		if (currentToolIdMap!=null) currentToolIdMap.clear();
+		currentToolIdMap = null;
 	}
 
 	public PlotType getPlotType() {
@@ -546,30 +544,26 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 		// TODO
 	}
 
-	private IToolPage lastUsedToolPage = null;
-	private Map<ToolPageRole, IToolPage> currentToolPageMap;
 	private Collection<IToolChangeListener> toolChangeListeners;
 
 	@Override
 	public IToolPage getCurrentToolPage(ToolPageRole role) {
 		
-		if (role==null) {
-			return lastUsedToolPage;
+		String id = null; 
+		if(currentToolIdMap!=null)
+			id = currentToolIdMap.get(role);
+		if (id==null) {
+			IToolPage toolPage = getEmptyTool(role);
+			if(currentToolIdMap!=null)
+				currentToolIdMap.put(role, toolPage.getToolId());
 		}
-		IToolPage toolPage = null; 
-		if(currentToolPageMap!=null)
-			toolPage = currentToolPageMap.get(role);
-		if (toolPage==null) {
-			toolPage = getEmptyTool(role);
-			if(currentToolPageMap!=null)
-				currentToolPageMap.put(role, toolPage);
-		}
-		return toolPage;
+		return actionBarManager.getToolPage(id);
 	}
 
+	private Map<ToolPageRole, String> currentToolIdMap;
 	protected void setCurrentToolPage(IToolPage page) {
-		lastUsedToolPage = page;
-		currentToolPageMap.put(page.getToolPageRole(), page);
+		if (currentToolIdMap==null) currentToolIdMap = new HashMap<IToolPage.ToolPageRole, String>(7);
+		currentToolIdMap.put(page.getToolPageRole(), page.getToolId());
 	}
 
 	@Override
@@ -579,7 +573,9 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 
 	@Override
 	public void clearCachedTools() {
-		actionBarManager.clearCachedTools();
+		if (actionBarManager!=null) {
+			actionBarManager.disposeCachedTools();
+		}
 	}
 
 	@Override

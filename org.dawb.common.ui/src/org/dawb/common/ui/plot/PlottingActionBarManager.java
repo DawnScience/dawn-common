@@ -344,10 +344,24 @@ public class PlottingActionBarManager implements IPlotActionSystem {
     	
     	return tool;
 	}
-
+	
+	private IToolPage createToolPage(IToolPage dispose) throws Exception {
+    	
+		IToolPage tool = dispose.getClass().newInstance();
+	    
+    	tool.setToolSystem(system);
+    	tool.setPlottingSystem(system);
+    	tool.setTitle(dispose.getTitle());
+    	tool.setPart(system.getPart());
+    	tool.setToolId(dispose.getToolId());
+    	tool.setCheatSheetId(dispose.getCheatSheetId());
+     	
+    	return tool;
+	}
 
 	protected IToolPage getToolPage(final String id) {
 		if (toolPages==null) return null;
+		if (id==null)        return null;
 		IToolPage page = toolPages.get(id);
 		if (page==null) {
 		    final IConfigurationElement[] configs = Platform.getExtensionRegistry().getConfigurationElementsFor("org.dawb.common.ui.toolPage");
@@ -362,9 +376,29 @@ public class PlottingActionBarManager implements IPlotActionSystem {
 		return page;
 	}
 	
-	protected void clearCachedTools() {
+	/**
+	 * This method disposes the tools and re-populates the 
+	 * toolPages map, which may now 
+	 */
+	protected void disposeCachedTools() {
 		if (toolPages==null) return;
+		
+		final Map<String,IToolPage> pages = new HashMap<String,IToolPage>(toolPages.size());
+		for (IToolPage page : toolPages.values()) {
+			
+			try {
+				pages.put(page.getToolId(), createToolPage(page));
+			} catch (Throwable e) {
+				logger.error("Creating replacement page for "+page.getTitle(), e);
+			}
+			try {
+				page.dispose();
+			} catch (Throwable e) {
+				logger.error("Disposing page "+page.getTitle(), e);
+			}
+		}
 		toolPages.clear();
+		toolPages.putAll(pages);
 	}
 	
 	/**

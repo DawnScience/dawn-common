@@ -15,6 +15,7 @@ public class EmptyTool extends AbstractToolPage {
 		setTitle("Empty Tool");
 		this.role = role;
 		setImageDescriptor(Activator.getImageDescriptor("icons/axis.png"));
+		setToolId("empty."+role.getId());
 	}
 	@Override
 	public void createControl(Composite parent) {
