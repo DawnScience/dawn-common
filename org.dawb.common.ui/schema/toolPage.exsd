@@ -100,6 +100,13 @@
                </documentation>
             </annotation>
          </attribute>
+         <attribute name="visible" type="boolean">
+            <annotation>
+               <documentation>
+                  Sets wether a tool is visible to the user (otherwise it is only available programmatically)
+               </documentation>
+            </annotation>
+         </attribute>
       </complexType>
    </element>
 

@@ -210,6 +210,9 @@ public class PlottingActionBarManager implements IPlotActionSystem {
 	    for (final IConfigurationElement e : configs) {
 	    	
 	    	foundSomeActions = true;
+	    	
+	    	// Check if tool should not have action
+	    	if ("false".equals(e.getAttribute("visible"))) continue;
 
 	    	final IToolPage tool = createToolPage(e, role);
 	    	if (tool==null) continue;
