@@ -570,12 +570,27 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	public IToolPage getToolPage(String toolId) {
 		return actionBarManager.getToolPage(toolId);
 	}
-
+	
+	/**
+	 * The tool system keeps a reference to all tools.
+	 * 
+	 * Calling this method removes this tool from the cache of tools
+	 * (and leaves a new stub in its place). It then
+	 * disposes the UI of the tool, if one has been created. The dispose()
+	 * method of the tool will also be called.
+	 */
+	@Override
+	public void disposeToolPage(String id) {
+		try {
+			actionBarManager.disposeToolPage(id);
+		} catch (Exception e) {
+			logger.error("Cannot dispose tool page: "+id, e);
+		}
+	}
+	
 	@Override
 	public void clearCachedTools() {
-		if (actionBarManager!=null) {
-			actionBarManager.disposeCachedTools();
-		}
+        
 	}
 
 	@Override

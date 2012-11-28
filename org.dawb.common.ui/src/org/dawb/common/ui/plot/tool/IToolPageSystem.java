@@ -46,6 +46,16 @@ public interface IToolPageSystem {
 	public IToolPage getToolPage(String toolId);
 	
 	/**
+	 * The tool system keeps a reference to all tools.
+	 * 
+	 * Calling this method removes this tool from the cache of tools
+	 * (and leaves a new stub in its place). It then
+	 * disposes the UI of the tool, if one has been created. The dispose()
+	 * method of the tool will also be called.
+	 */
+	public void disposeToolPage(String id);
+	
+	/**
 	 * Creates a new tool page using the id.
 	 * @param toolId
 	 * @return

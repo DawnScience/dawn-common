@@ -88,7 +88,7 @@ public abstract class AbstractToolPage extends Page implements IToolPage, IAdapt
 		part       = null;
 		isDisposed = true;
 	}
-	
+		
 	public boolean isDisposed() {
 		return isDisposed;
 	}
@@ -192,7 +192,7 @@ public abstract class AbstractToolPage extends Page implements IToolPage, IAdapt
 		clone.setPart(getPart());
 		clone.setToolId(getToolId());
 		clone.setImageDescriptor(getImageDescriptor());
-	    
+	    clone.setCheatSheetId(getCheatSheetId());
 		return clone;
 	}
 	
