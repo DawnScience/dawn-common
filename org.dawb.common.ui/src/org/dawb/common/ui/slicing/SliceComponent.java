@@ -492,10 +492,15 @@ public class SliceComponent {
 				final Map<Integer,String> others = new HashMap<Integer,String>(sliceObject.getNexusAxes());
 				others.keySet().removeAll(Arrays.asList(idim));
 				int index = 0;
-				while(others.values().contains(names.get(index))) {
-					index++;
+				try {
+					while(others.values().contains(names.get(index))) {
+						index++;
+					}
+					sliceObject.setNexusAxis(idim, names.get(index));
+				} catch (IndexOutOfBoundsException allowed) {
+					sliceObject.setNexusAxis(idim, "indices");
+					dimensionNames.put(idim, Arrays.asList("indices"));
 				}
-				sliceObject.setNexusAxis(idim, names.get(index));
 			}
 			
 		} catch (Exception e) {
