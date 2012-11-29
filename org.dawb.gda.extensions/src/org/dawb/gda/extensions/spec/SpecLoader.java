@@ -28,20 +28,11 @@ import uk.ac.diamond.scisoft.analysis.io.DataHolder;
 import uk.ac.diamond.scisoft.analysis.io.ExtendedMetadataAdapter;
 import uk.ac.diamond.scisoft.analysis.io.IMetaData;
 import uk.ac.diamond.scisoft.analysis.io.IMetaLoader;
-import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 import uk.ac.gda.monitor.IMonitor;
 
 public class SpecLoader extends AbstractFileLoader implements IMetaLoader {
 	
 	private static Logger logger = LoggerFactory.getLogger(SpecLoader.class);
-
-	public static void setLoaderInFactory(){
-		try {
-			LoaderFactory.registerLoader("dat", SpecLoader.class, 1); // Important, try SpecLoader before SRSLoader but after DatLoader
-		} catch (Exception e) {
-			logger.error("Cannot register "+SpecLoader.class.getName()+" in "+LoaderFactory.class.getName(), e);
-		}
-	}
 	
 	private String filePath;
 	private Collection<String> dataNames;

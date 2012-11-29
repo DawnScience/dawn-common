@@ -84,5 +84,10 @@
             file_extension="h5, nxs, hdf5, hd5, hdf, nexus"
             high_priority="true">
       </loader>
+      <loader
+            class="org.dawb.gda.extensions.spec.SpecLoader"
+            file_extension="dat"
+            high_priority="false">
+      </loader>
    </extension>
 </plugin>

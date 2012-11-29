@@ -367,7 +367,8 @@ public class PlottingActionBarManager implements IPlotActionSystem {
 		if (id==null)        return;
 		IToolPage page = toolPages.get(id);
 		if (page==null) return;
-		
+		if (page.getControl()==null) return; // Already is a stub
+
 		IToolPage clone = page.cloneTool();
 		page.dispose();
 		toolPages.put(clone.getToolId(), clone);
