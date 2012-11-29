@@ -72,6 +72,9 @@ public class H5LabelProvider extends ColumnLabelProvider implements ITableLabelP
 			logger.error("Cannot re-create link to recorde "+object.getFullName());
 		}
 
+		if (object == null)
+			return null;
+		
 		switch(columnIndex) {
 		case 0:
 			return object.getName();

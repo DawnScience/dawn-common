@@ -38,7 +38,7 @@ public class H5ContentProvider implements ILazyTreeContentProvider {
 	@Override
 	public void updateElement(Object parent, int index) {
 		TreeNode node = (TreeNode) parent;
-		if (index < node.getChildCount()) {
+		if (treeViewer != null && index < node.getChildCount()) {
 			TreeNode element = node.getChildAt(index);
 			treeViewer.replace(parent, index, element);
 			updateChildCount(element, -1);
@@ -49,7 +49,8 @@ public class H5ContentProvider implements ILazyTreeContentProvider {
 	public void updateChildCount(Object element, int currentChildCount) {
 		TreeNode node = (TreeNode) element;
 		int size = node.getChildCount();
-		treeViewer.setChildCount(element, size);
+		if (treeViewer != null)
+			treeViewer.setChildCount(element, size);
 	}
 
 	@Override
