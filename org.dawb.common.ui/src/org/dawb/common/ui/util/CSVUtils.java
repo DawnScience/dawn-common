@@ -151,7 +151,7 @@ public class CSVUtils {
 				                                  
 		final Map<String, IDataset> sortedData = new TreeMap<String, IDataset>();
 		for (String name : dataSetNames) {
-			final IDataset set = LoaderFactory.getDataSet(path, name, new ProgressMonitorWrapper(monitor));
+			final IDataset set = LoaderFactory.getDataSet(path, name, new ProgressMonitorWrapper(monitor)).squeeze();
 			if (dataSetNames.length>1 && set.getRank()!=1) {
 				logger.error("The dataset "+name+" is not a 1D dataset and cannot be converted to ascii!");
 				continue;
