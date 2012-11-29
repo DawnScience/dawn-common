@@ -408,6 +408,9 @@ public class ROIEditTable  {
 					                     orig.getDpp(),
 					                     orig.isClippingCompensation(),
 					                     orig.getSymmetry());
+			
+			sr.setCombineSymmetry(orig.isCombineSymmetry());
+			
 			ret = sr;
 		} else if (roi instanceof CircularROI) {
 			CircularROI cr = new CircularROI(Math.abs(rows.get(1).getxLikeVal()), rows.get(0).getxLikeVal(), rows.get(0).getyLikeVal());
