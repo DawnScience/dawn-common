@@ -7,7 +7,6 @@ Bundle-Activator: org.dawb.gda.extensions.Activator
 Bundle-Vendor: ESRF
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
- uk.ac.diamond.scisoft.analysis,
  uk.ac.diamond.scisoft.analysis.rcp,
  uk.ac.diamond.scisoft.python,
  org.dawb.hdf5,
@@ -18,7 +17,8 @@ Require-Bundle: org.eclipse.ui,
  org.dawb.hdf5.editor,
  uk.ac.gda.common;bundle-version="1.0.0",
  uk.ac.gda.common.rcp;bundle-version="1.0.0",
- org.dawnsci.plotting.jreality;bundle-version="1.0.0"
+ org.dawnsci.plotting.jreality;bundle-version="1.0.0",
+ uk.ac.diamond.scisoft.analysis;bundle-version="1.3.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Export-Package: org.dawb.gda.extensions.jython,
