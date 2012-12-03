@@ -20,7 +20,6 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.Perspective;
 import org.eclipse.ui.internal.WorkbenchPage;
 import org.eclipse.ui.internal.tweaklets.Tweaklets;
-import org.eclipse.ui.internal.tweaklets.WorkbenchImplementation;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
 
 public class EditorExtensionFactory {
