@@ -11,6 +11,7 @@ package org.dawb.common.ui.slicing;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import ncsa.hdf.object.Group;
@@ -19,6 +20,8 @@ import org.dawb.common.ui.monitor.ProgressMonitorWrapper;
 import org.dawb.common.ui.plot.AbstractPlottingSystem;
 import org.dawb.common.ui.plot.IPlottingSystem;
 import org.dawb.common.ui.plot.PlotType;
+import org.dawb.common.ui.plot.trace.IImageTrace;
+import org.dawb.common.ui.plot.trace.ITrace;
 import org.dawb.hdf5.HierarchicalDataFactory;
 import org.dawb.hdf5.IHierarchicalDataFile;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -240,12 +243,32 @@ public class SliceUtils {
 			AbstractDataset y = getNexusAxis(currentSlice, slice.getShape()[0], currentSlice.getX()+1, true, monitor);
 			AbstractDataset x = getNexusAxis(currentSlice, slice.getShape()[1], currentSlice.getY()+1, true, monitor);		
 			if (monitor!=null&&monitor.isCanceled()) return;
-			plottingSystem.updatePlot2D(slice, Arrays.asList(x,y), monitor);
- 			
+			
+			// Nullify user objects because the ImageHistoryTool uses
+			// user objects to know if the image came from it. Since we
+			// use update here, we update (as its faster) but we also 
+			// nullify the user object.
+			final IImageTrace trace = getImageTrace(plottingSystem);
+			if (trace!=null) trace.setUserObject(null);
+			plottingSystem.updatePlot2D(slice, Arrays.asList(x,y), monitor); 			
 		}
 
 		plottingSystem.repaint(requireScale);
 
+	}
+	
+	/**
+	 * this method gives access to the image trace plotted in the
+	 * main plotter or null if one is not plotted.
+	 * @return
+	 */
+	private static IImageTrace getImageTrace(IPlottingSystem plotting) {
+		if (plotting == null) return null;
+
+		final Collection<ITrace> traces = plotting.getTraces(IImageTrace.class);
+		if (traces==null || traces.size()==0) return null;
+		final ITrace trace = traces.iterator().next();
+		return trace instanceof IImageTrace ? (IImageTrace)trace : null;
 	}
 
 
