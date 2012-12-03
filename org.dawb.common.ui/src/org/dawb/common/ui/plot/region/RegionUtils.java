@@ -25,7 +25,8 @@ public class RegionUtils {
 	 */
 	public static String getUniqueName(final String nameStub, final IPlottingSystem system, final String... usedNames) {
 		int i = 1;
-		final List used = usedNames!=null ? Arrays.asList(usedNames) : Collections.emptyList();
+		@SuppressWarnings("unchecked")
+		final List<String> used = (List<String>) (usedNames!=null ? Arrays.asList(usedNames) : Collections.emptyList());
 		while(system.getRegion(nameStub+" "+i)!=null || used.contains(nameStub+" "+i)) {
 			++i;
 			if (i>10000) break; // something went wrong!
