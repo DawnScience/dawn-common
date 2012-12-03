@@ -11,25 +11,23 @@ package org.dawb.common.ui.plot;
 
 public enum PlotType {
     
-	IMAGE(false, true, false), 
+	IMAGE(2), 
     
-    SURFACE(false, false, true), 
+    SURFACE(3), 
     
-    XY(true, false, false), 
+    XY(1), 
         
-    XY_STACKED(true, false, false),
+    XY_STACKED(1),
 
-    XY_STACKED_3D(false, false, true);
+    XY_STACKED_3D(3);
     
 	
 	
 	
-	private final boolean is1D, is2D, is3D;
+	private final int rank;
 
-	private PlotType(boolean is1D, boolean is2D, boolean is3D) {
-    	this.is1D = is1D;
-    	this.is2D = is2D;
-    	this.is3D = is3D;
+	private PlotType(int rank) {
+    	this.rank = rank;
 	}
 	
 	public static PlotType forSliceIndex(int type) {
@@ -43,13 +41,13 @@ public enum PlotType {
 	}
 
 	public boolean is1D() {
-		return is1D;
+		return rank==1;
 	}
 	public boolean is2D() {
-		return is2D;
+		return rank==2;
 	}
 	public boolean is3D() {
-		return is3D;
+		return rank==3;
 	}
 	public boolean is1Dor2D() {
 		return is1D()||is2D();

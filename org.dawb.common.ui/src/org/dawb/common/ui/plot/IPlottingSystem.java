@@ -274,7 +274,10 @@ public interface IPlottingSystem extends ITraceSystem, IRegionSystem, IAxisSyste
 	 */
 	public AbstractDataset getData(final String dataSetName);
 
-
+	/**
+	 * Will return the current plot type 1D, 2D etc.
+	 */
+	public PlotType getPlotType();
 	/**
 	 * 
 	 * @return true if some or all of the plotted data is 2D or images.

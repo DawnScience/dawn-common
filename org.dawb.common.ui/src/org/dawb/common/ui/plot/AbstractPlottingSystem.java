@@ -207,6 +207,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 		currentToolIdMap = null;
 	}
 
+	@Override
 	public PlotType getPlotType() {
 		return plottingMode;
 	}
