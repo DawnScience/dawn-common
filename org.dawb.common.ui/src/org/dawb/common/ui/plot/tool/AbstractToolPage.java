@@ -264,5 +264,16 @@ public abstract class AbstractToolPage extends Page implements IToolPage, IAdapt
 	public IPlottingSystem getToolPlottingSystem() {
 		return null;
 	}
+	
+	/**
+	 * Optionally override to provide setting of data on a tool externally
+	 * 
+	 * By default does nothing.
+	 * 
+	 * @param data
+	 */
+	public void setData(Object data) {
+		
+	}
 
 }
