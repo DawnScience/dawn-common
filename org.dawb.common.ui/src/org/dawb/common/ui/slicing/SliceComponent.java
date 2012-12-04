@@ -40,6 +40,7 @@ import org.dawb.common.ui.plot.trace.TraceEvent;
 import org.dawb.common.ui.preferences.ViewConstants;
 import org.dawb.common.ui.util.EclipseUtils;
 import org.dawb.common.ui.util.GridUtils;
+import org.dawb.hdf5.HierarchicalDataFactory;
 import org.dawb.hdf5.nexus.NexusUtils;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -92,6 +93,7 @@ import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 import uk.ac.diamond.scisoft.analysis.io.SliceObject;
 import uk.ac.gda.richbeans.components.cell.CComboCellEditor;
 import uk.ac.gda.richbeans.components.cell.SpinnerCellEditorWithPlayButton;
@@ -481,6 +483,12 @@ public class SliceComponent {
 	 */
 	private void updateAxis(int idim) {
 		try {    	
+			if (!HierarchicalDataFactory.isHDF5(sliceObject.getPath())) {
+				sliceObject.setNexusAxis(idim, "indices");
+				dimensionNames.put(idim, Arrays.asList("indices"));
+				return;
+			}
+			
 			List<String> names = NexusUtils.getAxisNames(sliceObject.getPath(), sliceObject.getName(), idim);
 			names = names!=null ? names : new ArrayList<String>(1);
 			names.add("indices");

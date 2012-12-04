@@ -10,6 +10,8 @@
 package org.dawb.hdf5;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import ncsa.hdf.object.FileFormat;
 
@@ -80,5 +82,28 @@ public class HierarchicalDataFactory {
 		file.close();
 	}
 
+
+	public static boolean isHDF5(final String absolutePath) {
+		if (HierarchicalDataFile.isWriting(absolutePath)) return true;
+		if (HierarchicalDataFile.isReading(absolutePath)) return true;
+		
+		// We guess based on extension
+		final String lowPath = absolutePath.toLowerCase();
+		for (String ext : EXT) {
+			if (lowPath.endsWith(ext)) return true;
+		}
+		return false;
+	}
+	
+	private final static List<String> EXT;
+	static {
+		EXT = new ArrayList<String>(7);
+		EXT.add(".h5");
+		EXT.add(".nxs");
+		EXT.add(".hd5");
+		EXT.add(".hdf5");
+		EXT.add(".hdf");
+		EXT.add(".nexus");
+	}	
 
 }

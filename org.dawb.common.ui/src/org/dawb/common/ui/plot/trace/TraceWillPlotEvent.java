@@ -71,6 +71,10 @@ public class TraceWillPlotEvent extends EventObject {
 		}
 	}
 
+	public void setNewImageDataSet(boolean newImageDataSet) {
+		this.newImageDataSet = newImageDataSet;
+	}
+
 	public List<AbstractDataset> getAxes() {
 		return axes;
 	}

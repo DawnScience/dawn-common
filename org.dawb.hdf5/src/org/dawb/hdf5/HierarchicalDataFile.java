@@ -655,6 +655,9 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 	public static boolean isWriting(final String absolutePath) {
 		return writeCache!=null && writeCache.contains(absolutePath);
 	}
+	public static boolean isReading(final String absolutePath) {
+		return readCache!=null && readCache.containsKey(absolutePath);
+	}
 
 	@Override
 	public List<Dataset> getNexusAxes(String signalPath, int dimension) throws Exception {

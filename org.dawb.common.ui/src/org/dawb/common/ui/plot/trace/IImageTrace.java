@@ -88,8 +88,9 @@ public interface IImageTrace extends IPaletteTrace {
 	 * @param image
 	 * @param axes - may be null
 	 * @param performAutoScale - true to rescale to new selection, otherwise keeps last axis position.
+	 * @return false if could not set data
 	 */
-	public void setData(final AbstractDataset image, List<AbstractDataset> axes, boolean performAutoScale);
+	public boolean setData(final AbstractDataset image, List<AbstractDataset> axes, boolean performAutoScale);
 	
 	/**
 	 * Change the axes without changing the underlying data.
