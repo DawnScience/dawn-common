@@ -23,6 +23,8 @@ import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
  */
 public class TraceWillPlotEvent extends EventObject {
 
+	public  boolean         doit = true;
+	
 	private AbstractDataset image=null;
 	private boolean         newImageDataSet = false;
 	
@@ -97,6 +99,17 @@ public class TraceWillPlotEvent extends EventObject {
 
 	public boolean isNewLineDataSet() {
 		return newLineDataSet;
+	}
+
+	public ITrace getTrace() {
+		return (ITrace)getSource();
+	}
+
+	public IImageTrace getImageTrace() {
+		ITrace trace = getTrace();
+		return trace instanceof IImageTrace
+			   ? (IImageTrace)trace
+			   : null;
 	}
 	
 
