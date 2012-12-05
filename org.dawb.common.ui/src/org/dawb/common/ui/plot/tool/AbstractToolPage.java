@@ -13,9 +13,26 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.part.Page;
 
 /**
- * Page to extend for adding a tool to the plotting.
- * @author fcp94556
- *
+ * 
+Page to extend for adding a tool to the plotting.
+
+There are three possibilities for a tool page:
+
+1.	One instance per plotting system and dynamically chosen by the user (default)
+2.	Open in a dedicated view, one instance per plotting system but the view can only be this tool.
+OR
+3.	Static tool, one instance per view it's open in.
+
+
+3 works as follows: When the tool is open in a dedicated view, if it implements the method isStaticTool() to return true, 
+it will exist as one instance. The tool will have to set things up to respond to plotting system changing in this case.
+
+Tools can be added to a perspective in 2 or 3 form in the prespective by adding the “org.dawb.workbench.plotting.views.toolPageView.fixed”
+view to the perspective and setting the secondary id to the tool id required. For instance ‘org.dawb.workbench.plotting.tools.azimuthalProfileTool’. 
+Or by programmatically when opening a view by id. 
+
+ @author fcp94556
+ 
  */
 public abstract class AbstractToolPage extends Page implements IToolPage, IAdaptable {
 
@@ -226,15 +243,24 @@ public abstract class AbstractToolPage extends Page implements IToolPage, IAdapt
 	}
 	
 	public boolean isDedicatedView() {
-		final String id = getViewPart().getSite().getId();
-		return "org.dawb.workbench.plotting.views.toolPageView.fixed".equals(id);
+		try {
+			final String id = getViewPart().getSite().getId();
+			return "org.dawb.workbench.plotting.views.toolPageView.fixed".equals(id);
+		} catch (NullPointerException npe) {
+			return true;
+		}
+	}
+	
+	@Override
+	public boolean isStaticTool() {
+		return false;
 	}
 	
 	/**
 	 * returns true if we are linked to an IToolPage
 	 * @return
 	 */
-	protected boolean isLinkedToolPage() {
+	public boolean isLinkedToolPage() {
 		return getLinkedToolPage()!=null;
 	}
 
@@ -242,7 +268,7 @@ public abstract class AbstractToolPage extends Page implements IToolPage, IAdapt
 	 * Returns tool page we are a sub tool of or null if we are not
 	 * @return
 	 */
-    protected IToolPage getLinkedToolPage() {
+    public IToolPage getLinkedToolPage() {
     	final IWorkbenchPart part = getPart();
         if (part instanceof IToolContainer) {
     		// Go back up one so that history of profiles can be done.
