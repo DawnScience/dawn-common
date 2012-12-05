@@ -248,4 +248,16 @@ public interface IToolPage extends IPageBookViewPage, IAdaptable {
 	 */
 	public IPlottingSystem getToolPlottingSystem();
 
+	/**
+	 * When a tool is opened in a dedicated view, it can enter a static mode.
+	 * In this mode the tool is the same for all parts. By default this will return
+	 * false and tools wishing to be static should override it. 
+	 * 
+	 * They will also need to override setPlottingSystem(...) and other configuration methods
+	 * in order to work properly.
+	 * 
+	 * @return
+	 */
+	public boolean isStaticTool();
+
 }

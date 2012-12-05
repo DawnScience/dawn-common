@@ -276,4 +276,7 @@ public abstract class AbstractToolPage extends Page implements IToolPage, IAdapt
 		
 	}
 
+	public boolean isStaticTool() {
+		return false;
+	}
 }
