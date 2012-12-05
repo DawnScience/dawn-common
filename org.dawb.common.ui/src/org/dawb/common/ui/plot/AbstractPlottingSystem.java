@@ -290,7 +290,12 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	public void fireWillPlot(final TraceWillPlotEvent evt) {
 		if (traceListeners==null) return;
 		for (ITraceListener l : traceListeners) {
-			l.traceWillPlot(evt);
+			try {
+			    l.traceWillPlot(evt);
+			} catch (Throwable usuallyIgnored) {
+				// Does not stack trace when deployed in product.
+				logger.trace("Cannot call traceWillPlot!", usuallyIgnored);
+			}
 		}
 	}
 	public void fireTraceAdded(final TraceEvent evt) {
