@@ -96,6 +96,8 @@ public class IFileUtils {
 	 */
 	public static IFile getUniqueIFile(final IProject edna, final String rootName, final String ext) {
 		
+        final IFile file = edna.getFile(rootName+"."+ext);
+        if (!file.exists()) return file;
         return getUniqueIFile(edna, rootName, 1, ext);
 	}
 
