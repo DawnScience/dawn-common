@@ -16,5 +16,5 @@ package org.dawb.gda.extensions.jython;
 This is for executing a script directly from the workflow tool when you do not want to
 start a separate debug/run process to start the script.
  */
-public class JythonInterpreterUtils extends uk.ac.diamond.scisoft.analysis.rcp.util.JythonInterpreterUtils {
+public class JythonInterpreterUtils extends uk.ac.diamond.scisoft.python.JythonInterpreterUtils {
 }
