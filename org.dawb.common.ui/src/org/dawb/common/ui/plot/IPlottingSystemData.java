@@ -68,5 +68,11 @@ public interface IPlottingSystemData {
 	 */
 	public void addExpression();
 
+	/**
+	 * 
+	 * @return the path to the original data if there is a file path.
+	 */
+	public String getFilePath();
+
 
 }

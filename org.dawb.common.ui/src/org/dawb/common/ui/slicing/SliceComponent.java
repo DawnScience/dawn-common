@@ -581,7 +581,7 @@ public class SliceComponent {
 		
 		if (dimsDataList==null || dimsDataList.size()!=dataShape.length) {
 			try {
-				this.dimsDataList = new DimsDataList(dataShape, sliceObject);
+				this.dimsDataList = new DimsDataList(dataShape);
 			} catch (Exception e) {
 				logger.error("Cannot make new dims data list!", e);
 			}

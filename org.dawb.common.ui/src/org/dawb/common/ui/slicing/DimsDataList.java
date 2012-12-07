@@ -14,8 +14,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import uk.ac.diamond.scisoft.analysis.io.SliceObject;
-
 public class DimsDataList implements Serializable {
 
 	
@@ -34,16 +32,10 @@ public class DimsDataList implements Serializable {
 		dimsData = chunk;
 	}
 	
-	public DimsDataList(int[] dataShape, SliceObject slice) throws Exception {
+	public DimsDataList(int[] dataShape) throws Exception {
 		
-		// TODO Read axis maybe from nexus data?
-		//final IHierarchicalDataFile file = HierarchicalDataFactory.getReader(slice.getPath());
 		try {
-			
-			//final Dataset set = (Dataset)file.getData(slice.getName());
-			//final List   meta = set.getMetadata();
-			
-			
+						
 			// For now we just assume the first dimensions are the slow ones to make an axis out
 			// of. Later read the axis from the meta list but we do not have examples of this so
 			// far.
