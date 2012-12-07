@@ -438,10 +438,11 @@ public class SliceComponent {
    	}
 
 	private void setImageOrientationText(final StyledText text) {
-		try {
-			text.setText("");
-			text.append("Image Orientation: ");
-			final IImageTrace trace  = (IImageTrace)plottingSystem.getTraces(IImageTrace.class).iterator().next();
+		text.setText("");
+		text.append("Image Orientation: ");
+		Iterator<ITrace> it = plottingSystem.getTraces(IImageTrace.class).iterator();
+		if (it.hasNext()) {
+			final IImageTrace trace  = (IImageTrace) it.next();
             final ImageOrigin io     = trace.getImageOrigin();
             text.append(io.getLabel());
             /*  Might be need if users get confused.
@@ -452,7 +453,7 @@ public class SliceComponent {
                 text.setStyleRange(new StyleRange(len, reverseLabel.length(), null, null, SWT.BOLD));
             }
             */
-		} catch (Exception ne) {
+		} else {
 			text.setStyleRange(null);
 			text.setText("");
 		}
