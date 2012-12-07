@@ -67,6 +67,9 @@ import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 public interface IPlottingSystem extends ITraceSystem, IRegionSystem, IAxisSystem, IAnnotationSystem, IPrintablePlotting{
 
 	public final static String RESCALE_ID = "org.dawb.common.ui.plot.rescale";
+	
+	public static final int NORMAL_CURSOR = 0;
+	public static final int CROSS_CURSOR  = 1;
 
 	/**
 	 * Call to create the UI component dealing with the plotting.
@@ -294,4 +297,10 @@ public interface IPlottingSystem extends ITraceSystem, IRegionSystem, IAxisSyste
      * @return
      */
 	public IPlotActionSystem getPlotActionSystem();
+	
+	/**
+	 * The cursor type used normally when no zoom or other cursor is active.
+	 * NORMAL is the arrow, CROSS is a cross
+	 */
+	public void setDefaultCursor(int cursorType);
 }
