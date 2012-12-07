@@ -9,10 +9,14 @@
  */ 
 package org.dawb.common.ui.slicing;
 
+import java.io.File;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import ncsa.hdf.object.Group;
 
@@ -40,6 +44,7 @@ public class SliceUtils {
 
     private static Logger logger = LoggerFactory.getLogger(SliceUtils.class);
 
+	private static NumberFormat format = DecimalFormat.getNumberInstance();
     /**
      * Generates a list of slice information for a given set of dimensional data.
      * 
@@ -79,8 +84,14 @@ public class SliceUtils {
     		step[i]  = getStep(dimsData);
 
     		if (dimsData.getAxis()<0) {
-    			// TODO deal with range
-    			buf.append(" (Dim "+(dimsData.getDimension()+1)+" = "+(dimsData.getSliceRange()!=null?dimsData.getSliceRange():dimsData.getSlice())+")");
+    			String nexusAxisName = getNexusAxisName(currentSlice, dimsData, " (Dim "+(dimsData.getDimension()+1)); 
+    			String formatValue   = String.valueOf(dimsData.getSlice());
+    			try {
+    			    formatValue = format.format(getNexusAxisValue(sliceObject, dimsData, dimsData.getSlice(), null));
+    			} catch (Throwable ne) {
+    				formatValue   = String.valueOf(dimsData.getSlice());
+    			}
+    			buf.append("("+nexusAxisName+" = "+(dimsData.getSliceRange()!=null?dimsData.getSliceRange():formatValue)+")");
     		}
 
     		if (dimsData.getAxis()==0) {
@@ -121,6 +132,61 @@ public class SliceUtils {
 
     	return currentSlice;
 	}
+  
+    /**
+     * 
+     * @param sliceObject
+     * @param data
+     * @return
+     * @throws Exception
+     */
+    public static String getNexusAxisName(SliceObject sliceObject, DimsData data) {
+    	
+    	return getNexusAxisName(sliceObject, data, "indices");
+    }
+    /**
+     * 
+     * @param sliceObject
+     * @param data
+     * @return
+     * @throws Exception
+     */
+    public static String getNexusAxisName(SliceObject sliceObject, DimsData data, String alternateName) {
+    	
+    	try {
+			Map<Integer,String> dims = sliceObject.getNexusAxes();
+			String axisName = dims.get(data.getDimension()+1); // The data used for this axis
+			if (axisName==null || "".equals(axisName)) return alternateName;
+			return axisName;
+    	} catch (Throwable ne) {
+    		return alternateName;
+    	}
+    }
+    /**
+     * 
+     * @param sliceObject
+     * @param data
+     * @param value
+     * @param monitor
+     * @return the nexus axis value or the index if no nexus axis can be found.
+     */
+	public static Number getNexusAxisValue(SliceObject sliceObject, DimsData data, int value, IProgressMonitor monitor) {
+        AbstractDataset axis = null;
+        try {
+        	final String axisName = getNexusAxisName(sliceObject, data);
+            axis = SliceUtils.getNexusAxis(sliceObject, axisName, false, monitor);
+        } catch (Exception ne) {
+        	axis = null;
+        }
+        
+        try {
+            return axis!=null ? axis.getDouble(value)  :  value;
+        } catch (Throwable ne) {
+        	return value;
+        }
+
+	}
+
 
 
 	private static int getStart(DimsData dimsData) {
@@ -199,7 +265,7 @@ public class SliceUtils {
 			plottingSystem.clear();
 			final AbstractDataset x = getNexusAxis(currentSlice, slice.getShape()[0], currentSlice.getX()+1, true, monitor);
 			plottingSystem.setXfirst(true);
-			plottingSystem.createPlot1D(x, Arrays.asList(slice), monitor);
+			plottingSystem.createPlot1D(x, Arrays.asList(slice), slice.getName(), monitor);
 			Display.getDefault().syncExec(new Runnable() {
 				public void run() {
 					plottingSystem.getSelectedXAxis().setTitle(x.getName());
@@ -290,17 +356,10 @@ public class SliceUtils {
 			indices.setName("");
 			return indices;
 		}
-		IHierarchicalDataFile file = null;
+		
 		try {
-			file = HierarchicalDataFactory.getReader(currentSlice.getPath());
-			final Group  group    = file.getParent(currentSlice.getName());
-			final String fullName = group.getFullName()+"/"+axisName;
-			AbstractDataset axis = LoaderFactory.getDataSet(currentSlice.getPath(), fullName, new ProgressMonitorWrapper(monitor));
-			axis = axis.squeeze();
-			final String unit = file.getAttributeValue(fullName+"@unit");
-			if (unit!=null) axisName = axisName+" "+unit;
-			axis.setName(axisName);
-		    return axis;
+			return getNexusAxis(currentSlice, axisName, true, monitor);
+			
 		} catch (Throwable ne) {
 			logger.error("Cannot get nexus axis during slice!", ne);
 			if (requireIndicesOnError) {
@@ -311,9 +370,50 @@ public class SliceUtils {
 			} else {
 				return null;
 			}
-		} finally {
-			if (file!=null) file.close();
 		}
+	}
+	
+	/**
+	 * 
+	 * @param currentSlice
+	 * @param axisName
+	 * @param requireUnit - if true will get unit but will be slower.
+	 * @param requireIndicesOnError
+	 * @param monitor
+	 * @return
+	 */
+	public static AbstractDataset getNexusAxis(final SliceObject currentSlice, 
+			                                          String axisName, 
+			                                   final boolean requireUnit,
+			                                   final IProgressMonitor  monitor) throws Exception {
+		
+		if (requireUnit) { // Slower
+			IHierarchicalDataFile file = null;
+			try {
+				file = HierarchicalDataFactory.getReader(currentSlice.getPath());
+				final Group  group    = file.getParent(currentSlice.getName());
+				final String fullName = group.getFullName()+"/"+axisName;
+				AbstractDataset axis = LoaderFactory.getDataSet(currentSlice.getPath(), fullName, new ProgressMonitorWrapper(monitor));
+				axis = axis.squeeze();
+				final String unit = file.getAttributeValue(fullName+"@unit");
+				if (unit!=null) axisName = axisName+" "+unit;
+				axis.setName(axisName);
+			    return axis;
+			} finally {
+				if (file!=null) file.close();
+			}
+		} else { // Faster
+			
+			final String dataPath = currentSlice.getName();
+			final File file = new File(dataPath);
+			final String fullName = file.getParent().replace('\\','/')+"/"+axisName;
+			AbstractDataset axis = LoaderFactory.getDataSet(currentSlice.getPath(), fullName, new ProgressMonitorWrapper(monitor));
+			axis = axis.squeeze();
+			axis.setName(axisName);
+			return axis;
+		
+		}
+
 	}
 
 
@@ -322,7 +422,7 @@ public class SliceUtils {
 		
 		final int[] dataShape = currentSlice.getFullShape();
 		AbstractDataset slice = LoaderFactory.getSlice(currentSlice, new ProgressMonitorWrapper(monitor));
-		slice.setName("Slice of "+currentSlice.getName()+" (full shape "+Arrays.toString(dataShape)+")"+currentSlice.getShapeMessage());
+		slice.setName("Slice of "+currentSlice.getName()+" "+currentSlice.getShapeMessage());
 		
 		if (currentSlice.isRange()) {
 			// We sum the data in the dimensions that are not axes
@@ -348,7 +448,10 @@ public class SliceUtils {
 
 			slice = slice.squeeze();		
 			if (currentSlice.getX() > currentSlice.getY() && slice.getShape().length==2) {
+				// transpose clobbers name
+				final String name = slice.getName();
 				slice = slice.transpose();
+				if (name!=null) slice.setName(name);
 			}
 		}
 		return slice;

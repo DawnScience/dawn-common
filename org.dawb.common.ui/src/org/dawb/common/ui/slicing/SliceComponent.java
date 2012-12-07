@@ -15,6 +15,8 @@ import java.beans.XMLEncoder;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -93,7 +95,7 @@ import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
+import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.io.SliceObject;
 import uk.ac.gda.richbeans.components.cell.CComboCellEditor;
 import uk.ac.gda.richbeans.components.cell.SpinnerCellEditorWithPlayButton;
@@ -139,11 +141,16 @@ public class SliceComponent {
 	 */
 	private Map<Integer, List<String>> dimensionNames;
 
-	
+	/**
+	 * Format used to show value in nexus axes
+	 */
+	private NumberFormat format;
+
 	public SliceComponent(final String sliceReceiverId) {
 		this.sliceReceiverId = sliceReceiverId;
 		this.sliceJob        = new SliceJob();
 		this.dimensionNames  = new HashMap<Integer,List<String>>(5);
+		this.format          = DecimalFormat.getNumberInstance();
 	}
 	
 	/**
@@ -361,7 +368,7 @@ public class SliceComponent {
 		man.add(editorMenu);
 		editorMenu.setImageDescriptor(Activator.getImageDescriptor("icons/spinner_buttons.png"));
 		
-		final Action asScale = new Action("Sliding Scale", IAction.AS_CHECK_BOX) {
+		final Action asScale = new Action("Sliding scale", IAction.AS_CHECK_BOX) {
 			public void run () {
 				updateSliceEditor(0);
 				Activator.getDefault().getPreferenceStore().setValue(ViewConstants.SLICE_EDITOR, 0);
@@ -371,7 +378,7 @@ public class SliceComponent {
 		asScale.setChecked(Activator.getDefault().getPreferenceStore().getInt(ViewConstants.SLICE_EDITOR)==0);
 		editorMenu.add(asScale);
 		
-		final Action asSpinner = new Action("Slice index", IAction.AS_CHECK_BOX) {
+		final Action asSpinner = new Action("Slice index (only)", IAction.AS_CHECK_BOX) {
 			public void run () {
 				updateSliceEditor(1);
 				Activator.getDefault().getPreferenceStore().setValue(ViewConstants.SLICE_EDITOR, 1);
@@ -674,7 +681,8 @@ public class SliceComponent {
 					return data.getAxis()<0;
 				}
 				if (col==3) {
-					return data.getAxis()>-1;
+					boolean isSliceIndex = Activator.getDefault().getPreferenceStore().getInt(ViewConstants.SLICE_EDITOR)==1;
+					return isSliceIndex ? data.getAxis()>-1 : true;
 				}
 				return false;
 			}
@@ -702,6 +710,7 @@ public class SliceComponent {
 					// If there is only one other axis, set it to X
 				}
 				if (col==3) {
+
 					final int idim  = data.getDimension()+1;
 					if (value instanceof Integer) {
 						final List<String> names = dimensionNames.get(idim);
@@ -735,7 +744,7 @@ public class SliceComponent {
 						scale.setMaximum(dataShape[data.getDimension()]-1);
 						scale.setPageIncrement(scale.getMaximum()/10);
 
-						scale.setToolTipText(getScaleTooltip(scale.getMinimum(), scale.getMaximum()));
+						scale.setToolTipText(getScaleTooltip(data, scale.getMinimum(), scale.getMaximum()));
 
 					}
 					return data.getSliceRange() != null ? data.getSliceRange() : data.getSlice();
@@ -757,7 +766,7 @@ public class SliceComponent {
 	private SpinnerCellEditorWithPlayButton spinnerEditor;
 	
 	/**
-	 * A better way than this is to use the EditingSupport functionality 
+	 * A better way than this is to use the *EditingSupport* functionality 
 	 * of TableViewerColumn.
 	 * 
 	 * @param viewer
@@ -883,7 +892,7 @@ public class SliceComponent {
 		final int value = scale.getSelection();
 		data.setSlice(value);
 		data.setSliceRange(null);
-		scale.setToolTipText(getScaleTooltip(scale.getMinimum(), scale.getMaximum()));		
+		scale.setToolTipText(getScaleTooltip(data, scale.getMinimum(), scale.getMaximum()));		
 		if (doSlice&&synchronizeSliceData(data)) slice(false);
 	}
 
@@ -903,16 +912,37 @@ public class SliceComponent {
 		return items;
 	}
 
-	protected String getScaleTooltip(int minimum, int maximum) {
+	protected String getScaleTooltip(DimsData data, int minimum, int maximum) {
 		
-		final DimsData data  = (DimsData)((IStructuredSelection)viewer.getSelection()).getFirstElement();
 		int value = data.getSlice();
         final StringBuffer buf = new StringBuffer();
-        buf.append(minimum);
+        
+        AbstractDataset axis = null;
+        try {
+			final String axisName = SliceUtils.getNexusAxisName(sliceObject, data);
+            axis = SliceUtils.getNexusAxis(this.sliceObject, axisName, false, null);
+        } catch (Exception ne) {
+        	axis = null;
+        }
+        
+        String min = String.valueOf(minimum);
+        String max = String.valueOf(maximum);
+        String val = String.valueOf(value);
+        try {
+	        if (axis!=null) {
+				min = format.format(axis.getDouble(minimum));
+				max = format.format(axis.getDouble(maximum));
+				val = format.format(axis.getDouble(value));
+	        } 
+        } catch (Throwable ignored) {
+        	// Use indices
+        }
+    
+        buf.append(min);
         buf.append(" <= ");
-        buf.append(value);
-        buf.append(" < ");
-        buf.append(maximum+1);
+        buf.append(val);
+        buf.append(" <= ");
+        buf.append(max);
         return buf.toString();
 	}
 
@@ -929,7 +959,7 @@ public class SliceComponent {
 		axis.setLabelProvider(new DelegatingStyledCellLabelProvider(new SliceColumnLabelProvider(1)));
 
 		final TableViewerColumn slice   = new TableViewerColumn(viewer, SWT.LEFT, 2);
-		slice.getColumn().setText("Slice Index");
+		slice.getColumn().setText("Slice Value");
 		layout.setColumnData(slice.getColumn(), new ColumnWeightData(140));
 		slice.setLabelProvider(new DelegatingStyledCellLabelProvider(new SliceColumnLabelProvider(2)));
 		
@@ -961,17 +991,22 @@ public class SliceComponent {
 					ret.append( data.getSliceRange() );
 				} else {
 					final int slice = data.getSlice();
-					ret.append( slice>-1 ? slice+"" : "" );
+					String formatValue = String.valueOf(slice);
+					try {
+						formatValue = format.format(SliceUtils.getNexusAxisValue(sliceObject, data, slice, null));
+					} catch (Throwable ne) {
+						formatValue = String.valueOf(slice);
+					}
+					ret.append( slice>-1 ? formatValue : "" );
 				}
 				if (data.getAxis()<0 && !errorLabel.isVisible()) {
 					ret.append(new StyledString(" (click to change)", StyledString.QUALIFIER_STYLER));
 				}
 				break;
 			case 3:
-				if (sliceObject!=null && data.getAxis()>-1) {
-					Map<Integer,String> dims = sliceObject.getNexusAxes();
-					String name = dims.get(data.getDimension()+1); // The data used for this axis
-	                if (name!=null) ret.append(name);
+				if (sliceObject!=null) {
+					final String axisName = SliceUtils.getNexusAxisName(sliceObject, data);
+					if (axisName!=null) ret.append(axisName);
 				}
 			default:
 				ret.append( "" );
@@ -1030,7 +1065,7 @@ public class SliceComponent {
 		((CComboCellEditor)viewer.getCellEditors()[1]).setItems(items);
 
 	}
-	
+
 	public String getAxisLabel(DimsData data) {
 
 		final int axis = data.getAxis();
