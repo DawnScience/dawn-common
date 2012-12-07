@@ -86,6 +86,13 @@ public interface IToolPage extends IPageBookViewPage, IAdaptable {
 		public String getTooltip() {
 			return tooltip;
 		}
+
+		public boolean isCompatible(ToolPageRole role) {
+			if (role==this) return true;
+			if (ToolPageRole.ROLE_1D_AND_2D!=this) return false;
+			if (role==ROLE_1D || role==ROLE_2D) return true;
+			return false;
+		}
 	}
 	
 	public ToolPageRole getToolPageRole();
