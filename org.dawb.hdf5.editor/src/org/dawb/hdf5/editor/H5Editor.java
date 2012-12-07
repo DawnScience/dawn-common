@@ -33,7 +33,9 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IReusableEditor;
 import org.eclipse.ui.IURIEditorInput;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.EditorPart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -227,6 +229,22 @@ public class H5Editor extends EditorPart implements IReusableEditor, IH5Editor {
 		tree.getControl().addListener(SWT.MouseDoubleClick, new Listener() {
 			@Override
 			public void handleEvent(Event event) {
+				
+				try {
+					IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+					if (page != null) {
+						try {
+							if (page.findView("org.dawb.passerelle.views.ValueView")==null) {
+								page.showView("org.dawb.passerelle.views.ValueView");
+							}
+						} catch (PartInitException e) {
+							// do nothing
+						}
+					}
+				} catch (Throwable ignored) {
+					// It is not failure to not open the value view.
+				}
+
 				final IConfigurationElement[] ele = Platform.getExtensionRegistry().getConfigurationElementsFor("org.dawb.hdf5.editor.double.click.listener");
 				for (IConfigurationElement e : ele) {
 					IH5DoubleClickSelectionProvider prov=null;
