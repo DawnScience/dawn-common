@@ -106,7 +106,7 @@ public class DatasetTitleUtils {
 			final Matcher matcher = ROOT_PATTERN.matcher(name);
 			if (matcher.matches()) {
 				final String rName = matcher.group(1);
-				if (rootName!=null && !rootName.equals(rootName)) {
+				if (rootName!=null && !rootName.equals(rName)) {
 					rootName = null;
 					break;
 				}
