@@ -370,16 +370,16 @@
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
-            category="org.edna.workbench.preferences.root"
+            category="org.dawnsci.preferences.root"
             class="org.dawb.common.ui.views.monitor.MonitorPreferencePage"
             id="org.dawb.common.ui.views.dashboard.dashboardPreferences"
             name="Monitor">
       </page>
       <page
-            category="org.edna.workbench.preferences.root"
+            category="org.dawnsci.preferences.tango"
             class="org.dawb.common.ui.preferences.TangoPreferencePage"
             id="org.dawb.common.ui.views.tangoPreferences"
-            name="Tango">
+            name="Configuration">
       </page>
    </extension>
    <extension
@@ -460,7 +460,7 @@
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
-            category="org.edna.workbench.preferences.root"
+            category="org.dawnsci.preferences.root"
             class="org.dawb.common.ui.preferences.ViewPreferencePage"
             id="org.edna.workbench.views.preferencePage"
             name="Image Monitor">
