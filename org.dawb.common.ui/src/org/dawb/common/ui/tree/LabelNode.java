@@ -19,6 +19,13 @@ import javax.swing.tree.TreeNode;
  */
 public class LabelNode implements TreeNode {
 
+	private String           tooltip;
+	public String getTooltip() {
+		return tooltip;
+	}
+	public void setTooltip(String tooltip) {
+		this.tooltip = tooltip;
+	}
 	private String           label;
 	private TreeNode         parent;
 	private Vector<TreeNode> children;
