@@ -25,7 +25,9 @@ import org.eclipse.ui.preferences.ScopedPreferenceStore;
  * 
  * @author Andy Gotz
  * 
+   @Deprecated  use IPaletteService instead
  */
+@Deprecated
 public class PaletteFactory {
 	
 	
