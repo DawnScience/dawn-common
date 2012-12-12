@@ -11,9 +11,18 @@ package org.dawb.common.ui.plot;
 
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 import uk.ac.gda.monitor.IMonitor;
 
 public interface IPlottingSystemData {
+
+	/**
+	 * A data set which can be used without loading the data
+	 * @param name
+	 * @param monitor
+	 * @return
+	 */
+	public ILazyDataset getLazyDataSet(String name, IMonitor monitor);
 
 	/**
 	 * Return data set for name
