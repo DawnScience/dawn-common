@@ -73,8 +73,9 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPageSystem {
 	
 	private static final Logger logger = LoggerFactory.getLogger(AbstractPlottingSystem.class);
-	
-	protected boolean rescale = true;
+
+	// Do not autoscale by default
+	protected boolean rescale = false;
 
 	// True if first data set should be plotted as x axis
 	protected boolean xfirst = true; // NOTE Currently must always be true or some tools start in a bad state.
