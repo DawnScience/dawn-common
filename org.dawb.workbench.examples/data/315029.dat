@@ -4,14 +4,6 @@
  SRSTLE='                                                            ',
  SRSCN1='        ',SRSCN2='        ',SRSCN3='        ',
 <MetaDataAtStart>
-pil100k_path_template='snapped-data/pilatus100k/%05d.tif'
-pil100k_path_template='snapped-data/pilatus100k/%05d.tif'
-pil100k_path_template='snapped-data/pilatus100k/%05d.tif'
-pil100k_path_template='snapped-data/pilatus100k/%05d.tif'
-pil100k_path_template='snapped-data/pilatus100k/%05d.tif'
-pil100k_path_template='snapped-data/pilatus100k/%05d.tif'
-pil100k_path_template='snapped-data/pilatus100k/%05d.tif'
-pil100k_path_template='snapped-data/pilatus100k/%05d.tif'cmd='scancn eta 0.01 41 pil100k 1'
 date='Wed Oct 10 11:59:39 2012'
 Year=2012
 Month=10
