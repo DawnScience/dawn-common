@@ -8,12 +8,9 @@ Bundle-Vendor: ESRF
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  uk.ac.diamond.scisoft.analysis.rcp,
- uk.ac.diamond.scisoft.python,
  org.dawb.hdf5,
  org.dawb.common.util,
  org.dawb.common.ui,
- org.python.pydev;bundle-version="2.2.4",
- org.python.pydev.core;bundle-version="2.2.4",
  org.dawb.hdf5.editor,
  uk.ac.gda.common;bundle-version="1.0.0",
  uk.ac.gda.common.rcp;bundle-version="1.0.0",
@@ -21,15 +18,10 @@ Require-Bundle: org.eclipse.ui,
  uk.ac.diamond.scisoft.analysis;bundle-version="1.3.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
-Export-Package: org.dawb.gda.extensions.jython,
- org.dawb.gda.extensions.loaders,
+Export-Package: org.dawb.gda.extensions.loaders,
  org.dawb.gda.extensions.spec,
  org.dawb.gda.extensions.util
-Import-Package: com.thoughtworks.xstream.core.util,
- org.apache.commons.beanutils,
- org.dawb.common.services,
+Import-Package: org.dawb.common.services,
  org.dawb.hdf5.editor,
  org.eclipse.core.resources,
- org.python.core,
- org.python.util,
  org.slf4j
