@@ -1,8 +1,5 @@
 package org.dawb.common.ui.plot.tool;
 
-import java.util.List;
-
-import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.roi.ROIProfile.BoxLineType;
 
 /**
@@ -17,11 +14,5 @@ public interface IProfileToolPage extends IToolPage {
 	 * @param horizontalType
 	 */
 	void setLineType(BoxLineType lineType);
-
-	/**
-	 * Custom axes
-	 * @param axes1
-	 */
-	void setAxes(List<AbstractDataset> axes1);
 
 }
