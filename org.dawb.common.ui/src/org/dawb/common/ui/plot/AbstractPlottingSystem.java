@@ -74,8 +74,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	
 	private static final Logger logger = LoggerFactory.getLogger(AbstractPlottingSystem.class);
 
-	// Do not autoscale by default
-	protected boolean rescale = false;
+	protected boolean rescale = true;
 
 	// True if first data set should be plotted as x axis
 	protected boolean xfirst = true; // NOTE Currently must always be true or some tools start in a bad state.
