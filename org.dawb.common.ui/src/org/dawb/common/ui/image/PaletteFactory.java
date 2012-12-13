@@ -13,9 +13,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.dawb.common.util.object.ObjectUtils;
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.preferences.InstanceScope;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
@@ -25,11 +23,10 @@ import org.eclipse.ui.preferences.ScopedPreferenceStore;
  * 
  * @author Andy Gotz
  * 
-   @Deprecated  use IPaletteService instead
+   @deprecated  use {@link org.dawb.common.services.IPaletteService} instead
  */
 @Deprecated
 public class PaletteFactory {
-	
 	
 	public static final Map<String,Integer> PALETTES = PaletteFactory.getPaletteNames();
 	
@@ -90,7 +87,6 @@ public class PaletteFactory {
 	public static PaletteData makeJetPalette() {
 		RGB jet[] = new RGB[256];
 		
-		double colorPos[] = new double[5];
 		int nb = 256;
 
 		for (int i = 0; i < nb; i++) {
@@ -2436,130 +2432,5 @@ public class PaletteFactory {
 		PALETTES.put( "Jet", PaletteValues.PALETTE_JET);
 
 		return PALETTES;
-	}
-
-	/**
-	 * Returns an array of colors in a smooth palette from <code>start</code> to <code>end</code>.
-	 * <p>
-	 * The returned array has size <code>steps</code>, and the color at index 0 is <code>start</code>, the color
-	 * at index <code>steps&nbsp;-&nbsp;1</code> is <code>end</code>.
-	 * 
-	 * @see org.eclipse.jface.internal.text.revisions.Colors
-	 *
-	 * @param start the start color of the palette
-	 * @param end the end color of the palette
-	 * @param steps the requested size, must be &gt; 0
-	 * @return an array of <code>steps</code> colors in the palette from <code>start</code> to <code>end</code>
-	 */
-	private static RGB[] palette(RGB start, RGB end, int steps) {
-		Assert.isLegal(start != null);
-		Assert.isLegal(end != null);
-		Assert.isLegal(steps > 0);
-
-		if (steps == 1)
-			return new RGB[] { start };
-
-		float step= 1.0f / (steps - 1);
-		RGB[] gradient= new RGB[steps];
-		for (int i= 0; i < steps; i++)
-			gradient[i]= blend(start, end, step * i);
-
-		return gradient;
-	}
-
-	/**
-	 * Returns an RGB that lies between the given foreground and background
-	 * colors using the given mixing factor. A <code>factor</code> of 1.0 will produce a
-	 * color equal to <code>fg</code>, while a <code>factor</code> of 0.0 will produce one
-	 * equal to <code>bg</code>.
-	 * @param bg the background color
-	 * @param fg the foreground color
-	 * @param factor the mixing factor, must be in [0,&nbsp;1]
-	 *
-	 * @return the interpolated color
-	 */
-	private static RGB blend(RGB bg, RGB fg, float factor) {
-		Assert.isLegal(bg != null);
-		Assert.isLegal(fg != null);
-		Assert.isLegal(factor >= 0f && factor <= 1f);
-
-		float complement= 1f - factor;
-		return new RGB(
-				(int) (complement * bg.red + factor * fg.red),
-				(int) (complement * bg.green + factor * fg.green),
-				(int) (complement * bg.blue + factor * fg.blue)
-		);
-	}
-	
-	/**
-	 * Returns an array of colors with hues evenly distributed on the hue wheel defined by the <a
-	 * href="http://en.wikipedia.org/wiki/HSV_color_space">HSB color space</a>. The returned array
-	 * has size <code>steps</code>. The distance <var>d</var> between two successive colors is
-	 * in [120&#176;,&nbsp;180&#176;].
-	 * <p>
-	 * The color at a given <code>index</code> has the hue returned by
-	 * {@linkplain #computeHue(int) computeHue(index)}; i.e. the computed hues are not equidistant,
-	 * but adaptively distributed on the color wheel.
-	 * </p>
-	 * <p>
-	 * The first six colors returned correspond to the following {@link SWT} color constants:
-	 * {@link SWT#COLOR_RED red}, {@link SWT#COLOR_GREEN green}, {@link SWT#COLOR_BLUE blue},
-	 * {@link SWT#COLOR_YELLOW yellow}, {@link SWT#COLOR_CYAN cyan},
-	 * {@link SWT#COLOR_MAGENTA magenta}.
-	 * </p>
-	 *
-	 * @param steps the requested size, must be &gt;= 2
-	 * @return an array of <code>steps</code> colors evenly distributed on the color wheel
-	 */
-	public static RGB[] rainbow(int steps) {
-		Assert.isLegal(steps >= 2);
-
-		RGB[] rainbow= new RGB[steps];
-		for (int i= 0; i < steps; i++)
-			rainbow[i]= new RGB(computeHue(i), 1f, 1f);
-
-		return rainbow;
-	}
-
-	/**
-	 * Returns an indexed hue in [0&#176;,&nbsp;360&#176;), distributing the hues evenly on the hue wheel
-	 * defined by the <a href="http://en.wikipedia.org/wiki/HSV_color_space">HSB (or HSV) color
-	 * space</a>. The distance <var>d</var> between two successive colors is in [120&#176;,&nbsp;180&#176;].
-	 * <p>
-	 * The first six colors returned correspond to the following {@link SWT} color constants:
-	 * {@link SWT#COLOR_RED red}, {@link SWT#COLOR_GREEN green}, {@link SWT#COLOR_BLUE blue},
-	 * {@link SWT#COLOR_YELLOW yellow}, {@link SWT#COLOR_CYAN cyan},
-	 * {@link SWT#COLOR_MAGENTA magenta}.
-	 * </p>
-	 *
-	 * @param index the index of the color, must be &gt;= 0
-	 * @return a color hue in [0&#176;,&nbsp;360&#176;)
-	 * @see RGB#RGB(float, float, float)
-	 */
-	public static float computeHue(final int index) {
-		Assert.isLegal(index >= 0);
-		/*
-		 * Base 3 gives a nice partitioning for RGB colors with red, green, blue being the colors
-		 * 0,1,2, and yellow, cyan, magenta colors 3,4,5.
-		 */
-		final int base= 3;
-		final float range= 360f;
-
-		// partition the baseRange by using the least significant bit to select one half of the
-		// partitioning
-		int baseIndex= index / base;
-		float baseRange= range / base;
-		float baseOffset= 0f;
-		while (baseIndex > 0) {
-			baseRange /= 2;
-			int lsb= baseIndex % 2;
-			baseOffset += lsb * baseRange;
-			baseIndex >>= 1;
-		}
-
-		final int baseMod= index % base;
-		final float hue= baseOffset + baseMod * range / base;
-		Assert.isTrue(hue >= 0 && hue < 360);
-		return hue;
 	}
 }
