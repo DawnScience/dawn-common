@@ -1,6 +1,7 @@
 package org.dawb.common.ui.plot.tool;
 
 import org.dawb.common.ui.plot.tool.IToolPage.ToolPageRole;
+import org.eclipse.ui.IWorkbenchPart;
 
 /**
  * This system allows one to get the page
@@ -66,5 +67,13 @@ public interface IToolPageSystem {
 	 * Clears any cached tools, can be used during dispose methods.
 	 */
 	public void clearCachedTools();
+
+	/**
+	 * If the system is visible to the user and active,
+	 * it will return true here.
+	 * @param active the active part that this system may be active inside.
+	 * @return
+	 */
+	public boolean isActive(IWorkbenchPart active);
 
 }

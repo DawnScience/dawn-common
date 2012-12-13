@@ -46,6 +46,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.part.MultiPageEditorPart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -754,4 +755,13 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	}
 
 
+	@Override
+	public boolean isActive(IWorkbenchPart activePart) {
+		if (activePart instanceof MultiPageEditorPart) { 
+			// Ensure that part is editor that is selected.			
+			MultiPageEditorPart med = (MultiPageEditorPart)activePart;
+			return med.getSelectedPage() == getPart();
+		}
+		return true;
+	}
 }
