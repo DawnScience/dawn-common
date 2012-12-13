@@ -337,6 +337,8 @@ public class RROITableInfo implements IROIListener {
 				sumText.setText(sumStr);
 				minText.setText(minStr);
 				maxText.setText(maxStr);
+			} catch (ArrayIndexOutOfBoundsException ae) {
+				// do nothing
 			} catch (Exception e) {
 				logger.debug("Error while updating the ROITableInfo:"+ e);
 			}
