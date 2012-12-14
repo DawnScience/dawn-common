@@ -1086,6 +1086,7 @@ public class SliceComponent {
 
 
 	protected boolean isReversedImage() {
+		if (plottingSystem==null) return false;
 		Iterator<ITrace> it = plottingSystem.getTraces(IImageTrace.class).iterator();
 		if (it.hasNext()) {
 			final IImageTrace trace = (IImageTrace) it.next();
