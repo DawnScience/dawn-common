@@ -96,10 +96,7 @@ public interface IPlottingSystem extends ITraceSystem, IRegionSystem, IAxisSyste
 	/**
 	 * See also ITraceSystem for flexible trace manipulation.
 	 * 
-	 * For 1D - x is the x axis, ys is the y traces. X should be null when plotting with indices.
-	 * If x is non-null if the user has chosen to plot all datasets
-	 * against indices they will not see the x. Do no generate an index set, this
-	 * will be made automatically.
+	 * For 1D - x is the x axis, ys is the y traces. X may be null when plotting with indices.
 	 * 
 	 * NOTE The call createPlot1D(y, null, monitor) is no longer allowed. It should be:
 	 * createPlot1D(null, Arrays.asList(y), monitor).
@@ -116,7 +113,7 @@ public interface IPlottingSystem extends ITraceSystem, IRegionSystem, IAxisSyste
 	 * Each call to createPlot1D(...) adds to the plot and the current selected axes, use reset() to clear the plot.
 	 * 
 	 * @param x - may be null
-	 * @param ys- may not be null
+	 * @param ys - may not be null or empty
 	 * @param mode
 	 * @param monitor
 	 * @return List of ITrace objects plotted, may be null. Normally you can cast these to ILineTrace as all 1D 
