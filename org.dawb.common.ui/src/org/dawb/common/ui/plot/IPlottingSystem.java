@@ -115,8 +115,8 @@ public interface IPlottingSystem extends ITraceSystem, IRegionSystem, IAxisSyste
 	 * 
 	 * Each call to createPlot1D(...) adds to the plot and the current selected axes, use reset() to clear the plot.
 	 * 
-	 * @param x
-	 * @param ys
+	 * @param x - may be null
+	 * @param ys- may not be null
 	 * @param mode
 	 * @param monitor
 	 * @return List of ITrace objects plotted, may be null. Normally you can cast these to ILineTrace as all 1D 
