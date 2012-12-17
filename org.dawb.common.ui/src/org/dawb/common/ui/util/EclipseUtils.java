@@ -568,6 +568,21 @@ public class EclipseUtils {
 	}
 
 	/**
+	 * Close a view if @viewId exists, nothing otherwise
+	 * 
+	 * @param viewId
+	 */
+	public static void closeView(String viewId) {
+		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+		IViewReference[] references = page.getViewReferences();
+		for (IViewReference reference : references) {
+			if(reference.getId().equals(viewId)){
+				PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().hideView(reference);
+			}
+		}
+	}
+
+	/**
 	 * Thread Safe. This is a hard busy setter - it overrides everything and sets everything busy.
 	 * 
 	 * Always use with try, finally. Only use when you are sure that there is no other alternative.
