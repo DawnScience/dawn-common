@@ -15,6 +15,7 @@ import java.awt.image.DirectColorModel;
 import java.awt.image.IndexColorModel;
 import java.awt.image.WritableRaster;
 import java.io.File;
+import java.util.Arrays;
 
 import javax.swing.ImageIcon;
 import javax.swing.filechooser.FileSystemView;
@@ -27,7 +28,6 @@ import org.dawb.common.services.IThumbnailService;
 import org.dawb.common.services.ImageServiceBean;
 import org.dawb.common.services.ImageServiceBean.ImageOrigin;
 import org.dawb.common.services.ServiceManager;
-import org.dawb.common.ui.image.PaletteFactory;
 import org.dawb.common.ui.plot.AbstractPlottingSystem;
 import org.dawb.common.ui.plot.PlotType;
 import org.dawb.common.ui.plot.PlottingFactory;
@@ -254,7 +254,7 @@ public class ImageThumbnailCreator extends AbstractServiceFactory implements ITh
 					
 					// TODO set no title?
 					
-					system.createPlot1D(set, null, new NullProgressMonitor());
+					system.createPlot1D(null, Arrays.asList(set), new NullProgressMonitor());
 					
 		            final Image unscaled = system.getImage(new Rectangle(0, 0, 300, 300));
 		            scaled[0]   = new Image(display, unscaled.getImageData().scaledTo(size, size));

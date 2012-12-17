@@ -96,7 +96,13 @@ public interface IPlottingSystem extends ITraceSystem, IRegionSystem, IAxisSyste
 	/**
 	 * See also ITraceSystem for flexible trace manipulation.
 	 * 
-	 * For 1D - x is the x axis, ys is the y traces or null if only 1 data set should be plotted.
+	 * For 1D - x is the x axis, ys is the y traces. X should be null when plotting with indices.
+	 * If x is non-null if the user has chosen to plot all datasets
+	 * against indices they will not see the x. Do no generate an index set, this
+	 * will be made automatically.
+	 * 
+	 * NOTE The call createPlot1D(y, null, monitor) is no longer allowed. It should be:
+	 * createPlot1D(null, Arrays.asList(y), monitor).
 	 * 
 	 * NOTE Using this option plots everything on the current x and y axes. These are the default axes,
 	 * to change axes, use createAxis(...) then setActiveAxis(...). Then subsequent plotting will plot
