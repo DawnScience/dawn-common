@@ -72,6 +72,12 @@ public interface IPlottingSystem extends ITraceSystem, IRegionSystem, IAxisSyste
 	public static final int CROSS_CURSOR  = 1;
 
 	/**
+	 * Call to set the plot title.
+	 * @param title
+	 */
+	public void setTitle(final String title);
+	
+	/**
 	 * Call to create the UI component dealing with the plotting.
 	 * @param parent
 	 * @param plotName

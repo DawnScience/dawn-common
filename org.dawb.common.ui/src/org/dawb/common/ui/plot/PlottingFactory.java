@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.dawb.common.ui.plot.tool.IToolPageSystem;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
@@ -143,7 +144,32 @@ public class PlottingFactory {
 	 * @param plotName
 	 * @return AbstractPlottingSystem or null
 	 */
-	public static AbstractPlottingSystem getPlottingSystem(String plotName) {
+	public static IPlottingSystem getPlottingSystem(String plotName) {
+		return getPlottingSystem(plotName, false);
+	}
+	
+	/**
+	 * Get a plotting system by name. NOTE if more than one plotting system has the same name the
+	 * last one registered with this name is returned.
+	 * 
+	 * NOTE an AbstractPlottingSystem is also a IToolPageSystem, you can get tool pages here.
+
+	 * @param plotName
+	 * @param threadSafe - set if all the methods on the plotting system should be thread safe
+	 * @return
+	 */
+	public static IPlottingSystem getPlottingSystem(String plotName, boolean threadSafe) {
+		if (plottingSystems==null) return null;
+		AbstractPlottingSystem ps = plottingSystems.get(plotName);
+		return threadSafe ? new ThreadSafePlottingSystem(ps) : ps;
+	}
+
+	/**
+	 * Get a tool page system by name (normally a plotting system is also a toolPage system).
+	 * @param plotName
+	 * @return
+	 */
+	public static IToolPageSystem getToolSystem(String plotName) {
 		if (plottingSystems==null) return null;
 		return plottingSystems.get(plotName);
 	}
