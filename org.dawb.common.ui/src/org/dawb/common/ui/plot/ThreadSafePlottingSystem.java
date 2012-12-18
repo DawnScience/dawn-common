@@ -1,5 +1,7 @@
 package org.dawb.common.ui.plot;
 
+import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -16,8 +18,11 @@ import org.dawb.common.ui.plot.trace.ITraceListener;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IWorkbenchPart;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 
@@ -29,6 +34,8 @@ import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
  */
 public class ThreadSafePlottingSystem implements IPlottingSystem {
 
+	private static final Logger logger = LoggerFactory.getLogger(ThreadSafePlottingSystem.class);
+	
 	private IPlottingSystem deligate;
 
 	public ThreadSafePlottingSystem(IPlottingSystem deligate) {
@@ -37,365 +44,349 @@ public class ThreadSafePlottingSystem implements IPlottingSystem {
 
 	@Override
 	public IImageTrace createImageTrace(String traceName) {
-		// TODO Auto-generated method stub
-		return null;
+		return (IImageTrace)call(getMethodName(Thread.currentThread().getStackTrace()), traceName);
 	}
 
 	@Override
 	public ILineTrace createLineTrace(String traceName) {
-		// TODO Auto-generated method stub
-		return null;
+		return (ILineTrace)call(getMethodName(Thread.currentThread().getStackTrace()), traceName);
 	}
 
 	@Override
 	public ISurfaceTrace createSurfaceTrace(String traceName) {
-		// TODO Auto-generated method stub
-		return null;
+		return (ISurfaceTrace)call(getMethodName(Thread.currentThread().getStackTrace()), traceName);
 	}
 
 	@Override
 	public void addTrace(ITrace trace) {
-		// TODO Auto-generated method stub
-
+		call(getMethodName(Thread.currentThread().getStackTrace()), trace);
 	}
 
 	@Override
 	public void removeTrace(ITrace trace) {
-		// TODO Auto-generated method stub
-
+		call(getMethodName(Thread.currentThread().getStackTrace()), trace);
 	}
 
 	@Override
 	public ITrace getTrace(String name) {
-		// TODO Auto-generated method stub
-		return null;
+		return deligate.getTrace(name);
 	}
 
 	@Override
 	public Collection<ITrace> getTraces() {
-		// TODO Auto-generated method stub
-		return null;
+		return deligate.getTraces();
 	}
 
 	@Override
 	public Collection<ITrace> getTraces(Class<? extends ITrace> clazz) {
-		// TODO Auto-generated method stub
-		return null;
+		return deligate.getTraces(clazz);
 	}
 
 	@Override
 	public void addTraceListener(ITraceListener l) {
-		// TODO Auto-generated method stub
-
+		deligate.addTraceListener(l);
 	}
 
 	@Override
 	public void removeTraceListener(ITraceListener l) {
-		// TODO Auto-generated method stub
-
+		deligate.removeTraceListener(l);
 	}
 
 	@Override
 	public void renameTrace(ITrace trace, String name) throws Exception {
-		// TODO Auto-generated method stub
-
+		call(getMethodName(Thread.currentThread().getStackTrace()), trace, name);
 	}
 
 	@Override
-	public IRegion createRegion(String name, RegionType regionType)
-			throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+	public IRegion createRegion(String name, RegionType regionType) throws Exception {
+		return (IRegion)call(getMethodName(Thread.currentThread().getStackTrace()), name, regionType);
 	}
 
 	@Override
 	public void addRegion(IRegion region) {
-		// TODO Auto-generated method stub
-
+		call(getMethodName(Thread.currentThread().getStackTrace()), region);
 	}
 
 	@Override
 	public void removeRegion(IRegion region) {
-		// TODO Auto-generated method stub
-
+		call(getMethodName(Thread.currentThread().getStackTrace()), region);
 	}
 
 	@Override
 	public IRegion getRegion(String name) {
-		// TODO Auto-generated method stub
-		return null;
+		return deligate.getRegion(name);
 	}
 
 	@Override
 	public Collection<IRegion> getRegions(RegionType type) {
-		// TODO Auto-generated method stub
-		return null;
+        return deligate.getRegions(type);
 	}
 
 	@Override
 	public boolean addRegionListener(IRegionListener l) {
-		// TODO Auto-generated method stub
-		return false;
+		return deligate.addRegionListener(l);
 	}
 
 	@Override
 	public boolean removeRegionListener(IRegionListener l) {
-		// TODO Auto-generated method stub
-		return false;
+		return deligate.removeRegionListener(l);
 	}
 
 	@Override
 	public void clearRegions() {
-		// TODO Auto-generated method stub
-
+		call(getMethodName(Thread.currentThread().getStackTrace()));
 	}
 
 	@Override
 	public Collection<IRegion> getRegions() {
-		// TODO Auto-generated method stub
-		return null;
+		return deligate.getRegions();
 	}
 
 	@Override
 	public void renameRegion(IRegion region, String name) throws Exception {
-		// TODO Auto-generated method stub
-
+		call(getMethodName(Thread.currentThread().getStackTrace()), region, name);
 	}
 
 	@Override
 	public IAxis createAxis(String title, boolean isYAxis, int side) {
-		// TODO Auto-generated method stub
-		return null;
+		return 	(IAxis)call(getMethodName(Thread.currentThread().getStackTrace()), title, isYAxis, side);
 	}
 
 	@Override
 	public IAxis getSelectedYAxis() {
-		// TODO Auto-generated method stub
-		return null;
+		return deligate.getSelectedYAxis();
 	}
 
 	@Override
 	public void setSelectedYAxis(IAxis yAxis) {
-		// TODO Auto-generated method stub
-
+		call(getMethodName(Thread.currentThread().getStackTrace()), yAxis);
 	}
 
 	@Override
 	public IAxis getSelectedXAxis() {
-		// TODO Auto-generated method stub
-		return null;
+		return deligate.getSelectedXAxis();
 	}
 
 	@Override
 	public void setSelectedXAxis(IAxis xAxis) {
-		// TODO Auto-generated method stub
-
+		call(getMethodName(Thread.currentThread().getStackTrace()), xAxis);
 	}
 
 	@Override
 	public void autoscaleAxes() {
-		// TODO Auto-generated method stub
-
+		call(getMethodName(Thread.currentThread().getStackTrace()));
 	}
 
 	@Override
 	public IAnnotation createAnnotation(String name) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		return (IAnnotation)call(getMethodName(Thread.currentThread().getStackTrace()), name);
 	}
 
 	@Override
-	public void addAnnotation(IAnnotation region) {
-		// TODO Auto-generated method stub
-
+	public void addAnnotation(IAnnotation annot) {
+		call(getMethodName(Thread.currentThread().getStackTrace()), annot);
 	}
 
 	@Override
-	public void removeAnnotation(IAnnotation region) {
-		// TODO Auto-generated method stub
-
+	public void removeAnnotation(IAnnotation annot) {
+		call(getMethodName(Thread.currentThread().getStackTrace()), annot);
 	}
 
 	@Override
 	public IAnnotation getAnnotation(String name) {
-		// TODO Auto-generated method stub
-		return null;
+		return deligate.getAnnotation(name);
 	}
 
 	@Override
 	public void clearAnnotations() {
-		// TODO Auto-generated method stub
-
+		call(getMethodName(Thread.currentThread().getStackTrace()));
 	}
 
 	@Override
 	public void renameAnnotation(IAnnotation annotation, String name)
 			throws Exception {
-		// TODO Auto-generated method stub
-
+		call(getMethodName(Thread.currentThread().getStackTrace()), annotation, name);
 	}
 
 	@Override
 	public void printPlotting() {
-		// TODO Auto-generated method stub
-
+		call(getMethodName(Thread.currentThread().getStackTrace()));
 	}
 
 	@Override
 	public void copyPlotting() {
-		// TODO Auto-generated method stub
-
+		call(getMethodName(Thread.currentThread().getStackTrace()));
 	}
 
 	@Override
 	public String savePlotting(String filename) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		return (String)call(getMethodName(Thread.currentThread().getStackTrace()), filename);
 	}
 
 	@Override
 	public void savePlotting(String filename, String filetype) throws Exception {
-		// TODO Auto-generated method stub
-
+		call(getMethodName(Thread.currentThread().getStackTrace()), filename, filetype);
 	}
 
 	@Override
 	public void setTitle(String title) {
-		// TODO Auto-generated method stub
-
+		call(getMethodName(Thread.currentThread().getStackTrace()), title);
 	}
 
 	@Override
-	public void createPlotPart(Composite parent, String plotName,
-			IActionBars bars, PlotType hint, IWorkbenchPart part) {
-		// TODO Auto-generated method stub
-
+	public void createPlotPart(Composite parent, 
+			                   String plotName,
+			                   IActionBars bars, 
+			                   PlotType hint, 
+			                   IWorkbenchPart part) {
+		
+		throw new RuntimeException("Cannot call createPlotPart, only allowed to use this from python!");
 	}
 
 	@Override
 	public String getPlotName() {
-		// TODO Auto-generated method stub
-		return null;
+		return deligate.getPlotName();
 	}
 
 	@Override
-	public List<ITrace> createPlot1D(AbstractDataset x,
-			List<AbstractDataset> ys, IProgressMonitor monitor) {
-		// TODO Auto-generated method stub
-		return null;
+	public List<ITrace> createPlot1D(AbstractDataset x, List<AbstractDataset> ys, IProgressMonitor monitor) {
+		return deligate.createPlot1D(x, ys, monitor);
 	}
 
 	@Override
 	public List<ITrace> createPlot1D(AbstractDataset x,
 			List<AbstractDataset> ys, String title, IProgressMonitor monitor) {
-		// TODO Auto-generated method stub
-		return null;
+		return deligate.createPlot1D(x, ys, title, monitor);
 	}
 
 	@Override
 	public List<ITrace> updatePlot1D(AbstractDataset x,
 			List<AbstractDataset> ys, IProgressMonitor monitor) {
-		// TODO Auto-generated method stub
-		return null;
+		return deligate.updatePlot1D(x, ys, monitor);
 	}
 
 	@Override
 	public ITrace createPlot2D(AbstractDataset image,
 			List<AbstractDataset> axes, IProgressMonitor monitor) {
-		// TODO Auto-generated method stub
-		return null;
+		return deligate.createPlot2D(image, axes, monitor);
 	}
 
 	@Override
 	public ITrace updatePlot2D(AbstractDataset image,
 			List<AbstractDataset> axes, IProgressMonitor monitor) {
-		// TODO Auto-generated method stub
-		return null;
+		return deligate.updatePlot2D(image, axes, monitor);
 	}
 
 	@Override
 	public void setPlotType(PlotType plotType) {
-		// TODO Auto-generated method stub
-
+		call(getMethodName(Thread.currentThread().getStackTrace()), plotType);
 	}
 
 	@Override
-	public void append(String dataSetName, Number xValue, Number yValue,
-			IProgressMonitor monitor) throws Exception {
-		// TODO Auto-generated method stub
-
+	public void append(String dataSetName, Number xValue, Number yValue, IProgressMonitor monitor) throws Exception {
+		deligate.append(dataSetName, xValue, yValue, monitor);
 	}
 
 	@Override
 	public void reset() {
-		// TODO Auto-generated method stub
-
+		deligate.reset();
 	}
 
 	@Override
 	public void clear() {
-		// TODO Auto-generated method stub
-
+		deligate.clear();
 	}
 
 	@Override
 	public void dispose() {
-		// TODO Auto-generated method stub
-
+		call(getMethodName(Thread.currentThread().getStackTrace()));
 	}
 
 	@Override
 	public void repaint() {
-		// TODO Auto-generated method stub
-
+		call(getMethodName(Thread.currentThread().getStackTrace()));
 	}
 
 	@Override
 	public Composite getPlotComposite() {
-		// TODO Auto-generated method stub
-		return null;
+		return deligate.getPlotComposite();
 	}
 
 	@Override
 	public ISelectionProvider getSelectionProvider() {
-		// TODO Auto-generated method stub
-		return null;
+		return deligate.getSelectionProvider();
 	}
 
 	@Override
 	public AbstractDataset getData(String dataSetName) {
-		// TODO Auto-generated method stub
-		return null;
+		return deligate.getData(dataSetName);
 	}
 
 	@Override
 	public PlotType getPlotType() {
-		// TODO Auto-generated method stub
-		return null;
+		return deligate.getPlotType();
 	}
 
 	@Override
 	public boolean is2D() {
-		// TODO Auto-generated method stub
-		return false;
+		return deligate.is2D();
 	}
 
 	@Override
 	public IActionBars getActionBars() {
-		// TODO Auto-generated method stub
-		return null;
+		return deligate.getActionBars();
 	}
 
 	@Override
 	public IPlotActionSystem getPlotActionSystem() {
-		// TODO Auto-generated method stub
-		return null;
+		return deligate.getPlotActionSystem();
 	}
 
 	@Override
 	public void setDefaultCursor(int cursorType) {
-		// TODO Auto-generated method stub
-
+		call(getMethodName(Thread.currentThread().getStackTrace()), cursorType);
+	}
+	
+	/**
+	 * Calls method in a SWT thread safe way.
+	 * @param methodName
+	 * @param args
+	 */
+	private Object call(final String methodName, final Object... args) {
+		
+		final Class[] classes = args!=null ? new Class[args.length] : null;
+		if (classes!=null) {
+			for (int i = 0; i < args.length; i++) classes[i]=args[i].getClass();
+		}
+		final List<Object> ret = new ArrayList<Object>(1);
+		Display.getDefault().syncExec(new Runnable() {
+			public void run() {
+				try {
+				    Method method = deligate.getClass().getMethod(methodName, classes);
+				    Object val    = method.invoke(deligate, args);
+				    ret.add(val);
+				} catch (Exception ne) {
+					logger.error("Cannot execute "+methodName+" with "+args, ne);
+				}
+			}
+		});
+		return ret.get(0);
 	}
 
+	public static String getMethodName ( StackTraceElement ste[] ) {  
+		   
+	    String methodName = "";  
+	    boolean flag = false;  
+	   
+	    for ( StackTraceElement s : ste ) {  
+	   
+	        if ( flag ) {  
+	   
+	            methodName = s.getMethodName();  
+	            break;  
+	        }  
+	        flag = s.getMethodName().equals( "getStackTrace" );  
+	    }  
+	    return methodName;  
+	}  
 }

@@ -155,7 +155,8 @@ public class PlottingFactory {
 	 * NOTE an AbstractPlottingSystem is also a IToolPageSystem, you can get tool pages here.
 
 	 * @param plotName
-	 * @param threadSafe - set if all the methods on the plotting system should be thread safe
+	 * @param threadSafe - set if all the methods on the plotting system should be thread safe.
+	 *                     Generally used for plotting systems on servers.
 	 * @return
 	 */
 	public static IPlottingSystem getPlottingSystem(String plotName, boolean threadSafe) {
