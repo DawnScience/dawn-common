@@ -149,7 +149,9 @@ public class ThreadSafePlottingSystem implements IPlottingSystem {
 
 	@Override
 	public IAxis createAxis(String title, boolean isYAxis, int side) {
-		return 	(IAxis)call(getMethodName(Thread.currentThread().getStackTrace()), title, isYAxis, side);
+		return 	(IAxis)call(getMethodName(Thread.currentThread().getStackTrace()), 
+				           new Class[]{String.class, boolean.class, int.class},
+				           title, isYAxis, side);
 	}
 
 	@Override
@@ -344,7 +346,7 @@ public class ThreadSafePlottingSystem implements IPlottingSystem {
 
 	@Override
 	public void setDefaultCursor(int cursorType) {
-		call(getMethodName(Thread.currentThread().getStackTrace()), cursorType);
+		call(getMethodName(Thread.currentThread().getStackTrace()), new Class[]{int.class}, cursorType);
 	}
 	
 	/**
@@ -358,6 +360,16 @@ public class ThreadSafePlottingSystem implements IPlottingSystem {
 		if (classes!=null) {
 			for (int i = 0; i < args.length; i++) classes[i]=args[i].getClass();
 		}
+		return call(methodName, classes, args);
+	}
+	
+	/**
+	 * Calls method in a SWT thread safe way.
+	 * @param methodName
+	 * @param args
+	 */
+	private Object call(final String methodName, final Class[] classes, final Object... args) {
+		
 		final List<Object> ret = new ArrayList<Object>(1);
 		Display.getDefault().syncExec(new Runnable() {
 			public void run() {
