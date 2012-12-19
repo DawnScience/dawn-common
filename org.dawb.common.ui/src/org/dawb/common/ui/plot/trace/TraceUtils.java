@@ -6,6 +6,8 @@ import java.util.List;
 
 import org.dawb.common.ui.plot.IPlottingSystem;
 
+import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+
 /**
  * Class containing utility methods for regions to avoid duplication 
  * @author fcp94556
@@ -42,4 +44,33 @@ public class TraceUtils {
 		}
 		return system.createLineTrace(name);
 	}
+	
+	/**
+	 * Determine if IImageTrace has custom axes or not.
+	 */
+	public static boolean isCustomAxes(IImageTrace trace) {
+		
+		List<AbstractDataset> axes = trace.getAxes();
+		AbstractDataset      image = trace.getData();
+		
+		if (axes==null)     return false;
+		if (axes.isEmpty()) return false;
+		
+		if (axes.get(0).getDtype()!=AbstractDataset.INT32 || axes.get(1).getDtype()!=AbstractDataset.INT32) {
+			return true;
+		}
+		
+		if (axes.get(0).getSize() == image.getShape()[1] &&
+		    axes.get(1).getSize() == image.getShape()[0]) {
+			boolean rangeEqualsShape = axes.get(0).getDouble(0)==0d  &&
+				   axes.get(1).getDouble(0)==0d  &&
+				   axes.get(0).getDouble(image.getShape()[1]-1)==image.getShape()[1] &&
+				   axes.get(1).getDouble(image.getShape()[0]-1)==image.getShape()[0];
+			
+			if (rangeEqualsShape) return false;
+		}
+		
+		return true;
+	}
+
 }
