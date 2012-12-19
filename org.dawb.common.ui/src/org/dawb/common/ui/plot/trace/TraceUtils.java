@@ -62,12 +62,18 @@ public class TraceUtils {
 		
 		if (axes.get(0).getSize() == image.getShape()[1] &&
 		    axes.get(1).getSize() == image.getShape()[0]) {
-			boolean rangeEqualsShape = axes.get(0).getDouble(0)==0d  &&
-				   axes.get(1).getDouble(0)==0d  &&
-				   axes.get(0).getDouble(image.getShape()[1]-1)==image.getShape()[1] &&
-				   axes.get(1).getDouble(image.getShape()[0]-1)==image.getShape()[0];
+			boolean startZero = axes.get(0).getDouble(0)==0d  &&
+				                axes.get(1).getDouble(0)==0d;
 			
-			if (rangeEqualsShape) return false;
+			if (!startZero) return true;
+			
+			double xEnd = axes.get(0).getDouble(axes.get(0).getSize()-1);
+			double yEnd = axes.get(1).getDouble(axes.get(1).getSize()-1);
+			
+			boolean maxSame =	xEnd==image.getShape()[1]-1 &&
+				                yEnd==image.getShape()[0]-1;
+			
+			if (maxSame) return false;
 		}
 		
 		return true;
