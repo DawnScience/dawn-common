@@ -13,6 +13,7 @@ import org.eclipse.swt.graphics.Color;
 import uk.ac.diamond.scisoft.analysis.roi.CircularROI;
 import uk.ac.diamond.scisoft.analysis.roi.EllipticalFitROI;
 import uk.ac.diamond.scisoft.analysis.roi.EllipticalROI;
+import uk.ac.diamond.scisoft.analysis.roi.GridROI;
 import uk.ac.diamond.scisoft.analysis.roi.LinearROI;
 import uk.ac.diamond.scisoft.analysis.roi.PointROI;
 import uk.ac.diamond.scisoft.analysis.roi.PolygonalROI;
@@ -156,21 +157,22 @@ public interface IRegion {
 	 *
 	 */
 	public enum RegionType {
-		LINE("Line",               ColorConstants.cyan,  LinearROI.class),
-		POLYLINE("Polyline",       ColorConstants.cyan,  PolylineROI.class),
-		POLYGON("Polygon",         ColorConstants.cyan,  PolygonalROI.class),
-		BOX("Box",                 ColorConstants.green, RectangularROI.class),
-		CIRCLE("Circle",           darkYellow,           CircularROI.class),
-		SECTOR("Sector",           ColorConstants.red,   SectorROI.class),
-		POINT("Point",             darkMagenta,          PointROI.class),
+		LINE("Line",               ColorConstants.cyan,       LinearROI.class),
+		POLYLINE("Polyline",       ColorConstants.cyan,       PolylineROI.class),
+		POLYGON("Polygon",         ColorConstants.cyan,       PolygonalROI.class),
+		BOX("Box",                 ColorConstants.green,      RectangularROI.class),
+		GRID("Grid",               ColorConstants.lightGray,  GridROI.class),
+		CIRCLE("Circle",           darkYellow,                CircularROI.class),
+		SECTOR("Sector",           ColorConstants.red,        SectorROI.class),
+		POINT("Point",             darkMagenta,               PointROI.class),
 		ELLIPSE("Ellipse",         ColorConstants.lightGreen, EllipticalROI.class),
 		ELLIPSEFIT("Ellipse fit",  ColorConstants.lightGreen, EllipticalFitROI.class),
-		RING("Ring",               darkYellow,           SectorROI.class),
-		XAXIS("X-Axis",            ColorConstants.blue,  RectangularROI.class),
-		YAXIS("Y-Axis",            ColorConstants.blue,  RectangularROI.class),
-		XAXIS_LINE("X-Axis Line",  ColorConstants.blue,  RectangularROI.class),
-		YAXIS_LINE("Y-Axis Line",  ColorConstants.blue,  RectangularROI.class),
-		FREE_DRAW("Free draw",     darkYellow,           PolylineROI.class);
+		RING("Ring",               darkYellow,                SectorROI.class),
+		XAXIS("X-Axis",            ColorConstants.blue,       RectangularROI.class),
+		YAXIS("Y-Axis",            ColorConstants.blue,       RectangularROI.class),
+		XAXIS_LINE("X-Axis Line",  ColorConstants.blue,       RectangularROI.class),
+		YAXIS_LINE("Y-Axis Line",  ColorConstants.blue,       RectangularROI.class),
+		FREE_DRAW("Free draw",     darkYellow,                PolylineROI.class);
 
 		private String name;
 		private Color defaultColor;
