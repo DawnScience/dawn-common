@@ -50,6 +50,7 @@ public class TraceUtils {
 	 */
 	public static boolean isCustomAxes(IImageTrace trace) {
 		
+		if (trace==null) return false;
 		List<AbstractDataset> axes = trace.getAxes();
 		AbstractDataset      image = trace.getData();
 		
