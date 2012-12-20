@@ -28,6 +28,11 @@ import uk.ac.diamond.scisoft.analysis.roi.SectorROI;
  * @author fcp94556
  */
 public interface IRegion {
+	
+	/**
+	 * 
+	 */
+	public void repaint();
 
 	/**
 	 * @return the name of the region
