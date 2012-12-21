@@ -23,7 +23,7 @@
         </property>
         <property name="File Filter" class="com.isencia.passerelle.util.ptolemy.RegularExpressionParameter" value="">
         </property>
-        <property name="Path" class="com.isencia.passerelle.util.ptolemy.ResourceParameter" value="/${project_name)/data/ref-testscale_1_001.img">
+        <property name="Path" class="com.isencia.passerelle.util.ptolemy.ResourceParameter" value="/${project_name}/data/ref-testscale_1_001.img">
         </property>
         <property name="Data Sets" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="">
         </property>
