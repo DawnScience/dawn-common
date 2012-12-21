@@ -15,8 +15,7 @@ Require-Bundle: org.eclipse.core.runtime,
  uk.ac.gda.common;bundle-version="1.0.0",
  uk.ac.gda.common.rcp;bundle-version="1.0.0",
  org.dawb.common.util;bundle-version="1.0.0",
- uk.ac.diamond.scisoft.analysis,
- uk.ac.diamond.org.jscience;bundle-version="4.3.1"
+ uk.ac.diamond.scisoft.analysis
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Export-Package: org.dawb.common.ui,
@@ -38,7 +37,6 @@ Export-Package: org.dawb.common.ui,
  org.dawb.common.ui.preferences,
  org.dawb.common.ui.project,
  org.dawb.common.ui.slicing,
- org.dawb.common.ui.tree,
  org.dawb.common.ui.util,
  org.dawb.common.ui.viewers,
  org.dawb.common.ui.views,

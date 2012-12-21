@@ -1,6 +1,9 @@
 package org.dawb.common.ui.plot;
 
+import java.util.Collection;
+
 import org.dawb.common.ui.Activator;
+import org.dawb.common.ui.plot.region.IRegion;
 import org.dawb.common.ui.plot.tool.AbstractToolPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
@@ -32,7 +35,20 @@ public class EmptyTool extends AbstractToolPage {
 		// TODO Auto-generated method stub
 
 	}
-	
+	public void activate() {
+		super.activate();
+		
+		// Make any mouse following regions, inactive
+		if (getPlottingSystem()!=null) {
+			final Collection<IRegion> regions = getPlottingSystem().getRegions();
+			for (IRegion iRegion : regions) {
+				if (iRegion.isTrackMouse()) {
+					getPlottingSystem().removeRegion(iRegion);
+				}
+			}
+		}
+	}
+
 	@Override
 	public ToolPageRole getToolPageRole() {
 		return role;
