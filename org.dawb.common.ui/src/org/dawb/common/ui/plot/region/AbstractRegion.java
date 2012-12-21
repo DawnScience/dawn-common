@@ -59,12 +59,21 @@ public abstract class AbstractRegion extends Figure implements IRegion, IRegionC
 	}
 	
 	protected void fireROIChanged(ROIBase roi) {
-		if (roiListeners==null) return;
+		if (roiListeners==null)  return;
 		if (!regionEventsActive) return;
 		
 		final ROIEvent evt = new ROIEvent(this, roi);
 		for (IROIListener l : roiListeners) {
 			l.roiChanged(evt);
+		}
+	}
+	protected void fireROISelected(ROIBase roi) {
+		if (roiListeners==null)  return;
+		if (!regionEventsActive) return;
+		
+		final ROIEvent evt = new ROIEvent(this, roi);
+		for (IROIListener l : roiListeners) {
+			l.roiSelected(evt);
 		}
 	}
 

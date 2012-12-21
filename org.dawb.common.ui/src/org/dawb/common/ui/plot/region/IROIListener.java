@@ -9,16 +9,30 @@ public interface IROIListener extends EventListener {
 
 		@Override
 		public void roiDragged(ROIEvent evt) {
-			// TODO Auto-generated method stub
+			update(evt);
 
 		}
 
 		@Override
 		public void roiChanged(ROIEvent evt) {
-			// TODO Auto-generated method stub
+			update(evt);
+
+		}
+		
+		@Override
+		public void roiSelected(ROIEvent evt) {
+			update(evt);
 
 		}
 
+		/**
+		 * Override to do something whenever a roi changes.
+		 * NOTE Do not do much work on this or the UI will go slow...
+		 * @param evt
+		 */
+		public void update(ROIEvent evt) {
+	
+		}
 	}
 
 	/**
@@ -38,4 +52,13 @@ public interface IROIListener extends EventListener {
 	 * @param evt
 	 */
 	void roiChanged(ROIEvent evt);
+	
+	/**
+	 * Called when the region has a single click on it which does
+	 * not change its position.
+	 * 
+	 * @param evt
+	 */
+	void roiSelected(ROIEvent evt);
+
 }

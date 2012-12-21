@@ -431,7 +431,13 @@ public class RROITableInfo implements IROIListener {
 			setEditingRegion((RectangularROI)roi);
 		}
 	}
-
+	@Override
+	public void roiSelected(ROIEvent evt) {
+		ROIBase roi = evt.getROI();
+		if(roi != null && roi instanceof RectangularROI){
+			setEditingRegion((RectangularROI)roi);
+		}
+	}
 	private IRegionListener regionListener = new IRegionListener.Stub() {
 		@Override
 		public void regionRemoved(RegionEvent evt) {
