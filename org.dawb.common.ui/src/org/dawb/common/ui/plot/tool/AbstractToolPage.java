@@ -1,16 +1,28 @@
 package org.dawb.common.ui.plot.tool;
 
+import java.net.URL;
 import java.util.Collection;
+import java.util.Collections;
 
 import org.dawb.common.ui.plot.IPlottingSystem;
 import org.dawb.common.ui.plot.trace.IImageTrace;
 import org.dawb.common.ui.plot.trace.ITrace;
 import org.dawb.common.util.text.StringUtils;
+import org.eclipse.core.commands.Command;
+import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.part.Page;
+import org.osgi.framework.Bundle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 
@@ -36,6 +48,8 @@ Or by programmatically when opening a view by id.
  */
 public abstract class AbstractToolPage extends Page implements IToolPage, IAdaptable {
 
+	private static final Logger logger = LoggerFactory.getLogger(AbstractToolPage.class);
+	
 	private IToolPageSystem toolSystem;
 	private IPlottingSystem plotSystem;
 	private IWorkbenchPart  part;
@@ -300,6 +314,73 @@ public abstract class AbstractToolPage extends Page implements IToolPage, IAdapt
 	 */
 	public void setData(Object data) {
 		
+	}
+	
+	/**
+	 * Actions may be registered by extension point.
+	 * 
+	 * Call this method from your tool createControl(...) method to support
+	 * actions on your tool from extension points.
+	 * 
+	 */
+	protected void createToolPageActions() {
+		
+		final ICommandService service = (ICommandService)PlatformUI.getWorkbench().getService(ICommandService.class);
+		
+		IConfigurationElement[] e = Platform.getExtensionRegistry().getConfigurationElementsFor("org.dawb.common.ui.toolPageAction");
+		if (e!=null) for (IConfigurationElement ie : e) {
+			
+			final String toolPageId = ie.getAttribute("tool_id");
+			if (!getToolId().equals(toolPageId)) continue;
+			
+			final String commandId = ie.getAttribute("command_id");
+			final Command command = service.getCommand(commandId);
+			final String action_id = ie.getAttribute("id");
+			if (command==null) {
+				logger.error("Cannot find command '"+commandId+"' in tool Action "+action_id);
+				continue;
+			}
+			
+			final String iconPath = ie.getAttribute("icon");
+			ImageDescriptor icon=null;
+	    	if (iconPath!=null) {
+		    	final String   id    = ie.getContributor().getName();
+		    	final Bundle   bundle= Platform.getBundle(id);
+		    	final URL      entry = bundle.getEntry(iconPath);
+		    	icon = ImageDescriptor.createFromURL(entry);
+	    	}
+	    	String label = ie.getAttribute("label");
+	    	if (label==null||"".equals(label)) {
+	    		try {
+	    			label = command.getName();
+	    		} catch (Throwable ne) {
+		    		try {
+	    			    label = command.getDescription();
+		    		} catch (Throwable neOther) {
+		    			label = "Unknown command";
+		    		}
+	    		}
+	    	}
+	    	
+			final Action action = new Action(label) {
+				public void run() {
+					final ExecutionEvent event = new ExecutionEvent(command, Collections.EMPTY_MAP, this, AbstractToolPage.this);
+					try {
+						command.executeWithChecks(event);
+					} catch (Throwable e) {
+						logger.error("Cannot execute command '"+command.getId()+" from action "+action_id, e);
+					}
+				}
+			};
+			if (icon!=null) action.setImageDescriptor(icon);
+			
+	    	String type = ie.getAttribute("action_type");
+            if (type!=null && !"".equals(type) && "MENUBAR".equals(type)) {
+            	getSite().getActionBars().getMenuManager().add(action);
+            } else {
+            	getSite().getActionBars().getToolBarManager().add(action);
+            }
+		}
 	}
 
 }

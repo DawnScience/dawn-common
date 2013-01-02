@@ -5,8 +5,9 @@
    <extension-point id="hardwareClass" name="org.dawb.common.ui.views.dashboard.hardware.class" schema="schema/hardwareClass.exsd"/>
    <extension-point id="plottingClass" name="Plotting System" schema="schema/plottingClass.exsd"/>
    <extension-point id="valueProviderPage" name="Value Provider Page" schema="schema/valueProviderPage.exsd"/>
-   <extension-point id="toolPage" name="org.dawb.common.ui.plot.toolPage" schema="schema/toolPage.exsd"/>
+   <extension-point id="toolPage" name="Tool Page" schema="schema/toolPage.exsd"/>
    <extension-point id="editorExtension" name="Editor Extension" schema="schema/editorExtension.exsd"/>
+   <extension-point id="toolPageAction" name="Tool Page Action" schema="schema/toolPageAction.exsd"/>
 
    <extension
          point="org.eclipse.ui.importWizards">

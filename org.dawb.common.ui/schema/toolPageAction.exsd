@@ -3,10 +3,10 @@
 <schema targetNamespace="org.dawb.common.ui" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appInfo>
-         <meta.schema plugin="org.dawb.common.ui" id="toolPage" name="Tool Page"/>
+         <meta.schema plugin="org.dawb.common.ui" id="toolPageAction" name="Tool Page Action"/>
       </appInfo>
       <documentation>
-         A tool page contributed to the plotting which is the current tool, fitting, derviative, profile etc.
+         [Enter description of this extension point.]
       </documentation>
    </annotation>
 
@@ -18,7 +18,7 @@
       </annotation>
       <complexType>
          <sequence minOccurs="1" maxOccurs="unbounded">
-            <element ref="plotting_tool_page"/>
+            <element ref="tool_page_action" minOccurs="1" maxOccurs="unbounded"/>
          </sequence>
          <attribute name="point" type="string" use="required">
             <annotation>
@@ -47,62 +47,71 @@
       </complexType>
    </element>
 
-   <element name="plotting_tool_page">
+   <element name="tool_page_action">
+      <annotation>
+         <documentation>
+            A action that is registered to one tool page. This action will only appear on the page if the programmer of the page allows actions by extension point.
+         </documentation>
+      </annotation>
       <complexType>
-         <attribute name="class" type="string" use="required">
+         <attribute name="id" type="string" use="required">
             <annotation>
                <documentation>
-                  The tool page, normally created by extending AbstractToolPage.
+                  Id of the action, will be set so that the action may be retrieved from the toolbar or menubar for programmatic manipulation in the view.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="tool_id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Id of the tool page on which the action should appear.
                </documentation>
                <appInfo>
-                  <meta.attribute kind="java" basedOn=":org.dawb.common.ui.plot.tool.IToolPage"/>
+                  <meta.attribute kind="identifier" basedOn="org.dawb.common.ui.toolPage/plotting_tool_page/@id"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+         <attribute name="command_id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Id of command action should run.
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="identifier" basedOn="org.eclipse.ui.commands/command/@id"/>
                </appInfo>
             </annotation>
          </attribute>
          <attribute name="icon" type="string">
             <annotation>
                <documentation>
-                  The icon to be used for the tool when seen in drop down tool lists.
+                  Icon to be used on the tool pages toolbar. Default none.
                </documentation>
                <appInfo>
                   <meta.attribute kind="resource"/>
                </appInfo>
             </annotation>
          </attribute>
-         <attribute name="id" type="string" use="required">
+         <attribute name="label" type="string">
             <annotation>
                <documentation>
-                  The id for this tool page. Must be unique.
+                  Label/tooltip to use for action. If not set, the command will be asked for its label.
                </documentation>
             </annotation>
          </attribute>
-         <attribute name="tooltip" type="string">
+         <attribute name="action_type">
             <annotation>
                <documentation>
-                  The tooltip to use in the user interface explaining the tool.
+                  Where the action should appear. Default TOOLBAR.
                </documentation>
             </annotation>
-         </attribute>
-         <attribute name="label" type="string" use="required">
-            <annotation>
-               <documentation>
-                  A label for the tool, for instance &apos;Fitting&apos;
-               </documentation>
-            </annotation>
-         </attribute>
-         <attribute name="cheat_sheet_id" type="string">
-            <annotation>
-               <documentation>
-                  The id of a cheat sheet explaining how to use the tool.
-               </documentation>
-            </annotation>
-         </attribute>
-         <attribute name="visible" type="boolean">
-            <annotation>
-               <documentation>
-                  Sets wether a tool is visible to the user (otherwise it is only available programmatically)
-               </documentation>
-            </annotation>
+            <simpleType>
+               <restriction base="string">
+                  <enumeration value="TOOLBAR">
+                  </enumeration>
+                  <enumeration value="MENUBAR">
+                  </enumeration>
+               </restriction>
+            </simpleType>
          </attribute>
       </complexType>
    </element>
