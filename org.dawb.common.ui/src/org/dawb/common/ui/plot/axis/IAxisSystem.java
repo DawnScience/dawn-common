@@ -1,5 +1,7 @@
 package org.dawb.common.ui.plot.axis;
 
+import java.util.List;
+
 /**
  * No methods in this interface are thread safe.
  * 
@@ -17,6 +19,23 @@ public interface IAxisSystem {
 	 */
 	public IAxis createAxis(final String title, final boolean isYAxis, final int side);
 	
+	/**
+	 * Use this method to delete any extra axes which have been created.
+	 * 
+	 * You may not delete the primary axes using this method, only those which 
+	 * you have created using createAxis(...)
+	 * 
+	 * @param title
+	 * @return
+	 */
+	public IAxis removeAxis(final IAxis axis);
+	
+	/**
+	 * Get the list of all axes
+	 * @return
+	 */
+	public List<IAxis> getAxes();
+
 	/**
 	 * The current y axis to plot to. Intended for 1D plotting with multiple axes.
 	 * @return

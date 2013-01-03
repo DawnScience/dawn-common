@@ -400,5 +400,16 @@ public class ThreadSafePlottingSystem implements IPlottingSystem {
 	        flag = s.getMethodName().equals( "getStackTrace" );  
 	    }  
 	    return methodName;  
+	}
+
+	@Override
+	public IAxis removeAxis(IAxis axis) {
+		return (IAxis)call(getMethodName(Thread.currentThread().getStackTrace()), axis);	
 	}  
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<IAxis> getAxes() {
+		return (List<IAxis>)call(getMethodName(Thread.currentThread().getStackTrace()));	
+	}
 }
