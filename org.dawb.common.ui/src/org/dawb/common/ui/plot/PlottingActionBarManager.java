@@ -123,10 +123,17 @@ public class PlottingActionBarManager implements IPlotActionSystem {
     	
     	// If we are 1D we must deactivate 2D tools. If we are 
     	// 2D we must deactivate 1D tools.
+    	IAction action = null;
     	if (type.is1D()) {
     		clearTool(ToolPageRole.ROLE_2D);
+    		action = findAction(ToolPageRole.ROLE_1D.getId());
     	} else if (type.is2D()) {
     		clearTool(ToolPageRole.ROLE_1D);
+    		action = findAction(ToolPageRole.ROLE_2D.getId());
+    	}
+    	
+    	if (action instanceof MenuAction) {
+    		((MenuAction)action).run();
     	}
     	
 		return true;
@@ -267,7 +274,6 @@ public class PlottingActionBarManager implements IPlotActionSystem {
 	    			
 	    		}
 	    	};
-	    	
 	    	action.setId(e.getAttribute("id"));
 	    	final String   icon  = e.getAttribute("icon");
 	    	if (icon!=null) {

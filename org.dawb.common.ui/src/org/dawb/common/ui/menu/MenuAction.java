@@ -106,6 +106,12 @@ public class MenuAction extends Action implements IMenuCreator {
 	public void setCheckedAction(int iAction, boolean isChecked) {
 		actions.get(iAction).setChecked(isChecked);
 	}
+	public IAction getSelectedAction() {
+		for (IAction action : actions) {
+			if (action.isChecked()) return action;
+		}
+		return null;
+	}
 	public IAction getAction(int iAction) {
 		return actions.get(iAction);
 	}
@@ -137,7 +143,9 @@ public class MenuAction extends Action implements IMenuCreator {
 	}
 
 	public void run() {
-		if (selectedAction!=null) selectedAction.run();
+		if (selectedAction!=null) {
+			selectedAction.run();
+		}
 	}
 	
 	public String toString() {
