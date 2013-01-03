@@ -44,7 +44,7 @@ public interface IAxis {
 	 * 
 	 * @return true if axis is a primary one that cannot be deleted.
 	 */
-	public boolean isPrimary();
+	public boolean isPrimaryAxis();
 	
 	/**
 	 * 

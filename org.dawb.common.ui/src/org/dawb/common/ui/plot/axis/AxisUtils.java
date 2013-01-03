@@ -35,7 +35,7 @@ public class AxisUtils {
 		final List<IAxis>  axes = system.getAxes();
 		final List<IAxis> avail = new ArrayList<IAxis>(axes.size());
 		for (IAxis axis : axes) {
-			if (axis.isPrimary()) continue;
+			if (axis.isPrimaryAxis()) continue;
 			avail.add(axis);
 		}
 		return avail;
