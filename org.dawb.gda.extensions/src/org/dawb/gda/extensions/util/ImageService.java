@@ -25,6 +25,7 @@ import org.eclipse.ui.services.IServiceLocator;
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.BooleanDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.DatasetUtils;
+import uk.ac.diamond.scisoft.analysis.dataset.RGBDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.Stats;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 import uk.ac.diamond.scisoft.analysis.rcp.plotting.utils.SWTImageUtils;
@@ -102,6 +103,12 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 		AbstractDataset image    = bean.getImage();
 		final ImageOrigin     origin   = bean.getOrigin();
 		PaletteData     palette  = bean.getPalette();
+		
+		if (image instanceof RGBDataset) {
+			RGBDataset rgbImage = (RGBDataset) image;
+			
+			return SWTImageUtils.createImageData(rgbImage, 0, 255, null, null, null, false, false, false);
+		}
 		
 		int depth = bean.getDepth();
 		final int size  = (int)Math.round(Math.pow(2, depth));
