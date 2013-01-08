@@ -9,15 +9,28 @@
  */ 
 package org.dawb.common.services;
 
-import org.dawb.workbench.jmx.RemoveWorkbenchPart;
+import org.dawb.workbench.jmx.IRemoteWorkbenchPart;
 
 public interface IUserInputService {
 
 	/**
-	 * Opens and returns a part which implements RemoveWorkbenchPart
+	 * Opens and returns a part which implements RemoveWorkbenchPart. The part is used to 
+	 * edit user input.
+	 * 
 	 * @param partName
 	 * @param isDialog
 	 * @return
 	 */
-	public RemoveWorkbenchPart openUserInputPart(final String partName, final boolean isDialog)  throws Exception;
+	public IRemoteWorkbenchPart openUserInputPart(final String partName, final boolean isDialog)  throws Exception;
+
+	/**
+	 * Call to get a RemoteWorkbenchPart for editing the plot. The RemoteWorkbenchPart must have
+	 * setUserInput(UserInputBean bean) called on it or it will not configure propertly.
+	 * 
+	 * 
+	 * @param partName
+	 * @param dialog
+	 * @return
+	 */
+	public IRemoteWorkbenchPart openUserPlotPart(String partName, boolean dialog) throws Exception;
 }
