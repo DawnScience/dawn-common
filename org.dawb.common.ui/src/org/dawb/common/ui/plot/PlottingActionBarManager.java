@@ -26,6 +26,7 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.action.StatusLineManager;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
@@ -58,6 +59,7 @@ public class PlottingActionBarManager implements IPlotActionSystem {
 	protected MenuAction                imageMenu;
 	protected MenuAction                xyMenu;
 	protected ITraceActionProvider      traceActionProvider;
+	private   Composite                 toolComposite;
 	
 	public PlottingActionBarManager(AbstractPlottingSystem system) {
 		this.system = system;
@@ -230,40 +232,9 @@ public class PlottingActionBarManager implements IPlotActionSystem {
 	    			IToolPage registeredTool = toolPages.get(tool.getToolId());
 	    			if (registeredTool==null || registeredTool.isDisposed()) registeredTool = createToolPage(e, role);
 	    			 
-	    			// If we have a dedicated tool for this tool, we do not open another
-	    			String toolId  = registeredTool.getToolId();
-	    			if (toolId!=null) {
-	    				IViewReference ref = EclipseUtils.getPage().findViewReference("org.dawb.workbench.plotting.views.toolPageView.fixed", toolId);
-	    			    if (ref!=null) {
-	    			    	final IViewPart view = ref.getView(true);
-	    			    	EclipseUtils.getPage().activate(view);
-	    			    	return;
-	    			    }
-	    			    
-	    			    if (tool.isAlwaysSeparateView()) {
-	    					try {
-								final IViewPart view = EclipseUtils.getPage().showView("org.dawb.workbench.plotting.views.toolPageView.fixed",
-														    							tool.getToolId(),
-																						IWorkbenchPage.VIEW_ACTIVATE);
-		    			    	EclipseUtils.getPage().activate(view);
-								return;
-							} catch (PartInitException e1) {
-								logger.error("Cannot open fixed view for "+tool.getToolId(), e1);
-							}
-                            
-	    			    }
-	    			}
-	    			
-	    			IViewPart viewPart=null;
-	    			try {
-	    				viewPart = EclipseUtils.getActivePage().showView(viewId);
-						
-						if (viewPart!=null && viewPart instanceof IToolChangeListener) {
-							system.addToolChangeListener((IToolChangeListener)viewPart);
-						}
-					} catch (PartInitException e) {
-						logger.error("Cannot find a view with id org.dawb.workbench.plotting.views.ToolPageView", e);
-					}
+	    			// TODO FIXME, method for dealting with toolComposite != null!
+	    			// createToolOnComposite(...)
+	    			createToolOnView(registeredTool, viewId);
 	    			
 	    			final IToolPage old = system.getCurrentToolPage(role);
 	    			system.setCurrentToolPage(registeredTool);
@@ -307,6 +278,45 @@ public class PlottingActionBarManager implements IPlotActionSystem {
 	    toolActions.add(clear);
 
 	    return toolActions;
+	}
+	
+	protected void createToolOnView(IToolPage registeredTool, String viewId) {
+		
+		// If we have a dedicated tool for this tool, we do not open another
+		String toolId  = registeredTool.getToolId();
+		if (toolId!=null) {
+			IViewReference ref = EclipseUtils.getPage().findViewReference("org.dawb.workbench.plotting.views.toolPageView.fixed", toolId);
+		    if (ref!=null) {
+		    	final IViewPart view = ref.getView(true);
+		    	EclipseUtils.getPage().activate(view);
+		    	return;
+		    }
+		    
+		    if (registeredTool.isAlwaysSeparateView()) {
+				try {
+					final IViewPart view = EclipseUtils.getPage().showView("org.dawb.workbench.plotting.views.toolPageView.fixed",
+							                                                toolId,
+																			IWorkbenchPage.VIEW_ACTIVATE);
+			    	EclipseUtils.getPage().activate(view);
+					return;
+				} catch (PartInitException e1) {
+					logger.error("Cannot open fixed view for "+toolId, e1);
+				}
+                
+		    }
+		}
+		
+		IViewPart viewPart=null;
+		try {
+			viewPart = EclipseUtils.getActivePage().showView(viewId);
+			
+			if (viewPart!=null && viewPart instanceof IToolChangeListener) {
+				system.addToolChangeListener((IToolChangeListener)viewPart);
+			}
+		} catch (PartInitException e) {
+			logger.error("Cannot find a view with id org.dawb.workbench.plotting.views.ToolPageView", e);
+		}
+
 	}
 	
 	protected void clearTool(ToolPageRole role) {
@@ -588,6 +598,14 @@ public class PlottingActionBarManager implements IPlotActionSystem {
 
 		}
 		return null;
+	}
+
+	/**
+	 * Sets specific widget for using to show tools on rather than pages.
+	 * @param toolComposite
+	 */
+	public void setToolComposite(Composite toolComposite) {
+        this.toolComposite = toolComposite;
 	}
 
 }

@@ -10,6 +10,14 @@ import org.dawb.common.ui.plot.IPlottingSystem;
 import org.dawb.common.ui.plot.region.IRegion.RegionType;
 import org.eclipse.swt.graphics.Color;
 
+import uk.ac.diamond.scisoft.analysis.roi.EllipticalFitROI;
+import uk.ac.diamond.scisoft.analysis.roi.EllipticalROI;
+import uk.ac.diamond.scisoft.analysis.roi.LinearROI;
+import uk.ac.diamond.scisoft.analysis.roi.PointROI;
+import uk.ac.diamond.scisoft.analysis.roi.ROIBase;
+import uk.ac.diamond.scisoft.analysis.roi.RectangularROI;
+import uk.ac.diamond.scisoft.analysis.roi.SectorROI;
+
 /**
  * Class containing utility methods for regions to avoid duplication 
  * @author fcp94556
@@ -69,4 +77,56 @@ public class RegionUtils {
 		}
 		return system.createRegion(name, type);
 	}
+	
+	/**
+	 * Method attempts to make the best IRegion it
+	 * can for the ROI.
+	 * 
+	 * @param plottingSystem
+	 * @param roi
+	 * @param roiName
+	 * @return
+	 */
+	public static IRegion createRegion( final IPlottingSystem plottingSystem,
+										final ROIBase         roi, 
+										final String          roiName) throws Exception {
+
+		IRegion region = plottingSystem.getRegion(roiName);
+		if (region != null && region.isVisible()) {
+			region.setROI(roi);
+			return region;
+		} 
+		
+		RegionType type = null;
+		if (roi instanceof LinearROI) {
+			type = RegionType.LINE;
+			
+		} else if (roi instanceof RectangularROI) {
+			type = RegionType.BOX;
+			
+		} else if (roi instanceof SectorROI) {
+			type = RegionType.SECTOR;
+			
+		} else if (roi instanceof EllipticalROI) {
+			type = RegionType.ELLIPSE;
+			
+		} else if (roi instanceof EllipticalFitROI) {
+			type = RegionType.ELLIPSEFIT;
+			
+		} else if (roi instanceof PointROI) {
+			type = RegionType.POINT;
+
+		}
+		
+		if (type==null) return null;
+		
+		IRegion newRegion = plottingSystem.createRegion(roiName, type);
+		newRegion.setROI(roi);
+		plottingSystem.addRegion(newRegion);
+
+		return newRegion;
+
+	}
+		
+
 }

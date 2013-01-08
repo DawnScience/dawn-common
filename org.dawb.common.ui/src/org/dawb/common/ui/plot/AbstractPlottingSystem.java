@@ -53,7 +53,7 @@ import org.slf4j.LoggerFactory;
 /**
  * The base class for IPlottingSystem. NOTE some methods that should be implemented
  * throw exceptions if they are called. They should be overridden.
- * Some methods that should be implemented do nothing.
+ * Some methods that should be implemented do nothing, they should be overridden.
  * 
  * There are TODO tags added to provide information as to where these optional
  * methods to override are.
@@ -64,7 +64,7 @@ import org.slf4j.LoggerFactory;
  * extension point.
  * 
  * 
- * DO NOT CHANGE THIS CLASS TO IMPEMENT CUSTOM METHODS PLEASE. Instead use the 
+ * DO NOT CHANGE THIS CLASS TO IMPLEMENT CUSTOM METHODS PLEASE. Instead use the 
  * IPlottingSystem interface and keep your special methods in your class using the
  * plotting system.
  * 
@@ -568,6 +568,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	}
 
 	private Map<ToolPageRole, String> currentToolIdMap;
+
 	protected void setCurrentToolPage(IToolPage page) {
 		if (currentToolIdMap==null) currentToolIdMap = new HashMap<IToolPage.ToolPageRole, String>(7);
 		currentToolIdMap.put(page.getToolPageRole(), page.getToolId());
@@ -763,5 +764,17 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 			return med.getSelectedPage() == getPart();
 		}
 		return true;
+	}
+
+	/**
+	 * Alternative widget to use for the UI area of a tool.
+	 * Normally a tool would appear as a page but if this composite
+	 * is set, all tools will be added/removed to this composite not
+	 * views and pages in them.
+	 * 
+	 * @param toolComposite
+	 */
+	public void setToolComposite(Composite toolComposite) {
+		this.actionBarManager.setToolComposite(toolComposite);
 	}
 }
