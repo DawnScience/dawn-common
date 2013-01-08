@@ -10,10 +10,20 @@
 
 package org.dawb.common.ui.widgets;
 
+import org.dawb.common.ui.util.GridUtils;
+import org.eclipse.jface.action.ContributionManager;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.ToolBarManager;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IActionBars2;
 import org.eclipse.ui.SubActionBars2;
 
@@ -23,6 +33,7 @@ public class ActionBarWrapper extends SubActionBars2 {
 	private IToolBarManager    alternativeToolbarManager;
 	private IMenuManager       alternativeMenuManager;
 	private IStatusLineManager alternativeStatusManager;
+	private IToolBarManager    rightManager;
 	private Composite          toolbarControl;
 
 	/**
@@ -82,5 +93,63 @@ public class ActionBarWrapper extends SubActionBars2 {
 			toolbarControl.layout(toolbarControl.getChildren());
 			toolbarControl.getParent().layout(toolbarControl.getChildren());
 		}
+	}
+	
+	/**
+	 * Convenience method for adding action bars at the top of a composite.
+	 * 
+	 * @param main
+	 * @param originalBars, may be null.
+	 * @return
+	 */
+	public static ActionBarWrapper createActionBars(Composite main, IActionBars originalBars) {
+		
+		Composite toolbarControl = new Composite(main, SWT.RIGHT);
+		toolbarControl.setLayout(new GridLayout(2, false));
+		GridUtils.removeMargins(toolbarControl);
+		toolbarControl.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+
+		// We use a local toolbar to make it clear to the user the tools
+		// that they can use, also because the toolbar actions are 
+		// hard coded.
+		ToolBarManager toolMan = new ToolBarManager(SWT.FLAT|SWT.RIGHT|SWT.WRAP);
+		final ToolBar  toolBar = toolMan.createControl(toolbarControl);
+		toolBar.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true, false));
+
+		ToolBarManager rightMan = new ToolBarManager(SWT.FLAT|SWT.RIGHT|SWT.WRAP);
+		final ToolBar          rightBar = rightMan.createControl(toolbarControl);
+		rightBar.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
+
+		final MenuManager    menuMan = new MenuManager();
+		ActionBarWrapper wrapper = new ActionBarWrapper(toolMan,menuMan,null,originalBars!=null?(IActionBars2)originalBars: new EmptyActionBars());
+		wrapper.rightManager     = rightMan;                
+		wrapper.toolbarControl   = toolbarControl;
+		return wrapper;
+	}
+	
+	public ToolBar getToolBar() {
+		return ((ToolBarManager)getToolBarManager()).getControl();
+	}
+
+	public IToolBarManager getRightManager() {
+		return rightManager;
+	}
+
+	public void setRightManager(IToolBarManager rightManager) {
+		this.rightManager = rightManager;
+	}
+	
+	public void setVisible(boolean isVisible) {
+		GridUtils.setVisible(toolbarControl, isVisible);
+		toolbarControl.getParent().layout(new Control[]{toolbarControl});
+	}
+
+	/**
+	 * Updates the menu and toolbar only.
+	 * @param force
+	 */
+	public void update(boolean force) {
+		getToolBarManager().update(force);
+		getMenuManager().update(force);
 	}
 }

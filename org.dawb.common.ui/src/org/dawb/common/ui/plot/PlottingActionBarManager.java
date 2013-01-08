@@ -140,7 +140,7 @@ public class PlottingActionBarManager implements IPlotActionSystem {
 	}
 	
 	public IActionBars createEmptyActionBars() {
-		return new EmptyActionBars(new ToolBarManager(), new MenuManager(), new StatusLineManager());
+		return new EmptyActionBars();
 	}
 
 	public void dispose() {
