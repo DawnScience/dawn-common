@@ -105,8 +105,22 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 		PaletteData     palette  = bean.getPalette();
 		
 		if (image instanceof RGBDataset) {
+			switch (origin) {
+			case TOP_LEFT:
+				break;
+			case TOP_RIGHT:
+				image = DatasetUtils.transpose(image, 1, 0);
+				image = image.getSlice(null, null, new int[] {1,-1});
+				break;
+			case BOTTOM_LEFT:
+				image = DatasetUtils.transpose(image, 1, 0);
+				image = image.getSlice(null, null, new int[] {-1,1});
+				break;
+			case BOTTOM_RIGHT:
+				image = image.getSlice(null, null, new int[] {-1,-1});
+				break;
+			}
 			RGBDataset rgbImage = (RGBDataset) image;
-			
 			return SWTImageUtils.createImageData(rgbImage, 0, 255, null, null, null, false, false, false);
 		}
 		
