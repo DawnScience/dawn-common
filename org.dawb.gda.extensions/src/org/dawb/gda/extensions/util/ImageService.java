@@ -109,11 +109,11 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 			case TOP_LEFT:
 				break;
 			case TOP_RIGHT:
-				image = DatasetUtils.transpose(image, 1, 0);
+				image = DatasetUtils.transpose(image);
 				image = image.getSlice(null, null, new int[] {1,-1});
 				break;
 			case BOTTOM_LEFT:
-				image = DatasetUtils.transpose(image, 1, 0);
+				image = DatasetUtils.transpose(image);
 				image = image.getSlice(null, null, new int[] {-1,1});
 				break;
 			case BOTTOM_RIGHT:
