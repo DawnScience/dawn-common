@@ -39,7 +39,7 @@ OR
 3 works as follows: When the tool is open in a dedicated view, if it implements the method isStaticTool() to return true, 
 it will exist as one instance. The tool will have to set things up to respond to plotting system changing in this case.
 
-Tools can be added to a perspective in 2 or 3 form in the prespective by adding the “org.dawb.workbench.plotting.views.toolPageView.fixed”
+Tools can be added to a perspective in 2 or 3 form in the perspective by adding the “org.dawb.workbench.plotting.views.toolPageView.fixed”
 view to the perspective and setting the secondary id to the tool id required. For instance ‘org.dawb.workbench.plotting.tools.azimuthalProfileTool’. 
 Or by programmatically when opening a view by id. 
 
