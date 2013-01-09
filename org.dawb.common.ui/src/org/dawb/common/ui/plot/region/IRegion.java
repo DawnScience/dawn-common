@@ -166,6 +166,7 @@ public interface IRegion {
 		POLYLINE("Polyline",       ColorConstants.cyan,       PolylineROI.class),
 		POLYGON("Polygon",         ColorConstants.cyan,       PolygonalROI.class),
 		BOX("Box",                 ColorConstants.green,      RectangularROI.class),
+		COLORBOX("Colored edges box", ColorConstants.gray,    RectangularROI.class),
 		GRID("Grid",               ColorConstants.lightGray,  GridROI.class),
 		CIRCLE("Circle",           darkYellow,                CircularROI.class),
 		SECTOR("Sector",           ColorConstants.red,        SectorROI.class),
