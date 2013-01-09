@@ -11,7 +11,6 @@ import org.dawb.common.ui.Activator;
 import org.dawb.common.ui.menu.MenuAction;
 import org.dawb.common.ui.plot.tool.IToolChangeListener;
 import org.dawb.common.ui.plot.tool.IToolPage;
-import org.dawb.common.ui.plot.tool.IToolPageSystem;
 import org.dawb.common.ui.plot.tool.IToolPage.ToolPageRole;
 import org.dawb.common.ui.plot.tool.ToolChangeEvent;
 import org.dawb.common.ui.plot.trace.ITrace;
@@ -27,6 +26,7 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StackLayout;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -39,6 +39,8 @@ import org.eclipse.ui.PartInitException;
 import org.osgi.framework.Bundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import uk.ac.gda.common.rcp.util.GridUtils;
 
 
 /**
@@ -62,7 +64,6 @@ public class PlottingActionBarManager implements IPlotActionSystem {
 	protected MenuAction                imageMenu;
 	protected MenuAction                xyMenu;
 	protected ITraceActionProvider      traceActionProvider;
-	private   Composite                 toolComposite;
 	
 	public PlottingActionBarManager(AbstractPlottingSystem system) {
 		this.system = system;
@@ -285,42 +286,51 @@ public class PlottingActionBarManager implements IPlotActionSystem {
 	    return toolActions;
 	}
 	
-	private ActionBarWrapper toolWrapper;
-	private Composite        toolContent;
+	private Composite             toolComposite;
+	private Map<String,Composite> toolPseudoRecs;
 
 	protected void createToolOnComposite(IToolPage registeredTool) {
 		
-		if (toolWrapper==null) {
-			toolComposite.setLayout(new GridLayout(1, false));
-			toolWrapper = ActionBarWrapper.createActionBars(toolComposite, new EmptyActionBars());
-			toolContent = new Composite(toolComposite, SWT.NONE);
-			toolContent.setLayoutData(new GridData(GridData.FILL_BOTH));
-			toolContent.setLayout(new StackLayout());
+		if (toolPseudoRecs==null) {
+			toolComposite.setLayout(new StackLayout());
+			toolPseudoRecs = new HashMap<String, Composite>(7);
 		}
-
+		
 		String toolId  = registeredTool.getToolId();
 		if (toolId!=null) {
 		
 			IToolPage tool = system.getToolPage(toolId);
 			IToolPage old  = system.getCurrentToolPage(tool.getToolPageRole());
-			if (tool.getControl()==null) {
+			if (!toolPseudoRecs.containsKey(tool.getToolId())) {
 				try {
-					tool.init(new EmptyPageSite(toolComposite.getShell(), toolWrapper));
+					final Composite toolPseudoRec = new Composite(toolComposite, SWT.NONE);
+					toolPseudoRec.setLayout(new GridLayout(1, false));
+					GridUtils.removeMargins(toolPseudoRec);
+					
+					ActionBarWrapper toolWrapper = ActionBarWrapper.createActionBars(toolPseudoRec, new EmptyActionBars());
+					tool.init(new EmptyPageSite(toolPseudoRec.getShell(), toolWrapper));
+					
+					final Composite toolContent = new Composite(toolPseudoRec, SWT.NONE);
+					toolContent.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+					toolContent.setLayout(new FillLayout());
+					tool.createControl(toolContent);
+				
+					toolPseudoRecs.put(tool.getToolId(), toolPseudoRec);
+					 					
 				} catch (PartInitException e) {
 					logger.error("Cannot init "+toolId, e);
 				}
-				tool.createControl(toolContent);
- 			}
-				
-			StackLayout stack = (StackLayout)toolContent.getLayout();
-			stack.topControl = tool.getControl();
-			if (old!=null && old.isActive()) {
-				toolWrapper.clear();
-				old.deactivate();
 			}
-			tool.activate();
-			
-			toolComposite.layout(toolComposite.getChildren());
+				
+			StackLayout stack = (StackLayout)toolComposite.getLayout();
+			stack.topControl = toolPseudoRecs.get(tool.getToolId());
+	   		toolComposite.layout();
+
+			if (old!=null && old.isActive()) old.deactivate();
+			if (!tool.isActive()) {
+				tool.setPlottingSystem(system);
+				tool.activate();
+			}
 			
 			system.fireToolChangeListeners(new ToolChangeEvent(this, old, tool, system.getPart()));		
 
