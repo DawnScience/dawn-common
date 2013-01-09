@@ -10,8 +10,9 @@
 
 package org.dawb.common.ui.widgets;
 
+import org.dawb.common.ui.Activator;
 import org.dawb.common.ui.util.GridUtils;
-import org.eclipse.jface.action.ContributionManager;
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -22,6 +23,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IActionBars2;
@@ -119,11 +121,21 @@ public class ActionBarWrapper extends SubActionBars2 {
 		ToolBarManager rightMan = new ToolBarManager(SWT.FLAT|SWT.RIGHT|SWT.WRAP);
 		final ToolBar          rightBar = rightMan.createControl(toolbarControl);
 		rightBar.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
-
+		
 		final MenuManager    menuMan = new MenuManager();
+	    Action menuAction = new Action("", Activator.getImageDescriptor("/icons/DropDown.png")) {
+	    	@Override
+	    	public void run() {
+	    		final Menu   mbar = menuMan.createContextMenu(toolBar);
+	    		mbar.setVisible(true);
+	    	}
+	    };
+	    rightMan.add(menuAction);
+
 		ActionBarWrapper wrapper = new ActionBarWrapper(toolMan,menuMan,null,originalBars!=null?(IActionBars2)originalBars: new EmptyActionBars());
 		wrapper.rightManager     = rightMan;                
 		wrapper.toolbarControl   = toolbarControl;
+
 		return wrapper;
 	}
 	
@@ -149,7 +161,8 @@ public class ActionBarWrapper extends SubActionBars2 {
 	 * @param force
 	 */
 	public void update(boolean force) {
-		getToolBarManager().update(force);
-		getMenuManager().update(force);
+		if (getToolBarManager()!=null) getToolBarManager().update(force);
+		if (getMenuManager()!=null)    getMenuManager().update(force);
+		if (rightManager!=null)        rightManager.update(force);
 	}
 }
