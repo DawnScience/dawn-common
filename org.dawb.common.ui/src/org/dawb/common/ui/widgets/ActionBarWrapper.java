@@ -165,4 +165,10 @@ public class ActionBarWrapper extends SubActionBars2 {
 		if (getMenuManager()!=null)    getMenuManager().update(force);
 		if (rightManager!=null)        rightManager.update(force);
 	}
+
+	public void clear() {
+		if (getToolBarManager()!=null) getToolBarManager().removeAll();
+		if (getMenuManager()!=null)    getMenuManager().removeAll();
+		update(true);
+	}
 }

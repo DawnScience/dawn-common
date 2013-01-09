@@ -38,6 +38,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelectionProvider;
+import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
@@ -771,6 +772,9 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	 * Normally a tool would appear as a page but if this composite
 	 * is set, all tools will be added/removed to this composite not
 	 * views and pages in them.
+	 * 
+	 * The composite will have a tool toolbar at the top and then 
+	 * add contents which fill and have a stack layout.
 	 * 
 	 * @param toolComposite
 	 */

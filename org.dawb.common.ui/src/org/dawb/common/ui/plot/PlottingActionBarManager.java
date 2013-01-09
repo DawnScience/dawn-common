@@ -11,21 +11,24 @@ import org.dawb.common.ui.Activator;
 import org.dawb.common.ui.menu.MenuAction;
 import org.dawb.common.ui.plot.tool.IToolChangeListener;
 import org.dawb.common.ui.plot.tool.IToolPage;
+import org.dawb.common.ui.plot.tool.IToolPageSystem;
 import org.dawb.common.ui.plot.tool.IToolPage.ToolPageRole;
 import org.dawb.common.ui.plot.tool.ToolChangeEvent;
 import org.dawb.common.ui.plot.trace.ITrace;
 import org.dawb.common.ui.util.EclipseUtils;
+import org.dawb.common.ui.widgets.ActionBarWrapper;
 import org.dawb.common.ui.widgets.EmptyActionBars;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IContributionManager;
-import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.action.StatusLineManager;
-import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.StackLayout;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IViewPart;
@@ -232,9 +235,11 @@ public class PlottingActionBarManager implements IPlotActionSystem {
 	    			IToolPage registeredTool = toolPages.get(tool.getToolId());
 	    			if (registeredTool==null || registeredTool.isDisposed()) registeredTool = createToolPage(e, role);
 	    			 
-	    			// TODO FIXME, method for dealting with toolComposite != null!
-	    			// createToolOnComposite(...)
-	    			createToolOnView(registeredTool, viewId);
+	    			if (toolComposite!=null) {
+	    				createToolOnComposite(registeredTool);
+	    			} else {
+	    			    createToolOnView(registeredTool, viewId);
+	    			}
 	    			
 	    			final IToolPage old = system.getCurrentToolPage(role);
 	    			system.setCurrentToolPage(registeredTool);
@@ -278,6 +283,48 @@ public class PlottingActionBarManager implements IPlotActionSystem {
 	    toolActions.add(clear);
 
 	    return toolActions;
+	}
+	
+	private ActionBarWrapper toolWrapper;
+	private Composite        toolContent;
+
+	protected void createToolOnComposite(IToolPage registeredTool) {
+		
+		if (toolWrapper==null) {
+			toolComposite.setLayout(new GridLayout(1, false));
+			toolWrapper = ActionBarWrapper.createActionBars(toolComposite, new EmptyActionBars());
+			toolContent = new Composite(toolComposite, SWT.NONE);
+			toolContent.setLayoutData(new GridData(GridData.FILL_BOTH));
+			toolContent.setLayout(new StackLayout());
+		}
+
+		String toolId  = registeredTool.getToolId();
+		if (toolId!=null) {
+		
+			IToolPage tool = system.getToolPage(toolId);
+			IToolPage old  = system.getCurrentToolPage(tool.getToolPageRole());
+			if (tool.getControl()==null) {
+				try {
+					tool.init(new EmptyPageSite(toolComposite.getShell(), toolWrapper));
+				} catch (PartInitException e) {
+					logger.error("Cannot init "+toolId, e);
+				}
+				tool.createControl(toolContent);
+ 			}
+				
+			StackLayout stack = (StackLayout)toolContent.getLayout();
+			stack.topControl = tool.getControl();
+			if (old!=null && old.isActive()) {
+				toolWrapper.clear();
+				old.deactivate();
+			}
+			tool.activate();
+			
+			toolComposite.layout(toolComposite.getChildren());
+			
+			system.fireToolChangeListeners(new ToolChangeEvent(this, old, tool, system.getPart()));		
+
+		}
 	}
 	
 	protected void createToolOnView(IToolPage registeredTool, String viewId) {
