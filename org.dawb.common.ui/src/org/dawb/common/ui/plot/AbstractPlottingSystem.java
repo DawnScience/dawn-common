@@ -573,6 +573,18 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 		if (currentToolIdMap==null) currentToolIdMap = new HashMap<IToolPage.ToolPageRole, String>(7);
 		currentToolIdMap.put(page.getToolPageRole(), page.getToolId());
 	}
+	
+	public IToolPage getActiveTool() {
+		IToolPage page=null;			
+		// TODO FIXME 3D ??
+		if (is2D()) {
+			page = getCurrentToolPage(ToolPageRole.ROLE_2D);
+		} else {
+			page = getCurrentToolPage(ToolPageRole.ROLE_1D);
+		}
+		return page;
+	}
+
 
 	@Override
 	public IToolPage getToolPage(String toolId) {

@@ -17,6 +17,14 @@ import org.eclipse.ui.IWorkbenchPart;
 public interface IToolPageSystem {
 
 	/**
+	 * Convenience method for getCurrentToolPage(...). Checks if 1D or 2D
+	 * is plotted and asks for IToolPage using getCurrentToolPage(...).
+	 * 
+	 * @return the active tool page
+	 */
+	public IToolPage getActiveTool();
+	
+	/**
 	 * Get the current tool page that the user would like to use.
 	 * Fitting, profile, derivative etc. Null if no selection has been made.
 	 * @param role, may be null to get last used page.
