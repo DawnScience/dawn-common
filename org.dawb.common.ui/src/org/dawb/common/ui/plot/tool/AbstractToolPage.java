@@ -1,5 +1,6 @@
 package org.dawb.common.ui.plot.tool;
 
+import java.io.Serializable;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Collections;
@@ -383,4 +384,11 @@ public abstract class AbstractToolPage extends Page implements IToolPage, IAdapt
 		}
 	}
 
+	/**
+	 * @see IToolPage.getToolData()
+	 */
+	@Override
+	public Serializable getToolData() {
+		return null;
+	}
 }

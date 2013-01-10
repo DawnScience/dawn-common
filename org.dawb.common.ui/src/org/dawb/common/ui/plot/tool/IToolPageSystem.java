@@ -1,6 +1,7 @@
 package org.dawb.common.ui.plot.tool;
 
 import org.dawb.common.ui.plot.tool.IToolPage.ToolPageRole;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IWorkbenchPart;
 
 /**
@@ -75,5 +76,17 @@ public interface IToolPageSystem {
 	 * @return
 	 */
 	public boolean isActive(IWorkbenchPart active);
+	
+	/**
+	 * Tools appear in views on pages normally. Sometimes it is required to define
+	 * a special Composite for the tool to be shown on. For instance when showing a 
+	 * Dialog to the user which contains a plotting system and a tool.
+	 * 
+	 * Once set the tools for this plotting system are locked to this composite. Calling
+	 * again with composite=null may cause undesirable results.
+	 * 
+	 * @param composite
+	 */
+	public void setToolComposite(Composite composite);
 
 }

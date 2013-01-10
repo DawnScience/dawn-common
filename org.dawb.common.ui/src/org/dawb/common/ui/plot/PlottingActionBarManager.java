@@ -327,10 +327,7 @@ public class PlottingActionBarManager implements IPlotActionSystem {
 	   		toolComposite.layout();
 
 			if (old!=null && old.isActive()) old.deactivate();
-			if (!tool.isActive()) {
-				tool.setPlottingSystem(system);
-				tool.activate();
-			}
+			if (!tool.isActive()) tool.activate();
 			
 			system.fireToolChangeListeners(new ToolChangeEvent(this, old, tool, system.getPart()));		
 
@@ -467,18 +464,14 @@ public class PlottingActionBarManager implements IPlotActionSystem {
 	    	page.setPlottingSystem(system);
 	    	page.setTitle(label);
 	    	page.setPart(system.getPart());
+	    	page.setToolId(toolId);
 	    	
 
-	    	IViewPart viewPart=null;
-	    	try {
-	    		viewPart = EclipseUtils.getActivePage().showView(viewId);
-
-	    		if (viewPart!=null && viewPart instanceof IToolChangeListener) {
-	    			system.addToolChangeListener((IToolChangeListener)viewPart);
-	    		}
-	    	} catch (PartInitException pe) {
-	    		logger.error("Cannot find a view with id org.dawb.workbench.plotting.views.ToolPageView", pe);
-	    	}
+			if (toolComposite!=null) {
+				createToolOnComposite(page);
+			} else {
+			    createToolOnView(page, viewId);
+			}
 
 	    	final IToolPage old = system.getCurrentToolPage(role);
 	    	system.setCurrentToolPage(page);

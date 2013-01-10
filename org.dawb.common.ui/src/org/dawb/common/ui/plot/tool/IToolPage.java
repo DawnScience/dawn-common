@@ -1,5 +1,7 @@
 package org.dawb.common.ui.plot.tool;
 
+import java.io.Serializable;
+
 import org.dawb.common.ui.plot.IPlottingSystem;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -266,5 +268,15 @@ public interface IToolPage extends IPageBookViewPage, IAdaptable {
 	 * @return
 	 */
 	public boolean isStaticTool();
+	
+	/**
+	 * This method will be implemented to return any data which is defined by the tool
+	 * and may be used elsewhere. By default the AbstractToolPage will return null and
+	 * many tools will return null unless they have been specifically altered to encapsulate
+	 * and return their data.
+	 * 
+	 * @return data specific to tool
+	 */
+	public Serializable getToolData();
 
 }

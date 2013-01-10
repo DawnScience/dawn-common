@@ -553,6 +553,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	}
 
 	private Collection<IToolChangeListener> toolChangeListeners;
+	private Map<ToolPageRole, String>       currentToolIdMap;
 
 	@Override
 	public IToolPage getCurrentToolPage(ToolPageRole role) {
@@ -567,8 +568,6 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 		}
 		return actionBarManager.getToolPage(id);
 	}
-
-	private Map<ToolPageRole, String> currentToolIdMap;
 
 	protected void setCurrentToolPage(IToolPage page) {
 		if (currentToolIdMap==null) currentToolIdMap = new HashMap<IToolPage.ToolPageRole, String>(7);
