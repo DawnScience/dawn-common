@@ -316,7 +316,8 @@ public class PlottingActionBarManager implements IPlotActionSystem {
 					tool.createControl(toolContent);
 				
 					toolPseudoRecs.put(tool.getToolId(), toolPseudoRec);
-					 					
+					 
+					toolWrapper.update(true);
 				} catch (PartInitException e) {
 					logger.error("Cannot init "+toolId, e);
 				}
@@ -327,7 +328,7 @@ public class PlottingActionBarManager implements IPlotActionSystem {
 	   		toolComposite.layout();
 
 			if (old!=null && old.isActive()) old.deactivate();
-			if (!tool.isActive()) tool.activate();
+			tool.activate();
 			
 			system.fireToolChangeListeners(new ToolChangeEvent(this, old, tool, system.getPart()));		
 
