@@ -1,0 +1,133 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE entity PUBLIC "-//UC Berkeley//DTD MoML 1//EN"
+    "http://ptolemy.eecs.berkeley.edu/xml/dtd/MoML_1.dtd">
+<entity name="newModel" class="ptolemy.actor.TypedCompositeActor" source="C:\Work\runtime-uk.ac.diamond.dawn.product\workflows\gda_scan_example.moml">
+    <property name="_createdBy" class="ptolemy.kernel.attributes.VersionAttribute" value="7.0.1">
+    </property>
+    <property name="_workbenchVersion" class="ptolemy.kernel.attributes.VersionAttribute" value="null">
+    </property>
+    <property name="Director" class="com.isencia.passerelle.domain.cap.Director">
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{20, 20}">
+        </property>
+    </property>
+    <property name="TextAttribute" class="ptolemy.vergil.kernel.attributes.TextAttribute">
+        <property name="_hideName" class="ptolemy.data.expr.SingletonParameter" value="true">
+        </property>
+        <property name="_hideAllParameters" class="ptolemy.data.expr.Parameter" value="true">
+        </property>
+        <property name="textSize" class="ptolemy.data.expr.Parameter" value="14">
+        </property>
+        <property name="textColor" class="ptolemy.actor.gui.ColorAttribute" value="{0.0, 0.0, 1.0, 1.0}">
+        </property>
+        <property name="fontFamily" class="ptolemy.data.expr.StringParameter" value="SansSerif">
+        </property>
+        <property name="bold" class="ptolemy.data.expr.Parameter" value="false">
+        </property>
+        <property name="italic" class="ptolemy.data.expr.Parameter" value="false">
+        </property>
+        <property name="text" class="ptolemy.kernel.util.StringAttribute" value="Please edit the server to be the GDA server required.\nBy default it is 'localhost' and port 9999.\n\nYou may need to change the script 'gda-script.py' if\na scannble called 'simpleScannable' does not exist.">
+            <property name="_style" class="ptolemy.actor.gui.style.TextStyle">
+                <property name="height" class="ptolemy.data.expr.Parameter" value="20">
+                </property>
+                <property name="width" class="ptolemy.data.expr.Parameter" value="80">
+                </property>
+            </property>
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{122.0, 319.0}">
+        </property>
+    </property>
+    <entity name="GDA Telnet" class="org.dawb.passerelle.actors.net.TelnetTransformer">
+        <property name="Receiver Q Capacity (-1)" class="ptolemy.data.expr.Parameter" value="-1">
+        </property>
+        <property name="Receiver Q warning size (-1)" class="ptolemy.data.expr.Parameter" value="-1">
+        </property>
+        <property name="Expression Mode" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="Evaluate on every data input">
+        </property>
+        <property name="Memory Mode" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="Create copy of data leaving original data intact.">
+        </property>
+        <property name="Name Mode" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="Attempt to use image name if there is one.">
+        </property>
+        <property name="Template Source" class="com.isencia.passerelle.util.ptolemy.ResourceParameter" value="/${project_name}/src/gda-script.py">
+        </property>
+        <property name="Output" class="com.isencia.passerelle.util.ptolemy.ResourceParameter" value="/${project_name}/tmp/">
+        </property>
+        <property name="Encoding" class="org.dawb.passerelle.actors.file.SubstituteTransformer$1" value="UTF-8">
+        </property>
+        <property name="URI" class="ptolemy.data.expr.StringParameter" value="localhost">
+        </property>
+        <property name="Port" class="ptolemy.data.expr.StringParameter" value="9999">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{208.0, 148.0}">
+        </property>
+    </entity>
+    <entity name="ConnectionError" class="org.dawb.passerelle.actors.ui.MessageSink">
+        <property name="Receiver Q Capacity (-1)" class="ptolemy.data.expr.Parameter" value="-1">
+        </property>
+        <property name="Receiver Q warning size (-1)" class="ptolemy.data.expr.Parameter" value="-1">
+        </property>
+        <property name="PassThrough" class="ptolemy.data.expr.Parameter" value="false">
+        </property>
+        <property name="Expression Mode" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="Evaluate after all data received">
+        </property>
+        <property name="Memory Mode" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="Create copy of data leaving original data intact.">
+        </property>
+        <property name="Message Type" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="1">
+        </property>
+        <property name="Message" class="ptolemy.data.expr.StringParameter" value="Cannot connect to ${uri}:${port}. Please ensure that the telent service to ${uri}:${port} is running.">
+        </property>
+        <property name="Message Title" class="ptolemy.data.expr.StringParameter" value="Connection Problem">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{334.0, 79.0}">
+        </property>
+    </entity>
+    <entity name="Scan Complete" class="org.dawb.passerelle.actors.ui.MessageSink">
+        <property name="Receiver Q Capacity (-1)" class="ptolemy.data.expr.Parameter" value="-1">
+        </property>
+        <property name="Receiver Q warning size (-1)" class="ptolemy.data.expr.Parameter" value="-1">
+        </property>
+        <property name="PassThrough" class="ptolemy.data.expr.Parameter" value="false">
+        </property>
+        <property name="Expression Mode" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="Evaluate after all data received">
+        </property>
+        <property name="Memory Mode" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="Create copy of data leaving original data intact.">
+        </property>
+        <property name="Message Type" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="2">
+        </property>
+        <property name="Message" class="ptolemy.data.expr.StringParameter" value="Scans complete at ${scan_location1} and ${scan_location2}">
+        </property>
+        <property name="Message Title" class="ptolemy.data.expr.StringParameter" value="Scan Complete">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{338.0, 215.0}">
+        </property>
+    </entity>
+    <entity name="Scalar" class="org.dawb.passerelle.actors.data.Scalar">
+        <property name="Receiver Q Capacity (-1)" class="ptolemy.data.expr.Parameter" value="-1">
+        </property>
+        <property name="Receiver Q warning size (-1)" class="ptolemy.data.expr.Parameter" value="-1">
+        </property>
+        <property name="Name" class="ptolemy.data.expr.StringParameter" value="scansize">
+        </property>
+        <property name="Value" class="org.dawb.passerelle.actors.data.Scalar$RangeParameter" value="10">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{63.0, 158.0}">
+        </property>
+    </entity>
+    <relation name="_R_2" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <relation name="_R_3" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <relation name="_R" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <link port="GDA Telnet.error" relation="_R_2"/>
+    <link port="GDA Telnet.input" relation="_R"/>
+    <link port="GDA Telnet.output" relation="_R_3"/>
+    <link port="ConnectionError.input" relation="_R_2"/>
+    <link port="Scan Complete.input" relation="_R_3"/>
+    <link port="Scalar.output" relation="_R"/>
+</entity>
