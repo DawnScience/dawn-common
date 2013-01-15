@@ -33,4 +33,15 @@ public interface IUserInputService {
 	 * @return
 	 */
 	public IRemoteWorkbenchPart openUserPlotPart(String partName, boolean dialog) throws Exception;
+
+	/**
+	 * Sends debug information to the Value view or a similar part for inspecting data.
+	 * 
+	 * This part in this context also provides next and play / stop buttons
+	 * 
+	 * @param partName
+	 * @param dialog - should be false currently, debugging is done in the Value view.
+	 * @return
+	 */
+	public IRemoteWorkbenchPart openDebugPart(String partName, boolean dialog) throws Exception;
 }
