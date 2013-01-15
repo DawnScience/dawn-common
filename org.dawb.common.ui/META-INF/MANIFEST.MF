@@ -25,6 +25,7 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Export-Package: org.dawb.common.ui,
  org.dawb.common.ui.components.cell,
+ org.dawb.common.ui.databinding.widget,
  org.dawb.common.ui.editors,
  org.dawb.common.ui.file,
  org.dawb.common.ui.image,
