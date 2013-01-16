@@ -248,7 +248,7 @@ public class FunctionEditTable {
 		protected Object getValue(Object element) {
 			final FunctionRow row = (FunctionRow)element;
 			if(column<4){
-				return (int)row.getParameter(column-1);
+				return (double)row.getParameter(column-1);
 			}else{
 				return row.isFixed();
 			}
