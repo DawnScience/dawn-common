@@ -179,14 +179,16 @@ public class FunctionEditTable {
 				}
 			
 				final FloatSpinnerWrapper rb = (FloatSpinnerWrapper)ed.getFieldWidget();
-					
+				if (rb.getPrecision() < 5)
+					rb.setFormat(rb.getWidth(), 5);
+
 				rb.setMaximum(Double.MAX_VALUE);
 				rb.setMinimum(-Double.MAX_VALUE);
-			
+
 				rb.setButtonVisible(false);
 				rb.setActive(true);
-				rb.setFormat(10, 5);
-				
+//				rb.setFormat(10, 5);
+
 				((Spinner)rb.getControl()).addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(SelectionEvent e) {
