@@ -58,6 +58,14 @@ public class ServiceManager {
 		}
 		
 		try {
+			// Try to get it from OSGI if we can.
+			try {
+				Object instance = Activator.getService(serviceClass);
+				if (instance!=null) return instance;
+			} catch (Throwable ignored) {
+				// We check the OFFLINE_SERVICES now...
+			}
+			
 			// Designed to get dawb factories which implement the serviceClass, might not
 			// get other services properly. To help this we throw an exception if it is
 			// one we don't know about.

@@ -11,6 +11,7 @@ package org.dawb.common.services;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 
 public class Activator implements BundleActivator {
 
@@ -36,4 +37,15 @@ public class Activator implements BundleActivator {
 		Activator.context = null;
 	}
 
-}
+	/**
+	 * Looks for OSGI service, used by ServiceManager
+	 * 
+	 * @param clazz
+	 * @return
+	 */
+	public static Object getService(Class<?> clazz) {
+		if (context==null) return null;
+		ServiceReference<?> ref = context.getServiceReference(clazz);
+		if (ref==null) return null;
+		return context.getService(ref);
+	}}
