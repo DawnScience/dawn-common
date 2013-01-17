@@ -36,6 +36,11 @@ public class ServiceManager {
 		OFFLINE_SERVICES.add(IImageService.class);
 		OFFLINE_SERVICES.add(ISystemService.class);
 		OFFLINE_SERVICES.add(ITransferService.class);
+		OFFLINE_SERVICES.add(IClassLoaderService.class);
+	}
+	
+	public static Object getService(final Class serviceClass) throws Exception {
+		return getService(serviceClass, true);
 	}
 
 	/**
@@ -46,20 +51,26 @@ public class ServiceManager {
 	 * @param serviceClass
 	 * @return
 	 */
-	public static Object getService(final Class serviceClass) throws Exception {
+	public static Object getService(final Class serviceClass, boolean exceptionOnError) throws Exception {
 		
 		if (PlatformUI.isWorkbenchRunning()) {
 			return PlatformUI.getWorkbench().getService(serviceClass);
 		}
 		
-		// Designed to get dawb factories which implement the serviceClass, might not
-		// get other services properly. To help this we throw an exception if it is
-		// one we don't know about.
-		if (!OFFLINE_SERVICES.contains(serviceClass)) throw new Exception("Cannot get an implementor for "+serviceClass+" in headless mode!");
-		final IConfigurationElement[] ele = Platform.getExtensionRegistry().getConfigurationElementsFor("org.eclipse.ui.services");
-		for (IConfigurationElement i : ele) {
-			final Object factory = i.createExecutableExtension("factoryClass");
-			if (factory!=null && factory.getClass()==serviceClass) return factory;
+		try {
+			// Designed to get dawb factories which implement the serviceClass, might not
+			// get other services properly. To help this we throw an exception if it is
+			// one we don't know about.
+			if (!OFFLINE_SERVICES.contains(serviceClass)) throw new Exception("Cannot get an implementor for "+serviceClass+" in headless mode!");
+			final IConfigurationElement[] ele = Platform.getExtensionRegistry().getConfigurationElementsFor("org.eclipse.ui.services");
+			for (IConfigurationElement i : ele) {
+				final Object factory = i.createExecutableExtension("factoryClass");
+				if (factory!=null && factory.getClass()==serviceClass) return factory;
+			}
+		} catch (Exception ne) {
+			if (exceptionOnError) throw ne;
+			ne.printStackTrace();// Only in test decks does this happen
+			return null;
 		}
 		
 		return null;
