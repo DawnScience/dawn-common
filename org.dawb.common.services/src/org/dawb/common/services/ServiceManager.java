@@ -39,11 +39,20 @@ public class ServiceManager {
 		OFFLINE_SERVICES.add(IClassLoaderService.class);
 	}
 	
+	/**
+	 * Tries eclipse service, then osgi service, then reading eclipse extension points.
+	 * 
+	 * @param serviceClass
+	 * @return
+	 * @throws Exception
+	 */
 	public static Object getService(final Class serviceClass) throws Exception {
 		return getService(serviceClass, true);
 	}
 
 	/**
+	 * Tries eclipse service, then osgi service, then reading eclipse extension points.
+     *
 	 * Gets a service given a class, using the workbench if we are not
 	 * in headless mode, otherwise returns our services providing the
 	 * class declared for the extension point, also implements the service.
@@ -54,7 +63,8 @@ public class ServiceManager {
 	public static Object getService(final Class serviceClass, boolean exceptionOnError) throws Exception {
 		
 		if (PlatformUI.isWorkbenchRunning()) {
-			return PlatformUI.getWorkbench().getService(serviceClass);
+			Object instance = PlatformUI.getWorkbench().getService(serviceClass);
+			if (instance!=null) return instance;
 		}
 		
 		try {
