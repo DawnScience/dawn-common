@@ -31,6 +31,14 @@ public interface ITraceSystem {
 	
 	
 	/**
+	 *  
+
+ * DO NOT USE YET IPlottingSystem does not yet fully support 3D.
+ * 
+ * THIS PART OF THE INTERFACE IS A WORK IN PROGRESS (If you do use it it will not
+ * work fully but your code will be backwardsly compatible when the 3D API
+ * is finished ie this method will remain.)
+ * 
 	 * Creates a surface trace used for 3D plotting. This does not add the trace
 	 * or give it any data.
 	 * 

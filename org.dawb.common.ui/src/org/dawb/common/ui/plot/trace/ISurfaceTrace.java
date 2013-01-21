@@ -4,6 +4,16 @@ import java.util.List;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 
+/**
+ * DO NOT USE YET IPlottingSystem does not yet support 3D.
+ * 
+ * THIS INTERFACE IS A WORK IN PROGRESS (If you do use it it will not
+ * work but your code will be backwardsly compatible when the 3D API
+ * is finished.)
+ * 
+ * @author fcp94556
+ *
+ */
 public interface ISurfaceTrace extends IPaletteTrace {
 
 	/**
