@@ -357,6 +357,9 @@ public class PythonService {
 			                    final boolean ednaDebugMode, 
 			                    final String  xmlInputString) throws Exception {
 		
+		//TODO Should AbstractEdnaPlugin set the working dir on the command so that
+		//streams from the process are logged correctly?
+		
 		// We add fabio as an additional path to the service.
 		final List<String> additionalPaths = new ArrayList<String>(1);
 		additionalPaths.add(BundleUtils.getEclipseHome());
