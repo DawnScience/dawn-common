@@ -121,7 +121,6 @@ public class PythonService {
 		
 		// Currently log back python output directly to the log file.
 		service.command.setStreamLogsToLogging(true);
-		service.command.setWorkingDir(path);
 		service.command.execute();
 		
 		service.stopThread = new Thread("Stop Python Service") {
@@ -136,6 +135,61 @@ public class PythonService {
 		return service;
 	}
 	
+	/**
+	 * Tries to get a dir in the same place as the script, otherwise
+	 * it tries to get a dir in the user home.
+	 * 
+	 * @param scriptPath
+	 * @return
+	 */
+	private static File getWorkingDir(final String scriptPath) {
+		
+		File path = null;
+		try {
+			final File dir  = (new File(scriptPath)).getParentFile();
+			path = getUniqueDir(dir, "python_tmp");
+			if (!path.canWrite() || !path.isDirectory() || canTouch(path)) {
+				path = null;
+			}
+		} catch (Throwable ne) {
+			path = null;
+		}
+		
+		if (path==null) {
+			File home = new File(System.getProperty("user.home")+"/.dawn/");
+			home.mkdirs();
+			path = getUniqueDir(home, "python_tmp");
+		}
+		
+		return path;
+		
+	}
+
+	private static File getUniqueDir(File dir, String name) {
+		
+		int i = 1;
+		File ret = new File(dir, name+i);
+		while(ret.exists()) {
+			if (ret.list()==null || ret.list().length<1) break; // Use the same empty one.
+			++i;
+			ret = new File(dir, name+i);
+		}
+		ret.mkdirs();
+		return ret;
+	}
+
+	private static boolean canTouch(File path) {
+		try {
+			path.mkdirs();
+			File touch = new File(path, "touch");
+			touch.createNewFile();
+			touch.delete();
+		} catch (Throwable ne) {
+			return false;
+		}
+		return true;
+	}
+
 	/**
 	 * Call to get the scisoft plotting port, may be "", null or 0.
 	 * Will check temp variable set to dynamic port.
@@ -270,6 +324,8 @@ public class PythonService {
 	@SuppressWarnings("unchecked")
 	public Map<String,? extends Object> runScript(String scriptFullPath, Map<String, ?> data, Collection<String> outputNames) throws Exception {
 		
+		final File dir = getWorkingDir(scriptFullPath);
+		command.setWorkingDir(dir);
 		final List<String> additionalPaths = new ArrayList<String>(1);
 		additionalPaths.add(BundleUtils.getEclipseHome());
 		additionalPaths.add(new File(scriptFullPath).getParent().toString());
@@ -278,6 +334,11 @@ public class PythonService {
 		}
         
 		final Object out = client.request("runScript", new Object[]{scriptFullPath, data, outputNames, additionalPaths}); 
+		
+		if (dir.exists() && (dir.list()==null || dir.list().length<1)) {
+			dir.delete();
+		}
+		
 		// Calls the method 'runScript' in the script with the arguments
 	    return (Map<String,? extends Object>)out;
 	}
