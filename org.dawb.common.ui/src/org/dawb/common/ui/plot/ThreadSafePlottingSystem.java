@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.dawb.common.ui.plot.annotation.IAnnotation;
 import org.dawb.common.ui.plot.axis.IAxis;
+import org.dawb.common.ui.plot.axis.IPositionListener;
 import org.dawb.common.ui.plot.region.IRegion;
 import org.dawb.common.ui.plot.region.IRegion.RegionType;
 import org.dawb.common.ui.plot.region.IRegionListener;
@@ -411,5 +412,15 @@ public class ThreadSafePlottingSystem implements IPlottingSystem {
 	@Override
 	public List<IAxis> getAxes() {
 		return (List<IAxis>)call(getMethodName(Thread.currentThread().getStackTrace()));	
+	}
+
+	@Override
+	public void addPositionListener(IPositionListener l) {
+		call(getMethodName(Thread.currentThread().getStackTrace()), new Class[]{IPositionListener.class}, l);
+	}
+
+	@Override
+	public void removePositionListener(IPositionListener l) {
+		call(getMethodName(Thread.currentThread().getStackTrace()), new Class[]{IPositionListener.class}, l);
 	}
 }

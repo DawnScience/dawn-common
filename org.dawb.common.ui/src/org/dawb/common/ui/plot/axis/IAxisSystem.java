@@ -2,6 +2,7 @@ package org.dawb.common.ui.plot.axis;
 
 import java.util.List;
 
+
 /**
  * No methods in this interface are thread safe.
  * 
@@ -69,4 +70,19 @@ public interface IAxisSystem {
 	 * data to be scaled properly. Not thread safe.
 	 */
 	public void autoscaleAxes();
+	
+	
+	/**
+	 * A listener to be notified of mouse position.
+	 * @param l
+	 */
+	public void addPositionListener(IPositionListener l);
+	
+	
+	/**
+	 * A listener to stop being notified of mouse position.
+	 * @param l
+	 */
+	public void removePositionListener(IPositionListener l);
+
 }
