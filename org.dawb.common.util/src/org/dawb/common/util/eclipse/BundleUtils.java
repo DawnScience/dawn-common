@@ -13,6 +13,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Platform;
@@ -74,5 +76,33 @@ public class BundleUtils {
 			path = hDirectory.getAbsolutePath();
 		}
         return path;
+	}
+	
+	private static Pattern FEATURE_MATCH = Pattern.compile("uk.ac.diamond.dawn.product.feature_(.+)");
+	/**
+	 * Looks at installed features, gets newest uk.ac.diamond.dawn.product.feature
+	 * and returns that version.
+	 * 
+	 * @return null if cannot find a dawn feature (might happen in debug mode)
+	 */
+	public static String getDawnVersion() {
+		
+		final File   dir = new File(getEclipseHome(), "features");
+		if (!dir.exists()) return null;
+		final File[] fa  = dir.listFiles();
+		
+		long date = -1;
+		String version = null;
+		for (File sd : fa) {
+			if (!sd.isDirectory()) continue;
+			Matcher matcher = FEATURE_MATCH.matcher(sd.getName());
+			if (matcher.matches()) {
+				if (date<sd.lastModified()) {
+					date    = sd.lastModified();
+					version = matcher.group(1); 
+				}
+			}
+		}
+		return version;
 	}
 }
