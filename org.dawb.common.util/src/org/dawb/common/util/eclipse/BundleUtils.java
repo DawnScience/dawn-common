@@ -78,7 +78,7 @@ public class BundleUtils {
         return path;
 	}
 	
-	private static Pattern FEATURE_MATCH = Pattern.compile("uk.ac.diamond.dawn.product.feature_(.+)");
+	private static Pattern FEATURE_MATCH = Pattern.compile("uk.ac.diamond.dawn.base.product.feature_(.+)");
 	/**
 	 * Looks at installed features, gets newest uk.ac.diamond.dawn.product.feature
 	 * and returns that version.
