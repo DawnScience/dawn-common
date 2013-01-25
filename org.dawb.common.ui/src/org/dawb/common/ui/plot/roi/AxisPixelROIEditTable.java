@@ -40,6 +40,7 @@ import uk.ac.gda.richbeans.components.wrappers.SpinnerWrapper;
  * Class to create a TableViewer that shows ROI information<br> 
  * both with real (axis) and pixel values.<br>
  * This table uses JFace data binding to update its content.
+ * TODO make it work with all ROIs (only working for RectangularROI currently)
  * @author wqk87977
  *
  */
