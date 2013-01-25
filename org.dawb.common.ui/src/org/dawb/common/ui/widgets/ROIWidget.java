@@ -91,40 +91,45 @@ public class ROIWidget implements IROIListener {
 
 	private UpdateJob updateSumMinMax;
 
+	private boolean sumMinMaxIsShown = true;
+
+	private boolean isProfile = false;
+
 	/**
-	 * Custom widget that creates a RegionTable and makes it an IROIListener
-	 * given a specific LightWeightPlottingSystem
+	 * Constructor
 	 * @param parent
-	 * @param viewName
+	 * @param viewName the name of the plottingSystem
 	 */
-	public ROIWidget(Composite parent, String viewName) {
+	public ROIWidget(Composite parent, AbstractPlottingSystem plottingSystem) {
 
 		this.parent = parent;
-		this.plottingSystem = (AbstractPlottingSystem)PlottingFactory.getPlottingSystem(viewName);
-		this.viewName = viewName;
+		this.plottingSystem = plottingSystem;
 
 		this.regionListener = getRegionListener(plottingSystem);
+		this.plottingSystem.addRegionListener(regionListener);
 
+		this.updateSumMinMax = new UpdateJob("Update Sum, Min and Max Values");
+
+		logger.debug("widget created");
+	}
+
+	/**
+	 * Creates the widget and its controls
+	 */
+	public void createWidget(){
 		regionComposite = new Composite(parent, SWT.BORDER);
 		GridData gridData = new GridData(SWT.FILL, SWT.LEFT, true, true);
 		regionComposite.setLayout(new GridLayout(1, false));
 		regionComposite.setLayoutData(gridData);
 
-		if(plottingSystem != null){
-			Collection<IRegion> regions = plottingSystem.getRegions();
-			if(regions.size()>0){
-				IRegion region = (IRegion)regions.toArray()[0];
-				createRegionComposite(regionComposite, region.getRegionType());
-				region.addROIListener(ROIWidget.this);
-			}else{
-				createRegionComposite(regionComposite, RegionType.COLORBOX);
-			}
-			this.plottingSystem.addRegionListener(regionListener);
+		Collection<IRegion> regions = plottingSystem.getRegions();
+		if(regions.size()>0){
+			IRegion region = (IRegion)regions.toArray()[0];
+			createRegionComposite(regionComposite, region.getRegionType());
+			region.addROIListener(ROIWidget.this);
+		}else{
+			createRegionComposite(regionComposite, RegionType.COLORBOX);
 		}
-
-		this.updateSumMinMax = new UpdateJob("Update Sum, Min and Max Values");
-
-		logger.debug("widget created");
 	}
 
 	private void createRegionComposite(Composite regionComposite, RegionType regionType){
@@ -148,36 +153,40 @@ public class ROIWidget implements IROIListener {
 		regionTableGroup.setLayoutData(gridData);
 		regionTableGroup.setText("Region Editing Table");
 		roiViewer = new AxisPixelROIEditTable(regionTableGroup, plottingSystem);
-
+		roiViewer.setIsProfileTable(isProfile);
+		roiViewer.createControl();
 		// sumMinMax group
-		Group sumMinMaxGroup = new Group (regionComposite, SWT.NONE);
-		sumMinMaxGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		sumMinMaxGroup.setLayout(new GridLayout(2, false));
-		sumMinMaxGroup.setText("Region Information");
-		
-		Label sumLabel = new Label(sumMinMaxGroup, SWT.NONE);
-		sumLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-		sumLabel.setText("Sum");
-		
-		sumText = new Text(sumMinMaxGroup, SWT.BORDER);
-		sumText.setEditable(false);
-		sumText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		
-		Label minLabel = new Label(sumMinMaxGroup, SWT.NONE);
-		minLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-		minLabel.setText("Min");
-		
-		minText = new Text(sumMinMaxGroup, SWT.BORDER);
-		minText.setEditable(false);
-		minText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		
-		Label maxLabel = new Label(sumMinMaxGroup, SWT.NONE);
-		maxLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-		maxLabel.setText("Max");
-		
-		maxText = new Text(sumMinMaxGroup, SWT.BORDER);
-		maxText.setEditable(false);
-		maxText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		if(sumMinMaxIsShown){
+			Group sumMinMaxGroup = new Group (regionComposite, SWT.NONE);
+			sumMinMaxGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+			sumMinMaxGroup.setLayout(new GridLayout(2, false));
+			sumMinMaxGroup.setText("Region Information");
+			
+			Label sumLabel = new Label(sumMinMaxGroup, SWT.NONE);
+			sumLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+			sumLabel.setText("Sum");
+			
+			sumText = new Text(sumMinMaxGroup, SWT.BORDER);
+			sumText.setEditable(false);
+			sumText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+			
+			Label minLabel = new Label(sumMinMaxGroup, SWT.NONE);
+			minLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+			minLabel.setText("Min");
+			
+			minText = new Text(sumMinMaxGroup, SWT.BORDER);
+			minText.setEditable(false);
+			minText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+			
+			Label maxLabel = new Label(sumMinMaxGroup, SWT.NONE);
+			maxLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+			maxLabel.setText("Max");
+			
+			maxText = new Text(sumMinMaxGroup, SWT.BORDER);
+			maxText.setEditable(false);
+			maxText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		}
+
 		// Should be last
 		nameText.setText(getDefaultName(regionType.getIndex()));
 	}
@@ -211,7 +220,8 @@ public class ROIWidget implements IROIListener {
 				if(roiViewer == null)
 					createRegionComposite(regionComposite, region.getRegionType());
 				roiViewer.setTableValues(region.getROI());
-				updateSumMinMax((RectangularROI)region.getROI());
+				if(sumMinMaxIsShown)
+					updateSumMinMax((RectangularROI)region.getROI());
 
 				nameText.setText(region.getName());
 				this.region = region;
@@ -243,11 +253,34 @@ public class ROIWidget implements IROIListener {
 	 */
 	public void setEditingRegion(IRegion region){
 		roiViewer.setTableValues(region.getROI());
-		updateSumMinMax((RectangularROI)region.getROI());
-
-		nameText.setText(region.getName());
+		if(sumMinMaxIsShown)
+			updateSumMinMax((RectangularROI)region.getROI());
+		if(nameText != null && !nameText.isDisposed())
+			nameText.setText(region.getName());
 	}
 
+	/**
+	 * Method to either show or hide the Sum, Min, and Max text fields<br>
+	 * TRUE by default.
+	 * @param b
+	 */
+	public void showSumMinMax(boolean b){
+		this.sumMinMaxIsShown  = b;
+	}
+
+	/**
+	 * Method to build a Table Viewer for a main plottingSystem or for a profile plotting System<br>
+	 * FALSE by default.
+	 * @param isProfile
+	 */
+	public void setIsProfile(boolean isProfile){
+		this.isProfile = isProfile;
+	}
+
+	/**
+	 * 
+	 * @return IRegion
+	 */
 	public IRegion getRegion(){
 		return region;
 	}
@@ -275,7 +308,8 @@ public class ROIWidget implements IROIListener {
 						if(plottingSystem.getRegions().size()>0){
 							IRegion lastRegion = (IRegion)plottingSystem.getRegions().toArray()[0];
 							roiViewer.setTableValues(lastRegion.getROI());
-							updateSumMinMax((RectangularROI)region.getROI());
+							if(sumMinMaxIsShown)
+								updateSumMinMax((RectangularROI)region.getROI());
 
 						}
 					
@@ -292,7 +326,8 @@ public class ROIWidget implements IROIListener {
 				IRegion region = evt.getRegion();
 				if (region!=null) {
 						roiViewer.setTableValues(region.getROI());
-						updateSumMinMax((RectangularROI)region.getROI());
+						if(sumMinMaxIsShown)
+							updateSumMinMax((RectangularROI)region.getROI());
 
 					parent.layout();
 					parent.redraw();
@@ -308,7 +343,8 @@ public class ROIWidget implements IROIListener {
 					if(roiViewer==null){
 						createRegionComposite(regionComposite, region.getRegionType());
 					roiViewer.setTableValues(region.getROI());
-					updateSumMinMax((RectangularROI)region.getROI());
+					if(sumMinMaxIsShown)
+						updateSumMinMax((RectangularROI)region.getROI());
 					}
 				}
 			}
@@ -380,18 +416,22 @@ public class ROIWidget implements IROIListener {
 	}
 
 	private void updateSumMinMax(RectangularROI rroi){
-		int xStartPt = (int) rroi.getPoint()[0];
-		int yStartPt = (int) rroi.getPoint()[1];
-		int xStopPt = (int) rroi.getEndPoint()[0];
-		int yStopPt = (int) rroi.getEndPoint()[1];
-		int xInc = rroi.getPoint()[0]<rroi.getEndPoint()[0] ? 1 : -1;
-		int yInc = rroi.getPoint()[1]<rroi.getEndPoint()[1] ? 1 : -1;
-		
-		updateSumMinMax.update(plottingSystem, xStartPt, xStopPt, yStartPt, yStopPt, xInc, yInc);
+		if(plottingSystem != null && sumText != null && !sumText.isDisposed()
+				&& minText != null && !minText.isDisposed()
+				&& maxText != null && !maxText.isDisposed()){
+			int xStartPt = (int) rroi.getPoint()[0];
+			int yStartPt = (int) rroi.getPoint()[1];
+			int xStopPt = (int) rroi.getEndPoint()[0];
+			int yStopPt = (int) rroi.getEndPoint()[1];
+			int xInc = rroi.getPoint()[0]<rroi.getEndPoint()[0] ? 1 : -1;
+			int yInc = rroi.getPoint()[1]<rroi.getEndPoint()[1] ? 1 : -1;
+			
+			updateSumMinMax.update(plottingSystem, xStartPt, xStopPt, yStartPt, yStopPt, xInc, yInc);
 
-		sumText.setText(sumStr);
-		minText.setText(minStr);
-		maxText.setText(maxStr);
+			sumText.setText(sumStr);
+			minText.setText(minStr);
+			maxText.setText(maxStr);
+		}
 	}
 
 	private int precision = 5;
@@ -439,39 +479,43 @@ public class ROIWidget implements IROIListener {
 		@Override
 		protected IStatus run(IProgressMonitor monitor) {
 			
-			Collection<ITrace> traces = plottingSystem.getTraces();
-			
-			Iterator<ITrace> it = traces.iterator();
-			if (monitor.isCanceled()) return Status.CANCEL_STATUS;
-			while (it.hasNext()) {
-				ITrace iTrace = (ITrace) it.next();
-				if(iTrace instanceof IImageTrace){
-					IImageTrace image = (IImageTrace)iTrace;
-					
-					AbstractDataset dataRegion = image.getData();
-					try {
-						dataRegion = dataRegion.getSlice(
-								new int[] { yStart, xStart },
-								new int[] { yStop, xStop },
-								new int[] {yInc, xInc});
+			if(plottingSystem != null){
+				Collection<ITrace> traces = plottingSystem.getTraces();
+				
+				Iterator<ITrace> it = traces.iterator();
+				if (monitor.isCanceled()) return Status.CANCEL_STATUS;
+				while (it.hasNext()) {
+					ITrace iTrace = (ITrace) it.next();
+					if(iTrace instanceof IImageTrace){
+						IImageTrace image = (IImageTrace)iTrace;
+						
+						AbstractDataset dataRegion = image.getData();
+						try {
+							dataRegion = dataRegion.getSlice(
+									new int[] { yStart, xStart },
+									new int[] { yStop, xStop },
+									new int[] {yInc, xInc});
+							if (monitor.isCanceled()) return Status.CANCEL_STATUS;
+						} catch (IllegalArgumentException e) {
+							logger.debug("Error getting region data:"+ e);
+						}
+						//round the Sum value(scientific notation)
+						String[] str = dataRegion.sum(true).toString().split("E");
+						String val1 = str[0];
+						String val2 = str[1];
+						val1 = val1.substring(0, precision+2);
+						sumStr = val1+"E"+val2;
 						if (monitor.isCanceled()) return Status.CANCEL_STATUS;
-					} catch (IllegalArgumentException e) {
-						logger.debug("Error getting region data:"+ e);
+						minStr = String.valueOf(roundDouble((Double)dataRegion.min(), precision));
+						maxStr = String.valueOf(roundDouble((Double)dataRegion.max(), precision));
+						
 					}
-					//round the Sum value(scientific notation)
-					String[] str = dataRegion.sum(true).toString().split("E");
-					String val1 = str[0];
-					String val2 = str[1];
-					val1 = val1.substring(0, precision+2);
-					sumStr = val1+"E"+val2;
-					if (monitor.isCanceled()) return Status.CANCEL_STATUS;
-					minStr = String.valueOf(roundDouble((Double)dataRegion.min(), precision));
-					maxStr = String.valueOf(roundDouble((Double)dataRegion.max(), precision));
-					
 				}
+				return Status.OK_STATUS;
+			}else{
+				return Status.CANCEL_STATUS;
 			}
 			
-			return Status.OK_STATUS;
 		}
 	}
 }
