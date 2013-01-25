@@ -59,7 +59,7 @@
         </property>
         <property name="Silent" class="ptolemy.data.expr.Parameter" value="false">
         </property>
-        <property name="_location" class="ptolemy.kernel.util.Location" value="{278.0, 277.0}">
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{238.0, 263.0}">
         </property>
     </entity>
     <entity name="Data Export" class="org.dawb.passerelle.actors.data.DataExportTransformer">
@@ -83,7 +83,7 @@
         </property>
         <property name="Dataset Name" class="ptolemy.data.expr.StringParameter" value="">
         </property>
-        <property name="_location" class="ptolemy.kernel.util.Location" value="{399.0, 277.0}">
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{466.0, 263.0}">
         </property>
     </entity>
     <entity name="Open File" class="org.dawb.passerelle.actors.file.OpenFileSink">
@@ -99,7 +99,7 @@
         </property>
         <property name="File Path" class="ptolemy.data.expr.StringParameter" value="${file_path}">
         </property>
-        <property name="_location" class="ptolemy.kernel.util.Location" value="{520.0, 280.0}">
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{604.0, 266.0}">
         </property>
     </entity>
     <entity name="Region" class="org.dawb.passerelle.actors.roi.ROISource">
@@ -114,11 +114,61 @@
         <property name="_location" class="ptolemy.kernel.util.Location" value="{50.0, 98.0}">
         </property>
     </entity>
-    <relation name="_R" class="ptolemy.actor.TypedIORelation">
-        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+    <entity name="Cut Region" class="org.dawb.passerelle.actors.dawn.RegionSelectActor">
+<display name="Cut Region"/>        <property name="Receiver Q Capacity (-1)" class="ptolemy.data.expr.Parameter" value="-1">
         </property>
-    </relation>
-    <relation name="_R_3" class="ptolemy.actor.TypedIORelation">
+        <property name="Receiver Q warning size (-1)" class="ptolemy.data.expr.Parameter" value="-1">
+        </property>
+        <property name="_icon" class="com.isencia.passerelle.actor.gui.EditorIcon">
+        </property>
+        <property name="Expression Mode" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="Evaluate on every data input">
+        </property>
+        <property name="Memory Mode" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="Create copy of data leaving original data intact.">
+        </property>
+        <property name="Name Mode" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="Attempt to use image name if there is one.">
+        </property>
+        <property name="_break_point" class="ptolemy.data.expr.Parameter" value="false">
+        </property>
+        <property name="selectionROI" class="org.dawb.passerelle.common.parameter.roi.ROIParameter" value="">
+        </property>
+        <property name="roiName" class="ptolemy.data.expr.StringParameter" value="roi">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{354.0, 263.0}">
+        </property>
+        <port name="requestFinish" class="com.isencia.passerelle.core.ControlPort">
+            <property name="input"/>
+            <property name="multiport"/>
+            <property name="control" class="ptolemy.kernel.util.StringAttribute">
+            </property>
+        </port>
+        <port name="error" class="com.isencia.passerelle.core.ErrorPort">
+            <property name="output"/>
+            <property name="multiport"/>
+            <property name="error" class="ptolemy.kernel.util.StringAttribute">
+            </property>
+        </port>
+        <port name="hasFired" class="com.isencia.passerelle.core.ControlPort">
+            <property name="output"/>
+            <property name="multiport"/>
+            <property name="control" class="ptolemy.kernel.util.StringAttribute">
+            </property>
+        </port>
+        <port name="hasFinished" class="com.isencia.passerelle.core.ControlPort">
+            <property name="output"/>
+            <property name="multiport"/>
+            <property name="control" class="ptolemy.kernel.util.StringAttribute">
+            </property>
+        </port>
+        <port name="input" class="com.isencia.passerelle.core.Port">
+            <property name="input"/>
+            <property name="multiport"/>
+        </port>
+        <port name="output" class="com.isencia.passerelle.core.Port">
+            <property name="output"/>
+            <property name="multiport"/>
+        </port>
+    </entity>
+    <relation name="_R" class="ptolemy.actor.TypedIORelation">
         <property name="width" class="ptolemy.data.expr.Parameter" value="1">
         </property>
     </relation>
@@ -130,12 +180,22 @@
         <property name="width" class="ptolemy.data.expr.Parameter" value="1">
         </property>
     </relation>
+    <relation name="_R_3" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <relation name="_R_5" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
     <link port="ref-screentest-crystal1_1_001.output" relation="_R"/>
     <link port="ref-screentest-crystal1_1_001.trigger" relation="_R_2"/>
     <link port="Plot Review.input" relation="_R"/>
     <link port="Plot Review.output" relation="_R_3"/>
-    <link port="Data Export.input" relation="_R_3"/>
+    <link port="Data Export.input" relation="_R_5"/>
     <link port="Data Export.output" relation="_R_4"/>
     <link port="Open File.input" relation="_R_4"/>
     <link port="Region.output" relation="_R_2"/>
+    <link port="Cut Region.input" relation="_R_3"/>
+    <link port="Cut Region.output" relation="_R_5"/>
 </entity>
