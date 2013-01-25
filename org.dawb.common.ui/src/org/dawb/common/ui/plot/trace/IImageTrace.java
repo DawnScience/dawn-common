@@ -43,7 +43,7 @@ import uk.ac.diamond.scisoft.analysis.roi.ROIBase;
 ----------------++------------**--------+----------**----+---------------**+---------------++
               
  */
-public interface IImageTrace extends IPaletteTrace {
+public interface IImageTrace extends IPaletteTrace, IDownsampledTrace{
 
 		
 	public enum DownsampleType {
