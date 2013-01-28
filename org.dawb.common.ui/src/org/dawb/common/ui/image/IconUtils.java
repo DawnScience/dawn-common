@@ -1,6 +1,7 @@
 package org.dawb.common.ui.image;
 
 import org.eclipse.draw2d.ColorConstants;
+import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.PointList;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
@@ -84,8 +85,19 @@ public class IconUtils {
 		gc.fillRectangle(new Rectangle(0,0,pensize+4,pensize+4));
 
 		gc.setAlpha(255);
+		
+		// Draw a cross for the center.
+		final PointList x = new PointList(pensize+4);
+		final PointList y = new PointList(pensize+4);
+		for (int i = 0; i < pensize+4; i++) {
+			x.addPoint(new Point(i, (int)((pensize+4)/2)));
+			y.addPoint(new Point((int)((pensize+4)/2), i));
+		}
+		drawPointList(x, gc, false);
+		drawPointList(y, gc, true);
+		
+        // Draw the shape.
 		gc.setForeground(ColorConstants.black);
-
 		switch (shape) {
 		case SQUARE:
 			gc.drawRectangle(2,2,pensize,pensize);
@@ -112,6 +124,16 @@ public class IconUtils {
 			}
 		};
 
+	}
+
+
+	private static void drawPointList(PointList pl, GC gc, boolean isY) {
+		int xOff = isY?0:1;
+		int yOff = isY?1:0;
+		for (int i = 0; i < pl.size(); i++) {
+			gc.setForeground((i%2==0) ? ColorConstants.black : ColorConstants.white); 
+			gc.drawLine(pl.getPoint(i).x, pl.getPoint(i).y, pl.getPoint(i).x+xOff, pl.getPoint(i).y+yOff);
+		}		
 	}
 
 
