@@ -35,14 +35,17 @@ import org.dawb.common.ui.plot.trace.ITraceListener;
 import org.dawb.common.ui.plot.trace.TraceEvent;
 import org.dawb.common.ui.plot.trace.TraceWillPlotEvent;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IWorkbenchPart;
@@ -792,4 +795,15 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	public void setToolComposite(Composite toolComposite) {
 		this.actionBarManager.setToolComposite(toolComposite);
 	}
+	
+	
+	/**
+	 * Set the cursor using a custom icon on the plot.
+	 * This may get cancelled if other tools are used!
+	 */
+	public void setSelectedCursor(ImageDescriptor des) {
+			    
+	    // TODO SWT specific cursor set.
+	}
+
 }

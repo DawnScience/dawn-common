@@ -312,4 +312,5 @@ public interface IPlottingSystem extends ITraceSystem, IRegionSystem, IAxisSyste
 	 * NORMAL is the arrow, CROSS is a cross
 	 */
 	public void setDefaultCursor(int cursorType);
+	
 }
