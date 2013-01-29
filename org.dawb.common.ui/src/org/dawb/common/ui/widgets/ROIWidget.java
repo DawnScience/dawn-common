@@ -1,19 +1,3 @@
-/*-
- * Copyright 2012 Diamond Light Source Ltd.
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *   http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.dawb.common.ui.widgets;
 
 import java.util.Collection;
@@ -220,7 +204,7 @@ public class ROIWidget implements IROIListener {
 				if(roiViewer == null)
 					createRegionComposite(regionComposite, region.getRegionType());
 				roiViewer.setTableValues(region.getROI());
-				if(sumMinMaxIsShown)
+				if(sumMinMaxIsShown && region.getROI() instanceof RectangularROI)
 					updateSumMinMax((RectangularROI)region.getROI());
 
 				nameText.setText(region.getName());
@@ -253,7 +237,7 @@ public class ROIWidget implements IROIListener {
 	 */
 	public void setEditingRegion(IRegion region){
 		roiViewer.setTableValues(region.getROI());
-		if(sumMinMaxIsShown)
+		if(sumMinMaxIsShown && region.getROI() instanceof RectangularROI)
 			updateSumMinMax((RectangularROI)region.getROI());
 		if(nameText != null && !nameText.isDisposed())
 			nameText.setText(region.getName());
@@ -308,7 +292,7 @@ public class ROIWidget implements IROIListener {
 						if(plottingSystem.getRegions().size()>0){
 							IRegion lastRegion = (IRegion)plottingSystem.getRegions().toArray()[0];
 							roiViewer.setTableValues(lastRegion.getROI());
-							if(sumMinMaxIsShown)
+							if(sumMinMaxIsShown && region.getROI() instanceof RectangularROI)
 								updateSumMinMax((RectangularROI)region.getROI());
 
 						}
@@ -326,7 +310,7 @@ public class ROIWidget implements IROIListener {
 				IRegion region = evt.getRegion();
 				if (region!=null) {
 						roiViewer.setTableValues(region.getROI());
-						if(sumMinMaxIsShown)
+						if(sumMinMaxIsShown && region.getROI() instanceof RectangularROI)
 							updateSumMinMax((RectangularROI)region.getROI());
 
 					parent.layout();
@@ -343,7 +327,7 @@ public class ROIWidget implements IROIListener {
 					if(roiViewer==null){
 						createRegionComposite(regionComposite, region.getRegionType());
 					roiViewer.setTableValues(region.getROI());
-					if(sumMinMaxIsShown)
+					if(sumMinMaxIsShown && region.getROI() instanceof RectangularROI)
 						updateSumMinMax((RectangularROI)region.getROI());
 					}
 				}
@@ -502,13 +486,25 @@ public class ROIWidget implements IROIListener {
 						//round the Sum value(scientific notation)
 						String[] str = dataRegion.sum(true).toString().split("E");
 						String val1 = str[0];
-						String val2 = str[1];
-						val1 = val1.substring(0, precision+2);
-						sumStr = val1+"E"+val2;
+						if(str.length>1){
+							String val2 = str[1];
+							val1 = val1.substring(0, precision+2);
+							sumStr = val1+"E"+val2;
+						} else {
+							sumStr = dataRegion.sum(true).toString();
+						}
+
 						if (monitor.isCanceled()) return Status.CANCEL_STATUS;
-						minStr = String.valueOf(roundDouble((Double)dataRegion.min(), precision));
-						maxStr = String.valueOf(roundDouble((Double)dataRegion.max(), precision));
-						
+						if (dataRegion.min() instanceof Double){
+							minStr = String.valueOf(roundDouble((Double)dataRegion.min(), precision));
+						} else if(dataRegion.min() instanceof Integer){
+							minStr = String.valueOf(dataRegion.min());
+						}
+						if(dataRegion.max() instanceof Double){
+							maxStr = String.valueOf(roundDouble((Double)dataRegion.max(), precision));
+						} else if(dataRegion.max() instanceof Integer){
+							maxStr = String.valueOf(dataRegion.max());
+						}
 					}
 				}
 				return Status.OK_STATUS;
