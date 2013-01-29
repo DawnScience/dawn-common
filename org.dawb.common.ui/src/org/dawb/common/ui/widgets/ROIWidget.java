@@ -282,7 +282,7 @@ public class ROIWidget implements IROIListener {
 	}
 
 	private IRegionListener getRegionListener(final AbstractPlottingSystem plottingSystem){
-		return new IRegionListener() {
+		return new IRegionListener.Stub() {
 			@Override
 			public void regionRemoved(RegionEvent evt) {
 				System.out.println("arpes_region removed");

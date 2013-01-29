@@ -10,6 +10,10 @@ public interface IRegionListener extends EventListener {
 		public void regionCreated(RegionEvent evt) {
 			update(evt);
 		}
+		@Override
+		public void regionCancelled(RegionEvent evt) {
+
+		}
 
 		@Override
 		public void regionAdded(RegionEvent evt) {
@@ -37,6 +41,12 @@ public interface IRegionListener extends EventListener {
 	 */
 	void regionCreated(final RegionEvent evt);
 	
+	/**
+	 * Called when a region add that was happening (with a cursor change)
+	 * has been called (because there was a zoom for instance).
+	 * @param evt
+	 */
+	void regionCancelled(final RegionEvent evt);
 	
 	/**
 	 * Called when region added to graph.
