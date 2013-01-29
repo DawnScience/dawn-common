@@ -798,6 +798,19 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	}
 	
 	/**
+	 * Can be overridden to detect any custom cursor 
+	 * set on the plot. This cursor can also be lost 
+	 * if a zoom is done.
+	 * 
+	 * @return
+	 */
+	@Deprecated
+	public Cursor getSelectedCursor() {
+		
+		return null;
+	}
+	
+	/**
 	 * Set the cursor using a custom icon on the plot.
 	 * This may get cancelled if other tools are used!
 	 * 
