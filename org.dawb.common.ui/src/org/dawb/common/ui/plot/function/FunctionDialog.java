@@ -1,12 +1,16 @@
-package org.dawb.common.ui.widgets;
+/*
+ * Copyright (c) 2012 European Synchrotron Radiation Facility,
+ *                    Diamond Light Source Ltd.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ */ 
 
-import java.util.Vector;
+package org.dawb.common.ui.plot.function;
 
-import org.dawb.common.ui.plot.function.FunctionEditTable;
-import org.dawb.common.ui.plot.function.FunctionModifiedEvent;
-import org.dawb.common.ui.plot.function.FunctionType;
-import org.dawb.common.ui.plot.function.IFunctionModifiedListener;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -14,7 +18,9 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,40 +29,43 @@ import uk.ac.diamond.scisoft.analysis.fitting.functions.AFunction;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.Polynomial;
 
 /**
- * A custom Widget for editing a Mathematical Function. Uses <b>FunctionEditTable</b> widget.
- * Linked to a model file using an IWorkflowUpdater object
+ * A dialog for editing a Mathematical Function. Uses FunctionViewer table.
+ *
  */
-public class FunctionWidget {
+public class FunctionDialog extends Dialog {
 
-	private static final Logger logger = LoggerFactory.getLogger(FunctionWidget.class);
+	private static final Logger logger = LoggerFactory.getLogger(FunctionDialog.class);
 	
 	private FunctionEditTable functionEditor;
 	private CCombo functionType;
 	private Spinner polynomialDegree;
 	private Label labelDegree;
-
-	private Vector<IFunctionModifiedListener> functionModifiedListeners = new Vector<IFunctionModifiedListener>();
-
-	private IFunctionModifiedListener functionListener;
-
-	/**
-	 * Widget constructor
-	 * @param parent
-	 */
-	public FunctionWidget(Composite parent) {
-
-		final Composite top= new Composite(parent, SWT.LEFT);
-		top.setLayoutData(new GridData(SWT.LEFT, SWT.FILL, false, false));
+	
+	public FunctionDialog(Shell parentShell) {	
+		super(parentShell);
+	}
+	
+	protected boolean isResizable() {
+		return true;
+	}
+	
+	public Control createDialogArea(Composite parent) {
+		
+		final Composite main = (Composite)super.createDialogArea(parent);
+		main.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		
+		final Composite top= new Composite(main, SWT.NONE);
+		top.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 		top.setLayout(new GridLayout(2, false));
 		
 		final Label label = new Label(top, SWT.NONE);
 		label.setText("Function type    ");
+		label.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));	
 		
 		functionType = new CCombo(top, SWT.READ_ONLY|SWT.BORDER);
 		functionType.setItems(FunctionType.getTypes());
-		functionType.setLayoutData(new GridData(SWT.LEFT, SWT.FILL, false, false));
+		functionType.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 		functionType.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				try {
 					AFunction myFunction = FunctionType.createNew(functionType.getSelectionIndex());
@@ -68,7 +77,6 @@ public class FunctionWidget {
 						labelDegree.setVisible(false);
 						polynomialDegree.setVisible(false);
 					}
-					FunctionWidget.this.functionModified();
 				} catch (Exception e1) {
 					logger.error("Cannot create function "+FunctionType.getType(functionType.getSelectionIndex()).getName(), e1);
 				}
@@ -86,14 +94,12 @@ public class FunctionWidget {
 		polynomialDegree.setMaximum(100);
 		polynomialDegree.setVisible(false);
 		polynomialDegree.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				try {
 					AFunction myFunction = FunctionType.createNew(FunctionType.POLYNOMIAL);
 					Polynomial polynom = (Polynomial)myFunction;
 					polynom.setDegree(polynomialDegree.getSelection()-1);
 					functionEditor.setFunction(myFunction, null);
-					FunctionWidget.this.functionModified();
 				} catch (Exception e1) {
 					logger.error("Cannot create function "+FunctionType.POLYNOMIAL, e1);
 				}
@@ -101,20 +107,11 @@ public class FunctionWidget {
 		});
 		
 		this.functionEditor = new FunctionEditTable();
-		functionEditor.createPartControl(parent);
-	
-		if(functionListener != null)
-			functionModifiedListeners.addElement(functionListener);
+		functionEditor.createPartControl(main);
+		
+		return main;
 	}
 	
-	protected boolean isResizable() {
-		return true;
-	}
-
-	public void setFunctionTypeEnabled(boolean isEnabled){
-		functionType.setEnabled(isEnabled);
-	}
-
 	public void setFunction(AFunction function) {
 		final int index = FunctionType.getIndex(function.getClass());
 		functionType.select(index);
@@ -124,41 +121,4 @@ public class FunctionWidget {
 	public AFunction getFunction() {
 		return functionEditor.getFunction();
 	}
-
-	protected void functionModified() {
-		FunctionModifiedEvent e = new FunctionModifiedEvent(this);
-		int size = functionModifiedListeners.size();
-		for (int i = 0; i < size; i++) {
-			IFunctionModifiedListener listener = functionModifiedListeners.elementAt(i);
-			listener.functionModified(e);
-		}
-	}
-
-	public void setFunctionModifiedListener(IFunctionModifiedListener functionListener){
-		this.functionListener = functionListener;
-		functionModifiedListeners.addElement(functionListener);
-	}
-
-	public void dispose(){
-		functionModifiedListeners.removeElement(functionListener);
-	}
-
-	/**
-	 * Updates the Function widget content
-	 * @param function AFunction
-	 */
-	public void update(AFunction function){
-		setFunction(function);
-		functionModified();
-	}
-
-	public void addSelectionChangedListener(ISelectionChangedListener listener) {
-		functionEditor.addSelectionChangedListener(listener);
-		functionModified();
-	}
-	
-	public void removeSelectionChangedListener(ISelectionChangedListener listener) {
-		functionEditor.removeSelectionChangedListener(listener);
-	}
-	
 }

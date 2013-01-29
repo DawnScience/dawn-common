@@ -41,7 +41,6 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelectionProvider;
-import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.Image;
@@ -798,7 +797,6 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 		this.actionBarManager.setToolComposite(toolComposite);
 	}
 	
-	
 	/**
 	 * Set the cursor using a custom icon on the plot.
 	 * This may get cancelled if other tools are used!
@@ -845,4 +843,11 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 		
 	}
 
+	/**
+	 * Set the plotting System aspect ratio on/off
+	 * @param checked
+	 */
+	public void setKeepAspect(boolean checked){
+		
+	}
 }
