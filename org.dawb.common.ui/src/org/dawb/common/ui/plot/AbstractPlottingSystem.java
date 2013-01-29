@@ -35,6 +35,8 @@ import org.dawb.common.ui.plot.trace.ITraceListener;
 import org.dawb.common.ui.plot.trace.TraceEvent;
 import org.dawb.common.ui.plot.trace.TraceWillPlotEvent;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.draw2d.MouseListener;
+import org.eclipse.draw2d.MouseMotionListener;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -800,10 +802,47 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	/**
 	 * Set the cursor using a custom icon on the plot.
 	 * This may get cancelled if other tools are used!
+	 * 
+	 * @deprecated SWT Specific. Can still be used for code that does not mind SWT link.
 	 */
+	@Deprecated
 	public void setSelectedCursor(ImageDescriptor des) {
 			    
-	    // TODO SWT specific cursor set.
+	}
+
+	/**
+	 * Please override for draw2d listeners.
+	 * @deprecated draw2d Specific. Can still be used for code that does not mind draw2d link.
+	 */
+	@Deprecated
+	public void addMouseMotionListener(MouseMotionListener mml) {
+		
+	}
+	
+	/**
+	 * Please override for draw2d listeners.
+	 * @deprecated draw2d Specific. Can still be used for code that does not mind draw2d link.
+	 */
+	@Deprecated
+	public void addMouseClickListener(MouseListener mcl) {
+		
+	}
+	/**
+	 * Please override for draw2d listeners.
+	 * @deprecated draw2d Specific. Can still be used for code that does not mind draw2d link.
+	 */
+	@Deprecated
+	public void removeMouseMotionListener(MouseMotionListener mml) {
+		
+	}
+	
+	/**
+	 * Please override for draw2d listeners.
+	 * @deprecated draw2d Specific. Can still be used for code that does not mind draw2d link.
+	 */
+	@Deprecated
+	public void removeMouseClickListener(MouseListener mcl) {
+		
 	}
 
 }

@@ -18,9 +18,6 @@ import org.eclipse.swt.widgets.Display;
 
 public class IconUtils {
 	
-	public enum ShapeType {
-		SQUARE, TRIANGLE, CIRCLE;
-	}
 
 	public static ImageDescriptor createIconDescriptor(String iconText) {
 
@@ -76,6 +73,8 @@ public class IconUtils {
 	 * @return
 	 */
 	public static ImageDescriptor getPenCursorIcon(int pensize, ShapeType shape) {
+		
+		if (shape==ShapeType.NONE) return null;
 
 		final Image image = new Image(Display.getCurrent(), new Rectangle(0, 0, pensize+4, pensize+4));
 		final GC    gc    = new GC(image);
@@ -146,6 +145,8 @@ public class IconUtils {
 	 */
 	public static ImageDescriptor getBrushIcon(int size, ShapeType shape, RGB maskRGB) {
 		
+		if (shape==ShapeType.NONE) return null;
+
 		final ImageData data  = new ImageData(16, 16, 16, new PaletteData(0xFF, 0xFF00, 0xFF0000));
         final Image     image = new Image(Display.getCurrent(), data);
         
