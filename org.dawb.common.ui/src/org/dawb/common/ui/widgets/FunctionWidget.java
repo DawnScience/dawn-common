@@ -35,13 +35,7 @@ public class FunctionWidget {
 	private Spinner polynomialDegree;
 	private Label labelDegree;
 
-//	private FunctionUpdateJob updateFunctionJob;
-
 	private Vector<IFunctionModifiedListener> functionModifiedListeners = new Vector<IFunctionModifiedListener>();
-
-//	private IWorkflowUpdater updater;
-
-	//private String functionID;
 
 	private IFunctionModifiedListener functionListener;
 
@@ -50,9 +44,6 @@ public class FunctionWidget {
 	 * @param parent
 	 */
 	public FunctionWidget(Composite parent) {
-
-	//	this.functionID = functionID;
-//		this.updateFunctionJob = new FunctionUpdateJob("ARPES Worflow Updating Function");
 
 		final Composite top= new Composite(parent, SWT.LEFT);
 		top.setLayoutData(new GridData(SWT.LEFT, SWT.FILL, false, false));
@@ -111,12 +102,6 @@ public class FunctionWidget {
 		
 		this.functionEditor = new FunctionEditTable();
 		functionEditor.createPartControl(parent);
-//		functionEditor.addSelectionChangedListener(new ISelectionChangedListener() {
-//			@Override
-//			public void selectionChanged(SelectionChangedEvent event) {
-//				FunctionWidget.this.functionModified();
-//			}
-//		});
 	
 		if(functionListener != null)
 			functionModifiedListeners.addElement(functionListener);
@@ -154,39 +139,15 @@ public class FunctionWidget {
 		functionModifiedListeners.addElement(functionListener);
 	}
 
-//	private IFunctionModifiedListener functionListener = new IFunctionModifiedListener() {
-//		@Override
-//		public void functionModified(FunctionModifiedEvent event) {
-//			updateFunctionJob.setUpdater(updater);
-//			updateFunctionJob.setActorID(functionID);
-//			updateFunctionJob.setFunction(getFunction());
-//			updateFunctionJob.schedule();
-//		}
-//	};
-//	public void addFunctionModifiedListener(IFunctionModifiedListener functionListener){
-//		this.functionListener = functionListener;
-//		functionModifiedListeners.addElement(functionListener);
-//	}
-//
 	public void dispose(){
 		functionModifiedListeners.removeElement(functionListener);
 	}
-
-//	/**
-//	 * Set updater if a new file is loaded
-//	 * @param updater
-//	 */
-//	public void setUpdater(IWorkflowUpdater updater){
-//		this.updater = updater;
-//	}
 
 	/**
 	 * Updates the Function widget content
 	 * @param function AFunction
 	 */
 	public void update(AFunction function){
-		//AFunction myFunction = updater.getFunctionFromActor(functionID);
-//		if (myFunction != null)
 		setFunction(function);
 		functionModified();
 	}
