@@ -480,11 +480,16 @@ public class AxisPixelROIEditTable {
 		private AxisPixelRowDataModel xPixelRow;
 		private AxisPixelRowDataModel yPixelRow;
 
+		final private String description0 = "X-Axis values (Not yet editable)";
+		final private String description1 = "Y-Axis values (Not yet editable)"; 
+		final private String description2 = "X values as pixels (Editable)"; 
+		final private String description3 = "X values as pixels (Editable)"; 
+
 		{
-			xAxisRow = new AxisPixelRowDataModel(new String("X Axis"), new Double(0), new Double(0), new Double(0));
-			yAxisRow = new AxisPixelRowDataModel(new String("Y Axis"), new Double(0), new Double(0), new Double(0)); 
-			xPixelRow = new AxisPixelRowDataModel(new String("X Pixel"), new Double(0), new Double(0), new Double(0)); 
-			yPixelRow = new AxisPixelRowDataModel(new String("Y Pixel"), new Double(0), new Double(0), new Double(0)); 
+			xAxisRow = new AxisPixelRowDataModel(new String("X Axis"), new Double(0), new Double(0), new Double(0), description0);
+			yAxisRow = new AxisPixelRowDataModel(new String("Y Axis"), new Double(0), new Double(0), new Double(0), description1); 
+			xPixelRow = new AxisPixelRowDataModel(new String("X Pixel"), new Double(0), new Double(0), new Double(0), description2); 
+			yPixelRow = new AxisPixelRowDataModel(new String("Y Pixel"), new Double(0), new Double(0), new Double(0), description3); 
 
 			rows.add(xAxisRow);
 			rows.add(yAxisRow);
@@ -505,11 +510,12 @@ public class AxisPixelROIEditTable {
 
 		private IObservableList rows = new WritableList();
 
+		final private String description = "X-Axis values"; 
 		private AxisPixelRowDataModel xAxisRow;
 //		private AxisPixelRowDataModel xPixelRow;
 
 		{
-			xAxisRow = new AxisPixelRowDataModel(new String("X Axis"), new Double(0), new Double(0), new Double(0));
+			xAxisRow = new AxisPixelRowDataModel(new String("X Axis"), new Double(0), new Double(0), new Double(0), description);
 //			xPixelRow = new AxisPixelRowDataModel(new String("X Pixel"), new Double(0), new Double(0), new Double(0)); 
 
 			rows.add(xAxisRow);
@@ -531,12 +537,14 @@ public class AxisPixelROIEditTable {
 		private double start;
 		private double end;
 		private double diff;
+		private String description;
 
-		public AxisPixelRowDataModel(String name, double start, double end, double diff) {
+		public AxisPixelRowDataModel(String name, double start, double end, double diff, String description) {
 			this.name = name;
 			this.start = start;
 			this.end = end;
 			this.diff = diff;
+			this.description = description;
 		}
 
 		public String getName() {
@@ -553,6 +561,18 @@ public class AxisPixelROIEditTable {
 
 		public double getDiff() {
 			return diff;
+		}
+
+		@SuppressWarnings("unused")
+		/**
+		 * TODO add a description in a tool tip<br>
+		 * but this can only be done by providing our own LabelProvider<br>
+		 * which is currently done by the ViewerSupport.bind mechanism.<br>
+		 * 
+		 * @return string
+		 */
+		public String getDescription(){
+			return description;
 		}
 
 		public void setName(String name){
