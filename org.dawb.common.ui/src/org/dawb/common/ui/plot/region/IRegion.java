@@ -1,6 +1,7 @@
 package org.dawb.common.ui.plot.region;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 
@@ -184,10 +185,11 @@ public interface IRegion {
 		private Color defaultColor;
 		private Class<? extends ROIBase> roiClass;
 		
-		public static List<RegionType> ALL_TYPES = new ArrayList<RegionType>(12);
+		public static final List<RegionType> ALL_TYPES;
 		static {
-			for (RegionType t : EnumSet.allOf(RegionType.class))
-				ALL_TYPES.add(t);
+			List<RegionType> tmp = new ArrayList<RegionType>(12);
+			for (RegionType t : EnumSet.allOf(RegionType.class)) tmp.add(t);
+			ALL_TYPES = Collections.unmodifiableList(tmp);
 		}
 
 		RegionType(String name, Color defaultColor, Class<? extends ROIBase> roiClass) {
