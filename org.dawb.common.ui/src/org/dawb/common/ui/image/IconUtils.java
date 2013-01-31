@@ -22,7 +22,7 @@ public class IconUtils {
 
 	public static ImageDescriptor createIconDescriptor(String iconText) {
 
-		final ImageData data  = new ImageData(16, 16, 16, new PaletteData(0xFF, 0xFF00, 0xFF0000));
+		final ImageData data  = new ImageData(16, 16, 16, new PaletteData(0x7C00, 0x3E0, 0x1F));
         final Image     image = new Image(Display.getCurrent(), data);
         
         final GC gc = new GC(image);
@@ -46,7 +46,7 @@ public class IconUtils {
 
 	public static ImageDescriptor createPenDescriptor(int penSize) {
 
-		final ImageData data  = new ImageData(16, 16, 16, new PaletteData(0xFF, 0xFF00, 0xFF0000));
+		final ImageData data  = new ImageData(16, 16, 16, new PaletteData(0x7C00, 0x3E0, 0x1F));
         final Image     image = new Image(Display.getCurrent(), data);
         
         final GC gc = new GC(image);
@@ -79,7 +79,6 @@ public class IconUtils {
 
 		final Image image  = new Image(Display.getCurrent(), new Rectangle(0, 0, pensize+4, pensize+4));
 		final GC    gc     = new GC(image, SWT.NONE);
-
 
 		gc.setBackground(Display.getDefault().getActiveShell().getBackground());
 		gc.setAlpha(0);
@@ -145,7 +144,7 @@ public class IconUtils {
 		
 		if (shape==ShapeType.NONE) return null;
 
-		final ImageData data  = new ImageData(16, 16, 16, new PaletteData(0xFF, 0xFF00, 0xFF0000));
+		final ImageData data  = new ImageData(16, 16, 16, new PaletteData(0x7C00, 0x3E0, 0x1F));
         final Image     image = new Image(Display.getCurrent(), data);
         
         final GC gc = new GC(image);
