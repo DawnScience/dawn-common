@@ -9,6 +9,7 @@ import org.eclipse.draw2d.geometry.PointList;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.GC;
@@ -75,7 +76,7 @@ public class IconUtils {
 	 * @param square
 	 * @return
 	 */
-	public static ImageData getPenCursorIcon(int pensize, ShapeType shape) {
+	public static Cursor getPenCursor(int pensize, ShapeType shape) {
 		
 		if (shape==ShapeType.NONE) return null;
 
@@ -123,11 +124,8 @@ public class IconUtils {
 		}
 		
 		gc.popState();
-
-		final ImageData imageData = image.getImageData();
-		gc.dispose();
-
-		return imageData;
+		
+		return new Cursor(Display.getDefault(), image.getImageData(), (pensize+4)/2, (pensize+4)/2);
 
 	}
 
