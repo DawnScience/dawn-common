@@ -1,6 +1,9 @@
 package org.dawb.common.ui.image;
 
 import org.eclipse.draw2d.ColorConstants;
+import org.eclipse.draw2d.Graphics;
+import org.eclipse.draw2d.SWTGraphics;
+import org.eclipse.draw2d.ScaledGraphics;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.PointList;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -21,7 +24,7 @@ public class IconUtils {
 
 	public static ImageDescriptor createIconDescriptor(String iconText) {
 
-		final ImageData data  = new ImageData(16, 16, 8, new PaletteData(0xFF, 0xFF00, 0xFF0000));
+		final ImageData data  = new ImageData(16, 16, 16, new PaletteData(0xFF, 0xFF00, 0xFF0000));
         final Image     image = new Image(Display.getCurrent(), data);
         
         final GC gc = new GC(image);
@@ -45,7 +48,7 @@ public class IconUtils {
 
 	public static ImageDescriptor createPenDescriptor(int penSize) {
 
-		final ImageData data  = new ImageData(16, 16, 8, new PaletteData(0xFF, 0xFF00, 0xFF0000));
+		final ImageData data  = new ImageData(16, 16, 16, new PaletteData(0xFF, 0xFF00, 0xFF0000));
         final Image     image = new Image(Display.getCurrent(), data);
         
         final GC gc = new GC(image);
@@ -72,16 +75,20 @@ public class IconUtils {
 	 * @param square
 	 * @return
 	 */
-	public static ImageDescriptor getPenCursorIcon(int pensize, ShapeType shape) {
+	public static ImageData getPenCursorIcon(int pensize, ShapeType shape) {
 		
 		if (shape==ShapeType.NONE) return null;
 
-		final Image image = new Image(Display.getCurrent(), new Rectangle(0, 0, pensize+4, pensize+4));
-		final GC    gc    = new GC(image);
+		final Image image  = new Image(Display.getCurrent(), new Rectangle(0, 0, pensize+4, pensize+4));
+		final GC    swtGC  = new GC(image, SWT.NONE);
+		final Graphics	gc = new ScaledGraphics(new SWTGraphics(swtGC));
 
-		gc.setBackground(Display.getDefault().getActiveShell().getBackground());
+		gc.pushState();
+		gc.setClip(new org.eclipse.draw2d.geometry.Rectangle(0, 0, pensize+4, pensize+4));
+
+		gc.setBackgroundColor(Display.getDefault().getActiveShell().getBackground());
 		gc.setAlpha(0);
-		gc.fillRectangle(new Rectangle(0,0,pensize+4,pensize+4));
+		gc.fillRectangle(new org.eclipse.draw2d.geometry.Rectangle(0,0,pensize+4,pensize+4));
 
 		gc.setAlpha(255);
 		
@@ -96,7 +103,7 @@ public class IconUtils {
 		drawPointList(y, gc, true);
 		
         // Draw the shape.
-		gc.setForeground(ColorConstants.black);
+		gc.setForegroundColor(ColorConstants.black);
 		switch (shape) {
 		case SQUARE:
 			gc.drawRectangle(2,2,pensize,pensize);
@@ -111,26 +118,25 @@ public class IconUtils {
 		case CIRCLE:
 			gc.drawOval(2,2,pensize,pensize);
 			break;
+		default:
+			break;
 		}
+		
+		gc.popState();
 
-
+		final ImageData imageData = image.getImageData();
 		gc.dispose();
 
-		return new ImageDescriptor() {			
-			@Override
-			public ImageData getImageData() {
-				return image.getImageData();
-			}
-		};
+		return imageData;
 
 	}
 
 
-	private static void drawPointList(PointList pl, GC gc, boolean isY) {
+	private static void drawPointList(PointList pl, Graphics gc, boolean isY) {
 		int xOff = isY?0:1;
 		int yOff = isY?1:0;
 		for (int i = 0; i < pl.size(); i++) {
-			gc.setForeground((i%2==0) ? ColorConstants.black : ColorConstants.white); 
+			gc.setForegroundColor((i%2==0) ? ColorConstants.black : ColorConstants.white); 
 			gc.drawLine(pl.getPoint(i).x, pl.getPoint(i).y, pl.getPoint(i).x+xOff, pl.getPoint(i).y+yOff);
 		}		
 	}
@@ -177,7 +183,9 @@ public class IconUtils {
         	if (maskRGB!=null) gc.fillOval(2,2,size,size);
             gc.drawOval(2,2,size,size);
             break;
-       }
+		default:
+			break;
+        }
             
         
         gc.dispose();

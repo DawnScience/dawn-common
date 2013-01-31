@@ -37,7 +37,6 @@ import org.dawb.common.ui.plot.trace.TraceWillPlotEvent;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.draw2d.MouseListener;
 import org.eclipse.draw2d.MouseMotionListener;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelectionProvider;
@@ -46,7 +45,6 @@ import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IWorkbenchPart;
@@ -817,7 +815,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	 * @deprecated SWT Specific. Can still be used for code that does not mind SWT link.
 	 */
 	@Deprecated
-	public void setSelectedCursor(ImageDescriptor des) {
+	public void setSelectedCursor(Cursor des) {
 			    
 	}
 
