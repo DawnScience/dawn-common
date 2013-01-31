@@ -1,9 +1,6 @@
 package org.dawb.common.ui.image;
 
 import org.eclipse.draw2d.ColorConstants;
-import org.eclipse.draw2d.Graphics;
-import org.eclipse.draw2d.SWTGraphics;
-import org.eclipse.draw2d.ScaledGraphics;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.PointList;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -81,15 +78,12 @@ public class IconUtils {
 		if (shape==ShapeType.NONE) return null;
 
 		final Image image  = new Image(Display.getCurrent(), new Rectangle(0, 0, pensize+4, pensize+4));
-		final GC    swtGC  = new GC(image, SWT.NONE);
-		final Graphics	gc = new ScaledGraphics(new SWTGraphics(swtGC));
+		final GC    gc     = new GC(image, SWT.NONE);
 
-		gc.pushState();
-		gc.setClip(new org.eclipse.draw2d.geometry.Rectangle(0, 0, pensize+4, pensize+4));
 
-		gc.setBackgroundColor(Display.getDefault().getActiveShell().getBackground());
+		gc.setBackground(Display.getDefault().getActiveShell().getBackground());
 		gc.setAlpha(0);
-		gc.fillRectangle(new org.eclipse.draw2d.geometry.Rectangle(0,0,pensize+4,pensize+4));
+		gc.fillRectangle(new Rectangle(0,0,pensize+4,pensize+4));
 
 		gc.setAlpha(255);
 		
@@ -104,7 +98,7 @@ public class IconUtils {
 		drawPointList(y, gc, true);
 		
         // Draw the shape.
-		gc.setForegroundColor(ColorConstants.black);
+		gc.setForeground(ColorConstants.black);
 		switch (shape) {
 		case SQUARE:
 			gc.drawRectangle(2,2,pensize,pensize);
@@ -123,18 +117,18 @@ public class IconUtils {
 			break;
 		}
 		
-		gc.popState();
+		gc.dispose();
 		
 		return new Cursor(Display.getDefault(), image.getImageData(), (pensize+4)/2, (pensize+4)/2);
 
 	}
 
 
-	private static void drawPointList(PointList pl, Graphics gc, boolean isY) {
+	private static void drawPointList(PointList pl, GC gc, boolean isY) {
 		int xOff = isY?0:1;
 		int yOff = isY?1:0;
 		for (int i = 0; i < pl.size(); i++) {
-			gc.setForegroundColor((i%2==0) ? ColorConstants.black : ColorConstants.white); 
+			gc.setForeground((i%2==0) ? ColorConstants.black : ColorConstants.white); 
 			gc.drawLine(pl.getPoint(i).x, pl.getPoint(i).y, pl.getPoint(i).x+xOff, pl.getPoint(i).y+yOff);
 		}		
 	}
