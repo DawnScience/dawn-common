@@ -268,6 +268,15 @@ public interface IImageTrace extends IPaletteTrace, IDownsampledTrace{
 	 * than the indices. If no axes are set, then the original point is
 	 * returned.
 	 * 
+	 * NOTE the double[] passed in is not the pixel coordinates point from
+	 * events like a mouse click (int[]). It is the data point (indices of
+	 * real data the case of the image). The return value is
+	 * the data point looked up in the image custom axes. If no custom axes
+	 * are set (via the setAxes(..) method) then you will simply get the 
+	 * same double passed back.
+	 * 
+	 * THIS IS RATHER CONFUSING!
+	 * 
 	 * @return point in label coordinates. 
 	 * 
 	 * @throws Exception if the point could not be transformed or the point type

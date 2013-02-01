@@ -385,6 +385,15 @@ public abstract class AbstractToolPage extends Page implements IToolPage, IAdapt
 	}
 
 	/**
+	 * Override to set the tool data to something specific
+	 * @param toolData
+	 */
+	@Override
+	public void setToolData(Serializable toolData) {
+		
+	}
+
+	/**
 	 * @see IToolPage.getToolData()
 	 */
 	@Override

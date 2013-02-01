@@ -270,6 +270,18 @@ public interface IToolPage extends IPageBookViewPage, IAdaptable {
 	public boolean isStaticTool();
 	
 	/**
+	 * This method will be implemented to initiate the tool from existing data. For instance
+	 * the UserPlotBeam may be passed into this call to set up a tool from the workflows.
+	 * 
+	 * By default the AbstractToolPage will do nothing
+	 * many tools will return null unless they have been specifically altered to encapsulate
+	 * and return their data.
+	 * 
+	 * @return data specific to tool
+	 */
+	public void setToolData(Serializable data);
+
+	/**
 	 * This method will be implemented to return any data which is defined by the tool
 	 * and may be used elsewhere. By default the AbstractToolPage will return null and
 	 * many tools will return null unless they have been specifically altered to encapsulate
