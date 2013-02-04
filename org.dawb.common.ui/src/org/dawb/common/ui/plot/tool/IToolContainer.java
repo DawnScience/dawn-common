@@ -12,4 +12,10 @@ public interface IToolContainer {
 	 * @return
 	 */
 	public IToolPage getActiveTool();
+	
+	/**
+	 * Opens the tool in a dedicated view.
+	 * @param tool
+	 */
+	public IToolPage createToolInDedicatedView(IToolPage tool) throws Exception;
 }

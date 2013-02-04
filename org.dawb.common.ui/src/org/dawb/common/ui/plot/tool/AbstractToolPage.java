@@ -400,4 +400,16 @@ public abstract class AbstractToolPage extends Page implements IToolPage, IAdapt
 	public Serializable getToolData() {
 		return null;
 	}
+	
+	/**
+	 * 
+	 */
+	protected IToolPage createToolInDedicatedView() throws Exception {
+        if (isDedicatedView()) throw new Exception("Tool "+getToolId()+" is already open in a dedicated view!");
+        
+        if (getViewPart() instanceof IToolContainer) {
+        	return ((IToolContainer)getViewPart()).createToolInDedicatedView(this);
+        }
+        return this;
+	}
 }
