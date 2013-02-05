@@ -67,6 +67,7 @@ public class IconUtils {
 	}
 	
 
+	private final static Color TRANSPARENT_COLOR = new Color(null, new RGB(123,0,23));
 	/**
 	 * Icon for the cursor 
 	 * @param pensize
@@ -77,14 +78,12 @@ public class IconUtils {
 		
 		if (shape==ShapeType.NONE) return null;
 
-		final Image image  = new Image(Display.getCurrent(), new Rectangle(0, 0, pensize+4, pensize+4));
+		final Image image  = new Image(Display.getCurrent(), pensize+4, pensize+4);
 		final GC    gc     = new GC(image, SWT.NONE);
 
-		gc.setBackground(Display.getDefault().getActiveShell().getBackground());
-		gc.setAlpha(0);
-		gc.fillRectangle(new Rectangle(0,0,pensize+4,pensize+4));
+		gc.setBackground(TRANSPARENT_COLOR);
+		gc.fillRectangle(image.getBounds());
 
-		gc.setAlpha(255);
 		
 		// Draw a cross for the center.
 		final PointList x = new PointList(pensize+4);
@@ -116,10 +115,14 @@ public class IconUtils {
 			break;
 		}
 		
-		gc.dispose();
-		
-		return new Cursor(Display.getDefault(), image.getImageData(), (pensize+4)/2, (pensize+4)/2);
+		ImageData imageData = image.getImageData();
+		imageData.transparentPixel = imageData.palette.getPixel(TRANSPARENT_COLOR.getRGB());
 
+		Cursor ret = new Cursor(Display.getDefault(), imageData, (pensize+4)/2, (pensize+4)/2);
+		gc.dispose();
+        image.dispose();
+        
+        return ret;
 	}
 
 
