@@ -11,7 +11,8 @@
 package org.dawb.common.ui.monitor;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import uk.ac.gda.monitor.IMonitor;
+
+import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
 
 
 /**

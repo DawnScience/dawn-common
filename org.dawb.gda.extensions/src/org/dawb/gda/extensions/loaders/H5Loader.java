@@ -37,7 +37,7 @@ import uk.ac.diamond.scisoft.analysis.io.IMetaLoader;
 import uk.ac.diamond.scisoft.analysis.io.ISliceLoader;
 import uk.ac.diamond.scisoft.analysis.io.MetaDataAdapter;
 import uk.ac.diamond.scisoft.analysis.io.SliceObject;
-import uk.ac.gda.monitor.IMonitor;
+import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
 
 public class H5Loader extends AbstractFileLoader implements IMetaLoader, IDataSetLoader, ISliceLoader {
 

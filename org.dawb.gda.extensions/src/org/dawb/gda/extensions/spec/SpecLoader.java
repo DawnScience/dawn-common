@@ -28,7 +28,7 @@ import uk.ac.diamond.scisoft.analysis.io.DataHolder;
 import uk.ac.diamond.scisoft.analysis.io.ExtendedMetadataAdapter;
 import uk.ac.diamond.scisoft.analysis.io.IMetaData;
 import uk.ac.diamond.scisoft.analysis.io.IMetaLoader;
-import uk.ac.gda.monitor.IMonitor;
+import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
 
 public class SpecLoader extends AbstractFileLoader implements IMetaLoader {
 	

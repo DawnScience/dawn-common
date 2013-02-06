@@ -11,7 +11,7 @@ import gda.analysis.io.ScanFileHolderException;
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.io.ILazyLoader;
 import uk.ac.diamond.scisoft.analysis.io.SliceObject;
-import uk.ac.gda.monitor.IMonitor;
+import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
 
 public class H5LazyLoader implements ILazyLoader {
 

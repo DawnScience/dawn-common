@@ -8,9 +8,6 @@ Bundle-Vendor: ESRF
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.junit,
- uk.ac.diamond.org.apache.xmlrpc.client;bundle-version="3.1.3",
- uk.ac.diamond.org.apache.xmlrpc.common;bundle-version="3.1.3",
- uk.ac.diamond.org.apache.xmlrpc.server;bundle-version="3.1.3",
  uk.ac.diamond.scisoft.analysis;bundle-version="1.3.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
@@ -19,12 +16,9 @@ Import-Package: com.isencia.util.commandline;version="7.0.0",
  org.dawb.common.util.eclipse,
  org.dawb.common.util.net,
  org.dawb.common.util.test,
- org.eclipse.core.variables,
  org.junit,
  org.junit.runner,
- org.slf4j,
- uk.ac.gda.monitor,
- uk.ac.gda.util
+ org.slf4j
 Export-Package: org.dawb.common.python,
  org.dawb.common.python.rpc,
  org.dawb.common.python.test
