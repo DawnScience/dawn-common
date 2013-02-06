@@ -159,7 +159,7 @@ public class ImageThumbnailCreator extends AbstractServiceFactory implements ITh
 	 */
 	public Image createImageSWT(final AbstractDataset thumbnail) throws Exception {
         
-		final ScopedPreferenceStore store = new ScopedPreferenceStore(InstanceScope.INSTANCE, "org.dawb.workbench.plotting");
+		final ScopedPreferenceStore store = new ScopedPreferenceStore(InstanceScope.INSTANCE, "org.dawnsci.plotting");
 		final ImageServiceBean bean = new ImageServiceBean();
 
 		final IPaletteService pservice = (IPaletteService)PlatformUI.getWorkbench().getService(IPaletteService.class);
