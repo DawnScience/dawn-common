@@ -77,7 +77,11 @@ public class ImageServiceBean {
 	}
 
 	
-	
+	/**
+	 * 
+	 * @return the original downsampled data. If log scale the 
+	 * image will be shifted.
+	 */
 	public AbstractDataset getImage() {
 		if (logColorScale) {
 			AbstractDataset result = Maths.subtract(image, logOffset);
