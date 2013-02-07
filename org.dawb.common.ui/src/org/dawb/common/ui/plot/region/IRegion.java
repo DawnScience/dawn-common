@@ -11,6 +11,7 @@ import org.eclipse.draw2d.MouseListener;
 import org.eclipse.draw2d.MouseMotionListener;
 import org.eclipse.swt.graphics.Color;
 
+import uk.ac.diamond.scisoft.analysis.roi.CircularFitROI;
 import uk.ac.diamond.scisoft.analysis.roi.CircularROI;
 import uk.ac.diamond.scisoft.analysis.roi.EllipticalFitROI;
 import uk.ac.diamond.scisoft.analysis.roi.EllipticalROI;
@@ -170,6 +171,7 @@ public interface IRegion {
 		COLORBOX("Colored edges box", ColorConstants.gray,    RectangularROI.class),
 		GRID("Grid",               ColorConstants.lightGray,  GridROI.class),
 		CIRCLE("Circle",           darkYellow,                CircularROI.class),
+		CIRCLEFIT("Circle fit",    darkYellow,                CircularFitROI.class),
 		SECTOR("Sector",           ColorConstants.red,        SectorROI.class),
 		POINT("Point",             darkMagenta,               PointROI.class),
 		ELLIPSE("Ellipse",         ColorConstants.lightGreen, EllipticalROI.class),
