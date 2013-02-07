@@ -10,6 +10,8 @@ import org.dawb.common.ui.plot.IPlottingSystem;
 import org.dawb.common.ui.plot.region.IRegion.RegionType;
 import org.eclipse.swt.graphics.Color;
 
+import uk.ac.diamond.scisoft.analysis.roi.CircularFitROI;
+import uk.ac.diamond.scisoft.analysis.roi.CircularROI;
 import uk.ac.diamond.scisoft.analysis.roi.EllipticalFitROI;
 import uk.ac.diamond.scisoft.analysis.roi.EllipticalROI;
 import uk.ac.diamond.scisoft.analysis.roi.LinearROI;
@@ -106,6 +108,12 @@ public class RegionUtils {
 			
 		} else if (roi instanceof SectorROI) {
 			type = RegionType.SECTOR;
+			
+		} else if (roi instanceof CircularROI) {
+			type = RegionType.CIRCLE;
+			
+		} else if (roi instanceof CircularFitROI) {
+			type = RegionType.CIRCLEFIT;
 			
 		} else if (roi instanceof EllipticalROI) {
 			type = RegionType.ELLIPSE;
