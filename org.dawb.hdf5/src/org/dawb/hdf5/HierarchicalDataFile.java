@@ -667,6 +667,11 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
     	return NexusUtils.getAxes(file, (Dataset)signal, dimension);
 	}
 
+	@Override
+	public void setAttribute(HObject object, String name, String value) throws Exception {
+		NexusUtils.setAttribute(file, object, name, value);
+	}
+
 
 
 }

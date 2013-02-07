@@ -55,13 +55,30 @@ public class NexusUtils {
 			                             final HObject    entry,
 			                             final String     entryKey) throws Exception {
 		
+		setAttribute(file, entry, NXCLASS, entryKey);
+	}
+	
+	/**
+	 * Set any attribute on a HObject.
+	 * 
+	 * @param file
+	 * @param entry
+	 * @param name
+	 * @param entryKey
+	 * @throws Exception
+	 */
+	public static void setAttribute(final FileFormat file, 
+									final HObject    entry,
+									final String     name,
+									final String     entryKey) throws Exception {
+	
 		// Check if attribute is already there
 		final List attrList = entry.getMetadata();
 		if (attrList!=null) for (Object object : attrList) {
 			if (object instanceof Attribute) {
 				final Attribute a      = (Attribute)object;
 				final String[]  aValue = (String[])a.getValue();
-				if (NXCLASS.equals(a.getName()) && entryKey.equals(aValue[0])) return;
+				if (name.equals(a.getName()) && entryKey.equals(aValue[0])) return;
 			}
 		}
 		
@@ -69,7 +86,7 @@ public class NexusUtils {
 		try {
 	        String[] classValue = {entryKey};
 	        Datatype attrType = new H5Datatype(Datatype.CLASS_STRING, classValue[0].length()+1, -1, -1);
-	        Attribute attr = new Attribute(NXCLASS, attrType, new long[]{1});
+	        Attribute attr = new Attribute(name, attrType, new long[]{1});
 	        attr.setValue(classValue);
 			
 	        file.writeAttribute(entry, attr, false);
