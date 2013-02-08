@@ -5,16 +5,18 @@ import ncsa.hdf.object.HObject;
 
 public class NexusFindGroupByAttributeText implements IFindInNexus{
 	
-	public String text;
+	public String attributeValue;
+	public String attributeName;
 	
-	public NexusFindGroupByAttributeText(String attributeText) {
-		text = attributeText;
+	public NexusFindGroupByAttributeText(String attributeValue, String attributeName) {
+		this.attributeValue = attributeValue;
+		this.attributeName = attributeName;
 	}
 	
 	@Override
 	public boolean inNexus(HObject nexusObject) {
 		if (nexusObject instanceof Group) {
-			if (NexusUtils.getNexusGroupAttribute((Group)nexusObject).toLowerCase().equals(text.toLowerCase())) {
+			if (NexusUtils.getNexusGroupAttributeValue((Group)nexusObject, attributeName).toLowerCase().equals(attributeValue.toLowerCase())) {
 				return true;
 			}
 		}

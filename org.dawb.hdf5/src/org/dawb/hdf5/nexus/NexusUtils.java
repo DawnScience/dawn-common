@@ -298,13 +298,16 @@ public class NexusUtils {
 	 * 
 	 * @param group
 	 */
-	public static String getNexusGroupAttribute(Group group) {
+	public static String getNexusGroupAttributeValue(HObject group, String name) {
 		try {
 			for (Object ob: group.getMetadata()) {
 				if (ob instanceof Attribute) {
-					Object test = ((Attribute)ob).getValue();
-					if (test instanceof String[])
-						return ((String[])test)[0];
+					Attribute ab = (Attribute)ob;
+					if (ab.getName().toLowerCase().equals(name.toLowerCase())) {
+						Object test = ab.getValue();
+						if (test instanceof String[])
+							return ((String[])test)[0];
+					}
 				}
 			}
 		} catch (Exception e) {
