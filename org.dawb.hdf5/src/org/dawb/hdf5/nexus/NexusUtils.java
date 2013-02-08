@@ -10,8 +10,11 @@
 package org.dawb.hdf5.nexus;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.TreeMap;
 
 import ncsa.hdf.object.Attribute;
@@ -24,6 +27,8 @@ import ncsa.hdf.object.h5.H5Datatype;
 
 import org.dawb.hdf5.HierarchicalDataFactory;
 import org.dawb.hdf5.IHierarchicalDataFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Class used to mark groups in the hdf5 tree with nexus attributes.
@@ -41,6 +46,8 @@ public class NexusUtils {
 	public static final String PRIM    = "primary";	
 	public static final String SIGNAL  = "signal";	
 	public static final String UNIT    = "unit";	
+	
+	private final static Logger logger = LoggerFactory.getLogger(NexusUtils.class);
 
 	/**
 	 * Sets the nexus attribute so that if something is looking for them,
@@ -283,5 +290,71 @@ public class NexusUtils {
         	if (file!=null) file.close();
         }
 	}
-
+	
+	/**
+	 * Returns the attribute name of a nexus group.
+	 * 
+	 * If the group has more than one attribute only the first is returned
+	 * 
+	 * @param group
+	 */
+	public static String getNexusGroupAttribute(Group group) {
+		try {
+			for (Object ob: group.getMetadata()) {
+				if (ob instanceof Attribute) {
+					Object test = ((Attribute)ob).getValue();
+					if (test instanceof String[])
+						return ((String[])test)[0];
+				}
+			}
+		} catch (Exception e) {
+		}
+		return null;
+	}
+	
+	/**
+	 * Breath first search of a hierarchical data file group.
+	 * 
+	 * @param finder - IFindInNexus object, used to test a group
+	 * @param rootGroup - the group to be searched
+	 * @param findFirst - whether the search returns when the first object is found (quicker for single objects)
+	 */
+	public static List<HObject> nexusBreadthFirstSearch(IFindInNexus finder, Group rootGroup, boolean findFirst) {
+		
+		List<HObject> out = new ArrayList<HObject>();
+		
+		Queue<Group> queue = new LinkedList<Group>();
+		for (HObject nxObject: rootGroup.getMemberList()) {
+			if (finder.inNexus(nxObject)) {
+				
+				if (findFirst) return Arrays.asList(nxObject);
+				else out.add(nxObject);
+			}
+			
+			if(nxObject instanceof Group) {
+				queue.add((Group)nxObject);
+			}
+		}
+		
+		Integer i = 0;
+		
+		while (queue.size() != 0) {
+			Group group = queue.poll();
+			for (HObject nxObject: group.getMemberList()) {
+				
+				if (finder.inNexus(nxObject)) {
+					if (findFirst) return Arrays.asList(nxObject);
+					else out.add(nxObject);
+				}
+				
+				if (nxObject instanceof Group) {
+					queue.add((Group)nxObject);
+				}
+				
+				i++;
+			}
+		}
+		logger.debug("This many times through loop: " + i.toString());
+		return out;
+	}
 }
