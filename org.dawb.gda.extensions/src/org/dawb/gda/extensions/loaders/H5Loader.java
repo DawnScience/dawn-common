@@ -163,7 +163,7 @@ public class H5Loader extends AbstractFileLoader implements IMetaLoader, IDataSe
 			final Dataset set = (Dataset)file.getData(fullPath);
 			if (mon!=null) mon.worked(1);
 			resetDims(set);
-			final Object  val = set.read();
+			final Object  val = set.read(); // Dangerous if data large!
 			if (mon!=null) mon.worked(1);
 			return H5Utils.getSet(val,set);
 		} finally {
