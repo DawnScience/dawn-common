@@ -212,9 +212,9 @@ public class ROIEditTable  {
 		protected Object getValue(Object element) {
 			final RegionRow row = (RegionRow)element;
 			if (column==1) {
-				return (int)row.getxLikeVal();
+				return row.getxLikeVal();
 			} else {
-				return (int)row.getyLikeVal();
+				return row.getyLikeVal();
 			}
 		}
 
