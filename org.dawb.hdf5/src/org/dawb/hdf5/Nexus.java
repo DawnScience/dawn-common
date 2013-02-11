@@ -16,6 +16,7 @@ public class Nexus {
 	public static final String INST    = "NXinstrument";
 	public static final String DETECT  = "NXdetector";
 	public static final String SOURCE  = "NXsource";
+	public static final String MONITOR = "NXmonitor";
 	public static final String MONO    = "NXmonochromator";
 	public static final String SDS     = "SDS";
 
