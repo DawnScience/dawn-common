@@ -22,13 +22,16 @@ import org.eclipse.ui.dialogs.WizardNewFileCreationPage;
 public class FileChoosePage extends WizardNewFileCreationPage {
 
 	private boolean overwrite = false;
+	private Button overwriteBtn;
 	
 	public FileChoosePage(String pageName, IStructuredSelection selection) {
 		super(pageName, selection);
 	}
 
 	protected void createAdvancedControls(Composite parent) {
-        final Button overwriteBtn = new Button(parent, SWT.CHECK);
+		this.overwriteBtn = new Button(parent, SWT.CHECK);
+		overwriteBtn.setSelection(overwrite);
+		
         overwriteBtn.setText("Overwrite the file if it exists");
         overwriteBtn.addSelectionListener(new SelectionAdapter() {
         	public void widgetSelected(SelectionEvent e) {
@@ -72,5 +75,16 @@ public class FileChoosePage extends WizardNewFileCreationPage {
 	public File getFile() {
 		final String dir  = ResourcesPlugin.getWorkspace().getRoot().getLocation().toOSString()+getContainerFullPath().toOSString();
 		return new File(dir, getFileName());
+	}
+	
+	public void setFileName(String name) {
+		super.setFileName(name);
+		if (getContainerFullPath()!=null && name!=null) {
+			overwrite = true;
+			if (overwriteBtn!=null) {
+				overwriteBtn.setSelection(true);
+				validatePage();
+			}
+		}
 	}
 }
