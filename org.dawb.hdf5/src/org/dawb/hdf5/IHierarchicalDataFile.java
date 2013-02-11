@@ -76,6 +76,13 @@ public interface IHierarchicalDataFile {
 	public HObject getData(String fullPath) throws Exception;
 	
 	/**
+	 * Attempt to delete the HObject at this path and unlink any children.
+	 * 
+	 * @param fullPath
+	 */
+	public void delete(String fullPath) throws Exception;
+	
+	/**
 	 * 
 	 * @param path
 	 * @return the parent of the node at this path
