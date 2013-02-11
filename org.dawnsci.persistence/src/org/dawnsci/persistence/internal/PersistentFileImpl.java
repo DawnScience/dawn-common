@@ -506,4 +506,10 @@ class PersistentFileImpl implements IPersistentFile{
 	public String getFilePath(){
 		return filePath;
 	}
+
+	@Override
+	public boolean isRegionSupported(ROIBase roi) {
+		// TODO FIXME Baha please could we have a method to determine if a give ROIBase is supported?
+		return false;
+	}
 }

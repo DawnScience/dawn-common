@@ -179,7 +179,7 @@ public interface IPersistentFile {
 	 * Method that returns the list of mask names saved in the file.<br>
 	 * Reads from entry/mask<br>
 	 * 
-	 * @param mon
+	 * @param mon, may be null.
 	 * @return List<String>
 	 * @throws Exception
 	 *              is thrown if no correct entry is found in the file
@@ -196,4 +196,12 @@ public interface IPersistentFile {
 	 *              is thrown if no correct entry is found in the file
 	 */
 	public List<String> getROINames(IMonitor mon) throws Exception;
+
+	/**
+	 * A method to test if a given ROIBase can be persisted using JSON
+	 * @param roi
+	 * @return true if this region can be saved in the persistence file.
+	 * 
+	 */
+	public boolean isRegionSupported(ROIBase roi);
 }
