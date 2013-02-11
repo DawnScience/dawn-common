@@ -213,9 +213,10 @@ public class PersistenceServiceImplTest extends AbstractThreadTest {
 				fail("Reading Exception not caught");
 			} catch (Exception e) {
 				boolean resultException = e.getMessage().startsWith("Reading Exception: ");
-				assertEquals(true, resultException);
-				if(!resultException)
-					fail("Another error occured");
+				if(resultException)
+					assertTrue("Reading Exception caught", resultException);
+				else
+					assertTrue("Another exception was caught:"+ e.getMessage(), resultException);
 			}
 
 			try {
@@ -223,9 +224,10 @@ public class PersistenceServiceImplTest extends AbstractThreadTest {
 				fail("Reading Exception not caught");
 			} catch (Exception e) {
 				boolean resultException = e.getMessage().startsWith("Reading Exception: ");
-				assertEquals(true, resultException);
-				if(!resultException)
-					fail("Another error occured");
+				if(resultException)
+					assertTrue("Reading Exception caught", resultException);
+				else
+					assertTrue("Another exception was caught:"+ e.getMessage(), resultException);
 			}
 
 			try {
@@ -233,9 +235,10 @@ public class PersistenceServiceImplTest extends AbstractThreadTest {
 				fail("Reading Exception not caught");
 			} catch (Exception e) {
 				boolean resultException = e.getMessage().startsWith("Reading Exception: ");
-				assertEquals(true, resultException);
-				if(!resultException)
-					fail("Another error occured");
+				if(resultException)
+					assertTrue("Reading Exception caught", resultException);
+				else
+					assertTrue("Another exception was caught:"+ e.getMessage(), resultException);
 			}
 			
 		} catch (Exception e1) {
