@@ -18,7 +18,7 @@ public class Hdf5TestUtils {
 	 */
 	public static String getAbsolutePath(final String relPath) {
 		if (Activator.getContext()==null) { // Tests not running in eclipse
-			return "org.dawnsci.persistence.test/"+relPath;
+			return relPath;
 		}
 		String dir = cleanPath(Activator.getContext().getBundle().getLocation());
 		return dir+relPath;
