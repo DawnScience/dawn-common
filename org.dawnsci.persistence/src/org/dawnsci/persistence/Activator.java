@@ -10,6 +10,7 @@ import org.osgi.framework.BundleContext;
 public class Activator implements BundleActivator {
 
 	public void start(BundleContext context) throws Exception {
+		// What's wrong with loggers?
 		System.out.println("Starting org.dawnsci.persistence");
 		Hashtable<String, String> props = new Hashtable<String, String>(1);
 		props.put("description", "A service used to save and/or load data to hdf5 files");
