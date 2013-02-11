@@ -1,12 +1,10 @@
 package org.dawb.common.ui.image;
 
 import org.eclipse.draw2d.ColorConstants;
-import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.PointList;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.GC;
@@ -18,6 +16,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 
 public class IconUtils {
+	
 	
 
 	public static ImageDescriptor createIconDescriptor(String iconText) {
@@ -66,76 +65,6 @@ public class IconUtils {
 		};
 	}
 	
-
-	private final static Color TRANSPARENT_COLOR = new Color(null, new RGB(123,0,23));
-	/**
-	 * Icon for the cursor 
-	 * @param pensize
-	 * @param square
-	 * @return
-	 */
-	public static Cursor getPenCursor(int pensize, ShapeType shape) {
-		
-		if (shape==ShapeType.NONE) return null;
-
-		final Image image  = new Image(Display.getCurrent(), pensize+4, pensize+4);
-		final GC    gc     = new GC(image, SWT.NONE);
-
-		gc.setBackground(TRANSPARENT_COLOR);
-		gc.fillRectangle(image.getBounds());
-
-		
-		// Draw a cross for the center.
-		final PointList x = new PointList(pensize+4);
-		final PointList y = new PointList(pensize+4);
-		for (int i = 0; i < pensize+4; i++) {
-			x.addPoint(new Point(i, (int)((pensize+4)/2)));
-			y.addPoint(new Point((int)((pensize+4)/2), i));
-		}
-		drawPointList(x, gc, false);
-		drawPointList(y, gc, true);
-		
-        // Draw the shape.
-		gc.setForeground(ColorConstants.black);
-		switch (shape) {
-		case SQUARE:
-			gc.drawRectangle(2,2,pensize,pensize);
-			break;
-		case TRIANGLE:
-			final PointList pl = new PointList();
-			pl.addPoint(2+(pensize/2), 2);
-			pl.addPoint(2+pensize, 2+pensize);
-			pl.addPoint(2, 2+pensize);
-			gc.drawPolygon(pl.toIntArray());
-			break;
-		case CIRCLE:
-			gc.drawOval(2,2,pensize,pensize);
-			break;
-		default:
-			break;
-		}
-		
-		ImageData imageData = image.getImageData();
-		imageData.transparentPixel = imageData.palette.getPixel(TRANSPARENT_COLOR.getRGB());
-
-		Cursor ret = new Cursor(Display.getDefault(), imageData, (pensize+4)/2, (pensize+4)/2);
-		gc.dispose();
-        image.dispose();
-        
-        return ret;
-	}
-
-
-	private static void drawPointList(PointList pl, GC gc, boolean isY) {
-		int xOff = isY?0:1;
-		int yOff = isY?1:0;
-		for (int i = 0; i < pl.size(); i++) {
-			gc.setForeground((i%2==0) ? ColorConstants.black : ColorConstants.white); 
-			gc.drawLine(pl.getPoint(i).x, pl.getPoint(i).y, pl.getPoint(i).x+xOff, pl.getPoint(i).y+yOff);
-		}		
-	}
-
-
 	/**
 	 * Icon for the actions to choose brush type.
 	 * @param size
