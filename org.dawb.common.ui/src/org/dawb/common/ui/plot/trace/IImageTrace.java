@@ -16,32 +16,33 @@ import uk.ac.diamond.scisoft.analysis.roi.ROIBase;
  * 
  * @author fcp94556
  * 
-   Histogramming Explanation
-   ---------------------------
-   Image intensity distribution:
-
-                ++----------------------**---------------
-                +                      *  *              
-                ++                    *    *             
-                |                     *    *             
-                ++                    *     *            
-                *                    *       *            
-                +*                   *       *            
-                |*                  *        *            
-                +*                  *        *           
-                |                  *          *         
-                ++                 *          *          
-                |                  *           *        
-                ++                 *           *        
-                |                 *            *        
-                ++                *            *       
-                                 *              *      
-        Min Cut           Min    *              *      Max                     Max cut
- Red <- |   (min colour)  |    (color range, palette)  |      (max color)      | -> Blue
-                                *                 *  
-                |              *        +         *  
-----------------++------------**--------+----------**----+---------------**+---------------++
-              
+ * <pre>
+ *    Histogramming Explanation
+ *    ---------------------------
+ *    Image intensity distribution:
+ * 
+ *                 ++----------------------**---------------
+ *                 +                      *  *              
+ *                 ++                    *    *             
+ *                 |                     *    *             
+ *                 ++                    *     *            
+ *                 *                    *       *            
+ *                 +*                   *       *            
+ *                 |*                  *        *            
+ *                 +*                  *        *           
+ *                 |                  *          *         
+ *                 ++                 *          *          
+ *                 |                  *           *        
+ *                 ++                 *           *        
+ *                 |                 *            *        
+ *                 ++                *            *       
+ *                                  *              *      
+ *         Min Cut           Min    *              *      Max                     Max cut
+ *  Red <- |   (min colour)  |    (color range, palette)  |      (max color)      | -> Blue
+ *                                 *                 *  
+ *                 |              *        +         *  
+ * ----------------++------------**--------+----------**----+---------------**+---------------++
+ * </pre>
  */
 public interface IImageTrace extends IPaletteTrace, IDownsampledTrace{
 
