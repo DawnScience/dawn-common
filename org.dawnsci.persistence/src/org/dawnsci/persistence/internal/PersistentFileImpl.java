@@ -508,7 +508,7 @@ class PersistentFileImpl implements IPersistentFile{
 		String[] names = dh.getNames();
 		for (int i = 0; i < names.length; i++) {
 			if(names[i].startsWith(dataEntry)){
-				nameslist.add(names[i].split(dataEntry)[1]);
+				nameslist.add(names[i].substring(dataEntry.length()+1));
 			}
 		}
 		if (nameslist.isEmpty()) throw new Exception("Reading Exception: " +dataEntry+ " entry does not exist in the file " + filePath);
