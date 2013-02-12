@@ -39,7 +39,7 @@ import uk.ac.diamond.scisoft.analysis.roi.ROIBase;
 import uk.ac.diamond.scisoft.analysis.roi.RectangularROI;
 
 /**
- * Class to create an {@link}AxisPixelROIEditTable which implements an {@link}IROIListener
+ * Class to create an {@link AxisPixelROIEditTable} which implements an {@link}IROIListener
  * and shows the sum, minimum and maximum of a Rectangular ROI
  * @author wqk87977
  *
@@ -285,8 +285,8 @@ public class ROIWidget implements IROIListener {
 		return new IRegionListener.Stub() {
 			@Override
 			public void regionRemoved(RegionEvent evt) {
-				System.out.println("arpes_region removed");
 				IRegion region = evt.getRegion();
+				logger.debug("Region removed");
 				if (region!=null) {
 //						roiViewer.disposeRegion((AbstractSelectionRegion) region);
 						if(plottingSystem.getRegions().size()>0){
@@ -305,7 +305,7 @@ public class ROIWidget implements IROIListener {
 
 			@Override
 			public void regionAdded(RegionEvent evt) {
-				System.out.println("arpes_region added");
+				logger.debug("Region added");
 				
 				IRegion region = evt.getRegion();
 				if (region!=null) {
@@ -320,7 +320,7 @@ public class ROIWidget implements IROIListener {
 
 			@Override
 			public void regionCreated(RegionEvent evt) {
-				System.out.println("arpes_region created");
+				logger.debug("Region created");
 				IRegion region = evt.getRegion();
 				if (region!=null) {
 					region.addROIListener(ROIWidget.this);
@@ -363,6 +363,9 @@ public class ROIWidget implements IROIListener {
 		plotSystem.removeRegionListener(listener);
 	}
 
+	/**
+	 * This method needs to be called to clear the region listeners
+	 */
 	public void dispose(){
 		clearListeners(plottingSystem, regionListener);
 	}
