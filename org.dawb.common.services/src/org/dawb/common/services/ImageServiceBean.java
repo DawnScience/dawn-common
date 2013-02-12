@@ -55,7 +55,29 @@ public class ImageServiceBean {
 	public ImageServiceBean() {
 		
 	}
-    public ImageServiceBean(AbstractDataset slice, HistoType histoType) {
+	
+	/**
+	 * Clones everything apart from the data, mask and palette.
+	 */
+	public ImageServiceBean  clone() {
+		ImageServiceBean ret = new ImageServiceBean();
+		ret.min  = min.doubleValue();
+		ret.max  = max.doubleValue();
+		ret.histogramType = histogramType;
+		ret.logColorScale = logColorScale;
+		ret.logOffset = logOffset;
+		ret.maximumCutBound = cloneBound(maximumCutBound);
+		ret.minimumCutBound = cloneBound(minimumCutBound);
+		ret.nanBound = cloneBound(nanBound);
+		ret.origin = origin;
+		return ret;
+	}
+	
+    private HistogramBound cloneBound(HistogramBound clone) {
+		return new HistogramBound(clone.getBound(), clone.getColor());
+	}
+
+	public ImageServiceBean(AbstractDataset slice, HistoType histoType) {
 		this.image = slice;
 		this.histogramType = histoType;
 	}
