@@ -90,26 +90,43 @@ public class PersistenceServiceImplTest extends AbstractThreadTest {
 			BooleanDataset mask1 = new BooleanDataset(bd1);
 			BooleanDataset mask2 = new BooleanDataset(bd2);
 			Map<String, BooleanDataset> masks = new HashMap<String, BooleanDataset>();
-			masks.put("mask0", mask0);
-			masks.put("mask1", mask1);
+			masks.put("mask3", mask0);
+			masks.put("mask4", mask1);
 			
 			// create the PersistentService
 			IPersistenceService persist = PersistenceServiceCreator.createPersistenceService();
-			
 			//create the persistent file
 			IPersistentFile file = persist.createPersistentFile(tmp.getAbsolutePath());
-			file.setMasks(masks);
-			//overwrite mask1 with mask2
-			file.addMask("mask1", mask2, null);
-			// add another mask
-			file.addMask("mask2", mask2, null);
-			file.close();
+			try{
+				
+				//overwrite mask1 with mask2
+				file.addMask("mask0", mask0, null);
+				file.addMask("mask1", mask1, null);
+				file.addMask("mask1", mask2, null);
+				// add another mask
+				file.addMask("mask2", mask2, null);
+				// add a set of masks
+				file.setMasks(masks);
+
+			}catch(Exception e){
+				e.printStackTrace();
+				fail("Exception occured while writing Masks");
+			}finally{
+				file.close();
+			}
 			
 			//read the persistent file and retrieve the regions
 			IPersistentFile fileReader = persist.getPersistentFile(tmp.getAbsolutePath());
-			Map<String, BooleanDataset> masksRead = fileReader.getMasks(null);
-			fileReader.close();
-			
+			Map<String, BooleanDataset> masksRead = null;
+			try{
+				masksRead = fileReader.getMasks(null);
+			}catch(Exception e){
+				e.printStackTrace();
+				fail("Exception occured while reading Masks");
+			}finally{
+				fileReader.close();
+			}
+
 			//test that masks are saved in the file
 			if(masksRead != null){
 				assertTrue(masksRead.containsKey("mask0"));

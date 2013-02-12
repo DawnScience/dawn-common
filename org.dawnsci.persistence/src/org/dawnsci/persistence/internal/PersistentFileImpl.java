@@ -10,6 +10,7 @@ import java.util.Set;
 import ncsa.hdf.object.Dataset;
 import ncsa.hdf.object.Datatype;
 import ncsa.hdf.object.Group;
+import ncsa.hdf.object.HObject;
 import ncsa.hdf.object.h5.H5Datatype;
 
 import org.dawb.common.services.IPersistentFile;
@@ -78,15 +79,18 @@ class PersistentFileImpl implements IPersistentFile{
 	public void setMasks(Map<String, BooleanDataset> masks) throws Exception {
 		writeH5Mask(masks);
 	}
+
 	@Override
 	public void addMask(String name, BooleanDataset mask, IMonitor mon) throws Exception{
-		DataHolder dh = LoaderFactory.getData(filePath, true, mon);
-		Map<String, BooleanDataset> masks = readH5Masks(dh, mon);
-		if(masks.containsKey(name))
-			file.delete(MASK_ENTRY+"/"+name);
 
+		HObject currentData = file.getData(MASK_ENTRY+"/"+name);
+		// if data already exists, delete it
+		if(currentData!= null) file.delete(currentData.getPath()+name);
+		
 		AbstractDataset id = DatasetUtils.cast(mask, AbstractDataset.INT8);
+		//check if parent group exists
 		Group parent = (Group)file.getData(MASK_ENTRY);
+		if(parent == null) parent = createParentEntry(MASK_ENTRY);
 		final Datatype datatype = H5Utils.getDatatype(id);
 		final long[] shape = new long[id.getShape().length];
 		for (int i = 0; i < shape.length; i++)
@@ -216,31 +220,18 @@ class PersistentFileImpl implements IPersistentFile{
 
 		if(file == null)
 			file = HierarchicalDataFactory.getWriter(filePath);
-		String fullEntry = DATA_ENTRY;
-		String[] entries = fullEntry.split("/");
-		entries = cleanArray(entries);
-		Group parent = null;
-		for (int i = 0; i < entries.length; i++) {
-			Group entry = null;
-			if(i == 0){
-				entry = file.group(entries[i]);
-				file.setNexusAttribute(entry, Nexus.ENTRY);
-				parent = entry;
-			} else if(i == entries.length-1) {
-				entry = file.group(entries[i], parent);
-				file.setNexusAttribute(entry, Nexus.DATA);
-				parent = entry;
-			} else {
-				entry = file.group(entries[i], parent);
-				file.setNexusAttribute(entry, Nexus.ENTRY);
-				parent = entry;
-			}
-		}
+		
+		Group parent = createParentEntry(DATA_ENTRY);
+		
 		if(data != null){
-			String dataName = !data.getName().equals("") ? data.getName() : "data"; //max = (a > b) ? a : b;
+
+			String dataName = !data.getName().equals("") ? data.getName() : "data";
 			final Datatype      datatype = H5Utils.getDatatype(data);
 			final long[]         shape = new long[data.getShape().length];
 			for (int i = 0; i < shape.length; i++) shape[i] = data.getShape()[i];
+			HObject currentData = file.getData(DATA_ENTRY+"/"+data.getName());
+			// if data already exists, delete it
+			if(currentData!= null) file.delete(currentData.getPath());
 			final Dataset dataset = file.createDataset(dataName,  datatype, shape, data.getBuffer(), parent);
 			file.setNexusAttribute(dataset, Nexus.SDS);
 		}
@@ -249,6 +240,9 @@ class PersistentFileImpl implements IPersistentFile{
 			final Datatype      xDatatype = H5Utils.getDatatype(xAxisData);
 			final long[]         xShape = new long[xAxisData.getShape().length];
 			for (int i = 0; i < xShape.length; i++) xShape[i] = xAxisData.getShape()[i];
+			HObject currentData = file.getData(DATA_ENTRY+"/"+xAxisName);
+			// if data already exists, delete it
+			if(currentData!= null) file.delete(currentData.getPath());
 			final Dataset xDataset = file.createDataset(xAxisName,  xDatatype, xShape, xAxisData.getBuffer(), parent);
 			file.setNexusAttribute(xDataset, Nexus.SDS);
 		}
@@ -258,6 +252,9 @@ class PersistentFileImpl implements IPersistentFile{
 			final Datatype      yDatatype = H5Utils.getDatatype(yAxisData);
 			final long[]         yShape = new long[yAxisData.getShape().length];
 			for (int i = 0; i < yShape.length; i++) yShape[i] = yAxisData.getShape()[i];
+			HObject currentData = file.getData(DATA_ENTRY+"/"+yAxisName);
+			// if data already exists, delete it
+			if(currentData!= null) file.delete(currentData.getPath());
 			final Dataset yDataset = file.createDataset(yAxisName,  yDatatype, yShape, yAxisData.getBuffer(), parent);
 			file.setNexusAttribute(yDataset, Nexus.SDS);
 		}
@@ -286,26 +283,9 @@ class PersistentFileImpl implements IPersistentFile{
 
 		if(file == null)
 			file = HierarchicalDataFactory.getWriter(filePath);
-		String fullEntry = MASK_ENTRY;
-		String[] entries = fullEntry.split("/");
-		entries = cleanArray(entries);
-		Group parent = null;
-		for (int i = 0; i < entries.length; i++) {
-			Group entry = null;
-			if (i == 0) {
-				entry = file.group(entries[i]);
-				file.setNexusAttribute(entry, Nexus.ENTRY);
-				parent = entry;
-			} else if (i == entries.length - 1) {
-				entry = file.group(entries[i], parent);
-				file.setNexusAttribute(entry, Nexus.DATA);
-				parent = entry;
-			} else {
-				entry = file.group(entries[i], parent);
-				file.setNexusAttribute(entry, Nexus.ENTRY);
-				parent = entry;
-			}
-		}
+
+		Group parent = createParentEntry(MASK_ENTRY);
+		
 		if (masks != null) {
 			Set<String> names = masks.keySet();
 			
@@ -318,6 +298,10 @@ class PersistentFileImpl implements IPersistentFile{
 				final long[] shape = new long[id.getShape().length];
 				for (int i = 0; i < shape.length; i++)
 					shape[i] = id.getShape()[i];
+				
+				HObject currentData = file.getData(MASK_ENTRY+"/"+name);
+				// if data already exists, delete it
+				if(currentData!= null) file.delete(currentData.getPath()+name);
 				final Dataset dataset = file.createDataset(name, datatype, shape, id.getBuffer(), parent);
 				file.setNexusAttribute(dataset, Nexus.SDS);
 			}
@@ -335,26 +319,9 @@ class PersistentFileImpl implements IPersistentFile{
 
 		if(file == null)
 			file = HierarchicalDataFactory.getWriter(filePath);
-		String fullEntry = ROI_ENTRY;
-		String[] entries = fullEntry.split("/");
-		entries = cleanArray(entries);
-		Group parent = null;
-		for (int i = 0; i < entries.length; i++) {
-			Group entry = null;
-			if (i == 0) {
-				entry = file.group(entries[i]);
-				file.setNexusAttribute(entry, Nexus.ENTRY);
-				parent = entry;
-			} else if (i == entries.length - 1) {
-				entry = file.group(entries[i], parent);
-				file.setNexusAttribute(entry, Nexus.DATA);
-				parent = entry;
-			} else {
-				entry = file.group(entries[i], parent);
-				file.setNexusAttribute(entry, Nexus.ENTRY);
-				parent = entry;
-			}
-		}
+		
+		Group parent = createParentEntry(ROI_ENTRY);
+		
 		if (rois != null) {
 			Set<String> names = rois.keySet();
 			// JSON serialisation
@@ -372,6 +339,10 @@ class PersistentFileImpl implements IPersistentFile{
 				long[] dims = {1};
 				
 				String json = gson.toJson(roibean);
+				
+				HObject currentData = file.getData(ROI_ENTRY+"/"+name);
+				// if data already exists, delete it
+				if(currentData!= null) file.delete(currentData.getPath()+name);
 				// we create the dataset
 				Dataset dat = file.createDataset(name, new H5Datatype(Datatype.CLASS_INTEGER, 4, Datatype.NATIVE, Datatype.NATIVE), dims, new int[]{0}, parent);
 				// we set the JSON attribute
@@ -379,6 +350,29 @@ class PersistentFileImpl implements IPersistentFile{
 			}
 
 		}
+	}
+
+	private Group createParentEntry(String fullEntry) throws Exception{
+		String[] entries = fullEntry.split("/");
+		entries = cleanArray(entries);
+		Group parent = null;
+		for (int i = 0; i < entries.length; i++) {
+			Group entry = null;
+			if(i == 0){
+				entry = file.group(entries[i]);
+				file.setNexusAttribute(entry, Nexus.ENTRY);
+				parent = entry;
+			} else if(i == entries.length-1) {
+				entry = file.group(entries[i], parent);
+				file.setNexusAttribute(entry, Nexus.DATA);
+				parent = entry;
+			} else {
+				entry = file.group(entries[i], parent);
+				file.setNexusAttribute(entry, Nexus.ENTRY);
+				parent = entry;
+			}
+		}
+		return parent;
 	}
 
 	/**
@@ -521,7 +515,6 @@ class PersistentFileImpl implements IPersistentFile{
 
 	@Override
 	public boolean isRegionSupported(ROIBase roi) {
-		// TODO FIXME Baha please could we have a method to determine if a give ROIBase is supported?
-		return false;
+		return ROIBeanConverter.isROISupported(roi);
 	}
 }

@@ -139,4 +139,16 @@ public class ROIBeanConverter {
 		}
 		return null;
 	}
+
+	/**
+	 * Method that returns true if the type of ROI is supported by the ROIBeanConverter
+	 * @return
+	 */
+	public static boolean isROISupported(ROIBase roi){
+		if(roi instanceof CircularROI)return true;
+		else if(roi instanceof RectangularROI)return true;
+		else if(roi instanceof SectorROI)return true;
+		else if(roi instanceof PolylineROI)return true;
+		else return false;
+	}
 }
