@@ -57,6 +57,7 @@ class PersistentFileImpl implements IPersistentFile{
 	 */
 	PersistentFileImpl(IHierarchicalDataFile file) {
 		this.file = file;
+		this.filePath = file.getPath();
 	}
 
 	/**
@@ -78,9 +79,20 @@ class PersistentFileImpl implements IPersistentFile{
 		writeH5Mask(masks);
 	}
 	@Override
-	public void addMask(String name, BooleanDataset mask) {
-		// TODO Auto-generated method stub
-		
+	public void addMask(String name, BooleanDataset mask, IMonitor mon) throws Exception{
+		DataHolder dh = LoaderFactory.getData(filePath, true, mon);
+		Map<String, BooleanDataset> masks = readH5Masks(dh, mon);
+		if(masks.containsKey(name))
+			file.delete(MASK_ENTRY+"/"+name);
+
+		AbstractDataset id = DatasetUtils.cast(mask, AbstractDataset.INT8);
+		Group parent = (Group)file.getData(MASK_ENTRY);
+		final Datatype datatype = H5Utils.getDatatype(id);
+		final long[] shape = new long[id.getShape().length];
+		for (int i = 0; i < shape.length; i++)
+			shape[i] = id.getShape()[i];
+		final Dataset dataset = file.createDataset(name, datatype, shape, id.getBuffer(), parent);
+		file.setNexusAttribute(dataset, Nexus.SDS);
 	}
 
 	@Override

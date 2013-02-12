@@ -55,8 +55,10 @@ public interface IPersistentFile {
 	 * Not implemented yet.
 	 * @param String
 	 * @param BooleanDataset
+	 * @param mon
+	 * @throws Exception
 	 */
-	public void addMask(String name, BooleanDataset mask);
+	public void addMask(String name, BooleanDataset mask, IMonitor mon) throws Exception;
 
 	/**
 	 * Method to set a dataset: can be an image or a stack of images<br>

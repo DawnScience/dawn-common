@@ -84,8 +84,11 @@ public class PersistenceServiceImplTest extends AbstractThreadTest {
 					true, true, false, true };
 			boolean[] bd1 = { true, true, true, true, false, true, false, true,
 					false, true, false, false };
+			boolean[] bd2 = { false, false, true, true, false, true, false, true,
+					false, true, true, true };
 			BooleanDataset mask0 = new BooleanDataset(bd0);
 			BooleanDataset mask1 = new BooleanDataset(bd1);
+			BooleanDataset mask2 = new BooleanDataset(bd2);
 			Map<String, BooleanDataset> masks = new HashMap<String, BooleanDataset>();
 			masks.put("mask0", mask0);
 			masks.put("mask1", mask1);
@@ -96,17 +99,28 @@ public class PersistenceServiceImplTest extends AbstractThreadTest {
 			//create the persistent file
 			IPersistentFile file = persist.createPersistentFile(tmp.getAbsolutePath());
 			file.setMasks(masks);
+			//overwrite mask1 with mask2
+			file.addMask("mask1", mask2, null);
+			// add another mask
+			file.addMask("mask2", mask2, null);
 			file.close();
 			
 			//read the persistent file and retrieve the regions
-			file = persist.getPersistentFile(tmp.getAbsolutePath());
-			Map<String, BooleanDataset> masksRead = file.getMasks(null);
-			file.close();
+			IPersistentFile fileReader = persist.getPersistentFile(tmp.getAbsolutePath());
+			Map<String, BooleanDataset> masksRead = fileReader.getMasks(null);
+			fileReader.close();
 			
-			//test that the masks are the same
+			//test that masks are saved in the file
 			if(masksRead != null){
-				assertEquals(masks.containsKey("mask0"), masksRead.containsKey("mask0"));
-				assertEquals(masks.containsKey("mask1"), masksRead.containsKey("mask1"));
+				assertTrue(masksRead.containsKey("mask0"));
+				assertTrue(masksRead.containsKey("mask1"));
+				assertTrue(masksRead.containsKey("mask2"));
+				
+				//check that the rewriting did work
+				boolean[] resultData = masksRead.get("mask1").getData();
+				for (int i = 0; i < resultData.length; i++) {
+					assertEquals(bd2[i], resultData[i]);
+				}
 			} else {
 				fail("ROIs read are Null.");
 			}
