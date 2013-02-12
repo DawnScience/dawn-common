@@ -44,6 +44,7 @@ public interface IPersistentFile {
 	/**
 	 * Method to set a map of masks<br>
 	 * This will write the data to entry/mask<br>
+	 * If the masks already exist, they will be overwritten.<br>
 	 * 
 	 * @param Map
 	 * @throws Exception 
@@ -52,7 +53,8 @@ public interface IPersistentFile {
 
 	/**
 	 * Method to add a mask to the current map of masks<br>
-	 * Not implemented yet.
+	 * If the mask already exist, it will be overwritten.<br>
+	 * 
 	 * @param String
 	 * @param BooleanDataset
 	 * @param mon
@@ -63,6 +65,7 @@ public interface IPersistentFile {
 	/**
 	 * Method to set a dataset: can be an image or a stack of images<br>
 	 * This will write the data to entry/data<br>
+	 * If the data already exist it will be overwritten.<br>
 	 * 
 	 * @param data
 	 * @throws Exception 
