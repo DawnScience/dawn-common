@@ -43,8 +43,8 @@ public class CursorUtils {
 		double yCoordinate = yAxis.getPositionValue(me.y);
 		double intensity   = Double.NaN;
 		if (imageTrace!=null) {
-			xCoordinate = Math.round(xCoordinate);
-			yCoordinate = Math.round(yCoordinate);
+			xCoordinate = Math.floor(xCoordinate);
+			yCoordinate = Math.floor(yCoordinate);
 		    intensity   = imageTrace.getData().getDouble((int)yCoordinate, (int)xCoordinate);
 		    
 		    
