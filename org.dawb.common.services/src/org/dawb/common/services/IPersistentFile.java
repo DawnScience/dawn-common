@@ -104,7 +104,7 @@ public interface IPersistentFile {
 	 * @param String
 	 * @param ROIBase
 	 */
-	public void addROI(String name, ROIBase roi);
+	public void addROI(String name, ROIBase roi, String roiType) throws Exception ;
 
 	/**
 	 * Method that reads a ROI from entry/region<br>

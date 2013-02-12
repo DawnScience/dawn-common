@@ -115,9 +115,22 @@ class PersistentFileImpl implements IPersistentFile{
 	}
 
 	@Override
-	public void addROI(String name, ROIBase roi) {
-		// TODO Auto-generated method stub
+	public void addROI(String name, ROIBase roiBase, String roiType) throws Exception {
 		
+		if (file == null) file = HierarchicalDataFactory.getWriter(filePath);
+		
+		Group parent = createParentEntry(ROI_ENTRY);
+		
+		// JSON serialisation
+		GsonBuilder builder = new GsonBuilder();
+		//TODO: serialiser to be worked on...
+		//builder.registerTypeAdapter(ROIBean.class, new ROISerializer());
+		Gson gson = builder.create();
+	
+		HObject dataset = writeRoi(file, parent, name, roiBase, gson);
+		if (dataset!=null) {
+			file.setAttribute(dataset, "Region Type", roiType);
+		}
 	}
 
 	@Override
@@ -317,39 +330,48 @@ class PersistentFileImpl implements IPersistentFile{
 	 */
 	private void writeH5Rois(final Map<String, ROIBase> rois) throws Exception {
 
-		if(file == null)
-			file = HierarchicalDataFactory.getWriter(filePath);
+		if (file == null) file = HierarchicalDataFactory.getWriter(filePath);
 		
 		Group parent = createParentEntry(ROI_ENTRY);
 		
 		if (rois != null) {
-			Set<String> names = rois.keySet();
 			// JSON serialisation
 			GsonBuilder builder = new GsonBuilder();
 			//TODO: serialiser to be worked on...
 			//builder.registerTypeAdapter(ROIBean.class, new ROISerializer());
 			Gson gson = builder.create();
 
-			Iterator<String> it = names.iterator();
+			Iterator<String> it = rois.keySet().iterator();
 			while(it.hasNext()){
 				String name = it.next();
 				ROIBase roi = rois.get(name);
-				ROIBean roibean = ROIBeanConverter.ROIBaseToROIBean(name, roi);
-				
-				long[] dims = {1};
-				
-				String json = gson.toJson(roibean);
-				
-				HObject currentData = file.getData(ROI_ENTRY+"/"+name);
-				// if data already exists, delete it
-				if(currentData!= null) file.delete(currentData.getPath()+name);
-				// we create the dataset
-				Dataset dat = file.createDataset(name, new H5Datatype(Datatype.CLASS_INTEGER, 4, Datatype.NATIVE, Datatype.NATIVE), dims, new int[]{0}, parent);
-				// we set the JSON attribute
-				file.setAttribute(dat, "JSON", json);
+				writeRoi(file, parent, name, roi, gson);
 			}
 
 		}
+	}
+	
+	private HObject writeRoi(IHierarchicalDataFile file, 
+			                 Group   parent,
+				             String  name,
+				             ROIBase roi,
+				             Gson    gson) throws Exception {
+		
+		ROIBean roibean = ROIBeanConverter.ROIBaseToROIBean(name, roi);
+		
+		long[] dims = {1};
+		
+		String json = gson.toJson(roibean);
+		
+		HObject currentData = file.getData(ROI_ENTRY+"/"+name);
+		// if data already exists, delete it
+		if(currentData!= null) file.delete(currentData.getPath()+name);
+		// we create the dataset
+		Dataset dat = file.createDataset(name, new H5Datatype(Datatype.CLASS_INTEGER, 4, Datatype.NATIVE, Datatype.NATIVE), dims, new int[]{0}, parent);
+		// we set the JSON attribute
+		file.setAttribute(dat, "JSON", json);
+
+		return dat;
 	}
 
 	private Group createParentEntry(String fullEntry) throws Exception{
