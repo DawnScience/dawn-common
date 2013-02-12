@@ -39,7 +39,7 @@ import uk.ac.diamond.scisoft.analysis.roi.ROIBase;
 import uk.ac.diamond.scisoft.analysis.roi.RectangularROI;
 
 /**
- * Class to create an {@link}AxisPixelROIEditTable which implements an {@link}IROIListener
+ * Class to create an {@link AxisPixelROIEditTable} which implements an {@link}IROIListener
  * and shows the sum, minimum and maximum of a Rectangular ROI
  * @author wqk87977
  *
@@ -363,6 +363,9 @@ public class ROIWidget implements IROIListener {
 		plotSystem.removeRegionListener(listener);
 	}
 
+	/**
+	 * This method needs to be called to clear the region listeners
+	 */
 	public void dispose(){
 		clearListeners(plottingSystem, regionListener);
 	}
