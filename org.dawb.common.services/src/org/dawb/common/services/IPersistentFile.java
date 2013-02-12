@@ -59,8 +59,10 @@ public interface IPersistentFile {
 	 * Method to add a mask to the current map of masks<br>
 	 * If the mask already exist, it will be overwritten.<br>
 	 * 
-	 * @param String
-	 * @param BooleanDataset
+	 * @param name
+	 *           the name of the mask (must be unique)
+	 * @param mask
+	 *           the mask value as a BooleanDataset
 	 * @param mon
 	 * @throws Exception
 	 */
@@ -79,6 +81,7 @@ public interface IPersistentFile {
 	/**
 	 * Method to set the axes<br>
 	 * This will write the data to entry/data<br>
+	 * If the axes already exist, they will be overwritten.<br>
 	 * 
 	 * @param axes
 	 * @throws Exception 
@@ -88,6 +91,7 @@ public interface IPersistentFile {
 	/**
 	 * Method to set a map of ROIs<br>
 	 * This will write the data to entry/region<br>
+	 * If the ROIs already exist, they will be overwritten.<br>
 	 * 
 	 * @param Map
 	 * @throws Exception 
@@ -209,7 +213,8 @@ public interface IPersistentFile {
 	/**
 	 * A method to test if a given ROIBase can be persisted using JSON
 	 * @param roi
-	 * @return true if this region can be saved in the persistence file.
+	 * @return true 
+	 *            if this region can be saved in the persistence file.
 	 * 
 	 */
 	public boolean isRegionSupported(ROIBase roi);
