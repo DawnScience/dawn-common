@@ -1,5 +1,7 @@
 package org.dawb.common.ui.plot.axis;
 
+import java.text.NumberFormat;
+
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 
@@ -237,4 +239,10 @@ public interface IAxis {
 	 * @param ticksAtEnds if true then place ticks on scale ends
 	 */
 	public void setTicksAtEnds(boolean ticksAtEnds);
+
+	/**
+	 * 
+	 * @return the number (usually Double) formatted to the current format
+	 */
+	public String format(Object value);
 }

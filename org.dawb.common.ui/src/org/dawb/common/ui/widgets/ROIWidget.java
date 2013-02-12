@@ -489,7 +489,7 @@ public class ROIWidget implements IROIListener {
 						if(str.length>1){
 							String val2 = str[1];
 							val1 = val1.substring(0, precision+2);
-							sumStr = val1+"E"+val2;
+							sumStr = val1+"e"+val2;
 						} else {
 							sumStr = dataRegion.sum(true).toString();
 						}

@@ -17,6 +17,7 @@ import ncsa.hdf.object.Datatype;
 import ncsa.hdf.object.Group;
 import ncsa.hdf.object.h5.H5Datatype;
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.BooleanDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ByteDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.DatasetUtils;
 import uk.ac.diamond.scisoft.analysis.dataset.DoubleDataset;
@@ -144,7 +145,7 @@ public class H5Utils {
 	public static Datatype getDatatype(AbstractDataset a) throws Exception {
 		
 		// There is a smarter way of doing this, but am in a hurry...
-		if (a instanceof ByteDataset) {
+		if (a instanceof ByteDataset || a instanceof BooleanDataset) {
          	return new H5Datatype(Datatype.CLASS_INTEGER, 8/8, Datatype.NATIVE, Datatype.SIGN_NONE);
          	
         } else if (a instanceof ShortDataset) {

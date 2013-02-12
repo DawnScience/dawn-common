@@ -581,6 +581,12 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 		}
 		
 	}
+	
+	@Override
+    public void delete(String fullPath) throws Exception {
+		final HObject object = getData(fullPath);
+		file.delete(object);
+	}
 
 	/**
 	 * Method currently synchronized, you cannot have more than one thread
