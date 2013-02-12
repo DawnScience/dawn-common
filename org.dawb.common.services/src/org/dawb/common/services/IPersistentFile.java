@@ -30,11 +30,15 @@ import uk.ac.diamond.scisoft.analysis.roi.ROIBase;
  * entry/mask/...        |   ...          |  ...                    
  * entry/region          |   Dataset      |  8-bit integer          
  * entry/region/JSON     |   Attribute    |  String                 
+ * entry/function        |   Dataset      |  64-bit floating-point  
+ * entry/function/JSON   |   Attribute    |  String                 
  * </pre>
  * The image can contain more than one Dataset with its corresponding axes.<br>
  * The region is an JSON serialized dataset. It can therefore contain more than one region.<br>
  * <br>
  * After using an IPersistentFile, the method {@link close()} needs to be called.
+ * <br>
+ * TODO although defined here as placeholders the functions are not yet implemented.
  * 
  * @author wqk87977
  *
