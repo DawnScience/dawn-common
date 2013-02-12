@@ -603,6 +603,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	 */
 	@Override
 	public void disposeToolPage(String id) {
+		if (isDisposed()) return;
 		try {
 			actionBarManager.disposeToolPage(id);
 		} catch (Exception e) {

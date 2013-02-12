@@ -10,6 +10,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.widgets.Display;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import uk.ac.diamond.scisoft.analysis.roi.ROIBase;
 
@@ -54,9 +56,15 @@ public abstract class AbstractRegion extends Figure implements IRegion, IRegionC
 		final ROIEvent evt = new ROIEvent(this, roi);
 		evt.setDragType(type);
 		for (IROIListener l : roiListeners) {
-			l.roiDragged(evt);
+			try {
+			    l.roiDragged(evt);
+			} catch (Throwable ne) {
+				logger.error("Unexpected exception in drawning!", ne);
+			}
 		}
 	}
+	
+	private static final Logger logger = LoggerFactory.getLogger(AbstractRegion.class);
 	
 	protected void fireROIChanged(ROIBase roi) {
 		if (roiListeners==null)  return;
@@ -64,7 +72,11 @@ public abstract class AbstractRegion extends Figure implements IRegion, IRegionC
 		
 		final ROIEvent evt = new ROIEvent(this, roi);
 		for (IROIListener l : roiListeners) {
-			l.roiChanged(evt);
+			try {
+			    l.roiChanged(evt);
+			} catch (Throwable ne) {
+				logger.error("Unexpected exception in drawning!", ne);
+			}
 		}
 	}
 	protected void fireROISelected(ROIBase roi) {
@@ -73,7 +85,11 @@ public abstract class AbstractRegion extends Figure implements IRegion, IRegionC
 		
 		final ROIEvent evt = new ROIEvent(this, roi);
 		for (IROIListener l : roiListeners) {
-			l.roiSelected(evt);
+			try {
+			 l.roiSelected(evt);
+			} catch (Throwable ne) {
+				logger.error("Unexpected exception in drawning!", ne);
+			}
 		}
 	}
 
