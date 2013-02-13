@@ -45,7 +45,7 @@ public class NexusUtils {
 	public static final String LABEL   = "label";	
 	public static final String PRIM    = "primary";	
 	public static final String SIGNAL  = "signal";	
-	public static final String UNIT    = "unit";	
+	public static final String UNIT    = "units";	
 	
 	private final static Logger logger = LoggerFactory.getLogger(NexusUtils.class);
 

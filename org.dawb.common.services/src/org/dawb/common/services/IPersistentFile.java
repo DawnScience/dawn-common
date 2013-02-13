@@ -6,6 +6,7 @@ import java.util.Map;
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.BooleanDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
+import uk.ac.diamond.scisoft.analysis.io.IDiffractionMetadata;
 import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
 import uk.ac.diamond.scisoft.analysis.roi.ROIBase;
 
@@ -105,13 +106,6 @@ public interface IPersistentFile {
 	 * @param ROIBase
 	 */
 	public void addROI(String name, ROIBase roi, String roiType) throws Exception ;
-
-	/**
-	 * Method to set the version of a persistence file
-	 * @param version
-	 * @throws Exception
-	 */
-	public void setVersion(String version) throws Exception;
 
 	/**
 	 * Method to set the site
@@ -232,6 +226,17 @@ public interface IPersistentFile {
 	 * 
 	 */
 	public boolean isRegionSupported(ROIBase roi);
+	
+	/**
+	 * Method to set diffraction metadata<br>
+	 * This will write the data to entry/metadata<br>
+	 * If the metadata already exists, they will be overwritten.<br>
+	 * 
+	 * @param Map
+	 * @throws Exception 
+	 */
+	public void setDiffractionMetadata(IDiffractionMetadata metadata) throws Exception;
+
 
 	/**
 	 * Method that returns the version the persistent file.<br>
@@ -248,4 +253,5 @@ public interface IPersistentFile {
 	 * @throws Exception
 	 */
 	public String getSite() throws Exception;
+
 }

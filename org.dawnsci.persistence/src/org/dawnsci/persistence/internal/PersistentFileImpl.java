@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.vecmath.Matrix3d;
+
 import ncsa.hdf.object.Dataset;
 import ncsa.hdf.object.Datatype;
 import ncsa.hdf.object.Group;
@@ -18,6 +20,7 @@ import org.dawb.gda.extensions.loaders.H5Utils;
 import org.dawb.hdf5.HierarchicalDataFactory;
 import org.dawb.hdf5.IHierarchicalDataFile;
 import org.dawb.hdf5.Nexus;
+import org.dawb.hdf5.nexus.NexusUtils;
 import org.dawnsci.persistence.roi.ROIBean;
 import org.dawnsci.persistence.roi.ROIBeanConverter;
 import org.slf4j.Logger;
@@ -28,7 +31,10 @@ import uk.ac.diamond.scisoft.analysis.dataset.BooleanDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.DatasetUtils;
 import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ShortDataset;
+import uk.ac.diamond.scisoft.analysis.diffraction.DetectorProperties;
+import uk.ac.diamond.scisoft.analysis.diffraction.DiffractionCrystalEnvironment;
 import uk.ac.diamond.scisoft.analysis.io.DataHolder;
+import uk.ac.diamond.scisoft.analysis.io.IDiffractionMetadata;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
 import uk.ac.diamond.scisoft.analysis.roi.ROIBase;
@@ -52,14 +58,26 @@ class PersistentFileImpl implements IPersistentFile{
 	private final String DATA_ENTRY = "/entry/data";
 	private final String MASK_ENTRY = "/entry/mask";
 	private final String ROI_ENTRY = "/entry/region";
+	private final String DIFFRACTIONMETADATA_ENTRY = "/entry/diffractionmetadata";
+
+	/**
+	 * Version of the API
+	 */
+	private final String VERSION = "1.0";
+	/**
+	 * Site where the API is used
+	 */
+	private final String SITE = "Diamond Light Source";
 
 	/**
 	 * For save
 	 * @param file
 	 */
-	PersistentFileImpl(IHierarchicalDataFile file) {
+	PersistentFileImpl(IHierarchicalDataFile file) throws Exception{
 		this.file = file;
 		this.filePath = file.getPath();
+		setSite(SITE);
+		setVersion(VERSION);
 	}
 
 	/**
@@ -130,8 +148,12 @@ class PersistentFileImpl implements IPersistentFile{
 		}
 	}
 
-	@Override
-	public void setVersion(String version) throws Exception {
+	/**
+	 * Used to set the version of the API
+	 * @param version
+	 * @throws Exception
+	 */
+	private void setVersion(String version) throws Exception {
 		if (file == null) file = HierarchicalDataFactory.getWriter(filePath);
 		//check if parent group exists
 		Group parent = (Group)file.getData(ENTRY);
@@ -232,6 +254,11 @@ class PersistentFileImpl implements IPersistentFile{
 		names = getNames(dh, ROI_ENTRY);
 		
 		return names;
+	}
+	
+	@Override
+	public void setDiffractionMetadata(IDiffractionMetadata metadata) throws Exception {
+		writeH5DiffractionMetadata(metadata);		
 	}
 
 	@Override
@@ -550,4 +577,56 @@ class PersistentFileImpl implements IPersistentFile{
 	public boolean isRegionSupported(ROIBase roi) {
 		return ROIBeanConverter.isROISupported(roi);
 	}
+	
+	private void writeH5DiffractionMetadata(IDiffractionMetadata metadata) throws Exception {
+		if (file == null) file = HierarchicalDataFactory.getWriter(filePath);
+		
+		Group parent = createParentEntry(DIFFRACTIONMETADATA_ENTRY);
+		
+		//TODO do we want to be an NX_detector?
+		//TODO should existing diffraction metadata node be deleted?
+		
+		DetectorProperties detprop = metadata.getDetector2DProperties();
+		
+		H5Datatype intType = new H5Datatype(Datatype.CLASS_INTEGER, 32/8, Datatype.NATIVE, Datatype.NATIVE);
+		H5Datatype doubleType = new H5Datatype(Datatype.CLASS_FLOAT, 64/8, Datatype.NATIVE, Datatype.NATIVE);
+		
+		final Dataset nXPix = file.createDataset("x_pixel_number", intType, new long[] {1}, detprop.getPx(), parent);
+		file.setAttribute(nXPix,NexusUtils.UNIT, "pixels");
+		final Dataset nYPix = file.createDataset("y_pixel_number", intType, new long[] {1}, detprop.getPy(), parent);
+		file.setAttribute(nYPix,NexusUtils.UNIT , "pixels");
+		
+		final Dataset sXPix = file.createDataset("x_pixel_size", doubleType, new long[] {1}, detprop.getHPxSize(), parent);
+		file.setAttribute(sXPix, NexusUtils.UNIT, "mm");
+		final Dataset sYPix = file.createDataset("y_pixel_size", doubleType, new long[] {1}, detprop.getVPxSize(), parent);
+		file.setAttribute(sYPix, NexusUtils.UNIT, "mm");
+		
+		double[] beamVector = new double[3];
+		detprop.getBeamVector().get(beamVector);
+		
+		file.createDataset("beam_vector", doubleType, new long[] {3}, beamVector, parent);
+		
+		Matrix3d or = detprop.getOrientation();
+		double[] orientation = new double[] {or.m00 ,or.m01, or.m02,
+											 or.m10, or.m11, or.m12,
+											 or.m20, or.m21, or.m22};
+		
+		file.createDataset("beam_vector", doubleType, new long[] {9}, orientation, parent);
+		
+		DiffractionCrystalEnvironment crysenv = metadata.getDiffractionCrystalEnvironment();
+		// lambda(A) = 10^7 * (h*c/e) / energy(keV)
+		double energy = 1./(0.0806554465*crysenv.getWavelength());// constant from NIST CODATA 2006
+		final Dataset ene = file.createDataset("energy", doubleType, new long[] {1}, energy, parent);
+		file.setAttribute(ene, NexusUtils.UNIT, "keV");
+		
+		final Dataset count = file.createDataset("count_time", doubleType, new long[] {1}, crysenv.getExposureTime(), parent);
+		file.setAttribute(count, NexusUtils.UNIT, "s");
+		
+		final Dataset phi_start = file.createDataset("phi_start", doubleType, new long[] {1}, crysenv.getPhiStart(), parent);
+		file.setAttribute(phi_start, NexusUtils.UNIT, "degrees");
+		
+		final Dataset phi_range = file.createDataset("phi_start", doubleType, new long[] {1}, crysenv.getPhiRange(), parent);
+		file.setAttribute(phi_range, NexusUtils.UNIT, "degrees");
+	}
+	
 }
