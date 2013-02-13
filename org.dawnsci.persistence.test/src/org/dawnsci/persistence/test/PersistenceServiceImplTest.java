@@ -299,7 +299,6 @@ public class PersistenceServiceImplTest extends AbstractThreadTest {
 			try {
 				file = persist.createPersistentFile(tmp.getAbsolutePath());
 				file.setSite(site);
-				file.setVersion(version);
 			} catch (Exception e) {
 				e.printStackTrace();
 				fail("Exception occured while writing the version/site");
