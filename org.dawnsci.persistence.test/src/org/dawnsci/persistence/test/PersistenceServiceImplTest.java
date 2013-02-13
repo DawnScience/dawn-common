@@ -160,25 +160,8 @@ public class PersistenceServiceImplTest extends AbstractThreadTest {
 			tmp.createNewFile();
 			
 			// dataset
-			final double[] random = new double[100];
-			for (int i = 0; i < 100; i++) {
-				random[i] = Math.random();
-			}
-			final double[] axis = new double[2048];
-			for (int i = 0; i < 2048; i++) {
-				axis[i] = i;
-			}
-			AbstractDataset da = AbstractDataset.arange(4194304,
-					AbstractDataset.FLOAT64);
-			da.setName("data");
-			da.setShape(2048, 2048);
-			DoubleDataset dx = new DoubleDataset(axis);
-			dx.setName("X Axis");
-			DoubleDataset dy = new DoubleDataset(axis);
-			dy.setName("Y Axis");
-			List<AbstractDataset> axes = new ArrayList<AbstractDataset>();
-			axes.add(dx);
-			axes.add(dy);
+			AbstractDataset da = createTestData();
+			List<AbstractDataset> axes = createTestAxesData();
 
 			// create the PersistentService
 			IPersistenceService persist = PersistenceServiceCreator
@@ -208,6 +191,103 @@ public class PersistenceServiceImplTest extends AbstractThreadTest {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			fail("Exception occured while writing/reading Masks");
+		}
+	}
+
+	@Test
+	public void testReWriteData(){
+		try {
+			final File tmp = File.createTempFile("TestData", ".nxs");
+			tmp.deleteOnExit();
+			tmp.createNewFile();
+			
+			// dataset
+			AbstractDataset da = createTestData();
+			List<AbstractDataset> axes = createTestAxesData();
+			
+			// create the PersistentService
+			IPersistenceService persist = PersistenceServiceCreator
+					.createPersistenceService();
+
+			// create the persistent file
+			IPersistentFile file = persist.createPersistentFile(tmp
+					.getAbsolutePath());
+			file.setData(da);
+			file.setAxes(axes);
+			file.close();
+			
+			// rewrite the persistent file
+			file = persist.createPersistentFile(tmp.getAbsolutePath());
+			file.setData(da);
+			file.setAxes(axes);
+			file.close();
+			
+			// read the persistent file and retrieve the regions
+			file = persist.getPersistentFile(tmp.getAbsolutePath());
+			ILazyDataset dataRead = file.getData("data", null);
+			List<ILazyDataset> axesRead = file
+					.getAxes("X Axis", "Y Axis", null);
+			file.close();
+
+			// test that the data/axes are the same
+			assertEquals(da.getName(), dataRead.getName());
+			assertEquals(axes.get(0).getName(), axesRead.get(0).getName());
+			assertEquals(axes.get(1).getName(), axesRead.get(1).getName());
+		} catch (IOException e1) {
+			e1.printStackTrace();
+			fail("IOException occured while writing/reading data");
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail("Exception occured while writing/reading data");
+		}
+	}
+
+	@Test
+	public void testReadWriteVersionSite(){
+		
+		try {
+			File tmp = File.createTempFile("TestVersionSite", ".nxs");
+			tmp.deleteOnExit();
+			tmp.createNewFile();
+			String version = "1.0";
+			String site = "Diamond Light Source";
+			// create the PersistentService
+			IPersistenceService persist = PersistenceServiceCreator.createPersistenceService();
+
+			// create the persistent file and set the version/site
+			IPersistentFile file = null;
+			try {
+				file = persist.createPersistentFile(tmp.getAbsolutePath());
+				file.setSite(site);
+				file.setVersion(version);
+			} catch (Exception e) {
+				e.printStackTrace();
+				fail("Exception occured while writing the version/site");
+			} finally {
+				if (file!= null)
+					file.close();
+			}
+			
+			String versionRead = "";
+			String siteRead = "";
+			// read the persistent file and retrieve the version/site
+			try {
+				file = persist.getPersistentFile(tmp.getAbsolutePath());
+				String str = file.getVersion();
+				versionRead = str.substring(1, str.length()-1); //we get rid of the first and last character
+				str = file.getSite();
+				siteRead = str.substring(1, str.length()-1); //we get rid of the first and last character
+			} catch (Exception e) {
+				e.printStackTrace();
+				fail("Exception occured while reading the version/site");
+			}finally{
+				file.close();
+			}
+			assertEquals(version, versionRead);
+			assertEquals(site, siteRead);
+		} catch (IOException e) {
+			e.printStackTrace();
+			fail("IOException occured while creationg test file");;
 		}
 	}
 
@@ -281,4 +361,32 @@ public class PersistenceServiceImplTest extends AbstractThreadTest {
 		}
 	}
 
+	private AbstractDataset createTestData(){
+		// dataset
+		final double[] random = new double[100];
+		for (int i = 0; i < 100; i++) {
+			random[i] = Math.random();
+		}
+		AbstractDataset da = AbstractDataset.arange(4194304,
+				AbstractDataset.FLOAT64);
+		da.setName("data");
+		da.setShape(2048, 2048);
+		
+		return da;
+	}
+
+	private List<AbstractDataset> createTestAxesData(){
+		final double[] axis = new double[2048];
+		for (int i = 0; i < 2048; i++) {
+			axis[i] = i;
+		}
+		DoubleDataset dx = new DoubleDataset(axis);
+		dx.setName("X Axis");
+		DoubleDataset dy = new DoubleDataset(axis);
+		dy.setName("Y Axis");
+		List<AbstractDataset> axes = new ArrayList<AbstractDataset>();
+		axes.add(dx);
+		axes.add(dy);
+		return axes;
+	}
 }

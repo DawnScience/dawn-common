@@ -234,7 +234,7 @@ public interface IPersistentFile {
 	public boolean isRegionSupported(ROIBase roi);
 
 	/**
-	 * Method that returns the version of DAWN used to save the file.<br>
+	 * Method that returns the version the persistent file.<br>
 	 * Saved as an attribute in the HDF5 file.
 	 * @return String
 	 * @throws Exception

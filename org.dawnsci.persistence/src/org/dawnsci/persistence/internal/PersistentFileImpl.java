@@ -48,6 +48,7 @@ class PersistentFileImpl implements IPersistentFile{
 	private static final Logger logger = LoggerFactory.getLogger(PersistentFileImpl.class);
 	private IHierarchicalDataFile file;
 	private String filePath;
+	private final String ENTRY = "/entry";
 	private final String DATA_ENTRY = "/entry/data";
 	private final String MASK_ENTRY = "/entry/mask";
 	private final String ROI_ENTRY = "/entry/region";
@@ -131,14 +132,20 @@ class PersistentFileImpl implements IPersistentFile{
 
 	@Override
 	public void setVersion(String version) throws Exception {
-		// TODO Auto-generated method stub
-		
+		if (file == null) file = HierarchicalDataFactory.getWriter(filePath);
+		//check if parent group exists
+		Group parent = (Group)file.getData(ENTRY);
+		if(parent == null) parent = createParentEntry(ENTRY);
+		file.setAttribute(parent, "Version", version);
 	}
 
 	@Override
 	public void setSite(String site) throws Exception {
-		// TODO Auto-generated method stub
-		
+		if (file == null) file = HierarchicalDataFactory.getWriter(filePath);
+		//check if parent group exists
+		Group parent = (Group)file.getData(ENTRY);
+		if(parent == null) parent = createParentEntry(ENTRY);
+		file.setAttribute(parent, "Site", site);
 	}
 
 	@Override
@@ -229,14 +236,12 @@ class PersistentFileImpl implements IPersistentFile{
 
 	@Override
 	public String getVersion() throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		return file.getAttributeValue(ENTRY+"@Version");
 	}
 
 	@Override
 	public String getSite() throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		return file.getAttributeValue(ENTRY+"@Site");
 	}
 
 	/**
