@@ -446,9 +446,8 @@ class PersistentFileImpl implements IPersistentFile{
 		while (it.hasNext()) {
 			String name = (String) it.next();
 			
-			ShortDataset sdata = (ShortDataset)LoaderFactory.getDataSet(filePath, MASK_ENTRY+name, mon);
+			ShortDataset sdata = (ShortDataset)LoaderFactory.getDataSet(filePath, MASK_ENTRY+"/"+name, mon);
 			BooleanDataset bd = (BooleanDataset) DatasetUtils.cast(sdata, AbstractDataset.BOOL);
-			name = cleanArray(name.split("/"))[0]; //take the / out of the name
 			masks.put(name, bd);
 		}
 		return masks;
@@ -496,14 +495,13 @@ class PersistentFileImpl implements IPersistentFile{
 		Iterator<String> it = names.iterator();
 		while (it.hasNext()) {
 			String name = (String) it.next();
-			String json = file.getAttributeValue(ROI_ENTRY+name+"@JSON");
+			String json = file.getAttributeValue(ROI_ENTRY+"/"+name+"@JSON");
 			json = json.substring(1, json.length()-1); // this is needed as somehow, the getAttribute adds [ ] around the json string...
 			ROIBean roibean = ROIBeanConverter.getROIBeanfromJSON(gson, json);
 			
 			//convert the bean to roibase
 			ROIBase roi = ROIBeanConverter.ROIBeanToROIBase(roibean);
-			String[] str = cleanArray(name.split("/")); //take the / out of the name
-			rois.put(str[0], roi);
+			rois.put(name, roi);
 		}
 
 		return rois;
