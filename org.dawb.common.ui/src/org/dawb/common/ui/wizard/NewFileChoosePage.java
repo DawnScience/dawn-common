@@ -19,12 +19,12 @@ import org.eclipse.ui.dialogs.WizardNewFileCreationPage;
  * @author fcp94556
  *
  */
-public class FileChoosePage extends WizardNewFileCreationPage {
+public class NewFileChoosePage extends WizardNewFileCreationPage {
 
 	private boolean overwrite = false;
 	private Button overwriteBtn;
 	
-	public FileChoosePage(String pageName, IStructuredSelection selection) {
+	public NewFileChoosePage(String pageName, IStructuredSelection selection) {
 		super(pageName, selection);
 	}
 
