@@ -309,10 +309,14 @@ public class ROIWidget implements IROIListener {
 				
 				IRegion region = evt.getRegion();
 				if (region!=null) {
-						roiViewer.setTableValues(region.getROI());
-						if(sumMinMaxIsShown && region.getROI() instanceof RectangularROI)
-							updateSumMinMax((RectangularROI)region.getROI());
-
+					region.addROIListener(ROIWidget.this);
+					if(roiViewer==null){
+						createRegionComposite(regionComposite, region.getRegionType());
+					roiViewer.setTableValues(region.getROI());
+					if(sumMinMaxIsShown && region.getROI() instanceof RectangularROI)
+						updateSumMinMax((RectangularROI)region.getROI());
+					}
+					
 					parent.layout();
 					parent.redraw();
 				}
@@ -361,6 +365,24 @@ public class ROIWidget implements IROIListener {
 			}
 		}
 		plotSystem.removeRegionListener(listener);
+	}
+
+	/**
+	 * Add a region listener
+	 * @param plotSystem
+	 */
+	public void addRegionListener(AbstractPlottingSystem plotSystem){
+		
+		if (plotSystem==null) return;
+		Collection<IRegion> regions = plotSystem.getRegions();
+		if(regions != null && regions.size() > 0){
+			Iterator<IRegion> it = regions.iterator();
+			while(it.hasNext()){
+				IRegion region = it.next();
+				region.addROIListener(this);
+			}
+		}
+		plotSystem.addRegionListener(regionListener);
 	}
 
 	/**
