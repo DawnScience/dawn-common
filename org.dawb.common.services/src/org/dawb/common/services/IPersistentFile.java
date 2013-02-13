@@ -107,13 +107,6 @@ public interface IPersistentFile {
 	public void addROI(String name, ROIBase roi, String roiType) throws Exception ;
 
 	/**
-	 * Method to set the version of a persistence file
-	 * @param version
-	 * @throws Exception
-	 */
-	public void setVersion(String version) throws Exception;
-
-	/**
 	 * Method to set the site
 	 * @param site
 	 * @throws Exception

@@ -52,14 +52,24 @@ class PersistentFileImpl implements IPersistentFile{
 	private final String DATA_ENTRY = "/entry/data";
 	private final String MASK_ENTRY = "/entry/mask";
 	private final String ROI_ENTRY = "/entry/region";
+	/**
+	 * Version of the API
+	 */
+	private final String VERSION = "1.0";
+	/**
+	 * Site where the API is used
+	 */
+	private final String SITE = "Diamond Light Source";
 
 	/**
 	 * For save
 	 * @param file
 	 */
-	PersistentFileImpl(IHierarchicalDataFile file) {
+	PersistentFileImpl(IHierarchicalDataFile file) throws Exception{
 		this.file = file;
 		this.filePath = file.getPath();
+		setSite(SITE);
+		setVersion(VERSION);
 	}
 
 	/**
@@ -130,8 +140,12 @@ class PersistentFileImpl implements IPersistentFile{
 		}
 	}
 
-	@Override
-	public void setVersion(String version) throws Exception {
+	/**
+	 * Used to set the version of the API
+	 * @param version
+	 * @throws Exception
+	 */
+	private void setVersion(String version) throws Exception {
 		if (file == null) file = HierarchicalDataFactory.getWriter(filePath);
 		//check if parent group exists
 		Group parent = (Group)file.getData(ENTRY);
