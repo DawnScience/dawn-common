@@ -6,6 +6,7 @@ import java.util.Map;
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.BooleanDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
+import uk.ac.diamond.scisoft.analysis.io.IDiffractionMetadata;
 import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
 import uk.ac.diamond.scisoft.analysis.roi.ROIBase;
 
@@ -218,4 +219,14 @@ public interface IPersistentFile {
 	 * 
 	 */
 	public boolean isRegionSupported(ROIBase roi);
+	
+	/**
+	 * Method to set diffraction metadata<br>
+	 * This will write the data to entry/metadata<br>
+	 * If the metadata already exists, they will be overwritten.<br>
+	 * 
+	 * @param Map
+	 * @throws Exception 
+	 */
+	public void setDiffractionMetadata(IDiffractionMetadata metadata) throws Exception;
 }
