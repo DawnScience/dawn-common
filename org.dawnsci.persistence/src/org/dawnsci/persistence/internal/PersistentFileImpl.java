@@ -54,18 +54,30 @@ class PersistentFileImpl implements IPersistentFile{
 	private static final Logger logger = LoggerFactory.getLogger(PersistentFileImpl.class);
 	private IHierarchicalDataFile file;
 	private String filePath;
+	private final String ENTRY = "/entry";
 	private final String DATA_ENTRY = "/entry/data";
 	private final String MASK_ENTRY = "/entry/mask";
 	private final String ROI_ENTRY = "/entry/region";
 	private final String DIFFRACTIONMETADATA_ENTRY = "/entry/diffractionmetadata";
 
 	/**
+	 * Version of the API
+	 */
+	private final String VERSION = "1.0";
+	/**
+	 * Site where the API is used
+	 */
+	private final String SITE = "Diamond Light Source";
+
+	/**
 	 * For save
 	 * @param file
 	 */
-	PersistentFileImpl(IHierarchicalDataFile file) {
+	PersistentFileImpl(IHierarchicalDataFile file) throws Exception{
 		this.file = file;
 		this.filePath = file.getPath();
+		setSite(SITE);
+		setVersion(VERSION);
 	}
 
 	/**
@@ -89,10 +101,6 @@ class PersistentFileImpl implements IPersistentFile{
 
 	@Override
 	public void addMask(String name, BooleanDataset mask, IMonitor mon) throws Exception{
-
-		HObject currentData = file.getData(MASK_ENTRY+"/"+name);
-		// if data already exists, delete it
-		if(currentData!= null) file.delete(currentData.getPath()+name);
 		
 		AbstractDataset id = DatasetUtils.cast(mask, AbstractDataset.INT8);
 		//check if parent group exists
@@ -100,9 +108,9 @@ class PersistentFileImpl implements IPersistentFile{
 		if(parent == null) parent = createParentEntry(MASK_ENTRY);
 		final Datatype datatype = H5Utils.getDatatype(id);
 		final long[] shape = new long[id.getShape().length];
-		for (int i = 0; i < shape.length; i++)
-			shape[i] = id.getShape()[i];
-		final Dataset dataset = file.createDataset(name, datatype, shape, id.getBuffer(), parent);
+		
+		for (int i = 0; i < shape.length; i++) shape[i] = id.getShape()[i];
+		final Dataset dataset = file.replaceDataset(name, datatype, shape, id.getBuffer(), parent);
 		file.setNexusAttribute(dataset, Nexus.SDS);
 	}
 
@@ -138,6 +146,28 @@ class PersistentFileImpl implements IPersistentFile{
 		if (dataset!=null) {
 			file.setAttribute(dataset, "Region Type", roiType);
 		}
+	}
+
+	/**
+	 * Used to set the version of the API
+	 * @param version
+	 * @throws Exception
+	 */
+	private void setVersion(String version) throws Exception {
+		if (file == null) file = HierarchicalDataFactory.getWriter(filePath);
+		//check if parent group exists
+		Group parent = (Group)file.getData(ENTRY);
+		if(parent == null) parent = createParentEntry(ENTRY);
+		file.setAttribute(parent, "Version", version);
+	}
+
+	@Override
+	public void setSite(String site) throws Exception {
+		if (file == null) file = HierarchicalDataFactory.getWriter(filePath);
+		//check if parent group exists
+		Group parent = (Group)file.getData(ENTRY);
+		if(parent == null) parent = createParentEntry(ENTRY);
+		file.setAttribute(parent, "Site", site);
 	}
 
 	@Override
@@ -231,6 +261,16 @@ class PersistentFileImpl implements IPersistentFile{
 		writeH5DiffractionMetadata(metadata);		
 	}
 
+	@Override
+	public String getVersion() throws Exception {
+		return file.getAttributeValue(ENTRY+"@Version");
+	}
+
+	@Override
+	public String getSite() throws Exception {
+		return file.getAttributeValue(ENTRY+"@Site");
+	}
+
 	/**
 	 * Method to write image data (and axis) to an HDF5 file given a specific path entry to save the data.
 	 * 
@@ -254,10 +294,8 @@ class PersistentFileImpl implements IPersistentFile{
 			final Datatype      datatype = H5Utils.getDatatype(data);
 			final long[]         shape = new long[data.getShape().length];
 			for (int i = 0; i < shape.length; i++) shape[i] = data.getShape()[i];
-			HObject currentData = file.getData(DATA_ENTRY+"/"+data.getName());
-			// if data already exists, delete it
-			if(currentData!= null) file.delete(currentData.getPath());
-			final Dataset dataset = file.createDataset(dataName,  datatype, shape, data.getBuffer(), parent);
+			
+			final Dataset dataset = file.replaceDataset(dataName,  datatype, shape, data.getBuffer(), parent);
 			file.setNexusAttribute(dataset, Nexus.SDS);
 		}
 		if(xAxisData != null){
@@ -265,10 +303,8 @@ class PersistentFileImpl implements IPersistentFile{
 			final Datatype      xDatatype = H5Utils.getDatatype(xAxisData);
 			final long[]         xShape = new long[xAxisData.getShape().length];
 			for (int i = 0; i < xShape.length; i++) xShape[i] = xAxisData.getShape()[i];
-			HObject currentData = file.getData(DATA_ENTRY+"/"+xAxisName);
-			// if data already exists, delete it
-			if(currentData!= null) file.delete(currentData.getPath());
-			final Dataset xDataset = file.createDataset(xAxisName,  xDatatype, xShape, xAxisData.getBuffer(), parent);
+
+			final Dataset xDataset = file.replaceDataset(xAxisName,  xDatatype, xShape, xAxisData.getBuffer(), parent);
 			file.setNexusAttribute(xDataset, Nexus.SDS);
 		}
 
@@ -277,10 +313,8 @@ class PersistentFileImpl implements IPersistentFile{
 			final Datatype      yDatatype = H5Utils.getDatatype(yAxisData);
 			final long[]         yShape = new long[yAxisData.getShape().length];
 			for (int i = 0; i < yShape.length; i++) yShape[i] = yAxisData.getShape()[i];
-			HObject currentData = file.getData(DATA_ENTRY+"/"+yAxisName);
-			// if data already exists, delete it
-			if(currentData!= null) file.delete(currentData.getPath());
-			final Dataset yDataset = file.createDataset(yAxisName,  yDatatype, yShape, yAxisData.getBuffer(), parent);
+
+			final Dataset yDataset = file.replaceDataset(yAxisName,  yDatatype, yShape, yAxisData.getBuffer(), parent);
 			file.setNexusAttribute(yDataset, Nexus.SDS);
 		}
 	}
@@ -324,10 +358,7 @@ class PersistentFileImpl implements IPersistentFile{
 				for (int i = 0; i < shape.length; i++)
 					shape[i] = id.getShape()[i];
 				
-				HObject currentData = file.getData(MASK_ENTRY+"/"+name);
-				// if data already exists, delete it
-				if(currentData!= null) file.delete(currentData.getPath()+name);
-				final Dataset dataset = file.createDataset(name, datatype, shape, id.getBuffer(), parent);
+				final Dataset dataset = file.replaceDataset(name, datatype, shape, id.getBuffer(), parent);
 				file.setNexusAttribute(dataset, Nexus.SDS);
 			}
 		}
@@ -375,11 +406,8 @@ class PersistentFileImpl implements IPersistentFile{
 		
 		String json = gson.toJson(roibean);
 		
-		HObject currentData = file.getData(ROI_ENTRY+"/"+name);
-		// if data already exists, delete it
-		if(currentData!= null) file.delete(currentData.getPath()+name);
 		// we create the dataset
-		Dataset dat = file.createDataset(name, new H5Datatype(Datatype.CLASS_INTEGER, 4, Datatype.NATIVE, Datatype.NATIVE), dims, new int[]{0}, parent);
+		Dataset dat = file.replaceDataset(name, new H5Datatype(Datatype.CLASS_INTEGER, 4, Datatype.NATIVE, Datatype.NATIVE), dims, new int[]{0}, parent);
 		// we set the JSON attribute
 		file.setAttribute(dat, "JSON", json);
 
@@ -445,9 +473,8 @@ class PersistentFileImpl implements IPersistentFile{
 		while (it.hasNext()) {
 			String name = (String) it.next();
 			
-			ShortDataset sdata = (ShortDataset)LoaderFactory.getDataSet(filePath, MASK_ENTRY+name, mon);
+			ShortDataset sdata = (ShortDataset)LoaderFactory.getDataSet(filePath, MASK_ENTRY+"/"+name, mon);
 			BooleanDataset bd = (BooleanDataset) DatasetUtils.cast(sdata, AbstractDataset.BOOL);
-			name = cleanArray(name.split("/"))[0]; //take the / out of the name
 			masks.put(name, bd);
 		}
 		return masks;
@@ -495,14 +522,13 @@ class PersistentFileImpl implements IPersistentFile{
 		Iterator<String> it = names.iterator();
 		while (it.hasNext()) {
 			String name = (String) it.next();
-			String json = file.getAttributeValue(ROI_ENTRY+name+"@JSON");
+			String json = file.getAttributeValue(ROI_ENTRY+"/"+name+"@JSON");
 			json = json.substring(1, json.length()-1); // this is needed as somehow, the getAttribute adds [ ] around the json string...
 			ROIBean roibean = ROIBeanConverter.getROIBeanfromJSON(gson, json);
 			
 			//convert the bean to roibase
 			ROIBase roi = ROIBeanConverter.ROIBeanToROIBase(roibean);
-			String[] str = cleanArray(name.split("/")); //take the / out of the name
-			rois.put(str[0], roi);
+			rois.put(name, roi);
 		}
 
 		return rois;

@@ -26,6 +26,7 @@ public class CheckWizardPage extends WizardPage implements SelectionListener{
 	private Map<String, Boolean> values;
 	private Map<String, String>  stringValues;
 	private Map<String, Text>    textCache;
+	private Map<String, Button>  buttonCache;
 	private boolean isDisposed=false;
 
 	/**
@@ -55,7 +56,10 @@ public class CheckWizardPage extends WizardPage implements SelectionListener{
 		content.setLayout(new GridLayout(1, false));
 		
 		for (final String label : values.keySet()) {
+		    if (buttonCache==null) buttonCache = new HashMap<String, Button>(7);
 			Button button = new Button(content, SWT.CHECK);
+			buttonCache.put(label, button);
+			
 			button.setText(label);
 			button.setSelection(values.get(label));
 			if (stringValues!=null && stringValues.containsKey(label)) {
@@ -96,6 +100,18 @@ public class CheckWizardPage extends WizardPage implements SelectionListener{
 		setErrorMessage(null);
 	}
 
+	public void setOptionEnabled(String label, boolean isEnabled) {
+		values.put(label, isEnabled);
+		if (buttonCache!=null && buttonCache.containsKey(label)) {
+			buttonCache.get(label).setEnabled(isEnabled);
+			buttonCache.get(label).setSelection(isEnabled);
+		}
+		if (textCache!=null && textCache.containsKey(label)) {
+			textCache.get(label).setEnabled(isEnabled);
+			textCache.get(label).setText("");
+		}
+	}
+
 
 	@Override
 	public void widgetSelected(SelectionEvent e) {
@@ -111,7 +127,8 @@ public class CheckWizardPage extends WizardPage implements SelectionListener{
 	@Override
 	public void dispose() {
 		isDisposed = true;
-		if (textCache!=null) textCache.clear();
+		if (buttonCache!=null) buttonCache.clear();
+		if (textCache!=null)   textCache.clear();
 		super.dispose();
 	}
 	
@@ -128,5 +145,4 @@ public class CheckWizardPage extends WizardPage implements SelectionListener{
 		// TODO Auto-generated method stub
 		
 	}
-
 }

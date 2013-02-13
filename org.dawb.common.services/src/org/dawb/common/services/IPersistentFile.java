@@ -108,6 +108,13 @@ public interface IPersistentFile {
 	public void addROI(String name, ROIBase roi, String roiType) throws Exception ;
 
 	/**
+	 * Method to set the site
+	 * @param site
+	 * @throws Exception
+	 */
+	public void setSite(String site) throws Exception;
+
+	/**
 	 * Method that reads a ROI from entry/region<br>
 	 * 
 	 * @param roiName
@@ -229,4 +236,22 @@ public interface IPersistentFile {
 	 * @throws Exception 
 	 */
 	public void setDiffractionMetadata(IDiffractionMetadata metadata) throws Exception;
+
+
+	/**
+	 * Method that returns the version the persistent file.<br>
+	 * Saved as an attribute in the HDF5 file.
+	 * @return String
+	 * @throws Exception
+	 */
+	public String getVersion() throws Exception;
+
+	/**
+	 * Method that returns the site where the persistence API is being called.<br>
+	 * Saved as an attribute in the persistence file.
+	 * @return String
+	 * @throws Exception
+	 */
+	public String getSite() throws Exception;
+
 }
