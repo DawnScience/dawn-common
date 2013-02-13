@@ -1,18 +1,43 @@
 package org.dawb.common.ui.wizard.persistence;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import java.util.Map;
 
 import org.dawb.common.services.IPersistenceService;
 import org.dawb.common.services.IPersistentFile;
 import org.dawb.common.services.ServiceManager;
+import org.dawb.common.ui.monitor.ProgressMonitorWrapper;
+import org.dawb.common.ui.plot.IPlottingSystem;
+import org.dawb.common.ui.plot.ThreadSafePlottingSystem;
+import org.dawb.common.ui.plot.region.IRegion;
+import org.dawb.common.ui.plot.region.IRegion.RegionType;
+import org.dawb.common.ui.plot.region.RegionUtils;
+import org.dawb.common.ui.plot.trace.IImageTrace;
+import org.dawb.common.ui.plot.trace.ITrace;
+import org.dawb.common.ui.util.EclipseUtils;
 import org.dawb.common.ui.wizard.CheckWizardPage;
 import org.dawb.common.ui.wizard.ExternalFileChoosePage;
 import org.dawb.common.util.io.FileUtils;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.ErrorDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IImportWizard;
 import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPart;
+
+import uk.ac.diamond.scisoft.analysis.dataset.BooleanDataset;
+import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
+import uk.ac.diamond.scisoft.analysis.roi.ROIBase;
 
 /**
  * 
@@ -39,9 +64,13 @@ public class PersistenceImportWizard extends AbstractPerstenceWizard implements 
 		
 	}
 	
+	private static String lastStaticPath;
+	
 	public void createPageControls(Composite pageContainer) {
 		super.createPageControls(pageContainer);
-		// Set last import path from static
+		if (lastStaticPath!=null) {
+			fcp.setPath(lastStaticPath);
+		}
 	}
 	
     public boolean canFinish() {
@@ -98,8 +127,90 @@ public class PersistenceImportWizard extends AbstractPerstenceWizard implements 
 
 	@Override
 	public boolean performFinish() {
-		// TODO Auto-generated method stub
-		return false;
+		 String absolutePath = null;
+		 try {
+			 absolutePath   = fcp.getAbsoluteFilePath();
+			 			 
+			 final IWorkbenchPart  part   = EclipseUtils.getPage().getActivePart();
+			 final IPlottingSystem system = new ThreadSafePlottingSystem((IPlottingSystem)part.getAdapter(IPlottingSystem.class));
+
+			 final String finalPath = absolutePath;
+			 getContainer().run(true, true, new IRunnableWithProgress() {
+
+				 @Override
+				 public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+					 
+					 IPersistentFile file = null;
+					 try {
+						 IPersistenceService service = (IPersistenceService)ServiceManager.getService(IPersistenceService.class);
+						 file    = service.getPersistentFile(finalPath);
+						 
+						 final IMonitor mon = new ProgressMonitorWrapper(monitor);
+
+						 // Save things.
+						 ITrace trace  = system.getTraces().iterator().next();
+						 if (options.is("Original Data")) {
+							 // TODO
+							 //trace.setData(file.getData("data", mon));
+//							 if (trace instanceof IImageTrace) {
+//								 file.getAxes(xAxisName, yAxisName, mon)
+//								 final List<AbstractDataset> axes = file.getAxes(xAxisName, yAxisName, mon)
+//								 if (axes!=null) ((IImageTrace)trace).setAxes(axes);
+//							 }
+						 }
+						 
+						 if (options.is("Mask") && trace instanceof IImageTrace) {
+							 IImageTrace image = (IImageTrace)trace;
+							 final String name = options.getString("Mask"); //TODO drop down of available masks.
+							 BooleanDataset mask = file.getMask(name, mon);
+							 if (mask!=null)  image.setMask(mask);
+							 
+						 }
+						 
+						 final Map<String, ROIBase> rois = file.getROIs(mon);
+						 if (options.is("Regions") && rois!=null && !rois.isEmpty()) {
+							 for (String roiName : rois.keySet()) {
+								 final ROIBase roi = rois.get(roiName);
+								 if (system.getRegion(roiName)!=null) {
+									 final IRegion region = system.getRegion(roiName);
+									 Display.getDefault().asyncExec(new Runnable() {
+										 public void run() {
+											 region.setROI(roi);
+										 }
+									 });
+								 } else {
+									 IRegion region = system.createRegion(roiName, RegionType.forROI(roi));
+									 region.setROI(roi);
+									 system.addRegion(region);
+								 }
+							 }
+						 }
+						 
+					 } catch (Exception e) {
+						 throw new InvocationTargetException(e);
+					 } finally {
+						 if (file!=null) file.close();
+					 }
+				 }
+			 });
+		 } catch (Throwable ne) {
+			 if (ne instanceof InvocationTargetException && ((InvocationTargetException)ne).getCause()!=null){
+				 ne = ((InvocationTargetException)ne).getCause();
+			 }
+			 String message = null;
+			 if (absolutePath!=null) {
+				 message = "Cannot import from '"+absolutePath+"' ";
+			 } else {
+				 message = "Cannot import file.";
+			 }
+			 logger.error("Cannot export mask file!", ne);
+		     ErrorDialog.openError(Display.getDefault().getActiveShell(), "Export failure", message, new Status(IStatus.WARNING, "org.dawb.common.ui", ne.getMessage(), ne));
+		     return true;
+		 }
+		 
+		 lastStaticPath = absolutePath;
+		 
+		 return true;
 	}
 
 }

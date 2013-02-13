@@ -189,10 +189,10 @@ public class PersistenceExportWizard extends AbstractPerstenceWizard implements 
 			 if (file!=null) {
 				 message = "Cannot export '"+file.getName()+"' ";
 			 } else {
-				 message = "Cannot export masking file.";
+				 message = "Cannot export file.";
 			 }
-			 logger.error("Cannot export mask file!", ne);
-		     ErrorDialog.openError(Display.getDefault().getActiveShell(), "Export failure", message, new Status(IStatus.WARNING, "org.dawnsci.plotting", ne.getMessage(), ne));
+			 logger.error("Cannot export file!", ne);
+		     ErrorDialog.openError(Display.getDefault().getActiveShell(), "Export failure", message, new Status(IStatus.WARNING, "org.dawb.common.ui", ne.getMessage(), ne));
 		     return true;
 		 } finally {
 			 try {

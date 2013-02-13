@@ -195,6 +195,7 @@ public class ExternalFileChoosePage extends WizardPage {
 
 	public void setPath(String path) {
 		this.path = path;
+		if (txtPath!=null) txtPath.setText(path);
 	}
 	
 	protected IResource getIResource() {

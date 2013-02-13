@@ -235,6 +235,18 @@ public interface IRegion {
 		public String getId() {
 			return IRegion.class.getPackage().getName()+"."+toString();
 		}
+
+		/**
+		 * Find out the IRegion for the ROIBase
+		 * @param roi
+		 * @return
+		 */
+		public static RegionType forROI(ROIBase roi) {
+			for (RegionType t : values()) {
+				if (t.getROIClass().isInstance(roi)) return t;
+			}
+			return null;
+		}
 	}
 
 	/**
