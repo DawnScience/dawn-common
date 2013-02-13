@@ -130,6 +130,18 @@ class PersistentFileImpl implements IPersistentFile{
 	}
 
 	@Override
+	public void setVersion(String version) throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setSite(String site) throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
 	public ILazyDataset getData(String dataName, IMonitor mon) throws Exception{
 		ILazyDataset data = null;
 		DataHolder dh = LoaderFactory.getData(filePath, true, mon);
@@ -213,6 +225,18 @@ class PersistentFileImpl implements IPersistentFile{
 		names = getNames(dh, ROI_ENTRY);
 		
 		return names;
+	}
+
+	@Override
+	public String getVersion() throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getSite() throws Exception {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	/**
