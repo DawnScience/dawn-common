@@ -80,7 +80,7 @@ public interface IHierarchicalDataFile {
 	 * 
 	 * @param fullPath
 	 */
-	public void delete(String fullPath) throws Exception;
+	//public void delete(String fullPath) throws Exception;
 	
 	/**
 	 * 
@@ -205,6 +205,26 @@ public interface IHierarchicalDataFile {
 	 * @param data
 	 */
 	public Dataset createDataset(final String name, final Datatype dtype, final long[] shape, final Object buffer, final Group data) throws Exception;
+
+	/**
+	 * Creates and returns a new dataset with the given name and parent
+	 * If it already exists then the dataset is overwritten
+	 * 
+	 * @param name
+	 * @param value
+	 */
+	public Dataset replaceDataset(final String name, final String value, final Group parent) throws Exception;
+
+	/**
+	 * Creates and returns a new dataset with the given name and parent
+	 * If it already exists then the dataset is overwritten
+     *
+	 * @param name
+	 * @param shape
+	 * @param buffer
+	 * @param data
+	 */
+	public Dataset replaceDataset(final String name, final Datatype dtype, final long[] shape, final Object buffer, final Group data) throws Exception;
 
 	/**
 	 * Method finds the given data set in the group and adds buffer to the end of the stack.

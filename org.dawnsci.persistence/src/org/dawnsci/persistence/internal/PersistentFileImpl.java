@@ -82,10 +82,6 @@ class PersistentFileImpl implements IPersistentFile{
 
 	@Override
 	public void addMask(String name, BooleanDataset mask, IMonitor mon) throws Exception{
-
-		HObject currentData = file.getData(MASK_ENTRY+"/"+name);
-		// if data already exists, delete it
-		if(currentData!= null) file.delete(currentData.getPath()+name);
 		
 		AbstractDataset id = DatasetUtils.cast(mask, AbstractDataset.INT8);
 		//check if parent group exists
@@ -93,9 +89,9 @@ class PersistentFileImpl implements IPersistentFile{
 		if(parent == null) parent = createParentEntry(MASK_ENTRY);
 		final Datatype datatype = H5Utils.getDatatype(id);
 		final long[] shape = new long[id.getShape().length];
-		for (int i = 0; i < shape.length; i++)
-			shape[i] = id.getShape()[i];
-		final Dataset dataset = file.createDataset(name, datatype, shape, id.getBuffer(), parent);
+		
+		for (int i = 0; i < shape.length; i++) shape[i] = id.getShape()[i];
+		final Dataset dataset = file.replaceDataset(name, datatype, shape, id.getBuffer(), parent);
 		file.setNexusAttribute(dataset, Nexus.SDS);
 	}
 
@@ -242,10 +238,8 @@ class PersistentFileImpl implements IPersistentFile{
 			final Datatype      datatype = H5Utils.getDatatype(data);
 			final long[]         shape = new long[data.getShape().length];
 			for (int i = 0; i < shape.length; i++) shape[i] = data.getShape()[i];
-			HObject currentData = file.getData(DATA_ENTRY+"/"+data.getName());
-			// if data already exists, delete it
-			if(currentData!= null) file.delete(currentData.getPath());
-			final Dataset dataset = file.createDataset(dataName,  datatype, shape, data.getBuffer(), parent);
+			
+			final Dataset dataset = file.replaceDataset(dataName,  datatype, shape, data.getBuffer(), parent);
 			file.setNexusAttribute(dataset, Nexus.SDS);
 		}
 		if(xAxisData != null){
@@ -253,10 +247,8 @@ class PersistentFileImpl implements IPersistentFile{
 			final Datatype      xDatatype = H5Utils.getDatatype(xAxisData);
 			final long[]         xShape = new long[xAxisData.getShape().length];
 			for (int i = 0; i < xShape.length; i++) xShape[i] = xAxisData.getShape()[i];
-			HObject currentData = file.getData(DATA_ENTRY+"/"+xAxisName);
-			// if data already exists, delete it
-			if(currentData!= null) file.delete(currentData.getPath());
-			final Dataset xDataset = file.createDataset(xAxisName,  xDatatype, xShape, xAxisData.getBuffer(), parent);
+
+			final Dataset xDataset = file.replaceDataset(xAxisName,  xDatatype, xShape, xAxisData.getBuffer(), parent);
 			file.setNexusAttribute(xDataset, Nexus.SDS);
 		}
 
@@ -265,10 +257,8 @@ class PersistentFileImpl implements IPersistentFile{
 			final Datatype      yDatatype = H5Utils.getDatatype(yAxisData);
 			final long[]         yShape = new long[yAxisData.getShape().length];
 			for (int i = 0; i < yShape.length; i++) yShape[i] = yAxisData.getShape()[i];
-			HObject currentData = file.getData(DATA_ENTRY+"/"+yAxisName);
-			// if data already exists, delete it
-			if(currentData!= null) file.delete(currentData.getPath());
-			final Dataset yDataset = file.createDataset(yAxisName,  yDatatype, yShape, yAxisData.getBuffer(), parent);
+
+			final Dataset yDataset = file.replaceDataset(yAxisName,  yDatatype, yShape, yAxisData.getBuffer(), parent);
 			file.setNexusAttribute(yDataset, Nexus.SDS);
 		}
 	}
@@ -312,10 +302,7 @@ class PersistentFileImpl implements IPersistentFile{
 				for (int i = 0; i < shape.length; i++)
 					shape[i] = id.getShape()[i];
 				
-				HObject currentData = file.getData(MASK_ENTRY+"/"+name);
-				// if data already exists, delete it
-				if(currentData!= null) file.delete(currentData.getPath()+name);
-				final Dataset dataset = file.createDataset(name, datatype, shape, id.getBuffer(), parent);
+				final Dataset dataset = file.replaceDataset(name, datatype, shape, id.getBuffer(), parent);
 				file.setNexusAttribute(dataset, Nexus.SDS);
 			}
 		}
@@ -363,11 +350,8 @@ class PersistentFileImpl implements IPersistentFile{
 		
 		String json = gson.toJson(roibean);
 		
-		HObject currentData = file.getData(ROI_ENTRY+"/"+name);
-		// if data already exists, delete it
-		if(currentData!= null) file.delete(currentData.getPath()+name);
 		// we create the dataset
-		Dataset dat = file.createDataset(name, new H5Datatype(Datatype.CLASS_INTEGER, 4, Datatype.NATIVE, Datatype.NATIVE), dims, new int[]{0}, parent);
+		Dataset dat = file.replaceDataset(name, new H5Datatype(Datatype.CLASS_INTEGER, 4, Datatype.NATIVE, Datatype.NATIVE), dims, new int[]{0}, parent);
 		// we set the JSON attribute
 		file.setAttribute(dat, "JSON", json);
 
