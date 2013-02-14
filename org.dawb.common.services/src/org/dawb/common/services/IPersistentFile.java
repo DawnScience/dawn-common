@@ -232,11 +232,22 @@ public interface IPersistentFile {
 	 * This will write the data to entry/metadata<br>
 	 * If the metadata already exists, they will be overwritten.<br>
 	 * 
-	 * @param Map
+	 * @param DiffractionMetadata
 	 * @throws Exception 
 	 */
 	public void setDiffractionMetadata(IDiffractionMetadata metadata) throws Exception;
 
+	/**
+	 * Method that returns Diffraction metadata.<br>
+	 * This method reads from entry/diffraction_metadata.<br>
+	 * 
+	 * @param dataName
+	 * @param mon
+	 * @return ILazyDataset
+	 * @throws Exception
+	 *              is thrown if no correct entry is found in the file
+	 */
+	public IDiffractionMetadata getDiffractionMetadata(IMonitor mon) throws Exception;
 
 	/**
 	 * Method that returns the version the persistent file.<br>

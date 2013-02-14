@@ -260,6 +260,11 @@ class PersistentFileImpl implements IPersistentFile{
 	public void setDiffractionMetadata(IDiffractionMetadata metadata) throws Exception {
 		writeH5DiffractionMetadata(metadata);		
 	}
+	
+	@Override
+	public IDiffractionMetadata getDiffractionMetadata(IMonitor mon) throws Exception {
+		return null;	
+	}
 
 	@Override
 	public String getVersion() throws Exception {
