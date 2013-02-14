@@ -18,13 +18,16 @@ import ncsa.hdf.object.h5.H5Datatype;
 import ncsa.hdf.object.h5.H5ScalarDS;
 
 import org.dawb.common.services.IPersistentFile;
+import org.dawb.common.util.eclipse.BundleUtils;
 import org.dawb.gda.extensions.loaders.H5Utils;
 import org.dawb.hdf5.HierarchicalDataFactory;
 import org.dawb.hdf5.IHierarchicalDataFile;
 import org.dawb.hdf5.Nexus;
 import org.dawb.hdf5.nexus.NexusUtils;
+import org.dawnsci.persistence.Activator;
 import org.dawnsci.persistence.roi.ROIBean;
 import org.dawnsci.persistence.roi.ROIBeanConverter;
+import org.dawnsci.persistence.util.PersistenceUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,11 +69,11 @@ class PersistentFileImpl implements IPersistentFile{
 	/**
 	 * Version of the API
 	 */
-	private final String VERSION = "1.0";
+	private final String VERSION_FILE = "/resource/persistence-version.txt";
 	/**
 	 * Site where the API is used
 	 */
-	private final String SITE = "Diamond Light Source";
+	private final String SITE_FILE = "/resource/persistence-site.txt";
 
 	/**
 	 * For save
@@ -79,8 +82,12 @@ class PersistentFileImpl implements IPersistentFile{
 	PersistentFileImpl(IHierarchicalDataFile file) throws Exception{
 		this.file = file;
 		this.filePath = file.getPath();
-		setSite(SITE);
-		setVersion(VERSION);
+		// set the site
+		String path = BundleUtils.getBundleLocation(Activator.getContext().getBundle()).getAbsolutePath()+SITE_FILE;
+		setSite(PersistenceUtils.readFile(path));
+		// set the version
+		path = BundleUtils.getBundleLocation(Activator.getContext().getBundle()).getAbsolutePath()+VERSION_FILE;
+		setVersion(PersistenceUtils.readFile(path));
 	}
 
 	/**

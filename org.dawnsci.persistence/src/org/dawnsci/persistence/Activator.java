@@ -12,17 +12,23 @@ import org.slf4j.LoggerFactory;
 public class Activator implements BundleActivator {
 
 	Logger logger = LoggerFactory.getLogger(Activator.class);
+	private static BundleContext context;
+
+	public static BundleContext getContext() {
+		return context;
+	}
 
 	public void start(BundleContext context) throws Exception {
 		logger.info("Starting org.dawnsci.persistence");
 		Hashtable<String, String> props = new Hashtable<String, String>(1);
 		props.put("description", "A service used to save and/or load data to hdf5 files");
 		context.registerService(IPersistenceService.class, new PersistenceServiceImpl(), props);
-		
+		Activator.context = context;
 	}
 
 	public void stop(BundleContext context) throws Exception {
 		logger.info("Stopping org.dawnsci.persistence");
+		Activator.context = null;
 	}
 
 }
