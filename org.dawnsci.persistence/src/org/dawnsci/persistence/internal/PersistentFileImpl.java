@@ -8,12 +8,14 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.vecmath.Matrix3d;
+import javax.vecmath.Vector3d;
 
 import ncsa.hdf.object.Dataset;
 import ncsa.hdf.object.Datatype;
 import ncsa.hdf.object.Group;
 import ncsa.hdf.object.HObject;
 import ncsa.hdf.object.h5.H5Datatype;
+import ncsa.hdf.object.h5.H5ScalarDS;
 
 import org.dawb.common.services.IPersistentFile;
 import org.dawb.gda.extensions.loaders.H5Utils;
@@ -34,6 +36,7 @@ import uk.ac.diamond.scisoft.analysis.dataset.ShortDataset;
 import uk.ac.diamond.scisoft.analysis.diffraction.DetectorProperties;
 import uk.ac.diamond.scisoft.analysis.diffraction.DiffractionCrystalEnvironment;
 import uk.ac.diamond.scisoft.analysis.io.DataHolder;
+import uk.ac.diamond.scisoft.analysis.io.DiffractionMetadata;
 import uk.ac.diamond.scisoft.analysis.io.IDiffractionMetadata;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
@@ -263,7 +266,11 @@ class PersistentFileImpl implements IPersistentFile{
 	
 	@Override
 	public IDiffractionMetadata getDiffractionMetadata(IMonitor mon) throws Exception {
-		return null;	
+		//Reverse of the setMetadata.  Would be nice in the future to be able to use the
+		//LoaderFactory but work needs to be done on loading specific metadata from nexus
+		//files first
+		
+		return readH5DiffractionMetadata(mon);	
 	}
 
 	@Override
@@ -608,8 +615,11 @@ class PersistentFileImpl implements IPersistentFile{
 		
 		double[] beamVector = new double[3];
 		detprop.getBeamVector().get(beamVector);
-		
 		file.createDataset("beam_vector", doubleType, new long[] {3}, beamVector, parent);
+		
+		double[] beamOrigin= new double[3];
+		detprop.getOrigin().get(beamOrigin);
+		file.createDataset("beam_origin", doubleType, new long[] {3}, beamOrigin, parent);
 		
 		Matrix3d or = detprop.getOrientation();
 		double[] orientation = new double[] {or.m00 ,or.m01, or.m02,
@@ -619,10 +629,9 @@ class PersistentFileImpl implements IPersistentFile{
 		file.createDataset("detector_orientation", doubleType, new long[] {9}, orientation, parent);
 		
 		DiffractionCrystalEnvironment crysenv = metadata.getDiffractionCrystalEnvironment();
-		// lambda(A) = 10^7 * (h*c/e) / energy(keV)
-		double energy = 1./(0.0806554465*crysenv.getWavelength());// constant from NIST CODATA 2006
-		final Dataset ene = file.createDataset("energy", doubleType, new long[] {1}, new double[]{energy}, parent);
-		file.setAttribute(ene, NexusUtils.UNIT, "keV");
+
+		final Dataset energy = file.createDataset("energy", doubleType, new long[] {1}, new double[]{crysenv.getWavelength()}, parent);
+		file.setAttribute(energy, NexusUtils.UNIT, "Angstrom");
 		
 		final Dataset count = file.createDataset("count_time", doubleType, new long[] {1}, new double[]{crysenv.getExposureTime()}, parent);
 		file.setAttribute(count, NexusUtils.UNIT, "s");
@@ -632,6 +641,60 @@ class PersistentFileImpl implements IPersistentFile{
 		
 		final Dataset phi_range = file.createDataset("phi_range", doubleType, new long[] {1}, new double[]{crysenv.getPhiRange()}, parent);
 		file.setAttribute(phi_range, NexusUtils.UNIT, "degrees");
+	}
+	
+	private IDiffractionMetadata readH5DiffractionMetadata(IMonitor mon) throws Exception {
+		if(file == null)
+			file = HierarchicalDataFactory.getReader(filePath);
+		
+		//Build the detector properties object
+		HObject hOb = file.getData(DIFFRACTIONMETADATA_ENTRY + "/" + "x_pixel_number");
+		int x_pixel_number = ((int[])((H5ScalarDS)hOb).getData())[0];
+		
+		hOb = file.getData(DIFFRACTIONMETADATA_ENTRY + "/" + "y_pixel_number");
+		int y_pixel_number = ((int[])((H5ScalarDS)hOb).getData())[0];
+		
+		hOb = file.getData(DIFFRACTIONMETADATA_ENTRY + "/" + "x_pixel_size");
+		double x_pixel_size = ((double[])((H5ScalarDS)hOb).getData())[0];
+		
+		hOb = file.getData(DIFFRACTIONMETADATA_ENTRY + "/" + "y_pixel_size");
+		double y_pixel_size = ((double[])((H5ScalarDS)hOb).getData())[0];
+		
+		hOb = file.getData(DIFFRACTIONMETADATA_ENTRY + "/" + "beam_vector");
+		double[] beam_vector = ((double[])((H5ScalarDS)hOb).getData());
+		
+		hOb = file.getData(DIFFRACTIONMETADATA_ENTRY + "/" + "beam_origin");
+		double[] beam_origin = ((double[])((H5ScalarDS)hOb).getData());
+		
+		hOb = file.getData(DIFFRACTIONMETADATA_ENTRY + "/" + "detector_orientation");
+		double[] detector_orientation = ((double[])((H5ScalarDS)hOb).getData());
+		
+		Matrix3d orDet = new Matrix3d(detector_orientation);
+		Vector3d orBeam = new Vector3d(beam_vector);
+		Vector3d origin = new Vector3d(beam_origin);
+		
+		final DetectorProperties detprop = new DetectorProperties(origin, orBeam,
+															y_pixel_number, x_pixel_number,
+															x_pixel_size, y_pixel_size,
+															orDet);
+		
+		
+		//Build the diffraction environment object
+		hOb = file.getData(DIFFRACTIONMETADATA_ENTRY + "/" + "energy");
+		double energy = ((double[])((H5ScalarDS)hOb).getData())[0];
+		
+		hOb = file.getData(DIFFRACTIONMETADATA_ENTRY + "/" + "count_time");
+		double count_time = ((double[])((H5ScalarDS)hOb).getData())[0];
+		
+		hOb = file.getData(DIFFRACTIONMETADATA_ENTRY + "/" + "phi_start");
+		double phi_start = ((double[])((H5ScalarDS)hOb).getData())[0];
+		
+		hOb = file.getData(DIFFRACTIONMETADATA_ENTRY + "/" + "phi_range");
+		double phi_range = ((double[])((H5ScalarDS)hOb).getData())[0];
+		
+		final DiffractionCrystalEnvironment diffcrys = new DiffractionCrystalEnvironment(energy,phi_start,phi_range,count_time);
+		
+		return new DiffractionMetadata(file.getPath(), detprop, diffcrys); 
 	}
 	
 }
