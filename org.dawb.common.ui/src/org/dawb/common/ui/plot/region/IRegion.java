@@ -15,14 +15,20 @@ import uk.ac.diamond.scisoft.analysis.roi.CircularFitROI;
 import uk.ac.diamond.scisoft.analysis.roi.CircularROI;
 import uk.ac.diamond.scisoft.analysis.roi.EllipticalFitROI;
 import uk.ac.diamond.scisoft.analysis.roi.EllipticalROI;
+import uk.ac.diamond.scisoft.analysis.roi.FreeDrawROI;
 import uk.ac.diamond.scisoft.analysis.roi.GridROI;
 import uk.ac.diamond.scisoft.analysis.roi.LinearROI;
+import uk.ac.diamond.scisoft.analysis.roi.PerimeterBoxROI;
 import uk.ac.diamond.scisoft.analysis.roi.PointROI;
 import uk.ac.diamond.scisoft.analysis.roi.PolygonalROI;
 import uk.ac.diamond.scisoft.analysis.roi.PolylineROI;
 import uk.ac.diamond.scisoft.analysis.roi.ROIBase;
 import uk.ac.diamond.scisoft.analysis.roi.RectangularROI;
 import uk.ac.diamond.scisoft.analysis.roi.SectorROI;
+import uk.ac.diamond.scisoft.analysis.roi.XAxisBoxROI;
+import uk.ac.diamond.scisoft.analysis.roi.XAxisLineBoxROI;
+import uk.ac.diamond.scisoft.analysis.roi.YAxisBoxROI;
+import uk.ac.diamond.scisoft.analysis.roi.YAxisLineBoxROI;
 
 /**
  * A selection region must conform to this interface. You can set its position, colour and transparency settings.
@@ -168,7 +174,7 @@ public interface IRegion {
 		POLYLINE("Polyline",       ColorConstants.cyan,       PolylineROI.class),
 		POLYGON("Polygon",         ColorConstants.cyan,       PolygonalROI.class),
 		BOX("Box",                 ColorConstants.green,      RectangularROI.class),
-		COLORBOX("Colored edges box", ColorConstants.gray,    RectangularROI.class),
+		COLORBOX("Perimeter box",  ColorConstants.gray,       PerimeterBoxROI.class),
 		GRID("Grid",               ColorConstants.lightGray,  GridROI.class),
 		CIRCLE("Circle",           darkYellow,                CircularROI.class),
 		CIRCLEFIT("Circle fit",    darkYellow,                CircularFitROI.class),
@@ -177,11 +183,11 @@ public interface IRegion {
 		ELLIPSE("Ellipse",         ColorConstants.lightGreen, EllipticalROI.class),
 		ELLIPSEFIT("Ellipse fit",  ColorConstants.lightGreen, EllipticalFitROI.class),
 		RING("Ring",               darkYellow,                SectorROI.class),
-		XAXIS("X-Axis",            ColorConstants.blue,       RectangularROI.class),
-		YAXIS("Y-Axis",            ColorConstants.blue,       RectangularROI.class),
-		XAXIS_LINE("X-Axis Line",  ColorConstants.blue,       RectangularROI.class),
-		YAXIS_LINE("Y-Axis Line",  ColorConstants.blue,       RectangularROI.class),
-		FREE_DRAW("Free draw",     darkYellow,                PolylineROI.class);
+		XAXIS("X-Axis",            ColorConstants.blue,       XAxisBoxROI.class),
+		YAXIS("Y-Axis",            ColorConstants.blue,       YAxisBoxROI.class),
+		XAXIS_LINE("X-Axis Line",  ColorConstants.blue,       XAxisLineBoxROI.class),
+		YAXIS_LINE("Y-Axis Line",  ColorConstants.blue,       YAxisLineBoxROI.class),
+		FREE_DRAW("Free draw",     darkYellow,                FreeDrawROI.class);
 
 		private String name;
 		private Color defaultColor;
