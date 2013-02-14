@@ -241,9 +241,8 @@ public interface IPersistentFile {
 	 * Method that returns Diffraction metadata.<br>
 	 * This method reads from entry/diffraction_metadata.<br>
 	 * 
-	 * @param dataName
 	 * @param mon
-	 * @return ILazyDataset
+	 * @return IDiffractionMetadata
 	 * @throws Exception
 	 *              is thrown if no correct entry is found in the file
 	 */
