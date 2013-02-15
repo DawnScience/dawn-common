@@ -70,6 +70,19 @@ public class PersistenceExportWizard extends AbstractPerstenceWizard implements 
 	
 	public void createPageControls(Composite pageContainer) {
 		super.createPageControls(pageContainer);
+		
+		if (containerFullPath==null && staticFileName==null) {
+			try {
+			    final IFile file = EclipseUtils.getSelectedFile();
+			    if (file!=null) {
+			    	containerFullPath = file.getParent().getFullPath();
+			    	staticFileName    = file.getName();
+			    }
+			} catch (Throwable ne) {
+				// Nowt
+			}
+		}
+		
 		if (containerFullPath!=null) fcp.setContainerFullPath(containerFullPath);
 		if (staticFileName!=null)    fcp.setFileName(staticFileName);
 	}

@@ -19,6 +19,7 @@ import org.dawb.common.ui.util.EclipseUtils;
 import org.dawb.common.ui.wizard.CheckWizardPage;
 import org.dawb.common.ui.wizard.ExternalFileChoosePage;
 import org.dawb.common.util.io.FileUtils;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -65,6 +66,18 @@ public class PersistenceImportWizard extends AbstractPerstenceWizard implements 
 	
 	public void createPageControls(Composite pageContainer) {
 		super.createPageControls(pageContainer);
+		
+		if (lastStaticPath==null) {
+			try {
+			    final IFile file = EclipseUtils.getSelectedFile();
+			    if (file!=null) {
+			    	lastStaticPath = file.getLocation().toOSString();
+			    }
+			} catch (Throwable ne) {
+				// Nowt
+			}
+		}
+
 		if (lastStaticPath!=null) {
 			fcp.setPath(lastStaticPath);
 		}
