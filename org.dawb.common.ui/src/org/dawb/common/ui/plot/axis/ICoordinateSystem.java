@@ -1,5 +1,7 @@
 package org.dawb.common.ui.plot.axis;
 
+import org.eclipse.draw2d.geometry.Point;
+
 /**
  * Interface for converting between real value and coordinate in plotting system
  * (which is screen pixels).
@@ -22,12 +24,25 @@ public interface ICoordinateSystem {
 	public int[] getValuePosition(double... value);
 	
 	/**
-	 * The value for a position in pixels.
+	 * The position in pixels of a given value.
 	 * @param value
+	 * @return
+	 */
+	public Point getValuePosition(Point value);
+
+	/**
+	 * The value for a position in pixels.
+	 * @param position
 	 * @return
 	 */
 	public double[] getPositionValue(int... position);
 
+	/**
+	 * The value for a position in pixels.
+	 * @param position
+	 * @return
+	 */
+	public Point getPositionValue(Point position);
 
 	/**
 	 * Listen to the coordinates changing, zoom in or image rotated usually.
@@ -74,4 +89,9 @@ public interface ICoordinateSystem {
 	 */
 	public boolean isYReversed();
 
+	/**
+	 * Ratio of x axis to y axis scaling
+	 * @return
+	 */
+	public double getAspectRatio();
 }
