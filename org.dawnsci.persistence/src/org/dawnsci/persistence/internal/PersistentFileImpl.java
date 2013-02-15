@@ -433,7 +433,12 @@ class PersistentFileImpl implements IPersistentFile{
 		return dat;
 	}
 
-	private Group createParentEntry(String fullEntry) throws Exception{
+	
+	private Group createParentEntry(String fullEntry) throws Exception {
+		return createParentEntry(fullEntry, Nexus.DATA);
+	}
+	
+	private Group createParentEntry(String fullEntry, String nexusEntry) throws Exception{
 		String[] entries = fullEntry.split("/");
 		entries = cleanArray(entries);
 		Group parent = null;
@@ -445,7 +450,7 @@ class PersistentFileImpl implements IPersistentFile{
 				parent = entry;
 			} else if(i == entries.length-1) {
 				entry = file.group(entries[i], parent);
-				file.setNexusAttribute(entry, Nexus.DATA);
+				file.setNexusAttribute(entry, nexusEntry);
 				parent = entry;
 			} else {
 				entry = file.group(entries[i], parent);
@@ -600,7 +605,7 @@ class PersistentFileImpl implements IPersistentFile{
 	private void writeH5DiffractionMetadata(IDiffractionMetadata metadata) throws Exception {
 		if (file == null) file = HierarchicalDataFactory.getWriter(filePath);
 		
-		Group parent = createParentEntry(DIFFRACTIONMETADATA_ENTRY);
+		Group parent = createParentEntry(DIFFRACTIONMETADATA_ENTRY,Nexus.DETECT);
 		
 		//TODO do we want to be an NX_detector?
 		//TODO should existing diffraction metadata node be deleted?
