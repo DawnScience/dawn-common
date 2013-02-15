@@ -2,6 +2,7 @@ package org.dawb.common.ui.wizard.persistence;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -54,6 +55,7 @@ public class PersistenceImportWizard extends AbstractPerstenceWizard implements 
 		addPage(fcp);
 		
 		this.options = new CheckWizardPage("Import Options", createDefaultOptions());
+		options.setStringValues("Mask", Arrays.asList(""));
 		options.setDescription("Please choose things to import.");
 		addPage(options);
 		
@@ -92,6 +94,8 @@ public class PersistenceImportWizard extends AbstractPerstenceWizard implements 
     		    		    final List<String>  names = pf.getMaskNames(null);
     		    		    if (names==null || names.isEmpty()) {
     		    		    	options.setOptionEnabled("Mask", false);
+    		    		    } else {
+    		    		    	options.setStringValues("Mask", names);
     		    		    }
     		    		    
     		    		    final List<String> regions = pf.getROINames(null);
@@ -170,6 +174,7 @@ public class PersistenceImportWizard extends AbstractPerstenceWizard implements 
 							 
 						 }
 						 
+						 final IPersistentFile finalFile = file;
 						 final Map<String, ROIBase> rois = file.getROIs(mon);
 						 if (options.is("Regions") && rois!=null && !rois.isEmpty()) {
 							 for (final String roiName : rois.keySet()) {
@@ -177,13 +182,19 @@ public class PersistenceImportWizard extends AbstractPerstenceWizard implements 
 								 Display.getDefault().syncExec(new Runnable() {
 									 public void run() {
 										 try {
+											 IRegion region = null;
 											 if (system.getRegion(roiName)!=null) {
-												 final IRegion region = system.getRegion(roiName);
+												 region = system.getRegion(roiName);
 												 region.setROI(roi);
 											 } else {
-												 IRegion region = system.createRegion(roiName, RegionType.forROI(roi));
-												 region.setROI(roi);
+												 region = system.createRegion(roiName, RegionType.forROI(roi));
 												 system.addRegion(region);
+												 region.setROI(roi);
+											 }
+											 if (region!=null) {
+												 String uObject = finalFile.getRegionAttribute(roiName, "User Object");
+												 if (uObject!=null) region.setUserObject(uObject); // Makes a string out of
+												                                                   // it but gives a clue.
 											 }
 										 } catch (Throwable e) {
 											 logger.error("Cannot create/import region "+roiName, e);
