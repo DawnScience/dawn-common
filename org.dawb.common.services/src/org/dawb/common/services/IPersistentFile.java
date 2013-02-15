@@ -105,7 +105,7 @@ public interface IPersistentFile {
 	 * @param String
 	 * @param ROIBase
 	 */
-	public void addROI(String name, ROIBase roi, String roiType) throws Exception ;
+	public void addROI(String name, ROIBase roi) throws Exception ;
 
 	/**
 	 * Method to set the site
@@ -264,4 +264,23 @@ public interface IPersistentFile {
 	 */
 	public String getSite() throws Exception;
 
+	/**
+	 * Set attribute on region
+	 * @param regionName - the region
+	 * @param attributeName - JSON not allowed as name.
+	 * @param value
+	 */
+	public void setRegionAttribute(String regionName, String attributeName, String value) throws Exception;
+
+	
+	/**
+	 * Get attribute of a region
+	 * @param regionName
+	 * @param attributeName
+	 * @return
+	 * @throws Exception
+	 */
+	public String getRegionAttribute(String regionName, String attributeName) throws Exception;
+
+	
 }

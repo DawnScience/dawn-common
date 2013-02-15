@@ -10,21 +10,16 @@ import org.dawb.common.services.IPersistentFile;
 import org.dawb.common.services.ServiceManager;
 import org.dawb.common.ui.monitor.ProgressMonitorWrapper;
 import org.dawb.common.ui.plot.IPlottingSystem;
-import org.dawb.common.ui.plot.ThreadSafePlottingSystem;
 import org.dawb.common.ui.plot.region.IRegion;
 import org.dawb.common.ui.plot.region.IRegion.RegionType;
-import org.dawb.common.ui.plot.region.RegionUtils;
 import org.dawb.common.ui.plot.trace.IImageTrace;
 import org.dawb.common.ui.plot.trace.ITrace;
 import org.dawb.common.ui.util.EclipseUtils;
 import org.dawb.common.ui.wizard.CheckWizardPage;
 import org.dawb.common.ui.wizard.ExternalFileChoosePage;
 import org.dawb.common.util.io.FileUtils;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -132,7 +127,7 @@ public class PersistenceImportWizard extends AbstractPerstenceWizard implements 
 			 absolutePath   = fcp.getAbsoluteFilePath();
 			 			 
 			 final IWorkbenchPart  part   = EclipseUtils.getPage().getActivePart();
-			 final IPlottingSystem system = new ThreadSafePlottingSystem((IPlottingSystem)part.getAdapter(IPlottingSystem.class));
+			 final IPlottingSystem system = (IPlottingSystem)part.getAdapter(IPlottingSystem.class);
 
 			 final String finalPath = absolutePath;
 			 getContainer().run(true, true, new IRunnableWithProgress() {
@@ -142,6 +137,7 @@ public class PersistenceImportWizard extends AbstractPerstenceWizard implements 
 					 
 					 IPersistentFile file = null;
 					 try {
+	// TODO Fit2D!
 						 IPersistenceService service = (IPersistenceService)ServiceManager.getService(IPersistenceService.class);
 						 file    = service.getPersistentFile(finalPath);
 						 
@@ -160,29 +156,40 @@ public class PersistenceImportWizard extends AbstractPerstenceWizard implements 
 						 }
 						 
 						 if (options.is("Mask") && trace instanceof IImageTrace) {
-							 IImageTrace image = (IImageTrace)trace;
-							 final String name = options.getString("Mask"); //TODO drop down of available masks.
-							 BooleanDataset mask = file.getMask(name, mon);
-							 if (mask!=null)  image.setMask(mask);
+							 final IImageTrace image = (IImageTrace)trace;
+							 String name = options.getString("Mask"); //TODO drop down of available masks.
+							 if (name == null) name = file.getMaskNames(null).get(0);
+							 final BooleanDataset mask = file.getMask(name, mon);
+							 if (mask!=null)  {
+								 Display.getDefault().syncExec(new Runnable() {
+									 public void run() {
+										 image.setMask(mask);
+									 }
+								 });
+							 }
 							 
 						 }
 						 
 						 final Map<String, ROIBase> rois = file.getROIs(mon);
 						 if (options.is("Regions") && rois!=null && !rois.isEmpty()) {
-							 for (String roiName : rois.keySet()) {
+							 for (final String roiName : rois.keySet()) {
 								 final ROIBase roi = rois.get(roiName);
-								 if (system.getRegion(roiName)!=null) {
-									 final IRegion region = system.getRegion(roiName);
-									 Display.getDefault().asyncExec(new Runnable() {
-										 public void run() {
-											 region.setROI(roi);
+								 Display.getDefault().syncExec(new Runnable() {
+									 public void run() {
+										 try {
+											 if (system.getRegion(roiName)!=null) {
+												 final IRegion region = system.getRegion(roiName);
+												 region.setROI(roi);
+											 } else {
+												 IRegion region = system.createRegion(roiName, RegionType.forROI(roi));
+												 region.setROI(roi);
+												 system.addRegion(region);
+											 }
+										 } catch (Throwable e) {
+											 logger.error("Cannot create/import region "+roiName, e);
 										 }
-									 });
-								 } else {
-									 IRegion region = system.createRegion(roiName, RegionType.forROI(roi));
-									 region.setROI(roi);
-									 system.addRegion(region);
-								 }
+									 }
+								 });
 							 }
 						 }
 						 

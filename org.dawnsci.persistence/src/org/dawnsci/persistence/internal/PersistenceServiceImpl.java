@@ -4,8 +4,6 @@ import org.dawb.common.services.IPersistenceService;
 import org.dawb.common.services.IPersistentFile;
 import org.dawb.hdf5.HierarchicalDataFactory;
 import org.dawb.hdf5.IHierarchicalDataFile;
-import org.eclipse.ui.services.AbstractServiceFactory;
-import org.eclipse.ui.services.IServiceLocator;
 
 /**
  * Implementation of IPersistenceService<br>
@@ -15,22 +13,12 @@ import org.eclipse.ui.services.IServiceLocator;
  * @author wqk87977
  *
  */
-public class PersistenceServiceImpl extends AbstractServiceFactory implements IPersistenceService{
+public class PersistenceServiceImpl implements IPersistenceService{
 
 	/**
 	 * Default Constructor
 	 */
 	public PersistenceServiceImpl(){
-	}
-
-	@SuppressWarnings("rawtypes")
-	@Override
-	public Object create(Class serviceInterface, IServiceLocator parentLocator,
-			IServiceLocator locator) {
-		if (serviceInterface == IPersistenceService.class) {
-			return new PersistenceServiceImpl(); // Important always new as has member data.
-		} 
-		return null;
 	}
 
 	@Override

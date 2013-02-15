@@ -137,7 +137,11 @@ public class CheckWizardPage extends WizardPage implements SelectionListener{
 	}
 
 	public String getString(String propertyName) {
-		return stringValues.get(propertyName);
+		try {
+		    return stringValues.get(propertyName);
+		} catch (Throwable ne) {
+			return null;
+		}
 	}
 
 	@Override

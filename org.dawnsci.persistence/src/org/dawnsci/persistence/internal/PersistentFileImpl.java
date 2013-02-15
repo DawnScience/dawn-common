@@ -19,6 +19,7 @@ import ncsa.hdf.object.h5.H5ScalarDS;
 
 import org.dawb.common.services.IPersistentFile;
 import org.dawb.common.util.eclipse.BundleUtils;
+import org.dawb.gda.extensions.loaders.H5LazyDataset;
 import org.dawb.gda.extensions.loaders.H5Utils;
 import org.dawb.hdf5.HierarchicalDataFactory;
 import org.dawb.hdf5.IHierarchicalDataFile;
@@ -140,7 +141,7 @@ class PersistentFileImpl implements IPersistentFile{
 	}
 
 	@Override
-	public void addROI(String name, ROIBase roiBase, String roiType) throws Exception {
+	public void addROI(String name, ROIBase roiBase) throws Exception {
 		
 		if (file == null) file = HierarchicalDataFactory.getWriter(filePath);
 		
@@ -152,10 +153,19 @@ class PersistentFileImpl implements IPersistentFile{
 		//builder.registerTypeAdapter(ROIBean.class, new ROISerializer());
 		Gson gson = builder.create();
 	
-		HObject dataset = writeRoi(file, parent, name, roiBase, gson);
-		if (dataset!=null) {
-			file.setAttribute(dataset, "Region Type", roiType);
-		}
+		writeRoi(file, parent, name, roiBase, gson);
+	}
+	
+	@Override
+	public void setRegionAttribute(String regionName, String attributeName, String attributeValue) throws Exception {
+		if ("JSON".equals(attributeName)) throw new Exception("Cannot override the JSON attribute!");
+		final HObject node = file.getData(ROI_ENTRY+"/"+regionName);
+		file.setAttribute(node, attributeName, attributeValue);
+	}
+
+	@Override
+	public String getRegionAttribute(String regionName, String attributeName) throws Exception{
+		return file.getAttributeValue(ROI_ENTRY+"/"+regionName+"@"+attributeName);
 	}
 
 	/**
@@ -260,8 +270,21 @@ class PersistentFileImpl implements IPersistentFile{
 	@Override
 	public List<String> getROINames(IMonitor mon) throws Exception{
 		List<String> names = null;
-		DataHolder dh = LoaderFactory.getData(filePath, true, mon);
-		names = getNames(dh, ROI_ENTRY);
+		
+		IHierarchicalDataFile file = null;
+        try {
+        	file      = HierarchicalDataFactory.getReader(getFilePath());
+        	Group grp = (Group)file.getData(ROI_ENTRY);
+        	List<HObject> children =  grp.getMemberList();
+        	if (names==null) names = new ArrayList<String>(children.size());
+        	for (HObject hObject : children) {
+        		names.add(hObject.getName());
+			}
+        } catch (Exception ne) {
+        	names = null;
+        } finally {
+        	if (file!=null) file.close();
+        }
 		
 		return names;
 	}
@@ -474,9 +497,12 @@ class PersistentFileImpl implements IPersistentFile{
 	 * @throws Exception 
 	 */
 	private BooleanDataset readH5Mask(DataHolder dh, String maskName) throws Exception{
-		BooleanDataset bd = (BooleanDataset)dh.getDataset(MASK_ENTRY+maskName);
-		if(bd == null) throw new Exception("Reading Exception: " +MASK_ENTRY+ " entry does not exist in the file " + filePath);
-		return bd;
+		ILazyDataset ld = dh.getLazyDataset(MASK_ENTRY+"/"+maskName);
+		if (ld instanceof H5LazyDataset) {
+			return (BooleanDataset)DatasetUtils.cast(((H5LazyDataset)ld).getCompleteData(null), AbstractDataset.BOOL);
+		} else {
+			return (BooleanDataset)DatasetUtils.cast(dh.getDataset(MASK_ENTRY+"/"+maskName), AbstractDataset.BOOL);
+		}
 	}
 
 	/**
@@ -507,7 +533,7 @@ class PersistentFileImpl implements IPersistentFile{
 	 */
 	private ROIBase readH5ROI(String roiName) throws Exception{
 	
-		String json = file.getAttributeValue(ROI_ENTRY+roiName);
+		String json = file.getAttributeValue(ROI_ENTRY+"/"+roiName);
 		if(json == null) throw new Exception("Reading Exception: " +ROI_ENTRY+ " entry does not exist in the file " + filePath);
 		// JSON deserialization
 		GsonBuilder builder = new GsonBuilder();
