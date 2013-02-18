@@ -32,7 +32,11 @@ import org.eclipse.ui.IImportWizard;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPart;
 
+import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.BooleanDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.DatasetUtils;
+import uk.ac.diamond.scisoft.analysis.io.DataHolder;
+import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
 import uk.ac.diamond.scisoft.analysis.roi.ROIBase;
 
@@ -96,7 +100,8 @@ public class PersistenceImportWizard extends AbstractPerstenceWizard implements 
     			if (ext!=null) {
     				if ("msk".equals(ext.toLowerCase())){
     		    		options.setOptionEnabled("Regions", false);
-   					
+		    		    options.setStringValue("Mask", null);
+		    		    
     				} else if ("nxs".equals(ext.toLowerCase())) {
     					
     		    		IPersistentFile     pf=null;
@@ -152,76 +157,16 @@ public class PersistenceImportWizard extends AbstractPerstenceWizard implements 
 				 @Override
 				 public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 					 
-					 IPersistentFile file = null;
 					 try {
-	// TODO Fit2D!
-						 IPersistenceService service = (IPersistenceService)ServiceManager.getService(IPersistenceService.class);
-						 file    = service.getPersistentFile(finalPath);
-						 
-						 final IMonitor mon = new ProgressMonitorWrapper(monitor);
-
-						 // Save things.
-						 ITrace trace  = system.getTraces().iterator().next();
-						 if (options.is("Original Data")) {
-							 // TODO
-							 //trace.setData(file.getData("data", mon));
-//							 if (trace instanceof IImageTrace) {
-//								 file.getAxes(xAxisName, yAxisName, mon)
-//								 final List<AbstractDataset> axes = file.getAxes(xAxisName, yAxisName, mon)
-//								 if (axes!=null) ((IImageTrace)trace).setAxes(axes);
-//							 }
+						 if (finalPath.toLowerCase().endsWith(".msk")) {
+							 createFit2DMask(finalPath, system, monitor);
+						 } else {
+							 createDawnMask(finalPath, system, monitor);
 						 }
-						 
-						 if (options.is("Mask") && trace instanceof IImageTrace) {
-							 final IImageTrace image = (IImageTrace)trace;
-							 String name = options.getString("Mask"); //TODO drop down of available masks.
-							 if (name == null) name = file.getMaskNames(null).get(0);
-							 final BooleanDataset mask = file.getMask(name, mon);
-							 if (mask!=null)  {
-								 Display.getDefault().syncExec(new Runnable() {
-									 public void run() {
-										 image.setMask(mask);
-									 }
-								 });
-							 }
-							 
-						 }
-						 
-						 final IPersistentFile finalFile = file;
-						 final Map<String, ROIBase> rois = file.getROIs(mon);
-						 if (options.is("Regions") && rois!=null && !rois.isEmpty()) {
-							 for (final String roiName : rois.keySet()) {
-								 final ROIBase roi = rois.get(roiName);
-								 Display.getDefault().syncExec(new Runnable() {
-									 public void run() {
-										 try {
-											 IRegion region = null;
-											 if (system.getRegion(roiName)!=null) {
-												 region = system.getRegion(roiName);
-												 region.setROI(roi);
-											 } else {
-												 region = system.createRegion(roiName, RegionType.forROI(roi));
-												 system.addRegion(region);
-												 region.setROI(roi);
-											 }
-											 if (region!=null) {
-												 String uObject = finalFile.getRegionAttribute(roiName, "User Object");
-												 if (uObject!=null) region.setUserObject(uObject); // Makes a string out of
-												                                                   // it but gives a clue.
-											 }
-										 } catch (Throwable e) {
-											 logger.error("Cannot create/import region "+roiName, e);
-										 }
-									 }
-								 });
-							 }
-						 }
-						 
 					 } catch (Exception e) {
 						 throw new InvocationTargetException(e);
-					 } finally {
-						 if (file!=null) file.close();
 					 }
+
 				 }
 			 });
 		 } catch (Throwable ne) {
@@ -242,6 +187,88 @@ public class PersistenceImportWizard extends AbstractPerstenceWizard implements 
 		 lastStaticPath = absolutePath;
 		 
 		 return true;
+	}
+
+	protected void createFit2DMask(String filePath, IPlottingSystem system, IProgressMonitor monitor) throws Exception {
+		
+		final DataHolder      holder = LoaderFactory.getData(filePath, new ProgressMonitorWrapper(monitor));
+		final AbstractDataset mask   = DatasetUtils.cast(holder.getDataset(0), AbstractDataset.BOOL);
+		final ITrace          trace  = system.getTraces().iterator().next();
+		
+		if (mask!=null && trace!=null && trace instanceof IImageTrace) {
+			Display.getDefault().syncExec(new Runnable() {
+				public void run() {
+					IImageTrace image = (IImageTrace)trace;
+					image.setMask(mask);
+				}
+			});
+		}
+	}
+
+	protected void createDawnMask(final String filePath, final IPlottingSystem system, final IProgressMonitor monitor) throws Exception{
+		 
+		IPersistentFile file = null;
+		try {
+			IPersistenceService service = (IPersistenceService)ServiceManager.getService(IPersistenceService.class);
+			file    = service.getPersistentFile(filePath);
+
+			final IMonitor mon = new ProgressMonitorWrapper(monitor);
+
+			// Save things.
+			ITrace trace  = system.getTraces().iterator().next();
+			if (options.is("Original Data")) {
+				// TODO
+			}
+
+			if (options.is("Mask") && trace instanceof IImageTrace) {
+				final IImageTrace image = (IImageTrace)trace;
+				String name = options.getString("Mask"); //TODO drop down of available masks.
+				if (name == null) name = file.getMaskNames(null).get(0);
+				final BooleanDataset mask = file.getMask(name, mon);
+				if (mask!=null)  {
+					Display.getDefault().syncExec(new Runnable() {
+						public void run() {
+							image.setMask(mask);
+						}
+					});
+				}
+
+			}
+
+			final IPersistentFile finalFile = file;
+			final Map<String, ROIBase> rois = file.getROIs(mon);
+			if (options.is("Regions") && rois!=null && !rois.isEmpty()) {
+				for (final String roiName : rois.keySet()) {
+					final ROIBase roi = rois.get(roiName);
+					Display.getDefault().syncExec(new Runnable() {
+						public void run() {
+							try {
+								IRegion region = null;
+								if (system.getRegion(roiName)!=null) {
+									region = system.getRegion(roiName);
+									region.setROI(roi);
+								} else {
+									region = system.createRegion(roiName, RegionType.forROI(roi));
+									system.addRegion(region);
+									region.setROI(roi);
+								}
+								if (region!=null) {
+									String uObject = finalFile.getRegionAttribute(roiName, "User Object");
+									if (uObject!=null) region.setUserObject(uObject); // Makes a string out of
+									// it but gives a clue.
+								}
+							} catch (Throwable e) {
+								logger.error("Cannot create/import region "+roiName, e);
+							}
+						}
+					});
+				}
+			}
+
+		} finally {
+			if (file!=null) file.close();
+		}
+		
 	}
 
 }
