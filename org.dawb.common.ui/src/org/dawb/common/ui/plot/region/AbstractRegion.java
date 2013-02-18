@@ -181,6 +181,7 @@ public abstract class AbstractRegion extends Figure implements IRegion, IRegionC
 	}
 	
 	public String getLabel() {
+		if (label==null) return getName();
 		return label;
 	}
 	
