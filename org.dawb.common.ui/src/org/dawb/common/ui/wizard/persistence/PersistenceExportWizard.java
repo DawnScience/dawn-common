@@ -70,6 +70,19 @@ public class PersistenceExportWizard extends AbstractPerstenceWizard implements 
 	
 	public void createPageControls(Composite pageContainer) {
 		super.createPageControls(pageContainer);
+		
+		if (containerFullPath==null && staticFileName==null) {
+			try {
+			    final IFile file = EclipseUtils.getSelectedFile();
+			    if (file!=null) {
+			    	containerFullPath = file.getParent().getFullPath();
+			    	staticFileName    = file.getName();
+			    }
+			} catch (Throwable ne) {
+				// Nowt
+			}
+		}
+		
 		if (containerFullPath!=null) fcp.setContainerFullPath(containerFullPath);
 		if (staticFileName!=null)    fcp.setFileName(staticFileName);
 	}
@@ -170,7 +183,11 @@ public class PersistenceExportWizard extends AbstractPerstenceWizard implements 
 						 if (options.is("Regions") && regions!=null && !regions.isEmpty()) {
 							 for (IRegion iRegion : regions) {
 								 if (!file.isRegionSupported(iRegion.getROI())) continue;
-								 file.addROI(iRegion.getName(), iRegion.getROI(), iRegion.getRegionType().getName());
+								 file.addROI(iRegion.getName(), iRegion.getROI());
+								 file.setRegionAttribute(iRegion.getName(), "Region Type", iRegion.getRegionType().getName());
+								 if (iRegion.getUserObject()!=null) {
+									 file.setRegionAttribute(iRegion.getName(), "User Object", iRegion.getUserObject().toString()); 
+								 }
 							 }
 						 }
 						 

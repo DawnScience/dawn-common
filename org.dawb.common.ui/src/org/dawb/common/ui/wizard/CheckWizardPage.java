@@ -1,19 +1,29 @@
 package org.dawb.common.ui.wizard;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Widget;
+
+import uk.ac.gda.common.rcp.util.GridUtils;
 
 /**
  * A page for editing a list of booleans.
@@ -25,7 +35,8 @@ public class CheckWizardPage extends WizardPage implements SelectionListener{
 
 	private Map<String, Boolean> values;
 	private Map<String, String>  stringValues;
-	private Map<String, Text>    textCache;
+	private Collection<String>   listValues;
+	private Map<String, Control> textCache;
 	private Map<String, Button>  buttonCache;
 	private boolean isDisposed=false;
 
@@ -45,10 +56,64 @@ public class CheckWizardPage extends WizardPage implements SelectionListener{
 		this.stringValues = values;
 	}
 
+	/**
+	 * Sets default value of string
+	 * @param label
+	 * @param stringValue
+	 */
 	public void setStringValue(String label, String stringValue) {
-		stringValues.put(label, stringValue);
-		textCache.get(label).setText(stringValue);
+		if (stringValue==null) {
+			if (stringValues==null) return;
+			stringValues.remove(label);
+			if (textCache!=null) {
+				Control widget = textCache.get(label);
+				if (widget!=null) {
+					GridUtils.setVisible(widget, false);
+					widget.getParent().layout(new Control[]{widget});
+				}
+				textCache.remove(label);
+			}
+			
+		} else {
+			if (stringValues==null) stringValues = new HashMap<String, String>();
+			stringValues.put(label, stringValue);
+			if (textCache!=null) {
+				Widget widget = textCache.get(label);
+				if (widget!=null) {
+					if (widget instanceof Text) {
+						((Text)widget).setText(stringValue);
+					} else if (widget instanceof CCombo) {
+						final List<String> items = Arrays.asList(((CCombo)widget).getItems());
+						((CCombo)widget).select(items.indexOf(stringValue));
+					}
+				}
+			}
+		}
+		validate();
 	}
+	
+	/**
+	 * Sets list of values to edit with the string. Changes the
+	 * editor to a combo if the UI has not been created as yet.
+	 * @param label
+	 * @param choices
+	 */
+	public void setStringValues(String label, List<String> choices) {
+		if (stringValues==null) stringValues = new HashMap<String, String>();
+		stringValues.put(label, choices.get(0));
+		if (listValues==null) listValues = new ArrayList<String>(7);
+		listValues.add(label);
+		if (textCache!=null) {
+			Widget widget = textCache.get(label);
+			if (widget!=null) {
+	            CCombo combo = (CCombo)widget;
+	            combo.setItems(choices.toArray(new String[choices.size()]));
+			    combo.select(0);
+			}
+			validate();
+		}
+	}
+
 
 	@Override
 	public void createControl(Composite parent) {
@@ -64,19 +129,37 @@ public class CheckWizardPage extends WizardPage implements SelectionListener{
 			button.setSelection(values.get(label));
 			if (stringValues!=null && stringValues.containsKey(label)) {
 			    button.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-			    final Text text = new Text(content, SWT.BORDER);
-			    text.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-			    text.setEnabled(values.get(label));
-			    text.setText(stringValues.get(label));
-			    text.addModifyListener(new ModifyListener() {					
-					@Override
-					public void modifyText(ModifyEvent e) {
-						stringValues.put(label, text.getText());
-						validate();
-					}
-				});
-			    if (textCache==null) textCache = new HashMap<String, Text>(7);
-			    textCache.put(label, text);
+			    
+			    if (listValues!=null && listValues.contains(label)) {
+				    final CCombo combo = new CCombo(content, SWT.READ_ONLY|SWT.BORDER);
+				    combo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+				    combo.setEnabled(values.get(label));
+				    combo.addSelectionListener(new SelectionAdapter() {
+				    	public void widgetSelected(SelectionEvent e) {
+							stringValues.put(label, combo.getItems()[combo.getSelectionIndex()]);
+							validate();
+				    	}
+				    });
+				   
+				    if (textCache==null) textCache = new HashMap<String, Control>(7);
+				    textCache.put(label, combo);
+				    combo.select(0);
+			    	
+			    } else {
+				    final Text text = new Text(content, SWT.BORDER);
+				    text.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+				    text.setEnabled(values.get(label));
+				    text.setText(stringValues.get(label));
+				    text.addModifyListener(new ModifyListener() {					
+						@Override
+						public void modifyText(ModifyEvent e) {
+							stringValues.put(label, text.getText());
+							validate();
+						}
+					});
+				    if (textCache==null) textCache = new HashMap<String, Control>(7);
+				    textCache.put(label, text);
+			    }
 			    
 			} else {
 			    button.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
@@ -108,7 +191,9 @@ public class CheckWizardPage extends WizardPage implements SelectionListener{
 		}
 		if (textCache!=null && textCache.containsKey(label)) {
 			textCache.get(label).setEnabled(isEnabled);
-			textCache.get(label).setText("");
+			if (textCache.get(label) instanceof Text) {
+				((Text)textCache.get(label)).setText("");
+			}
 		}
 	}
 
@@ -137,7 +222,11 @@ public class CheckWizardPage extends WizardPage implements SelectionListener{
 	}
 
 	public String getString(String propertyName) {
-		return stringValues.get(propertyName);
+		try {
+		    return stringValues.get(propertyName);
+		} catch (Throwable ne) {
+			return null;
+		}
 	}
 
 	@Override

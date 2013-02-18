@@ -6,6 +6,7 @@ import java.util.Map;
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.BooleanDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
+import uk.ac.diamond.scisoft.analysis.fitting.functions.AFunction;
 import uk.ac.diamond.scisoft.analysis.io.IDiffractionMetadata;
 import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
 import uk.ac.diamond.scisoft.analysis.roi.ROIBase;
@@ -39,7 +40,6 @@ import uk.ac.diamond.scisoft.analysis.roi.ROIBase;
  * <br>
  * After using an IPersistentFile, the method {@link close()} needs to be called.
  * <br>
- * TODO although defined here as placeholders the functions are not yet implemented.
  * 
  * @author wqk87977
  *
@@ -105,7 +105,7 @@ public interface IPersistentFile {
 	 * @param String
 	 * @param ROIBase
 	 */
-	public void addROI(String name, ROIBase roi, String roiType) throws Exception ;
+	public void addROI(String name, ROIBase roi) throws Exception ;
 
 	/**
 	 * Method to set the site
@@ -228,6 +228,54 @@ public interface IPersistentFile {
 	public boolean isRegionSupported(ROIBase roi);
 	
 	/**
+	 * Method to set a map of functions<br>
+	 * This will write the data to entry/region<br>
+	 * If the functions already exist, they will be overwritten.<br>
+	 * 
+	 * @param Map
+	 * @throws Exception 
+	 */
+	public void setFunctions(Map<String, AFunction> functions) throws Exception;
+
+	/**
+	 * Method to add a function to the current map of functions<br>
+	 * @param String name
+	 * @param AFunction function
+	 */
+	public void addFunction(String name, AFunction function, String roiType) throws Exception ;
+
+	/**
+	 * Method that reads a function from entry/region<br>
+	 * 
+	 * @param functionName
+	 * @return AFunction
+	 * @throws Exception
+	 *              is thrown if no correct entry is found in the file
+	 */
+	public AFunction getFunction(String functionName) throws Exception;
+
+	/**
+	 * Method that reads a map of functions from entry/region<br>
+	 * 
+	 * @param mon
+	 * @return Map
+	 * @throws Exception
+	 *              is thrown if no correct entry is found in the file
+	 */
+	public Map<String, AFunction> getFunctions(IMonitor mon) throws Exception;
+	
+	/**
+	 * Method that returns the list of function names saved in the file.<br>
+	 * Reads from entry/data<br>
+	 * 
+	 * @param mon
+	 * @return List<String>
+	 * @throws Exception
+	 *              is thrown if no correct entry is found in the file
+	 */
+	public List<String> getFunctionNames(IMonitor mon) throws Exception;
+
+	/**
 	 * Method to set diffraction metadata<br>
 	 * This will write the data to entry/metadata<br>
 	 * If the metadata already exists, they will be overwritten.<br>
@@ -264,4 +312,22 @@ public interface IPersistentFile {
 	 */
 	public String getSite() throws Exception;
 
+	/**
+	 * Set attribute on region
+	 * @param regionName - the region
+	 * @param attributeName - JSON not allowed as name.
+	 * @param value
+	 */
+	public void setRegionAttribute(String regionName, String attributeName, String value) throws Exception;
+
+	
+	/**
+	 * Get attribute of a region
+	 * @param regionName
+	 * @param attributeName
+	 * @return
+	 * @throws Exception
+	 */
+	public String getRegionAttribute(String regionName, String attributeName) throws Exception;
+	
 }

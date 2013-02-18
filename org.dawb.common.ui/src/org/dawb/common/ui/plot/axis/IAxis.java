@@ -1,7 +1,5 @@
 package org.dawb.common.ui.plot.axis;
 
-import java.text.NumberFormat;
-
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 
@@ -245,4 +243,9 @@ public interface IAxis {
 	 * @return the number (usually Double) formatted to the current format
 	 */
 	public String format(Object value);
+
+	/**
+	 * @return scaling of axis in terms of pixels/unit
+	 */
+	public double getScaling();
 }
