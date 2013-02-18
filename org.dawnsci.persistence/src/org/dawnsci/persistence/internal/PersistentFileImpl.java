@@ -28,6 +28,7 @@ import uk.ac.diamond.scisoft.analysis.dataset.BooleanDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.DatasetUtils;
 import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ShortDataset;
+import uk.ac.diamond.scisoft.analysis.fitting.functions.AFunction;
 import uk.ac.diamond.scisoft.analysis.io.DataHolder;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
@@ -538,5 +539,36 @@ class PersistentFileImpl implements IPersistentFile{
 	@Override
 	public boolean isRegionSupported(ROIBase roi) {
 		return ROIBeanConverter.isROISupported(roi);
+	}
+
+	@Override
+	public void setFunctions(Map<String, AFunction> functions) throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void addFunction(String name, AFunction function, String roiType)
+			throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public AFunction getFunction(String functionName) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Map<String, AFunction> getFunctions(IMonitor mon) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<String> getFunctionNames(IMonitor mon) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
