@@ -38,6 +38,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.IWizard;
@@ -70,6 +71,27 @@ import org.eclipse.ui.wizards.IWizardDescriptor;
  *
  */
 public class EclipseUtils {
+	
+	/**
+	 * 
+	 * @return file, if any, selected in the workbench
+	 */
+	public static IFile getSelectedFile() {
+
+		ISelection selection = EclipseUtils.getActivePage().getSelection();
+		if (selection instanceof IStructuredSelection) {
+			IStructuredSelection ssel = (IStructuredSelection) selection;
+			Object obj = ssel.getFirstElement();
+			IFile file = (IFile) Platform.getAdapterManager().getAdapter(obj, IFile.class);
+			if (file == null) {
+				if (obj instanceof IAdaptable) {
+					file = (IFile) ((IAdaptable) obj).getAdapter(IFile.class);
+				}
+			}
+			return file;
+		}
+		return null;
+	}
 
 	/**
 	 * Get the URI from editor input if it's a URI editor input

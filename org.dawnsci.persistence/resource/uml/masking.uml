@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<uml:Model xmi:version="20110701" xmlns:xmi="http://www.omg.org/spec/XMI/20110701" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:uml="http://www.eclipse.org/uml2/4.0.0/UML" xmi:id="_osMUEGvBEeKolfUuecYhuA" name="model">
+  <ownedComment xmi:id="_vKaWcGxKEeKolfUuecYhuA">
+    <body>Persistence Saving/Loading Class Diagram</body>
+  </ownedComment>
+  <packagedElement xmi:type="uml:Package" xmi:id="_qxSYUGvBEeKolfUuecYhuA" name="org.dawnsci.persistence">
+    <packagedElement xmi:type="uml:Interface" xmi:id="_y6jlgGvBEeKolfUuecYhuA" name="IPersistenceService">
+      <ownedOperation xmi:id="_0iNwUGxEEeKolfUuecYhuA" name="getPersistenceFile">
+        <ownedParameter xmi:id="_wRcz0GxGEeKolfUuecYhuA" name="hdf5FilePath" visibility="private" type="_oRpEoGxGEeKolfUuecYhuA" effect="update"/>
+        <ownedParameter xmi:id="_8GJJ4GxGEeKolfUuecYhuA" name="persistentFile" visibility="private" type="_-1HjgGxEEeKolfUuecYhuA" direction="return" effect="read"/>
+      </ownedOperation>
+      <ownedOperation xmi:id="_39CRYGxEEeKolfUuecYhuA" name="createPersistenceFile">
+        <ownedParameter xmi:id="_DpltMGxHEeKolfUuecYhuA" name="hdf5FilePath" visibility="private" type="_oRpEoGxGEeKolfUuecYhuA" effect="update"/>
+        <ownedParameter xmi:id="_I_lhgGxHEeKolfUuecYhuA" name="persistentFile" visibility="private" type="_-1HjgGxEEeKolfUuecYhuA" direction="return" effect="update"/>
+      </ownedOperation>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="_GBbvwGvCEeKolfUuecYhuA" clientDependency="_OcgSoGxGEeKolfUuecYhuA _hA7g0HXuEeKZF5WPgZxK5g" name="PersistenceServiceImpl">
+      <interfaceRealization xmi:id="_OcgSoGxGEeKolfUuecYhuA" name="Implements" client="_GBbvwGvCEeKolfUuecYhuA" supplier="_y6jlgGvBEeKolfUuecYhuA" contract="_y6jlgGvBEeKolfUuecYhuA"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="_NwZQAGxFEeKolfUuecYhuA" clientDependency="_NYFBMGxGEeKolfUuecYhuA _bAaI0HXuEeKZF5WPgZxK5g" name="PersistentFileImpl">
+      <ownedAttribute xmi:id="_UMOD8GxFEeKolfUuecYhuA" name="filePath" visibility="private" type="_oRpEoGxGEeKolfUuecYhuA">
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_V9oXMGxFEeKolfUuecYhuA" value="1"/>
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_V-kyYGxFEeKolfUuecYhuA" value="1"/>
+        <defaultValue xmi:type="uml:LiteralString" xmi:id="_V_D6kGxFEeKolfUuecYhuA">
+          <value xsi:nil="true"/>
+        </defaultValue>
+      </ownedAttribute>
+      <ownedAttribute xmi:id="_fK9pcGxFEeKolfUuecYhuA" name="data" visibility="private" type="_qwNOQGxFEeKolfUuecYhuA">
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_hhmJoGxFEeKolfUuecYhuA" value="1"/>
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_hhmwsGxFEeKolfUuecYhuA" value="1"/>
+        <defaultValue xmi:type="uml:LiteralString" xmi:id="_hhnXwGxFEeKolfUuecYhuA">
+          <value xsi:nil="true"/>
+        </defaultValue>
+      </ownedAttribute>
+      <ownedAttribute xmi:id="_i3nhYGxFEeKolfUuecYhuA" name="masks" visibility="private" type="_UL8agGxuEeKolfUuecYhuA">
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_jIjgYGxFEeKolfUuecYhuA" value="1"/>
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_jIkHcGxFEeKolfUuecYhuA" value="1"/>
+        <defaultValue xmi:type="uml:LiteralString" xmi:id="_jIkugGxFEeKolfUuecYhuA">
+          <value xsi:nil="true"/>
+        </defaultValue>
+      </ownedAttribute>
+      <ownedAttribute xmi:id="_iv9V0HXrEeKZF5WPgZxK5g" name="functions" visibility="private" type="_kIxNwHXpEeKZF5WPgZxK5g"/>
+      <ownedAttribute xmi:id="_5Z-aMHXsEeKZF5WPgZxK5g" name="axes" visibility="private" type="_9b-KAGxqEeKolfUuecYhuA"/>
+      <ownedAttribute xmi:id="_fwj6kHXtEeKZF5WPgZxK5g" name="file" visibility="private" type="_eF9Z8HXtEeKZF5WPgZxK5g"/>
+      <interfaceRealization xmi:id="_NYFBMGxGEeKolfUuecYhuA" name="implements" client="_NwZQAGxFEeKolfUuecYhuA" supplier="_-1HjgGxEEeKolfUuecYhuA" contract="_-1HjgGxEEeKolfUuecYhuA"/>
+      <ownedOperation xmi:id="_khM_EHXtEeKZF5WPgZxK5g" name="PersistentFileImpl">
+        <ownedParameter xmi:id="_p5He8HXtEeKZF5WPgZxK5g" name="filePath" visibility="private" type="_oRpEoGxGEeKolfUuecYhuA"/>
+      </ownedOperation>
+      <ownedOperation xmi:id="_qoqFgHXtEeKZF5WPgZxK5g" name="PersistentFileImpl">
+        <ownedParameter xmi:id="_udkhkHXtEeKZF5WPgZxK5g" name="file" visibility="private" type="_eF9Z8HXtEeKZF5WPgZxK5g"/>
+      </ownedOperation>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="_d8La8GxtEeKolfUuecYhuA" name="iPersistenceService_iPersistentFile_1" memberEnd="_d8La9GxtEeKolfUuecYhuA _d8La8WxtEeKolfUuecYhuA">
+      <ownedEnd xmi:id="_d8La8WxtEeKolfUuecYhuA" name="iPersistentFile" type="_-1HjgGxEEeKolfUuecYhuA" association="_d8La8GxtEeKolfUuecYhuA">
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_d8La8mxtEeKolfUuecYhuA" value="1"/>
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_d8La82xtEeKolfUuecYhuA" value="1"/>
+      </ownedEnd>
+      <ownedEnd xmi:id="_d8La9GxtEeKolfUuecYhuA" name="iPersistenceService" type="_y6jlgGvBEeKolfUuecYhuA" association="_d8La8GxtEeKolfUuecYhuA">
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_d8La9WxtEeKolfUuecYhuA" value="1"/>
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_d8La9mxtEeKolfUuecYhuA" value="*"/>
+      </ownedEnd>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Interface" xmi:id="_7r6Z4HXnEeKZF5WPgZxK5g" name="IPersistentFile"/>
+    <packagedElement xmi:type="uml:Interface" xmi:id="_-1HjgGxEEeKolfUuecYhuA" name="IPersistentFile">
+      <ownedOperation xmi:id="_GNqeYGxFEeKolfUuecYhuA" name="getData">
+        <ownedParameter xmi:id="_pj6IUGxHEeKolfUuecYhuA" name="data" visibility="private" type="_qwNOQGxFEeKolfUuecYhuA" direction="return" effect="read"/>
+      </ownedOperation>
+      <ownedOperation xmi:id="_dAhDkHXnEeKZF5WPgZxK5g" name="getAxes">
+        <ownedParameter xmi:id="_tGMtsHXnEeKZF5WPgZxK5g" name="axes" visibility="private" type="_9b-KAGxqEeKolfUuecYhuA" direction="return" effect="read"/>
+      </ownedOperation>
+      <ownedOperation xmi:id="_IwgOkGxFEeKolfUuecYhuA" name="getMasks">
+        <ownedParameter xmi:id="_tDZuAGxHEeKolfUuecYhuA" name="masks" visibility="private" type="_UL8agGxuEeKolfUuecYhuA" direction="return" effect="read">
+          <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_RipkYGxrEeKolfUuecYhuA"/>
+          <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_RiqLcGxrEeKolfUuecYhuA" value="*"/>
+        </ownedParameter>
+      </ownedOperation>
+      <ownedOperation xmi:id="_dY7HEHXoEeKZF5WPgZxK5g" name="getMask">
+        <ownedParameter xmi:id="_ig-mAHXoEeKZF5WPgZxK5g" name="name" visibility="private" type="_oRpEoGxGEeKolfUuecYhuA" effect="read"/>
+        <ownedParameter xmi:id="_nL2ZsHXoEeKZF5WPgZxK5g" name="mask" visibility="private" type="_qwNOQGxFEeKolfUuecYhuA" direction="return" effect="read"/>
+      </ownedOperation>
+      <ownedOperation xmi:id="_EcrB4GxFEeKolfUuecYhuA" name="getROIs">
+        <ownedParameter xmi:id="_lMQyoGxHEeKolfUuecYhuA" name="rois" visibility="private" type="_HRLXwGxvEeKolfUuecYhuA" direction="return" effect="read">
+          <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_qKw_EGxqEeKolfUuecYhuA"/>
+          <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_qKw_EWxqEeKolfUuecYhuA" value="*"/>
+        </ownedParameter>
+      </ownedOperation>
+      <ownedOperation xmi:id="_PbXAAHXoEeKZF5WPgZxK5g" name="getROI">
+        <ownedParameter xmi:id="_Vb0GkHXoEeKZF5WPgZxK5g" name="name" visibility="private" type="_oRpEoGxGEeKolfUuecYhuA" effect="read"/>
+        <ownedParameter xmi:id="_ZK3LMHXoEeKZF5WPgZxK5g" name="roi" visibility="private" type="_qQRxAGxFEeKolfUuecYhuA" direction="return" effect="read"/>
+      </ownedOperation>
+      <ownedOperation xmi:id="_yTdK0HXpEeKZF5WPgZxK5g" name="getFunctions">
+        <ownedParameter xmi:id="_2piaQHXpEeKZF5WPgZxK5g" name="functions" visibility="private" type="_kIxNwHXpEeKZF5WPgZxK5g" direction="return"/>
+      </ownedOperation>
+      <ownedOperation xmi:id="_cJm-0HXpEeKZF5WPgZxK5g" name="getFunction">
+        <ownedParameter xmi:id="_qxkGsHXpEeKZF5WPgZxK5g" name="name" visibility="private" type="_oRpEoGxGEeKolfUuecYhuA" effect="read"/>
+        <ownedParameter xmi:id="_xIaUAHXpEeKZF5WPgZxK5g" name="function" visibility="private" type="_fUhboHXpEeKZF5WPgZxK5g" direction="return" effect="read"/>
+      </ownedOperation>
+      <ownedOperation xmi:id="_LH8nEGxFEeKolfUuecYhuA" name="setData">
+        <ownedParameter xmi:id="_04gpEGxHEeKolfUuecYhuA" name="data" visibility="private" type="_qwNOQGxFEeKolfUuecYhuA" isUnique="false" effect="update">
+          <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_9d4cQGxvEeKolfUuecYhuA" value="1"/>
+          <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_9d5DUGxvEeKolfUuecYhuA" value="*"/>
+        </ownedParameter>
+      </ownedOperation>
+      <ownedOperation xmi:id="_HjFmwHXpEeKZF5WPgZxK5g" name="setAxes">
+        <ownedParameter xmi:id="_LMYBoHXpEeKZF5WPgZxK5g" name="axes" visibility="private" type="_9b-KAGxqEeKolfUuecYhuA"/>
+      </ownedOperation>
+      <ownedOperation xmi:id="_MuwaYHXpEeKZF5WPgZxK5g" name="setMasks">
+        <ownedParameter xmi:id="_RwiSMHXpEeKZF5WPgZxK5g" name="masks" visibility="private" type="_UL8agGxuEeKolfUuecYhuA"/>
+      </ownedOperation>
+      <ownedOperation xmi:id="_MH0IoGxFEeKolfUuecYhuA" name="addMask">
+        <ownedParameter xmi:id="_ruSOAGxvEeKolfUuecYhuA" name="name" visibility="private" type="_oRpEoGxGEeKolfUuecYhuA" isUnique="false">
+          <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_DLzBUGxwEeKolfUuecYhuA" value="1"/>
+          <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_DLzoYGxwEeKolfUuecYhuA" value="*"/>
+        </ownedParameter>
+        <ownedParameter xmi:id="_9tXe0HXoEeKZF5WPgZxK5g" name="mask" visibility="private" type="_qwNOQGxFEeKolfUuecYhuA"/>
+      </ownedOperation>
+      <ownedOperation xmi:id="_TDo40HXpEeKZF5WPgZxK5g" name="setROIs">
+        <ownedParameter xmi:id="_ZaJu8HXpEeKZF5WPgZxK5g" name="rois" visibility="private" type="_HRLXwGxvEeKolfUuecYhuA"/>
+      </ownedOperation>
+      <ownedOperation xmi:id="_JzofgGxFEeKolfUuecYhuA" name="addROI">
+        <ownedParameter xmi:id="_ciYBUGxrEeKolfUuecYhuA" name="name" visibility="private" type="_oRpEoGxGEeKolfUuecYhuA" isUnique="false">
+          <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_3NMhUGxvEeKolfUuecYhuA" value="1"/>
+          <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_3NMhUWxvEeKolfUuecYhuA" value="*"/>
+        </ownedParameter>
+        <ownedParameter xmi:id="_DR9v0HXpEeKZF5WPgZxK5g" name="roi" visibility="private" type="_qQRxAGxFEeKolfUuecYhuA"/>
+      </ownedOperation>
+      <ownedOperation xmi:id="_7_CfUHXpEeKZF5WPgZxK5g" name="setFunctions">
+        <ownedParameter xmi:id="_AUrp4HXqEeKZF5WPgZxK5g" name="functions" visibility="private" type="_kIxNwHXpEeKZF5WPgZxK5g"/>
+      </ownedOperation>
+      <ownedOperation xmi:id="_A-Z8UHXqEeKZF5WPgZxK5g" name="addFunction">
+        <ownedParameter xmi:id="_FMUuQHXqEeKZF5WPgZxK5g" name="name" visibility="private" type="_oRpEoGxGEeKolfUuecYhuA"/>
+        <ownedParameter xmi:id="_Hiy2YHXqEeKZF5WPgZxK5g" name="function" visibility="private" type="_fUhboHXpEeKZF5WPgZxK5g"/>
+      </ownedOperation>
+      <ownedOperation xmi:id="_XB0eQHXsEeKZF5WPgZxK5g" name="getSite">
+        <ownedParameter xmi:id="_bb1ygHXsEeKZF5WPgZxK5g" name="site" visibility="private" type="_oRpEoGxGEeKolfUuecYhuA" direction="return"/>
+      </ownedOperation>
+      <ownedOperation xmi:id="_cG_BQHXsEeKZF5WPgZxK5g" name="setSite">
+        <ownedParameter xmi:id="_fWlw0HXsEeKZF5WPgZxK5g" name="site" visibility="private" type="_oRpEoGxGEeKolfUuecYhuA"/>
+      </ownedOperation>
+      <ownedOperation xmi:id="_ghWTwHXsEeKZF5WPgZxK5g" name="getVersion">
+        <ownedParameter xmi:id="_kCvW4HXsEeKZF5WPgZxK5g" name="version" visibility="private" type="_oRpEoGxGEeKolfUuecYhuA" direction="return"/>
+      </ownedOperation>
+      <ownedOperation xmi:id="_m_pM4HXsEeKZF5WPgZxK5g" name="close"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Usage" xmi:id="_bAaI0HXuEeKZF5WPgZxK5g" name="Usage1" client="_NwZQAGxFEeKolfUuecYhuA" supplier="_GBbvwGvCEeKolfUuecYhuA"/>
+    <packagedElement xmi:type="uml:Usage" xmi:id="_hA7g0HXuEeKZF5WPgZxK5g" name="Usage2" client="_GBbvwGvCEeKolfUuecYhuA" supplier="_NwZQAGxFEeKolfUuecYhuA"/>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Class" xmi:id="_qQRxAGxFEeKolfUuecYhuA" clientDependency="_bxk5gGxKEeKolfUuecYhuA" name="ROIBase">
+    <interfaceRealization xmi:id="_bxk5gGxKEeKolfUuecYhuA" name="implements" client="_qQRxAGxFEeKolfUuecYhuA" supplier="_ZcbAAGxKEeKolfUuecYhuA" contract="_ZcbAAGxKEeKolfUuecYhuA"/>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Class" xmi:id="_qwNOQGxFEeKolfUuecYhuA" clientDependency="_dCIicGxKEeKolfUuecYhuA" name="AbstractDataset" isAbstract="true">
+    <interfaceRealization xmi:id="_dCIicGxKEeKolfUuecYhuA" name="implements" client="_qwNOQGxFEeKolfUuecYhuA" supplier="_ZcbAAGxKEeKolfUuecYhuA" contract="_ZcbAAGxKEeKolfUuecYhuA"/>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Class" xmi:id="_rjxZMGxFEeKolfUuecYhuA" clientDependency="_9TLaMGxFEeKolfUuecYhuA" name="DoubleDataset"/>
+  <packagedElement xmi:type="uml:Class" xmi:id="_zez9IGxFEeKolfUuecYhuA" clientDependency="_-8EqoGxFEeKolfUuecYhuA" name="BooleanDataset"/>
+  <packagedElement xmi:type="uml:Abstraction" xmi:id="_9TLaMGxFEeKolfUuecYhuA" name="extends" client="_rjxZMGxFEeKolfUuecYhuA" supplier="_qwNOQGxFEeKolfUuecYhuA"/>
+  <packagedElement xmi:type="uml:Abstraction" xmi:id="_-8EqoGxFEeKolfUuecYhuA" name="extends" client="_zez9IGxFEeKolfUuecYhuA" supplier="_qwNOQGxFEeKolfUuecYhuA"/>
+  <packagedElement xmi:type="uml:Class" xmi:id="_oRpEoGxGEeKolfUuecYhuA" clientDependency="_p1OacGxKEeKolfUuecYhuA" name="String">
+    <interfaceRealization xmi:id="_p1OacGxKEeKolfUuecYhuA" name="implements" client="_oRpEoGxGEeKolfUuecYhuA" supplier="_ZcbAAGxKEeKolfUuecYhuA" contract="_ZcbAAGxKEeKolfUuecYhuA"/>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Class" xmi:id="_DcHKgGxKEeKolfUuecYhuA" name="Serializable"/>
+  <packagedElement xmi:type="uml:Interface" xmi:id="_ZcbAAGxKEeKolfUuecYhuA" name="Serializable"/>
+  <packagedElement xmi:type="uml:Class" xmi:id="_9b-KAGxqEeKolfUuecYhuA" name="List&lt;AbstractDataset>" isAbstract="true"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_rU-6AGxrEeKolfUuecYhuA" name="DataType1"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_UL8agGxuEeKolfUuecYhuA" name="Map&lt;String, AsbtractDataset>"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_HRLXwGxvEeKolfUuecYhuA" name="Map&lt;String, ROIBase>"/>
+  <packagedElement xmi:type="uml:Class" xmi:id="_fUhboHXpEeKZF5WPgZxK5g" name="AFunction"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_kIxNwHXpEeKZF5WPgZxK5g" name="Map&lt;String, AFunction>"/>
+  <packagedElement xmi:type="uml:Interface" xmi:id="_eF9Z8HXtEeKZF5WPgZxK5g" name="IHierarchicalDataFile"/>
+</uml:Model>

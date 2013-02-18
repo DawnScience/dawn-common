@@ -14,6 +14,10 @@ public class PersistenceServiceCreator {
 		
 	}
 
+	/**
+	 * Used only for testing - DO NOT USE Externally. Instead get the Service by class.
+	 * @return
+	 */
 	public static IPersistenceService createPersistenceService(){
 		return new PersistenceServiceImpl();
 	}

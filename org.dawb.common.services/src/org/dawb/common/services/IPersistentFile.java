@@ -7,6 +7,7 @@ import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.BooleanDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.AFunction;
+import uk.ac.diamond.scisoft.analysis.io.IDiffractionMetadata;
 import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
 import uk.ac.diamond.scisoft.analysis.roi.ROIBase;
 
@@ -104,7 +105,14 @@ public interface IPersistentFile {
 	 * @param String
 	 * @param ROIBase
 	 */
-	public void addROI(String name, ROIBase roi, String roiType) throws Exception ;
+	public void addROI(String name, ROIBase roi) throws Exception ;
+
+	/**
+	 * Method to set the site
+	 * @param site
+	 * @throws Exception
+	 */
+	public void setSite(String site) throws Exception;
 
 	/**
 	 * Method that reads a ROI from entry/region<br>
@@ -266,5 +274,60 @@ public interface IPersistentFile {
 	 *              is thrown if no correct entry is found in the file
 	 */
 	public List<String> getFunctionNames(IMonitor mon) throws Exception;
+
+	/**
+	 * Method to set diffraction metadata<br>
+	 * This will write the data to entry/metadata<br>
+	 * If the metadata already exists, they will be overwritten.<br>
+	 * 
+	 * @param DiffractionMetadata
+	 * @throws Exception 
+	 */
+	public void setDiffractionMetadata(IDiffractionMetadata metadata) throws Exception;
+
+	/**
+	 * Method that returns Diffraction metadata.<br>
+	 * This method reads from entry/diffraction_metadata.<br>
+	 * 
+	 * @param mon
+	 * @return IDiffractionMetadata
+	 * @throws Exception
+	 *              is thrown if no correct entry is found in the file
+	 */
+	public IDiffractionMetadata getDiffractionMetadata(IMonitor mon) throws Exception;
+
+	/**
+	 * Method that returns the version the persistent file.<br>
+	 * Saved as an attribute in the HDF5 file.
+	 * @return String
+	 * @throws Exception
+	 */
+	public String getVersion() throws Exception;
+
+	/**
+	 * Method that returns the site where the persistence API is being called.<br>
+	 * Saved as an attribute in the persistence file.
+	 * @return String
+	 * @throws Exception
+	 */
+	public String getSite() throws Exception;
+
+	/**
+	 * Set attribute on region
+	 * @param regionName - the region
+	 * @param attributeName - JSON not allowed as name.
+	 * @param value
+	 */
+	public void setRegionAttribute(String regionName, String attributeName, String value) throws Exception;
+
+	
+	/**
+	 * Get attribute of a region
+	 * @param regionName
+	 * @param attributeName
+	 * @return
+	 * @throws Exception
+	 */
+	public String getRegionAttribute(String regionName, String attributeName) throws Exception;
 	
 }
