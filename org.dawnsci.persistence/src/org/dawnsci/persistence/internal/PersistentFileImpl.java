@@ -38,9 +38,9 @@ import uk.ac.diamond.scisoft.analysis.dataset.BooleanDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.DatasetUtils;
 import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ShortDataset;
-import uk.ac.diamond.scisoft.analysis.fitting.functions.AFunction;
 import uk.ac.diamond.scisoft.analysis.diffraction.DetectorProperties;
 import uk.ac.diamond.scisoft.analysis.diffraction.DiffractionCrystalEnvironment;
+import uk.ac.diamond.scisoft.analysis.fitting.functions.AFunction;
 import uk.ac.diamond.scisoft.analysis.io.DataHolder;
 import uk.ac.diamond.scisoft.analysis.io.IDiffractionMetadata;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
@@ -85,12 +85,17 @@ class PersistentFileImpl implements IPersistentFile{
 	PersistentFileImpl(IHierarchicalDataFile file) throws Exception{
 		this.file = file;
 		this.filePath = file.getPath();
-		// set the site
-		String path = BundleUtils.getBundleLocation(Activator.getContext().getBundle()).getAbsolutePath()+SITE_FILE;
-		setSite(PersistenceUtils.readFile(path));
-		// set the version
-		path = BundleUtils.getBundleLocation(Activator.getContext().getBundle()).getAbsolutePath()+VERSION_FILE;
-		setVersion(PersistenceUtils.readFile(path));
+		// set the site and version
+		String sitePath = "", versionPath = "";
+		if(Activator.getContext() == null){
+			sitePath = System.getProperty("user.dir")+SITE_FILE;
+			versionPath = System.getProperty("user.dir")+VERSION_FILE;
+		} else {
+			sitePath = BundleUtils.getBundleLocation(Activator.getContext().getBundle()).getAbsolutePath()+SITE_FILE;
+			versionPath = BundleUtils.getBundleLocation(Activator.getContext().getBundle()).getAbsolutePath()+VERSION_FILE;
+		}
+		setSite(PersistenceUtils.readFile(sitePath));
+		setVersion(PersistenceUtils.readFile(versionPath));
 	}
 
 	/**
