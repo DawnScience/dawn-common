@@ -340,7 +340,7 @@ public class SliceComponent {
 		surfacePlot.setImageDescriptor(Activator.getImageDescriptor("icons/TraceSurface.png"));
 		grp.add(surfacePlot);
 		plotTypeActions.put(PlotType.SURFACE, surfacePlot);
-		surfacePlot.setEnabled(false);
+		//surfacePlot.setEnabled(false);
 		
 		man.add(new Separator("group2"));
 		

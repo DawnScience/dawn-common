@@ -3,6 +3,7 @@ package org.dawb.common.ui.plot.trace;
 import java.util.List;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.roi.ROIBase;
 
 /**
  * DO NOT USE YET IPlottingSystem does not yet support 3D.
@@ -53,5 +54,17 @@ public interface ISurfaceTrace extends IPaletteTrace {
 	 * @return true if plot is currently plotting.
 	 */
 	public boolean isActive();
+	
+	/**
+	 * 
+	 * @return the region of the window, usually a SurfacePlotROI or a RectangularROI
+	 */
+	public ROIBase getWindow();
+	
+	/**
+	 * Set the window to be used as a SurfacePlotROI or RectangularROI
+	 * @param window
+	 */
+	public void setWindow(ROIBase window);
 
 }
