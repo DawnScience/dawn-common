@@ -23,6 +23,8 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
 
+import uk.ac.gda.common.rcp.util.GridUtils;
+
 /**
  * A page for editing a list of booleans.
  * @author fcp94556
@@ -60,19 +62,34 @@ public class CheckWizardPage extends WizardPage implements SelectionListener{
 	 * @param stringValue
 	 */
 	public void setStringValue(String label, String stringValue) {
-		if (stringValues==null) stringValues = new HashMap<String, String>();
-		stringValues.put(label, stringValue);
-		if (textCache!=null) {
-			Widget widget = textCache.get(label);
-			if (widget!=null) {
-				if (widget instanceof Text) {
-					((Text)widget).setText(stringValue);
-				} else if (widget instanceof CCombo) {
-					final List<String> items = Arrays.asList(((CCombo)widget).getItems());
-					((CCombo)widget).select(items.indexOf(stringValue));
+		if (stringValue==null) {
+			if (stringValues==null) return;
+			stringValues.remove(label);
+			if (textCache!=null) {
+				Control widget = textCache.get(label);
+				if (widget!=null) {
+					GridUtils.setVisible(widget, false);
+					widget.getParent().layout(new Control[]{widget});
+				}
+				textCache.remove(label);
+			}
+			
+		} else {
+			if (stringValues==null) stringValues = new HashMap<String, String>();
+			stringValues.put(label, stringValue);
+			if (textCache!=null) {
+				Widget widget = textCache.get(label);
+				if (widget!=null) {
+					if (widget instanceof Text) {
+						((Text)widget).setText(stringValue);
+					} else if (widget instanceof CCombo) {
+						final List<String> items = Arrays.asList(((CCombo)widget).getItems());
+						((CCombo)widget).select(items.indexOf(stringValue));
+					}
 				}
 			}
 		}
+		validate();
 	}
 	
 	/**

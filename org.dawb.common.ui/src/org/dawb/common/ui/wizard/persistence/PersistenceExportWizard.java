@@ -39,6 +39,8 @@ import org.eclipse.ui.IWorkbenchPart;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.BooleanDataset;
+import uk.ac.diamond.scisoft.analysis.io.IDiffractionMetadata;
+import uk.ac.diamond.scisoft.analysis.io.IMetaData;
 import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
 
 public class PersistenceExportWizard extends AbstractPerstenceWizard implements IExportWizard {
@@ -93,6 +95,7 @@ public class PersistenceExportWizard extends AbstractPerstenceWizard implements 
     		options.setOptionEnabled("Original Data", true);
     		options.setOptionEnabled("Mask",          true);
     		options.setOptionEnabled("Regions",       true);
+    		options.setOptionEnabled("Diffraction Meta Data",       true);
 
     		File                file=null;
     		IPersistentFile     pf=null;
@@ -125,7 +128,13 @@ public class PersistenceExportWizard extends AbstractPerstenceWizard implements 
     				if (regions==null || regions.isEmpty()) {
     					options.setOptionEnabled("Regions", false);
     				}
-   				
+    				
+    				if (trace!=null && trace instanceof IImageTrace && trace.getData() != null) {
+    					IMetaData meta = trace.getData().getMetadata();
+    					if (meta == null || !(meta instanceof IDiffractionMetadata)) {
+    						options.setOptionEnabled("Diffraction Meta Data", false);
+    					}
+    				}
     			}
     		}
 
@@ -187,6 +196,15 @@ public class PersistenceExportWizard extends AbstractPerstenceWizard implements 
 								 file.setRegionAttribute(iRegion.getName(), "Region Type", iRegion.getRegionType().getName());
 								 if (iRegion.getUserObject()!=null) {
 									 file.setRegionAttribute(iRegion.getName(), "User Object", iRegion.getUserObject().toString()); 
+								 }
+							 }
+						 }
+						 
+						 if (options.is("Diffraction Meta Data")) {
+							 if (trace!=null && trace instanceof IImageTrace && trace.getData() != null) {
+								 IMetaData meta = trace.getData().getMetadata();
+								 if (meta == null || meta instanceof IDiffractionMetadata) {
+									 file.setDiffractionMetadata((IDiffractionMetadata) meta);
 								 }
 							 }
 						 }
