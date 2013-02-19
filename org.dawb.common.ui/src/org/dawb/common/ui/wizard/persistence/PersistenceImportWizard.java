@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.dawb.common.services.ILoaderService;
 import org.dawb.common.services.IPersistenceService;
 import org.dawb.common.services.IPersistentFile;
 import org.dawb.common.services.ServiceManager;
@@ -31,11 +32,15 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IImportWizard;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.PlatformUI;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.BooleanDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.DatasetUtils;
+import uk.ac.diamond.scisoft.analysis.diffraction.DiffractionMetadataUtils;
 import uk.ac.diamond.scisoft.analysis.io.DataHolder;
+import uk.ac.diamond.scisoft.analysis.io.IDiffractionMetadata;
+import uk.ac.diamond.scisoft.analysis.io.IMetaData;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
 import uk.ac.diamond.scisoft.analysis.roi.ROIBase;
@@ -232,7 +237,6 @@ public class PersistenceImportWizard extends AbstractPerstenceWizard implements 
 						}
 					});
 				}
-
 			}
 
 			final IPersistentFile finalFile = file;
@@ -264,6 +268,31 @@ public class PersistenceImportWizard extends AbstractPerstenceWizard implements 
 					});
 				}
 			}
+			
+			if (options.is("Diffraction Meta Data") && trace instanceof IImageTrace) {
+				//check loader service and overwrite if not null
+				//check image and overwrite if none in service
+				ILoaderService loaderService = (ILoaderService)PlatformUI.getWorkbench().getService(ILoaderService.class);
+
+				final IDiffractionMetadata fileMeta = file.getDiffractionMetadata(mon);
+
+				final IDiffractionMetadata lockedmeta = loaderService.getLockedDiffractionMetaData();
+				final IImageTrace image = (IImageTrace)trace;
+				Display.getDefault().syncExec(new Runnable() {
+					public void run() {
+						if (lockedmeta != null) {
+							DiffractionMetadataUtils.copyNewOverOld(fileMeta, lockedmeta);
+						} else if (image.getData() != null && image.getData().getMetadata()!= null){
+							//Should only need to copy over here, not replace
+							IMetaData meta = image.getData().getMetadata();
+							if (meta instanceof IDiffractionMetadata) {
+								DiffractionMetadataUtils.copyNewOverOld(fileMeta, (IDiffractionMetadata)meta);
+							}
+						}
+					}
+				});
+			}
+				
 
 		} finally {
 			if (file!=null) file.close();

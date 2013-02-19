@@ -280,6 +280,7 @@ class PersistentFileImpl implements IPersistentFile{
         		names.add(hObject.getName());
 			}
         } catch (Exception ne) {
+        	//Hides other exceptions
         	names = null;
         } finally {
         	if (file!=null) file.close();
@@ -567,7 +568,9 @@ class PersistentFileImpl implements IPersistentFile{
 		Gson gson = builder.create();
 		
 		List<String> names = getROINames(mon);
-
+		
+		if (names== null) return null;
+		
 		Iterator<String> it = names.iterator();
 		while (it.hasNext()) {
 			String name = (String) it.next();
