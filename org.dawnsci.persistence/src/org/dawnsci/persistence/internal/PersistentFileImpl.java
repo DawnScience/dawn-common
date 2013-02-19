@@ -277,8 +277,8 @@ class PersistentFileImpl implements IPersistentFile{
 		try {
 			file      = HierarchicalDataFactory.getReader(getFilePath());
 			Group grp = (Group)file.getData(ROI_ENTRY);
-			if (grp==null) return null;
-			
+			if (grp==null) throw new Exception("Reading Exception: " +ROI_ENTRY+ " entry does not exist in the file " + filePath);
+
 			List<HObject> children =  grp.getMemberList();
 			if (names==null) names = new ArrayList<String>(children.size());
 			for (HObject hObject : children) {
