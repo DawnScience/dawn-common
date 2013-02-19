@@ -277,14 +277,13 @@ class PersistentFileImpl implements IPersistentFile{
 		try {
 			file      = HierarchicalDataFactory.getReader(getFilePath());
 			Group grp = (Group)file.getData(ROI_ENTRY);
+			if (grp==null) return null;
+			
 			List<HObject> children =  grp.getMemberList();
 			if (names==null) names = new ArrayList<String>(children.size());
 			for (HObject hObject : children) {
 				names.add(hObject.getName());
 			}
-        } catch (Exception ne) {
-        	//Hides other exceptions
-        	names = null;
         } finally {
         	if (file!=null) file.close();
         }
