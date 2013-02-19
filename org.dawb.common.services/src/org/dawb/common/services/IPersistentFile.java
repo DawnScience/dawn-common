@@ -242,7 +242,7 @@ public interface IPersistentFile {
 	 * @param String name
 	 * @param AFunction function
 	 */
-	public void addFunction(String name, AFunction function, String roiType) throws Exception ;
+	public void addFunction(String name, AFunction function) throws Exception ;
 
 	/**
 	 * Method that reads a function from entry/region<br>

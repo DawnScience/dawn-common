@@ -26,6 +26,8 @@ import org.dawb.hdf5.IHierarchicalDataFile;
 import org.dawb.hdf5.Nexus;
 import org.dawb.hdf5.nexus.NexusUtils;
 import org.dawnsci.persistence.Activator;
+import org.dawnsci.persistence.function.FunctionBean;
+import org.dawnsci.persistence.function.FunctionBeanConverter;
 import org.dawnsci.persistence.roi.ROIBean;
 import org.dawnsci.persistence.roi.ROIBeanConverter;
 import org.dawnsci.persistence.util.PersistenceUtils;
@@ -66,6 +68,7 @@ class PersistentFileImpl implements IPersistentFile{
 	private final String DATA_ENTRY = "/entry/data";
 	private final String MASK_ENTRY = "/entry/mask";
 	private final String ROI_ENTRY = "/entry/region";
+	private final String FUNCTION_ENTRY = "/entry/function";
 	private final String DIFFRACTIONMETADATA_ENTRY = "/entry/diffraction_metadata";
 
 	/**
@@ -113,14 +116,14 @@ class PersistentFileImpl implements IPersistentFile{
 
 	@Override
 	public void addMask(String name, BooleanDataset mask, IMonitor mon) throws Exception{
-		
+
 		AbstractDataset id = DatasetUtils.cast(mask, AbstractDataset.INT8);
 		//check if parent group exists
 		Group parent = (Group)file.getData(MASK_ENTRY);
 		if(parent == null) parent = createParentEntry(MASK_ENTRY);
 		final Datatype datatype = H5Utils.getDatatype(id);
 		final long[] shape = new long[id.getShape().length];
-		
+
 		for (int i = 0; i < shape.length; i++) shape[i] = id.getShape()[i];
 		final Dataset dataset = file.replaceDataset(name, datatype, shape, id.getBuffer(), parent);
 		file.setNexusAttribute(dataset, Nexus.SDS);
@@ -143,20 +146,20 @@ class PersistentFileImpl implements IPersistentFile{
 
 	@Override
 	public void addROI(String name, ROIBase roiBase) throws Exception {
-		
+
 		if (file == null) file = HierarchicalDataFactory.getWriter(filePath);
-		
+
 		Group parent = createParentEntry(ROI_ENTRY);
-		
+
 		// JSON serialisation
 		GsonBuilder builder = new GsonBuilder();
 		//TODO: serialiser to be worked on...
 		//builder.registerTypeAdapter(ROIBean.class, new ROISerializer());
 		Gson gson = builder.create();
-	
+
 		writeRoi(file, parent, name, roiBase, gson);
 	}
-	
+
 	@Override
 	public void setRegionAttribute(String regionName, String attributeName, String attributeValue) throws Exception {
 		if ("JSON".equals(attributeName)) throw new Exception("Cannot override the JSON attribute!");
@@ -197,7 +200,7 @@ class PersistentFileImpl implements IPersistentFile{
 		DataHolder dh = LoaderFactory.getData(filePath, true, mon);
 		dataName = !dataName.equals("") ? dataName : "data";
 		data = readH5Data(dh, dataName, DATA_ENTRY);
-		
+
 		return data;
 	}
 
@@ -215,7 +218,7 @@ class PersistentFileImpl implements IPersistentFile{
 		yaxis = readH5Data(dh, yAxisName, DATA_ENTRY);
 		if(yaxis != null)
 			axes.add(yaxis);
-		
+
 		return axes;
 	}
 
@@ -239,7 +242,7 @@ class PersistentFileImpl implements IPersistentFile{
 	public ROIBase getROI(String roiName) throws Exception {
 		ROIBase roi = null;
 		roi = readH5ROI(roiName);
-	
+
 		return roi;
 	}
 
@@ -247,7 +250,7 @@ class PersistentFileImpl implements IPersistentFile{
 	public Map<String, ROIBase> getROIs(IMonitor mon) throws Exception {
 		Map<String, ROIBase> rois = null;
 		rois = readH5ROIs(mon);
-		
+
 		return rois;
 	}
 
@@ -256,7 +259,7 @@ class PersistentFileImpl implements IPersistentFile{
 		List<String> names = null;
 		DataHolder dh = LoaderFactory.getData(filePath, true, mon);
 		names = getNames(dh, DATA_ENTRY);
-		
+
 		return names;
 	}
 
@@ -271,36 +274,36 @@ class PersistentFileImpl implements IPersistentFile{
 	@Override
 	public List<String> getROINames(IMonitor mon) throws Exception{
 		List<String> names = null;
-		
+
 		IHierarchicalDataFile file = null;
-        try {
-        	file      = HierarchicalDataFactory.getReader(getFilePath());
-        	Group grp = (Group)file.getData(ROI_ENTRY);
-        	List<HObject> children =  grp.getMemberList();
-        	if (names==null) names = new ArrayList<String>(children.size());
-        	for (HObject hObject : children) {
-        		names.add(hObject.getName());
+		try {
+			file      = HierarchicalDataFactory.getReader(getFilePath());
+			Group grp = (Group)file.getData(ROI_ENTRY);
+			List<HObject> children =  grp.getMemberList();
+			if (names==null) names = new ArrayList<String>(children.size());
+			for (HObject hObject : children) {
+				names.add(hObject.getName());
 			}
-        } catch (Exception ne) {
-        	names = null;
-        } finally {
-        	if (file!=null) file.close();
-        }
-		
+		} catch (Exception ne) {
+			names = null;
+		} finally {
+			if (file!=null) file.close();
+		}
+
 		return names;
 	}
-	
+
 	@Override
 	public void setDiffractionMetadata(IDiffractionMetadata metadata) throws Exception {
 		writeH5DiffractionMetadata(metadata);		
 	}
-	
+
 	@Override
 	public IDiffractionMetadata getDiffractionMetadata(IMonitor mon) throws Exception {
 		//Reverse of the setMetadata.  Would be nice in the future to be able to use the
 		//LoaderFactory but work needs to be done on loading specific metadata from nexus
 		//files first
-		
+
 		return readH5DiffractionMetadata(mon);	
 	}
 
@@ -323,21 +326,21 @@ class PersistentFileImpl implements IPersistentFile{
 	 * @throws Exception
 	 */
 	private void writeH5Data(final AbstractDataset data, 
-							 final AbstractDataset xAxisData, 
-							 final AbstractDataset yAxisData) throws Exception {
+			final AbstractDataset xAxisData, 
+			final AbstractDataset yAxisData) throws Exception {
 
 		if(file == null)
 			file = HierarchicalDataFactory.getWriter(filePath);
-		
+
 		Group parent = createParentEntry(DATA_ENTRY);
-		
+
 		if(data != null){
 
 			String dataName = !data.getName().equals("") ? data.getName() : "data";
 			final Datatype      datatype = H5Utils.getDatatype(data);
 			final long[]         shape = new long[data.getShape().length];
 			for (int i = 0; i < shape.length; i++) shape[i] = data.getShape()[i];
-			
+
 			final Dataset dataset = file.replaceDataset(dataName,  datatype, shape, data.getBuffer(), parent);
 			file.setNexusAttribute(dataset, Nexus.SDS);
 		}
@@ -387,10 +390,10 @@ class PersistentFileImpl implements IPersistentFile{
 			file = HierarchicalDataFactory.getWriter(filePath);
 
 		Group parent = createParentEntry(MASK_ENTRY);
-		
+
 		if (masks != null) {
 			Set<String> names = masks.keySet();
-			
+
 			Iterator<String> it = names.iterator();
 			while(it.hasNext()){
 				String name = it.next();
@@ -400,7 +403,7 @@ class PersistentFileImpl implements IPersistentFile{
 				final long[] shape = new long[id.getShape().length];
 				for (int i = 0; i < shape.length; i++)
 					shape[i] = id.getShape()[i];
-				
+
 				final Dataset dataset = file.replaceDataset(name, datatype, shape, id.getBuffer(), parent);
 				file.setNexusAttribute(dataset, Nexus.SDS);
 			}
@@ -417,9 +420,9 @@ class PersistentFileImpl implements IPersistentFile{
 	private void writeH5Rois(final Map<String, ROIBase> rois) throws Exception {
 
 		if (file == null) file = HierarchicalDataFactory.getWriter(filePath);
-		
+
 		Group parent = createParentEntry(ROI_ENTRY);
-		
+
 		if (rois != null) {
 			// JSON serialisation
 			GsonBuilder builder = new GsonBuilder();
@@ -436,19 +439,19 @@ class PersistentFileImpl implements IPersistentFile{
 
 		}
 	}
-	
+
 	private HObject writeRoi(IHierarchicalDataFile file, 
-			                 Group   parent,
-				             String  name,
-				             ROIBase roi,
-				             Gson    gson) throws Exception {
-		
+			Group   parent,
+			String  name,
+			ROIBase roi,
+			Gson    gson) throws Exception {
+
 		ROIBean roibean = ROIBeanConverter.ROIBaseToROIBean(name, roi);
-		
+
 		long[] dims = {1};
-		
+
 		String json = gson.toJson(roibean);
-		
+
 		// we create the dataset
 		Dataset dat = file.replaceDataset(name, new H5Datatype(Datatype.CLASS_INTEGER, 4, Datatype.NATIVE, Datatype.NATIVE), dims, new int[]{0}, parent);
 		// we set the JSON attribute
@@ -457,11 +460,11 @@ class PersistentFileImpl implements IPersistentFile{
 		return dat;
 	}
 
-	
+
 	private Group createParentEntry(String fullEntry) throws Exception {
 		return createParentEntry(fullEntry, Nexus.DATA);
 	}
-	
+
 	private Group createParentEntry(String fullEntry, String nexusEntry) throws Exception{
 		String[] entries = fullEntry.split("/");
 		entries = cleanArray(entries);
@@ -523,7 +526,7 @@ class PersistentFileImpl implements IPersistentFile{
 		Iterator<String> it = names.iterator();
 		while (it.hasNext()) {
 			String name = (String) it.next();
-			
+
 			ShortDataset sdata = (ShortDataset)LoaderFactory.getDataSet(filePath, MASK_ENTRY+"/"+name, mon);
 			BooleanDataset bd = (BooleanDataset) DatasetUtils.cast(sdata, AbstractDataset.BOOL);
 			masks.put(name, bd);
@@ -538,7 +541,7 @@ class PersistentFileImpl implements IPersistentFile{
 	 * @throws Exception 
 	 */
 	private ROIBase readH5ROI(String roiName) throws Exception{
-	
+
 		String json = file.getAttributeValue(ROI_ENTRY+"/"+roiName);
 		if(json == null) throw new Exception("Reading Exception: " +ROI_ENTRY+ " entry does not exist in the file " + filePath);
 		// JSON deserialization
@@ -549,7 +552,7 @@ class PersistentFileImpl implements IPersistentFile{
 		ROIBean roibean = gson.fromJson(json, ROIBean.class);
 		//convert the bean to roibase
 		ROIBase roi = ROIBeanConverter.ROIBeanToROIBase(roibean);
-		
+
 		return roi;
 	}
 
@@ -567,7 +570,7 @@ class PersistentFileImpl implements IPersistentFile{
 		//TODO: deserialiser to be worked on...
 		//builder.registerTypeAdapter(ROIBean.class, new ROIDeserializer());
 		Gson gson = builder.create();
-		
+
 		List<String> names = getROINames(mon);
 
 		Iterator<String> it = names.iterator();
@@ -576,7 +579,7 @@ class PersistentFileImpl implements IPersistentFile{
 			String json = file.getAttributeValue(ROI_ENTRY+"/"+name+"@JSON");
 			json = json.substring(1, json.length()-1); // this is needed as somehow, the getAttribute adds [ ] around the json string...
 			ROIBean roibean = ROIBeanConverter.getROIBeanfromJSON(gson, json);
-			
+
 			//convert the bean to roibase
 			ROIBase roi = ROIBeanConverter.ROIBeanToROIBase(roibean);
 			rois.put(name, roi);
@@ -631,27 +634,36 @@ class PersistentFileImpl implements IPersistentFile{
 
 	@Override
 	public void setFunctions(Map<String, AFunction> functions) throws Exception {
-		// TODO Auto-generated method stub
-		
+		writeH5Functions(functions);
 	}
 
 	@Override
-	public void addFunction(String name, AFunction function, String roiType)
+	public void addFunction(String name, AFunction function)
 			throws Exception {
-		// TODO Auto-generated method stub
-		
+		if (file == null) file = HierarchicalDataFactory.getWriter(filePath);
+
+		Group parent = createParentEntry(FUNCTION_ENTRY);
+
+		// JSON serialisation
+		GsonBuilder builder = new GsonBuilder();
+		Gson gson = builder.create();
+
+		writeFunction(file, parent, name, function, gson);
+
 	}
 
 	@Override
 	public AFunction getFunction(String functionName) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		AFunction function = null;
+		function = readH5Function(functionName);
+		return function;
 	}
 
 	@Override
 	public Map<String, AFunction> getFunctions(IMonitor mon) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		Map<String, AFunction> functions = null;
+		functions = readH5Functions(mon);
+		return functions;
 	}
 
 	@Override
@@ -659,111 +671,205 @@ class PersistentFileImpl implements IPersistentFile{
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
+
+	/**
+	 * Method to write function data to an HDF5 file given a specific path entry to save the data.<br>
+	 * The rois are serialised using GSON and are saved as JSON format in the HDF5 file.
+	 * 
+	 * @param functions
+	 * @throws Exception
+	 */
+	private void writeH5Functions(final Map<String, AFunction> functions) throws Exception {
+
+		if (file == null) file = HierarchicalDataFactory.getWriter(filePath);
+
+		Group parent = createParentEntry(FUNCTION_ENTRY);
+
+		if (functions != null) {
+			// JSON serialisation
+			GsonBuilder builder = new GsonBuilder();
+			Gson gson = builder.create();
+
+			Iterator<String> it = functions.keySet().iterator();
+			while(it.hasNext()){
+				String name = it.next();
+				AFunction roi = functions.get(name);
+				writeFunction(file, parent, name, roi, gson);
+			}
+		}
+	}
+
+	private HObject writeFunction(IHierarchicalDataFile file, Group parent,
+			String name, AFunction function, Gson gson) throws Exception {
+
+		FunctionBean fBean = FunctionBeanConverter.AFunctionToFunctionBean(name, function);
+
+		long[] dims = {1};
+
+		String json = gson.toJson(fBean);
+
+		// we create the dataset
+		Dataset dat = file.replaceDataset(name, new H5Datatype(Datatype.CLASS_INTEGER, 4, Datatype.NATIVE, Datatype.NATIVE), dims, new int[]{0}, parent);
+		// we set the JSON attribute
+		file.setAttribute(dat, "JSON", json);
+
+		return dat;
+	}
+
+	/**
+	 * Method to read function data from an HDF5 file
+	 * 
+	 * @return AFunction
+	 * @throws Exception 
+	 */
+	private AFunction readH5Function(String functionName) throws Exception{
+
+		String json = file.getAttributeValue(FUNCTION_ENTRY+"/"+functionName);
+		if(json == null) throw new Exception("Reading Exception: " +FUNCTION_ENTRY+ " entry does not exist in the file " + filePath);
+		// JSON deserialization
+		GsonBuilder builder = new GsonBuilder();
+		Gson gson = builder.create();
+		FunctionBean fBean = FunctionBeanConverter.getFunctionBeanfromJSON(gson, json);
+		//convert the bean to AFunction
+		AFunction function = FunctionBeanConverter.FunctionBeanToAFunction(fBean);
+
+		return function;
+	}
+
+	/**
+	 * Method to read function data from an HDF5 file
+	 * @return Map<String, AFunction>
+	 * @throws Exception 
+	 */
+	private Map<String, AFunction> readH5Functions(IMonitor mon) throws Exception{
+		Map<String, AFunction> functions = new HashMap<String, AFunction>();
+		if(file == null)
+			file = HierarchicalDataFactory.getReader(filePath);
+		// JSON deserialization
+		GsonBuilder builder = new GsonBuilder();
+		Gson gson = builder.create();
+
+		List<String> names = getROINames(mon);
+
+		Iterator<String> it = names.iterator();
+		while (it.hasNext()) {
+			String name = (String) it.next();
+			String json = file.getAttributeValue(FUNCTION_ENTRY+"/"+name+"@JSON");
+			json = json.substring(1, json.length()-1); // this is needed as somehow, the getAttribute adds [ ] around the json string...
+			FunctionBean fBean = FunctionBeanConverter.getFunctionBeanfromJSON(gson, json);
+
+			//convert the bean to AFunction
+			AFunction function = FunctionBeanConverter.FunctionBeanToAFunction(fBean);
+			functions.put(name, function);
+		}
+
+		return functions;
+	}
+
 	private void writeH5DiffractionMetadata(IDiffractionMetadata metadata) throws Exception {
 		if (file == null) file = HierarchicalDataFactory.getWriter(filePath);
-		
+
 		Group parent = createParentEntry(DIFFRACTIONMETADATA_ENTRY,Nexus.DETECT);
-		
+
 		//TODO do we want to be an NX_detector?
 		//TODO should existing diffraction metadata node be deleted?
-		
+
 		DetectorProperties detprop = metadata.getDetector2DProperties();
-		
+
 		H5Datatype intType = new H5Datatype(Datatype.CLASS_INTEGER, 32/8, Datatype.NATIVE, Datatype.NATIVE);
 		H5Datatype doubleType = new H5Datatype(Datatype.CLASS_FLOAT, 64/8, Datatype.NATIVE, Datatype.NATIVE);
-		
+
 		final Dataset nXPix = file.createDataset("x_pixel_number", intType, new long[] {1}, new int[]{detprop.getPx()}, parent);
 		file.setAttribute(nXPix,NexusUtils.UNIT, "pixels");
 		final Dataset nYPix = file.createDataset("y_pixel_number", intType, new long[] {1}, new int[]{detprop.getPy()}, parent);
 		file.setAttribute(nYPix,NexusUtils.UNIT , "pixels");
-		
+
 		final Dataset sXPix = file.createDataset("x_pixel_size", doubleType, new long[] {1}, new double[]{detprop.getHPxSize()}, parent);
 		file.setAttribute(sXPix, NexusUtils.UNIT, "mm");
 		final Dataset sYPix = file.createDataset("y_pixel_size", doubleType, new long[] {1}, new double[]{detprop.getVPxSize()}, parent);
 		file.setAttribute(sYPix, NexusUtils.UNIT, "mm");
-		
+
 		double[] beamVector = new double[3];
 		detprop.getBeamVector().get(beamVector);
 		file.createDataset("beam_vector", doubleType, new long[] {3}, beamVector, parent);
-		
+
 		double[] beamOrigin= new double[3];
 		detprop.getOrigin().get(beamOrigin);
 		file.createDataset("beam_origin", doubleType, new long[] {3}, beamOrigin, parent);
-		
+
 		Matrix3d or = detprop.getOrientation();
 		double[] orientation = new double[] {or.m00 ,or.m01, or.m02,
-											 or.m10, or.m11, or.m12,
-											 or.m20, or.m21, or.m22};
-		
+				or.m10, or.m11, or.m12,
+				or.m20, or.m21, or.m22};
+
 		file.createDataset("detector_orientation", doubleType, new long[] {9}, orientation, parent);
-		
+
 		DiffractionCrystalEnvironment crysenv = metadata.getDiffractionCrystalEnvironment();
 
 		final Dataset energy = file.createDataset("energy", doubleType, new long[] {1}, new double[]{crysenv.getWavelength()}, parent);
 		file.setAttribute(energy, NexusUtils.UNIT, "Angstrom");
-		
+
 		final Dataset count = file.createDataset("count_time", doubleType, new long[] {1}, new double[]{crysenv.getExposureTime()}, parent);
 		file.setAttribute(count, NexusUtils.UNIT, "s");
-		
+
 		final Dataset phi_start = file.createDataset("phi_start", doubleType, new long[] {1}, new double[]{crysenv.getPhiStart()}, parent);
 		file.setAttribute(phi_start, NexusUtils.UNIT, "degrees");
-		
+
 		final Dataset phi_range = file.createDataset("phi_range", doubleType, new long[] {1}, new double[]{crysenv.getPhiRange()}, parent);
 		file.setAttribute(phi_range, NexusUtils.UNIT, "degrees");
 	}
-	
+
 	private IDiffractionMetadata readH5DiffractionMetadata(IMonitor mon) throws Exception {
 		if(file == null)
 			file = HierarchicalDataFactory.getReader(filePath);
-		
+
 		//Build the detector properties object
 		HObject hOb = file.getData(DIFFRACTIONMETADATA_ENTRY + "/" + "x_pixel_number");
 		int x_pixel_number = ((int[])((H5ScalarDS)hOb).getData())[0];
-		
+
 		hOb = file.getData(DIFFRACTIONMETADATA_ENTRY + "/" + "y_pixel_number");
 		int y_pixel_number = ((int[])((H5ScalarDS)hOb).getData())[0];
-		
+
 		hOb = file.getData(DIFFRACTIONMETADATA_ENTRY + "/" + "x_pixel_size");
 		double x_pixel_size = ((double[])((H5ScalarDS)hOb).getData())[0];
-		
+
 		hOb = file.getData(DIFFRACTIONMETADATA_ENTRY + "/" + "y_pixel_size");
 		double y_pixel_size = ((double[])((H5ScalarDS)hOb).getData())[0];
-		
+
 		hOb = file.getData(DIFFRACTIONMETADATA_ENTRY + "/" + "beam_vector");
 		double[] beam_vector = ((double[])((H5ScalarDS)hOb).getData());
-		
+
 		hOb = file.getData(DIFFRACTIONMETADATA_ENTRY + "/" + "beam_origin");
 		double[] beam_origin = ((double[])((H5ScalarDS)hOb).getData());
-		
+
 		hOb = file.getData(DIFFRACTIONMETADATA_ENTRY + "/" + "detector_orientation");
 		double[] detector_orientation = ((double[])((H5ScalarDS)hOb).getData());
-		
+
 		Matrix3d orDet = new Matrix3d(detector_orientation);
 		Vector3d orBeam = new Vector3d(beam_vector);
 		Vector3d origin = new Vector3d(beam_origin);
-		
+
 		final DetectorProperties detprop = new DetectorProperties(origin, orBeam,
-															y_pixel_number, x_pixel_number,
-															x_pixel_size, y_pixel_size,
-															orDet);
-		
-		
+				y_pixel_number, x_pixel_number,
+				x_pixel_size, y_pixel_size,
+				orDet);
+
+
 		//Build the diffraction environment object
 		hOb = file.getData(DIFFRACTIONMETADATA_ENTRY + "/" + "energy");
 		double energy = ((double[])((H5ScalarDS)hOb).getData())[0];
-		
+
 		hOb = file.getData(DIFFRACTIONMETADATA_ENTRY + "/" + "count_time");
 		double count_time = ((double[])((H5ScalarDS)hOb).getData())[0];
-		
+
 		hOb = file.getData(DIFFRACTIONMETADATA_ENTRY + "/" + "phi_start");
 		double phi_start = ((double[])((H5ScalarDS)hOb).getData())[0];
-		
+
 		hOb = file.getData(DIFFRACTIONMETADATA_ENTRY + "/" + "phi_range");
 		double phi_range = ((double[])((H5ScalarDS)hOb).getData())[0];
-		
+
 		final DiffractionCrystalEnvironment diffcrys = new DiffractionCrystalEnvironment(energy,phi_start,phi_range,count_time);
-		
+
 		return new DiffractionMetadata(file.getPath(), detprop, diffcrys); 
 	}
 }
