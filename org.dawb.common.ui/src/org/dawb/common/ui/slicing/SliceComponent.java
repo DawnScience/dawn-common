@@ -33,6 +33,7 @@ import org.dawb.common.ui.menu.MenuAction;
 import org.dawb.common.ui.plot.AbstractPlottingSystem;
 import org.dawb.common.ui.plot.IPlottingSystem;
 import org.dawb.common.ui.plot.PlotType;
+import org.dawb.common.ui.plot.tool.IToolPage.ToolPageRole;
 import org.dawb.common.ui.plot.trace.IImageTrace;
 import org.dawb.common.ui.plot.trace.IPaletteListener;
 import org.dawb.common.ui.plot.trace.ITrace;
@@ -85,6 +86,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Scale;
@@ -125,6 +127,7 @@ public class SliceComponent {
 	private DimsDataList    dimsDataList;
 
 	private CLabel          errorLabel, explain;
+	private Link            openWindowing;
 	private Composite       area;
 	private boolean         isErrorCondition=false;
     private SliceJob        sliceJob;
@@ -209,6 +212,23 @@ public class SliceComponent {
 		errorLabel.setImage(Activator.getImageDescriptor("icons/error.png").createImage());
 		GridUtils.setVisible(errorLabel,         false);
 		
+		openWindowing = new Link(area, SWT.WRAP);
+		openWindowing.setText("Data is being viewed using a <a>window</a>");
+		openWindowing.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false));
+		GridUtils.setVisible(openWindowing,         false);
+		openWindowing.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				if (plottingSystem!=null) {
+					try {
+						plottingSystem.setToolVisible("org.dawb.workbench.plotting.tools.windowTool", ToolPageRole.ROLE_3D, 
+								                      "org.dawb.workbench.plotting.views.toolPageView.3D");
+					} catch (Exception e1) {
+						logger.error("Cannot open window tool!", e1);
+					}
+				}
+			}
+		});
+		
 		final Composite bottom = new Composite(area, SWT.NONE);
 		bottom.setLayout(new GridLayout(4, false));
 		bottom.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, true));					
@@ -267,8 +287,7 @@ public class SliceComponent {
 	}
 	
 	private Map<PlotType, Action> plotTypeActions;
-
-	private Action reverse;
+	private Action                reverse;
 	/**
 	 * Creates the actions for 
 	 * @return
@@ -430,7 +449,9 @@ public class SliceComponent {
 		
 		viewer.refresh();
 		reverse.setEnabled(plotType==PlotType.IMAGE||plotType==PlotType.SURFACE);
-		
+		GridUtils.setVisible(openWindowing, plotType==PlotType.SURFACE && plottingSystem!=null);
+		openWindowing.getParent().layout(new Control[]{openWindowing});
+
 		// Save preference
 		Activator.getDefault().getPreferenceStore().setValue(SliceConstants.PLOT_CHOICE, plotType.toString());
    		boolean isOk = updateErrorLabel();
@@ -592,6 +613,7 @@ public class SliceComponent {
 		if (dimsDataList!=null) {
 			if (plotType==null) plotType = dimsDataList.getAxisCount()>1 ? PlotType.IMAGE : PlotType.XY;
 			plotTypeActions.get(plotType).setChecked(true);
+			plottingTypeChanged();
 			
 			// We make sure that the size is not outside
 			for (int i = 0; i < dims; i++) {
