@@ -54,7 +54,6 @@ public class DoubleUtils {
 	 * Returns a formatted Double value given a specific DecimalFormat<br>
 	 * If more than 4 integer, then we display the value in scientific notation
 	 * @param value
-	 * @param format
 	 * @return a double value formatted as a String
 	 */
 	public static String formatDouble(double value){
