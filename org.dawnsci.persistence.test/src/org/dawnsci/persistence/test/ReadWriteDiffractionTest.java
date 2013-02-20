@@ -99,9 +99,8 @@ public class ReadWriteDiffractionTest extends AbstractThreadTest {
 	@Test
 	public void testReWriteData(){ 
 		try {
-			final File tmp = new File("/scratch/Data/testOverwrite.nxs");
-			//final File tmp = File.createTempFile("TestMask", ".nxs");
-			//tmp.deleteOnExit();
+			final File tmp = File.createTempFile("TestMask", ".nxs");
+			tmp.deleteOnExit();
 			tmp.createNewFile();
 
 			IDiffractionMetadata metaIn = new DiffractionMetadata(null, 
