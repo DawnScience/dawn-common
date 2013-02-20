@@ -782,27 +782,27 @@ class PersistentFileImpl implements IPersistentFile{
 		H5Datatype intType = new H5Datatype(Datatype.CLASS_INTEGER, 32/8, Datatype.NATIVE, Datatype.NATIVE);
 		H5Datatype doubleType = new H5Datatype(Datatype.CLASS_FLOAT, 64/8, Datatype.NATIVE, Datatype.NATIVE);
 
-		final Dataset nXPix = file.createDataset("x_pixel_number", intType, new long[] {1}, new int[]{detprop.getPx()}, parent);
+		final Dataset nXPix = file.replaceDataset("x_pixel_number", intType, new long[] {1}, new int[]{detprop.getPx()}, parent);
 		file.setAttribute(nXPix,NexusUtils.UNIT, "pixels");
-		final Dataset nYPix = file.createDataset("y_pixel_number", intType, new long[] {1}, new int[]{detprop.getPy()}, parent);
+		final Dataset nYPix = file.replaceDataset("y_pixel_number", intType, new long[] {1}, new int[]{detprop.getPy()}, parent);
 		file.setAttribute(nYPix,NexusUtils.UNIT , "pixels");
 
-		final Dataset sXPix = file.createDataset("x_pixel_size", doubleType, new long[] {1}, new double[]{detprop.getHPxSize()}, parent);
+		final Dataset sXPix = file.replaceDataset("x_pixel_size", doubleType, new long[] {1}, new double[]{detprop.getHPxSize()}, parent);
 		file.setAttribute(sXPix, NexusUtils.UNIT, "mm");
-		final Dataset sYPix = file.createDataset("y_pixel_size", doubleType, new long[] {1}, new double[]{detprop.getVPxSize()}, parent);
+		final Dataset sYPix = file.replaceDataset("y_pixel_size", doubleType, new long[] {1}, new double[]{detprop.getVPxSize()}, parent);
 		file.setAttribute(sYPix, NexusUtils.UNIT, "mm");
 
 		double[] beamVector = new double[3];
 		detprop.getBeamVector().get(beamVector);
-		file.createDataset("beam_vector", doubleType, new long[] {3}, beamVector, parent);
+		file.replaceDataset("beam_vector", doubleType, new long[] {3}, beamVector, parent);
 		
 		double[] beamCentre = detprop.getBeamCentreCoords();
 		
 		double dist = detprop.getDetectorDistance();
 		
-		final Dataset centre = file.createDataset("beam_centre", doubleType, new long[] {2}, beamCentre, parent);
+		final Dataset centre = file.replaceDataset("beam_centre", doubleType, new long[] {2}, beamCentre, parent);
 		file.setAttribute(centre,NexusUtils.UNIT, "pixels");
-		final Dataset distance = file.createDataset("distance", doubleType, new long[] {1}, new double[] {dist}, parent);
+		final Dataset distance = file.replaceDataset("distance", doubleType, new long[] {1}, new double[] {dist}, parent);
 		file.setAttribute(distance, NexusUtils.UNIT, "mm");
 		
 		Matrix3d or = detprop.getOrientation();
@@ -810,20 +810,20 @@ class PersistentFileImpl implements IPersistentFile{
 				or.m10, or.m11, or.m12,
 				or.m20, or.m21, or.m22};
 
-		file.createDataset("detector_orientation", doubleType, new long[] {9}, orientation, parent);
+		file.replaceDataset("detector_orientation", doubleType, new long[] {9}, orientation, parent);
 
 		DiffractionCrystalEnvironment crysenv = metadata.getDiffractionCrystalEnvironment();
 
-		final Dataset energy = file.createDataset("energy", doubleType, new long[] {1}, new double[]{crysenv.getWavelength()}, parent);
+		final Dataset energy = file.replaceDataset("energy", doubleType, new long[] {1}, new double[]{crysenv.getWavelength()}, parent);
 		file.setAttribute(energy, NexusUtils.UNIT, "Angstrom");
 
-		final Dataset count = file.createDataset("count_time", doubleType, new long[] {1}, new double[]{crysenv.getExposureTime()}, parent);
+		final Dataset count = file.replaceDataset("count_time", doubleType, new long[] {1}, new double[]{crysenv.getExposureTime()}, parent);
 		file.setAttribute(count, NexusUtils.UNIT, "s");
 
 		final Dataset phi_start = file.createDataset("phi_start", doubleType, new long[] {1}, new double[]{crysenv.getPhiStart()}, parent);
 		file.setAttribute(phi_start, NexusUtils.UNIT, "degrees");
 
-		final Dataset phi_range = file.createDataset("phi_range", doubleType, new long[] {1}, new double[]{crysenv.getPhiRange()}, parent);
+		final Dataset phi_range = file.replaceDataset("phi_range", doubleType, new long[] {1}, new double[]{crysenv.getPhiRange()}, parent);
 		file.setAttribute(phi_range, NexusUtils.UNIT, "degrees");
 	}
 
