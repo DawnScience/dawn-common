@@ -54,6 +54,11 @@ public class SurfacePlotROI extends ROIBase{
 		spt = new double[]{startX,startY};
 	}
 	
+	@Override
+	public String toString() {
+		return "("+startX+", "+startY+")("+endX+", "+endY+")";
+	}
+	
 	public int getStartX() {
 		return startX; 
 	}
