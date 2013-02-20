@@ -319,6 +319,27 @@ class PersistentFileImpl implements IPersistentFile{
 		return file.getAttributeValue(ENTRY+"@Site");
 	}
 
+	@Override
+	public boolean isEntry(String entryPath, IMonitor mon)  {
+		DataHolder dh = null;
+		try {
+			dh = LoaderFactory.getData(filePath, true, mon);
+		} catch (Exception e) {
+			logger.debug("Error while loading the file: "+ e);
+			e.printStackTrace();
+		}
+		if(dh != null){
+			String[] names = dh.getNames();
+			for (int i = 0; i < names.length; i++) {
+				if(names[i].startsWith(entryPath)){
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
 	/**
 	 * Method to write image data (and axis) to an HDF5 file given a specific path entry to save the data.
 	 * 

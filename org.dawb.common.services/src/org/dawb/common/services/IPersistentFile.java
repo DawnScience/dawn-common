@@ -329,5 +329,12 @@ public interface IPersistentFile {
 	 * @throws Exception
 	 */
 	public String getRegionAttribute(String regionName, String attributeName) throws Exception;
-	
+
+	/**
+	 * Method that returns true if an entry exist in the HDF5 file. False otherwise.<br>
+	 * @param entryPath
+	 * @param mon
+	 * @return a boolean
+	 */
+	public boolean isEntry(String entryPath, IMonitor mon);
 }
