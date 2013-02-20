@@ -9,6 +9,8 @@
  */ 
 package org.dawb.common.util.number;
 
+import java.text.DecimalFormat;
+
 public class DoubleUtils {
 
 	/**
@@ -44,6 +46,35 @@ public class DoubleUtils {
 		if (r > t)
 			return r >= Math.abs(a - b);
 			return t >= Math.abs(a - b);
+	}
+
+	private final static DecimalFormat format = new DecimalFormat("0.######E0");
+
+	/**
+	 * Returns a formatted Double value given a specific DecimalFormat<br>
+	 * If more than 4 integer, then we display the value in scientific notation
+	 * @param value
+	 * @param format
+	 * @return a double value formatted as a String
+	 */
+	public static String formatDouble(double value){
+		String result;
+		if(((int)value) > 9999 || ((int)value) < -9999)
+			result = format.format(value);
+		else
+			result = String.valueOf(roundDouble(value, 3));
+		return result == null ? "-" : result;
+	}
+
+	/**
+	 * Method that rounds a value to the n precision decimals
+	 * @param value
+	 * @param precision
+	 * @return a double value rounded to n precision
+	 */
+	public static double roundDouble(double value, int precision){
+		int rounder = (int)Math.pow(10, precision);
+		return (double)Math.round(value * rounder) / rounder;
 	}
 
 	public static void main(String[] args) {
