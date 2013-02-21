@@ -124,11 +124,11 @@ public class PersistenceExportWizard extends AbstractPerstenceWizard implements 
     			final IPlottingSystem system = (IPlottingSystem)part.getAdapter(IPlottingSystem.class);
     			if (system != null) {
     				ITrace trace  = system.getTraces().iterator().next();
-    				if (trace!=null && trace instanceof IImageTrace) {
+    				if (trace!=null) {
     					
     					options.setOptionEnabled("Original Data", true);
     					
-    					if (((IImageTrace)trace).getMask()!=null) {
+    					if (trace instanceof IImageTrace && ((IImageTrace)trace).getMask()!=null) {
     						options.setOptionEnabled("Mask", true);
     					}
     				}
