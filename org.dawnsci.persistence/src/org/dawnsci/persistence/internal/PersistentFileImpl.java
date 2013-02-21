@@ -667,8 +667,23 @@ class PersistentFileImpl implements IPersistentFile{
 
 	@Override
 	public List<String> getFunctionNames(IMonitor mon) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		List<String> names = null;
+
+		IHierarchicalDataFile file = null;
+		try {
+			file      = HierarchicalDataFactory.getReader(getFilePath());
+			Group grp = (Group)file.getData(FUNCTION_ENTRY);
+			if (grp==null) throw new Exception("Reading Exception: " +FUNCTION_ENTRY+ " entry does not exist in the file " + filePath);
+
+			List<HObject> children =  grp.getMemberList();
+			if (names==null) names = new ArrayList<String>(children.size());
+			for (HObject hObject : children) {
+				names.add(hObject.getName());
+			}
+        } finally {
+        	if (file!=null) file.close();
+        }
+		return names;
 	}
 
 	/**
@@ -748,7 +763,7 @@ class PersistentFileImpl implements IPersistentFile{
 		GsonBuilder builder = new GsonBuilder();
 		Gson gson = builder.create();
 
-		List<String> names = getROINames(mon);
+		List<String> names = getFunctionNames(mon);
 
 		Iterator<String> it = names.iterator();
 		while (it.hasNext()) {

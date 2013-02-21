@@ -2,7 +2,7 @@ package org.dawnsci.persistence.function;
 
 import java.util.Arrays;
 
-import uk.ac.diamond.scisoft.analysis.fitting.functions.IParameter;
+import uk.ac.diamond.scisoft.analysis.fitting.functions.Parameter;
 
 public class FunctionBean {
 
@@ -21,7 +21,7 @@ public class FunctionBean {
 
 	protected String name;
 	protected int type;
-	protected IParameter[] parameters;
+	protected Parameter[] parameters;
 	public String getName() {
 		return name;
 	}
@@ -34,10 +34,10 @@ public class FunctionBean {
 	public void setType(int type) {
 		this.type = type;
 	}
-	public IParameter[] getParameters() {
+	public Parameter[] getParameters() {
 		return parameters;
 	}
-	public void setParameters(IParameter[] parameters) {
+	public void setParameters(Parameter[] parameters) {
 		this.parameters = parameters;
 	}
 	@Override
