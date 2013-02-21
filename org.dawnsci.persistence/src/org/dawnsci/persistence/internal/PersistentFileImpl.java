@@ -318,9 +318,33 @@ class PersistentFileImpl implements IPersistentFile{
 	public String getSite() throws Exception {
 		return file.getAttributeValue(ENTRY+"@Site");
 	}
+	
+	@Override
+	public boolean containsData() {
+		return isEntry(DATA_ENTRY,null);
+	}
 
 	@Override
-	public boolean isEntry(String entryPath, IMonitor mon)  {
+	public boolean containsMask() {
+		return isEntry(MASK_ENTRY,null);
+	}
+
+	@Override
+	public boolean containsRegion() {
+		return isEntry(ROI_ENTRY,null);
+	}
+
+	@Override
+	public boolean containsDiffractionMetadata() {
+		return isEntry(DIFFRACTIONMETADATA_ENTRY,null);
+	}
+
+	@Override
+	public boolean containsFunction() {
+		return isEntry(FUNCTION_ENTRY,null);
+	}
+
+	private boolean isEntry(String entryPath, IMonitor mon)  {
 		DataHolder dh = null;
 		try {
 			dh = LoaderFactory.getData(filePath, true, mon);

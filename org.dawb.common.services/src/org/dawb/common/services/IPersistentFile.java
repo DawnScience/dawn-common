@@ -331,10 +331,32 @@ public interface IPersistentFile {
 	public String getRegionAttribute(String regionName, String attributeName) throws Exception;
 
 	/**
-	 * Method that returns true if an entry exist in the HDF5 file. False otherwise.<br>
-	 * @param entryPath
-	 * @param mon
+	 * Method that returns true if the HDF5 file contains a image entry. False otherwise.<br>
 	 * @return a boolean
 	 */
-	public boolean isEntry(String entryPath, IMonitor mon);
+	public boolean containsData();
+	
+	/**
+	 * Method that returns true if the HDF5 file contains a mask entry. False otherwise.<br>
+	 * @return a boolean
+	 */
+	public boolean containsMask();
+	
+	/**
+	 * Method that returns true if the HDF5 file contains a region entry. False otherwise.<br>
+	 * @return a boolean
+	 */
+	public boolean containsRegion();
+	
+	/**
+	 * Method that returns true if the HDF5 file contains a diffraction meta entry. False otherwise.<br>
+	 * @return a boolean
+	 */
+	public boolean containsDiffractionMetadata();
+	
+	/**
+	 * Method that returns true if the HDF5 file contains a function entry. False otherwise.<br>
+	 * @return a boolean
+	 */
+	public boolean containsFunction();
 }
