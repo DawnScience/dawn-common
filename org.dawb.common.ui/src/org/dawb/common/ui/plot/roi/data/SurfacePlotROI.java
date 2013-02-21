@@ -16,12 +16,19 @@
 
 package org.dawb.common.ui.plot.roi.data;
 
+import uk.ac.diamond.scisoft.analysis.roi.ROIBase;
+
 /**
  * This is a region of interest selection object for the 3D surface plotting 
  * 
  */
-public class SurfacePlotROI {
+public class SurfacePlotROI extends ROIBase{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -85518689914929874L;
+	
 	private int startX;
 	private int startY;
 	private int endX;
@@ -44,6 +51,12 @@ public class SurfacePlotROI {
 		this.ySamplingMode = ySamplingMode;
 		this.xAspect = xAspect;
 		this.yAspect = yAspect;
+		spt = new double[]{startX,startY};
+	}
+	
+	@Override
+	public String toString() {
+		return "("+startX+", "+startY+")("+endX+", "+endY+")";
 	}
 	
 	public int getStartX() {

@@ -8,6 +8,7 @@ import org.dawb.common.ui.databinding.AbstractModelObject;
 import org.dawb.common.ui.plot.AbstractPlottingSystem;
 import org.dawb.common.ui.plot.trace.IImageTrace;
 import org.dawb.common.ui.plot.trace.ITrace;
+import org.dawb.common.util.number.DoubleUtils;
 import org.eclipse.core.databinding.beans.BeanProperties;
 import org.eclipse.core.databinding.observable.list.IObservableList;
 import org.eclipse.core.databinding.observable.list.WritableList;
@@ -257,17 +258,6 @@ public class AxisPixelROIEditTable {
 	}
 
 	/**
-	 * Method that rounds a value to the n precision decimals
-	 * @param value
-	 * @param precision
-	 * @return double
-	 */
-	private double roundDouble(double value, int precision){
-		int rounder = (int)Math.pow(10, precision);
-		return (double)Math.round(value * rounder) / rounder;
-	}
-
-	/**
 	 * Method that creates a ROI using the input of the table viewer
 	 * @param rows
 	 * @return ROIBase
@@ -404,15 +394,15 @@ public class AxisPixelROIEditTable {
 							// x axis and width
 							double xAxisStart = axes.get(0).getElementDoubleAbs((int)Math.round(xStart));
 							double xAxisEnd =axes.get(0).getElementDoubleAbs((int)(int)Math.round(xEnd));
-							xAxisRow.setStart(roundDouble(xAxisStart, precision));
-							xAxisRow.setEnd(roundDouble(xAxisEnd, precision));
-							xAxisRow.setDiff(roundDouble(xAxisEnd-xAxisStart, precision));
+							xAxisRow.setStart(DoubleUtils.roundDouble(xAxisStart, precision));
+							xAxisRow.setEnd(DoubleUtils.roundDouble(xAxisEnd, precision));
+							xAxisRow.setDiff(DoubleUtils.roundDouble(xAxisEnd-xAxisStart, precision));
 							// yaxis and height
 							double yAxisStart = axes.get(1).getElementDoubleAbs((int)Math.round(yStart));
 							double yAxisEnd =axes.get(1).getElementDoubleAbs((int)(int)Math.round(yEnd));
-							yAxisRow.setStart(roundDouble(yAxisStart, precision));
-							yAxisRow.setEnd(roundDouble(yAxisEnd, precision));
-							yAxisRow.setDiff(roundDouble(yAxisEnd-yAxisStart, precision));
+							yAxisRow.setStart(DoubleUtils.roundDouble(yAxisStart, precision));
+							yAxisRow.setEnd(DoubleUtils.roundDouble(yAxisEnd, precision));
+							yAxisRow.setDiff(DoubleUtils.roundDouble(yAxisEnd-yAxisStart, precision));
 							
 						} else { //if no axes we set them manually according to the data shape
 							int[] shapes = image.getData().getShape();
@@ -432,26 +422,26 @@ public class AxisPixelROIEditTable {
 							// x axis and width
 							double xAxisStart = xData.getElementDoubleAbs((int)Math.round(xStart));
 							double xAxisEnd = xData.getElementDoubleAbs((int)(int)Math.round(xEnd));
-							xAxisRow.setStart(roundDouble(xAxisStart, precision));
-							xAxisRow.setEnd(roundDouble(xAxisEnd, precision));
-							xAxisRow.setDiff(roundDouble(xAxisEnd-xAxisStart, precision));
+							xAxisRow.setStart(DoubleUtils.roundDouble(xAxisStart, precision));
+							xAxisRow.setEnd(DoubleUtils.roundDouble(xAxisEnd, precision));
+							xAxisRow.setDiff(DoubleUtils.roundDouble(xAxisEnd-xAxisStart, precision));
 							// yaxis and height
 							double yAxisStart = yData.getElementDoubleAbs((int)Math.round(yStart));
 							double yAxisEnd = yData.getElementDoubleAbs((int)(int)Math.round(yEnd));
-							yAxisRow.setStart(roundDouble(yAxisStart, precision));
-							yAxisRow.setEnd(roundDouble(yAxisEnd, precision));
-							yAxisRow.setDiff(roundDouble(yAxisEnd-yAxisStart, precision));
+							yAxisRow.setStart(DoubleUtils.roundDouble(yAxisStart, precision));
+							yAxisRow.setEnd(DoubleUtils.roundDouble(yAxisEnd, precision));
+							yAxisRow.setDiff(DoubleUtils.roundDouble(yAxisEnd-yAxisStart, precision));
 						}
 
 					}
 				}
 
-				xPixelRow.setStart(roundDouble(xStart, precision));
-				xPixelRow.setEnd(roundDouble(xEnd, precision));
-				xPixelRow.setDiff(roundDouble(xEnd-xStart, precision));
-				yPixelRow.setStart(roundDouble(yStart, precision));
-				yPixelRow.setEnd(roundDouble(yEnd, precision));
-				yPixelRow.setDiff(roundDouble(yEnd-yStart, precision));
+				xPixelRow.setStart(DoubleUtils.roundDouble(xStart, precision));
+				xPixelRow.setEnd(DoubleUtils.roundDouble(xEnd, precision));
+				xPixelRow.setDiff(DoubleUtils.roundDouble(xEnd-xStart, precision));
+				yPixelRow.setStart(DoubleUtils.roundDouble(yStart, precision));
+				yPixelRow.setEnd(DoubleUtils.roundDouble(yEnd, precision));
+				yPixelRow.setDiff(DoubleUtils.roundDouble(yEnd-yStart, precision));
 			} catch (ArrayIndexOutOfBoundsException ae) {
 				// do nothing
 			} catch (Exception e) {
@@ -461,9 +451,9 @@ public class AxisPixelROIEditTable {
 			values = profileViewModel.getValues();
 			AxisPixelRowDataModel xAxisRow = (AxisPixelRowDataModel)values.get(0);
 //			AxisPixelRowDataModel xPixelRow = (AxisPixelRowDataModel)values.get(1);
-			xAxisRow.setStart(roundDouble(xStart, precision));
-			xAxisRow.setEnd(roundDouble(xEnd, precision));
-			xAxisRow.setDiff(roundDouble(xEnd-xStart, precision));
+			xAxisRow.setStart(DoubleUtils.roundDouble(xStart, precision));
+			xAxisRow.setEnd(DoubleUtils.roundDouble(xEnd, precision));
+			xAxisRow.setDiff(DoubleUtils.roundDouble(xEnd-xStart, precision));
 			
 //			xPixelRow.setStart(roundDouble(xStart, precision));
 //			xPixelRow.setEnd(roundDouble(xEnd, precision));

@@ -70,6 +70,9 @@ public class ImageServiceBean {
 		ret.minimumCutBound = cloneBound(minimumCutBound);
 		ret.nanBound = cloneBound(nanBound);
 		ret.origin = origin;
+		if (getPalette()!=null) {
+		    ret.palette = new PaletteData(getPalette().getRGBs());
+		}
 		return ret;
 	}
 	

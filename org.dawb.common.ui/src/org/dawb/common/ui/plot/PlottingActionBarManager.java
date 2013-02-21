@@ -183,6 +183,11 @@ public class PlottingActionBarManager implements IPlotActionSystem {
 					registerToolBarGroup(groupName);
 					registerAction(groupName, toolSet, ActionType.IMAGE);
 				}
+				if (role.is3D()) {
+					final String groupName=role.getId()+".group3D";
+					registerToolBarGroup(groupName);
+					registerAction(groupName, toolSet, ActionType.THREED);
+				}
 
 				if (role.is2D()) {
 					toolSet.addActionsTo(imageMenu);
