@@ -104,10 +104,13 @@ public interface IPlottingSystem extends ITraceSystem, IRegionSystem, IAxisSyste
 	 * 
 	 * For 1D - x is the x axis, ys is the y traces. X may be null when plotting with indices.
 	 * 
-	 * NOTE The call createPlot1D(y, null, monitor) is no longer allowed. It should be:
+	 * This call will also plot in 3D if the plotting mode is setting to PlotType.XY_STACKED_3D first.
+	 * A 3D plot will be produced staggering the 1D data in Z.
+	 * 
+	 * NOTE: The call createPlot1D(y, null, monitor) is no longer allowed. It should be:
 	 * createPlot1D(null, Arrays.asList(y), monitor).
 	 * 
-	 * NOTE Using this option plots everything on the current x and y axes. These are the default axes,
+	 * NOTE: Using this option plots everything on the current x and y axes. These are the default axes,
 	 * to change axes, use createAxis(...) then setActiveAxis(...). Then subsequent plotting will plot
 	 * to these active axes.
 	 * 
@@ -123,7 +126,8 @@ public interface IPlottingSystem extends ITraceSystem, IRegionSystem, IAxisSyste
 	 * @param mode
 	 * @param monitor
 	 * @return List of ITrace objects plotted, may be null. Normally you can cast these to ILineTrace as all 1D 
-	 *         plotting systems will wholly or partially support ILineTrace
+	 *         plotting systems will wholly or partially support ILineTrace. If plotting mode is XY_STACKED_3D then 
+	 *         will return a list of size 1 with the trace of type IStackTrace.
 	 */
 	public List<ITrace> createPlot1D(AbstractDataset       x, 
 							         List<AbstractDataset> ys,
@@ -160,7 +164,7 @@ public interface IPlottingSystem extends ITraceSystem, IRegionSystem, IAxisSyste
 	 * See also ITraceSystem for flexible trace manipulation.
      *
 	 * For 2D - x is the image dataset, ys is the axes. It will also plot in 3D
-	 * if the plotting mode is setting to surface first.
+	 * if the plotting mode is setting to PlotType.SURFACE first.
 	 * 
 	 * Does not have to be called in the UI thread. Should be called to switch the entire
 	 * plot contents. 

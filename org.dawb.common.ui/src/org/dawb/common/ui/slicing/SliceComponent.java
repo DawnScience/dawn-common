@@ -212,7 +212,7 @@ public class SliceComponent {
 		errorLabel.setImage(Activator.getImageDescriptor("icons/error.png").createImage());
 		GridUtils.setVisible(errorLabel,         false);
 		
-		openWindowing = new Link(area, SWT.WRAP);
+		this.openWindowing = new Link(area, SWT.WRAP);
 		openWindowing.setText("Data is being viewed using a <a>window</a>");
 		openWindowing.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false));
 		GridUtils.setVisible(openWindowing,         false);
@@ -312,7 +312,7 @@ public class SliceComponent {
         				dimsDataList.setSingleAxisOnly(0, 0);
         			}
         		}
-        		plottingTypeChanged();
+        		updatePlottingType();
         	}
 		};
 		man.add(xyPlot);
@@ -320,26 +320,47 @@ public class SliceComponent {
 		grp.add(xyPlot);
 		plotTypeActions.put(PlotType.XY, xyPlot);
 		
+		final MenuAction stackMenu = new MenuAction("Edit with .");
+		
         final Action stackPlot = new Action("Slice as a stack of line plots", IAction.AS_CHECK_BOX) {
         	public void run() {
+        		setChecked(true);
         		plotType = PlotType.XY_STACKED;
+        		stackMenu.setSelectedAction(this);
         		// Loop over DimsData to ensure 1X only.
         		if (dimsDataList!=null) dimsDataList.setTwoAxisOnly(0, 1);   		
-        		plottingTypeChanged();
-        	}
+        		updatePlottingType();
+         	}
 		};
-		man.add(stackPlot);
+		stackMenu.add(stackPlot);
 		stackPlot.setImageDescriptor(Activator.getImageDescriptor("icons/TraceLines.png"));
 		grp.add(stackPlot);
 		plotTypeActions.put(PlotType.XY_STACKED, stackPlot);
 
+        final Action stackPlot3D = new Action("Slice as a stack of line plots in 3D", IAction.AS_CHECK_BOX) {
+        	public void run() {
+        		setChecked(true);
+        		plotType = PlotType.XY_STACKED_3D;
+        		stackMenu.setSelectedAction(this);
+        		// Loop over DimsData to ensure 1X only.
+        		if (dimsDataList!=null) dimsDataList.setTwoAxisOnly(0, 1);   		
+        		updatePlottingType();
+        	}
+		};
+		stackMenu.add(stackPlot3D);
+		stackPlot3D.setImageDescriptor(Activator.getImageDescriptor("icons/TraceLines3D.png"));
+		grp.add(stackPlot3D);
+		plotTypeActions.put(PlotType.XY_STACKED_3D, stackPlot3D);
+		man.add(stackMenu);
 		
+		stackMenu.setSelectedAction(stackPlot);
+	
         final Action imagePlot = new Action("Slice as image", IAction.AS_CHECK_BOX) {
         	public void run() {
         		plotType = PlotType.IMAGE;
         		if (dimsDataList!=null) dimsDataList.setTwoAxisOnly(0, 1);   		
         		viewer.refresh();
-        		plottingTypeChanged();
+        		updatePlottingType();
         	}
 		};
 		man.add(imagePlot);
@@ -352,7 +373,7 @@ public class SliceComponent {
         		plotType = PlotType.SURFACE;
         		if (dimsDataList!=null) dimsDataList.setTwoAxisOnly(0, 1);   		
         		viewer.refresh();
-        		plottingTypeChanged();
+        		updatePlottingType();
         	}
 		};
 		man.add(surfacePlot);
@@ -441,7 +462,7 @@ public class SliceComponent {
 
 	}
 	
-	private void plottingTypeChanged() {
+	private void updatePlottingType() {
 		viewer.cancelEditing();
 		
 		final String[] items = getAxisItems();
@@ -449,7 +470,7 @@ public class SliceComponent {
 		
 		viewer.refresh();
 		reverse.setEnabled(plotType==PlotType.IMAGE||plotType==PlotType.SURFACE);
-		GridUtils.setVisible(openWindowing, plotType==PlotType.SURFACE && plottingSystem!=null);
+		GridUtils.setVisible(openWindowing, plotType.is3D() && plottingSystem!=null);
 		openWindowing.getParent().layout(new Control[]{openWindowing});
 
 		// Save preference
@@ -611,9 +632,18 @@ public class SliceComponent {
 		}
 		
 		if (dimsDataList!=null) {
+			if (plotType==null) {
+				try {
+				    plotType = PlotType.valueOf(Activator.getDefault().getPreferenceStore().getString(SliceConstants.PLOT_CHOICE));
+				    if (dimsDataList.getAxisCount()<2) plotType = PlotType.XY;
+				} catch (Throwable ignored) {
+					// Ok then
+				}
+			}
+
 			if (plotType==null) plotType = dimsDataList.getAxisCount()>1 ? PlotType.IMAGE : PlotType.XY;
-			plotTypeActions.get(plotType).setChecked(true);
-			plottingTypeChanged();
+			final Action action = plotTypeActions.get(plotType);
+			action.run();
 			
 			// We make sure that the size is not outside
 			for (int i = 0; i < dims; i++) {

@@ -21,6 +21,8 @@ import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 
+import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+
 public class CursorUtils {
 
 	private final static Color TRANSPARENT_COLOR = new Color(null, new RGB(123,0,23));
@@ -46,12 +48,24 @@ public class CursorUtils {
 		if (imageTrace!=null) {
 			xCoordinate = Math.floor(xCoordinate);
 			yCoordinate = Math.floor(yCoordinate);
+			AbstractDataset image = imageTrace.getData();
+			int i, j;
 			if (imageTrace.getImageOrigin() == ImageOrigin.TOP_LEFT
 					|| imageTrace.getImageOrigin() == ImageOrigin.BOTTOM_RIGHT) {
-				intensity = imageTrace.getData().getDouble((int) yCoordinate, (int) xCoordinate);
+				i = (int) yCoordinate;
+				j = (int) xCoordinate;
 			} else {
-				intensity = imageTrace.getData().getDouble((int) xCoordinate, (int) yCoordinate);
+				i = (int) xCoordinate;
+				j = (int) yCoordinate;
 			}
+			int[] shape = image.getShape();
+			if (i >= shape[0]) {
+				i = shape[0] - 1;
+			}
+			if (j >= shape[1]) {
+				j = shape[1] - 1;
+			}
+			intensity = image.getDouble(i, j);
 		    
 			try {
 				double[] axisPnt = imageTrace.getPointInAxisCoordinates(new double[]{xCoordinate, yCoordinate});

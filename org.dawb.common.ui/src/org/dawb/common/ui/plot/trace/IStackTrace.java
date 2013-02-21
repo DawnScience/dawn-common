@@ -3,6 +3,7 @@ package org.dawb.common.ui.plot.trace;
 import java.util.List;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.roi.ROIBase;
 
 /**
  * Interface for plotting stack of plots in 3D.
@@ -46,4 +47,24 @@ public interface IStackTrace extends IAxesTrace {
 	 * @param axesNames
 	 */
 	public void setAxesNames(List<String> axesNames);
+	
+	
+	/**
+	 * 
+	 * @return the region of the window, usually a LineROI
+	 */
+	public ROIBase getWindow();
+	
+	/**
+	 * Set the window to be used as a LineROI. The first x value is
+	 * the start of the window, the second x value is the end. the y
+	 * values are ignored.
+	 * 
+	 * This window is used to filter down the number of lines in the stack
+	 * to avoid it getting to large for the 3D plotter.
+	 * 
+	 * @param window
+	 */
+	public void setWindow(ROIBase window);
+
 }
