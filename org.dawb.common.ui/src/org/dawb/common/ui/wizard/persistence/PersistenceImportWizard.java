@@ -38,6 +38,8 @@ import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.BooleanDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.DatasetUtils;
 import uk.ac.diamond.scisoft.analysis.diffraction.DiffractionMetadataUtils;
+import uk.ac.diamond.scisoft.analysis.fitting.functions.AFunction;
+import uk.ac.diamond.scisoft.analysis.fitting.functions.IFunctionService;
 import uk.ac.diamond.scisoft.analysis.io.DataHolder;
 import uk.ac.diamond.scisoft.analysis.io.IDiffractionMetadata;
 import uk.ac.diamond.scisoft.analysis.io.IMetaData;
@@ -155,6 +157,7 @@ public class PersistenceImportWizard extends AbstractPerstenceWizard implements 
 			 			 
 			 final IWorkbenchPart  part   = EclipseUtils.getPage().getActivePart();
 			 final IPlottingSystem system = (IPlottingSystem)part.getAdapter(IPlottingSystem.class);
+			 final IFunctionService funcService = (IFunctionService)part.getAdapter(IFunctionService.class);
 
 			 final String finalPath = absolutePath;
 			 getContainer().run(true, true, new IRunnableWithProgress() {
@@ -166,8 +169,9 @@ public class PersistenceImportWizard extends AbstractPerstenceWizard implements 
 						 if (finalPath.toLowerCase().endsWith(".msk")) {
 							 createFit2DMask(finalPath, system, monitor);
 						 } else {
-							 createDawnMask(finalPath, system, monitor);
+							 createDawnMask(finalPath, system, monitor, funcService);
 						 }
+						 
 					 } catch (Exception e) {
 						 throw new InvocationTargetException(e);
 					 }
@@ -210,7 +214,7 @@ public class PersistenceImportWizard extends AbstractPerstenceWizard implements 
 		}
 	}
 
-	protected void createDawnMask(final String filePath, final IPlottingSystem system, final IProgressMonitor monitor) throws Exception{
+	protected void createDawnMask(final String filePath, final IPlottingSystem system, final IProgressMonitor monitor, final IFunctionService funcService) throws Exception{
 		 
 		IPersistentFile file = null;
 		try {
@@ -292,7 +296,16 @@ public class PersistenceImportWizard extends AbstractPerstenceWizard implements 
 					}
 				});
 			}
-				
+			
+			 if (options.is("Functions")) {
+				 if (funcService != null) {
+					 Map<String, AFunction> functions = file.getFunctions(mon);
+					 if (functions != null) {
+						 funcService.setFunctions(functions);
+					}
+				 }
+			 }
+			
 
 		} finally {
 			if (file!=null) file.close();
