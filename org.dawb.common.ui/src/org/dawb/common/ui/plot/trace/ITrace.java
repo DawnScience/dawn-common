@@ -72,4 +72,11 @@ public interface ITrace {
 	 * @return
 	 */
 	public void setUserObject(Object userObject);
+	
+	/**
+	 * @return true if trace is plotted using a 3D viewer.
+	 * @return
+	 */
+	public boolean is3DTrace();
+
 }

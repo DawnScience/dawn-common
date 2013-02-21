@@ -3,7 +3,7 @@ package org.dawb.common.ui.plot.trace;
 import org.dawb.common.services.ImageServiceBean;
 import org.eclipse.swt.graphics.PaletteData;
 
-public interface IPaletteTrace extends ITrace{
+public interface IPaletteTrace extends IAxesTrace {
 
 	
 	/**

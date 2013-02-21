@@ -31,14 +31,6 @@ public interface ITraceSystem {
 	
 	
 	/**
-	 *  
-
- * DO NOT USE YET IPlottingSystem does not yet fully support 3D.
- * 
- * THIS PART OF THE INTERFACE IS A WORK IN PROGRESS (If you do use it it will not
- * work fully but your code will be backwardsly compatible when the 3D API
- * is finished ie this method will remain.)
- * 
 	 * Creates a surface trace used for 3D plotting. This does not add the trace
 	 * or give it any data.
 	 * 
@@ -46,6 +38,18 @@ public interface ITraceSystem {
 	 * @return
 	 */
 	public ISurfaceTrace createSurfaceTrace(String traceName);
+
+	
+	/**
+	 * Creates a stack trace used for 3D plotting. This does not add the trace
+	 * or give it any data.
+	 * 
+	 * A stack trace is a 3D set of lines.
+	 * 
+	 * @param traceName
+	 * @return
+	 */
+	public IStackTrace createStackTrace(String traceName);
 
 	
 	/**

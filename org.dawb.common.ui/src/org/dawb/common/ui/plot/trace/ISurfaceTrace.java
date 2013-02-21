@@ -6,11 +6,10 @@ import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.roi.ROIBase;
 
 /**
- * DO NOT USE YET IPlottingSystem does not yet support 3D.
  * 
- * THIS INTERFACE IS A WORK IN PROGRESS (If you do use it it will not
- * work but your code will be backwardsly compatible when the 3D API
- * is finished.)
+ * This interface is ready for use from now onwards and is to be used for
+ * 3D plotting operations. Use IImageTrace normally for images.
+ * 
  * 
  * @author fcp94556
  *
@@ -24,37 +23,13 @@ public interface ISurfaceTrace extends IPaletteTrace {
 	 * @throws Exception
 	 */
 	public void setData(final AbstractDataset data, final List<AbstractDataset> axes);
-	
-	/**
-	 * The 3D set of axes, may contain nulls (z is often null for intensity).
-	 * @return
-	 */
-	public List<AbstractDataset> getAxes();
-	
-	/**
-	 * Data for the surface, a 2D dataset
-	 */
-	public AbstractDataset getData();
-	
-	/**
-	 * Labels for the axes. The data set name of the axis used if not set.
-	 * Should be size 3 but may have nulls.
-	 * @return
-	 */
-	public List<String> getAxesNames();
-	
+			
 	/**
 	 * 
 	 * @param axesNames
 	 */
 	public void setAxesNames(List<String> axesNames);
-	
-	/**
-	 * 
-	 * @return true if plot is currently plotting.
-	 */
-	public boolean isActive();
-	
+		
 	/**
 	 * 
 	 * @return the region of the window, usually a SurfacePlotROI or a RectangularROI
