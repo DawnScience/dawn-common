@@ -233,14 +233,14 @@ public class SliceUtils {
 	 * Thread safe and time consuming part of the slice.
 	 * @param currentSlice
 	 * @param dataShape
-	 * @param mode
+	 * @param type
 	 * @param plottingSystem - may be null, but if so no plotting will happen.
 	 * @param monitor
 	 * @throws Exception
 	 */
 	public static void plotSlice(final SliceObject       currentSlice,
 			                     final int[]             dataShape,
-			                     final PlotType          mode,
+			                     final PlotType          type,
 			                     final AbstractPlottingSystem   plottingSystem,
 			                     final IProgressMonitor  monitor) throws Exception {
 
@@ -259,9 +259,9 @@ public class SliceUtils {
 		if (monitor!=null) monitor.worked(1);
 		
 		boolean requireScale = plottingSystem.isRescale()
-				               || mode!=plottingSystem.getPlotType();
+				               || type!=plottingSystem.getPlotType();
 		
-		if (mode==PlotType.XY) {
+		if (type==PlotType.XY) {
 			plottingSystem.clear();
 			final AbstractDataset x = getNexusAxis(currentSlice, slice.getShape()[0], currentSlice.getX()+1, true, monitor);
 			plottingSystem.setXfirst(true);
@@ -273,7 +273,7 @@ public class SliceUtils {
 				}
 			});
 			
-		} else if (mode==PlotType.XY_STACKED) {
+		} else if (type==PlotType.XY_STACKED || type==PlotType.XY_STACKED_3D) {
 			
 			final AbstractDataset xAxis = getNexusAxis(currentSlice, slice.getShape()[0], currentSlice.getX()+1, true, monitor);
 			plottingSystem.clear();
@@ -297,15 +297,18 @@ public class SliceUtils {
 				++index;
 			}
 			plottingSystem.setXfirst(true);
+			plottingSystem.setPlotType(type);
 			plottingSystem.createPlot1D(xAxis, ys, monitor);
+			
 			Display.getDefault().syncExec(new Runnable() {
 				public void run() {
 					plottingSystem.getSelectedXAxis().setTitle(xAxis.getName());
 					plottingSystem.getSelectedYAxis().setTitle("");
 				}
 			});
-		} else if (mode==PlotType.IMAGE || mode==PlotType.SURFACE){
-			plottingSystem.setPlotType(mode);
+			
+		} else if (type==PlotType.IMAGE || type==PlotType.SURFACE){
+			plottingSystem.setPlotType(type);
 			AbstractDataset y = getNexusAxis(currentSlice, slice.getShape()[0], currentSlice.getX()+1, true, monitor);
 			AbstractDataset x = getNexusAxis(currentSlice, slice.getShape()[1], currentSlice.getY()+1, true, monitor);		
 			if (monitor!=null&&monitor.isCanceled()) return;
