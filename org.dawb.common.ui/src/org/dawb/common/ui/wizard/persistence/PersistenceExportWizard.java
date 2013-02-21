@@ -94,10 +94,11 @@ public class PersistenceExportWizard extends AbstractPerstenceWizard implements 
     public boolean canFinish() {
     	if (fcp.isPageComplete()) {
     		options.setDescription("Please choose the things to save in '"+fcp.getFileName()+"'.");
-    		options.setOptionEnabled("Original Data", true);
-    		options.setOptionEnabled("Mask",          true);
-    		options.setOptionEnabled("Regions",       true);
-    		options.setOptionEnabled("Diffraction Meta Data",       true);
+    		options.setOptionEnabled("Original Data", false);
+    		options.setOptionEnabled("Mask",          false);
+    		options.setOptionEnabled("Regions",       false);
+    		options.setOptionEnabled("Diffraction Meta Data",       false);
+    		options.setOptionEnabled("Functions",       false);
 
     		File                file=null;
     		IPersistentFile     pf=null;
@@ -123,23 +124,33 @@ public class PersistenceExportWizard extends AbstractPerstenceWizard implements 
     			final IPlottingSystem system = (IPlottingSystem)part.getAdapter(IPlottingSystem.class);
     			if (system != null) {
     				ITrace trace  = system.getTraces().iterator().next();
-    				if (trace!=null && trace instanceof IImageTrace && ((IImageTrace)trace).getMask()==null) {
-    					options.setOptionEnabled("Mask", false);
+    				if (trace!=null) {
+    					
+    					options.setOptionEnabled("Original Data", true);
+    					
+    					if (trace instanceof IImageTrace && ((IImageTrace)trace).getMask()!=null) {
+    						options.setOptionEnabled("Mask", true);
+    					}
     				}
     				final Collection<IRegion> regions = system.getRegions();
-    				if (regions==null || regions.isEmpty()) {
-    					options.setOptionEnabled("Regions", false);
+    				if (regions != null && !regions.isEmpty()) {
+    					options.setOptionEnabled("Regions", true);
     				}
     				
     				if (trace!=null && trace instanceof IImageTrace && trace.getData() != null) {
     					IMetaData meta = trace.getData().getMetadata();
-    					if (meta == null || !(meta instanceof IDiffractionMetadata)) {
-    						options.setOptionEnabled("Diffraction Meta Data", false);
+    					if (meta != null && (meta instanceof IDiffractionMetadata)) {
+    						options.setOptionEnabled("Diffraction Meta Data", true);
     					}
+    				}
+    				
+    				final IFunctionService funcService = (IFunctionService)part.getAdapter(IFunctionService.class);
+    				
+    				if (funcService != null) {
+    					options.setOptionEnabled("Functions", true);
     				}
     			}
     		}
-
     	}
         return super.canFinish();
     }

@@ -3,6 +3,7 @@ package org.dawb.common.ui.image;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
+import org.dawb.common.services.ImageServiceBean.ImageOrigin;
 import org.dawb.common.ui.plot.axis.IAxis;
 import org.dawb.common.ui.plot.trace.IImageTrace;
 import org.eclipse.draw2d.ColorConstants;
@@ -45,8 +46,12 @@ public class CursorUtils {
 		if (imageTrace!=null) {
 			xCoordinate = Math.floor(xCoordinate);
 			yCoordinate = Math.floor(yCoordinate);
-		    intensity   = imageTrace.getData().getDouble((int)yCoordinate, (int)xCoordinate);
-		    
+			if (imageTrace.getImageOrigin() == ImageOrigin.TOP_LEFT
+					|| imageTrace.getImageOrigin() == ImageOrigin.BOTTOM_RIGHT) {
+				intensity = imageTrace.getData().getDouble((int) yCoordinate, (int) xCoordinate);
+			} else {
+				intensity = imageTrace.getData().getDouble((int) xCoordinate, (int) yCoordinate);
+			}
 		    
 			try {
 				double[] axisPnt = imageTrace.getPointInAxisCoordinates(new double[]{xCoordinate, yCoordinate});

@@ -94,54 +94,73 @@ public class PersistenceImportWizard extends AbstractPerstenceWizard implements 
 		}
 	}
 	
-    public boolean canFinish() {
-    	COMPLETE_TEST: if (fcp.isPageComplete()) {
-    		final String absolutePath = fcp.getAbsoluteFilePath();
-    		if (absolutePath==null) break COMPLETE_TEST;
-    		options.setOptionEnabled("Original Data", false);
-    		options.setOptionEnabled("Mask",          true);
-    		options.setOptionEnabled("Regions",       true);
-    		final File   file         = new File(absolutePath);
-    		if (file.exists())  {
-    			final String ext = FileUtils.getFileExtension(file);
-    			if (ext!=null) {
-    				if ("msk".equals(ext.toLowerCase())){
-    		    		options.setOptionEnabled("Regions", false);
-		    		    options.setStringValue("Mask", null);
-		    		    
-    				} else if ("nxs".equals(ext.toLowerCase())) {
-    					
-    		    		IPersistentFile     pf=null;
-    		    		
-    		    		try {
-    		        		IPersistenceService service = (IPersistenceService)ServiceManager.getService(IPersistenceService.class);
-    		    		    pf    = service.getPersistentFile(file.getAbsolutePath());
-    		    		    final List<String>  names = pf.getMaskNames(null);
-    		    		    if (names==null || names.isEmpty()) {
-    		    		    	options.setOptionEnabled("Mask", false);
-    		    		    } else {
-    		    		    	options.setStringValues("Mask", names);
-    		    		    }
-    		    		    
-    		    		    final List<String> regions = pf.getROINames(null);
-    		    		    if (regions==null || regions.isEmpty()) {
-    		    		    	options.setOptionEnabled("Regions", false);
-    		    		    }
-    		    		        		    
-    		    		} catch (Throwable ne) {
-    		    			logger.error("Cannot read persistence file at "+file);
-    		    		} finally {
-    		    			if (pf!=null) pf.close();
-    		    		}
+	public boolean canFinish() {
+		COMPLETE_TEST: if (fcp.isPageComplete()) {
+			final String absolutePath = fcp.getAbsoluteFilePath();
+			if (absolutePath==null) break COMPLETE_TEST;
+			options.setOptionEnabled("Original Data", false);
+			options.setOptionEnabled("Mask",          false);
+			options.setOptionEnabled("Regions",       false);
+			options.setOptionEnabled("Functions",       false);
+			options.setOptionEnabled("Diffraction Meta Data",       false);
+			final File   file         = new File(absolutePath);
+			if (file.exists())  {
+				final String ext = FileUtils.getFileExtension(file);
+				if (ext!=null) {
+					if ("msk".equals(ext.toLowerCase())){
+						options.setStringValue("Mask", null);
+						options.setOptionEnabled("Mask",true);
 
-    				}
-    			}
-    				
-    			
-    		}
-    	}
-    	return super.canFinish();
-    }
+					} else if ("nxs".equals(ext.toLowerCase())) {
+
+						IPersistentFile     pf=null;
+
+						try {
+							IPersistenceService service = (IPersistenceService)ServiceManager.getService(IPersistenceService.class);
+							pf    = service.getPersistentFile(file.getAbsolutePath());
+
+							if (pf.containsMask()) {
+								final List<String>  names = pf.getMaskNames(null);
+								if (names!=null && !names.isEmpty()) {
+									options.setOptionEnabled("Mask", true);
+									options.setStringValues("Mask", names);
+								}
+							} else {
+								options.setStringValue("Mask", null);
+							}
+
+							if (pf.containsRegion()) {
+								final List<String>  regions = pf.getROINames(null);
+								if (regions!=null && !regions.isEmpty()) {
+									options.setOptionEnabled("Regions", true);
+								}
+							}
+
+							if (pf.containsFunction()) {
+								final List<String>  functions = pf.getFunctionNames(null);
+								if (functions!=null && !functions.isEmpty()) {
+									options.setOptionEnabled("Functions", true);
+								}
+							}
+
+							if (pf.containsDiffractionMetadata()) {
+								options.setOptionEnabled("Diffraction Meta Data", true);
+							}
+
+						} catch (Throwable ne) {
+							logger.error("Cannot read persistence file at "+file);
+						} finally {
+							if (pf!=null) pf.close();
+						}
+
+					}
+				}
+
+
+			}
+		}
+	return super.canFinish();
+	}
 
 	@Override
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
@@ -244,32 +263,34 @@ public class PersistenceImportWizard extends AbstractPerstenceWizard implements 
 			}
 
 			final IPersistentFile finalFile = file;
-			final Map<String, ROIBase> rois = file.getROIs(mon);
-			if (options.is("Regions") && rois!=null && !rois.isEmpty()) {
-				for (final String roiName : rois.keySet()) {
-					final ROIBase roi = rois.get(roiName);
-					Display.getDefault().syncExec(new Runnable() {
-						public void run() {
-							try {
-								IRegion region = null;
-								if (system.getRegion(roiName)!=null) {
-									region = system.getRegion(roiName);
-									region.setROI(roi);
-								} else {
-									region = system.createRegion(roiName, RegionType.forROI(roi));
-									system.addRegion(region);
-									region.setROI(roi);
+			if (options.is("Regions")) {
+				final Map<String, ROIBase> rois = file.getROIs(mon);
+				if (rois!=null && !rois.isEmpty()) {
+					for (final String roiName : rois.keySet()) {
+						final ROIBase roi = rois.get(roiName);
+						Display.getDefault().syncExec(new Runnable() {
+							public void run() {
+								try {
+									IRegion region = null;
+									if (system.getRegion(roiName)!=null) {
+										region = system.getRegion(roiName);
+										region.setROI(roi);
+									} else {
+										region = system.createRegion(roiName, RegionType.forROI(roi));
+										system.addRegion(region);
+										region.setROI(roi);
+									}
+									if (region!=null) {
+										String uObject = finalFile.getRegionAttribute(roiName, "User Object");
+										if (uObject!=null) region.setUserObject(uObject); // Makes a string out of
+										// it but gives a clue.
+									}
+								} catch (Throwable e) {
+									logger.error("Cannot create/import region "+roiName, e);
 								}
-								if (region!=null) {
-									String uObject = finalFile.getRegionAttribute(roiName, "User Object");
-									if (uObject!=null) region.setUserObject(uObject); // Makes a string out of
-									// it but gives a clue.
-								}
-							} catch (Throwable e) {
-								logger.error("Cannot create/import region "+roiName, e);
 							}
-						}
-					});
+						});
+					}
 				}
 			}
 			
