@@ -8,6 +8,7 @@ import uk.ac.diamond.scisoft.analysis.fitting.functions.Gaussian;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.IParameter;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.Lorentzian;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.Offset;
+import uk.ac.diamond.scisoft.analysis.fitting.functions.Parameter;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.PearsonVII;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.Polynomial;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.PseudoVoigt;
@@ -33,7 +34,12 @@ public class FunctionBeanConverter {
 	public static FunctionBean AFunctionToFunctionBean(String name, AFunction function){
 		FunctionBean fBean = new FunctionBean();
 		fBean.setName(name);
-		fBean.setParameters(function.getParameters());
+		IParameter[] iParameters = function.getParameters();
+		Parameter[] parameters = new Parameter[iParameters.length];
+		for (int i = 0; i < parameters.length; i++) {
+			parameters[i] = new Parameter(iParameters[i]);
+		}
+		fBean.setParameters(parameters);
 		if (function instanceof Cubic) {
 			fBean.setType(FunctionBean.TYPE_CUBIC);
 		} else if (function instanceof Fermi) {

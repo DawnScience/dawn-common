@@ -39,6 +39,8 @@ import org.eclipse.ui.IWorkbenchPart;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.BooleanDataset;
+import uk.ac.diamond.scisoft.analysis.fitting.functions.AFunction;
+import uk.ac.diamond.scisoft.analysis.fitting.functions.IFunctionService;
 import uk.ac.diamond.scisoft.analysis.io.IDiffractionMetadata;
 import uk.ac.diamond.scisoft.analysis.io.IMetaData;
 import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
@@ -156,6 +158,7 @@ public class PersistenceExportWizard extends AbstractPerstenceWizard implements 
 			 			 
 			 final IWorkbenchPart  part   = EclipseUtils.getPage().getActivePart();
 			 final IPlottingSystem system = new ThreadSafePlottingSystem((IPlottingSystem)part.getAdapter(IPlottingSystem.class));
+			 final IFunctionService funcService = (IFunctionService)part.getAdapter(IFunctionService.class);
 
 			 final IFile finalFile = file;
 			 getContainer().run(true, true, new IRunnableWithProgress() {
@@ -208,6 +211,16 @@ public class PersistenceExportWizard extends AbstractPerstenceWizard implements 
 								 }
 							 }
 						 }
+						 
+						 if (options.is("Functions")) {
+							 if (funcService != null) {
+								 Map<String, AFunction> functions = funcService.getFunctions();
+								 if (functions != null) {
+									 file.setFunctions(functions);
+								}
+							 }
+						 }
+						 
 						 
 					 } catch (Exception e) {
 						 throw new InvocationTargetException(e);
