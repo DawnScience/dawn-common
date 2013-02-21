@@ -827,8 +827,6 @@ class PersistentFileImpl implements IPersistentFile{
 
 		Group parent = createParentEntry(DIFFRACTIONMETADATA_ENTRY,Nexus.DETECT);
 
-		//TODO do we want to be an NX_detector?
-		//TODO should existing diffraction metadata node be deleted?
 		DetectorProperties detprop = metadata.getDetector2DProperties();
 
 		H5Datatype intType = new H5Datatype(Datatype.CLASS_INTEGER, 32/8, Datatype.NATIVE, Datatype.NATIVE);

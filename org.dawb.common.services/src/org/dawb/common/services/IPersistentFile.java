@@ -17,26 +17,29 @@ import uk.ac.diamond.scisoft.analysis.roi.ROIBase;
  * <br>
  * The resulting tree structure of the HDF5 file saved will be the following:<br>
  * <pre>
- *     Entry name        |   Class        |    Description          
+ *     Entry name              |   Class        |    Description          
  * -----------------------------------------------------------------
- * entry                 |   Group        |                         
- * entry/data            |   Group        |                         
- * entry/data/image      |   Dataset      |  64-bit floating-point  
- * entry/data/xaxis      |   Dataset      |  64-bit floating-point  
- * entry/data/yaxis      |   Dataset      |  64-bit floating-point  
- * entry/mask            |   Group        |                         
- * entry/mask/mask0      |   Dataset      |  8-bit integer          
- * entry/mask/mask0/name |   Attribute    |  String                 
- * entry/mask/mask1      |   Dataset      |  8-bit integer          
- * entry/mask/mask1/name |   Attribute    |  String                 
- * entry/mask/...        |   ...          |  ...                    
- * entry/region          |   Dataset      |  8-bit integer          
- * entry/region/JSON     |   Attribute    |  String                 
- * entry/function        |   Dataset      |  64-bit floating-point  
- * entry/function/JSON   |   Attribute    |  String                 
+ * entry                       |   Group        |                         
+ * entry/data                  |   Group        |                         
+ * entry/data/image            |   Dataset      |  64-bit floating-point  
+ * entry/data/xaxis            |   Dataset      |  64-bit floating-point  
+ * entry/data/yaxis            |   Dataset      |  64-bit floating-point  
+ * entry/mask                  |   Group        |                         
+ * entry/mask/mask0            |   Dataset      |  8-bit integer          
+ * entry/mask/mask0/name       |   Attribute    |  String                 
+ * entry/mask/mask1            |   Dataset      |  8-bit integer          
+ * entry/mask/mask1/name       |   Attribute    |  String                 
+ * entry/mask/...              |   ...          |  ...                    
+ * entry/region                |   Dataset      |  8-bit integer          
+ * entry/region/JSON           |   Attribute    |  String                 
+ * entry/function              |   Dataset      |  64-bit floating-point  
+ * entry/function/JSON         |   Attribute    |  String                 
+ * /entry/diffraction_metadata |   Group        |                         
  * </pre>
  * The image can contain more than one Dataset with its corresponding axes.<br>
  * The region is an JSON serialized dataset. It can therefore contain more than one region.<br>
+ * The diffraction metadata is an NX_detector group containing many datasets
+ * required to build a IDiffractionMetadata object. <br>
  * <br>
  * After using an IPersistentFile, the method {@link close()} needs to be called.
  * <br>
