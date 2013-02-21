@@ -345,22 +345,14 @@ class PersistentFileImpl implements IPersistentFile{
 	}
 
 	private boolean isEntry(String entryPath, IMonitor mon)  {
-		DataHolder dh = null;
+		HObject hOb = null;
 		try {
-			dh = LoaderFactory.getData(filePath, true, mon);
+			hOb = file.getData(entryPath);
+			return hOb != null;
 		} catch (Exception e) {
-			logger.debug("Error while loading the file: "+ e);
+			logger.debug("Error while reading file: "+ e);
 			e.printStackTrace();
 		}
-		if(dh != null){
-			String[] names = dh.getNames();
-			for (int i = 0; i < names.length; i++) {
-				if(names[i].startsWith(entryPath)){
-					return true;
-				}
-			}
-		}
-
 		return false;
 	}
 
