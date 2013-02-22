@@ -14,7 +14,7 @@ import uk.ac.diamond.scisoft.analysis.roi.ROIBase;
  * @author fcp94556
  *
  */
-public interface ISurfaceTrace extends IPaletteTrace {
+public interface ISurfaceTrace extends IPaletteTrace, IWindowTrace {
 
 	/**
 	 * Set the data of the plot, will replot if called on an active plot.

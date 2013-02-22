@@ -7,8 +7,10 @@ import java.util.Collections;
 
 import org.dawb.common.ui.plot.IPlottingSystem;
 import org.dawb.common.ui.plot.trace.IImageTrace;
+import org.dawb.common.ui.plot.trace.IStackTrace;
 import org.dawb.common.ui.plot.trace.ISurfaceTrace;
 import org.dawb.common.ui.plot.trace.ITrace;
+import org.dawb.common.ui.plot.trace.IWindowTrace;
 import org.dawb.common.util.text.StringUtils;
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -198,23 +200,36 @@ public abstract class AbstractToolPage extends Page implements IToolPage, IAdapt
 	 * @return
 	 */
 	public IImageTrace getImageTrace() {
-		IPlottingSystem plotting = getPlottingSystem();
-		if (plotting == null) return null;
-
-		final Collection<ITrace> traces = plotting.getTraces(IImageTrace.class);
-		if (traces==null || traces.size()==0) return null;
-		final ITrace trace = traces.iterator().next();
+		final ITrace trace = getTrace();
 		return trace instanceof IImageTrace ? (IImageTrace)trace : null;
 	}
 	
 	protected ISurfaceTrace getSurfaceTrace() {
+		final ITrace trace = getTrace();
+		return trace instanceof ISurfaceTrace ? (ISurfaceTrace)trace : null;
+	}
+	
+	protected IStackTrace getStackTrace() {
+		final ITrace trace = getTrace();
+		return trace instanceof IStackTrace ? (IStackTrace)trace : null;
+	}
+	
+	protected IWindowTrace getWindowTrace() {
+		final ITrace trace = getTrace();
+		return trace instanceof IWindowTrace ? (IWindowTrace)trace : null;
+	}
+	
+	/**
+	 * Gets the trace or the first trace if there are more than one.
+	 * @return
+	 */
+	protected ITrace getTrace() {
 		IPlottingSystem plotting = getPlottingSystem();
 		if (plotting == null) return null;
 
-		final Collection<ITrace> traces = plotting.getTraces(ISurfaceTrace.class);
+		final Collection<ITrace> traces = plotting.getTraces();
 		if (traces==null || traces.size()==0) return null;
-		final ITrace trace = traces.iterator().next();
-		return trace instanceof ISurfaceTrace ? (ISurfaceTrace)trace : null;
+        return  traces.iterator().next();
 	}
 
 	
