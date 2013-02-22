@@ -106,7 +106,7 @@ public class RegionUtils {
 			
 		} else if (roi instanceof RectangularROI) {
 			if (roi instanceof PerimeterBoxROI) {
-				type = RegionType.COLORBOX;
+				type = RegionType.PERIMETERBOX;
 			
 			} else {
 				type = RegionType.BOX;

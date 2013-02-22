@@ -112,7 +112,7 @@ public class ROIWidget implements IROIListener {
 			createRegionComposite(regionComposite, region.getRegionType());
 			region.addROIListener(ROIWidget.this);
 		}else{
-			createRegionComposite(regionComposite, RegionType.COLORBOX);
+			createRegionComposite(regionComposite, RegionType.PERIMETERBOX);
 		}
 	}
 

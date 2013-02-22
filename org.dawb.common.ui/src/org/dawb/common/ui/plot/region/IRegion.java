@@ -174,7 +174,7 @@ public interface IRegion {
 		POLYLINE("Polyline",       ColorConstants.cyan,       PolylineROI.class),
 		POLYGON("Polygon",         ColorConstants.cyan,       PolygonalROI.class),
 		BOX("Box",                 ColorConstants.green,      RectangularROI.class),
-		COLORBOX("Perimeter box",  ColorConstants.gray,       PerimeterBoxROI.class),
+		PERIMETERBOX("Perimeter box", ColorConstants.gray,       PerimeterBoxROI.class),
 		GRID("Grid",               ColorConstants.lightGray,  GridROI.class),
 		CIRCLE("Circle",           darkYellow,                CircularROI.class),
 		CIRCLEFIT("Circle fit",    darkYellow,                CircularFitROI.class),
