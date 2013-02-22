@@ -320,41 +320,35 @@ public class SliceComponent {
 		grp.add(xyPlot);
 		plotTypeActions.put(PlotType.XY, xyPlot);
 		
-		final MenuAction stackMenu = new MenuAction("Edit with .");
 		
         final Action stackPlot = new Action("Slice as a stack of line plots", IAction.AS_CHECK_BOX) {
         	public void run() {
         		setChecked(true);
         		plotType = PlotType.XY_STACKED;
-        		stackMenu.setSelectedAction(this);
-        		// Loop over DimsData to ensure 1X only.
+         		// Loop over DimsData to ensure 1X only.
         		if (dimsDataList!=null) dimsDataList.setTwoAxisOnly(0, 1);   		
         		updatePlottingType();
          	}
 		};
-		stackMenu.add(stackPlot);
 		stackPlot.setImageDescriptor(Activator.getImageDescriptor("icons/TraceLines.png"));
 		grp.add(stackPlot);
 		plotTypeActions.put(PlotType.XY_STACKED, stackPlot);
+		man.add(stackPlot);
 
         final Action stackPlot3D = new Action("Slice as a stack of line plots in 3D", IAction.AS_CHECK_BOX) {
         	public void run() {
         		setChecked(true);
         		plotType = PlotType.XY_STACKED_3D;
-        		stackMenu.setSelectedAction(this);
         		// Loop over DimsData to ensure 1X only.
         		if (dimsDataList!=null) dimsDataList.setTwoAxisOnly(0, 1);   		
         		updatePlottingType();
         	}
 		};
-		stackMenu.add(stackPlot3D);
+		man.add(stackPlot3D);
 		stackPlot3D.setImageDescriptor(Activator.getImageDescriptor("icons/TraceLines3D.png"));
 		grp.add(stackPlot3D);
 		plotTypeActions.put(PlotType.XY_STACKED_3D, stackPlot3D);
-		man.add(stackMenu);
-		
-		stackMenu.setSelectedAction(stackPlot);
-	
+			
         final Action imagePlot = new Action("Slice as image", IAction.AS_CHECK_BOX) {
         	public void run() {
         		plotType = PlotType.IMAGE;
@@ -1222,7 +1216,7 @@ public class SliceComponent {
 	public void setVisible(final boolean vis) {
 		area.setVisible(vis);
 		area.getParent().layout(new Control[]{area});
-		
+		if (plottingSystem!=null && !vis) plottingSystem.setPlotType(PlotType.XY);
 		if (!vis) {
 			sliceJob.cancel();
 			saveSettings();

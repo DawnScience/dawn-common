@@ -265,6 +265,7 @@ public class SliceUtils {
 			plottingSystem.clear();
 			final AbstractDataset x = getNexusAxis(currentSlice, slice.getShape()[0], currentSlice.getX()+1, true, monitor);
 			plottingSystem.setXfirst(true);
+			plottingSystem.setPlotType(type);
 			plottingSystem.createPlot1D(x, Arrays.asList(slice), slice.getName(), monitor);
 			Display.getDefault().syncExec(new Runnable() {
 				public void run() {
