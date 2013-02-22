@@ -325,19 +325,21 @@ public class ROIEditTable  {
 			ret.add(new RegionRow("Point (x,y)", "pixel", pr.getPointX(), pr.getPointY()));
 			
 		} else if (roi instanceof RectangularROI) {
-			final RectangularROI rr = (RectangularROI)roi;
-			ret.add(new RegionRow("Start Point (x,y)", "pixel", rr.getPointX(),       rr.getPointY()));
-			final double[] ept = rr.getEndPoint();
-			ret.add(new RegionRow("End Point (x,y)",   "pixel", ept[0],               ept[1]));
-			ret.add(new RegionRow("Rotation (°)",      "°",     rr.getAngleDegrees(), Double.NaN));
-			
-		}else if (roi instanceof PerimeterBoxROI) {
-				final PerimeterBoxROI rr = (PerimeterBoxROI)roi;
+			if (roi instanceof PerimeterBoxROI) {
+				final PerimeterBoxROI pr = (PerimeterBoxROI)roi;
+				ret.add(new RegionRow("Start Point (x,y)", "pixel", pr.getPointX(),       pr.getPointY()));
+				final double[] ept = pr.getEndPoint();
+				ret.add(new RegionRow("End Point (x,y)",   "pixel", ept[0],               ept[1]));
+				ret.add(new RegionRow("Rotation (°)",      "°",     pr.getAngleDegrees(), Double.NaN));
+		
+			} else {
+				final RectangularROI rr = (RectangularROI)roi;
 				ret.add(new RegionRow("Start Point (x,y)", "pixel", rr.getPointX(),       rr.getPointY()));
 				final double[] ept = rr.getEndPoint();
 				ret.add(new RegionRow("End Point (x,y)",   "pixel", ept[0],               ept[1]));
 				ret.add(new RegionRow("Rotation (°)",      "°",     rr.getAngleDegrees(), Double.NaN));
-
+			}
+			
 		} else if (roi instanceof SectorROI) {
 			final SectorROI sr = (SectorROI)roi;
 			ret.add(new RegionRow("Centre (x,y)",         "pixel", sr.getPointX(),        sr.getPointY()));
@@ -400,18 +402,20 @@ public class ROIEditTable  {
 			ret = pr;
 			
 		} else if (roi instanceof RectangularROI) {
-			RectangularROI rr = new RectangularROI(rows.get(0).getxLikeVal(), rows.get(0).getyLikeVal(),
+			if (roi instanceof PerimeterBoxROI) {
+				PerimeterBoxROI pr = new PerimeterBoxROI(rows.get(0).getxLikeVal(), rows.get(0).getyLikeVal(),
+								                                rows.get(1).getxLikeVal()-rows.get(0).getxLikeVal(),
+								                                rows.get(1).getyLikeVal()-rows.get(0).getyLikeVal(), 
+								                                Math.toRadians(rows.get(2).getxLikeVal()));
+						ret = pr;
+			} else {
+				RectangularROI rr = new RectangularROI(rows.get(0).getxLikeVal(), rows.get(0).getyLikeVal(),
 					                                rows.get(1).getxLikeVal()-rows.get(0).getxLikeVal(),
 					                                rows.get(1).getyLikeVal()-rows.get(0).getyLikeVal(), 
 					                                Math.toRadians(rows.get(2).getxLikeVal()));
-			ret = rr;
+				ret = rr;
+			}
 			
-		} else if (roi instanceof PerimeterBoxROI) {
-			PerimeterBoxROI rr = new PerimeterBoxROI(rows.get(0).getxLikeVal(), rows.get(0).getyLikeVal(),
-							                                rows.get(1).getxLikeVal()-rows.get(0).getxLikeVal(),
-							                                rows.get(1).getyLikeVal()-rows.get(0).getyLikeVal(), 
-							                                Math.toRadians(rows.get(2).getxLikeVal()));
-					ret = rr;
 		} else if (roi instanceof SectorROI) {
 			SectorROI orig = (SectorROI)roi;
 			SectorROI sr = new SectorROI(rows.get(0).getxLikeVal(),
