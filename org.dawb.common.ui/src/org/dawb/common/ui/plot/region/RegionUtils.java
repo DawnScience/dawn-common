@@ -105,10 +105,12 @@ public class RegionUtils {
 			type = RegionType.LINE;
 			
 		} else if (roi instanceof RectangularROI) {
-			type = RegionType.BOX;
-		
-		} else if (roi instanceof PerimeterBoxROI) {
-			type = RegionType.COLORBOX;
+			if (roi instanceof PerimeterBoxROI) {
+				type = RegionType.COLORBOX;
+			
+			} else {
+				type = RegionType.BOX;
+			}
 		
 		} else if (roi instanceof SectorROI) {
 			type = RegionType.SECTOR;
