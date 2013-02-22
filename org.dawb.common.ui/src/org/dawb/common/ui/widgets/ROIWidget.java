@@ -79,16 +79,22 @@ public class ROIWidget implements IROIListener {
 
 	private boolean isProfile = false;
 
+	private boolean showName = false;
+	
+	private String regionName;
+
+	private String tableTitle;
+
 	/**
 	 * Constructor
 	 * @param parent
 	 * @param viewName the name of the plottingSystem
 	 */
-	public ROIWidget(Composite parent, AbstractPlottingSystem plottingSystem) {
+	public ROIWidget(Composite parent, AbstractPlottingSystem plottingSystem, String tableTitle) {
 
 		this.parent = parent;
 		this.plottingSystem = plottingSystem;
-
+		this.tableTitle = tableTitle;
 		this.regionListener = getRegionListener(plottingSystem);
 		this.plottingSystem.addRegionListener(regionListener);
 
@@ -118,24 +124,26 @@ public class ROIWidget implements IROIListener {
 
 	private void createRegionComposite(Composite regionComposite, RegionType regionType){
 
-		Composite nameComp = new Composite(regionComposite, SWT.NONE);
-		nameComp.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-		nameComp.setLayout(new GridLayout(2, false));
+		if(showName){
+			Composite nameComp = new Composite(regionComposite, SWT.NONE);
+			nameComp.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+			nameComp.setLayout(new GridLayout(2, false));
 
-		final Label nameLabel = new Label(nameComp, SWT.NONE);
-		nameLabel.setText("Region Name  ");
-		nameLabel.setLayoutData(new GridData(SWT.LEFT, SWT.FILL, false, false));
+			final Label nameLabel = new Label(nameComp, SWT.NONE);
+			nameLabel.setText("Region Name  ");
+			nameLabel.setLayoutData(new GridData(SWT.LEFT, SWT.FILL, false, false));
 
-		nameText = new Text(nameComp, SWT.BORDER | SWT.SINGLE);
-		nameText.setToolTipText("Region name");
-		nameText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-		nameText.setEditable(false);
+			nameText = new Text(nameComp, SWT.BORDER | SWT.SINGLE);
+			nameText.setToolTipText("Region name");
+			nameText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+			nameText.setEditable(false);
+		}
 
 		Group regionTableGroup = new Group (regionComposite, SWT.NONE);
 		GridData gridData = new GridData(SWT.FILL, SWT.LEFT, true, true);
 		regionTableGroup.setLayout(new GridLayout(1, false));
 		regionTableGroup.setLayoutData(gridData);
-		regionTableGroup.setText("Region Editing Table");
+		regionTableGroup.setText(tableTitle);
 		roiViewer = new AxisPixelROIEditTable(regionTableGroup, plottingSystem);
 		roiViewer.setIsProfileTable(isProfile);
 		roiViewer.createControl();
@@ -172,7 +180,9 @@ public class ROIWidget implements IROIListener {
 		}
 
 		// Should be last
-		nameText.setText(getDefaultName(regionType.getIndex()));
+		if(showName)
+			nameText.setText(getDefaultName(regionType.getIndex()));
+		regionName = getDefaultName(regionType.getIndex());
 	}
 
 	private static Map<Integer, Integer> countMap;
@@ -193,6 +203,15 @@ public class ROIWidget implements IROIListener {
 	}
 
 	/**
+	 * Method to be used to show the name Text field of the ROI<br>
+	 * FALSE by default
+	 * @param show
+	 */
+	public void showName(boolean show){
+		this.showName  = show;
+	}
+
+	/**
 	 * Update the widget with the correct roi information
 	 */
 	public void update(){
@@ -207,7 +226,9 @@ public class ROIWidget implements IROIListener {
 				if(sumMinMaxIsShown && region.getROI() instanceof RectangularROI)
 					updateSumMinMax((RectangularROI)region.getROI());
 
-				nameText.setText(region.getName());
+				if(nameText != null)
+					nameText.setText(region.getName());
+				regionName = region.getName();
 				this.region = region;
 				region.addROIListener(ROIWidget.this);
 			}
@@ -241,6 +262,7 @@ public class ROIWidget implements IROIListener {
 			updateSumMinMax((RectangularROI)region.getROI());
 		if(nameText != null && !nameText.isDisposed())
 			nameText.setText(region.getName());
+		regionName = region.getName();
 	}
 
 	/**
@@ -417,11 +439,11 @@ public class ROIWidget implements IROIListener {
 	}
 
 	/**
-	 * Method that returns the region name
+	 * Method that returns the region name<br>
 	 * @return String
 	 */
 	public String getRegionName(){
-		return nameText.getText();
+		return regionName;
 	}
 
 	private void updateSumMinMax(RectangularROI rroi){
