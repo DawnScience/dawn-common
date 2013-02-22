@@ -54,14 +54,15 @@ public class DoubleUtils {
 	 * Returns a formatted Double value given a specific DecimalFormat<br>
 	 * If more than 4 integer, then we display the value in scientific notation
 	 * @param value
+	 * @param precision
 	 * @return a double value formatted as a String
 	 */
-	public static String formatDouble(double value){
+	public static String formatDouble(double value, int precision){
 		String result;
 		if(((int)value) > 9999 || ((int)value) < -9999)
 			result = format.format(value);
 		else
-			result = String.valueOf(roundDouble(value, 3));
+			result = String.valueOf(roundDouble(value, precision));
 		return result == null ? "-" : result;
 	}
 
