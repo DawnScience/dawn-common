@@ -15,6 +15,7 @@ import uk.ac.diamond.scisoft.analysis.roi.CircularROI;
 import uk.ac.diamond.scisoft.analysis.roi.EllipticalFitROI;
 import uk.ac.diamond.scisoft.analysis.roi.EllipticalROI;
 import uk.ac.diamond.scisoft.analysis.roi.LinearROI;
+import uk.ac.diamond.scisoft.analysis.roi.PerimeterBoxROI;
 import uk.ac.diamond.scisoft.analysis.roi.PointROI;
 import uk.ac.diamond.scisoft.analysis.roi.ROIBase;
 import uk.ac.diamond.scisoft.analysis.roi.RectangularROI;
@@ -105,7 +106,10 @@ public class RegionUtils {
 			
 		} else if (roi instanceof RectangularROI) {
 			type = RegionType.BOX;
-			
+		
+		} else if (roi instanceof PerimeterBoxROI) {
+			type = RegionType.COLORBOX;
+		
 		} else if (roi instanceof SectorROI) {
 			type = RegionType.SECTOR;
 			
