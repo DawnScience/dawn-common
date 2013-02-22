@@ -3,6 +3,7 @@ package org.dawb.common.ui.plot.roi;
 
 import uk.ac.diamond.scisoft.analysis.roi.EllipticalROI;
 import uk.ac.diamond.scisoft.analysis.roi.LinearROI;
+import uk.ac.diamond.scisoft.analysis.roi.PerimeterBoxROI;
 import uk.ac.diamond.scisoft.analysis.roi.PointROI;
 import uk.ac.diamond.scisoft.analysis.roi.PolygonalROI;
 import uk.ac.diamond.scisoft.analysis.roi.ROIBase;
@@ -15,6 +16,7 @@ public enum ROIType {
 	//POLYGONAL(PolygonalROI.class),   // TODO
 	POINT(PointROI.class),
 	RECTANGULAR(RectangularROI.class),
+	PERIMETERBOX(PerimeterBoxROI.class),
 	SECTOR(SectorROI.class),
 	ELLIPICAL(EllipticalROI.class);
 	

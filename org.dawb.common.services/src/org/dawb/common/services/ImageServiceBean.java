@@ -61,8 +61,8 @@ public class ImageServiceBean {
 	 */
 	public ImageServiceBean  clone() {
 		ImageServiceBean ret = new ImageServiceBean();
-		ret.min  = min.doubleValue();
-		ret.max  = max.doubleValue();
+		ret.min  = (min == null) ? null : min.doubleValue();
+		ret.max  = (max == null) ? null : max.doubleValue();
 		ret.histogramType = histogramType;
 		ret.logColorScale = logColorScale;
 		ret.logOffset = logOffset;
