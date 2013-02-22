@@ -394,14 +394,18 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 		float min = Float.MAX_VALUE;
 		float max = -Float.MAX_VALUE;
 		float sum = 0.0f;
-		final int size = image.getSize();
+		int size = 0;
+		float posMin = Float.MAX_VALUE;
+		float posMax = -Float.MAX_VALUE;
+		float posSum = 0.0f;
+		int posSize = 0;
 		
 		BooleanDataset mask = bean.getMask()!=null
 	                        ? (BooleanDataset)DatasetUtils.cast(bean.getMask(), AbstractDataset.BOOL)
 	                        : null;
 
 	    // Big loop warning:
-		for (int index = 0; index<size; ++index) {
+		for (int index = 0; index < image.getSize(); ++index) {
 			
 			final double dv = image.getElementDoubleAbs(index);
 			try {
@@ -422,7 +426,22 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 			sum += val;
 			if (val < min) min = val;
 			if (val > max) max = val;
+			size++;
 			
+			if (bean.isLogColorScale() && val > 0.0) {
+				posSum += val;
+				if (val < posMin) posMin = val;
+				if (val > posMax) posMax = val;
+				posSize++;
+			}
+			
+		}
+		
+		if (bean.isLogColorScale()) {
+			min = posMin;
+			max = posMax;
+			sum = posSum;
+			size = posSize;
 		}
 		
 		float retMin = min;
