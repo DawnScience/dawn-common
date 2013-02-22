@@ -19,7 +19,7 @@ import uk.ac.diamond.scisoft.analysis.roi.ROIBase;
  * @author fcp94556
  *
  */
-public interface IStackTrace extends IAxesTrace {
+public interface IStackTrace extends IAxesTrace, IWindowTrace {
 
 	/**
 	 * For IStackTrace, calling this method will throw a RuntimeException

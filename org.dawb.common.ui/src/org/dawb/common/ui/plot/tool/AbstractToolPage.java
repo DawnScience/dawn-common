@@ -10,6 +10,7 @@ import org.dawb.common.ui.plot.trace.IImageTrace;
 import org.dawb.common.ui.plot.trace.IStackTrace;
 import org.dawb.common.ui.plot.trace.ISurfaceTrace;
 import org.dawb.common.ui.plot.trace.ITrace;
+import org.dawb.common.ui.plot.trace.IWindowTrace;
 import org.dawb.common.util.text.StringUtils;
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -211,6 +212,11 @@ public abstract class AbstractToolPage extends Page implements IToolPage, IAdapt
 	protected IStackTrace getStackTrace() {
 		final ITrace trace = getTrace();
 		return trace instanceof IStackTrace ? (IStackTrace)trace : null;
+	}
+	
+	protected IWindowTrace getWindowTrace() {
+		final ITrace trace = getTrace();
+		return trace instanceof IWindowTrace ? (IWindowTrace)trace : null;
 	}
 	
 	/**
