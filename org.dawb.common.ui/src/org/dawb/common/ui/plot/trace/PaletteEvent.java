@@ -16,16 +16,16 @@ public class PaletteEvent extends EventObject {
 	 */
 	private static final long serialVersionUID = -5574618484168809185L;
 
-	protected IImageTrace trace;
+	protected IPaletteTrace trace;
 	protected PaletteData paletteData;
 	
 	public PaletteEvent(Object source, PaletteData paletteData) {
 		super(source);
-		this.trace       = (IImageTrace)source;
+		this.trace       = (IPaletteTrace)source;
 		this.paletteData = paletteData;
 	}
 
-	public IImageTrace getTrace() {
+	public IPaletteTrace getTrace() {
 		return trace;
 	}
 
@@ -43,6 +43,10 @@ public class PaletteEvent extends EventObject {
 
 	public void setPaletteData(PaletteData paletteData) {
 		this.paletteData = paletteData;
+	}
+
+	public IImageTrace getImageTrace() {
+		return (IImageTrace)trace;
 	}
 
 }

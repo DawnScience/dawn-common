@@ -1,5 +1,6 @@
 package org.dawb.common.ui.plot.trace;
 
+import org.dawb.common.services.HistogramBound;
 import org.dawb.common.services.ImageServiceBean;
 import org.eclipse.swt.graphics.PaletteData;
 
@@ -38,4 +39,22 @@ public interface IPaletteTrace extends IAxesTrace {
 	 * @param pl
 	 */
 	public void removePaletteListener(IPaletteListener pl);
+
+	/**
+	 * 
+	 * @return
+	 */
+	public Number getMin();
+
+	/**
+	 * 
+	 * @return
+	 */
+	public Number getMax();
+
+	/**
+	 * 
+	 * @return
+	 */
+	public HistogramBound getNanBound();
 }
