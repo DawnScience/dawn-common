@@ -26,6 +26,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
@@ -68,10 +69,6 @@ public class ROIWidget implements IROIListener {
 	private Text minText;
 
 	private Text maxText;
-	
-	private String sumStr = "";
-	private String minStr = "";
-	private String maxStr = "";
 
 	private UpdateJob updateSumMinMax;
 
@@ -457,11 +454,7 @@ public class ROIWidget implements IROIListener {
 			int xInc = rroi.getPoint()[0]<rroi.getEndPoint()[0] ? 1 : -1;
 			int yInc = rroi.getPoint()[1]<rroi.getEndPoint()[1] ? 1 : -1;
 			
-			updateSumMinMax.update(plottingSystem, xStartPt, xStopPt, yStartPt, yStopPt, xInc, yInc);
-
-			sumText.setText(sumStr);
-			minText.setText(minStr);
-			maxText.setText(maxStr);
+			updateSumMinMax.update(xStartPt, xStopPt, yStartPt, yStopPt, xInc, yInc);
 		}
 	}
 
@@ -479,13 +472,15 @@ public class ROIWidget implements IROIListener {
 
 	private class UpdateJob extends Job {
 
-		private AbstractPlottingSystem plottingSystem;
 		private int xStart;
 		private int xStop;
 		private int yStart;
 		private int yStop;
 		private int xInc;
 		private int yInc;
+		private String sumStr = "";
+		private String minStr = "";
+		private String maxStr = "";
 
 		UpdateJob(String name) {
 			super(name);
@@ -494,9 +489,7 @@ public class ROIWidget implements IROIListener {
 			setPriority(Job.INTERACTIVE);
 		}
 
-		public void update(AbstractPlottingSystem plottingSystem, 
-				int xStart, int xStop, int yStart, int yStop, int xInc, int yInc) {
-			this.plottingSystem = plottingSystem;
+		public void update(int xStart, int xStop, int yStart, int yStop, int xInc, int yInc) {
 			this.xStart = xStart;
 			this.xStop = xStop;
 			this.yStart = yStart;
@@ -552,6 +545,16 @@ public class ROIWidget implements IROIListener {
 						} else if(dataRegion.max() instanceof Integer){
 							maxStr = String.valueOf(dataRegion.max());
 						}
+
+						Display.getDefault().asyncExec(new Runnable() {
+							@Override
+							public void run() {
+								sumText.setText(sumStr);
+								minText.setText(minStr);
+								maxText.setText(maxStr);
+							}
+						});
+						
 					}
 				}
 				return Status.OK_STATUS;
