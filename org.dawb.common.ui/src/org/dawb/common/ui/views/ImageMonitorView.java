@@ -21,6 +21,7 @@ import org.dawb.common.services.ServiceManager;
 import org.dawb.common.ui.Activator;
 import org.dawb.common.ui.menu.CheckableActionGroup;
 import org.dawb.common.ui.util.EclipseUtils;
+import org.dawb.common.ui.util.GridUtils;
 import org.dawb.common.util.image.ImageFileUtils;
 import org.dawb.common.util.io.FileUtils;
 import org.dawb.common.util.io.SortingUtils;
@@ -52,6 +53,7 @@ import org.eclipse.nebula.widgets.gallery.DefaultGalleryItemRenderer;
 import org.eclipse.nebula.widgets.gallery.Gallery;
 import org.eclipse.nebula.widgets.gallery.GalleryItem;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.DragSource;
 import org.eclipse.swt.dnd.DragSourceAdapter;
@@ -68,6 +70,8 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -109,6 +113,7 @@ public class ImageMonitorView extends ViewPart implements MouseListener, Selecti
 	private Comparator<File>         currentComparitor=SortingUtils.DATE_SORT_BACKWARDS;
 
 	private GallerySelectionProvider selectionProvider;
+	private CLabel                   locationLabel;
 	
 	public ImageMonitorView() throws Exception {
 		this.queue = new LinkedBlockingDeque<ImageItem>(Integer.MAX_VALUE);
@@ -121,9 +126,18 @@ public class ImageMonitorView extends ViewPart implements MouseListener, Selecti
 	@Override
 	public void createPartControl(Composite parent) {
 
-		parent.setLayout(new FillLayout());
+		parent.setLayout(new GridLayout(1, false));
+		GridUtils.removeMargins(parent);
+		
+		parent.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
+		
+		this.locationLabel = new CLabel(parent, SWT.NONE);
+		locationLabel.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
+		locationLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+		if (directoryPath!=null) locationLabel.setText(directoryPath);
 
 		this.gallery = new Gallery(parent, SWT.V_SCROLL | SWT.VIRTUAL | SWT.SINGLE);
+		gallery.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		gallery.setToolTipText("Double click to open a file, afterwards the same editor will be used where possible. Right click to start a new editor.");
 		
 		// Renderers
@@ -396,6 +410,7 @@ public class ImageMonitorView extends ViewPart implements MouseListener, Selecti
 
 	public void setDirectoryPath(String directoryPath) {
 		this.directoryPath = directoryPath;
+		locationLabel.setText(directoryPath);
 		this.fileList      = null;
 		refreshAll();
 	}

@@ -32,6 +32,7 @@ import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
@@ -67,6 +68,7 @@ public class HeaderTableView extends ViewPart implements ISelectionListener, IPa
 	private StructuredSelection lastSelection;
 	private boolean             requirePageUpdates;
 	private TableViewer         table;
+	private CLabel              fileNameLabel;
 	
 	public HeaderTableView() {
         this(true);
@@ -93,6 +95,9 @@ public class HeaderTableView extends ViewPart implements ISelectionListener, IPa
 		container.setLayout(new GridLayout(1, false));
 		container.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		GridUtils.removeMargins(container);
+		
+		this.fileNameLabel = new CLabel(container, SWT.NONE);
+		fileNameLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 		
 		final Text searchText = new Text(container, SWT.BORDER | SWT.SEARCH | SWT.ICON_SEARCH | SWT.ICON_CANCEL);
 		searchText.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.HORIZONTAL_ALIGN_FILL));
@@ -175,10 +180,14 @@ public class HeaderTableView extends ViewPart implements ISelectionListener, IPa
 		if(meta!=null){
 		Collection<String> partName = meta.getDataNames();
 		if ( partName!=null)
-			setPartName("Metadata "+partName.toString());
+			setFileName(partName.toString());
 		else
-			setPartName("Metadata");
+			setFileName("");
 		}
+	}
+
+	private void setFileName(String fileName) {
+		fileNameLabel.setText(fileName);		
 	}
 
 	private void getMetaData(final String filePath) throws InterruptedException {
@@ -249,7 +258,7 @@ public class HeaderTableView extends ViewPart implements ISelectionListener, IPa
 		
 	    try {
 			getMetaData(filePath);
-			setPartName("Header " + (new File(filePath)).getName());
+			setFileName((new File(filePath)).getName());
 		} catch (InterruptedException e) {
 			logger.error("Interupted reading meta data.", e);
 		}
@@ -334,7 +343,7 @@ public class HeaderTableView extends ViewPart implements ISelectionListener, IPa
 				meta = ((IMetadataProvider) part).getMetadata();
 				if (meta != null && !table.getTable().isDisposed()) {
 					updateTable.schedule();
-					setPartName("Header " + part.getTitle());
+					setFileName(part.getTitle());
 				}
 			} catch (Exception e) {
 				logger.error("Cannot get meta data from " + part.getTitle(), e);
