@@ -46,5 +46,17 @@ public interface IImageStackTrace extends IImageTrace {
 	 */
 	public void setStackIndex(int index);
 
+	/**
+	 * Notifies of stack position.
+	 * @param l
+	 */
+	public void addStackPositionListener(IStackPositionListener l);
 	
+	
+	/**
+	 * Removes notification of stack position.
+	 * @param l
+	 */
+	public void removeStackPositionListener(IStackPositionListener l);
+
 }
