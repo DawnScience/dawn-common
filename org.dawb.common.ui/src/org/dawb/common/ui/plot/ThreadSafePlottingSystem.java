@@ -11,9 +11,10 @@ import org.dawb.common.ui.plot.axis.IPositionListener;
 import org.dawb.common.ui.plot.region.IRegion;
 import org.dawb.common.ui.plot.region.IRegion.RegionType;
 import org.dawb.common.ui.plot.region.IRegionListener;
+import org.dawb.common.ui.plot.trace.IImageStackTrace;
 import org.dawb.common.ui.plot.trace.IImageTrace;
+import org.dawb.common.ui.plot.trace.ILineStackTrace;
 import org.dawb.common.ui.plot.trace.ILineTrace;
-import org.dawb.common.ui.plot.trace.IStackTrace;
 import org.dawb.common.ui.plot.trace.ISurfaceTrace;
 import org.dawb.common.ui.plot.trace.ITrace;
 import org.dawb.common.ui.plot.trace.ITraceListener;
@@ -60,8 +61,13 @@ public class ThreadSafePlottingSystem implements IPlottingSystem {
 	}
 
 	@Override
-	public IStackTrace createStackTrace(String traceName) {
-		return (IStackTrace)call(getMethodName(Thread.currentThread().getStackTrace()), traceName);
+	public ILineStackTrace createLineStackTrace(String traceName) {
+		return (ILineStackTrace)call(getMethodName(Thread.currentThread().getStackTrace()), traceName);
+	}
+	
+	@Override
+	public IImageStackTrace createImageStackTrace(String traceName) {
+		return (IImageStackTrace)call(getMethodName(Thread.currentThread().getStackTrace()), traceName);
 	}
 
 	@Override

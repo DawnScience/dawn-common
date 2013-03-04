@@ -49,9 +49,20 @@ public interface ITraceSystem {
 	 * @param traceName
 	 * @return
 	 */
-	public IStackTrace createStackTrace(String traceName);
+	public ILineStackTrace createLineStackTrace(String traceName);
 
-	
+	/**
+	 * Creates a stack trace used for 2D plotting. This does not add the trace
+	 * or give it any data.
+	 * 
+	 * A stack trace is a 3D set of images. Only one image is visible at a time
+	 * in the 2D plot.
+	 * 
+	 * @param traceName
+	 * @return
+	 */
+	public IImageStackTrace createImageStackTrace(String traceName);
+
 	/**
 	 * Adds and plots the trace.
 	 * @param trace

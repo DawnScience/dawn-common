@@ -7,7 +7,7 @@ import java.util.Collections;
 
 import org.dawb.common.ui.plot.IPlottingSystem;
 import org.dawb.common.ui.plot.trace.IImageTrace;
-import org.dawb.common.ui.plot.trace.IStackTrace;
+import org.dawb.common.ui.plot.trace.ILineStackTrace;
 import org.dawb.common.ui.plot.trace.ISurfaceTrace;
 import org.dawb.common.ui.plot.trace.ITrace;
 import org.dawb.common.ui.plot.trace.IWindowTrace;
@@ -209,9 +209,9 @@ public abstract class AbstractToolPage extends Page implements IToolPage, IAdapt
 		return trace instanceof ISurfaceTrace ? (ISurfaceTrace)trace : null;
 	}
 	
-	protected IStackTrace getStackTrace() {
+	protected ILineStackTrace getStackTrace() {
 		final ITrace trace = getTrace();
-		return trace instanceof IStackTrace ? (IStackTrace)trace : null;
+		return trace instanceof ILineStackTrace ? (ILineStackTrace)trace : null;
 	}
 	
 	protected IWindowTrace getWindowTrace() {
