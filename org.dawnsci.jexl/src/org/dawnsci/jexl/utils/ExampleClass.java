@@ -53,7 +53,7 @@ public class ExampleClass {
 		
 		//Use
 		ex = jexl.createExpression("cake = 50");
-		System.out.println(ex.evaluate(context));
+		ex.evaluate(context);
 		
 		//Use
 		ex = jexl.createExpression("cake + x");
@@ -72,7 +72,12 @@ public class ExampleClass {
 		System.out.println(ex.evaluate(context));
 		
 		//use arrays to call functions
-		ex = jexl.createExpression("rd:rand([2,10])");
+		ex = jexl.createExpression("var image");
+		ex.evaluate(context);
+		ex = jexl.createExpression("image = rd:rand([100,100])");
+		System.out.println(ex.evaluate(context));
+		
+		ex = jexl.createExpression("im:sobelFilter(image)");
 		System.out.println(ex.evaluate(context));
 		
 		//Then go crazy looping over lists
