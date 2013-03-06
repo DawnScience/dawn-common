@@ -9,51 +9,71 @@
  */ 
 package org.dawb.common.util;
 
+import java.util.HashMap;
 import java.util.Map;
 
-import org.nfunk.jep.JEP;
-import org.nfunk.jep.Node;
+import org.apache.commons.jexl2.Expression;
+import org.apache.commons.jexl2.JexlContext;
+import org.apache.commons.jexl2.JexlEngine;
+import org.apache.commons.jexl2.MapContext;
+import org.dawnsci.jexl.utils.JexlUtils;
+
 
 public class ExpressionEvaluatorImpl implements IExpressionEvaluator {
 
-	
-	private JEP  jepParser;
-	private Node node;
+	private JexlEngine jexl;
+	private String     expressionString;
+	private Expression expression;
 
 	@Override
 	public void setExpression(String expr) {
-		this.jepParser= new JEP();
-		jepParser.addStandardFunctions();
-		jepParser.addStandardConstants();
-		jepParser.setAllowUndeclared(true);
-		jepParser.setImplicitMul(true);
-		
-		this.node = jepParser.parseExpression(expr);
+		if (jexl==null) jexl = JexlUtils.getDawnJexlEngine();
+		this.expressionString = expr;
 	}
 
 	@Override
 	public double evaluate(Map<String, ?> vals) throws Exception {
 		
-		for (String key : vals.keySet()) {
-			Object value = vals.get(key);
-			if (value instanceof Number) {
-				jepParser.addVariable(key, ((Number)value).doubleValue());
-			} else if (value instanceof String){
+		if (!isValidSyntax()) throw new Exception("Expression '"+expressionString+"' is not valid!");
+		
+		Map<String, Object> parsedValues = new HashMap<String,Object>(vals.size());
+		for (String name : vals.keySet()) {
+			final Object value = vals.get(name);
+			try {
+				parsedValues.put(name, Long.parseLong(value.toString()));
+			} catch (Throwable ne) {
 				try {
-					value = Double.parseDouble((String)value);
-				} catch (Exception igonred) {
-					// Nothing
+					parsedValues.put(name, Double.parseDouble(value.toString()));
+					
+				} catch (Throwable neOther) {
+					parsedValues.put(name, value);
 				}
-				jepParser.addVariable(key, value);
 			}
 		}
-		final Object val = jepParser.evaluate(node);
-		return jepParser.getValue();
+		
+		JexlContext context = new MapContext();
+		for (String name : parsedValues.keySet()) {
+			context.set(name, parsedValues.get(name));
+		}
+		
+		final Object output = expression.evaluate(context);
+		if (output instanceof Number) {
+			return ((Number)expression.evaluate(context)).doubleValue();
+		} else if (output instanceof Boolean) {
+			return ((Boolean) output).booleanValue() ? 1.0 : 0.0;
+		}
+		return Double.NaN;
 	}
 
 	@Override
 	public boolean isValidSyntax() {
-		return node!=null;
+		if (expression!=null) return true;
+		try {
+			expression    = jexl.createExpression(expressionString);
+		}catch (Exception ne) {
+			return false;
+		}
+		return true;
 	}
 
 }
