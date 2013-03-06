@@ -2,6 +2,7 @@ package org.dawnsci.jexl.utils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.jexl2.Expression;
 import org.apache.commons.jexl2.JexlContext;
@@ -19,6 +20,15 @@ public class ExampleClass {
 		
 		//Get the Dawn engine which can do dataset operations
 		JexlEngine jexl = JexlUtils.getDawnJexlEngine();
+		
+		Map<String,Object> funcs = jexl.getFunctions();
+		
+		//print namespaces
+		for(String fun: funcs.keySet()) System.out.println(fun);
+		
+		//add custom functions
+		funcs.put("maffs", Math.class);
+		jexl.setFunctions(funcs);
 		
 		//Create some data (Datasets and lists)
 		DoubleDataset x = DoubleDataset.ones(10);
@@ -53,7 +63,7 @@ public class ExampleClass {
 		
 		//Use
 		ex = jexl.createExpression("cake = 50");
-		System.out.println(ex.evaluate(context));
+		ex.evaluate(context);
 		
 		//Use
 		ex = jexl.createExpression("cake + x");
@@ -72,7 +82,12 @@ public class ExampleClass {
 		System.out.println(ex.evaluate(context));
 		
 		//use arrays to call functions
-		ex = jexl.createExpression("rd:rand([2,10])");
+		ex = jexl.createExpression("var image");
+		ex.evaluate(context);
+		ex = jexl.createExpression("image = rd:rand([100,100])");
+		System.out.println(ex.evaluate(context));
+		
+		ex = jexl.createExpression("im:sobelFilter(image)");
 		System.out.println(ex.evaluate(context));
 		
 		//Then go crazy looping over lists
