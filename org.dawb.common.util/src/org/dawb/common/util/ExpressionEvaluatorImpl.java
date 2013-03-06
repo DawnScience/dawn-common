@@ -16,7 +16,6 @@ import org.apache.commons.jexl2.Expression;
 import org.apache.commons.jexl2.JexlContext;
 import org.apache.commons.jexl2.JexlEngine;
 import org.apache.commons.jexl2.MapContext;
-import org.dawnsci.jexl.utils.JexlUtils;
 
 
 public class ExpressionEvaluatorImpl implements IExpressionEvaluator {
@@ -27,7 +26,7 @@ public class ExpressionEvaluatorImpl implements IExpressionEvaluator {
 
 	@Override
 	public void setExpression(String expr) {
-		if (jexl==null) jexl = JexlUtils.getDawnJexlEngine();
+		if (jexl==null) jexl = new JexlEngine();
 		this.expressionString = expr;
 	}
 
