@@ -5,11 +5,10 @@ import java.util.Map;
 
 import org.apache.commons.jexl2.JexlEngine;
 import org.dawnsci.jexl.internal.DatasetArithmetic;
-
-import uk.ac.diamond.scisoft.analysis.dataset.DoubleDataset;
+import org.dawnsci.jexl.internal.JexlGeneralFunctions;
+import uk.ac.diamond.scisoft.analysis.dataset.FFT;
 import uk.ac.diamond.scisoft.analysis.dataset.Image;
 import uk.ac.diamond.scisoft.analysis.dataset.Maths;
-import uk.ac.diamond.scisoft.analysis.dataset.Random;
 
 /**
  * Utilities class for using the Jexl expression engine with AbstractDatasets
@@ -32,9 +31,9 @@ public class JexlUtils {
 		//Add some useful functions to the engine
 		Map<String,Object> funcs = new HashMap<String,Object>();
 		funcs.put("dnp", Maths.class);
-		funcs.put("rd", Random.class);
-		funcs.put("dd", DoubleDataset.class);
+		funcs.put("dat", JexlGeneralFunctions.class);
 		funcs.put("im", Image.class);
+		funcs.put("fft", FFT.class);
 		jexl.setFunctions(funcs);
 		
 		return jexl;
