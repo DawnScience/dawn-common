@@ -6,13 +6,9 @@ import java.util.Map;
 import org.apache.commons.jexl2.JexlEngine;
 import org.dawnsci.jexl.internal.DatasetArithmetic;
 import org.dawnsci.jexl.internal.JexlGeneralFunctions;
-
-import uk.ac.diamond.scisoft.analysis.dataset.DoubleDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.FFT;
 import uk.ac.diamond.scisoft.analysis.dataset.Image;
 import uk.ac.diamond.scisoft.analysis.dataset.Maths;
-import uk.ac.diamond.scisoft.analysis.dataset.Random;
-import uk.ac.diamond.scisoft.analysis.dataset.Stats;
 
 /**
  * Utilities class for using the Jexl expression engine with AbstractDatasets
