@@ -40,7 +40,7 @@ public interface IPlottingSystemData {
 	 * @param monitor
 	 * @return
 	 */
-	public AbstractDataset getExpressionSet(String expressionName, final IMonitor monitor);
+	public AbstractDataset getVariableValue(String expressionName, final IMonitor monitor);
 
 
 	/**
@@ -52,12 +52,12 @@ public interface IPlottingSystemData {
 	public boolean isDataSetName(String name, IMonitor monitor);
 
 	/**
-	 * Test if data set name or expression name.
+	 * Test if variable name can be resoloved.
 	 * @param name
 	 * @param monitor
 	 * @return
 	 */
-	public boolean isExpressionSetName(String name, IMonitor monitor);
+	public boolean isVariableName(String name, IMonitor monitor);
 
 	/**
 	 * May return null, if data not plotting
