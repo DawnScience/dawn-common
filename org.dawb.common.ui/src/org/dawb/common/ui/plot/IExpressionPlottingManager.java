@@ -14,7 +14,7 @@ import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
 
-public interface IPlottingSystemData {
+public interface IExpressionPlottingManager {
 
 	/**
 	 * A data set which can be used without loading the data
@@ -66,7 +66,7 @@ public interface IPlottingSystemData {
 	public AbstractPlottingSystem getPlottingSystem();
 
 	/**
-	 * Delete selected 
+	 * Delete selected expression, if any
 	 */
 	public void deleteExpression();
 
