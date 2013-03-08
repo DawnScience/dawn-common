@@ -17,6 +17,7 @@ import org.dawb.common.services.ImageServiceBean.ImageOrigin;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.PaletteData;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.services.AbstractServiceFactory;
@@ -314,15 +315,18 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 		// less than the min cut and the NaN number. For these we use special pixel
 		// values in the palette as defined by the cut bound if it is set.
 		if (bean.getMinimumCutBound()!=null && bean.getMinimumCutBound().getColor()!=null) {
-			bean.getPalette().colors[MIN_PIX_INDEX] = bean.getMinimumCutBound().getColor();
+			int[] ia = bean.getMinimumCutBound().getColor();
+			bean.getPalette().colors[MIN_PIX_INDEX] = new RGB(ia[0], ia[1], ia[2]);
 		}
 		
 		if (bean.getNanBound()!=null && bean.getNanBound().getColor()!=null) {
-			bean.getPalette().colors[NAN_PIX_INDEX] = bean.getNanBound().getColor();
+			int[] ia = bean.getNanBound().getColor();
+			bean.getPalette().colors[NAN_PIX_INDEX] = new RGB(ia[0], ia[1], ia[2]);
 		}
 		
 		if (bean.getMaximumCutBound()!=null && bean.getMaximumCutBound().getColor()!=null) {
-			bean.getPalette().colors[MAX_PIX_INDEX] = bean.getMaximumCutBound().getColor();
+			int[] ia = bean.getMaximumCutBound().getColor();
+			bean.getPalette().colors[MAX_PIX_INDEX] = new RGB(ia[0], ia[1], ia[2]);
 		}
 		
 	}

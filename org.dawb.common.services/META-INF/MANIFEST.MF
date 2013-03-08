@@ -7,12 +7,8 @@ Bundle-Activator: org.dawb.common.services.Activator
 Bundle-Vendor: Diamond Light Source
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui;bundle-version="3.7.0",
- uk.ac.diamond.scisoft.analysis
+ uk.ac.diamond.scisoft.analysis,
+ org.dawb.workbench.jmx;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Export-Package: org.dawb.common.services
-Import-Package: org.dawb.workbench.jmx,
- org.eclipse.draw2d,
- org.eclipse.swt.graphics,
- uk.ac.diamond.scisoft.analysis.dataset,
- uk.ac.diamond.scisoft.analysis.io

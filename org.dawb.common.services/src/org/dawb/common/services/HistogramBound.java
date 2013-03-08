@@ -16,8 +16,8 @@
 
 package org.dawb.common.services;
 
-import org.eclipse.draw2d.ColorConstants;
-import org.eclipse.swt.graphics.RGB;
+import java.util.Arrays;
+
 /**
  * Immutable HistogramBound class. Keep immutable so that static
  * bound defaults cannot be modified.
@@ -33,13 +33,13 @@ public final class HistogramBound {
 		 * DO NOT USE Display.getDefault().getSystemColor(..) here! This causes things to break because
 		 * Display.getDefault() may be null at the point where statics are initiated.
 		 */
-		DEFAULT_MAXIMUM = new HistogramBound(Double.POSITIVE_INFINITY, ColorConstants.red.getRGB());
-		DEFAULT_MINIMUM = new HistogramBound(Double.NEGATIVE_INFINITY, ColorConstants.blue.getRGB());
-		DEFAULT_NAN     = new HistogramBound(Double.NaN,               ColorConstants.green.getRGB());
+		DEFAULT_MAXIMUM = new HistogramBound(Double.POSITIVE_INFINITY, 255, 0, 0);
+		DEFAULT_MINIMUM = new HistogramBound(Double.NEGATIVE_INFINITY, 0, 0, 255);
+		DEFAULT_NAN     = new HistogramBound(Double.NaN,               0,255,0);
 	}
 	
 	protected Number bound;
-	protected RGB  color;
+	protected int[]  color;
 	
 	/**
 	 * RGB may be null. If it is the last three colours in the palette
@@ -49,14 +49,14 @@ public final class HistogramBound {
 	 * @param bound
 	 * @param color
 	 */
-	public HistogramBound(Number bound, RGB color) {
+	public HistogramBound(Number bound, int... color) {
 		this.bound = bound;
 		this.color = color;
 	}
 	public Number getBound() {
 		return bound;
 	}
-	public RGB getColor() {
+	public int[] getColor() {
 		return color;
 	}
 	@Override
@@ -94,11 +94,7 @@ public final class HistogramBound {
 		buf.append(bound);
 		buf.append(",");
 		if (color!=null) {
-			buf.append(color.red);
-			buf.append(",");
-			buf.append(color.green);
-			buf.append(",");
-			buf.append(color.blue);
+			buf.append(Arrays.toString(getColor()));
 			
 		} else{
 			buf.append("null");
@@ -121,11 +117,11 @@ public final class HistogramBound {
 			bound = Double.parseDouble(sa[0]);
 		}
 		
-		RGB color = null;
+		int[] color = null;
 		if (sa[1].equals("null")) {
 			color = null;
 		} else {
-			color = new RGB(Integer.parseInt(sa[1]), Integer.parseInt(sa[2]), Integer.parseInt(sa[3]));
+			color = new int[]{Integer.parseInt(sa[1]), Integer.parseInt(sa[2]), Integer.parseInt(sa[3])};
 		}
 		return new HistogramBound(bound, color);
 	}
