@@ -9,7 +9,6 @@
  */ 
 package org.dawb.common.services;
 
-import org.dawb.workbench.jmx.IRemoteWorkbenchPart;
 
 public interface IUserInputService {
 
@@ -19,9 +18,9 @@ public interface IUserInputService {
 	 * 
 	 * @param partName
 	 * @param isDialog
-	 * @return
+	 * @return a IRemoteWorkbenchPart
 	 */
-	public IRemoteWorkbenchPart openUserInputPart(final String partName, final boolean isDialog)  throws Exception;
+	public Object openUserInputPart(final String partName, final boolean isDialog)  throws Exception;
 
 	/**
 	 * Call to get a RemoteWorkbenchPart for editing the plot. The RemoteWorkbenchPart must have
@@ -30,9 +29,9 @@ public interface IUserInputService {
 	 * 
 	 * @param partName
 	 * @param dialog
-	 * @return
+	 * @return IRemoteWorkbenchPart
 	 */
-	public IRemoteWorkbenchPart openUserPlotPart(String partName, boolean dialog) throws Exception;
+	public Object openUserPlotPart(String partName, boolean dialog) throws Exception;
 
 	/**
 	 * Sends debug information to the Value view or a similar part for inspecting data.
@@ -41,7 +40,7 @@ public interface IUserInputService {
 	 * 
 	 * @param partName
 	 * @param dialog - should be false currently, debugging is done in the Value view.
-	 * @return
+	 * @return IRemoteWorkbenchPart
 	 */
-	public IRemoteWorkbenchPart openDebugPart(String partName, boolean dialog) throws Exception;
+	public Object openDebugPart(String partName, boolean dialog) throws Exception;
 }

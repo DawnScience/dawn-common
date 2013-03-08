@@ -1,3 +1,5 @@
+Dependency-Note: There should be few or no dependencies on this plugin
+ as it can be used almost anywhere. The services are ofen eclipse based therefore this is an allowed dependency.
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Services
@@ -7,8 +9,7 @@ Bundle-Activator: org.dawb.common.services.Activator
 Bundle-Vendor: Diamond Light Source
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui;bundle-version="3.7.0",
- uk.ac.diamond.scisoft.analysis,
- org.dawb.workbench.jmx;bundle-version="1.0.0"
+ uk.ac.diamond.scisoft.analysis
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Export-Package: org.dawb.common.services
