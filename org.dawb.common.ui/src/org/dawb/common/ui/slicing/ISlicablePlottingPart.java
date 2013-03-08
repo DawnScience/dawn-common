@@ -15,5 +15,5 @@ import org.dawb.common.ui.plot.IExpressionPlottingManager;
 public interface ISlicablePlottingPart {
 
 	public IExpressionPlottingManager getDataSetComponent();
-	public SliceComponent      getSliceComponent();
+	public SliceComponent             getSliceComponent();
 }

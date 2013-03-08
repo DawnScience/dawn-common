@@ -10,11 +10,18 @@
 package org.dawb.common.ui.plot;
 
 
+import org.dawb.common.services.IVariableManager;
+
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
 
-public interface IExpressionPlottingManager {
+/**
+ * An interface used to specify how expressions are evaluated
+ * @author fcp94556
+ *
+ */
+public interface IExpressionPlottingManager extends IVariableManager{
 
 	/**
 	 * A data set which can be used without loading the data
@@ -32,16 +39,6 @@ public interface IExpressionPlottingManager {
 	 */
 	public AbstractDataset getDataSet(final String name, final IMonitor monitor);
 
-	/**
-	 * The same as getDataSet(...) however the expressionName has been
-	 * parsed to be a legal expression variable.
-	 * 
-	 * @param expressionName
-	 * @param monitor
-	 * @return
-	 */
-	public AbstractDataset getVariableValue(String expressionName, final IMonitor monitor);
-
 
 	/**
 	 * Test if data set name.
@@ -52,18 +49,10 @@ public interface IExpressionPlottingManager {
 	public boolean isDataSetName(String name, IMonitor monitor);
 
 	/**
-	 * Test if variable name can be resoloved.
-	 * @param name
-	 * @param monitor
-	 * @return
-	 */
-	public boolean isVariableName(String name, IMonitor monitor);
-
-	/**
 	 * May return null, if data not plotting
 	 * @return
 	 */
-	public AbstractPlottingSystem getPlottingSystem();
+	public IPlottingSystem getPlottingSystem();
 
 	/**
 	 * Delete selected expression, if any
