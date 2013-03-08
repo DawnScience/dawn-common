@@ -26,6 +26,7 @@ import org.dawb.common.ui.slicing.ISliceReceiver;
 import org.dawb.common.ui.slicing.SliceComponent;
 import org.dawb.common.ui.util.EclipseUtils;
 import org.dawb.common.util.object.ObjectUtils;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -305,7 +306,8 @@ public class H5GalleryView extends ViewPart implements MouseListener, SelectionL
 			if (items.length<=1) return;
 			
 			List<AbstractDataset> ys = getSlices(items);
-			final IPlottingSystem system = prov.getDataSetComponent().getPlottingSystem();
+			final IAdaptable      adaptable = (IAdaptable)prov.getDataSetComponent();
+			final IPlottingSystem system    = (IPlottingSystem)adaptable.getAdapter(IPlottingSystem.class);
 			system.clear();
 
 			if (ys.get(0).getShape().length==1) {

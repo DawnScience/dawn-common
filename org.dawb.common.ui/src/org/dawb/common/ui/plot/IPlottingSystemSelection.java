@@ -12,7 +12,7 @@ package org.dawb.common.ui.plot;
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 
 public interface IPlottingSystemSelection {
-
+	
 	/**
 	 * Select some data and return it for future use.
 	 * @param name

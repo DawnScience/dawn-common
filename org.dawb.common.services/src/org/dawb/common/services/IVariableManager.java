@@ -45,4 +45,17 @@ public interface IVariableManager {
 	 */
 	public AbstractDataset getVariableValue(String expressionName, final IMonitor monitor);
 
+	
+	/**
+	 * Delete selected expression, if any
+	 */
+	public void deleteExpression();
+
+
+	/**
+	 * Create a plottable dataset from an expression.
+	 * Normally is implemented to add an item to a table and make it editable to recieve the expression.
+	 */
+	public void addExpression();
+
 }

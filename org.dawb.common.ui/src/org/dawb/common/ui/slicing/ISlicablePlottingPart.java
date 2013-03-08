@@ -10,10 +10,10 @@
 
 package org.dawb.common.ui.slicing;
 
-import org.dawb.common.ui.plot.IExpressionPlottingManager;
+import org.dawb.common.services.IVariableManager;
 
 public interface ISlicablePlottingPart {
 
-	public IExpressionPlottingManager getDataSetComponent();
-	public SliceComponent             getSliceComponent();
+	public IVariableManager getDataSetComponent();
+	public SliceComponent   getSliceComponent();
 }
