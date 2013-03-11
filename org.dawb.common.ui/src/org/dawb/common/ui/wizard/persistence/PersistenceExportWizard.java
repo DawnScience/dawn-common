@@ -185,15 +185,18 @@ public class PersistenceExportWizard extends AbstractPerstenceWizard implements 
 						 final IMonitor mon = new ProgressMonitorWrapper(monitor);
 
 						 // Save things.
-						 ITrace trace  = system.getTraces().iterator().next();
 						 if (options.is("Original Data")) {
-							 file.setData(trace.getData());
-							 if (trace instanceof IImageTrace) {
-								 final List<AbstractDataset> axes = ((IImageTrace)trace).getAxes();
-								 if (axes!=null) file.setAxes(axes);
+							 Collection<ITrace> traces  = system.getTraces();
+							 for (ITrace trace : traces) {
+								 file.setData(trace.getData());
+								 if (trace instanceof IImageTrace) {
+									 final List<AbstractDataset> axes = ((IImageTrace)trace).getAxes();
+									 if (axes!=null) file.setAxes(axes);
+								 }
 							 }
 						 }
 						 
+						 final ITrace trace = system.getTraces().iterator().next();
 						 if (options.is("Mask") && trace instanceof IImageTrace) {
 							 IImageTrace image = (IImageTrace)trace;
 							 final String name = options.getString("Mask");
