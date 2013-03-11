@@ -24,6 +24,8 @@ import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
  * An interface used to provide a connection with the other expressions
  * For instance is a given string is a defined variable name in the current 
  * context.
+ * 
+ * TODO is this similar to a JEXL context? - maybe it is not needed
  */
 public interface IVariableManager {
 
@@ -36,14 +38,14 @@ public interface IVariableManager {
 	public boolean isVariableName(String name, IMonitor monitor);
 
 	/**
-	 * The same as getDataSet(...) however the expressionName has been
+	 * The  has been
 	 * parsed to be a legal expression variable.
 	 * 
-	 * @param expressionName
+	 * @param name
 	 * @param monitor
 	 * @return
 	 */
-	public AbstractDataset getVariableValue(String expressionName, final IMonitor monitor);
+	public AbstractDataset getVariableValue(String name, final IMonitor monitor);
 
 	
 	/**
