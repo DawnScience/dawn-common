@@ -17,6 +17,7 @@
 package org.dawb.common.services;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
 
 
@@ -28,6 +29,7 @@ import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
  * TODO is this similar to a JEXL context? - maybe it is not needed
  */
 public interface IVariableManager {
+	
 
 	/**
 	 * Test if variable name can be resolved.
@@ -47,7 +49,14 @@ public interface IVariableManager {
 	 */
 	public AbstractDataset getVariableValue(String name, final IMonitor monitor);
 
-	
+	/**
+	 * Tries to get the lazy dataset for the name
+	 * @param name
+	 * @param monitor
+	 * @return
+	 */
+	public ILazyDataset getLazyValue(String name, final IMonitor monitor);
+
 	/**
 	 * Delete selected expression, if any
 	 */

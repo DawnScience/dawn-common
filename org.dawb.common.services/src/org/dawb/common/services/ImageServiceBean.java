@@ -23,6 +23,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.graphics.PaletteData;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.Maths;
 
 /**
@@ -38,8 +39,8 @@ public class ImageServiceBean {
 	private HistogramBound  maximumCutBound = HistogramBound.DEFAULT_MAXIMUM;
 	private HistogramBound  minimumCutBound = HistogramBound.DEFAULT_MINIMUM;
 	private HistogramBound  nanBound        = HistogramBound.DEFAULT_NAN;
-	private AbstractDataset image;
-	private AbstractDataset mask;
+	private IDataset        image;
+	private IDataset        mask;
 	private PaletteData     palette;
 	private ImageOrigin     origin;
 	private Number          min;
@@ -107,7 +108,7 @@ public class ImageServiceBean {
 	 * @return the original downsampled data. If log scale the 
 	 * image will be shifted.
 	 */
-	public AbstractDataset getImage() {
+	public IDataset getImage() {
 		if (logColorScale) {
 			AbstractDataset result = Maths.subtract(image, logOffset);
 			result = Maths.log10(result);
@@ -115,7 +116,7 @@ public class ImageServiceBean {
 		}
 		return image;
 	}
-	public void setImage(AbstractDataset image) {
+	public void setImage(IDataset image) {
 		this.image = image;
 	}
 	public PaletteData getPalette() {
@@ -307,7 +308,7 @@ public class ImageServiceBean {
 	 * The mask is false to mask and true to do nothing
 	 * @return
 	 */
-	public AbstractDataset getMask() {
+	public IDataset getMask() {
 		return mask;
 	}
 	

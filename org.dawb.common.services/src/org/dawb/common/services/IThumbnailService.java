@@ -14,6 +14,7 @@ import java.io.File;
 import org.eclipse.swt.graphics.Image;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 
 /**
  * A service for getting thumnails from datasets as images and for
@@ -40,14 +41,14 @@ public interface IThumbnailService extends IFileIconService{
 	 * @param size
 	 * @return
 	 */
-	public AbstractDataset getThumbnail(AbstractDataset set, int size);
+	public AbstractDataset getThumbnail(IDataset set, int size);
 
 	/**
 	 * Create an image from an AbstractDataset
 	 * @param thumb - must be 2D set
 	 * @return
 	 */
-	public Image createImage(AbstractDataset thumb) throws Exception;
+	public Image createImage(IDataset thumb) throws Exception;
 	
 	/**
 	 * Main method for thumbnails, deals with 1D and 2D set thumbnails.
@@ -55,6 +56,6 @@ public interface IThumbnailService extends IFileIconService{
 	 * @param size
 	 * @return
 	 */
-	public Image getThumbnailImage(AbstractDataset set, int size) throws Exception;
+	public Image getThumbnailImage(IDataset set, int size) throws Exception;
 	
 }

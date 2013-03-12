@@ -17,6 +17,7 @@
 package org.dawb.common.services;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
 
 /**
@@ -47,23 +48,25 @@ public interface IExpressionObject {
 
 	/**
 	 * Evaluates and caches the expression if necessary.
+	 * @param suggestedName may be null
+	 * @param monitor
 	 * @return the evaluated value of the expression.
+	 * @throws Exception
 	 */
-	public AbstractDataset getDataSet(IMonitor monitor) throws Exception;
+	public AbstractDataset getDataSet(String suggestedName, IMonitor monitor) throws Exception;
 
 	/**
+	 * Guesses the data without evaluating the expression, instead looks for
+	 * a reference to a concrete data set and uses the attributes (shape etc)
+	 * of this.
 	 * 
-	 * @param stub
-	 * @return
+	 * *WARNING* Is educated guess at lazy dataset, will not always work.
+	 * 
+	 * @param suggestedName should not be null, should be the data name or the variable name for expressions.
+	 * @param monitor
+	 * @return null if the guess cannot be made or there was any kind of error.
 	 */
-	public String getShape(IMonitor monitor);
-
-	/**
-	 * Get the total size of the data
-	 * @param stub
-	 * @return
-	 */
-	public int getSize(IMonitor monitor);
+	public ILazyDataset getLazyDataSet(String suggestedName, IMonitor monitor);
 
 	/**
 	 * 
