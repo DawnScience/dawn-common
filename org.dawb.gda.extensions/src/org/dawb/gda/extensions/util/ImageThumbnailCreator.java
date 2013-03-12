@@ -56,6 +56,7 @@ import org.eclipse.ui.services.AbstractServiceFactory;
 import org.eclipse.ui.services.IServiceLocator;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.RGBDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.Stats;
 import uk.ac.diamond.scisoft.analysis.dataset.function.Downsample;
@@ -132,7 +133,7 @@ public class ImageThumbnailCreator extends AbstractServiceFactory implements ITh
 		return thumb;
 	}
 
-	public AbstractDataset getThumbnail(final AbstractDataset ds, int size) {
+	public AbstractDataset getThumbnail(final IDataset ds, int size) {
 
 		if (ds!=null && ds.getRank() == 2) { // 2D datasets only!!!
 			int width = ds.getShape()[1];
@@ -157,7 +158,7 @@ public class ImageThumbnailCreator extends AbstractServiceFactory implements ITh
 	 * @return
 	 * @throws Exception 
 	 */
-	public Image createImageSWT(final AbstractDataset thumbnail) throws Exception {
+	public Image createImageSWT(final IDataset thumbnail) throws Exception {
         
 		final ScopedPreferenceStore store = new ScopedPreferenceStore(InstanceScope.INSTANCE, "org.dawnsci.plotting");
 		final ImageServiceBean bean = new ImageServiceBean();
@@ -225,12 +226,12 @@ public class ImageThumbnailCreator extends AbstractServiceFactory implements ITh
 	}
 
 	@Override
-	public Image createImage(AbstractDataset thumb) throws Exception {
+	public Image createImage(IDataset thumb) throws Exception {
 		return createImageSWT(thumb);
 	}
 
 	@Override
-	public Image getThumbnailImage(final AbstractDataset set, final int size) throws Exception {
+	public Image getThumbnailImage(final IDataset set, final int size) throws Exception {
 		
 		if (set.getShape().length==2) {
 			final AbstractDataset thumb = getThumbnail(set, size);
@@ -254,7 +255,7 @@ public class ImageThumbnailCreator extends AbstractServiceFactory implements ITh
 					
 					// TODO set no title?
 					
-					system.createPlot1D(null, Arrays.asList(set), new NullProgressMonitor());
+					system.createPlot1D(null, Arrays.asList((AbstractDataset)set), new NullProgressMonitor());
 					
 		            final Image unscaled = system.getImage(new Rectangle(0, 0, 300, 300));
 		            scaled[0]   = new Image(display, unscaled.getImageData().scaledTo(size, size));

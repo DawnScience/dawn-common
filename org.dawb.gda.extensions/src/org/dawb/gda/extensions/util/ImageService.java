@@ -101,7 +101,7 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 	 */
 	public ImageData getImageData(ImageServiceBean bean) {
 		
-		AbstractDataset image    = bean.getImage();
+		AbstractDataset image    = (AbstractDataset)bean.getImage();
 		final ImageOrigin     origin   = bean.getOrigin();
 		PaletteData     palette  = bean.getPalette();
 		
@@ -175,7 +175,7 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 		if (bean.isCancelled()) return null;
 		
 		BooleanDataset mask = bean.getMask()!=null
-				            ? (BooleanDataset)DatasetUtils.cast(bean.getMask(), AbstractDataset.BOOL)
+				            ? (BooleanDataset)DatasetUtils.cast((AbstractDataset)bean.getMask(), AbstractDataset.BOOL)
 				            : null;
 				            
  		ImageData imageData = null;
@@ -394,7 +394,7 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 	 */
 	public float[] getFastStatistics(ImageServiceBean bean) {
 		
-		final AbstractDataset image    = bean.getImage();
+		final AbstractDataset image    = (AbstractDataset)bean.getImage();
 		float min = Float.MAX_VALUE;
 		float max = -Float.MAX_VALUE;
 		float sum = 0.0f;
@@ -405,7 +405,7 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 		int posSize = 0;
 		
 		BooleanDataset mask = bean.getMask()!=null
-	                        ? (BooleanDataset)DatasetUtils.cast(bean.getMask(), AbstractDataset.BOOL)
+	                        ? (BooleanDataset)DatasetUtils.cast((AbstractDataset)bean.getMask(), AbstractDataset.BOOL)
 	                        : null;
 
 	    // Big loop warning:

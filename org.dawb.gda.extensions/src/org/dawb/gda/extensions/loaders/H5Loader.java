@@ -34,12 +34,11 @@ import uk.ac.diamond.scisoft.analysis.io.DataHolder;
 import uk.ac.diamond.scisoft.analysis.io.IDataSetLoader;
 import uk.ac.diamond.scisoft.analysis.io.IMetaData;
 import uk.ac.diamond.scisoft.analysis.io.IMetaLoader;
-import uk.ac.diamond.scisoft.analysis.io.ISliceLoader;
 import uk.ac.diamond.scisoft.analysis.io.MetaDataAdapter;
 import uk.ac.diamond.scisoft.analysis.io.SliceObject;
 import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
 
-public class H5Loader extends AbstractFileLoader implements IMetaLoader, IDataSetLoader, ISliceLoader {
+public class H5Loader extends AbstractFileLoader implements IMetaLoader, IDataSetLoader {
 
 	private final static List<String> EXT;
 	static {
@@ -106,8 +105,7 @@ public class H5Loader extends AbstractFileLoader implements IMetaLoader, IDataSe
 		}
 	}
 
-	@Override
-	public synchronized AbstractDataset slice(SliceObject bean, IMonitor mon) throws Exception {
+	protected synchronized AbstractDataset slice(SliceObject bean, IMonitor mon) throws Exception {
 		IHierarchicalDataFile file = null;
 		try {
 			file = HierarchicalDataFactory.getReader(bean.getPath());
