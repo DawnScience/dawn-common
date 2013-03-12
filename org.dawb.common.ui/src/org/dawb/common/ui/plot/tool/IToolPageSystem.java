@@ -97,4 +97,13 @@ public interface IToolPageSystem {
 	 */
 	public void setToolComposite(Composite composite);
 
+	/**
+	 * 
+	 * @param toolId
+	 * @param role
+	 * @param viewId
+	 * @return
+	 * @throws Exception
+	 */
+	public boolean setToolVisible(final String toolId, final ToolPageRole role, final String viewId) throws Exception;
 }

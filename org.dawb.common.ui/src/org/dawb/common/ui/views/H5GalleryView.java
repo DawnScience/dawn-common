@@ -69,7 +69,9 @@ import org.slf4j.LoggerFactory;
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.DatasetUtils;
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.Maths;
+import uk.ac.diamond.scisoft.analysis.io.DataHolder;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 import uk.ac.diamond.scisoft.analysis.io.SliceObject;
 
@@ -329,9 +331,9 @@ public class H5GalleryView extends ViewPart implements MouseListener, SelectionL
 			ii.setIndex(item.getItemCount());
 			ii.setItem(item);
             try {
-            	AbstractDataset slice = getSlice(ii);
+            	IDataset slice = getSlice(ii);
             	slice.setName("Slice "+item.getItemCount());
-				ys.add(slice);
+				ys.add((AbstractDataset)slice);
 			} catch (Exception e) {
 				logger.error("Cannot slice ", e);
 				continue;
@@ -383,7 +385,7 @@ public class H5GalleryView extends ViewPart implements MouseListener, SelectionL
 	                   	if (ii.getIndex()<0)    return;
 	                   	if (ii.getItem().isDisposed()) continue;
 	                   	
-	                   	final AbstractDataset set = getSlice(ii);
+	                   	final IDataset set = getSlice(ii);
 	                   	if (set==null) continue;
 	            		
 	            		// Generate thumbnail
@@ -414,23 +416,26 @@ public class H5GalleryView extends ViewPart implements MouseListener, SelectionL
 		imageThread.start();
 	}
 	
-	private AbstractDataset getSlice(final ImageItem ii) throws Exception {
+	private IDataset getSlice(final ImageItem ii) throws Exception {
 		// Do slice
 		final SliceObject slice = info.getSlice();
-		slice.setSliceStart(getSliceStart(ii.getIndex()));
-		slice.setSliceStop(getSliceStop(ii.getIndex()));
-		slice.setSliceStep(getSliceStep(ii.getIndex()));
+		
+		final DataHolder   dh = LoaderFactory.getData(slice.getPath(), false, null);
+		final ILazyDataset ld = dh.getLazyDataset(slice.getName());
 
-		AbstractDataset set=null;
+		IDataset set=null;
 		try {
-			set   = LoaderFactory.getSlice(slice, null);
+			set = ld.getSlice(getSliceStart(ii.getIndex()), getSliceStop(ii.getIndex()), getSliceStep(ii.getIndex()));
 			if (set==null) return null;
+			if (set instanceof AbstractDataset) {
+				set = ((AbstractDataset)set).squeeze();
+			}
 		} catch (java.lang.IllegalArgumentException ne) {
 			// We do not want the thread to stop in this case.
 			logger.debug("Encountered invalid shape with "+slice);
 			return null;
 		}
-		set.setShape(slice.getSlicedShape());
+		set.setShape(set.getShape());
 
 		return set;
 	}

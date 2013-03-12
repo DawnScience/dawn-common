@@ -98,6 +98,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 import uk.ac.diamond.scisoft.analysis.io.SliceObject;
 import uk.ac.gda.richbeans.components.cell.CComboCellEditor;
 import uk.ac.gda.richbeans.components.cell.SpinnerCellEditorWithPlayButton;
@@ -119,6 +120,7 @@ public class SliceComponent {
 
 	private static final List<String> COLUMN_PROPERTIES = Arrays.asList(new String[]{"Dimension","Axis","Slice","Axis Data"});
 	
+	private ILazyDataset    lazySet; // The dataset that we are slicing.
 	private SliceObject     sliceObject;
 	private int[]           dataShape;
 	private AbstractPlottingSystem plottingSystem;
@@ -811,6 +813,7 @@ public class SliceComponent {
 
 	private ScaleCellEditor                 scaleEditor;
 	private SpinnerCellEditorWithPlayButton spinnerEditor;
+
 	
 	/**
 	 * A better way than this is to use the *EditingSupport* functionality 
@@ -1073,9 +1076,7 @@ public class SliceComponent {
 	 * 
 	 * This method is not thread safe, please call in the UI thread.
 	 */
-	public void setData(final String     name,
-				        final String     filePath,
-				        final int[]      dataShape) {
+	public void setData(final ILazyDataset lazySet, final String dataName, final String filePath) {
 		
 		if (Display.getDefault().getThread()!=Thread.currentThread()) {
 			throw new SWTError("Please call setData(...) in slice component from the UI thread only!");
@@ -1083,18 +1084,18 @@ public class SliceComponent {
 		sliceJob.cancel();
 		saveSettings();
 
+		this.lazySet = lazySet;
 		final SliceObject object = new SliceObject();
 		object.setPath(filePath);
-		object.setName(name);
+		object.setName(dataName);
 		setSliceObject(object);
-		setDataShape(dataShape);
+		setDataShape(lazySet.getShape());
 		
 		explain.setText("Create a slice of "+sliceObject.getName()+".\nIt has the shape "+Arrays.toString(dataShape));
 		if (viewer.getCellEditors()[2] instanceof SpinnerCellEditorWithPlayButton) {
 			((SpinnerCellEditorWithPlayButton)viewer.getCellEditors()[2]).setRangeDialogTitle("Range for slice in '"+sliceObject.getName()+"'");
 			((SpinnerCellEditorWithPlayButton)viewer.getCellEditors()[2]).setPlayButtonVisible(false);
 		}
-
 		
 		createDimsData();
 		updateAxesChoices();
@@ -1258,7 +1259,8 @@ public class SliceComponent {
 				monitor.worked(1);
 				if (monitor.isCanceled()) return Status.CANCEL_STATUS;
 			
-				SliceUtils.plotSlice(slice, 
+				SliceUtils.plotSlice(lazySet,
+						             slice, 
 						             dataShape, 
 						             plotType, 
 						             plottingSystem, 

@@ -35,7 +35,10 @@ import org.slf4j.LoggerFactory;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.DoubleDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.IntegerDataset;
+import uk.ac.diamond.scisoft.analysis.io.DataHolder;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 import uk.ac.diamond.scisoft.analysis.io.SliceObject;
 import uk.ac.gda.doe.DOEUtils;
@@ -238,7 +241,8 @@ public class SliceUtils {
 	 * @param monitor
 	 * @throws Exception
 	 */
-	public static void plotSlice(final SliceObject       currentSlice,
+	public static void plotSlice(final ILazyDataset      lazySet,
+			                     final SliceObject       currentSlice,
 			                     final int[]             dataShape,
 			                     final PlotType          type,
 			                     final AbstractPlottingSystem   plottingSystem,
@@ -249,7 +253,7 @@ public class SliceUtils {
 		if (monitor!=null&&monitor.isCanceled()) return;
 		
         currentSlice.setFullShape(dataShape);
-		final AbstractDataset slice = getSlice(currentSlice,monitor);
+		final AbstractDataset slice = getSlice(lazySet, currentSlice,monitor);
 		if (slice==null) return;
 		
 		// We sum the data in the dimensions that are not axes
@@ -421,11 +425,13 @@ public class SliceUtils {
 	}
 
 
-	public static AbstractDataset getSlice(final SliceObject       currentSlice,
+	public static AbstractDataset getSlice(final ILazyDataset      ld,
+			                               final SliceObject       currentSlice,
 			                               final IProgressMonitor  monitor) throws Exception {
 		
 		final int[] dataShape = currentSlice.getFullShape();
-		AbstractDataset slice = LoaderFactory.getSlice(currentSlice, new ProgressMonitorWrapper(monitor));
+		
+		AbstractDataset slice = (AbstractDataset)ld.getSlice(currentSlice.getSliceStart(), currentSlice.getSliceStop(), currentSlice.getSliceStep());
 		slice.setName("Slice of "+currentSlice.getName()+" "+currentSlice.getShapeMessage());
 		
 		if (currentSlice.isRange()) {
