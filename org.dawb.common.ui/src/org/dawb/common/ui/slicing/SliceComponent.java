@@ -577,7 +577,7 @@ public class SliceComponent {
 			return;
 		}
 		if (view instanceof ISliceReceiver) {
-			((ISliceReceiver)view).updateSlice(dataShape, cs);
+			((ISliceReceiver)view).updateSlice(lazySet, cs);
 		}
 		
 	}
@@ -588,7 +588,7 @@ public class SliceComponent {
 		
 		if (plottingSystem!=null) {
 			final File dataFile     = new File(sliceObject.getPath());
-			final File lastSettings = new File(DawbUtils.getDawnHome()+dataFile.getName()+sliceObject.getName()+".xml");
+			final File lastSettings = new File(DawbUtils.getDawnHome()+dataFile.getName()+getSafeFileName(sliceObject.getName())+".xml");
 			if (lastSettings.exists()) {
 				XMLDecoder decoder = null;
 				try {
@@ -1175,7 +1175,7 @@ public class SliceComponent {
 		if (sliceObject == null || isErrorCondition) return;
 		
 		final File dataFile     = new File(sliceObject.getPath());
-		final File lastSettings = new File(DawbUtils.getDawnHome()+dataFile.getName()+"."+sliceObject.getName()+".xml");
+		final File lastSettings = new File(DawbUtils.getDawnHome()+dataFile.getName()+"."+getSafeFileName(sliceObject.getName())+".xml");
 		if (!lastSettings.getParentFile().exists()) lastSettings.getParentFile().mkdirs();
 	
 		XMLEncoder encoder=null;
@@ -1194,6 +1194,10 @@ public class SliceComponent {
 		}
 	}
 	
+	private String getSafeFileName(String name) {
+		return name.replaceAll("[^a-zA-Z0-9_\\-]", "");
+	}
+
 	public void setSliceObject(SliceObject sliceObject) {
 		this.sliceObject = sliceObject;
 	}

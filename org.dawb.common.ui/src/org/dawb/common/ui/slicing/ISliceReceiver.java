@@ -9,6 +9,7 @@
  */ 
 package org.dawb.common.ui.slicing;
 
+import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 import uk.ac.diamond.scisoft.analysis.io.SliceObject;
 
 public interface ISliceReceiver {
@@ -20,5 +21,5 @@ public interface ISliceReceiver {
 	 * @param shape
 	 * @param slice
 	 */
-	public void updateSlice(final int[] shape, final SliceObject slice);
+	public void updateSlice(final ILazyDataset lazySet, final SliceObject slice);
 }

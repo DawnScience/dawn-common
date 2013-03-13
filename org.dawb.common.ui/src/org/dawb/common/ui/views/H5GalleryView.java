@@ -67,12 +67,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
-import uk.ac.diamond.scisoft.analysis.dataset.DatasetUtils;
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.Maths;
-import uk.ac.diamond.scisoft.analysis.io.DataHolder;
-import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 import uk.ac.diamond.scisoft.analysis.io.SliceObject;
 
 /**
@@ -88,12 +85,14 @@ public class H5GalleryView extends ViewPart implements MouseListener, SelectionL
     
 	private static Logger  logger = LoggerFactory.getLogger(H5GalleryView.class);
 	
+	private ILazyDataset             lazySet;
 	private Gallery                  gallery;
 	private GalleryItem              galleryGroup;
 	private BlockingDeque<ImageItem> queue;
 	private Thread                   imageThread;
 	private H5GalleryInfo            info;
 	private MenuAction               dimensionList;
+
 	
 	public H5GalleryView() {
 		this.queue = new LinkedBlockingDeque<ImageItem>(Integer.MAX_VALUE);
@@ -420,12 +419,9 @@ public class H5GalleryView extends ViewPart implements MouseListener, SelectionL
 		// Do slice
 		final SliceObject slice = info.getSlice();
 		
-		final DataHolder   dh = LoaderFactory.getData(slice.getPath(), false, null);
-		final ILazyDataset ld = dh.getLazyDataset(slice.getName());
-
 		IDataset set=null;
 		try {
-			set = ld.getSlice(getSliceStart(ii.getIndex()), getSliceStop(ii.getIndex()), getSliceStep(ii.getIndex()));
+			set = lazySet.getSlice(getSliceStart(ii.getIndex()), getSliceStop(ii.getIndex()), getSliceStep(ii.getIndex()));
 			if (set==null) return null;
 			if (set instanceof AbstractDataset) {
 				set = ((AbstractDataset)set).squeeze();
@@ -485,10 +481,11 @@ public class H5GalleryView extends ViewPart implements MouseListener, SelectionL
 	}
 
 	@Override
-	public void updateSlice(int[] shape, SliceObject slice) {
+	public void updateSlice(final ILazyDataset lazySet, final SliceObject slice) {
 
+		this.lazySet = lazySet;
 		final H5GalleryInfo info = new H5GalleryInfo();
-		info.setShape(shape);		
+		info.setShape(lazySet.getShape());		
 		info.setSlice(slice);
 		info.createDefaultSliceDimension();
 		createImageGallery(info);
