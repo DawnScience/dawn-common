@@ -6,39 +6,13 @@ Bundle-Version: 1.2.0.qualifier
 Bundle-Activator: org.dawb.hdf5.Activator
 Bundle-Vendor: ESRF
 Require-Bundle: org.eclipse.core.runtime,
- org.junit
+ org.junit,
+ ncsa.hdf;bundle-version="2.8.0";visibility:=reexport
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
-Bundle-NativeCode: lib/linux-x86/libjhdf.so; lib/linux-x86/libjhdf5.so;
- osname=Linux; processor=x86,
- lib/linux-x86_64/libjhdf.so; lib/linux-x86_64/libjhdf5.so;
- osname=Linux; processor=x86_64,
- lib/win32-x86/jhdf.dll; lib/win32-x86/jhdf5.dll;
- osname=Win32; processor=x86,
- lib/win32-x86_64/jhdf.dll; lib/win32-x86_64/jhdf5.dll;
- osname=Win32; processor=x86_64,
- lib/mac-x86/libjhdf.jnilib; lib/mac-x86/libjhdf5.jnilib;
- osname=macosx; osname=Mac OS X;  osname=MacOS; processor=x86,
- lib/mac-x86_64/libjhdf.jnilib; lib/mac-x86_64/libjhdf5.jnilib;
- osname=macosx; osname=Mac OS X;  osname=MacOS; processor=x86_64,
- *
-Bundle-ClassPath: fits.jar,
- netcdf.jar,
- .
-Export-Package: ncsa.hdf.hdf5lib,
- ncsa.hdf.hdf5lib.callbacks,
- ncsa.hdf.hdf5lib.exceptions,
- ncsa.hdf.hdf5lib.structs,
- ncsa.hdf.hdflib,
- ncsa.hdf.object,
- ncsa.hdf.object.fits,
- ncsa.hdf.object.h4,
- ncsa.hdf.object.h5,
- ncsa.hdf.view,
- nom.tam.fits,
- nom.tam.image,
- nom.tam.util,
- org.dawb.hdf5,
+Bundle-ClassPath: .
+Export-Package: org.dawb.hdf5,
  org.dawb.hdf5.nexus
 Import-Package: org.junit,
- org.junit.runner
+ org.junit.runner,
+ org.slf4j;version="1.5.6"
