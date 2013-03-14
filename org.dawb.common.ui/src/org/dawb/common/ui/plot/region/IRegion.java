@@ -24,6 +24,7 @@ import uk.ac.diamond.scisoft.analysis.roi.PolygonalROI;
 import uk.ac.diamond.scisoft.analysis.roi.PolylineROI;
 import uk.ac.diamond.scisoft.analysis.roi.ROIBase;
 import uk.ac.diamond.scisoft.analysis.roi.RectangularROI;
+import uk.ac.diamond.scisoft.analysis.roi.RingROI;
 import uk.ac.diamond.scisoft.analysis.roi.SectorROI;
 import uk.ac.diamond.scisoft.analysis.roi.XAxisBoxROI;
 import uk.ac.diamond.scisoft.analysis.roi.XAxisLineBoxROI;
@@ -182,7 +183,7 @@ public interface IRegion {
 		POINT("Point",             darkMagenta,               PointROI.class),
 		ELLIPSE("Ellipse",         ColorConstants.lightGreen, EllipticalROI.class),
 		ELLIPSEFIT("Ellipse fit",  ColorConstants.lightGreen, EllipticalFitROI.class),
-		RING("Ring",               darkYellow,                SectorROI.class),
+		RING("Ring",               darkYellow,                RingROI.class),
 		XAXIS("X-Axis",            ColorConstants.blue,       XAxisBoxROI.class),
 		YAXIS("Y-Axis",            ColorConstants.blue,       YAxisBoxROI.class),
 		XAXIS_LINE("X-Axis Line",  ColorConstants.blue,       XAxisLineBoxROI.class),
