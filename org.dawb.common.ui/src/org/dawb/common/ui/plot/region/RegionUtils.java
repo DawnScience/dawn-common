@@ -19,7 +19,10 @@ import uk.ac.diamond.scisoft.analysis.roi.PerimeterBoxROI;
 import uk.ac.diamond.scisoft.analysis.roi.PointROI;
 import uk.ac.diamond.scisoft.analysis.roi.ROIBase;
 import uk.ac.diamond.scisoft.analysis.roi.RectangularROI;
+import uk.ac.diamond.scisoft.analysis.roi.RingROI;
 import uk.ac.diamond.scisoft.analysis.roi.SectorROI;
+import uk.ac.diamond.scisoft.analysis.roi.XAxisBoxROI;
+import uk.ac.diamond.scisoft.analysis.roi.YAxisBoxROI;
 
 /**
  * Class containing utility methods for regions to avoid duplication 
@@ -107,14 +110,20 @@ public class RegionUtils {
 		} else if (roi instanceof RectangularROI) {
 			if (roi instanceof PerimeterBoxROI) {
 				type = RegionType.PERIMETERBOX;
-			
+			} else if (roi instanceof XAxisBoxROI){
+				type = RegionType.XAXIS;
+			} else if (roi instanceof YAxisBoxROI){
+				type = RegionType.YAXIS;
 			} else {
 				type = RegionType.BOX;
 			}
 		
 		} else if (roi instanceof SectorROI) {
-			type = RegionType.SECTOR;
-			
+			if(roi instanceof RingROI){
+				type = RegionType.RING;
+			} else {
+				type = RegionType.SECTOR;
+			}
 		} else if (roi instanceof CircularROI) {
 			type = RegionType.CIRCLE;
 			

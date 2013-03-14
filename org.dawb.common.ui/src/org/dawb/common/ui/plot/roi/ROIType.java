@@ -5,6 +5,9 @@ import uk.ac.diamond.scisoft.analysis.roi.EllipticalROI;
 import uk.ac.diamond.scisoft.analysis.roi.LinearROI;
 import uk.ac.diamond.scisoft.analysis.roi.PerimeterBoxROI;
 import uk.ac.diamond.scisoft.analysis.roi.PointROI;
+import uk.ac.diamond.scisoft.analysis.roi.RingROI;
+import uk.ac.diamond.scisoft.analysis.roi.XAxisBoxROI;
+import uk.ac.diamond.scisoft.analysis.roi.YAxisBoxROI;
 //import uk.ac.diamond.scisoft.analysis.roi.PolygonalROI;
 import uk.ac.diamond.scisoft.analysis.roi.ROIBase;
 import uk.ac.diamond.scisoft.analysis.roi.RectangularROI;
@@ -17,7 +20,10 @@ public enum ROIType {
 	POINT(PointROI.class),
 	RECTANGULAR(RectangularROI.class),
 	PERIMETERBOX(PerimeterBoxROI.class),
+	XAXIS(XAxisBoxROI.class),
+	YAXIS(YAxisBoxROI.class),
 	SECTOR(SectorROI.class),
+	RING(RingROI.class),
 	ELLIPICAL(EllipticalROI.class);
 	
 	private Class<? extends ROIBase> clazz;
