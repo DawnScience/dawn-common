@@ -102,24 +102,10 @@
         <property name="_location" class="ptolemy.kernel.util.Location" value="{604.0, 266.0}">
         </property>
     </entity>
-    <entity name="Region" class="org.dawb.passerelle.actors.roi.ROISource">
+    <entity name="Cut Region" class="org.dawb.passerelle.actors.dawn.RegionSelectActor">
         <property name="Receiver Q Capacity (-1)" class="ptolemy.data.expr.Parameter" value="-1">
         </property>
         <property name="Receiver Q warning size (-1)" class="ptolemy.data.expr.Parameter" value="-1">
-        </property>
-        <property name="Name" class="ptolemy.data.expr.StringParameter" value="roi">
-        </property>
-        <property name="Region" class="org.dawb.passerelle.common.parameter.roi.ROIParameter" value="rO0ABXNyADF1ay5hYy5kaWFtb25kLnNjaXNvZnQuYW5hbHlzaXMucm9pLlJlY3Rhbmd1bGFyUk9JyDWSwghFng0CAAVEAANhbmdEAARjYW5nWgAUY2xpcHBpbmdDb21wZW5zYXRpb25EAARzYW5nWwADbGVudAACW0R4cgAqdWsuYWMuZGlhbW9uZC5zY2lzb2Z0LmFuYWx5c2lzLnJvaS5ST0lCYXNld0nNgErWMDsCAAJaAARwbG90WwADc3B0cQB+AAF4cAB1cgACW0Q+powUq2NaHgIAAHhwAAAAAkB/QAAAAAAAQH9AAAAAAAAAAAAAAAAAAD/wAAAAAAAAAAAAAAAAAAAAdXEAfgAEAAAAAkB/QAAAAAAAQH9AAAAAAAA=">
-        </property>
-        <property name="_location" class="ptolemy.kernel.util.Location" value="{50.0, 98.0}">
-        </property>
-    </entity>
-    <entity name="Cut Region" class="org.dawb.passerelle.actors.dawn.RegionSelectActor">
-<display name="Cut Region"/>        <property name="Receiver Q Capacity (-1)" class="ptolemy.data.expr.Parameter" value="-1">
-        </property>
-        <property name="Receiver Q warning size (-1)" class="ptolemy.data.expr.Parameter" value="-1">
-        </property>
-        <property name="_icon" class="com.isencia.passerelle.actor.gui.EditorIcon">
         </property>
         <property name="Expression Mode" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="Evaluate on every data input">
         </property>
@@ -134,6 +120,22 @@
         <property name="roiName" class="ptolemy.data.expr.StringParameter" value="roi">
         </property>
         <property name="_location" class="ptolemy.kernel.util.Location" value="{354.0, 263.0}">
+        </property>
+    </entity>
+    <entity name="Region" class="org.dawb.passerelle.actors.roi.ROISource">
+        <property name="Receiver Q Capacity (-1)" class="ptolemy.data.expr.Parameter" value="-1">
+        </property>
+        <property name="Receiver Q warning size (-1)" class="ptolemy.data.expr.Parameter" value="-1">
+        </property>
+        <property name="_icon" class="com.isencia.passerelle.actor.gui.EditorIcon">
+        </property>
+        <property name="_break_point" class="ptolemy.data.expr.Parameter" value="false">
+        </property>
+        <property name="Name" class="ptolemy.data.expr.StringParameter" value="roi">
+        </property>
+        <property name="Region" class="org.dawb.passerelle.common.parameter.roi.ROIParameter" value="rO0ABXNyADF1ay5hYy5kaWFtb25kLnNjaXNvZnQuYW5hbHlzaXMucm9pLlJlY3Rhbmd1bGFyUk9JD9iUFOCNtbUCAAVEAANhbmdEAARjYW5nWgAUY2xpcHBpbmdDb21wZW5zYXRpb25EAARzYW5nWwADbGVudAACW0R4cgAqdWsuYWMuZGlhbW9uZC5zY2lzb2Z0LmFuYWx5c2lzLnJvaS5ST0lCYXNld0nNgErWMDsCAAJaAARwbG90WwADc3B0cQB+AAF4cAB1cgACW0Q+powUq2NaHgIAAHhwAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/wAAAAAAAAAAAAAAAAAAAAdXEAfgAEAAAAAkBywAAAAAAAQHLAAAAAAAA=">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{56.0, 99.0}">
         </property>
         <port name="requestFinish" class="com.isencia.passerelle.core.ControlPort">
             <property name="input"/>
@@ -159,12 +161,12 @@
             <property name="control" class="ptolemy.kernel.util.StringAttribute">
             </property>
         </port>
-        <port name="input" class="com.isencia.passerelle.core.Port">
-            <property name="input"/>
-            <property name="multiport"/>
-        </port>
         <port name="output" class="com.isencia.passerelle.core.Port">
             <property name="output"/>
+            <property name="multiport"/>
+        </port>
+        <port name="trigger" class="com.isencia.passerelle.core.Port">
+            <property name="input"/>
             <property name="multiport"/>
         </port>
     </entity>
@@ -176,15 +178,15 @@
         <property name="width" class="ptolemy.data.expr.Parameter" value="1">
         </property>
     </relation>
-    <relation name="_R_2" class="ptolemy.actor.TypedIORelation">
-        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
-        </property>
-    </relation>
     <relation name="_R_3" class="ptolemy.actor.TypedIORelation">
         <property name="width" class="ptolemy.data.expr.Parameter" value="1">
         </property>
     </relation>
     <relation name="_R_5" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <relation name="_R_2" class="ptolemy.actor.TypedIORelation">
         <property name="width" class="ptolemy.data.expr.Parameter" value="1">
         </property>
     </relation>
@@ -195,7 +197,7 @@
     <link port="Data Export.input" relation="_R_5"/>
     <link port="Data Export.output" relation="_R_4"/>
     <link port="Open File.input" relation="_R_4"/>
-    <link port="Region.output" relation="_R_2"/>
     <link port="Cut Region.input" relation="_R_3"/>
     <link port="Cut Region.output" relation="_R_5"/>
+    <link port="Region.output" relation="_R_2"/>
 </entity>
