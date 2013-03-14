@@ -249,8 +249,9 @@ public interface IRegion {
 		 * @return
 		 */
 		public static RegionType forROI(ROIBase roi) {
+			// All region types have their own ROIBase equivalent
 			for (RegionType t : values()) {
-				if (t.getROIClass().isInstance(roi)) return t;
+				if (t.getROIClass() == roi.getClass()) return t;
 			}
 			return null;
 		}
