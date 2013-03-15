@@ -12,7 +12,6 @@ import org.dawb.common.services.IPersistentFile;
 import org.dawb.common.services.ServiceManager;
 import org.dawb.common.ui.monitor.ProgressMonitorWrapper;
 import org.dawb.common.ui.plot.IPlottingSystem;
-import org.dawb.common.ui.plot.ThreadSafePlottingSystem;
 import org.dawb.common.ui.plot.region.IRegion;
 import org.dawb.common.ui.plot.trace.IImageTrace;
 import org.dawb.common.ui.plot.trace.ITrace;
@@ -22,6 +21,7 @@ import org.dawb.common.ui.wizard.NewFileChoosePage;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -33,6 +33,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IExportWizard;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPart;
@@ -119,9 +120,8 @@ public class PersistenceExportWizard extends AbstractPerstenceWizard implements 
     			if (pf!=null) pf.close();
     		}
 
-    		final IWorkbenchPart  part   = EclipseUtils.getPage().getActivePart();
-    		if (part!=null) {
-    			final IPlottingSystem system = (IPlottingSystem)part.getAdapter(IPlottingSystem.class);
+    		final IPlottingSystem  system   = getPlottingSystem();
+    		if (system!=null) {
     			if (system != null) {
     				ITrace trace  = system.getTraces().iterator().next();
     				if (trace!=null) {
@@ -144,11 +144,14 @@ public class PersistenceExportWizard extends AbstractPerstenceWizard implements 
     					}
     				}
     				
-    				final IFunctionService funcService = (IFunctionService)part.getAdapter(IFunctionService.class);
-    				
-    				if (funcService != null) {
-    					options.setOptionEnabled("Functions", true);
+    				final IWorkbenchPart   part   = EclipseUtils.getPage().getActivePart();
+    				if (part!=null) {
+    					final IFunctionService funcService = (IFunctionService)part.getAdapter(IFunctionService.class);
+    					if (funcService != null) {
+    						options.setOptionEnabled("Functions", true);
+    					}
     				}
+
     			}
     		}
     	}
@@ -168,7 +171,7 @@ public class PersistenceExportWizard extends AbstractPerstenceWizard implements 
 			 file   = fcp.createNewFile();
 			 			 
 			 final IWorkbenchPart  part   = EclipseUtils.getPage().getActivePart();
-			 final IPlottingSystem system = new ThreadSafePlottingSystem((IPlottingSystem)part.getAdapter(IPlottingSystem.class));
+			 final IPlottingSystem system = getPlottingSystem();
 			 final IFunctionService funcService = (IFunctionService)part.getAdapter(IFunctionService.class);
 
 			 final IFile finalFile = file;
@@ -268,6 +271,27 @@ public class PersistenceExportWizard extends AbstractPerstenceWizard implements 
 		 staticFileName    = fcp.getFileName();
 		 
 		 return true;
+	}
+
+	private IPlottingSystem getPlottingSystem() {
+		
+		
+		// Perhaps the plotting system is on a dialog
+		final Shell[] shells = Display.getDefault().getShells();
+		if (shells!=null) for (Shell shell : shells) {
+			final Object o = shell.getData();
+			if (o!=null && o instanceof IAdaptable) {
+				IPlottingSystem s = (IPlottingSystem)((IAdaptable)o).getAdapter(IPlottingSystem.class);
+				if (s!=null) return s;
+			} 
+		}
+		
+		final IWorkbenchPart  part   = EclipseUtils.getPage().getActivePart();
+		if (part!=null) {
+			return (IPlottingSystem)part.getAdapter(IPlottingSystem.class);
+		}
+		
+		return null;
 	}
 
 }
