@@ -88,40 +88,41 @@ public class CursorUtils {
 		buf.append("]");
 		
 		Dimension size = FigureUtilities.getTextExtents(buf.toString(), Display.getDefault().getSystemFont());
-		Image image = new Image(Display.getDefault(), size.width + CURSOR_SIZE, size.height + CURSOR_SIZE);
+		Image image = new Image(Display.getDefault(), size.width + CURSOR_SIZE, size.height + CURSOR_SIZE);		
+		GC    gc    = new GC(image);
 		
-		GC gc = new GC(image);
-		//gc.setAlpha(0);
-		gc.setBackground(TRANSPARENT_COLOR);					
-		gc.fillRectangle(image.getBounds());
-		gc.setForeground(BLACK_COLOR);
-		
-		// Draw cross
-		final PointList x = new PointList(CURSOR_SIZE);
-		final PointList y = new PointList(CURSOR_SIZE);
-		for (int i = 0; i < CURSOR_SIZE; i++) {
-			x.addPoint(new Point(i, CURSOR_SIZE/2));
-			y.addPoint(new Point(CURSOR_SIZE/2, i));
+		try {
+			//gc.setAlpha(0);
+			gc.setBackground(TRANSPARENT_COLOR);					
+			gc.fillRectangle(image.getBounds());
+			gc.setForeground(BLACK_COLOR);
+			
+			// Draw cross
+			final PointList x = new PointList(CURSOR_SIZE);
+			final PointList y = new PointList(CURSOR_SIZE);
+			for (int i = 0; i < CURSOR_SIZE; i++) {
+				x.addPoint(new Point(i, CURSOR_SIZE/2));
+				y.addPoint(new Point(CURSOR_SIZE/2, i));
+			}
+			drawPointList(x, gc, false);
+			drawPointList(y, gc, true);
+			
+			// Draw position
+			gc.setBackground(WHITE_COLOR);
+			gc.setForeground(BLACK_COLOR);
+			gc.fillRectangle(CURSOR_SIZE, CURSOR_SIZE, 
+					image.getBounds().width-CURSOR_SIZE, 
+					image.getBounds().height-CURSOR_SIZE);					
+			gc.drawText(buf.toString(), CURSOR_SIZE, CURSOR_SIZE, true);
+			
+			ImageData imageData = image.getImageData();
+			imageData.transparentPixel = imageData.palette.getPixel(TRANSPARENT_COLOR.getRGB());
+			
+			return new Cursor(Display.getCurrent(), imageData, CURSOR_SIZE/2 ,CURSOR_SIZE/2);
+		} finally {
+			gc.dispose();
+			image.dispose();
 		}
-		drawPointList(x, gc, false);
-		drawPointList(y, gc, true);
-		
-		// Draw position
-		gc.setBackground(WHITE_COLOR);
-		gc.setForeground(BLACK_COLOR);
-		gc.fillRectangle(CURSOR_SIZE, CURSOR_SIZE, 
-				image.getBounds().width-CURSOR_SIZE, 
-				image.getBounds().height-CURSOR_SIZE);					
-		gc.drawText(buf.toString(), CURSOR_SIZE, CURSOR_SIZE, true);
-		
-		ImageData imageData = image.getImageData();
-		imageData.transparentPixel = imageData.palette.getPixel(TRANSPARENT_COLOR.getRGB());
-		
-		Cursor positionCursor = new Cursor(Display.getCurrent(), imageData, CURSOR_SIZE/2 ,CURSOR_SIZE/2);
-		gc.dispose();
-		image.dispose();
-
-		return positionCursor;
 	}
 
 	
