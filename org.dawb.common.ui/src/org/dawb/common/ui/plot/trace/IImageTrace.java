@@ -162,7 +162,7 @@ public interface IImageTrace extends IPaletteTrace, IDownsampledTrace{
 	/**
 	 * Sets the histo type.
 	 */
-	public void setHistoType(HistoType type);
+	public boolean setHistoType(HistoType type);
 
 	/**
 	 * You may set the image not to redraw images during updating a number of 
