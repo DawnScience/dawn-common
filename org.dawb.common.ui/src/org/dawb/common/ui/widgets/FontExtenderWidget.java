@@ -9,6 +9,7 @@ import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.SWT;
@@ -18,7 +19,6 @@ import org.eclipse.swt.widgets.FontDialog;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.RowLayout;
-import org.eclipse.wb.swt.SWTResourceManager;
 import org.eclipse.swt.widgets.Label;
 
 /**
@@ -97,7 +97,7 @@ public class FontExtenderWidget extends Composite {
 
 		
 		canvas = new Canvas(scrolledComposite, SWT.BORDER);
-		canvas.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		canvas.setBackground(new Color(parent.getDisplay(), 255, 255, 255));
 		canvas.setToolTipText("Shows the "+title);
 //		canvas.setLayout(new GridLayout());
 		GridData gridData = new GridData(GridData.FILL_BOTH);
