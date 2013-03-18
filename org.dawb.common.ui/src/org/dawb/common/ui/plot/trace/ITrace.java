@@ -79,4 +79,8 @@ public interface ITrace {
 	 */
 	public boolean is3DTrace();
 
+	/**
+	 * Called to release system resources.
+	 */
+	public void dispose();
 }

@@ -344,6 +344,9 @@ public class ImageServiceBean {
 
 	public enum HistoType {
 		
+		/**
+		 * NOTE These strings are in preferences and referenced by value in LivePerspective
+		 */
 		MEAN(0, "Mean"), MEDIAN(1, "Median"), OUTLIER_VALUES(2, "Outlier Values");
 
 		public final String label;
