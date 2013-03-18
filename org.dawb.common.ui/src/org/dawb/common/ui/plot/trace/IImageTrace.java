@@ -68,6 +68,12 @@ public interface IImageTrace extends IPaletteTrace, IDownsampledTrace{
 		public int getIndex() {
 			return index;
 		}
+		public static DownsampleType forLabel(String label) {
+			for (DownsampleType type : values()) {
+				if (type.label.equals(label)) return type;
+			}
+			return null;
+		}
 	}
 
 	/**

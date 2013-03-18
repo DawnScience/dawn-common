@@ -52,6 +52,14 @@ public class ImageServiceBean {
 	private Object          functionObject;
 	private boolean         logColorScale=false; // Normally linear, can switch to log color scale.
 	private double          logOffset=0.0;
+	/**
+	 * Only used with HistoType.OUTLIER_VALUES algorithm
+	 */
+	private double          lo;
+	/**
+	 * Only used with HistoType.OUTLIER_VALUES algorithm
+	 */
+	private double          hi;
 
 	public ImageServiceBean() {
 		
@@ -62,15 +70,19 @@ public class ImageServiceBean {
 	 */
 	public ImageServiceBean  clone() {
 		ImageServiceBean ret = new ImageServiceBean();
-		ret.min  = (min == null) ? null : min.doubleValue();
-		ret.max  = (max == null) ? null : max.doubleValue();
-		ret.histogramType = histogramType;
-		ret.logColorScale = logColorScale;
-		ret.logOffset = logOffset;
+		
+		ret.min             = (min == null) ? null : min.doubleValue();
+		ret.max             = (max == null) ? null : max.doubleValue();
+		ret.lo              = lo;
+		ret.hi              = hi;
+		ret.histogramType   = histogramType;
+		ret.logColorScale   = logColorScale;
+		ret.logOffset       = logOffset;
 		ret.maximumCutBound = cloneBound(maximumCutBound);
 		ret.minimumCutBound = cloneBound(minimumCutBound);
-		ret.nanBound = cloneBound(nanBound);
-		ret.origin = origin;
+		ret.nanBound        = cloneBound(nanBound);
+		ret.origin          = origin;
+		
 		if (getPalette()!=null) {
 		    ret.palette = new PaletteData(getPalette().getRGBs());
 		}
@@ -331,7 +343,8 @@ public class ImageServiceBean {
 	
 
 	public enum HistoType {
-		MEAN(0, "Mean"), MEDIAN(1, "Median");
+		
+		MEAN(0, "Mean"), MEDIAN(1, "Median"), OUTLIER_VALUES(2, "Outlier Values");
 
 		public final String label;
 		public final int    index;
@@ -350,6 +363,7 @@ public class ImageServiceBean {
 			histoTypes = new ArrayList<HistoType>();
 			histoTypes.add(MEAN);
 			histoTypes.add(MEDIAN);
+			histoTypes.add(OUTLIER_VALUES);
 		}
 		public static HistoType forLabel(String label) {
 			for (HistoType t : histoTypes) {
@@ -389,6 +403,134 @@ public class ImageServiceBean {
 			}
 			return null;
 		}
+	}
+
+
+
+	public double getLo() {
+		return lo;
+	}
+
+	public void setLo(double lo) {
+		this.lo = lo;
+	}
+
+	public double getHi() {
+		return hi;
+	}
+
+	public void setHi(double hi) {
+		this.hi = hi;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + depth;
+		result = prime * result
+				+ ((functionObject == null) ? 0 : functionObject.hashCode());
+		long temp;
+		temp = Double.doubleToLongBits(hi);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		result = prime * result
+				+ ((histogramType == null) ? 0 : histogramType.hashCode());
+		result = prime * result + ((image == null) ? 0 : image.hashCode());
+		temp = Double.doubleToLongBits(lo);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		result = prime * result + (logColorScale ? 1231 : 1237);
+		temp = Double.doubleToLongBits(logOffset);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		result = prime * result + ((mask == null) ? 0 : mask.hashCode());
+		result = prime * result + ((max == null) ? 0 : max.hashCode());
+		result = prime * result
+				+ ((maximumCutBound == null) ? 0 : maximumCutBound.hashCode());
+		result = prime * result + ((min == null) ? 0 : min.hashCode());
+		result = prime * result
+				+ ((minimumCutBound == null) ? 0 : minimumCutBound.hashCode());
+		result = prime * result + ((monitor == null) ? 0 : monitor.hashCode());
+		result = prime * result
+				+ ((nanBound == null) ? 0 : nanBound.hashCode());
+		result = prime * result + ((origin == null) ? 0 : origin.hashCode());
+		result = prime * result + ((palette == null) ? 0 : palette.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ImageServiceBean other = (ImageServiceBean) obj;
+		if (depth != other.depth)
+			return false;
+		if (functionObject == null) {
+			if (other.functionObject != null)
+				return false;
+		} else if (!functionObject.equals(other.functionObject))
+			return false;
+		if (Double.doubleToLongBits(hi) != Double.doubleToLongBits(other.hi))
+			return false;
+		if (histogramType != other.histogramType)
+			return false;
+		if (image == null) {
+			if (other.image != null)
+				return false;
+		} else if (!image.equals(other.image))
+			return false;
+		if (Double.doubleToLongBits(lo) != Double.doubleToLongBits(other.lo))
+			return false;
+		if (logColorScale != other.logColorScale)
+			return false;
+		if (Double.doubleToLongBits(logOffset) != Double
+				.doubleToLongBits(other.logOffset))
+			return false;
+		if (mask == null) {
+			if (other.mask != null)
+				return false;
+		} else if (!mask.equals(other.mask))
+			return false;
+		if (max == null) {
+			if (other.max != null)
+				return false;
+		} else if (!max.equals(other.max))
+			return false;
+		if (maximumCutBound == null) {
+			if (other.maximumCutBound != null)
+				return false;
+		} else if (!maximumCutBound.equals(other.maximumCutBound))
+			return false;
+		if (min == null) {
+			if (other.min != null)
+				return false;
+		} else if (!min.equals(other.min))
+			return false;
+		if (minimumCutBound == null) {
+			if (other.minimumCutBound != null)
+				return false;
+		} else if (!minimumCutBound.equals(other.minimumCutBound))
+			return false;
+		if (monitor == null) {
+			if (other.monitor != null)
+				return false;
+		} else if (!monitor.equals(other.monitor))
+			return false;
+		if (nanBound == null) {
+			if (other.nanBound != null)
+				return false;
+		} else if (!nanBound.equals(other.nanBound))
+			return false;
+		if (origin != other.origin)
+			return false;
+		if (palette == null) {
+			if (other.palette != null)
+				return false;
+		} else if (!palette.equals(other.palette))
+			return false;
+		return true;
 	}
 
 }

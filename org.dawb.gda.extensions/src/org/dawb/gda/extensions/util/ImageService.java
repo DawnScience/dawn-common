@@ -395,6 +395,19 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 	public float[] getFastStatistics(ImageServiceBean bean) {
 		
 		final AbstractDataset image    = (AbstractDataset)bean.getImage();
+		if (bean.getHistogramType()==HistoType.OUTLIER_VALUES) {
+
+			try {
+			    double[] stats = Stats.outlierValues(image, bean.getLo(), bean.getHi(), -1);
+			    return new float[]{(float)stats[0], (float)stats[1], -1};
+			} catch (IllegalArgumentException iae) {
+				bean.setLo(10);
+				bean.setHi(90);
+			    double[] stats = Stats.outlierValues(image, bean.getLo(), bean.getHi(), -1);
+			    return new float[]{(float)stats[0], (float)stats[1], -1};				
+			}
+		}
+		
 		float min = Float.MAX_VALUE;
 		float max = -Float.MAX_VALUE;
 		float sum = 0.0f;
