@@ -63,18 +63,14 @@ public class DatasetTitleUtils {
 			}
 			
 			if (used.contains(name)) continue;			
-			if(i==0)
-				buf.append(name);
-			if(i==1 && 1==dataSetSize-1)
-				buf.append(","+name);
-			if(i==dataSetSize-1 && dataSetSize-1!=1)
-				buf.append("..."+name);
+			if(i==0) buf.append(name);
+			if (ys.size()<2) break;
+			if(i==1 && 1==dataSetSize-1) buf.append(","+name);
+			if(i==dataSetSize-1 && dataSetSize-1!=1) buf.append("..."+name);
 			i++;
 		}
-		final int index = buf.length()-1;
-		buf.delete(index, index+1);
 		buf.append(" against ");
-		buf.append(getName(x,rootName));
+		buf.append(x.getName());
 		return buf.toString();
 	}
 
