@@ -1,4 +1,4 @@
-/*
+/*-
  * Copyright 2011 Diamond Light Source Ltd.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,16 +18,17 @@ package org.dawb.common.ui.plot.roi;
 
 import java.io.Serializable;
 
+import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.swt.graphics.Color;
 
 /**
  * Class for Resolution rings in the diffraction viewer.
  */
 public class ResolutionRing implements Serializable {
-
+	private static final long serialVersionUID = 1496209098011098370L;
 	private double resolution;
 	private boolean visible;
-	private java.awt.Color colour;
+	private Color colour;
 	private boolean ice;
 	private boolean evenSpaced;
 	private boolean standard;
@@ -36,7 +37,7 @@ public class ResolutionRing implements Serializable {
 	 * @param resolution in Angstroms
 	 */
 	public ResolutionRing(double resolution) {
-		this(resolution, true, java.awt.Color.ORANGE, false, false, false);
+		this(resolution, true, ColorConstants.orange, false, false, false);
 	}
 
 	/**
@@ -60,11 +61,6 @@ public class ResolutionRing implements Serializable {
 	 */
 	public ResolutionRing(double resolution, boolean visible, Color colour, boolean ice, boolean evenSpacedRings,
 			boolean standard) {
-		this(resolution, visible, new java.awt.Color(colour.getRed(), colour.getGreen(), colour.getBlue()), ice,
-				evenSpacedRings, standard);
-	}
-
-	private ResolutionRing(double resolution, boolean visible, java.awt.Color colour, boolean ice, boolean evenSpacedRings,boolean standard) {
 		this.resolution = resolution;
 		this.visible = visible;
 		this.colour = colour;
@@ -97,11 +93,11 @@ public class ResolutionRing implements Serializable {
 	}
 
 	public Color getColour() {
-		return new Color(null, colour.getRed(), colour.getGreen(), colour.getBlue());
+		return colour;
 	}
 
 	public java.awt.Color getAWTColour() {
-		return colour;
+		return new java.awt.Color(colour.getRed(), colour.getGreen(), colour.getBlue());
 	}
 
 	public void setIce(boolean ice) {
