@@ -186,10 +186,6 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
  		// forces the use of on byte.
 		final byte[] scaledImageAsByte = new byte[len];
 
-		// NOTE: getBoolean(...) and getFloat(...) are SLOW
-		if (mask!=null) mask.setExtendible(false);
-		image.setExtendible(false);
-
 		if (origin==ImageOrigin.TOP_LEFT) { 
 			
 			int index = 0;
@@ -386,7 +382,7 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 	}
 	
 	/**
-	 * Fast statistcs as a rough guide - this is faster than AbstractDataset.getMin()
+	 * Fast statistics as a rough guide - this is faster than AbstractDataset.getMin()
 	 * and getMax() which may cache but slows the opening of images too much.
 	 * 
 	 * @param bean
