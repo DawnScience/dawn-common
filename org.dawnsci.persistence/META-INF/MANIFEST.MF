@@ -4,7 +4,7 @@ Bundle-Name: Persistence
 Bundle-SymbolicName: org.dawnsci.persistence
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.dawnsci.persistence.Activator
-Bundle-Vendor: DLS
+Bundle-Vendor: Diamond Light Source
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Require-Bundle: org.eclipse.osgi;bundle-version="3.7.2",
  uk.ac.diamond.scisoft.analysis;bundle-version="1.3.0",
