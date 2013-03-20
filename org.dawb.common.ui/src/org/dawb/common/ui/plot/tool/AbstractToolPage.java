@@ -286,14 +286,13 @@ public abstract class AbstractToolPage extends Page implements IToolPage, IAdapt
 	}
 	
 	public boolean isDedicatedView() {
-		try {
-			final String id = getViewPart().getSite().getId();
-			return "org.dawb.workbench.plotting.views.toolPageView.fixed".equals(id);
-		} catch (NullPointerException npe) {
+		if (viewPart == null)
 			return true;
-		}
+
+		final String id = viewPart.getSite().getId();
+		return "org.dawb.workbench.plotting.views.toolPageView.fixed".equals(id);
 	}
-	
+
 	@Override
 	public boolean isStaticTool() {
 		return false;
