@@ -15,6 +15,25 @@ public class DatasetArithmetic extends JexlArithmetic {
 		super(lenient);
 	}
 	
+	public Object bitwiseXor(Object lhs, Object rhs) { 
+		
+		if (rhs instanceof AbstractDataset &&
+		    lhs instanceof AbstractDataset) {
+
+			return Maths.power((AbstractDataset)lhs, (AbstractDataset)rhs);
+			
+		} else if (lhs instanceof AbstractDataset ||
+				   rhs instanceof AbstractDataset) {
+
+			return Maths.power(lhs, rhs);
+			
+		} else {
+	        double l = toDouble(lhs); 
+	        double r = toDouble(rhs); 
+	        return Math.pow(l, r); 
+		}
+    } 
+	
 	/**
 	 * This function adds two objects, including AbstractDatasets
 	 * 
