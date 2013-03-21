@@ -5,6 +5,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import javax.management.ListenerNotFoundException;
+import javax.management.MBeanNotificationInfo;
+import javax.management.Notification;
+import javax.management.NotificationBroadcaster;
+import javax.management.NotificationBroadcasterSupport;
+import javax.management.NotificationFilter;
+import javax.management.NotificationListener;
+import javax.management.StandardMBean;
+
 import org.dawb.common.ui.plot.annotation.IAnnotation;
 import org.dawb.common.ui.plot.axis.IAxis;
 import org.dawb.common.ui.plot.axis.IPositionListener;
@@ -28,20 +37,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
-
 /**
  * Will be a thread safe version of all the plotting system methods.
  * 
  * @author fcp94556
  *
  */
-public class ThreadSafePlottingSystem implements IPlottingSystem {
+public class ThreadSafePlottingSystem extends StandardMBean implements IPlottingSystem, NotificationBroadcaster {
 
 	private static final Logger logger = LoggerFactory.getLogger(ThreadSafePlottingSystem.class);
 	
 	private IPlottingSystem deligate;
 
-	public ThreadSafePlottingSystem(IPlottingSystem deligate) {
+	public ThreadSafePlottingSystem(IPlottingSystem deligate) throws Exception {
+		super(IPlottingSystem.class);
 		this.deligate = deligate;
 	}
 
@@ -434,5 +443,33 @@ public class ThreadSafePlottingSystem implements IPlottingSystem {
 	@Override
 	public void removePositionListener(IPositionListener l) {
 		call(getMethodName(Thread.currentThread().getStackTrace()), new Class[]{IPositionListener.class}, l);
+	}
+
+	private NotificationBroadcasterSupport generalBroadcaster;
+
+	@Override
+	public void addNotificationListener(NotificationListener listener,
+			                            NotificationFilter filter, Object handback) throws IllegalArgumentException {
+		
+		if (generalBroadcaster == null)  generalBroadcaster = new NotificationBroadcasterSupport();		
+		generalBroadcaster.addNotificationListener(listener, filter, handback);
+		
+	}
+
+	@Override
+	public void removeNotificationListener(NotificationListener listener) throws ListenerNotFoundException {
+		if (generalBroadcaster == null)  return;	
+		generalBroadcaster.removeNotificationListener(listener);
+	}
+
+	@Override
+	public MBeanNotificationInfo[] getNotificationInfo() {
+		return new MBeanNotificationInfo[] {
+				new MBeanNotificationInfo(
+						new String[] { "plotting code 1" },   // notif. types
+						Notification.class.getName(), // notif. class
+						"User Notifications."         // description
+				)
+		};
 	}
 }
