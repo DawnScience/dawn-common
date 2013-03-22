@@ -83,7 +83,7 @@ public class ROIWidget implements IROIListener {
 	 * Creates the widget and its controls
 	 */
 	public void createWidget(){
-		regionComposite = new Composite(parent, SWT.BORDER);
+		regionComposite = new Composite(parent, SWT.NONE);
 		GridData gridData = new GridData(SWT.FILL, SWT.LEFT, true, true);
 		regionComposite.setLayout(new GridLayout(1, false));
 		regionComposite.setLayoutData(gridData);
