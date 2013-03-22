@@ -9,10 +9,19 @@
  */ 
 package org.dawb.common.ui.plot;
 
+import java.lang.management.ManagementFactory;
+import java.net.InetAddress;
+import java.rmi.registry.LocateRegistry;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
+import javax.management.remote.JMXConnectorServer;
+import javax.management.remote.JMXConnectorServerFactory;
+import javax.management.remote.JMXServiceURL;
 
 import org.dawb.common.ui.plot.tool.IToolPageSystem;
 import org.eclipse.core.runtime.CoreException;
@@ -20,6 +29,8 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * PlottingFactory is the preferred way to get an AbstractPlottingSystem. Also
@@ -32,7 +43,19 @@ import org.eclipse.ui.preferences.ScopedPreferenceStore;
  *
  */
 public class PlottingFactory {
+	
+	private static final Logger logger = LoggerFactory.getLogger(PlottingFactory.class);
 
+	static {
+		if (Boolean.getBoolean("org.dawnsci.plotting.jmx.active")) {
+			try {
+				PlottingFactory.startServer();
+			} catch (Exception e) {
+				logger.error("Cannot start server!", e);
+			}
+		}
+	}
+	
 	/**
 	 * This class has a public constructor so that the squish tests can get a references using
 	 * the class loader. Really it should be private. 
@@ -116,6 +139,11 @@ public class PlottingFactory {
 	 * @return the removed system
 	 */
 	public static AbstractPlottingSystem removePlottingSystem(String plotName) {
+		try {
+			unregisterRemote(plotName);
+		} catch (Exception e) {
+			logger.error("Cannot unregister JMX plotting system!", e);
+		}
 		if (plottingSystems==null) return null;
 		return plottingSystems.remove(plotName);
 	}
@@ -129,11 +157,88 @@ public class PlottingFactory {
 	 * @return the replaced system if any or null otherwise.
 	 */
 	public static AbstractPlottingSystem registerPlottingSystem(final String                 plotName,
-			                                                   final AbstractPlottingSystem abstractPlottingSystem) {
+			                                                    final AbstractPlottingSystem abstractPlottingSystem) {
 		
+		
+		try {
+			registerRemote(plotName, abstractPlottingSystem);
+		} catch (Exception e) {
+			logger.error("Cannot register JMX plotting system!", e);
+		}
 		if (plottingSystems==null) plottingSystems = new HashMap<String, AbstractPlottingSystem>(7);
 		return plottingSystems.put(plotName, abstractPlottingSystem);
 	}
+	
+	
+	/**
+	 * Call to regiser plotting system remotely.
+	 */
+	private static void registerRemote(final String plotName, final IPlottingSystem ps) throws Exception {
+
+		if (!Boolean.getBoolean("org.dawnsci.plotting.jmx.active")) return;
+
+		MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+
+		ObjectName on = new ObjectName("remote.plotting.system/"+plotName+":type=RemotePlottingSystem");
+		// Uniquely identify the MBeans and register them with the MBeanServer 
+		try {
+			if (mbs.getObjectInstance(on)!=null) {
+				mbs.unregisterMBean(on);
+			}
+		} catch (Exception ignored) {
+			// Throws exception not returns null, so ignore.
+		}
+		mbs.registerMBean(new ThreadSafePlottingSystem(ps), on);
+
+	}
+	
+	/**
+	 * Call to regiser plotting system remotely.
+	 */
+	private static void unregisterRemote(final String plotName) throws Exception {
+
+		if (!Boolean.getBoolean("org.dawnsci.plotting.jmx.active")) return;
+
+		MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+
+		ObjectName on = new ObjectName(IPlottingSystem.class.getPackage().getName()+"/"+plotName+":type=RemotePlottingSystem");
+		mbs.unregisterMBean(on);
+
+	}
+	
+
+	
+	private static void startServer() throws Exception {
+		
+		if (!Boolean.getBoolean("org.dawnsci.plotting.jmx.active")) return;
+
+		MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+
+		// We force a new registry on the port and use this
+		// for workflow processes started.
+		try {
+			LocateRegistry.createRegistry(8991);
+		} catch (java.rmi.server.ExportException ne) {
+			// If we are running in tango server mode, there may be a registry already existing.
+			logger.debug("Found existing registry on "+8991);
+		}
+		
+		String hostName = System.getProperty("org.dawnsci.plotting.jmx.host.name");
+		if (hostName==null) hostName = InetAddress.getLocalHost().getHostName();
+		if (hostName==null) hostName = InetAddress.getLocalHost().getHostAddress();
+		if (hostName==null) hostName = "localhost";
+
+		
+		JMXServiceURL serverUrl     = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://"+hostName+":8991/plottingservice");
+
+		// Create an RMI connector and start it
+		JMXConnectorServer cs = JMXConnectorServerFactory.newJMXConnectorServer(serverUrl, null, mbs);
+		cs.start();
+
+		logger.debug("Plotting service started on "+serverUrl);
+
+	}
+
 	
 	/**
 	 * Get a plotting system by name. NOTE if more than one plotting system has the same name the
@@ -162,7 +267,14 @@ public class PlottingFactory {
 	public static IPlottingSystem getPlottingSystem(String plotName, boolean threadSafe) {
 		if (plottingSystems==null) return null;
 		AbstractPlottingSystem ps = plottingSystems.get(plotName);
-		return threadSafe ? new ThreadSafePlottingSystem(ps) : ps;
+	    try {
+			return threadSafe ? new ThreadSafePlottingSystem(ps) : ps;
+		} catch (Exception e) {
+			if (threadSafe) {
+				logger.error("Cannot create thread safe system, will return UI thread one.", e);
+			}
+			return ps;
+		}
 	}
 
 	/**
