@@ -19,6 +19,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -545,13 +546,16 @@ public class SliceComponent {
 				// We get an axis not used elsewhere for the default
 				final Map<Integer,String> others = new HashMap<Integer,String>(sliceObject.getNexusAxes());
 				others.keySet().removeAll(Arrays.asList(idim));
-				int index = 0;
-				try {
-					while(others.values().contains(names.get(index))) {
-						index++;
+				boolean found = false;
+				Collection<String> values = others.values();
+				for (String n : names) {
+					if (!values.contains(n)) {
+						sliceObject.setNexusAxis(idim, n);
+						found = true;
+						break;
 					}
-					sliceObject.setNexusAxis(idim, names.get(index));
-				} catch (IndexOutOfBoundsException allowed) {
+				}
+				if (!found) {
 					sliceObject.setNexusAxis(idim, "indices");
 					dimensionNames.put(idim, Arrays.asList("indices"));
 				}
