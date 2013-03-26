@@ -1275,6 +1275,7 @@ public class SliceComponent {
 						             monitor);
 			} catch (Exception e) {
 				logger.error("Cannot slice "+slice.getName(), e);
+				System.out.println(slice);
 			} finally {
 				monitor.done();
 			}	

@@ -11,7 +11,8 @@ Require-Bundle: org.eclipse.osgi;bundle-version="3.7.2",
  org.dawb.hdf5;bundle-version="1.2.0",
  org.dawb.gda.extensions;bundle-version="1.2.0",
  com.google.gson;bundle-version="2.2.2",
- javax.vecmath;bundle-version="1.5.2"
+ javax.vecmath;bundle-version="1.5.2",
+ ncsa.hdf;bundle-version="2.8.0"
 Import-Package: org.dawb.common.services,
  org.dawb.common.util.eclipse,
  org.slf4j;version="1.5.6"
