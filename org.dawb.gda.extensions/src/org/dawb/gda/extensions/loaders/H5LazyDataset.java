@@ -24,7 +24,7 @@ public class H5LazyDataset extends LazyDataset {
 	    super(set.getFullName(), 
               H5Utils.getDataType(set.getDatatype()), 
               H5Utils.getInt(set.getDims()),
-			  new H5LazyLoader(filePath, set.getFullName()));
+			  new H5LazyLoader(set.getFile(), set.getFullName()));
 	}
 	
 	public AbstractDataset getCompleteData(IMonitor monitor) throws Exception {
