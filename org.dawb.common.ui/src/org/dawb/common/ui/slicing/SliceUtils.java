@@ -35,10 +35,8 @@ import org.slf4j.LoggerFactory;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.DoubleDataset;
-import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.IntegerDataset;
-import uk.ac.diamond.scisoft.analysis.io.DataHolder;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 import uk.ac.diamond.scisoft.analysis.io.SliceObject;
 import uk.ac.gda.doe.DOEUtils;
@@ -384,29 +382,40 @@ public class SliceUtils {
 	/**
 	 * 
 	 * @param currentSlice
-	 * @param axisName
+	 * @param axisName, full path and then optionally a : and the dimension which the axis is for.
 	 * @param requireUnit - if true will get unit but will be slower.
 	 * @param requireIndicesOnError
 	 * @param monitor
 	 * @return
 	 */
 	public static AbstractDataset getNexusAxis(final SliceObject currentSlice, 
-			                                          String axisName, 
+			                                         String origName, 
 			                                   final boolean requireUnit,
 			                                   final IProgressMonitor  monitor) throws Exception {
+		
+		int dimension = -1;
+		String axisName = origName;
+		if (axisName.contains(":")) {
+			final String[] sa = axisName.split(":");
+			axisName  = sa[0];
+			dimension = Integer.parseInt(sa[1])-1;
+		}
+		
+		AbstractDataset axis = null;
 		
 		if (requireUnit) { // Slower
 			IHierarchicalDataFile file = null;
 			try {
 				file = HierarchicalDataFactory.getReader(currentSlice.getPath());
 				final Group  group    = file.getParent(currentSlice.getName());
+				
 				final String fullName = group.getFullName()+"/"+axisName;
-				AbstractDataset axis = LoaderFactory.getDataSet(currentSlice.getPath(), fullName, new ProgressMonitorWrapper(monitor));
+				axis = LoaderFactory.getDataSet(currentSlice.getPath(), fullName, new ProgressMonitorWrapper(monitor));
 				axis = axis.squeeze();
+				
 				final String unit = file.getAttributeValue(fullName+"@unit");
-				if (unit!=null) axisName = axisName+" "+unit;
-				axis.setName(axisName);
-			    return axis;
+				if (unit!=null) origName = origName+" "+unit;
+			    
 			} finally {
 				if (file!=null) file.close();
 			}
@@ -415,12 +424,32 @@ public class SliceUtils {
 			final String dataPath = currentSlice.getName();
 			final File file = new File(dataPath);
 			final String fullName = file.getParent().replace('\\','/')+"/"+axisName;
-			AbstractDataset axis = LoaderFactory.getDataSet(currentSlice.getPath(), fullName, new ProgressMonitorWrapper(monitor));
+			axis = LoaderFactory.getDataSet(currentSlice.getPath(), fullName, new ProgressMonitorWrapper(monitor));
 			axis = axis.squeeze();
-			axis.setName(axisName);
-			return axis;
 		
 		}
+
+		// TODO Should really be averaging not using first index.
+		if (dimension>-1) {
+			final int[] shape = axis.getShape();
+			final int[] start = new int[shape.length];
+			final int[] stop  = new int[shape.length];
+			final int[] step  = new int[shape.length];
+			for (int i = 0; i < shape.length; i++) {
+				start[i] = 0;
+				step[i]  = 1;
+				if (i==dimension) {
+					stop[i] = shape[i];
+				} else {
+					stop[i] = 1;
+				}
+			}
+			axis = axis.getSlice(start, stop, step);
+			axis = axis.squeeze();
+		}
+		
+		axis.setName(origName);
+	    return axis;
 
 	}
 

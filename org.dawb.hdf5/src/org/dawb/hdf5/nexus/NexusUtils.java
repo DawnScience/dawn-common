@@ -17,6 +17,8 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.TreeMap;
 
+import javax.swing.plaf.ListUI;
+
 import ncsa.hdf.object.Attribute;
 import ncsa.hdf.object.Dataset;
 import ncsa.hdf.object.Datatype;
@@ -167,10 +169,10 @@ public class NexusUtils {
 	 * @return
 	 * @throws Exception especially if dims are ask for which the signal does not have.
 	 */
-	public static List<Dataset> getAxes(final FileFormat file, final Dataset signal, int dimension) throws Exception {
+	public static List<String> getAxes(final FileFormat file, final Dataset signal, int dimension) throws Exception {
 		
-		final List<Dataset>         axesTmp = new ArrayList<Dataset>(3);
-        final Map<Integer, Dataset> axesMap = new TreeMap<Integer, Dataset>();
+		final List<String>         axesTmp = new ArrayList<String>(3);
+        final Map<Integer, String> axesMap = new TreeMap<Integer, String>();
 		
         signal.getMetadata();
         final long size = signal.getDims()[dimension-1];
@@ -185,7 +187,7 @@ public class NexusUtils {
 			if (!(hObject instanceof Dataset)) continue;
 			if (hObject.getFullName().equals(signal.getFullName())) continue;
 			
-			Dataset axis = null;
+			String axis = null;
 			int     pos  = -1;
 			boolean isSignal = false;
 			for (Object object : att) {
@@ -193,10 +195,28 @@ public class NexusUtils {
 					Attribute attribute = (Attribute)object;
 					if (AXIS.equals(attribute.getName())) {
 						int iaxis = getAttributeIntValue(attribute);
-						if (iaxis == dimension) axis = (Dataset)hObject;
+						if (iaxis<0) { // We look for comma separated string
+							final int[]   axesDims = getAttributeIntValues(attribute);
+							final long[]  shapeAxes = ((Dataset)hObject).getDims();
+							final long[]  shapeData = signal.getDims();
+							if (axesDims!=null && Arrays.equals(shapeAxes, shapeData)) {
+								for (int dim : axesDims) {
+									if (dim == dimension) {
+										axis = ((Dataset)hObject).getName()+":"+dimension;
+										break;
+									}
+								}
+							}
+						}
+						if (iaxis == dimension) axis = ((Dataset)hObject).getName();
 						
 					} else if (PRIM.equals(attribute.getName())) {
-						pos = getAttributeIntValue(attribute);
+						if (pos!=0) pos = getAttributeIntValue(attribute);
+						
+					} else if (LABEL.equals(attribute.getName())) {
+						int labelAxis = getAttributeIntValue(attribute);
+						if (labelAxis == dimension) pos = 0;
+						
 					} else if (SIGNAL.equals(attribute.getName())) {
 						isSignal = true;
 						axis     = null;
@@ -212,7 +232,7 @@ public class NexusUtils {
 			if (axis==null && !isSignal) {
 				final long[] dims = ((Dataset)hObject).getDims();
 				if (dims[0]==size && dims.length==1) {
-					axis = (Dataset)hObject;
+					axis = ((Dataset)hObject).getName();
 				}
 			}
 			
@@ -225,15 +245,13 @@ public class NexusUtils {
 			}
 		}
 		
-		final List<Dataset>         axes = new ArrayList<Dataset>(3);
+		final List<String> axes = new ArrayList<String>(3);
 		if (!axesMap.isEmpty()) {
 			for (Integer pos : axesMap.keySet()) {
 				axes.add(axesMap.get(pos));
 			}
 		}
 		axes.addAll(axesTmp);
-		
-		if (axes.isEmpty()) return null;
 		
 		return axes;
 	}
@@ -259,6 +277,25 @@ public class NexusUtils {
 
 		return -1;
 	}
+	
+	private static int[] getAttributeIntValues(Attribute attribute) {
+		final Object ob = attribute.getValue();
+		if (ob instanceof String[]) {
+			String[] sa = (String[])ob;
+			try {
+				final String[] axes  = sa[0].split(",");
+				int[] ret = new int[axes.length];
+				for (int i = 0; i < axes.length; i++) {
+					ret[i] = Integer.parseInt(axes[i].trim());
+				}
+				return ret;
+			} catch (Throwable ne) {
+				return null;
+			}
+		}
+
+		return null;
+	}
 
 	/**
 	 * Returns names of axes in group at same level as name passed in.
@@ -279,13 +316,7 @@ public class NexusUtils {
        	IHierarchicalDataFile file = null;
         try {
         	file = HierarchicalDataFactory.getReader(filePath);
-        	final List<Dataset> axes = file.getNexusAxes(nexusPath, dimension);
-        	if (axes==null) return null;
-       
-        	final List<String> names = new ArrayList<String>(axes.size());
-        	for (Dataset ds : axes) names.add(ds.getName());
-        	
-        	return names;
+        	return file.getNexusAxesNames(nexusPath, dimension);
         } finally {
         	if (file!=null) file.close();
         }

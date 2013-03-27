@@ -718,7 +718,7 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 	}
 
 	@Override
-	public List<Dataset> getNexusAxes(String signalPath, int dimension) throws Exception {
+	public List<String> getNexusAxesNames(String signalPath, int dimension) throws Exception {
 
 		HObject signal = file.get(signalPath);
     	

@@ -182,9 +182,9 @@ public interface IHierarchicalDataFile {
 	 * 
 	 * @param signalPath
 	 * @param dimension
-	 * @return
+	 * @return list of strings which represent the path to the dataset
 	 */
-	public List<Dataset> getNexusAxes(String signalPath, int dimension) throws Exception;
+	public List<String> getNexusAxesNames(String signalPath, int dimension) throws Exception;
 	
 	/**
 	 * Creates and returns a new dataset with the given name and parent
