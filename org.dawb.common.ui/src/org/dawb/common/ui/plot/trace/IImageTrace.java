@@ -282,14 +282,29 @@ public interface IImageTrace extends IPaletteTrace, IDownsampledTrace{
 	 * are set (via the setAxes(..) method) then you will simply get the 
 	 * same double passed back.
 	 * 
-	 * THIS IS RATHER CONFUSING!
-	 * 
+	 * @see ICoordinateSystem
+	 * @param  point in index of dataset coordinates (same as ROIs on images use). 
 	 * @return point in label coordinates. 
 	 * 
 	 * @throws Exception if the point could not be transformed or the point type
 	 *         is unknown.
 	 */
 	public double[] getPointInAxisCoordinates(final double[] point) throws Exception;
+
+	/**
+	 * For regions over images: if the axis data set has been set, this method will return 
+	 * a point in the coordinates of the image indices rather
+	 * than the axes. If no axes are set, then the original point is
+	 * returned. If the plot is 1D then the original values are returned.
+	 * 
+	 * @see ICoordinateSystem
+	 * @param  point in label coordinates
+	 * @return point in index of dataset coordinates (same as ROIs on images use). 
+	 * 
+	 * @throws Exception if the point could not be transformed or the point type
+	 *         is unknown.
+	 */
+	public double[] getPointInImageCoordinates(final double[] axisLocation) throws Exception;
 
 	/**
 	 * Is the imagetrace set to rescale the histogram when a new image update occurs

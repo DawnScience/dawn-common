@@ -6,9 +6,10 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
+import org.dawb.common.ui.plot.axis.ICoordinateSystem;
 import org.dawb.common.ui.plot.region.IROIListener;
-import org.dawb.common.ui.plot.region.ROIEvent;
 import org.dawb.common.ui.plot.region.IRegion.RegionType;
+import org.dawb.common.ui.plot.region.ROIEvent;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
@@ -43,6 +44,7 @@ import uk.ac.diamond.scisoft.analysis.roi.PolygonalROI;
 import uk.ac.diamond.scisoft.analysis.roi.PolylineROI;
 import uk.ac.diamond.scisoft.analysis.roi.ROIBase;
 import uk.ac.diamond.scisoft.analysis.roi.RectangularROI;
+import uk.ac.diamond.scisoft.analysis.roi.RingROI;
 import uk.ac.diamond.scisoft.analysis.roi.SectorROI;
 import uk.ac.gda.richbeans.components.cell.FieldComponentCellEditor;
 import uk.ac.gda.richbeans.components.wrappers.FloatSpinnerWrapper;
@@ -60,11 +62,12 @@ public class ROIEditTable  {
 	
 	private TableViewer regionTable;
 	private ROIBase     roi;
+	private ICoordinateSystem coords;
 	private ROIBase     originalRoi;
-	private RegionType  regionType;
 	private double      xLowerBound=Double.NaN, xUpperBound=Double.NaN; // Optional bounds
 	private double      yLowerBound=Double.NaN, yUpperBound=Double.NaN; // Optional bounds
 	private List<RegionRow> rows;
+
 
 	public Control createPartControl(Composite parent) {
 		
@@ -86,14 +89,15 @@ public class ROIEditTable  {
 	 * Can be called also to change to editing a different region.
 	 * @param roi
 	 * @param regionType - may be null
+	 * @param coords     - may be null
 	 */
-	public void setRegion(final ROIBase roi, final RegionType regionType) {
+	public void setRegion(final ROIBase roi, final RegionType regionType, final ICoordinateSystem coords) {
 		
-		this.regionType  = regionType;
 		this.originalRoi = roi!=null ? roi : null;
 		this.roi         = roi!=null ? roi.copy() : null;
+		this.coords      = coords;
 				
-		this.rows = createRegionRows(roi);
+		this.rows = createRegionRows(roi, coords);
 		
 		regionTable.setContentProvider(new IStructuredContentProvider() {
 			
@@ -237,7 +241,7 @@ public class ROIEditTable  {
             	getViewer().refresh();
             }
             
-            roi = createRoi(rows, row);
+            roi = createRoi(rows, row, coords);
             fireROIListeners();
 		}
 
@@ -304,71 +308,64 @@ public class ROIEditTable  {
 		}
 	}
 
-	private List<RegionRow> createRegionRows(ROIBase roi) {
+	private List<RegionRow> createRegionRows(ROIBase roi, final ICoordinateSystem coords) {
     	
 		final List<RegionRow> ret = new ArrayList<ROIEditTable.RegionRow>();
 		
 		if (roi instanceof LinearROI) {
 			final LinearROI lr = (LinearROI)roi;
-			ret.add(new RegionRow("Start Point (x,y)", "pixel", lr.getPointX(),       lr.getPointY()));
-			final double[] ept = lr.getEndPoint();
-			ret.add(new RegionRow("End Point (x,y)",   "pixel", ept[0],               ept[1]));
+			ret.add(new RegionRow("Start Point (x,y)", "pixel", getAxis(coords, lr.getPoint())));
+			ret.add(new RegionRow("End Point (x,y)",   "pixel", getAxis(coords, lr.getEndPoint())));
 			ret.add(new RegionRow("Rotation (°)",      "°",     lr.getAngleDegrees(), Double.NaN));
+			
 		} else if (roi instanceof PolylineROI) {
 			final PolylineROI pr = (PolylineROI)roi;
 			for (int i = 0, imax = pr.getNumberOfPoints(); i < imax; i++) {
-				ret.add(new RegionRow("Point "+(i+1)+"  (x,y)", "pixel", pr.getPointX(i), pr.getPointY(i)));
+				ret.add(new RegionRow("Point "+(i+1)+"  (x,y)", "pixel", getAxis(coords, pr.getPoint(i).getPoint())));
 			}
 			
 		} else if (roi instanceof PointROI) {
 			final PointROI pr = (PointROI)roi;
-			ret.add(new RegionRow("Point (x,y)", "pixel", pr.getPointX(), pr.getPointY()));
+			ret.add(new RegionRow("Point (x,y)", "pixel", getAxis(coords, pr.getPoint())));
 			
 		} else if (roi instanceof RectangularROI) {
-			if (roi instanceof PerimeterBoxROI) {
-				final PerimeterBoxROI pr = (PerimeterBoxROI)roi;
-				ret.add(new RegionRow("Start Point (x,y)", "pixel", pr.getPointX(),       pr.getPointY()));
-				final double[] ept = pr.getEndPoint();
-				ret.add(new RegionRow("End Point (x,y)",   "pixel", ept[0],               ept[1]));
-				ret.add(new RegionRow("Rotation (°)",      "°",     pr.getAngleDegrees(), Double.NaN));
-		
-			} else {
-				final RectangularROI rr = (RectangularROI)roi;
-				ret.add(new RegionRow("Start Point (x,y)", "pixel", rr.getPointX(),       rr.getPointY()));
-				final double[] ept = rr.getEndPoint();
-				ret.add(new RegionRow("End Point (x,y)",   "pixel", ept[0],               ept[1]));
-				ret.add(new RegionRow("Rotation (°)",      "°",     rr.getAngleDegrees(), Double.NaN));
-			}
+			final RectangularROI rr = (RectangularROI)roi;
+			ret.add(new RegionRow("Start Point (x,y)", "pixel", getAxis(coords, rr.getPoint())));
+			ret.add(new RegionRow("End Point (x,y)",   "pixel", getAxis(coords, rr.getEndPoint())));
+			ret.add(new RegionRow("Rotation (°)",      "°",     rr.getAngleDegrees(), Double.NaN));
+
 			
 		} else if (roi instanceof SectorROI) {
 			final SectorROI sr = (SectorROI)roi;
-			ret.add(new RegionRow("Centre (x,y)",         "pixel", sr.getPointX(),        sr.getPointY()));
-			ret.add(new RegionRow("Radii (inner, outer)", "pixel", sr.getRadius(0),       sr.getRadius(1)));
-			ret.add(new RegionRow("Angles (°)",           "°",     sr.getAngleDegrees(0), sr.getAngleDegrees(1)));
-			
-			if (regionType!=null && regionType==RegionType.RING) {
+			ret.add(new RegionRow("Centre (x,y)",         "pixel", getAxis(coords, sr.getPoint())));
+			ret.add(new RegionRow("Radii (inner, outer)", "pixel", sr.getRadii()));
+			ret.add(new RegionRow("Angles (°)",           "°",     sr.getAngleDegrees(0), sr.getAngleDegrees(1)));			
+			if (roi instanceof RingROI) {
 				ret.get(2).setEnabled(false);
 			}
 		} else if (roi instanceof CircularROI) {
 			final CircularROI cr = (CircularROI) roi;
-			ret.add(new RegionRow("Centre (x,y)", "pixel", cr.getPointX(), cr.getPointY()));
-			ret.add(new RegionRow("Radius",       "pixel", cr.getRadius(), Double.NaN));
+			ret.add(new RegionRow("Centre (x,y)", "pixel",  getAxis(coords, cr.getPoint())));
+			ret.add(new RegionRow("Radius",       "pixel",  cr.getRadius(), Double.NaN));
+			
 		} else if (roi instanceof EllipticalROI) {
 			final EllipticalROI er = (EllipticalROI) roi;
-			ret.add(new RegionRow("Centre (x,y)",             "pixel", er.getPointX(),       er.getPointY()));
-			ret.add(new RegionRow("Semi-axes (major, minor)", "pixel", er.getSemiAxis(0),    er.getSemiAxis(1)));
+			ret.add(new RegionRow("Centre (x,y)",             "pixel", getAxis(coords,    er.getPoint())));
+			ret.add(new RegionRow("Semi-axes (major, minor)", "pixel", er.getSemiAxis(0), er.getSemiAxis(1)));
 			ret.add(new RegionRow("Rotation (°)",             "°",     er.getAngleDegrees(), Double.NaN));
+			
 			if (er instanceof EllipticalFitROI) {
 				ret.get(0).setEnabled(false);
 				ret.get(1).setEnabled(false);
 				ret.get(2).setEnabled(false);
 				final PolylineROI pr = ((EllipticalFitROI) er).getPoints();
 				for (int i = 0, imax = pr.getNumberOfPoints(); i < imax; i++) {
-					ret.add(new RegionRow("Point "+(i+1)+"  (x,y)", "pixel", pr.getPointX(i), pr.getPointY(i)));
+					ret.add(new RegionRow("Point "+(i+1)+"  (x,y)", "pixel", getAxis(coords, pr.getPoint())));
 				}
 			}
 		} else if (roi != null) {
-				ret.add(new RegionRow("Unknown type (x,y)", "pixel", roi.getPointX(), roi.getPointY()));
+			ret.add(new RegionRow("Unknown type (x,y)", "pixel", getAxis(coords, roi.getPoint())));
+			
 		} else {
 			ret.add(new RegionRow("Null type (x,y)", "None", Double.NaN, Double.NaN));
 			ret.get(0).setEnabled(false);
@@ -376,17 +373,31 @@ public class ROIEditTable  {
 		
 		return ret;
 	}
+	
+	/**
+	 * get point in axis coords
+	 * @param coords
+	 * @return
+	 */
+	private double[] getAxis(ICoordinateSystem coords, double... vals) {
+		if (coords==null) return vals;
+		try {
+			return coords.getValueAxisLocation(vals);
+		} catch (Exception e) {
+			return vals;
+		}
+	}
 
-	public ROIBase createRoi(List<RegionRow> rows, RegionRow changed) {
+	public ROIBase createRoi(List<RegionRow> rows, RegionRow changed, ICoordinateSystem coords) {
 				
 		ROIBase ret = null; 
 		if (roi instanceof LinearROI) {
 			if (changed==rows.get(2)) {
-				LinearROI lr = new LinearROI(rows.get(0).getPoint(), rows.get(1).getPoint());
+				LinearROI lr = new LinearROI(getImage(coords, rows.get(0)), getImage(coords, rows.get(1)));
 				lr.setAngle(Math.toRadians(rows.get(2).getxLikeVal()));
 				ret = lr;
 			} else {
-				LinearROI lr = new LinearROI(rows.get(0).getPoint(), rows.get(1).getPoint());
+				LinearROI lr = new LinearROI(getImage(coords, rows.get(0)), getImage(coords, rows.get(1)));
 				if (changed==rows.get(1)) rows.get(2).setxLikeVal(0d);
 				ret = lr;
 			}
@@ -394,34 +405,42 @@ public class ROIEditTable  {
 		} else if (roi instanceof PolylineROI) {
 			PolylineROI pr = (roi instanceof PolygonalROI) ? new PolygonalROI() : new PolylineROI();
 			for (RegionRow regionRow : rows) {
-				pr.insertPoint(regionRow.getPoint());
+				pr.insertPoint(getImage(coords, regionRow));
 			}
 			ret = pr;
+			
 		} else if (roi instanceof PointROI) {
-			PointROI pr = new PointROI(rows.get(0).getPoint());
+			PointROI pr = new PointROI(getImage(coords, rows.get(0)));
 			ret = pr;
 			
 		} else if (roi instanceof RectangularROI) {
+			
+			final double[] start = getImage(coords, rows.get(0));
+			final double[] end   = getImage(coords, rows.get(1));
+			
+			// TODO don't have to do it this way - reflection would solve all the tests with identical blocks.
 			if (roi instanceof PerimeterBoxROI) {
-				PerimeterBoxROI pr = new PerimeterBoxROI(rows.get(0).getxLikeVal(), rows.get(0).getyLikeVal(),
-								                                rows.get(1).getxLikeVal()-rows.get(0).getxLikeVal(),
-								                                rows.get(1).getyLikeVal()-rows.get(0).getyLikeVal(), 
-								                                Math.toRadians(rows.get(2).getxLikeVal()));
-						ret = pr;
+				PerimeterBoxROI pr = new PerimeterBoxROI(start[0],         start[1],
+								                         end[0]-start[0],  end[1]-start[1], 
+								                         Math.toRadians(rows.get(2).getxLikeVal()));
+				ret = pr;
+				
 			} else {
-				RectangularROI rr = new RectangularROI(rows.get(0).getxLikeVal(), rows.get(0).getyLikeVal(),
-					                                rows.get(1).getxLikeVal()-rows.get(0).getxLikeVal(),
-					                                rows.get(1).getyLikeVal()-rows.get(0).getyLikeVal(), 
-					                                Math.toRadians(rows.get(2).getxLikeVal()));
+				RectangularROI rr = new RectangularROI(start[0],          start[1],
+								                       end[0]-start[0],   end[1]-start[1], 
+								                       Math.toRadians(rows.get(2).getxLikeVal()));
 				ret = rr;
 			}
 			
 		} else if (roi instanceof SectorROI) {
 			SectorROI orig = (SectorROI)roi;
-			SectorROI sr = new SectorROI(rows.get(0).getxLikeVal(),
-					                     rows.get(0).getyLikeVal(),
-					                     rows.get(1).getxLikeVal(),
-					                     rows.get(1).getyLikeVal(),
+			final double[] cent  = getImage(coords, rows.get(0));
+			final double[] radii = rows.get(1).getPoint();
+
+			SectorROI sr = new SectorROI(cent[0],
+					                     cent[1],
+					                     radii[0],
+					                     radii[1],
 					                     Math.toRadians(rows.get(2).getxLikeVal()),
 					                     Math.toRadians(rows.get(2).getyLikeVal()),
 					                     orig.getDpp(),
@@ -431,29 +450,62 @@ public class ROIEditTable  {
 			sr.setCombineSymmetry(orig.isCombineSymmetry());
 			
 			ret = sr;
+			
 		} else if (roi instanceof CircularROI) {
-			CircularROI cr = new CircularROI(Math.abs(rows.get(1).getxLikeVal()), rows.get(0).getxLikeVal(), rows.get(0).getyLikeVal());
+			
+			final double[] cent = getImage(coords, rows.get(0));
+			final double   rad  = rows.get(1).getxLikeVal();
+
+			CircularROI cr = new CircularROI(Math.abs(rad), cent[0], cent[1]);
 			ret = cr;
+			
 		} else if (roi instanceof EllipticalFitROI) {
 			PolylineROI pr = new PolylineROI();
 
 			for (int i = 3, imax = rows.size(); i < imax; i++) {
-				pr.insertPoint(rows.get(i).getPoint());
+				pr.insertPoint(getImage(coords, rows.get(i)));
 			}
 			ret = new EllipticalFitROI(pr);
+			
 		} else if (roi instanceof EllipticalROI) {
-			EllipticalROI er = new EllipticalROI(Math.abs(rows.get(1).getxLikeVal()), Math.abs(rows.get(1).getyLikeVal()),
-					Math.toRadians(rows.get(2).getxLikeVal()), rows.get(0).getxLikeVal(), rows.get(0).getyLikeVal());
+			
+			final double[] cent = getImage(coords, rows.get(0));
+			final double[] maj  = rows.get(1).getPoint();
+			final double   ang  = rows.get(2).getxLikeVal();
+			
+			EllipticalROI er = new EllipticalROI(maj[0],maj[1],
+					                             Math.toRadians(ang), 
+					                             cent[0], 
+					                             cent[1]);
 			ret = er;
 		}
 		
 		return ret;
 	}
+	
+	/**
+	 * get point in axis coords
+	 * @param coords
+	 * @return
+	 */
+	private double[] getImage(ICoordinateSystem coords, RegionRow row) {
+		if (coords==null) return row.getPoint();
+		return getImage(coords, row.getPoint());
+	}
+	private double[] getImage(ICoordinateSystem coords, double... vals) {
+		if (coords==null) return vals;
+		try {
+			return coords.getAxisLocationValue(vals);
+		} catch (Exception e) {
+			return vals;
+		}
+	}
+
 
 	public void dispose() {
 		roi=null;
 		originalRoi=null;
-		regionType=null;
+		coords=null;
 		rows.clear();
 		rows=null;
     }
@@ -464,11 +516,11 @@ public class ROIEditTable  {
         private double xLikeVal;
     	private double yLikeVal;
     	private boolean enabled=true;
-		public RegionRow(String name, String unit, double xLikeVal, double yLikeVal) {
+		public RegionRow(String name, String unit, double... vals) {
 			this.name     = name;
 			this.unit     = unit;
-			this.xLikeVal = xLikeVal;
-			this.yLikeVal = yLikeVal;
+			this.xLikeVal = vals[0];
+			this.yLikeVal = vals[1];
 		}
 		public double[] getPoint() {
 			return new double[]{xLikeVal, yLikeVal};

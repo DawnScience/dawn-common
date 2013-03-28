@@ -55,7 +55,7 @@ public class ROIDialog extends Dialog {
 		roiType.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				try {
-					roiEditor.setRegion(ROIType.createNew(roiType.getSelectionIndex()), null);
+					roiEditor.setRegion(ROIType.createNew(roiType.getSelectionIndex()), null, null);
 				} catch (Exception e1) {
 					logger.error("Cannot create roi "+ROIType.getType(roiType.getSelectionIndex()).getName(), e1);
 				}
@@ -72,7 +72,7 @@ public class ROIDialog extends Dialog {
 	public void setROI(ROIBase roi) {
 		final int index = ROIType.getIndex(roi.getClass());
 		roiType.select(index);
-		roiEditor.setRegion(roi, null);
+		roiEditor.setRegion(roi, null, null);
 	}
 	
 	public ROIBase getROI() {
