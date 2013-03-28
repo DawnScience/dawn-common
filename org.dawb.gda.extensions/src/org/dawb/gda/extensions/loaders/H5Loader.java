@@ -128,7 +128,7 @@ public class H5Loader extends AbstractFileLoader implements IMetaLoader, IDataSe
 			}
 
 			if (mon!=null) mon.worked(1);
-			final Object    val  = dataset.read();
+			final Object    val  = dataset.read(); // Appears in stack traces of VM exists
 			if (mon!=null) mon.worked(1);
 			AbstractDataset aset = H5Utils.getSet(val,selected,dataset);
 			
