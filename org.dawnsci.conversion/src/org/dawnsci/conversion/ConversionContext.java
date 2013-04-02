@@ -1,13 +1,17 @@
 package org.dawnsci.conversion;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.dawb.common.services.IConversionContext;
 
 class ConversionContext implements IConversionContext {
 
-	private ConversionScheme conversionScheme;
-	private String           filePath;
-	private String           datasetName;
-	private String           outputFolder;
+	private ConversionScheme    conversionScheme;
+	private String              filePath;
+	private String              datasetName;
+	private String              outputFolder;
+	private Map<Integer,String> sliceDimensions;
 	
 	public ConversionScheme getConversionScheme() {
 		return conversionScheme;
@@ -76,5 +80,26 @@ class ConversionContext implements IConversionContext {
 			return false;
 		return true;
 	}	
+
+	
+	/**
+	 * 
+	 * @param dim
+	 * @param sliceString either an integer to hold the dimension constant or
+	 * a range of the form "start:end" where start is the start index and end is
+	 * the end index or the string "all" to use the size of the dataset (start=0,
+	 * end-length dimension).
+	 */
+	public void addSliceDimension(int dim, String sliceString) {
+		if (sliceDimensions == null) sliceDimensions = new HashMap<Integer,String>(7);
+		sliceDimensions.put(dim, sliceString);
+	}
+	/**
+	 * 
+	 * @return the dimensions to slice in, may be null, in which case no slice done.
+	 */
+	public Map<Integer, String> getSliceDimensions() {
+		return sliceDimensions;
+	}
 
 }

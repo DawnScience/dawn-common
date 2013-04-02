@@ -25,8 +25,8 @@ package org.dawb.common.services;
  * Usage something like:
  * <code>
  * IConversionService service = (IConversionService)ServiceManager.getService(IConversionService.class);
- * IConversionContext context = service.open("/dls/path_to_some_hdf5_file.h5");
- * context.setDatasetName("/entry1/signal/some_data");
+ * IConversionContext context = service.open("/dls/path_to_some_hdf5_file.nxs"); // regex allowed
+ * context.setDatasetName("/entry1/signal/some_data"); // regex allowed
  * context.setOutputFolder("/dls/some_place_I_want_my_data");
  * context.setScheme("IConversionContext.ConversionScheme.ASCII_FROM_2D");
  * service.process(context);

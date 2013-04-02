@@ -16,6 +16,8 @@
 
 package org.dawb.common.services;
 
+import java.util.Map;
+
 /**
  * The conversion context which will drive what we are going to convert.
  */
@@ -73,5 +75,24 @@ public interface IConversionContext {
 	 * @param folderPath
 	 */
 	public void setOutputFolder(String folderPath);
+	
+	/**
+	 * 
+	 * @param dim
+	 * @param sliceString either an integer to hold the dimension constant or
+	 * a range of the form "start:end" where start is the start index and end is
+	 * the end index or the string "all" to use the size of the dataset (start=0,
+	 * end-length dimension).
+	 * 
+	 * There should be only one range set in the slicing, one set to "all" or one
+	 * set to "start:end" where start is the start index. Only one range can be
+	 * processed at a time.
+	 */
+	public void addSliceDimension(int dim, String sliceString);
 
+	/**
+	 * 
+	 * @return the dimensions to slice in.
+	 */
+	public Map<Integer, String> getSliceDimensions();
 }
