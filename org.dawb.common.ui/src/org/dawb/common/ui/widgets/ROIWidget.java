@@ -200,7 +200,9 @@ public class ROIWidget implements IROIListener {
 	 * @param region
 	 */
 	public void setEditingRegion(IRegion region){
-		roiViewer.setTableValues(region.getROI());
+		if(region == null || roiViewer == null) return;
+		if(region.getROI() != null)
+			roiViewer.setTableValues(region.getROI());
 		if(nameText != null && !nameText.isDisposed())
 			nameText.setText(region.getName());
 		regionName = region.getName();
