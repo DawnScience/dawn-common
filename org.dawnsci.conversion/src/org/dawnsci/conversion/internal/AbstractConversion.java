@@ -17,7 +17,7 @@ public abstract class AbstractConversion {
 	protected abstract void processFile(String filePathNoRegex, IConversionContext context);
 
 	/**
-	 * TODO expand the regex according to the javadoc. I will do this.
+	 * TODO expand the regex according to the javadoc.
 	 * @param context
 	 * @return
 	 */
