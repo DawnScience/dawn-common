@@ -2,6 +2,7 @@ package org.dawnsci.conversion;
 
 import org.dawb.common.services.IConversionContext;
 import org.dawb.common.services.IConversionService;
+import org.dawnsci.conversion.internal.AbstractConversion;
 import org.dawnsci.conversion.internal.AsciiConvert1D;
 import org.dawnsci.conversion.internal.AsciiConvert2D;
 import org.dawnsci.conversion.internal.CustomNCDConverter;
@@ -18,7 +19,7 @@ class ConversionServiceImpl implements IConversionService {
 
 	@Override
 	public void process(IConversionContext context) throws Exception {
-		IConversionService deligate=null;
+		AbstractConversion deligate=null;
 		switch(context.getConversionScheme()) {
 		case ASCII_FROM_2D:
 			deligate = new AsciiConvert2D();
