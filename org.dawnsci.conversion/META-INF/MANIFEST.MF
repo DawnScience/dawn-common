@@ -1,0 +1,14 @@
+Dependecy-Note: Do not add dependencies to this plugin, it should depend on JDK and
+ HDF5 only. Do not add anything else as this plugin may be run on the cluster for converting
+ H5 files to various formats.
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Conversion
+Bundle-SymbolicName: org.dawnsci.conversion
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: org.dawnsci.conversion.Activator
+Bundle-Vendor: Diamond Light Source
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy
+Import-Package: org.osgi.framework
+Require-Bundle: org.dawb.common.services;bundle-version="1.2.0"
