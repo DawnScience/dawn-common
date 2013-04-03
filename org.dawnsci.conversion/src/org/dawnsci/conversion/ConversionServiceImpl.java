@@ -20,21 +20,25 @@ class ConversionServiceImpl implements IConversionService {
 	@Override
 	public void process(IConversionContext context) throws Exception {
 		AbstractConversion deligate=null;
-		switch(context.getConversionScheme()) {
-		case ASCII_FROM_2D:
-			deligate = new AsciiConvert2D();
-			break;
-		case ASCII_FROM_1D:
-			deligate = new AsciiConvert1D();
-			break;
-		case CUSTOM_NCD:
-			deligate = new CustomNCDConverter();
-			break;
-		case TIFF_FROM_3D:
-			deligate = new TiffConverter();
-			break;
+		try {
+			switch(context.getConversionScheme()) {
+			case ASCII_FROM_2D:
+				deligate = new AsciiConvert2D(context);
+				break;
+			case ASCII_FROM_1D:
+				deligate = new AsciiConvert1D(context);
+				break;
+			case CUSTOM_NCD:
+				deligate = new CustomNCDConverter(context);
+				break;
+			case TIFF_FROM_3D:
+				deligate = new TiffConverter(context);
+				break;
+			}
+			deligate.process(context);
+		} finally {
+			if (deligate!=null) deligate.close(context);
 		}
-		deligate.process(context);
 	}
 
 }

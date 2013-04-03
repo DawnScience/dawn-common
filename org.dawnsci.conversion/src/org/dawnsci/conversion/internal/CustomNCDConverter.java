@@ -6,8 +6,13 @@ import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 
 public class CustomNCDConverter extends AbstractConversion  {
 
+	public CustomNCDConverter(IConversionContext context) {
+		super(context);
+		// TODO Auto-generated constructor stub
+	}
+
 	@Override
-	protected void convert(AbstractDataset slice, IConversionContext context) {
+	protected void convert(AbstractDataset slice) {
 		// TODO Auto-generated method stub
 
 	}

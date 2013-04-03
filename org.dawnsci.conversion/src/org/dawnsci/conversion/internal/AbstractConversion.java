@@ -23,6 +23,12 @@ import uk.ac.diamond.scisoft.analysis.dataset.LongDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ShortDataset;
 
 public abstract class AbstractConversion {
+	
+	protected IConversionContext context;
+
+	AbstractConversion(IConversionContext context) {
+		this.context = context;
+	}
 
 	public void process(IConversionContext context) throws Exception {
 		// Process regular expression
@@ -34,6 +40,18 @@ public abstract class AbstractConversion {
 			}
 		}
 	}
+	
+	/**
+	 * Override this class to provide things which should happen after the processing.
+	 * @param context
+	 */
+	public void close(IConversionContext context) {
+		
+	}
+	
+	protected IConversionContext getContext() {
+		return context;
+	}
 
 	/**
 	 * Please implement this method to process a single conversion. The files will have been 
@@ -43,7 +61,7 @@ public abstract class AbstractConversion {
 	 * @param slice
 	 * @param context, used to provide the output location mainly.
 	 */
-	protected abstract void convert(AbstractDataset slice, IConversionContext context);
+	protected abstract void convert(AbstractDataset slice);
 	
 	/**
 	 * 
@@ -72,7 +90,7 @@ public abstract class AbstractConversion {
 			if (sliceDimensions==null) {
 				AbstractDataset data = getSet(dataset.getData(),selected,dataset);
 				data.setName(dsPath);
-				convert(data, context);
+				convert(data);
 				return;
 			}
 			
@@ -120,13 +138,13 @@ public abstract class AbstractConversion {
 					
 					AbstractDataset data = getSet(dataset.getData(),dim,dataset);
 					data.setName(dsPath+" (Dim "+sliceIndex+"; index="+index+")");
-					convert(data, context);
+					convert(data);
 				}
 				
 			} else {
 				AbstractDataset data = getSet(dataset.getData(),dim,dataset);
 				data.setName(dsPath+" (Dim "+sliceIndex+"; index="+start[sliceIndex] +")");
-				convert(data, context);
+				convert(data);
 			}
 			
 		} finally {
@@ -253,9 +271,9 @@ public abstract class AbstractConversion {
 	 */
 	public static void main(String[] args)  throws Exception {
 		
-		final AbstractConversion conv = new AbstractConversion() {
+		final AbstractConversion conv = new AbstractConversion(null) {
 			@Override
-			protected void convert(AbstractDataset slice, IConversionContext context) {
+			protected void convert(AbstractDataset slice ) {
 				System.out.println(slice);
 			}
 		};

@@ -12,6 +12,7 @@ class ConversionContext implements IConversionContext {
 	private String              datasetName;
 	private String              outputFolder;
 	private Map<Integer,String> sliceDimensions;
+	private Object              userObject;
 	
 	public ConversionScheme getConversionScheme() {
 		return conversionScheme;
@@ -50,6 +51,10 @@ class ConversionContext implements IConversionContext {
 				+ ((filePath == null) ? 0 : filePath.hashCode());
 		result = prime * result
 				+ ((outputFolder == null) ? 0 : outputFolder.hashCode());
+		result = prime * result
+				+ ((sliceDimensions == null) ? 0 : sliceDimensions.hashCode());
+		result = prime * result
+				+ ((userObject == null) ? 0 : userObject.hashCode());
 		return result;
 	}
 	@Override
@@ -78,6 +83,16 @@ class ConversionContext implements IConversionContext {
 				return false;
 		} else if (!outputFolder.equals(other.outputFolder))
 			return false;
+		if (sliceDimensions == null) {
+			if (other.sliceDimensions != null)
+				return false;
+		} else if (!sliceDimensions.equals(other.sliceDimensions))
+			return false;
+		if (userObject == null) {
+			if (other.userObject != null)
+				return false;
+		} else if (!userObject.equals(other.userObject))
+			return false;
 		return true;
 	}	
 
@@ -100,6 +115,12 @@ class ConversionContext implements IConversionContext {
 	 */
 	public Map<Integer, String> getSliceDimensions() {
 		return sliceDimensions;
+	}
+	public Object getUserObject() {
+		return userObject;
+	}
+	public void setUserObject(Object userObject) {
+		this.userObject = userObject;
 	}
 
 }
