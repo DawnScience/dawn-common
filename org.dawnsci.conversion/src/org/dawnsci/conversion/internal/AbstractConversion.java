@@ -277,6 +277,9 @@ public abstract class AbstractConversion {
 		slice.put(0, "36");
 		conv.processSlice(new File("C:/Work/results/results/large test files/TomographyDataSet.hdf5"), "/entry/exchange/dark_data", slice, null);
 
+		slice.put(0, "12:24");
+		conv.processSlice(new File("C:/Work/results/results/large test files/TomographyDataSet.hdf5"), "/entry/exchange/dark_data", slice, null);
+
 		slice.put(0, "all");
 		conv.processSlice(new File("C:/Work/results/results/large test files/TomographyDataSet.hdf5"), "/entry/exchange/dark_data", slice, null);
 
