@@ -95,4 +95,16 @@ public interface IConversionContext {
 	 * @return the dimensions to slice in.
 	 */
 	public Map<Integer, String> getSliceDimensions();
+	
+	/**
+	 * Get custom data which may be needed for a certain ConversionScheme
+	 * @return
+	 */
+	public Object getUserObject();
+	
+	/**
+	 * Set custom data which may be needed for a certain ConversionScheme
+	 * @return
+	 */
+	public void setUserObject(Object object);
 }
