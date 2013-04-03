@@ -237,6 +237,10 @@ public abstract class AbstractConversion {
 		
 		final File[] fa = new File(dir).listFiles();
 		for (File file : fa) {
+			if (regexp==null || "".equals(regexp)) {
+				files.add(file);
+				continue;
+			}
 			if (file.getName().matches(regexp)) files.add(file);
 		}
 		
@@ -262,6 +266,7 @@ public abstract class AbstractConversion {
 		System.out.println(conv.expand("C:/Work/results/i03_data/35873/fred.cbf"));
 		System.out.println(conv.expand("C:/Work/results/i03_data/35873/(.*).img"));
 		System.out.println(conv.expand("C:/Work/results/i03_data/35873/(.*).cbf"));
+		System.out.println(conv.expand("C:/tmp/"));
 		
 		System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$ DATA");
 		System.out.println(conv.getData(new File("C:/Work/results/results/large test files/TomographyDataSet.hdf5"), "naff"));
