@@ -2,7 +2,9 @@ package org.dawb.common.ui.wizard;
 
 import java.io.File;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -73,6 +75,8 @@ public class NewFileChoosePage extends WizardNewFileCreationPage {
 	}
 
 	public File getFile() {
+		final IFile ifile = ResourcesPlugin.getWorkspace().getRoot().getFile(new Path(getContainerFullPath()+"/"+getFileName()));
+		if (ifile!=null) return new File(ifile.getLocation().toOSString());
 		final String dir  = ResourcesPlugin.getWorkspace().getRoot().getLocation().toOSString()+getContainerFullPath().toOSString();
 		return new File(dir, getFileName());
 	}
