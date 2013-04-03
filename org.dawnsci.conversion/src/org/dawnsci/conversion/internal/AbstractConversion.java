@@ -18,9 +18,12 @@ import uk.ac.diamond.scisoft.analysis.dataset.ByteDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.DatasetUtils;
 import uk.ac.diamond.scisoft.analysis.dataset.DoubleDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.FloatDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.IntegerDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.LongDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ShortDataset;
+import uk.ac.diamond.scisoft.analysis.io.DataHolder;
+import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 
 /**
  * AbstractConversion details converting from hdf/nexus to other
@@ -70,6 +73,17 @@ public abstract class AbstractConversion {
 	 */
 	protected abstract void convert(AbstractDataset slice);
 	
+	private void processSlice(final File                 path, 
+				            final String               dsPath,
+				            final Map<Integer, String> sliceDimensions,
+				            final IConversionContext   context) throws Exception {
+		
+		// TODO Should have used ILazyDataset here, but it is very slow
+		// in comparison to direct.
+		processSliceDirect(path, dsPath, sliceDimensions, context);
+		//processSliceLazy(path, dsPath, sliceDimensions, context);  // Slow!
+	}
+
 	/**
 	 * 
 	 * @param path
@@ -79,12 +93,11 @@ public abstract class AbstractConversion {
 	 * @return
 	 * @throws Exception
 	 */
-	private void processSlice(final File                 path, 
+	private void processSliceDirect(final File                 path, 
 			                  final String               dsPath,
 			                  final Map<Integer, String> sliceDimensions,
 			                  final IConversionContext   context) throws Exception {
 		
-		// TODO Should have used ILazyDataset here, but it works as is for now.
 		IHierarchicalDataFile file = null;
 		try {
 			file = HierarchicalDataFactory.getReader(path.getAbsolutePath());
@@ -156,6 +169,92 @@ public abstract class AbstractConversion {
 			
 		} finally {
 			file.close();
+		}
+	}
+	
+	/**
+	 * 
+	 * @param path
+	 * @param dsPath
+	 * @param sliceDimensions
+	 * @param context, might be null for testing
+	 * @return
+	 * @throws Exception
+	 */
+	private void processSliceLazy(final File                 path, 
+				                  final String               dsPath,
+				                  final Map<Integer, String> sliceDimensions,
+				                  final IConversionContext   context) throws Exception {
+		
+		
+		final DataHolder   dh = LoaderFactory.getData(path.getAbsolutePath());
+		if (sliceDimensions==null) {
+			AbstractDataset data = LoaderFactory.getDataSet(path.getAbsolutePath(), dsPath, null);
+			data.setName(dsPath);
+			convert(data);
+			return;
+		}
+		
+		final ILazyDataset lz = dh.getLazyDataset(dsPath);
+		final int[] fullDims = lz.getShape();
+
+		int[] start  = new int[fullDims.length];
+		for (int i = 0; i < start.length; i++) start[i] = 0;
+		
+		int[] stop  = new int[fullDims.length];
+		for (int i = 0; i < stop.length; i++) stop[i] = fullDims[i];
+		
+		int[] step  = new int[fullDims.length];
+
+		List<Integer> dims = new ArrayList<Integer>(fullDims.length);
+		String sliceRange=null;
+		int    sliceIndex=-1;
+		for (int i = 0; i < fullDims.length; i++) {
+			step[i] = 1;
+
+			// Any that parse statically to a single int are not ranges.
+			if (sliceDimensions.containsKey(i)) {
+				try {
+					start[i]    = Integer.parseInt(sliceDimensions.get(i));
+					stop[i]     = start[i]+1;
+					sliceIndex  = i;
+				} catch (Throwable ne) {
+					sliceRange = sliceDimensions.get(i);
+					sliceIndex = i;
+					continue;
+				}
+			} else {
+				dims.add(fullDims[i]);
+			}
+		}
+
+		long[] dim = new long[dims.size()];
+		for (int i = 0; i < dim.length; i++) dim[i] = dims.get(i);
+
+		if (sliceRange!=null) { // We compute the range to slice.
+			int s = 0;
+			int e = fullDims[sliceIndex];
+			if (sliceRange.indexOf(":")>0) {
+				final String[] sa = sliceRange.split(":");
+				s = Integer.parseInt(sa[0]);
+				e = Integer.parseInt(sa[1]);
+			}
+
+			for (int index = s; index < e; index++) {
+				start[sliceIndex]   = index;
+				stop[sliceIndex]    = index+1;
+
+				AbstractDataset data = (AbstractDataset)lz.getSlice(start, stop, step);
+				data = data.squeeze();
+				data.setName(dsPath+" (Dim "+sliceIndex+"; index="+index+")");
+				convert(data);
+			}
+
+		} else {
+			AbstractDataset data = (AbstractDataset)lz.getSlice(start, stop, step);
+			data = data.squeeze();
+			data.setName(dsPath+" (Dim "+sliceIndex+"; index="+start[sliceIndex] +")");
+			convert(data);
 		}
 	}
 	
