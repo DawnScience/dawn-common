@@ -49,7 +49,7 @@ public abstract class AbstractConversion {
 	}
 	
 	/**
-	 * Override this class to provide things which should happen after the processing.
+	 * Override this method to provide things which should happen after the processing.
 	 * @param context
 	 */
 	public void close(IConversionContext context) {
