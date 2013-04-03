@@ -19,10 +19,10 @@ public class Activator implements BundleActivator {
 	 * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
 	 */
 	public void start(BundleContext bundleContext) throws Exception {
-		System.out.println("Starting org.dawnsci.persistence");
+		System.out.println("Starting "+bundleContext.getBundle().getSymbolicName());
 		Hashtable<String, String> props = new Hashtable<String, String>(1);
 		props.put("description", "A service used to convert hdf5 files");
-		context.registerService(IConversionService.class, new ConversionServiceImpl(), props);
+		bundleContext.registerService(IConversionService.class, new ConversionServiceImpl(), props);
 		Activator.context = bundleContext;
 	}
 
