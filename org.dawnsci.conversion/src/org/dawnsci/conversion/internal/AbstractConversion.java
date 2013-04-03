@@ -22,6 +22,13 @@ import uk.ac.diamond.scisoft.analysis.dataset.IntegerDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.LongDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ShortDataset;
 
+/**
+ * AbstractConversion details converting from hdf/nexus to other
+ * things only at the moment.
+ * 
+ * @author fcp94556
+ *
+ */
 public abstract class AbstractConversion {
 	
 	protected IConversionContext context;
