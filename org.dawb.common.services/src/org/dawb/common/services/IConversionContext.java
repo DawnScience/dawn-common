@@ -28,7 +28,27 @@ public interface IConversionContext {
 	 * of the conversions we have spoken about before.
 	 */
 	public enum ConversionScheme {
-		ASCII_FROM_2D, ASCII_FROM_1D, CUSTOM_NCD, TIFF_FROM_3D;
+		ASCII_FROM_2D("Convert to ascii from 2D data"), 
+		ASCII_FROM_1D("Convert to ascii from 1D data"), 
+		CUSTOM_NCD("Convert to ascii from NCD data"), 
+		TIFF_FROM_3D("Convert to tiff from image stack");
+		
+		private String uiLabel;
+
+		ConversionScheme(String uiLabel) {
+			this.uiLabel = uiLabel;
+		}
+
+		public String getUiLabel() {
+			return uiLabel;
+		}
+		
+		public ConversionScheme fromLabel(String uiLabel) {
+			for (ConversionScheme cs : values()) {
+				if (cs.getUiLabel().equals(uiLabel)) return cs;
+			}
+			return null;
+		}
 	}
 	
 	/**
