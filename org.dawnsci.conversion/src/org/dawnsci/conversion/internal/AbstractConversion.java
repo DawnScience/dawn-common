@@ -59,6 +59,7 @@ public abstract class AbstractConversion {
 			                  final Map<Integer, String> sliceDimensions,
 			                  final IConversionContext   context) throws Exception {
 		
+		// TODO Should have used ILazyDataset here, but it works as is for now.
 		IHierarchicalDataFile file = null;
 		try {
 			file = HierarchicalDataFactory.getReader(path.getAbsolutePath());
@@ -70,6 +71,7 @@ public abstract class AbstractConversion {
 			
 			if (sliceDimensions==null) {
 				AbstractDataset data = getSet(dataset.getData(),selected,dataset);
+				data.setName(dsPath);
 				convert(data, context);
 				return;
 			}
@@ -87,11 +89,12 @@ public abstract class AbstractConversion {
 				// Any that parse statically to a single int are not ranges.
 				if (sliceDimensions.containsKey(i)) {
 					try {
-						long top    = Long.parseLong(sliceDimensions.get(i));
-						start[i]    = top-1;
+						start[i]    = Long.parseLong(sliceDimensions.get(i));
 						selected[i] = 1;
+						sliceIndex  = i;
 					} catch (Throwable ne) {
 						sliceRange = sliceDimensions.get(i);
+						sliceIndex = i;
 						continue;
 					}
 				} else {
@@ -103,16 +106,26 @@ public abstract class AbstractConversion {
 			for (int i = 0; i < dim.length; i++) dim[i] = dims.get(i);
 			
 			if (sliceRange!=null) { // We compute the range to slice.
-				
-				if ("all".equals(sliceRange)) {
-					for (long index = 0; index < fullDims[sliceIndex]; index++) {
-						
-					}
+				long s = 0;
+				long e = fullDims[sliceIndex];
+				if (sliceRange.indexOf(":")>0) {
+					final String[] sa = sliceRange.split(":");
+					s = Long.parseLong(sa[0]);
+					e = Long.parseLong(sa[1]);
 				}
 
+				for (long index = s; index < e; index++) {
+					start[sliceIndex]    = index;
+					selected[sliceIndex] = 1;
+					
+					AbstractDataset data = getSet(dataset.getData(),dim,dataset);
+					data.setName(dsPath+" (Dim "+sliceIndex+"; index="+index+")");
+					convert(data, context);
+				}
 				
 			} else {
 				AbstractDataset data = getSet(dataset.getData(),dim,dataset);
+				data.setName(dsPath+" (Dim "+sliceIndex+"; index="+start[sliceIndex] +")");
 				convert(data, context);
 			}
 			
