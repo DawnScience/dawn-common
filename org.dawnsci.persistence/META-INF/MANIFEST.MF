@@ -19,4 +19,6 @@ Import-Package: org.dawb.common.services,
 Export-Package: org.dawnsci.persistence,
  org.dawnsci.persistence.metadata.diffraction,
  org.dawnsci.persistence.roi
-Bundle-ActivationPolicy: lazy
+Important-Note: This plugin SHOULD NOT be lazy activated because we always want this 
+ plugin to be loaded to contribute the service.
+
