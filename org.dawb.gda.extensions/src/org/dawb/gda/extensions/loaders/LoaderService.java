@@ -31,6 +31,7 @@ import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 /**
  * Provides a class which will use any loaders available to load a particular file
  * 
+ * TODO FIXME This class should be moved to a proper OSGI service.
  * 
  * @author gerring
  *
