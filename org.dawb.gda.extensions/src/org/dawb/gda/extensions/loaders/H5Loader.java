@@ -40,15 +40,16 @@ import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
 
 public class H5Loader extends AbstractFileLoader implements IMetaLoader, IDataSetLoader {
 
-	private final static List<String> EXT;
+	public final static List<String> EXT;
 	static {
-		EXT = new ArrayList<String>(7);
-		EXT.add("h5");
-		EXT.add("nxs");
-		EXT.add("hd5");
-		EXT.add("hdf5");
-		EXT.add("hdf");
-		EXT.add("nexus");
+		List<String> tmp = new ArrayList<String>(7);
+		tmp.add("h5");
+		tmp.add("nxs");
+		tmp.add("hd5");
+		tmp.add("hdf5");
+		tmp.add("hdf");
+		tmp.add("nexus");
+		EXT = Collections.unmodifiableList(tmp);
 	}	
 
 	public static boolean isH5(final String filePath) {
