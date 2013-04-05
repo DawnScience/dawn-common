@@ -10,6 +10,8 @@
 package org.dawb.gda.extensions.loaders;
 
 import java.io.File;
+import java.net.URI;
+import java.net.URL;
 
 import org.dawb.common.services.ILoaderService;
 import org.dawb.common.ui.monitor.ProgressMonitorWrapper;
@@ -44,7 +46,12 @@ public class LoaderService extends AbstractServiceFactory implements ILoaderServ
 	}
 	
 	public AbstractDataset getDataset(String filePath, final IProgressMonitor monitor) throws Throwable {
-	    
+	    try {
+		    final URL uri = new URL(filePath);
+		    filePath = uri.getPath();
+		} catch (Throwable ignored) {
+		    // We try the file path anyway
+		}
 		return getDataset(new File(filePath), new NullProgressMonitor());
 	}
 

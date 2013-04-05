@@ -114,6 +114,9 @@ public class EclipseUtils {
 	 * @return File
 	 */
 	public static File getFile(IEditorInput fileInput) {
+		File file = (File)fileInput.getAdapter(File.class);
+		if( file != null )
+			return file;
 		URI uri = getFileURI(fileInput);
 		return uri == null ? null : new File(uri);
 	}
@@ -508,12 +511,25 @@ public class EclipseUtils {
 	 * @param file
 	 * @throws PartInitException
 	 */
+//	public static IEditorPart openEditor(IFile file) throws PartInitException {
+//		
+//		final IWorkbenchPage page = EclipseUtils.getPage();
+//		IEditorDescriptor desc = PlatformUI.getWorkbench().getEditorRegistry().getDefaultEditor(file.getName());
+//        if (desc == null) desc =  PlatformUI.getWorkbench().getEditorRegistry().getDefaultEditor(file.getName()+".txt");
+//		return page.openEditor(new FileEditorInput(file), desc.getId());
+//	}
 	public static IEditorPart openEditor(IFile file) throws PartInitException {
+		return openExternalEditor(new FileEditorInput(file), file.getName());
+	}
 		
-		final IWorkbenchPage page = EclipseUtils.getPage();
-		IEditorDescriptor desc = PlatformUI.getWorkbench().getEditorRegistry().getDefaultEditor(file.getName());
-        if (desc == null) desc =  PlatformUI.getWorkbench().getEditorRegistry().getDefaultEditor(file.getName()+".txt");
-		return page.openEditor(new FileEditorInput(file), desc.getId());
+	/**
+	 * Returns a FileStoreEditorInput as IEditorInput on a file path,
+	 * containing a file system reference to it.
+	 * @param filename
+	 */
+	public static IEditorInput getExternalFileStoreEditorInput(String filename) {
+		final IFileStore externalFile = EFS.getLocalFileSystem().fromLocalFile(new File(filename));
+		return new FileStoreEditorInput(externalFile);
 	}
 
 	/**
@@ -521,15 +537,32 @@ public class EclipseUtils {
 	 * @param filename
 	 * @throws PartInitException
 	 */
+//	public static IEditorPart openExternalEditor(String filename) throws PartInitException {
+//		
+//		final IWorkbenchPage page = EclipseUtils.getPage();
+//		IEditorDescriptor desc = PlatformUI.getWorkbench().getEditorRegistry().getDefaultEditor(filename);
+//        if (desc == null) desc =  PlatformUI.getWorkbench().getEditorRegistry().getDefaultEditor(filename+".txt");
+//		final IFileStore externalFile = EFS.getLocalFileSystem().fromLocalFile(new File(filename));
+//		final IEditorInput store      = new FileStoreEditorInput(externalFile);
+//		final String       id         = desc.getId();
+//        return page.openEditor(store, id);
+//	}
 	public static IEditorPart openExternalEditor(String filename) throws PartInitException {
+		return openExternalEditor(getExternalFileStoreEditorInput(filename), filename);
+	}
 		
+	/**
+	 * Opens an external editor on an IEditorInput containing the file having filePath
+	 * @param editorInput
+	 * @param filePath
+	 * @throws PartInitException
+	 */
+	public static IEditorPart openExternalEditor(IEditorInput editorInput, String filePath) throws PartInitException {
+		//TODO Maybe this method could be improved by omitting filepath which comes from editorInput, but "how?" should be defined here
 		final IWorkbenchPage page = EclipseUtils.getPage();
-		IEditorDescriptor desc = PlatformUI.getWorkbench().getEditorRegistry().getDefaultEditor(filename);
-        if (desc == null) desc =  PlatformUI.getWorkbench().getEditorRegistry().getDefaultEditor(filename+".txt");
-		final IFileStore externalFile = EFS.getLocalFileSystem().fromLocalFile(new File(filename));
-		final IEditorInput store      = new FileStoreEditorInput(externalFile);
-		final String       id         = desc.getId();
-        return page.openEditor(store, id);
+		IEditorDescriptor desc = PlatformUI.getWorkbench().getEditorRegistry().getDefaultEditor(filePath);
+		if (desc == null) desc = PlatformUI.getWorkbench().getEditorRegistry().getDefaultEditor(filePath+".txt");
+		return page.openEditor(editorInput, desc.getId());
 	}
 
 	/**
