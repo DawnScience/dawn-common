@@ -105,7 +105,8 @@ public class FontExtenderWidget extends Composite {
 	 */
 	public void update(String text){
 		fontText = text;
-		canvas.redraw();
+		if(canvas != null && !canvas.isDisposed())
+			canvas.redraw();
 	}
 
 	/**
