@@ -48,8 +48,6 @@ public class DoubleUtils {
 			return t >= Math.abs(a - b);
 	}
 
-	private final static DecimalFormat format = new DecimalFormat("0.######E0");
-
 	/**
 	 * Returns a formatted Double value given a specific DecimalFormat<br>
 	 * If more than 4 integer, then we display the value in scientific notation
@@ -59,8 +57,9 @@ public class DoubleUtils {
 	 */
 	public static String formatDouble(double value, int precision){
 		String result;
-		if(((int)value) > 9999 || ((int)value) < -9999)
-			result = format.format(value);
+		if(((int)value) > 9999 || ((int)value) < -9999){
+			result = new DecimalFormat("0.######E0").format(value);
+		}
 		else
 			result = String.valueOf(roundDouble(value, precision));
 		return result == null ? "-" : result;
