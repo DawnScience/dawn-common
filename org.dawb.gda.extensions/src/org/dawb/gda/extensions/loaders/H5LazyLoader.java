@@ -1,13 +1,18 @@
 package org.dawb.gda.extensions.loaders;
 
+import gda.analysis.io.ScanFileHolderException;
+
 import java.io.File;
+import java.lang.ref.Reference;
+import java.lang.ref.SoftReference;
+import java.util.HashMap;
+import java.util.Map;
 
 import ncsa.hdf.object.Dataset;
 
 import org.dawb.hdf5.HierarchicalDataFactory;
 import org.dawb.hdf5.IHierarchicalDataFile;
 
-import gda.analysis.io.ScanFileHolderException;
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.io.ILazyLoader;
 import uk.ac.diamond.scisoft.analysis.io.SliceObject;
@@ -15,6 +20,7 @@ import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
 
 public class H5LazyLoader implements ILazyLoader {
 
+	private Map<SliceObject,Reference<AbstractDataset>> cache;
 	/**
 	 * 
 	 */
@@ -29,6 +35,7 @@ public class H5LazyLoader implements ILazyLoader {
 		this.loader   = new H5Loader();
 		this.path     = path;
 		this.fullPath = fullPath;
+		this.cache    = new HashMap<SliceObject, Reference<AbstractDataset>>(31);
 	}
 
 	@Override
@@ -57,8 +64,17 @@ public class H5LazyLoader implements ILazyLoader {
 		slice.setSliceStart(start);
 		slice.setSliceStop(stop);
 		slice.setSliceStep(step);
+		
+		if (cache.containsKey(slice)) {
+			final Reference<AbstractDataset> sr = cache.get(slice);
+			if (sr.get()!=null) {
+				return sr.get();
+			}
+		}
 		try {
-			return loader.slice(slice, mon);
+			AbstractDataset set = loader.slice(slice, mon);
+			cache.put(slice, new SoftReference<AbstractDataset>(set));
+			return set;
 		} catch (Exception e) {
 			throw new ScanFileHolderException("Cannot slice "+path+", "+fullPath, e);
 		}	
