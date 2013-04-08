@@ -18,6 +18,8 @@ package org.dawb.common.services;
 
 import java.util.Map;
 
+import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
+
 /**
  * The conversion context which will drive what we are going to convert.
  */
@@ -50,6 +52,18 @@ public interface IConversionContext {
 			return null;
 		}
 	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public IMonitor getMonitor();
+	
+	/**
+	 * 
+	 * @param monitor
+	 */
+	public void getMonitor(IMonitor monitor);
 	
 	/**
 	 * Get the current conversion.
@@ -86,15 +100,15 @@ public interface IConversionContext {
 	
 	/**
 	 * 
-	 * @return path export will process to
+	 * @return path export will process to.
 	 */
-	public String getOutputFolder();
+	public String getOutputPath();
 	
 	/**
 	 * Set the file path to output to.
 	 * @param folderPath
 	 */
-	public void setOutputFolder(String folderPath);
+	public void setOutputPath(String fileOrfolderPath);
 	
 	/**
 	 * 

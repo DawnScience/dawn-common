@@ -5,6 +5,8 @@ import java.util.Map;
 
 import org.dawb.common.services.IConversionContext;
 
+import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
+
 class ConversionContext implements IConversionContext {
 
 	private ConversionScheme    conversionScheme;
@@ -13,6 +15,7 @@ class ConversionContext implements IConversionContext {
 	private String              outputFolder;
 	private Map<Integer,String> sliceDimensions;
 	private Object              userObject;
+	private IMonitor            monitor;
 	
 	public ConversionScheme getConversionScheme() {
 		return conversionScheme;
@@ -32,10 +35,10 @@ class ConversionContext implements IConversionContext {
 	public void setDatasetName(String datasetName) {
 		this.datasetName = datasetName;
 	}
-	public String getOutputFolder() {
+	public String getOutputPath() {
 		return outputFolder;
 	}
-	public void setOutputFolder(String outputFolder) {
+	public void setOutputPath(String outputFolder) {
 		this.outputFolder = outputFolder;
 	}
 	@Override
@@ -121,6 +124,14 @@ class ConversionContext implements IConversionContext {
 	}
 	public void setUserObject(Object userObject) {
 		this.userObject = userObject;
+	}
+	@Override
+	public IMonitor getMonitor() {
+		return monitor;
+	}
+	@Override
+	public void getMonitor(IMonitor monitor) {
+		this.monitor = monitor;
 	}
 
 }

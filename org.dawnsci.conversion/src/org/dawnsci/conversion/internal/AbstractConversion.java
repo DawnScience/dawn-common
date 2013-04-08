@@ -55,7 +55,7 @@ public abstract class AbstractConversion {
 	 * Override this method to provide things which should happen after the processing.
 	 * @param context
 	 */
-	public void close(IConversionContext context) {
+	public void close(IConversionContext context) throws Exception{
 		
 	}
 	
