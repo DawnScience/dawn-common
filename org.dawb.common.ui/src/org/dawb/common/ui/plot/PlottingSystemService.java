@@ -4,6 +4,7 @@ import java.util.Hashtable;
 import java.util.Map;
 
 import org.dawb.common.services.ISystemService;
+import org.dawnsci.plotting.api.IPlottingSystem;
 import org.eclipse.ui.services.AbstractServiceFactory;
 import org.eclipse.ui.services.IServiceLocator;
 

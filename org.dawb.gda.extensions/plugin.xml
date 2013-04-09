@@ -57,7 +57,7 @@
       <serviceFactory
             factoryClass="org.dawb.gda.extensions.util.ImageService">
          <service
-               serviceClass="org.dawb.common.services.IImageService">
+               serviceClass="org.dawnsci.plotting.api.histogram.IImageService">
          </service>
       </serviceFactory>
    </extension>

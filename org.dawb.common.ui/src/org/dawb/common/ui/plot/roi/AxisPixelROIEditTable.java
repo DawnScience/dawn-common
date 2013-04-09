@@ -2,9 +2,9 @@ package org.dawb.common.ui.plot.roi;
 
 import org.dawb.common.ui.databinding.AbstractModelObject;
 import org.dawb.common.ui.plot.AbstractPlottingSystem;
-import org.dawb.common.ui.plot.trace.IImageTrace;
-import org.dawb.common.ui.plot.trace.ITrace;
 import org.dawb.common.util.number.DoubleUtils;
+import org.dawnsci.plotting.api.trace.IImageTrace;
+import org.dawnsci.plotting.api.trace.ITrace;
 import org.eclipse.core.databinding.beans.BeanProperties;
 import org.eclipse.core.databinding.observable.list.IObservableList;
 import org.eclipse.core.databinding.observable.list.WritableList;

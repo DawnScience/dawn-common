@@ -3,8 +3,8 @@ package org.dawb.common.ui.plot;
 import java.util.Collection;
 
 import org.dawb.common.ui.Activator;
-import org.dawb.common.ui.plot.region.IRegion;
-import org.dawb.common.ui.plot.tool.AbstractToolPage;
+import org.dawnsci.plotting.api.region.IRegion;
+import org.dawnsci.plotting.api.tool.AbstractToolPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;

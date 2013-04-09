@@ -6,10 +6,10 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
-import org.dawb.common.ui.plot.axis.ICoordinateSystem;
-import org.dawb.common.ui.plot.region.IROIListener;
-import org.dawb.common.ui.plot.region.IRegion.RegionType;
-import org.dawb.common.ui.plot.region.ROIEvent;
+import org.dawnsci.plotting.api.axis.ICoordinateSystem;
+import org.dawnsci.plotting.api.region.IROIListener;
+import org.dawnsci.plotting.api.region.ROIEvent;
+import org.dawnsci.plotting.api.region.IRegion.RegionType;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;

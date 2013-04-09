@@ -23,7 +23,9 @@ import javax.management.remote.JMXConnectorServer;
 import javax.management.remote.JMXConnectorServerFactory;
 import javax.management.remote.JMXServiceURL;
 
-import org.dawb.common.ui.plot.tool.IToolPageSystem;
+import org.dawnsci.plotting.api.IPlottingSystem;
+import org.dawnsci.plotting.api.ThreadSafePlottingSystem;
+import org.dawnsci.plotting.api.tool.IToolPageSystem;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;

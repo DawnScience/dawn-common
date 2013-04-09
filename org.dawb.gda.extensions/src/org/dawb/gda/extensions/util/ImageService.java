@@ -9,11 +9,11 @@
  */ 
 package org.dawb.gda.extensions.util;
 
-import org.dawb.common.services.IImageService;
 import org.dawb.common.services.IPaletteService;
-import org.dawb.common.services.ImageServiceBean;
-import org.dawb.common.services.ImageServiceBean.HistoType;
-import org.dawb.common.services.ImageServiceBean.ImageOrigin;
+import org.dawnsci.plotting.api.histogram.IImageService;
+import org.dawnsci.plotting.api.histogram.ImageServiceBean;
+import org.dawnsci.plotting.api.histogram.ImageServiceBean.HistoType;
+import org.dawnsci.plotting.api.histogram.ImageServiceBean.ImageOrigin;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.PaletteData;
