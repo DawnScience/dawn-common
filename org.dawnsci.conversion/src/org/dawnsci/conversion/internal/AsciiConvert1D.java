@@ -53,6 +53,13 @@ public class AsciiConvert1D extends AbstractConversion {
 		final StringBuilder contents = new StringBuilder();
         get1DDataSetCVS(contents, sortedData, maxSize, context.getMonitor());
 
+        if (file.exists()) {
+        	file.delete();
+        } else {
+        	file.getParentFile().mkdirs();   	
+        }
+    	file.createNewFile();
+
         write(file, contents.toString(), "US-ASCII");
 	}
 	
@@ -98,7 +105,7 @@ public class AsciiConvert1D extends AbstractConversion {
 				final String name = it.next();
 
 				final IDataset set = sortedData.get(name);
-				final String     value = (i<set.getSize()) ? String.valueOf(((IDataset)set).getDouble(i)) : " ";
+				final String     value = (i<set.getSize()) ? ((IDataset)set).getString(i) : " ";
 				contents.append(value);
 				if (it.hasNext()) contents.append(",");
 
