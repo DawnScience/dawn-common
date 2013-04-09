@@ -15,6 +15,11 @@ import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
 
+/**
+ * There is no testing for this class now. TODO Add testing.
+ * @author fcp94556
+ *
+ */
 public class AsciiConvert1D extends AbstractConversion {
 
 	private TreeMap<String, IDataset> sortedData;
