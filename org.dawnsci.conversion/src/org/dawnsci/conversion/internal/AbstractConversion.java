@@ -66,7 +66,7 @@ public abstract class AbstractConversion {
 	/**
 	 * Please implement this method to process a single conversion. The files will have been 
 	 * expanded, the datasets expanded, the slice done, you need to implement the writing of the
-	 * apropriate file for this slice.
+	 * appropriate file for this slice.
 	 * 
 	 * @param slice
 	 * @param context, used to provide the output location mainly.
