@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.DoubleDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.IntegerDataset;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
@@ -268,7 +269,7 @@ public class SliceUtils {
 			final AbstractDataset x = getNexusAxis(currentSlice, slice.getShape()[0], currentSlice.getX()+1, true, monitor);
 			plottingSystem.setXfirst(true);
 			plottingSystem.setPlotType(type);
-			plottingSystem.createPlot1D(x, Arrays.asList(slice), slice.getName(), monitor);
+			plottingSystem.createPlot1D(x, Arrays.asList((IDataset)slice), slice.getName(), monitor);
 			Display.getDefault().syncExec(new Runnable() {
 				public void run() {
 					plottingSystem.getSelectedXAxis().setTitle(x.getName());
@@ -291,7 +292,7 @@ public class SliceUtils {
 					data[x] = slice.getDouble(x,y);
 				}
 			}
-			final List<AbstractDataset> ys = new ArrayList<AbstractDataset>(shape[1]);
+			final List<IDataset> ys = new ArrayList<IDataset>(shape[1]);
 			int index = 0;
 			for (double[] da : sets) {
 				final DoubleDataset dds = new DoubleDataset(da, da.length);
@@ -322,7 +323,7 @@ public class SliceUtils {
 			// nullify the user object.
 			final IImageTrace trace = getImageTrace(plottingSystem);
 			if (trace!=null) trace.setUserObject(null);
-			plottingSystem.updatePlot2D(slice, Arrays.asList(x,y), monitor); 			
+			plottingSystem.updatePlot2D(slice, Arrays.asList((IDataset)x,y), monitor); 			
 		}
 
 		plottingSystem.repaint(requireScale);

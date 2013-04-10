@@ -2,6 +2,7 @@ package org.dawb.common.ui.wizard.persistence;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -40,6 +41,7 @@ import org.eclipse.ui.IWorkbenchPart;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.BooleanDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.AFunction;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.IFunctionService;
 import uk.ac.diamond.scisoft.analysis.io.IDiffractionMetadata;
@@ -138,7 +140,7 @@ public class PersistenceExportWizard extends AbstractPerstenceWizard implements 
     				}
     				
     				if (trace!=null && trace instanceof IImageTrace && trace.getData() != null) {
-    					IMetaData meta = trace.getData().getMetadata();
+    					IMetaData meta = ((AbstractDataset)trace.getData()).getMetadata();
     					if (meta != null && (meta instanceof IDiffractionMetadata)) {
     						options.setOptionEnabled("Diffraction Meta Data", true);
     					}
@@ -191,10 +193,16 @@ public class PersistenceExportWizard extends AbstractPerstenceWizard implements 
 						 if (options.is("Original Data")) {
 							 Collection<ITrace> traces  = system.getTraces();
 							 for (ITrace trace : traces) {
-								 file.setData(trace.getData());
+								 file.setData((AbstractDataset)trace.getData());
 								 if (trace instanceof IImageTrace) {
-									 final List<AbstractDataset> axes = ((IImageTrace)trace).getAxes();
-									 if (axes!=null) file.setAxes(axes);
+									 final List<IDataset> iaxes = ((IImageTrace)trace).getAxes();
+									 if (iaxes!=null) {
+										 final List<AbstractDataset> axes = new ArrayList<AbstractDataset>();
+										 for (IDataset ids : iaxes) {
+											 axes.add((AbstractDataset)ids);
+										 }
+										 file.setAxes(axes);
+									 }
 								 }
 							 }
 						 }

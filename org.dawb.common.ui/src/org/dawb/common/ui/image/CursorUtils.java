@@ -21,7 +21,7 @@ import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 
-import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 
 public class CursorUtils {
 
@@ -48,7 +48,7 @@ public class CursorUtils {
 		if (imageTrace!=null) {
 			xCoordinate = Math.floor(xCoordinate);
 			yCoordinate = Math.floor(yCoordinate);
-			AbstractDataset image = imageTrace.getData();
+			IDataset image = imageTrace.getData();
 			int i, j;
 			if (imageTrace.getImageOrigin() == ImageOrigin.TOP_LEFT
 					|| imageTrace.getImageOrigin() == ImageOrigin.BOTTOM_RIGHT) {

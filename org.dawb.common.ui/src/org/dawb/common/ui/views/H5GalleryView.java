@@ -306,7 +306,7 @@ public class H5GalleryView extends ViewPart implements MouseListener, SelectionL
 			}
 			if (items.length<=1) return;
 			
-			List<AbstractDataset> ys = getSlices(items);
+			List<IDataset> ys = getSlices(items);
 			final IAdaptable      adaptable = (IAdaptable)prov.getDataSetComponent();
 			final IPlottingSystem system    = (IPlottingSystem)adaptable.getAdapter(IPlottingSystem.class);
 			system.clear();
@@ -322,9 +322,9 @@ public class H5GalleryView extends ViewPart implements MouseListener, SelectionL
 		}
 	}
 	
-	private List<AbstractDataset> getSlices(GalleryItem[] items) {
+	private List<IDataset> getSlices(GalleryItem[] items) {
 		
-		final List<AbstractDataset> ys = new ArrayList<AbstractDataset>(11);
+		final List<IDataset> ys = new ArrayList<IDataset>(11);
 		for (GalleryItem item : items) {
 			final ImageItem ii = new ImageItem();
 			ii.setIndex(item.getItemCount());

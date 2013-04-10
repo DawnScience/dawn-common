@@ -255,7 +255,7 @@ public class ImageThumbnailCreator extends AbstractServiceFactory implements ITh
 					
 					// TODO set no title?
 					
-					system.createPlot1D(null, Arrays.asList((AbstractDataset)set), new NullProgressMonitor());
+					system.createPlot1D(null, Arrays.asList(set), new NullProgressMonitor());
 					
 		            final Image unscaled = system.getImage(new Rectangle(0, 0, 300, 300));
 		            scaled[0]   = new Image(display, unscaled.getImageData().scaledTo(size, size));

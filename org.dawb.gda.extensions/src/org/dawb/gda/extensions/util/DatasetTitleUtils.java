@@ -19,27 +19,26 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.DoubleDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 
 public class DatasetTitleUtils {
 
-	public static String getTitle(final AbstractDataset xIn, 
-			                      final List<AbstractDataset> ysIn, 
+	public static String getTitle(final IDataset xIn, 
+			                      final List<IDataset> ysIn, 
 			                      final boolean isFileName) {
 		return getTitle(xIn,ysIn,isFileName,null);
 	}
 
-	public static String getTitle(final AbstractDataset xIn, 
-			                      final List<AbstractDataset> ysIn, 
+	public static String getTitle(final IDataset xIn, 
+			                      final List<IDataset> ysIn, 
 			                      final boolean isFileName,
 			                      final String  rootName) {
 		
-		final AbstractDataset       x;
-		final List<AbstractDataset> ys;
+		final IDataset       x;
+		final List<IDataset> ys;
 		if (ysIn==null) {
-			ys = new ArrayList<AbstractDataset>(1);
+			ys = new ArrayList<IDataset>(1);
 			ys.add(xIn);
 			x = DoubleDataset.arange(ys.get(0).getSize());
 			x.setName("Index of "+xIn.getName());
