@@ -26,6 +26,8 @@ import org.eclipse.ui.services.IServiceLocator;
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.BooleanDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.DatasetUtils;
+import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.Maths;
 import uk.ac.diamond.scisoft.analysis.dataset.RGBDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.Stats;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
@@ -101,7 +103,7 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 	 */
 	public ImageData getImageData(ImageServiceBean bean) {
 		
-		AbstractDataset image    = (AbstractDataset)bean.getImage();
+		AbstractDataset image    = getImageLoggedData(bean);
 		final ImageOrigin     origin   = bean.getOrigin();
 		PaletteData     palette  = bean.getPalette();
 		
@@ -381,6 +383,15 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 		return (byte) (0x000000FF & ((int) scaled_pixel));
 	}
 	
+	private AbstractDataset getImageLoggedData(ImageServiceBean bean) {
+		AbstractDataset imageDataset = (AbstractDataset)bean.getImage();
+		if (bean.isLogColorScale()) {
+			AbstractDataset result = Maths.subtract(imageDataset, bean.getLogOffset());
+			imageDataset = Maths.log10(result);
+		}
+		return imageDataset;
+	}
+
 	/**
 	 * Fast statistics as a rough guide - this is faster than AbstractDataset.getMin()
 	 * and getMax() which may cache but slows the opening of images too much.
@@ -390,7 +401,7 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 	 */
 	public float[] getFastStatistics(ImageServiceBean bean) {
 		
-		final AbstractDataset image    = (AbstractDataset)bean.getImage();
+		final AbstractDataset image    = getImageLoggedData(bean);
 		if (bean.getHistogramType()==HistoType.OUTLIER_VALUES) {
 
 			try {
