@@ -7,16 +7,17 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gson.Gson;
-
 import uk.ac.diamond.scisoft.analysis.roi.CircularROI;
 import uk.ac.diamond.scisoft.analysis.roi.FreeDrawROI;
+import uk.ac.diamond.scisoft.analysis.roi.IROI;
 import uk.ac.diamond.scisoft.analysis.roi.PolygonalROI;
 import uk.ac.diamond.scisoft.analysis.roi.PolylineROI;
 import uk.ac.diamond.scisoft.analysis.roi.ROIBase;
 import uk.ac.diamond.scisoft.analysis.roi.RectangularROI;
-import uk.ac.diamond.scisoft.analysis.roi.SectorROI;
 import uk.ac.diamond.scisoft.analysis.roi.RingROI;
+import uk.ac.diamond.scisoft.analysis.roi.SectorROI;
+
+import com.google.gson.Gson;
 
 /**
  * Class used to convert from a ROIBase to a ROIBean and vice-versa
@@ -33,8 +34,8 @@ public class ROIBeanConverter {
 	 * @param roi
 	 * @return ROIBean
 	 */
-	public static ROIBean ROIBaseToROIBean(String name, ROIBase roi){
-		Class<? extends ROIBase> roiClass = roi.getClass();
+	public static ROIBean ROIBaseToROIBean(String name, IROI roi){
+		Class<? extends IROI> roiClass = roi.getClass();
 		if(roiClass == RectangularROI.class){
 			RectangularROI rroi = (RectangularROI) roi;
 			RectangularROIBean rroibean = new RectangularROIBean();
@@ -218,7 +219,7 @@ public class ROIBeanConverter {
 	 * Method that returns true if the type of ROI is supported by the ROIBeanConverter
 	 * @return
 	 */
-	public static boolean isROISupported(ROIBase roi){
+	public static boolean isROISupported(IROI roi){
 		if(roi instanceof CircularROI)return true;
 		else if(roi instanceof RectangularROI)return true;
 		else if(roi instanceof SectorROI)return true;

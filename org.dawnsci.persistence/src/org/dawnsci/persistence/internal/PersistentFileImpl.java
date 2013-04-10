@@ -36,15 +36,18 @@ import org.slf4j.LoggerFactory;
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.BooleanDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.DatasetUtils;
+import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ShortDataset;
 import uk.ac.diamond.scisoft.analysis.diffraction.DetectorProperties;
 import uk.ac.diamond.scisoft.analysis.diffraction.DiffractionCrystalEnvironment;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.AFunction;
+import uk.ac.diamond.scisoft.analysis.fitting.functions.IFunction;
 import uk.ac.diamond.scisoft.analysis.io.DataHolder;
 import uk.ac.diamond.scisoft.analysis.io.IDiffractionMetadata;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
+import uk.ac.diamond.scisoft.analysis.roi.IROI;
 import uk.ac.diamond.scisoft.analysis.roi.ROIBase;
 
 import com.google.gson.Gson;
@@ -113,14 +116,14 @@ class PersistentFileImpl implements IPersistentFile{
 	}
 
 	@Override
-	public void setMasks(Map<String, BooleanDataset> masks) throws Exception {
+	public void setMasks(Map<String, IDataset> masks) throws Exception {
 		writeH5Mask(masks);
 	}
 
 	@Override
-	public void addMask(String name, BooleanDataset mask, IMonitor mon) throws Exception{
+	public void addMask(String name, IDataset mask, IMonitor mon) throws Exception{
 
-		AbstractDataset id = DatasetUtils.cast(mask, AbstractDataset.INT8);
+		AbstractDataset id = DatasetUtils.cast((BooleanDataset)mask, AbstractDataset.INT8);
 		//check if parent group exists
 		Group parent = (Group)file.getData(MASK_ENTRY);
 		if(parent == null) parent = createParentEntry(MASK_ENTRY);
@@ -133,22 +136,22 @@ class PersistentFileImpl implements IPersistentFile{
 	}
 
 	@Override
-	public void setData(AbstractDataset data) throws Exception {
+	public void setData(IDataset data) throws Exception {
 		writeH5Data(data, null, null);
 	}
 
 	@Override
-	public void setAxes(List<AbstractDataset> axes) throws Exception{
+	public void setAxes(List<IDataset> axes) throws Exception{
 		writeH5Data(null, axes.get(0), axes.get(1));
 	}
 
 	@Override
-	public void setROIs(Map<String, ROIBase> rois) throws Exception {
+	public void setROIs(Map<String, IROI> rois) throws Exception {
 		writeH5Rois(rois);
 	}
 
 	@Override
-	public void addROI(String name, ROIBase roiBase) throws Exception {
+	public void addROI(String name, IROI roiBase) throws Exception {
 
 		if (file == null) file = HierarchicalDataFactory.getWriter(filePath);
 
@@ -234,8 +237,8 @@ class PersistentFileImpl implements IPersistentFile{
 	}
 
 	@Override
-	public Map<String, BooleanDataset> getMasks(IMonitor mon) throws Exception {
-		Map<String, BooleanDataset> masks = null;
+	public Map<String, IDataset> getMasks(IMonitor mon) throws Exception {
+		Map<String, IDataset> masks = null;
 		DataHolder dh = LoaderFactory.getData(filePath, true, mon);
 		masks = readH5Masks(dh, mon);
 		return masks;
@@ -250,8 +253,8 @@ class PersistentFileImpl implements IPersistentFile{
 	}
 
 	@Override
-	public Map<String, ROIBase> getROIs(IMonitor mon) throws Exception {
-		Map<String, ROIBase> rois = null;
+	public Map<String, IROI> getROIs(IMonitor mon) throws Exception {
+		Map<String, IROI> rois = null;
 		rois = readH5ROIs(mon);
 
 		return rois;
@@ -364,9 +367,9 @@ class PersistentFileImpl implements IPersistentFile{
 	 * @param yAxisData
 	 * @throws Exception
 	 */
-	private void writeH5Data(final AbstractDataset data, 
-			final AbstractDataset xAxisData, 
-			final AbstractDataset yAxisData) throws Exception {
+	private void writeH5Data(final IDataset data, 
+							final IDataset xAxisData, 
+							final IDataset yAxisData) throws Exception {
 
 		if(file == null)
 			file = HierarchicalDataFactory.getWriter(filePath);
@@ -423,7 +426,7 @@ class PersistentFileImpl implements IPersistentFile{
 	 * @param masks
 	 * @throws Exception
 	 */
-	private void writeH5Mask(final Map<String, BooleanDataset> masks) throws Exception {
+	private void writeH5Mask(final Map<String, IDataset> masks) throws Exception {
 
 		if(file == null)
 			file = HierarchicalDataFactory.getWriter(filePath);
@@ -436,7 +439,7 @@ class PersistentFileImpl implements IPersistentFile{
 			Iterator<String> it = names.iterator();
 			while(it.hasNext()){
 				String name = it.next();
-				BooleanDataset bd = masks.get(name);
+				BooleanDataset bd = (BooleanDataset)masks.get(name);
 				AbstractDataset id = DatasetUtils.cast(bd, AbstractDataset.INT8);
 				final Datatype datatype = H5Utils.getDatatype(id);
 				final long[] shape = new long[id.getShape().length];
@@ -456,7 +459,7 @@ class PersistentFileImpl implements IPersistentFile{
 	 * @param rois
 	 * @throws Exception
 	 */
-	private void writeH5Rois(final Map<String, ROIBase> rois) throws Exception {
+	private void writeH5Rois(final Map<String, IROI> rois) throws Exception {
 
 		if (file == null) file = HierarchicalDataFactory.getWriter(filePath);
 
@@ -472,7 +475,7 @@ class PersistentFileImpl implements IPersistentFile{
 			Iterator<String> it = rois.keySet().iterator();
 			while(it.hasNext()){
 				String name = it.next();
-				ROIBase roi = rois.get(name);
+				ROIBase roi = (ROIBase)rois.get(name);
 				writeRoi(file, parent, name, roi, gson);
 			}
 
@@ -482,7 +485,7 @@ class PersistentFileImpl implements IPersistentFile{
 	private HObject writeRoi(IHierarchicalDataFile file, 
 			Group   parent,
 			String  name,
-			ROIBase roi,
+			IROI    roi,
 			Gson    gson) throws Exception {
 
 		ROIBean roibean = ROIBeanConverter.ROIBaseToROIBean(name, roi);
@@ -558,8 +561,8 @@ class PersistentFileImpl implements IPersistentFile{
 	 * @return Map<String, BooleanDataset>
 	 * @throws Exception 
 	 */
-	private Map<String, BooleanDataset> readH5Masks(DataHolder dh, IMonitor mon) throws Exception{
-		Map<String, BooleanDataset> masks = new HashMap<String, BooleanDataset>();
+	private Map<String, IDataset> readH5Masks(DataHolder dh, IMonitor mon) throws Exception{
+		Map<String, IDataset> masks = new HashMap<String, IDataset>();
 		List<String> names = getMaskNames(mon);
 
 		Iterator<String> it = names.iterator();
@@ -600,8 +603,8 @@ class PersistentFileImpl implements IPersistentFile{
 	 * @return Map<String, ROIBase>
 	 * @throws Exception 
 	 */
-	private Map<String, ROIBase> readH5ROIs(IMonitor mon) throws Exception{
-		Map<String, ROIBase> rois = new HashMap<String, ROIBase>();
+	private Map<String, IROI> readH5ROIs(IMonitor mon) throws Exception{
+		Map<String, IROI> rois = new HashMap<String, IROI>();
 		if(file == null)
 			file = HierarchicalDataFactory.getReader(filePath);
 		// JSON deserialization
@@ -669,18 +672,17 @@ class PersistentFileImpl implements IPersistentFile{
 	}
 
 	@Override
-	public boolean isRegionSupported(ROIBase roi) {
+	public boolean isRegionSupported(IROI roi) {
 		return ROIBeanConverter.isROISupported(roi);
 	}
 
 	@Override
-	public void setFunctions(Map<String, AFunction> functions) throws Exception {
+	public void setFunctions(Map<String, IFunction> functions) throws Exception {
 		writeH5Functions(functions);
 	}
 
 	@Override
-	public void addFunction(String name, AFunction function)
-			throws Exception {
+	public void addFunction(String name, IFunction function) throws Exception {
 		if (file == null) file = HierarchicalDataFactory.getWriter(filePath);
 
 		Group parent = createParentEntry(FUNCTION_ENTRY);
@@ -701,8 +703,8 @@ class PersistentFileImpl implements IPersistentFile{
 	}
 
 	@Override
-	public Map<String, AFunction> getFunctions(IMonitor mon) throws Exception {
-		Map<String, AFunction> functions = null;
+	public Map<String, IFunction> getFunctions(IMonitor mon) throws Exception {
+		Map<String, IFunction> functions = null;
 		functions = readH5Functions(mon);
 		return functions;
 	}
@@ -735,7 +737,7 @@ class PersistentFileImpl implements IPersistentFile{
 	 * @param functions
 	 * @throws Exception
 	 */
-	private void writeH5Functions(final Map<String, AFunction> functions) throws Exception {
+	private void writeH5Functions(final Map<String, IFunction> functions) throws Exception {
 
 		if (file == null) file = HierarchicalDataFactory.getWriter(filePath);
 
@@ -749,16 +751,16 @@ class PersistentFileImpl implements IPersistentFile{
 			Iterator<String> it = functions.keySet().iterator();
 			while(it.hasNext()){
 				String name = it.next();
-				AFunction roi = functions.get(name);
+				IFunction roi = functions.get(name);
 				writeFunction(file, parent, name, roi, gson);
 			}
 		}
 	}
 
 	private HObject writeFunction(IHierarchicalDataFile file, Group parent,
-			String name, AFunction function, Gson gson) throws Exception {
+			String name, IFunction function, Gson gson) throws Exception {
 
-		FunctionBean fBean = FunctionBeanConverter.AFunctionToFunctionBean(name, function);
+		FunctionBean fBean = FunctionBeanConverter.AFunctionToFunctionBean(name, (AFunction)function);
 
 		long[] dims = {1};
 
@@ -797,8 +799,8 @@ class PersistentFileImpl implements IPersistentFile{
 	 * @return Map<String, AFunction>
 	 * @throws Exception 
 	 */
-	private Map<String, AFunction> readH5Functions(IMonitor mon) throws Exception{
-		Map<String, AFunction> functions = new HashMap<String, AFunction>();
+	private Map<String, IFunction> readH5Functions(IMonitor mon) throws Exception{
+		Map<String, IFunction> functions = new HashMap<String, IFunction>();
 		if(file == null)
 			file = HierarchicalDataFactory.getReader(filePath);
 		// JSON deserialization

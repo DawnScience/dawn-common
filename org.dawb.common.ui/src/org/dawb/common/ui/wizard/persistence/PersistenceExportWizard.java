@@ -2,7 +2,6 @@ package org.dawb.common.ui.wizard.persistence;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -42,7 +41,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.BooleanDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
-import uk.ac.diamond.scisoft.analysis.fitting.functions.AFunction;
+import uk.ac.diamond.scisoft.analysis.fitting.functions.IFunction;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.IFunctionService;
 import uk.ac.diamond.scisoft.analysis.io.IDiffractionMetadata;
 import uk.ac.diamond.scisoft.analysis.io.IMetaData;
@@ -196,13 +195,7 @@ public class PersistenceExportWizard extends AbstractPerstenceWizard implements 
 								 file.setData((AbstractDataset)trace.getData());
 								 if (trace instanceof IImageTrace) {
 									 final List<IDataset> iaxes = ((IImageTrace)trace).getAxes();
-									 if (iaxes!=null) {
-										 final List<AbstractDataset> axes = new ArrayList<AbstractDataset>();
-										 for (IDataset ids : iaxes) {
-											 axes.add((AbstractDataset)ids);
-										 }
-										 file.setAxes(axes);
-									 }
+									 if (iaxes!=null) file.setAxes(iaxes);
 								 }
 							 }
 						 }
@@ -239,7 +232,7 @@ public class PersistenceExportWizard extends AbstractPerstenceWizard implements 
 						 
 						 if (options.is("Functions")) {
 							 if (funcService != null) {
-								 Map<String, AFunction> functions = funcService.getFunctions();
+								 Map<String, IFunction> functions = funcService.getFunctions();
 								 if (functions != null) {
 									 file.setFunctions(functions);
 								}

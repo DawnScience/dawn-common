@@ -11,13 +11,13 @@ import org.dawb.common.services.IPersistenceService;
 import org.dawb.common.services.IPersistentFile;
 import org.dawb.common.services.ServiceManager;
 import org.dawb.common.ui.monitor.ProgressMonitorWrapper;
+import org.dawb.common.ui.plot.region.RegionService;
 import org.dawb.common.ui.util.EclipseUtils;
 import org.dawb.common.ui.wizard.CheckWizardPage;
 import org.dawb.common.ui.wizard.ExternalFileChoosePage;
 import org.dawb.common.util.io.FileUtils;
 import org.dawnsci.plotting.api.IPlottingSystem;
 import org.dawnsci.plotting.api.region.IRegion;
-import org.dawnsci.plotting.api.region.IRegion.RegionType;
 import org.dawnsci.plotting.api.trace.IImageTrace;
 import org.dawnsci.plotting.api.trace.ITrace;
 import org.eclipse.core.resources.IFile;
@@ -38,14 +38,14 @@ import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.BooleanDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.DatasetUtils;
 import uk.ac.diamond.scisoft.analysis.diffraction.DiffractionMetadataUtils;
-import uk.ac.diamond.scisoft.analysis.fitting.functions.AFunction;
+import uk.ac.diamond.scisoft.analysis.fitting.functions.IFunction;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.IFunctionService;
 import uk.ac.diamond.scisoft.analysis.io.DataHolder;
 import uk.ac.diamond.scisoft.analysis.io.IDiffractionMetadata;
 import uk.ac.diamond.scisoft.analysis.io.IMetaData;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
-import uk.ac.diamond.scisoft.analysis.roi.ROIBase;
+import uk.ac.diamond.scisoft.analysis.roi.IROI;
 
 /**
  * 
@@ -252,7 +252,7 @@ public class PersistenceImportWizard extends AbstractPerstenceWizard implements 
 				final IImageTrace image = (IImageTrace)trace;
 				String name = options.getString("Mask"); //TODO drop down of available masks.
 				if (name == null) name = file.getMaskNames(null).get(0);
-				final BooleanDataset mask = file.getMask(name, mon);
+				final BooleanDataset mask = (BooleanDataset)file.getMask(name, mon);
 				if (mask!=null)  {
 					Display.getDefault().syncExec(new Runnable() {
 						public void run() {
@@ -264,10 +264,10 @@ public class PersistenceImportWizard extends AbstractPerstenceWizard implements 
 
 			final IPersistentFile finalFile = file;
 			if (options.is("Regions")) {
-				final Map<String, ROIBase> rois = file.getROIs(mon);
+				final Map<String, IROI> rois = file.getROIs(mon);
 				if (rois!=null && !rois.isEmpty()) {
 					for (final String roiName : rois.keySet()) {
-						final ROIBase roi = rois.get(roiName);
+						final IROI roi = rois.get(roiName);
 						Display.getDefault().syncExec(new Runnable() {
 							public void run() {
 								try {
@@ -276,7 +276,7 @@ public class PersistenceImportWizard extends AbstractPerstenceWizard implements 
 										region = system.getRegion(roiName);
 										region.setROI(roi);
 									} else {
-										region = system.createRegion(roiName, RegionType.forROI(roi));
+										region = system.createRegion(roiName, RegionService.forROI(roi));
 										system.addRegion(region);
 										region.setROI(roi);
 									}
@@ -320,7 +320,7 @@ public class PersistenceImportWizard extends AbstractPerstenceWizard implements 
 			
 			 if (options.is("Functions")) {
 				 if (funcService != null) {
-					 Map<String, AFunction> functions = file.getFunctions(mon);
+					 Map<String, IFunction> functions = file.getFunctions(mon);
 					 if (functions != null) {
 						 funcService.setFunctions(functions);
 					}

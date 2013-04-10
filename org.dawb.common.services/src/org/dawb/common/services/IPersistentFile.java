@@ -3,13 +3,12 @@ package org.dawb.common.services;
 import java.util.List;
 import java.util.Map;
 
-import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
-import uk.ac.diamond.scisoft.analysis.dataset.BooleanDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
-import uk.ac.diamond.scisoft.analysis.fitting.functions.AFunction;
+import uk.ac.diamond.scisoft.analysis.fitting.functions.IFunction;
 import uk.ac.diamond.scisoft.analysis.io.IDiffractionMetadata;
 import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
-import uk.ac.diamond.scisoft.analysis.roi.ROIBase;
+import uk.ac.diamond.scisoft.analysis.roi.IROI;
 
 /**
  * An IPersistent File is defined by what can be saved in an HDF5 file.<br>
@@ -57,7 +56,7 @@ public interface IPersistentFile {
 	 * @param Map
 	 * @throws Exception 
 	 */
-	public void setMasks(Map<String, BooleanDataset> masks) throws Exception;
+	public void setMasks(Map<String, IDataset> masks) throws Exception;
 
 	/**
 	 * Method to add a mask to the current map of masks<br>
@@ -70,7 +69,7 @@ public interface IPersistentFile {
 	 * @param mon
 	 * @throws Exception
 	 */
-	public void addMask(String name, BooleanDataset mask, IMonitor mon) throws Exception;
+	public void addMask(String name, IDataset mask, IMonitor mon) throws Exception;
 
 	/**
 	 * Method to set a dataset: can be an image or a stack of images<br>
@@ -80,7 +79,7 @@ public interface IPersistentFile {
 	 * @param data
 	 * @throws Exception 
 	 */
-	public void setData(AbstractDataset data) throws Exception;
+	public void setData(IDataset data) throws Exception;
 
 	/**
 	 * Method to set the axes<br>
@@ -90,7 +89,7 @@ public interface IPersistentFile {
 	 * @param axes
 	 * @throws Exception 
 	 */
-	public void setAxes(List<AbstractDataset> axes) throws Exception;
+	public void setAxes(List<IDataset> axes) throws Exception;
 
 	/**
 	 * Method to set a map of ROIs<br>
@@ -100,7 +99,7 @@ public interface IPersistentFile {
 	 * @param Map
 	 * @throws Exception 
 	 */
-	public void setROIs(Map<String, ROIBase> rois) throws Exception;
+	public void setROIs(Map<String, IROI> rois) throws Exception;
 
 	/**
 	 * Method to add a ROI to the current map of ROIs<br>
@@ -108,7 +107,7 @@ public interface IPersistentFile {
 	 * @param String
 	 * @param ROIBase
 	 */
-	public void addROI(String name, ROIBase roi) throws Exception ;
+	public void addROI(String name, IROI roi) throws Exception ;
 
 	/**
 	 * Method to set the site
@@ -125,7 +124,7 @@ public interface IPersistentFile {
 	 * @throws Exception
 	 *              is thrown if no correct entry is found in the file
 	 */
-	public ROIBase getROI(String roiName) throws Exception;
+	public IROI getROI(String roiName) throws Exception;
 
 	/**
 	 * Method that reads a map of ROIs from entry/region<br>
@@ -135,7 +134,7 @@ public interface IPersistentFile {
 	 * @throws Exception
 	 *              is thrown if no correct entry is found in the file
 	 */
-	public Map<String, ROIBase> getROIs(IMonitor mon) throws Exception;
+	public Map<String, IROI> getROIs(IMonitor mon) throws Exception;
 
 	/**
 	 * Method that returns an ILazyDataset. Could be an image or a stack of images.<br>
@@ -169,7 +168,7 @@ public interface IPersistentFile {
 	 * @throws Exception
 	 *              is thrown if no correct entry is found in the file
 	 */
-	public Map<String, BooleanDataset> getMasks(IMonitor mon) throws Exception;
+	public Map<String, IDataset> getMasks(IMonitor mon) throws Exception;
 
 	/**
 	 * Method that reads a mask from entry/mask.<br>
@@ -180,7 +179,7 @@ public interface IPersistentFile {
 	 * @throws Exception
 	 *              is thrown if no correct entry is found in the file
 	 */
-	public BooleanDataset getMask(String maskName, IMonitor mon) throws Exception;
+	public IDataset getMask(String maskName, IMonitor mon) throws Exception;
 
 	/**
 	 * Close the Hierarchical file<br>
@@ -228,7 +227,7 @@ public interface IPersistentFile {
 	 *            if this region can be saved in the persistence file.
 	 * 
 	 */
-	public boolean isRegionSupported(ROIBase roi);
+	public boolean isRegionSupported(IROI roi);
 	
 	/**
 	 * Method to set a map of functions<br>
@@ -238,14 +237,14 @@ public interface IPersistentFile {
 	 * @param Map
 	 * @throws Exception 
 	 */
-	public void setFunctions(Map<String, AFunction> functions) throws Exception;
+	public void setFunctions(Map<String, IFunction> functions) throws Exception;
 
 	/**
 	 * Method to add a function to the current map of functions<br>
 	 * @param String name
 	 * @param AFunction function
 	 */
-	public void addFunction(String name, AFunction function) throws Exception ;
+	public void addFunction(String name, IFunction function) throws Exception ;
 
 	/**
 	 * Method that reads a function from entry/region<br>
@@ -255,7 +254,7 @@ public interface IPersistentFile {
 	 * @throws Exception
 	 *              is thrown if no correct entry is found in the file
 	 */
-	public AFunction getFunction(String functionName) throws Exception;
+	public IFunction getFunction(String functionName) throws Exception;
 
 	/**
 	 * Method that reads a map of functions from entry/region<br>
@@ -265,7 +264,7 @@ public interface IPersistentFile {
 	 * @throws Exception
 	 *              is thrown if no correct entry is found in the file
 	 */
-	public Map<String, AFunction> getFunctions(IMonitor mon) throws Exception;
+	public Map<String, IFunction> getFunctions(IMonitor mon) throws Exception;
 	
 	/**
 	 * Method that returns the list of function names saved in the file.<br>

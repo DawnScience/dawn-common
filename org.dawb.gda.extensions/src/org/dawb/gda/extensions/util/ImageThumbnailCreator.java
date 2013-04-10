@@ -128,7 +128,7 @@ public class ImageThumbnailCreator extends AbstractServiceFactory implements ITh
 		
 	    if (H5Loader.isH5(f.getAbsolutePath())) return null; // Cannot risk loading large datasets!
 		final ILoaderService loader = (ILoaderService)ServiceManager.getService(ILoaderService.class);
-		final AbstractDataset set   = loader.getDataset(f);
+		final AbstractDataset set   = (AbstractDataset)loader.getDataset(f);
 		final AbstractDataset thumb = getThumbnail(set, size);
 		return thumb;
 	}

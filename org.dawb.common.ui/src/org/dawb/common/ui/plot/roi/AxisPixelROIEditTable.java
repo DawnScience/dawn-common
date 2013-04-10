@@ -26,6 +26,7 @@ import org.eclipse.swt.widgets.Table;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.ac.diamond.scisoft.analysis.roi.IROI;
 import uk.ac.diamond.scisoft.analysis.roi.ROIBase;
 import uk.ac.diamond.scisoft.analysis.roi.RectangularROI;
 import uk.ac.gda.richbeans.components.cell.FieldComponentCellEditor;
@@ -51,7 +52,7 @@ public class AxisPixelROIEditTable {
 
 	private Logger logger = LoggerFactory.getLogger(AxisPixelROIEditTable.class);
 
-	private ROIBase roi;
+	private IROI roi;
 
 	private IObservableList values;
 
@@ -284,10 +285,10 @@ public class AxisPixelROIEditTable {
 	 * @param rows
 	 * @return ROIBase
 	 */
-	private ROIBase createRoi(IObservableList rows) {
+	private IROI createRoi(IObservableList rows) {
 		
 		double ptx = 0, pty = 0, width = 0, height = 0, angle = 0;
-		ROIBase ret = null; 
+		IROI ret = null; 
 		if (roi == null)
 			roi = plottingSystem.getRegions().iterator().next().getROI();
 		if (roi instanceof RectangularROI) {
@@ -388,7 +389,7 @@ public class AxisPixelROIEditTable {
 	 * Method that sets the table viewer values given a Region of Interest
 	 * @param region
 	 */
-	public void setTableValues(ROIBase region) {
+	public void setTableValues(IROI region) {
 		roi = region;
 
 		RectangularROI rroi = (RectangularROI)roi;
@@ -444,7 +445,7 @@ public class AxisPixelROIEditTable {
 	 * Methods that returns the current ROI
 	 * @return ROIBase
 	 */
-	public ROIBase getROI(){
+	public IROI getROI(){
 		return roi;
 	}
 

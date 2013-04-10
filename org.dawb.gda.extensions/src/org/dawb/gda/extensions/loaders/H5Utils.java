@@ -9,19 +9,21 @@
  */ 
 package org.dawb.gda.extensions.loaders;
 
-import org.dawb.hdf5.IHierarchicalDataFile;
-import org.dawb.hdf5.Nexus;
-
 import ncsa.hdf.object.Dataset;
 import ncsa.hdf.object.Datatype;
 import ncsa.hdf.object.Group;
 import ncsa.hdf.object.h5.H5Datatype;
+
+import org.dawb.hdf5.IHierarchicalDataFile;
+import org.dawb.hdf5.Nexus;
+
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.BooleanDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ByteDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.DatasetUtils;
 import uk.ac.diamond.scisoft.analysis.dataset.DoubleDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.FloatDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.IntegerDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.LongDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ShortDataset;
@@ -142,7 +144,7 @@ public class H5Utils {
 	 * @param a
 	 * @return
 	 */
-	public static Datatype getDatatype(AbstractDataset a) throws Exception {
+	public static Datatype getDatatype(IDataset a) throws Exception {
 		
 		// There is a smarter way of doing this, but am in a hurry...
 		if (a instanceof ByteDataset || a instanceof BooleanDataset) {

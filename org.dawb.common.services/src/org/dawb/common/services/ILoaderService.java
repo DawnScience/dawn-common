@@ -13,7 +13,7 @@ import java.io.File;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 
-import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.io.IDiffractionMetadata;
 import uk.ac.diamond.scisoft.analysis.io.IMetaData;
 
@@ -35,7 +35,7 @@ public interface ILoaderService {
 	 * @return
 	 * @throws Throwable
 	 */
-    public AbstractDataset getDataset(String filePath) throws Throwable;
+    public IDataset getDataset(String filePath) throws Throwable;
 	
 	/**
 	 * Reads a dataset and returns it as an AbstractDataset, with progress
@@ -43,7 +43,7 @@ public interface ILoaderService {
 	 * @return
 	 * @throws Throwable
 	 */
-    public AbstractDataset getDataset(String filePath, final IProgressMonitor monitor) throws Throwable;
+    public IDataset getDataset(String filePath, final IProgressMonitor monitor) throws Throwable;
 
 	 /**
 	  * Reads a file and returns it as an AbstractDataset, used for image files.
@@ -51,7 +51,7 @@ public interface ILoaderService {
 	  * @return
 	  * @throws Throwable
 	  */
-	 public AbstractDataset getDataset(File f) throws Throwable;
+	 public IDataset getDataset(File f) throws Throwable;
 	 
 	 /**
 	  * This method can be used to load meta data. It will use Fabio if

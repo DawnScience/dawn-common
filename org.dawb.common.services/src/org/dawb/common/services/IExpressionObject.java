@@ -16,7 +16,7 @@
 
 package org.dawb.common.services;
 
-import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
 
@@ -53,7 +53,7 @@ public interface IExpressionObject {
 	 * @return the evaluated value of the expression.
 	 * @throws Exception
 	 */
-	public AbstractDataset getDataSet(String suggestedName, IMonitor monitor) throws Exception;
+	public IDataset getDataSet(String suggestedName, IMonitor monitor) throws Exception;
 
 	/**
 	 * Guesses the data without evaluating the expression, instead looks for

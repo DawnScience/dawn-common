@@ -13,7 +13,6 @@ import java.io.File;
 
 import org.eclipse.swt.graphics.Image;
 
-import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 
 /**
@@ -41,7 +40,7 @@ public interface IThumbnailService extends IFileIconService{
 	 * @param size
 	 * @return
 	 */
-	public AbstractDataset getThumbnail(IDataset set, int size);
+	public IDataset getThumbnail(IDataset set, int size);
 
 	/**
 	 * Create an image from an AbstractDataset

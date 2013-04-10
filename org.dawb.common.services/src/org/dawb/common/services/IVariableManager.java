@@ -16,7 +16,7 @@
 
 package org.dawb.common.services;
 
-import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
 
@@ -47,7 +47,7 @@ public interface IVariableManager {
 	 * @param monitor
 	 * @return
 	 */
-	public AbstractDataset getVariableValue(String name, final IMonitor monitor);
+	public IDataset getVariableValue(String name, final IMonitor monitor);
 
 	/**
 	 * Tries to get the lazy dataset for the name
