@@ -383,7 +383,7 @@ class PersistentFileImpl implements IPersistentFile{
 			final long[]         shape = new long[data.getShape().length];
 			for (int i = 0; i < shape.length; i++) shape[i] = data.getShape()[i];
 
-			final Dataset dataset = file.replaceDataset(dataName,  datatype, shape, data.getBuffer(), parent);
+			final Dataset dataset = file.replaceDataset(dataName,  datatype, shape, ((AbstractDataset)data).getBuffer(), parent);
 			file.setNexusAttribute(dataset, Nexus.SDS);
 		}
 		if(xAxisData != null){
@@ -392,7 +392,7 @@ class PersistentFileImpl implements IPersistentFile{
 			final long[]         xShape = new long[xAxisData.getShape().length];
 			for (int i = 0; i < xShape.length; i++) xShape[i] = xAxisData.getShape()[i];
 
-			final Dataset xDataset = file.replaceDataset(xAxisName,  xDatatype, xShape, xAxisData.getBuffer(), parent);
+			final Dataset xDataset = file.replaceDataset(xAxisName,  xDatatype, xShape, ((AbstractDataset)xAxisData).getBuffer(), parent);
 			file.setNexusAttribute(xDataset, Nexus.SDS);
 		}
 
@@ -402,7 +402,7 @@ class PersistentFileImpl implements IPersistentFile{
 			final long[]         yShape = new long[yAxisData.getShape().length];
 			for (int i = 0; i < yShape.length; i++) yShape[i] = yAxisData.getShape()[i];
 
-			final Dataset yDataset = file.replaceDataset(yAxisName,  yDatatype, yShape, yAxisData.getBuffer(), parent);
+			final Dataset yDataset = file.replaceDataset(yAxisName,  yDatatype, yShape,((AbstractDataset)yAxisData).getBuffer(), parent);
 			file.setNexusAttribute(yDataset, Nexus.SDS);
 		}
 	}
