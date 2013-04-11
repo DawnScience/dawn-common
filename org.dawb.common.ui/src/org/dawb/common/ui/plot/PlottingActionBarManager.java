@@ -28,6 +28,7 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IContributionManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -84,8 +85,8 @@ public class PlottingActionBarManager implements IPlotActionSystem {
      */
 	public void init(ITraceActionProvider traceActionProvider) {
 		
-		system.getActionBars().getToolBarManager().add(new Separator(defaultGroupName));
-		system.getActionBars().getMenuManager().add(new Separator(defaultGroupName));
+		system.getActionBars().getToolBarManager().add(new Separator(system.getPlotName()+"/"+defaultGroupName));
+		system.getActionBars().getMenuManager().add(new Separator(system.getPlotName()+"/"+defaultGroupName));
 		
 		xyMenu =  new MenuAction("X/Y Plot");
 		if (system.getActionBars()!=null) {
@@ -520,12 +521,21 @@ public class PlottingActionBarManager implements IPlotActionSystem {
 	}
 	
 	public void registerGroup(String groupName, ManagerType type) {
+		
+		groupName = system.getPlotName()+"/"+groupName;
+
 		if (getActionBars()!=null) {
+			IContributionManager man=null;
 			if (type==ManagerType.TOOLBAR) {
-				getActionBars().getToolBarManager().add(new Separator(groupName));
+				man = getActionBars().getToolBarManager();
 			} else {
-				getActionBars().getMenuManager().add(new Separator(groupName));
+				man = getActionBars().getMenuManager();
 			}
+			if (man.find(groupName)!=null) {
+				man.remove(groupName);
+			}
+			final Separator group = new Separator(groupName);
+			man.add(group);
 		}
 	}
 	
@@ -551,6 +561,8 @@ public class PlottingActionBarManager implements IPlotActionSystem {
 
 	public void registerAction(String groupName, IAction action, ActionType actionType, ManagerType manType) {
 
+		groupName = system.getPlotName()+"/"+groupName;
+		
 		// We generate an id!
 		if (action.getId()==null) {
 			action.setId(groupName+action.getText());
