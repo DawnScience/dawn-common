@@ -26,7 +26,6 @@ import org.eclipse.ui.services.IServiceLocator;
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.BooleanDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.DatasetUtils;
-import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.Maths;
 import uk.ac.diamond.scisoft.analysis.dataset.RGBDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.Stats;
@@ -395,10 +394,10 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 	
 	private AbstractDataset getImageLoggedData(ImageServiceBean bean) {
 		AbstractDataset imageDataset = (AbstractDataset)bean.getImage();
-		if (bean.isLogColorScale()) {
-			AbstractDataset result = Maths.subtract(imageDataset, bean.getLogOffset());
-			imageDataset = Maths.log10(result);
-		}
+//		if (bean.isLogColorScale()) {
+//			AbstractDataset result = Maths.subtract(imageDataset, bean.getLogOffset());
+//			imageDataset = Maths.log10(result);
+//		}
 		return imageDataset;
 	}
 
@@ -415,16 +414,24 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 		if(bean.isLogColorScale()) {
 			image = Maths.log10(image);
 		}
+		
 		if (bean.getHistogramType()==HistoType.OUTLIER_VALUES) {
 
 			try {
 			    double[] stats = Stats.outlierValues(image, bean.getLo(), bean.getHi(), -1);
+			    
+			    if (bean.isLogColorScale()) {
+			    	return new float[]{(float)Math.pow(stats[0],10), (float)Math.pow(stats[1],10), -1};
+				}
 			    return new float[]{(float)stats[0], (float)stats[1], -1};
 			} catch (IllegalArgumentException iae) {
 				bean.setLo(10);
 				bean.setHi(90);
 			    double[] stats = Stats.outlierValues(image, bean.getLo(), bean.getHi(), -1);
-			    return new float[]{(float)stats[0], (float)stats[1], -1};				
+			    if (bean.isLogColorScale()) {
+			    	return new float[]{(float)Math.pow(stats[0],10), (float)Math.pow(stats[1],10), -1};
+				}
+			    return new float[]{(float)stats[0], (float)stats[1], -1};
 			}
 		}
 		
@@ -432,10 +439,6 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 		float max = -Float.MAX_VALUE;
 		float sum = 0.0f;
 		int size = 0;
-		float posMin = Float.MAX_VALUE;
-		float posMax = -Float.MAX_VALUE;
-		float posSum = 0.0f;
-		int posSize = 0;
 		
 		BooleanDataset mask = bean.getMask()!=null
 	                        ? (BooleanDataset)DatasetUtils.cast((AbstractDataset)bean.getMask(), AbstractDataset.BOOL)
@@ -465,20 +468,6 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 			if (val > max) max = val;
 			size++;
 			
-			if (bean.isLogColorScale() && val > 0.0) {
-				posSum += val;
-				if (val < posMin) posMin = val;
-				if (val > posMax) posMax = val;
-				posSize++;
-			}
-			
-		}
-		
-		if (bean.isLogColorScale()) {
-			min = posMin;
-			max = posMax;
-			sum = posSum;
-			size = posSize;
 		}
 		
 		float retMin = min;
@@ -504,12 +493,10 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 		
 		if (retMax > max)	retMax = max;
 		
-		float[] result = new float[]{retMin, retMax, retExtra};
 		if (bean.isLogColorScale()) {
-			result = new float[]{(float) Math.pow(retMin,10), (float) Math.pow(retMax,10), (float) Math.pow(retExtra,10)};
-		}
-		
-		return result;
+			return new float[]{(float) Math.pow(retMin,10), (float) Math.pow(retMax,10), (float) Math.pow(retExtra,10)};
+		}		
+		return new float[]{retMin, retMax, retExtra};
 
 	}
 
