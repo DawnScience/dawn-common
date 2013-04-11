@@ -135,7 +135,17 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 		float min = getMin(bean);
 		
 		float maxCut = getMaxCut(bean);
-		float minCut = getMinCut(bean);		
+		float minCut = getMinCut(bean);
+		
+		// now deal with the log if needed
+		if(bean.isLogColorScale()) {
+			image = Maths.log10(image);
+			max = (float) Math.log10(max);
+			min = (float) Math.log10(min);
+			if (min <= 0 || Float.isNaN(min)) min = (float) 0.0000001;
+			maxCut = (float) Math.log10(maxCut);
+			minCut = (float) Math.log10(minCut);
+		}
 		
 		if (bean.getFunctionObject()!=null && bean.getFunctionObject() instanceof FunctionContainer) {
 			final FunctionContainer fc = (FunctionContainer)bean.getFunctionObject();
@@ -401,7 +411,10 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 	 */
 	public float[] getFastStatistics(ImageServiceBean bean) {
 		
-		final AbstractDataset image    = getImageLoggedData(bean);
+		AbstractDataset image    = getImageLoggedData(bean);
+		if(bean.isLogColorScale()) {
+			image = Maths.log10(image);
+		}
 		if (bean.getHistogramType()==HistoType.OUTLIER_VALUES) {
 
 			try {
@@ -491,7 +504,12 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 		
 		if (retMax > max)	retMax = max;
 		
-		return new float[]{retMin, retMax, retExtra};
+		float[] result = new float[]{retMin, retMax, retExtra};
+		if (bean.isLogColorScale()) {
+			result = new float[]{(float) Math.pow(retMin,10), (float) Math.pow(retMax,10), (float) Math.pow(retExtra,10)};
+		}
+		
+		return result;
 
 	}
 
