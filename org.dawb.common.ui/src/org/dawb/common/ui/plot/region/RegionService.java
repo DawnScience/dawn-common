@@ -6,21 +6,19 @@ import java.util.Map;
 import org.dawnsci.plotting.api.IPlottingSystem;
 import org.dawnsci.plotting.api.region.IRegion;
 import org.dawnsci.plotting.api.region.IRegion.RegionType;
-import org.eclipse.draw2d.ColorConstants;
 
-import uk.ac.diamond.scisoft.analysis.roi.IROI;
 import uk.ac.diamond.scisoft.analysis.roi.CircularFitROI;
 import uk.ac.diamond.scisoft.analysis.roi.CircularROI;
 import uk.ac.diamond.scisoft.analysis.roi.EllipticalFitROI;
 import uk.ac.diamond.scisoft.analysis.roi.EllipticalROI;
 import uk.ac.diamond.scisoft.analysis.roi.FreeDrawROI;
 import uk.ac.diamond.scisoft.analysis.roi.GridROI;
+import uk.ac.diamond.scisoft.analysis.roi.IROI;
 import uk.ac.diamond.scisoft.analysis.roi.LinearROI;
 import uk.ac.diamond.scisoft.analysis.roi.PerimeterBoxROI;
 import uk.ac.diamond.scisoft.analysis.roi.PointROI;
 import uk.ac.diamond.scisoft.analysis.roi.PolygonalROI;
 import uk.ac.diamond.scisoft.analysis.roi.PolylineROI;
-import uk.ac.diamond.scisoft.analysis.roi.ROIBase;
 import uk.ac.diamond.scisoft.analysis.roi.RectangularROI;
 import uk.ac.diamond.scisoft.analysis.roi.RingROI;
 import uk.ac.diamond.scisoft.analysis.roi.SectorROI;
@@ -32,9 +30,11 @@ import uk.ac.diamond.scisoft.analysis.roi.YAxisLineBoxROI;
 @SuppressWarnings("unchecked")
 public class RegionService {
 
-	private static final Map roiMap;
-	static {
-		roiMap = new HashMap(7);
+	private static Map<Object,Object> roiMap;
+	
+	private static Map<Object,Object> getRoiMap() {
+		if (roiMap!=null) return roiMap;
+		roiMap = new HashMap<Object,Object>(7);
 		roiMap.put(RegionType.LINE,          LinearROI.class);
 		roiMap.put(RegionType.POLYLINE,      PolylineROI.class);
 		roiMap.put(RegionType.POLYGON,       PolygonalROI.class);
@@ -58,13 +58,14 @@ public class RegionService {
 		for (Object key : roiMap.keySet()) {
 			roiMap.put(roiMap.get(key), key);
 		}
+		return roiMap;
 	}
 	
 	public static final RegionType forROI(IROI iroi) {
-		return (RegionType)roiMap.get(iroi.getClass());
+		return (RegionType)getRoiMap().get(iroi.getClass());
 	}
 	public static RegionType getRegion(Class<? extends IROI> clazz) {
-		return (RegionType)roiMap.get(clazz);
+		return (RegionType)getRoiMap().get(clazz);
 	}
 	
 	/**
