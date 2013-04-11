@@ -15,6 +15,7 @@ import org.dawnsci.persistence.PersistenceServiceCreator;
 import org.junit.Test;
 
 import uk.ac.diamond.scisoft.analysis.dataset.BooleanDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 
 public class ReadWriteMaskTest extends AbstractThreadTest{
 	
@@ -35,7 +36,7 @@ public class ReadWriteMaskTest extends AbstractThreadTest{
 			BooleanDataset mask0 = new BooleanDataset(bd0);
 			BooleanDataset mask1 = new BooleanDataset(bd1);
 			BooleanDataset mask2 = new BooleanDataset(bd2);
-			Map<String, BooleanDataset> masks = new HashMap<String, BooleanDataset>();
+			Map<String, IDataset> masks = new HashMap<String, IDataset>();
 			masks.put("mask3", mask0);
 			masks.put("mask4", mask1);
 			
@@ -64,7 +65,7 @@ public class ReadWriteMaskTest extends AbstractThreadTest{
 			
 			//read the persistent file and retrieve the regions
 			IPersistentFile fileReader = null;
-			Map<String, BooleanDataset> masksRead = null;
+			Map<String, IDataset> masksRead = null;
 			try{
 				fileReader = persist.getPersistentFile(tmp.getAbsolutePath());
 				masksRead = fileReader.getMasks(null);
@@ -83,7 +84,7 @@ public class ReadWriteMaskTest extends AbstractThreadTest{
 				assertTrue(masksRead.containsKey("mask2"));
 				
 				//check that the rewriting did work
-				boolean[] resultData = masksRead.get("mask1").getData();
+				boolean[] resultData = ((BooleanDataset)masksRead.get("mask1")).getData();
 				for (int i = 0; i < resultData.length; i++) {
 					assertEquals(bd2[i], resultData[i]);
 				}

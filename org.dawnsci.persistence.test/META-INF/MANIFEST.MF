@@ -10,4 +10,5 @@ Import-Package: org.dawb.common.services,
  org.osgi.framework;version="1.3.0"
 Require-Bundle: org.dawnsci.persistence;bundle-version="1.0.0",
  org.junit,
- uk.ac.diamond.scisoft.analysis
+ uk.ac.diamond.scisoft.analysis,
+ uk.ac.diamond.scisoft.analysis.api;bundle-version="1.0.0"

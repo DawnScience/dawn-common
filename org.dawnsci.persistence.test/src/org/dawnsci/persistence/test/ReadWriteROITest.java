@@ -14,7 +14,7 @@ import org.dawnsci.persistence.PersistenceServiceCreator;
 import org.junit.Test;
 
 import uk.ac.diamond.scisoft.analysis.roi.CircularROI;
-import uk.ac.diamond.scisoft.analysis.roi.ROIBase;
+import uk.ac.diamond.scisoft.analysis.roi.IROI;
 import uk.ac.diamond.scisoft.analysis.roi.RectangularROI;
 
 public class ReadWriteROITest extends AbstractThreadTest {
@@ -30,7 +30,7 @@ public class ReadWriteROITest extends AbstractThreadTest {
 			//regions
 			RectangularROI rroi = new RectangularROI(0, 0, 100, 200, 0);
 			CircularROI croi = new CircularROI(50, 100, 100);
-			Map<String, ROIBase> rois = new HashMap<String, ROIBase>();
+			Map<String, IROI> rois = new HashMap<String, IROI>();
 			rois.put("rectangle0", rroi);
 			rois.put("circle0", croi);
 			
@@ -50,7 +50,7 @@ public class ReadWriteROITest extends AbstractThreadTest {
 					file.close();
 			}
 
-			Map<String, ROIBase> roisRead = null;
+			Map<String, IROI> roisRead = null;
 			//read the persistent file and retrieve the regions
 			try {
 				file = persist.getPersistentFile(tmp.getAbsolutePath());

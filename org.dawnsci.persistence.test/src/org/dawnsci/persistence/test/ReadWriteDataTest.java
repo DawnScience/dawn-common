@@ -15,6 +15,7 @@ import org.junit.Test;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.DoubleDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 
 public class ReadWriteDataTest extends AbstractThreadTest {
@@ -27,8 +28,8 @@ public class ReadWriteDataTest extends AbstractThreadTest {
 			tmp.createNewFile();
 			
 			// dataset
-			AbstractDataset da = createTestData();
-			List<AbstractDataset> axes = createTestAxesData();
+			AbstractDataset  da = createTestData();
+			List<IDataset> axes = createTestAxesData();
 
 			// create the PersistentService
 			IPersistenceService persist = PersistenceServiceCreator
@@ -81,8 +82,8 @@ public class ReadWriteDataTest extends AbstractThreadTest {
 			tmp.createNewFile();
 			
 			// dataset
-			AbstractDataset da = createTestData();
-			List<AbstractDataset> axes = createTestAxesData();
+			AbstractDataset da  = createTestData();
+			List<IDataset> axes = createTestAxesData();
 			
 			// create the PersistentService
 			IPersistenceService persist = PersistenceServiceCreator
@@ -171,7 +172,7 @@ public class ReadWriteDataTest extends AbstractThreadTest {
 		return da;
 	}
 
-	private List<AbstractDataset> createTestAxesData(){
+	private List<IDataset> createTestAxesData(){
 		final double[] axis = new double[2048];
 		for (int i = 0; i < 2048; i++) {
 			axis[i] = i;
@@ -180,7 +181,7 @@ public class ReadWriteDataTest extends AbstractThreadTest {
 		dx.setName("X Axis");
 		DoubleDataset dy = new DoubleDataset(axis);
 		dy.setName("Y Axis");
-		List<AbstractDataset> axes = new ArrayList<AbstractDataset>();
+		List<IDataset> axes = new ArrayList<IDataset>();
 		axes.add(dx);
 		axes.add(dy);
 		return axes;
