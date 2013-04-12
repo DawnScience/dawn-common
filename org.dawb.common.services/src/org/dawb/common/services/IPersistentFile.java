@@ -56,7 +56,7 @@ public interface IPersistentFile {
 	 * @param Map
 	 * @throws Exception 
 	 */
-	public void setMasks(Map<String, IDataset> masks) throws Exception;
+	public void setMasks(Map<String, ? extends IDataset> masks) throws Exception;
 
 	/**
 	 * Method to add a mask to the current map of masks<br>
@@ -89,7 +89,7 @@ public interface IPersistentFile {
 	 * @param axes
 	 * @throws Exception 
 	 */
-	public void setAxes(List<IDataset> axes) throws Exception;
+	public void setAxes(List<? extends IDataset> axes) throws Exception;
 
 	/**
 	 * Method to set a map of ROIs<br>

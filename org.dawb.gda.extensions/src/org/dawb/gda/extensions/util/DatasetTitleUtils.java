@@ -30,8 +30,9 @@ public class DatasetTitleUtils {
 		return getTitle(xIn,ysIn,isFileName,null);
 	}
 
+	@SuppressWarnings("unchecked")
 	public static String getTitle(final IDataset xIn, 
-			                      final List<IDataset> ysIn, 
+			                      final List<? extends IDataset> ysIn, 
 			                      final boolean isFileName,
 			                      final String  rootName) {
 		
@@ -44,7 +45,7 @@ public class DatasetTitleUtils {
 			x.setName("Index of "+xIn.getName());
 		} else {
 			x  = xIn;
-			ys = ysIn;
+			ys = (List<IDataset>) ysIn;
 		}
 		
 		final StringBuilder buf = new StringBuilder();

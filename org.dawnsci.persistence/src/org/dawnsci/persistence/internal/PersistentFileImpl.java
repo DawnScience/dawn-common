@@ -116,7 +116,7 @@ class PersistentFileImpl implements IPersistentFile{
 	}
 
 	@Override
-	public void setMasks(Map<String, IDataset> masks) throws Exception {
+	public void setMasks(Map<String, ? extends IDataset> masks) throws Exception {
 		writeH5Mask(masks);
 	}
 
@@ -141,7 +141,7 @@ class PersistentFileImpl implements IPersistentFile{
 	}
 
 	@Override
-	public void setAxes(List<IDataset> axes) throws Exception{
+	public void setAxes(List<? extends IDataset> axes) throws Exception{
 		writeH5Data(null, axes.get(0), axes.get(1));
 	}
 
@@ -426,7 +426,7 @@ class PersistentFileImpl implements IPersistentFile{
 	 * @param masks
 	 * @throws Exception
 	 */
-	private void writeH5Mask(final Map<String, IDataset> masks) throws Exception {
+	private void writeH5Mask(final Map<String, ? extends IDataset> masks) throws Exception {
 
 		if(file == null)
 			file = HierarchicalDataFactory.getWriter(filePath);

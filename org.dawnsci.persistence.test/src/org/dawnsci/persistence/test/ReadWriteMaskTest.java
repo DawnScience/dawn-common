@@ -84,9 +84,9 @@ public class ReadWriteMaskTest extends AbstractThreadTest{
 				assertTrue(masksRead.containsKey("mask2"));
 				
 				//check that the rewriting did work
-				boolean[] resultData = ((BooleanDataset)masksRead.get("mask1")).getData();
-				for (int i = 0; i < resultData.length; i++) {
-					assertEquals(bd2[i], resultData[i]);
+				IDataset mask = masksRead.get("mask1");
+				for (int i = 0, imax = mask.getSize(); i < imax; i++) {
+					assertEquals(bd2[i], mask.getBoolean(i));
 				}
 			} else {
 				fail("ROIs read are Null.");
