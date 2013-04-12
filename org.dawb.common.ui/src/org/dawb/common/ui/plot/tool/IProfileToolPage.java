@@ -1,6 +1,6 @@
 package org.dawb.common.ui.plot.tool;
 
-import uk.ac.diamond.scisoft.analysis.roi.ROIProfile.BoxLineType;
+import org.dawb.common.ui.plot.region.IRegion;
 
 /**
  * Interface designed to hide special tool pages.
@@ -11,8 +11,26 @@ public interface IProfileToolPage extends IToolPage {
 
 	/**
 	 * Line type for Box Line Profiles
-	 * @param horizontalType
+	 * @param lineType either SWT.VERTICAL, or SWT.HORIZONTAL
 	 */
-	void setLineType(BoxLineType lineType);
+	void setLineType(int lineType);
+
+	/**
+	 * Set the plotAverageProfile flag for BoxLineProfile
+	 * @param b
+	 */
+	void setPlotAverageProfile(boolean b);
+
+	/**
+	 * Set the plotEdgeProfile flag for BoxLineProfile
+	 * @param b
+	 */
+	void setPlotEdgeProfile(boolean b);
+
+	/**
+	 * Update Profile given an IRegion
+	 * @param region
+	 */
+	void update(IRegion region);
 
 }
