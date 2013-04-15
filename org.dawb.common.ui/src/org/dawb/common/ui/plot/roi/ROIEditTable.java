@@ -8,8 +8,8 @@ import java.util.List;
 
 import org.dawnsci.plotting.api.axis.ICoordinateSystem;
 import org.dawnsci.plotting.api.region.IROIListener;
-import org.dawnsci.plotting.api.region.ROIEvent;
 import org.dawnsci.plotting.api.region.IRegion.RegionType;
+import org.dawnsci.plotting.api.region.ROIEvent;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
@@ -37,12 +37,12 @@ import org.slf4j.LoggerFactory;
 import uk.ac.diamond.scisoft.analysis.roi.CircularROI;
 import uk.ac.diamond.scisoft.analysis.roi.EllipticalFitROI;
 import uk.ac.diamond.scisoft.analysis.roi.EllipticalROI;
+import uk.ac.diamond.scisoft.analysis.roi.IROI;
 import uk.ac.diamond.scisoft.analysis.roi.LinearROI;
 import uk.ac.diamond.scisoft.analysis.roi.PerimeterBoxROI;
 import uk.ac.diamond.scisoft.analysis.roi.PointROI;
 import uk.ac.diamond.scisoft.analysis.roi.PolygonalROI;
 import uk.ac.diamond.scisoft.analysis.roi.PolylineROI;
-import uk.ac.diamond.scisoft.analysis.roi.ROIBase;
 import uk.ac.diamond.scisoft.analysis.roi.RectangularROI;
 import uk.ac.diamond.scisoft.analysis.roi.RingROI;
 import uk.ac.diamond.scisoft.analysis.roi.SectorROI;
@@ -61,9 +61,9 @@ public class ROIEditTable  {
 	private static final Logger logger = LoggerFactory.getLogger(ROIEditTable.class);
 	
 	private TableViewer regionTable;
-	private ROIBase     roi;
+	private IROI     roi;
 	private ICoordinateSystem coords;
-	private ROIBase     originalRoi;
+	private IROI     originalRoi;
 	private double      xLowerBound=Double.NaN, xUpperBound=Double.NaN; // Optional bounds
 	private double      yLowerBound=Double.NaN, yUpperBound=Double.NaN; // Optional bounds
 	private List<RegionRow> rows;
@@ -91,7 +91,7 @@ public class ROIEditTable  {
 	 * @param regionType - may be null
 	 * @param coords     - may be null
 	 */
-	public void setRegion(final ROIBase roi, final RegionType regionType, final ICoordinateSystem coords) {
+	public void setRegion(final IROI roi, final RegionType regionType, final ICoordinateSystem coords) {
 		
 		this.originalRoi = roi!=null ? roi : null;
 		this.roi         = roi!=null ? roi.copy() : null;
@@ -308,7 +308,7 @@ public class ROIEditTable  {
 		}
 	}
 
-	private List<RegionRow> createRegionRows(ROIBase roi, final ICoordinateSystem coords) {
+	private List<RegionRow> createRegionRows(IROI roi, final ICoordinateSystem coords) {
     	
 		final List<RegionRow> ret = new ArrayList<ROIEditTable.RegionRow>();
 		
@@ -388,9 +388,9 @@ public class ROIEditTable  {
 		}
 	}
 
-	public ROIBase createRoi(List<RegionRow> rows, RegionRow changed, ICoordinateSystem coords) {
+	public IROI createRoi(List<RegionRow> rows, RegionRow changed, ICoordinateSystem coords) {
 				
-		ROIBase ret = null; 
+		IROI ret = null; 
 		if (roi instanceof LinearROI) {
 			if (changed==rows.get(2)) {
 				LinearROI lr = new LinearROI(getImage(coords, rows.get(0)), getImage(coords, rows.get(1)));
@@ -598,10 +598,10 @@ public class ROIEditTable  {
 		}
     }
 
-	public ROIBase getOriginalRoi() {
+	public IROI getOriginalRoi() {
 		return originalRoi;
 	}
-	public ROIBase getRoi() {
+	public IROI getRoi() {
 		return roi;
 	}
 

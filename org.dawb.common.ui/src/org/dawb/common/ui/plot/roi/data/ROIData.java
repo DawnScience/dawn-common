@@ -22,13 +22,13 @@ import org.eclipse.swt.graphics.RGB;
 
 import uk.ac.diamond.scisoft.analysis.axis.AxisValues;
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
-import uk.ac.diamond.scisoft.analysis.roi.ROIBase;
+import uk.ac.diamond.scisoft.analysis.roi.IROI;
 
 /**
  * Base class to contain bare essentials of region of interest data
  */
 public class ROIData implements IRowData {
-	protected ROIBase roi;
+	protected IROI roi;
 	protected AbstractDataset[] profileData;
 	protected double profileSum;
 	protected RGB plotColourRGB;
@@ -135,14 +135,14 @@ public class ROIData implements IRowData {
 	/**
 	 * @param roi
 	 */
-	public void setROI(ROIBase roi) {
+	public void setROI(IROI roi) {
 		this.roi = roi;
 	}
 
 	/**
 	 * @return region of interest
 	 */
-	public ROIBase getROI() {
+	public IROI getROI() {
 		return roi;
 	}
 }

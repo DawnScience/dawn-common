@@ -48,7 +48,6 @@ import uk.ac.diamond.scisoft.analysis.io.IDiffractionMetadata;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
 import uk.ac.diamond.scisoft.analysis.roi.IROI;
-import uk.ac.diamond.scisoft.analysis.roi.ROIBase;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -245,8 +244,8 @@ class PersistentFileImpl implements IPersistentFile{
 	}
 
 	@Override
-	public ROIBase getROI(String roiName) throws Exception {
-		ROIBase roi = null;
+	public IROI getROI(String roiName) throws Exception {
+		IROI roi = null;
 		roi = readH5ROI(roiName);
 
 		return roi;
@@ -475,7 +474,7 @@ class PersistentFileImpl implements IPersistentFile{
 			Iterator<String> it = rois.keySet().iterator();
 			while(it.hasNext()){
 				String name = it.next();
-				ROIBase roi = (ROIBase)rois.get(name);
+				IROI roi = rois.get(name);
 				writeRoi(file, parent, name, roi, gson);
 			}
 
@@ -488,7 +487,7 @@ class PersistentFileImpl implements IPersistentFile{
 			IROI    roi,
 			Gson    gson) throws Exception {
 
-		ROIBean roibean = ROIBeanConverter.ROIBaseToROIBean(name, roi);
+		ROIBean roibean = ROIBeanConverter.IROIToROIBean(name, roi);
 
 		long[] dims = {1};
 
@@ -582,7 +581,7 @@ class PersistentFileImpl implements IPersistentFile{
 	 * @return ROIBase
 	 * @throws Exception 
 	 */
-	private ROIBase readH5ROI(String roiName) throws Exception{
+	private IROI readH5ROI(String roiName) throws Exception{
 
 		String json = file.getAttributeValue(ROI_ENTRY+"/"+roiName);
 		if(json == null) throw new Exception("Reading Exception: " +ROI_ENTRY+ " entry does not exist in the file " + filePath);
@@ -593,7 +592,7 @@ class PersistentFileImpl implements IPersistentFile{
 		Gson gson = builder.create();
 		ROIBean roibean = gson.fromJson(json, ROIBean.class);
 		//convert the bean to roibase
-		ROIBase roi = ROIBeanConverter.ROIBeanToROIBase(roibean);
+		IROI roi = ROIBeanConverter.ROIBeanToROIBase(roibean);
 
 		return roi;
 	}
@@ -625,7 +624,7 @@ class PersistentFileImpl implements IPersistentFile{
 			ROIBean roibean = ROIBeanConverter.getROIBeanfromJSON(gson, json);
 
 			//convert the bean to roibase
-			ROIBase roi = ROIBeanConverter.ROIBeanToROIBase(roibean);
+			IROI roi = ROIBeanConverter.ROIBeanToROIBase(roibean);
 			rois.put(name, roi);
 		}
 

@@ -14,7 +14,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.ac.diamond.scisoft.analysis.roi.ROIBase;
+import uk.ac.diamond.scisoft.analysis.roi.IROI;
 
 /**
  * A dialog for editing a ROI. Uses ROIViewer table.
@@ -69,13 +69,13 @@ public class ROIDialog extends Dialog {
 		return main;
 	}
 	
-	public void setROI(ROIBase roi) {
+	public void setROI(IROI roi) {
 		final int index = ROIType.getIndex(roi.getClass());
 		roiType.select(index);
 		roiEditor.setRegion(roi, null, null);
 	}
 	
-	public ROIBase getROI() {
+	public IROI getROI() {
 		return roiEditor.getRoi();
 	}
 }

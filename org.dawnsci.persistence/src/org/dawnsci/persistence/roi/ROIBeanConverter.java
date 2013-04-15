@@ -12,7 +12,6 @@ import uk.ac.diamond.scisoft.analysis.roi.FreeDrawROI;
 import uk.ac.diamond.scisoft.analysis.roi.IROI;
 import uk.ac.diamond.scisoft.analysis.roi.PolygonalROI;
 import uk.ac.diamond.scisoft.analysis.roi.PolylineROI;
-import uk.ac.diamond.scisoft.analysis.roi.ROIBase;
 import uk.ac.diamond.scisoft.analysis.roi.RectangularROI;
 import uk.ac.diamond.scisoft.analysis.roi.RingROI;
 import uk.ac.diamond.scisoft.analysis.roi.SectorROI;
@@ -20,7 +19,7 @@ import uk.ac.diamond.scisoft.analysis.roi.SectorROI;
 import com.google.gson.Gson;
 
 /**
- * Class used to convert from a ROIBase to a ROIBean and vice-versa
+ * Class used to convert from an IROI to a ROIBean and vice-versa
  * @author wqk87977
  *
  */
@@ -29,12 +28,12 @@ public class ROIBeanConverter {
 	static private Logger logger = LoggerFactory.getLogger(ROIBeanConverter.class);
 
 	/**
-	 * Method that converts a ROIBase to a ROIBean
+	 * Method that converts a IROI to a ROIBean
 	 * @param name
 	 * @param roi
 	 * @return ROIBean
 	 */
-	public static ROIBean ROIBaseToROIBean(String name, IROI roi){
+	public static ROIBean IROIToROIBean(String name, IROI roi){
 		Class<? extends IROI> roiClass = roi.getClass();
 		if(roiClass == RectangularROI.class){
 			RectangularROI rroi = (RectangularROI) roi;
@@ -123,7 +122,7 @@ public class ROIBeanConverter {
 	 * @param rbean
 	 * @return ROIBase
 	 */
-	public static ROIBase ROIBeanToROIBase(ROIBean rbean){
+	public static IROI ROIBeanToROIBase(ROIBean rbean){
 		if(rbean instanceof RectangularROIBean){
 			RectangularROIBean rroibean = (RectangularROIBean) rbean;
 			RectangularROI rroi = new RectangularROI(rroibean.getStartPoint()[0], 
