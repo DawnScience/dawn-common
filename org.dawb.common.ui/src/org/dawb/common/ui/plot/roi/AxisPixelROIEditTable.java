@@ -393,6 +393,7 @@ public class AxisPixelROIEditTable {
 		roi = region;
 
 		RectangularROI rroi = (RectangularROI)roi;
+		if(roi == null) return;
 		double xStart = roi.getPointX();
 		double yStart = roi.getPointY();
 		double xEnd = rroi.getEndPoint()[0];
