@@ -85,7 +85,7 @@ class PersistentFileImpl implements IPersistentFile{
 	 * For save
 	 * @param file
 	 */
-	PersistentFileImpl(IHierarchicalDataFile file) throws Exception{
+	public PersistentFileImpl(IHierarchicalDataFile file) throws Exception{
 		this.file = file;
 		this.filePath = file.getPath();
 		// set the site and version
@@ -105,7 +105,7 @@ class PersistentFileImpl implements IPersistentFile{
 	 * For read
 	 * @param filePath
 	 */
-	PersistentFileImpl(String filePath) {
+	public PersistentFileImpl(String filePath) {
 		this.filePath = filePath;
 		try {
 			this.file = HierarchicalDataFactory.getReader(filePath);
