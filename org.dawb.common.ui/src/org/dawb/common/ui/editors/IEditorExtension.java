@@ -1,5 +1,6 @@
 package org.dawb.common.ui.editors;
 
+import org.dawb.common.ui.plot.AbstractPlottingSystem;
 import org.eclipse.ui.IEditorPart;
 
 /**
@@ -53,4 +54,10 @@ public interface IEditorExtension extends IEditorPart {
 	 */
 	// TODO
 	//public int getPreferredEditorIndex();
+
+	/**
+	 * The plotting system of editor extension.
+	 * @return plotting system
+	 */
+	public AbstractPlottingSystem getPlottingSystem();
 }
