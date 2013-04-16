@@ -10,17 +10,8 @@ import org.dawb.common.util.io.PropUtils;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.preferences.InstanceScope;
-import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IPerspectiveDescriptor;
-import org.eclipse.ui.IWorkbenchPreferenceConstants;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.internal.Perspective;
-import org.eclipse.ui.internal.WorkbenchPage;
-import org.eclipse.ui.internal.tweaklets.Tweaklets;
-import org.eclipse.ui.preferences.ScopedPreferenceStore;
 
 public class EditorExtensionFactory {
 

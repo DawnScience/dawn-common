@@ -22,7 +22,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 
 public class GallerySelectionProvider implements ISelectionProvider {
 
-    private List listeners = new ArrayList();
+    private List<ISelectionChangedListener> listeners = new ArrayList<ISelectionChangedListener>();
 
     private ISelection theSelection = StructuredSelection.EMPTY;
 
@@ -39,7 +39,8 @@ public class GallerySelectionProvider implements ISelectionProvider {
         listeners.remove(listener);
     }
 
-    public void setSelection(ISelection selection) {
+    @SuppressWarnings("deprecation")
+	public void setSelection(ISelection selection) {
         theSelection = selection;
         final SelectionChangedEvent e = new SelectionChangedEvent(this, selection);
         Object[] listenersArray = listeners.toArray();

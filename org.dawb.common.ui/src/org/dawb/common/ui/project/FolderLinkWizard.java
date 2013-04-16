@@ -29,6 +29,7 @@ import org.eclipse.ui.IWorkbench;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@SuppressWarnings("restriction")
 public class FolderLinkWizard extends Wizard implements IImportWizard {
 
 	private static Logger logger = LoggerFactory.getLogger(FolderLinkWizard.class);
