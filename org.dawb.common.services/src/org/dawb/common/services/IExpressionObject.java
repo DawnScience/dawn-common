@@ -16,6 +16,8 @@
 
 package org.dawb.common.services;
 
+import java.util.Map;
+
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
@@ -74,6 +76,12 @@ public interface IExpressionObject {
 	 * @return true if expression contained in the object has legal syntax.
 	 */
 	public boolean isValid(IMonitor monitor);
-
+	
+	/**
+	 * Get all functions currently in the expression engine
+	 * 
+	 * @returns functions
+	 */
+	public Map<String,Object> getFunctions();
 
 }
