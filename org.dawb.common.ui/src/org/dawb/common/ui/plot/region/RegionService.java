@@ -1,6 +1,7 @@
 package org.dawb.common.ui.plot.region;
 
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 
 import org.dawnsci.plotting.api.IPlottingSystem;
@@ -54,7 +55,7 @@ public class RegionService {
 		roiMap.put(RegionType.FREE_DRAW,     FreeDrawROI.class);
 
 		// Goes both ways.
-		for (Object key : roiMap.keySet()) {
+		for (Object key : new LinkedHashSet<Object>(roiMap.keySet())) {
 			roiMap.put(roiMap.get(key), key);
 		}
 		return roiMap;
