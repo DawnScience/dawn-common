@@ -418,7 +418,6 @@ public final class FileUtils {
 	 * @param buffer
 	 * @throws IOException
 	 */
-	@SuppressWarnings("null")
 	public final static void copy(final File source_file, final File destination_file, final byte[] buffer)
 			throws IOException {
 

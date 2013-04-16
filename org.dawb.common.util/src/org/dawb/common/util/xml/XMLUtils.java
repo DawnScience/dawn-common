@@ -64,7 +64,7 @@ public class XMLUtils {
 
 	private static final Pattern HEADER_PATTERN = Pattern.compile("^\\<\\?.+\\?\\>(.*)", Pattern.DOTALL);
 	
-	public static Map<String, String> getVariables(final Map                 variables,
+	public static Map<String, String> getVariables(final Map<?, ?>           variables,
 			                                       final String              xmlSource, 
 			                                       final Map<String, String> scalarSource) throws Exception {
 		

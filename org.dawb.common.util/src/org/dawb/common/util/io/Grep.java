@@ -39,9 +39,9 @@ public class Grep {
     	
         Matcher lm = LINE_PATTERN.matcher(cb);  // Line matcher
         Matcher pm = null;                     // Pattern matcher
-        int lines = 0;
+        //int lines = 0;
         while (lm.find()) {
-            lines++;
+            //lines++;
             CharSequence cs = lm.group();      // The current line
             if (pm == null)
                 pm = pattern.matcher(cs);
@@ -192,9 +192,9 @@ public class Grep {
 
     	Matcher lm = LINE_PATTERN.matcher(cb);  // Line matcher
     	Matcher pm = null;                     // Pattern matcher
-    	int lines = 0;
+    	//int lines = 0;
     	while (lm.find()) {
-    		lines++;
+    		//lines++;
     		CharSequence cs = lm.group();      // The current line
     		if (pm == null)
     			pm = pattern.matcher(cs);
@@ -219,9 +219,9 @@ public class Grep {
     	
         Matcher lm = LINE_PATTERN.matcher(cb);  // Line matcher
         Matcher pm = null;                     // Pattern matcher
-        int lines = 0;
+        //int lines = 0;
         while (lm.find()) {
-            lines++;
+            //lines++;
             CharSequence cs = lm.group();      // The current line
             if (pm == null)
                 pm = pattern.matcher(cs);

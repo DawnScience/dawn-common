@@ -15,6 +15,10 @@ package org.dawb.common.util.list;
  */
 public class IntersectionException extends Exception {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private String firstName, secondName;
 	/**
 	 * 

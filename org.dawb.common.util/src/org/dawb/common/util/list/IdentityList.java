@@ -19,6 +19,11 @@ import java.util.ArrayList;
  */
 public class IdentityList<E> extends ArrayList<E> {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public boolean contains(Object o) {
 		for (int i = 0; i < size(); i++) {
 			if (get(i)==o) return true;

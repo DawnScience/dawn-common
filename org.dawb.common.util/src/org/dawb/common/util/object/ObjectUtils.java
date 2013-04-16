@@ -77,7 +77,7 @@ public class ObjectUtils {
 			if (loader==null) loader = getClass().getClassLoader();
 		}
 
-		protected Class resolveClass(ObjectStreamClass classDesc)
+		protected Class<?> resolveClass(ObjectStreamClass classDesc)
 				throws IOException, ClassNotFoundException {
 			return Class.forName(classDesc.getName(), false, loader);
 		}
