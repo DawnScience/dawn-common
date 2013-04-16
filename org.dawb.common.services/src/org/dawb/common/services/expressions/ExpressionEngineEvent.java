@@ -20,6 +20,10 @@ import java.util.EventObject;
 
 public class ExpressionEngineEvent extends EventObject {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private Object result;
 	private String expression;
 	

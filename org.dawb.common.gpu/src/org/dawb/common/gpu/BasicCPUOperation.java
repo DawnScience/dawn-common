@@ -1,13 +1,7 @@
 package org.dawb.common.gpu;
 
 
-import com.amd.aparapi.Kernel;
-import com.amd.aparapi.Range;
-
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
-import uk.ac.diamond.scisoft.analysis.dataset.DatasetUtils;
-import uk.ac.diamond.scisoft.analysis.dataset.DoubleDataset;
-import uk.ac.diamond.scisoft.analysis.dataset.IntegerDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.Maths;
 
 /**

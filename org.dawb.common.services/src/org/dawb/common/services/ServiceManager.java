@@ -45,7 +45,7 @@ public class ServiceManager {
 	 * @return
 	 * @throws Exception
 	 */
-	public static Object getService(final Class serviceClass) throws Exception {
+	public static Object getService(final Class<?> serviceClass) throws Exception {
 		return getService(serviceClass, true);
 	}
 
@@ -59,7 +59,7 @@ public class ServiceManager {
 	 * @param serviceClass
 	 * @return
 	 */
-	public static Object getService(final Class serviceClass, boolean exceptionOnError) throws Exception {
+	public static Object getService(final Class<?> serviceClass, boolean exceptionOnError) throws Exception {
 		
 		if (PlatformUI.isWorkbenchRunning()) {
 			Object instance = PlatformUI.getWorkbench().getService(serviceClass);

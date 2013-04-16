@@ -23,6 +23,7 @@ public class JepTest {
 	 * At least this one works...
 	 * @throws Throwable
 	 */
+	@SuppressWarnings("unused")
 	@Test
 	public void testJepBasic() throws Throwable {
 		
@@ -202,6 +203,7 @@ public class JepTest {
 	}
 
 	
+	@SuppressWarnings("unused")
 	private String getBuffer(int[] data, int start, int chunk) {
 		final StringBuilder buf = new StringBuilder();
 		buf.append("[");
