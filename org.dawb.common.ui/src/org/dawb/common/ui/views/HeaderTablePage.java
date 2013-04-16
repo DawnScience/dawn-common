@@ -56,6 +56,7 @@ public class HeaderTablePage extends Page implements IAdaptable{
 		super.dispose();
 	}
 	
+	@SuppressWarnings("rawtypes")
 	public Object getAdapter(Class type) {
 		if (type == String.class) {
 			return "Meta Data";

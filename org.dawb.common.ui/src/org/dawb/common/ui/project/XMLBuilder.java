@@ -40,7 +40,7 @@ public class XMLBuilder extends IncrementalProjectBuilder {
 	}
 
 	@Override
-	protected IProject[] build(int kind, Map args, IProgressMonitor monitor) throws CoreException {
+	protected IProject[] build(int kind, Map<String, String> args, IProgressMonitor monitor) throws CoreException {
 		ResourcesPlugin.getWorkspace().run(new IWorkspaceRunnable() {
 			@Override
 			public void run(IProgressMonitor monitor) throws CoreException {

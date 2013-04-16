@@ -78,10 +78,12 @@ public class CommonUIPreferenceInitializer extends AbstractPreferenceInitializer
 	}
 
 
+	@SuppressWarnings("unused")
 	private boolean isInt(String name) {
 		return integerPrefs.contains(name);
 	}
 
+	@SuppressWarnings("unused")
 	private boolean isBoolean(String name) {
 		return booleanPrefs.contains(name);
 	}

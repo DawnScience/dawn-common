@@ -16,12 +16,10 @@ class ActionContainer {
 		this.manager = manager;
 	}
 
-	@SuppressWarnings("unused")
 	public void setAction(IAction action) {
 		this.action = action;
 	}
 
-	@SuppressWarnings("unused")
 	public void setManager(IContributionManager manager) {
 		this.manager = manager;
 	}

@@ -148,7 +148,7 @@ public class DimsData implements Serializable {
 			return ret;
 		}
 		if (sliceRange!=null) {
-			List<Number> rs = (List<Number>) DOEUtils.expand(sliceRange);
+			List<? extends Number> rs = DOEUtils.expand(sliceRange);
 			for (Number number : rs) {
 				final DimsData val = new DimsData(this.dimension);
 				val.setSlice(number.intValue());

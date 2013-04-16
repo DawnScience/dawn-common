@@ -27,7 +27,6 @@ import uk.ac.diamond.scisoft.analysis.roi.XAxisLineBoxROI;
 import uk.ac.diamond.scisoft.analysis.roi.YAxisBoxROI;
 import uk.ac.diamond.scisoft.analysis.roi.YAxisLineBoxROI;
 
-@SuppressWarnings("unchecked")
 public class RegionService {
 
 	private static Map<Object,Object> roiMap;
