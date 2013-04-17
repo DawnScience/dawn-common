@@ -1,7 +1,7 @@
 package org.dawb.common.ui.plot.region;
 
 import java.util.HashMap;
-import java.util.LinkedHashSet;
+import java.util.HashSet;
 import java.util.Map;
 
 import org.dawnsci.plotting.api.IPlottingSystem;
@@ -32,8 +32,9 @@ public class RegionService {
 
 	private static Map<Object,Object> roiMap;
 	
-	private static Map<Object,Object> getRoiMap() {
+	private synchronized static Map<Object,Object> getRoiMap() {
 		if (roiMap!=null) return roiMap;
+
 		roiMap = new HashMap<Object,Object>(7);
 		roiMap.put(RegionType.LINE,          LinearROI.class);
 		roiMap.put(RegionType.POLYLINE,      PolylineROI.class);
@@ -55,9 +56,10 @@ public class RegionService {
 		roiMap.put(RegionType.FREE_DRAW,     FreeDrawROI.class);
 
 		// Goes both ways.
-		for (Object key : new LinkedHashSet<Object>(roiMap.keySet())) {
+		for (Object key : new HashSet<Object>(roiMap.keySet())) {
 			roiMap.put(roiMap.get(key), key);
 		}
+
 		return roiMap;
 	}
 	
@@ -134,7 +136,4 @@ public class RegionService {
 		return newRegion;
 
 	}
-
-		
-
 }
