@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.dawb.common.services;
+package org.dawb.common.services.conversion;
 
 import java.util.Map;
 
@@ -77,6 +77,19 @@ public interface IConversionContext {
 	 */
 	public void setConversionScheme(ConversionScheme cs);
 	
+	/**
+	 * Call to override the conversion scheme. If this 
+	 * @return
+	 */
+	public void setConversionVisitor(IConversionVisitor visitor);
+
+	/**
+	 * Call to run the conversion. Process all files matching the filePathRegEx
+	 * @param context
+	 * @throws Exception if problem processing the conversion.
+	 */
+	public IConversionVisitor getConversionVisitor();
+
 	/**
 	 * The file that we are converting
 	 * @return

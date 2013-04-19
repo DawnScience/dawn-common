@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.dawb.common.services;
+package org.dawb.common.services.conversion;
 
 /**
  * This service is available as an OSGI service similar to IPersistenceService.
@@ -58,4 +58,5 @@ public interface IConversionService {
 	 * @throws Exception if problem processing the conversion.
 	 */
 	public void process(IConversionContext context) throws Exception;
+	
 }
