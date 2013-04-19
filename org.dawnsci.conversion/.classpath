@@ -1,7 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6">
+		<attributes>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="ncsa.hdf/lib/win32-x86_64"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="test"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/ncsa.hdf"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.dawb.hdf5"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/uk.ac.diamond.scisoft.analysis"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/uk.ac.diamond.scisoft.analysis.api"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.dawb.common.services"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

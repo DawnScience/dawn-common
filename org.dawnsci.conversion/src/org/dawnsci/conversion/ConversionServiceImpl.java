@@ -13,6 +13,9 @@ class ConversionServiceImpl implements IConversionService {
 
 	@Override
 	public IConversionContext open(String filePathRegEx) {
+		if (filePathRegEx.startsWith("file:/")) {
+			filePathRegEx = filePathRegEx.substring("file:/".length());
+		}
 		ConversionContext context = new ConversionContext();
 		context.setFilePath(filePathRegEx);
 		return context;

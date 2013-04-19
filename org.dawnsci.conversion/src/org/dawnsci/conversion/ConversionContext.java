@@ -28,8 +28,10 @@ class ConversionContext implements IConversionContext {
 	public String getFilePath() {
 		return filePath;
 	}
-	public void setFilePath(String filePath) {
-		this.filePath = filePath;
+	public void setFilePath(String filePathOrRegex) {
+		// In order to parse the regex, it must have / not \
+		filePathOrRegex = filePathOrRegex.replace('\\', '/');
+		this.filePath = filePathOrRegex;
 	}
 	public String getDatasetName() {
 		return datasetName;

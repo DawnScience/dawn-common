@@ -36,7 +36,7 @@ public abstract class AbstractConversion {
 	
 	protected IConversionContext context;
 
-	AbstractConversion(IConversionContext context) {
+	public AbstractConversion(IConversionContext context) {
 		this.context = context;
 	}
 
@@ -73,7 +73,7 @@ public abstract class AbstractConversion {
 	 */
 	protected abstract void convert(AbstractDataset slice);
 	
-	private void processSlice(final File                 path, 
+	public void processSlice(final File                 path, 
 				            final String               dsPath,
 				            final Map<Integer, String> sliceDimensions,
 				            final IConversionContext   context) throws Exception {
@@ -330,7 +330,7 @@ public abstract class AbstractConversion {
 	 * @return null if none match, the datasets otherwise
 	 * @throws Exception
 	 */
-	protected List<String> getData(File ioFile, String datasetName) throws Exception {
+	public List<String> getData(File ioFile, String datasetName) throws Exception {
 		
 		final List<String> ds = new ArrayList<String>(7);
 		IHierarchicalDataFile file = null;
@@ -344,7 +344,7 @@ public abstract class AbstractConversion {
 			}
 			
 		} finally {
-			file.close();
+			if (file!=null) file.close();
 		}
 		return ds.isEmpty() ? null : ds;
 	}
@@ -354,7 +354,7 @@ public abstract class AbstractConversion {
 	 * @param context
 	 * @return
 	 */
-	protected List<File> expand(String path) {
+	public List<File> expand(String path) {
 		final List<File> files = new ArrayList<File>(7);
 		final String dir    = path.substring(0, path.lastIndexOf("/"));
 		final String regexp = path.substring(path.lastIndexOf("/")+1);
