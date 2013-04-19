@@ -31,7 +31,7 @@ public interface IConversionContext {
 	 */
 	public enum ConversionScheme {
 		ASCII_FROM_2D("Convert to ascii from 2D data"), 
-		ASCII_FROM_1D("Convert to ascii from 1D data"), 
+		ASCII_FROM_1D("Convert to ascii(dat) from 1D data"), 
 		CUSTOM_NCD("Convert to ascii from NCD data"), 
 		TIFF_FROM_3D("Convert to tiff from image stack");
 		

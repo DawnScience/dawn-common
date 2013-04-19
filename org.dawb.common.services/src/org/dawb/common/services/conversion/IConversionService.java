@@ -27,12 +27,24 @@ package org.dawb.common.services.conversion;
  * IConversionService service = (IConversionService)ServiceManager.getService(IConversionService.class);
  * IConversionContext context = service.open("/dls/path_to_some_hdf5_file.nxs"); // regex allowed
  * context.setDatasetName("/entry1/signal/some_data"); // regex allowed
- * context.setOutputFolder("/dls/some_place_I_want_my_data");
+ * context.setOutputPath("/dls/some_place_I_want_my_data");
  * context.setScheme(IConversionContext.ConversionScheme.ASCII_FROM_2D);
  * service.process(context);
  * </code>
  * 
- * The core service support looping
+ * The core service supports looping, slicing and dicing etc.
+ * 
+ * Two methods for adding your own conversion:
+ * 
+ * 1. 
+ * 1.1 Extend the enum ConversionScheme to have your new conversion.
+ * 1.2 Add an implementation of it in org.dawnsci.conversion.internal
+ * 1.3 Change method process(...) in ConversionServiceImpl to use this new scheme and class.
+ * 
+ * 2.
+ * 2.1 Create a new class implementing IConversionVisitor
+ * 2.2 Set this visitor on the context using IConversionContext.setConversionVisitor(...)
+ * 2.3 Call conversion as normal, each slice will be sent for the visitor to do the writing.
  * 
  */
 public interface IConversionService {
