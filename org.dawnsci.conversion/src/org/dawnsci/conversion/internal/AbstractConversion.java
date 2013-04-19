@@ -9,7 +9,7 @@ import java.util.Map;
 
 import ncsa.hdf.object.Dataset;
 
-import org.dawb.common.services.IConversionContext;
+import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.hdf5.HierarchicalDataFactory;
 import org.dawb.hdf5.IHierarchicalDataFile;
 

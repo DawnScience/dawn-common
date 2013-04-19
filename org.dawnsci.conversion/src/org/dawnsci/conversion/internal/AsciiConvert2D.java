@@ -1,6 +1,6 @@
 package org.dawnsci.conversion.internal;
 
-import org.dawb.common.services.IConversionContext;
+import org.dawb.common.services.conversion.IConversionContext;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 

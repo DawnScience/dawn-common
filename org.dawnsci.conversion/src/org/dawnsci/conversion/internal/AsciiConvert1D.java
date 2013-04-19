@@ -9,7 +9,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.dawb.common.services.IConversionContext;
+import org.dawb.common.services.conversion.IConversionContext;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;

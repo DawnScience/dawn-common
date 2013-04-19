@@ -2,7 +2,7 @@ package org.dawnsci.conversion;
 
 import java.util.Hashtable;
 
-import org.dawb.common.services.IConversionService;
+import org.dawb.common.services.conversion.IConversionService;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 

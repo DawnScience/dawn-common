@@ -1,12 +1,13 @@
 package org.dawnsci.conversion;
 
-import org.dawb.common.services.IConversionContext;
-import org.dawb.common.services.IConversionService;
+import org.dawb.common.services.conversion.IConversionContext;
+import org.dawb.common.services.conversion.IConversionService;
 import org.dawnsci.conversion.internal.AbstractConversion;
 import org.dawnsci.conversion.internal.AsciiConvert1D;
 import org.dawnsci.conversion.internal.AsciiConvert2D;
 import org.dawnsci.conversion.internal.CustomNCDConverter;
 import org.dawnsci.conversion.internal.TiffConverter;
+import org.dawnsci.conversion.internal.VisitorConversion;
 
 class ConversionServiceImpl implements IConversionService {
 
@@ -21,19 +22,24 @@ class ConversionServiceImpl implements IConversionService {
 	public void process(IConversionContext context) throws Exception {
 		AbstractConversion deligate=null;
 		try {
-			switch(context.getConversionScheme()) {
-			case ASCII_FROM_2D:
-				deligate = new AsciiConvert2D(context);
-				break;
-			case ASCII_FROM_1D:
-				deligate = new AsciiConvert1D(context);
-				break;
-			case CUSTOM_NCD:
-				deligate = new CustomNCDConverter(context);
-				break;
-			case TIFF_FROM_3D:
-				deligate = new TiffConverter(context);
-				break;
+			if (context.getConversionVisitor()!=null) {
+				deligate = new VisitorConversion(context);
+			}
+			if (deligate==null) {
+				switch(context.getConversionScheme()) {
+				case ASCII_FROM_2D:
+					deligate = new AsciiConvert2D(context);
+					break;
+				case ASCII_FROM_1D:
+					deligate = new AsciiConvert1D(context);
+					break;
+				case CUSTOM_NCD:
+					deligate = new CustomNCDConverter(context);
+					break;
+				case TIFF_FROM_3D:
+					deligate = new TiffConverter(context);
+					break;
+				}
 			}
 			deligate.process(context);
 		} finally {

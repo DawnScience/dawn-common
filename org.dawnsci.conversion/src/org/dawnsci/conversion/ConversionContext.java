@@ -3,13 +3,15 @@ package org.dawnsci.conversion;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.dawb.common.services.IConversionContext;
+import org.dawb.common.services.conversion.IConversionContext;
+import org.dawb.common.services.conversion.IConversionVisitor;
 
 import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
 
 class ConversionContext implements IConversionContext {
 
 	private ConversionScheme    conversionScheme;
+	private IConversionVisitor  conversionVisitor;
 	private String              filePath;
 	private String              datasetName;
 	private String              outputFolder;
@@ -48,6 +50,10 @@ class ConversionContext implements IConversionContext {
 		result = prime
 				* result
 				+ ((conversionScheme == null) ? 0 : conversionScheme.hashCode());
+		result = prime
+				* result
+				+ ((conversionVisitor == null) ? 0 : conversionVisitor
+						.hashCode());
 		result = prime * result
 				+ ((datasetName == null) ? 0 : datasetName.hashCode());
 		result = prime * result
@@ -70,6 +76,11 @@ class ConversionContext implements IConversionContext {
 			return false;
 		ConversionContext other = (ConversionContext) obj;
 		if (conversionScheme != other.conversionScheme)
+			return false;
+		if (conversionVisitor == null) {
+			if (other.conversionVisitor != null)
+				return false;
+		} else if (!conversionVisitor.equals(other.conversionVisitor))
 			return false;
 		if (datasetName == null) {
 			if (other.datasetName != null)
@@ -132,6 +143,12 @@ class ConversionContext implements IConversionContext {
 	@Override
 	public void getMonitor(IMonitor monitor) {
 		this.monitor = monitor;
+	}
+	public IConversionVisitor getConversionVisitor() {
+		return conversionVisitor;
+	}
+	public void setConversionVisitor(IConversionVisitor conversionVisitor) {
+		this.conversionVisitor = conversionVisitor;
 	}
 
 }
