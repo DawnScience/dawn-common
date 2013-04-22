@@ -71,7 +71,7 @@ public abstract class AbstractConversion {
 	 * @param slice
 	 * @param context, used to provide the output location mainly.
 	 */
-	protected abstract void convert(AbstractDataset slice);
+	protected abstract void convert(AbstractDataset slice) throws Exception;
 	
 	public void processSlice(final File                 path, 
 				            final String               dsPath,

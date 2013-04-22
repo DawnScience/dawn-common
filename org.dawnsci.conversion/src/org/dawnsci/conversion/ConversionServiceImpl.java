@@ -6,7 +6,7 @@ import org.dawnsci.conversion.internal.AbstractConversion;
 import org.dawnsci.conversion.internal.AsciiConvert1D;
 import org.dawnsci.conversion.internal.AsciiConvert2D;
 import org.dawnsci.conversion.internal.CustomNCDConverter;
-import org.dawnsci.conversion.internal.TiffConverter;
+import org.dawnsci.conversion.internal.ImageConverter;
 import org.dawnsci.conversion.internal.VisitorConversion;
 
 class ConversionServiceImpl implements IConversionService {
@@ -40,7 +40,7 @@ class ConversionServiceImpl implements IConversionService {
 					deligate = new CustomNCDConverter(context);
 					break;
 				case TIFF_FROM_3D:
-					deligate = new TiffConverter(context);
+					deligate = new ImageConverter(context);
 					break;
 				}
 			}

@@ -133,7 +133,7 @@ public interface IConversionContext {
 	 * 
 	 * There should be only one range set in the slicing, one set to "all" or one
 	 * set to "start:end" where start is the start index. Only one range can be
-	 * processed at a time.
+	 * processed for a given convert, other dimensions may be constant however.
 	 */
 	public void addSliceDimension(int dim, String sliceString);
 
