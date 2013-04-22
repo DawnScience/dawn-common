@@ -17,13 +17,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.dawnsci.conversion.internal.AsciiConvert1D;
 import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.ui.monitor.ProgressMonitorWrapper;
-import org.dawb.common.ui.util.EclipseUtils;
+import org.dawnsci.conversion.internal.AsciiConvert1D;
 import org.dawnsci.conversion.ui.AbstractConversionPage;
 import org.dawnsci.conversion.ui.Activator;
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IContributionManager;
@@ -31,9 +29,7 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
-import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -51,7 +47,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
-import org.slf4j.LoggerFactory;
 
 import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 import uk.ac.diamond.scisoft.analysis.io.DataHolder;
@@ -66,8 +61,6 @@ import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
  *   @project org.edna.workbench.actions
  **/
 public class AsciiConvertPage extends AbstractConversionPage {
-
-	private static final org.slf4j.Logger logger = LoggerFactory.getLogger(AsciiConvertPage.class);
 	
 	private CheckboxTableViewer checkboxTableViewer;
 	private String[]            dataSetNames;
@@ -81,7 +74,6 @@ public class AsciiConvertPage extends AbstractConversionPage {
 
 	private IMetaData          imeta;
 	private DataHolder         holder;
-	private IConversionContext context;
 	
 	private final static String[] CONVERT_OPTIONS = new String[] {"Tab Separated Values (*.dat)", 
 		                                                          "Comma Separated Values (*.cvs)"};
@@ -366,23 +358,6 @@ public class AsciiConvertPage extends AbstractConversionPage {
 			}
 
 		});
-	}
-	private String getSourcePath() {
-		if (context!=null) return context.getFilePath();
-		
-		try {
-			ISelection selection = EclipseUtils.getActivePage().getSelection();
-			StructuredSelection s = (StructuredSelection)selection;
-			final Object        o = s.getFirstElement();
-			if (o instanceof IFile) {
-				IFile source = (IFile)o;
-				return source.getLocation().toOSString();
-			}
-		} catch (Throwable ignored) {
-			// default ""
-		}
-		return "";
-	        
 	}
 
 	protected void setDataNames(String[] array, final IMetaData imeta, final DataHolder holder) {

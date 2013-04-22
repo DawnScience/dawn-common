@@ -11,18 +11,23 @@ package org.dawnsci.conversion.ui;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.dawb.common.services.ServiceManager;
 import org.dawb.common.services.conversion.IConversionContext;
+import org.dawb.common.services.conversion.IConversionContext.ConversionScheme;
 import org.dawb.common.services.conversion.IConversionService;
 import org.dawb.common.ui.monitor.ProgressMonitorWrapper;
 import org.dawb.common.ui.util.EclipseUtils;
-import org.dawnsci.conversion.ui.pages.AsciiConvertPage;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -49,7 +54,8 @@ public class ConvertWizard extends Wizard implements IExportWizard{
 
 	private static final Logger logger = LoggerFactory.getLogger(ConvertWizard.class);
 	
-	private AbstractConversionPage customConversionPage;
+	private IConversionWizardPage selectedConversionPage;
+	private Map<ConversionScheme, IConversionWizardPage> conversionPages;
 
 	private IConversionService service;
 	private ConversionChoicePage setupPage;
@@ -60,26 +66,51 @@ public class ConvertWizard extends Wizard implements IExportWizard{
 		try {
 			this.service = (IConversionService)ServiceManager.getService(IConversionService.class);
 		} catch (Exception e) {
-			logger.error("Cannot get cnversion service!", e);
+			logger.error("Cannot get conversion service!", e);
+			return;
 		}
 		
 		// Add choice of file(s) and conversion type page.
 		this.setupPage = new ConversionChoicePage("Conversion Type", service);
 		addPage(setupPage);
 		
-		// TODO Hard coded to ascii! Need extension point
-		this.customConversionPage = new AsciiConvertPage();
-		addPage(customConversionPage);
+		// Create map of possible pages, only one of which will be selected at one time.
+		this.conversionPages = new HashMap<IConversionContext.ConversionScheme, IConversionWizardPage>(7);
+		final IConfigurationElement[] ce = Platform.getExtensionRegistry().getConfigurationElementsFor("org.dawnsci.conversion.ui.conversionPage");
+		if (ce!=null) for (IConfigurationElement e : ce) {
+			
+			final String schemeName  = e.getAttribute("conversion_scheme");
+			final ConversionScheme s = Enum.valueOf(ConversionScheme.class, schemeName);
+			try {
+				final IConversionWizardPage p = (IConversionWizardPage)e.createExecutableExtension("conversion_page");
+				conversionPages.put(s, p);
+				addPage(p);
+			} catch (CoreException e1) {
+				logger.error("Cannot get page "+e.getAttribute("conversion_page"), e1);
+			}
+		}
+		this.selectedConversionPage = conversionPages.get(ConversionScheme.values()[0]);
+		
 		setWindowTitle("Convert Data Wizard");
 	}
 	
     public boolean canFinish() {
-    	if (setupPage.isPageComplete() && !customConversionPage.isPageComplete()) {
-    		IConversionContext context = setupPage.getContext();
-    		customConversionPage.setContext(context);
+    	
+   		IConversionContext context = setupPage.getContext();
+   		
+     	// We select only the preferred page.
+    	if (setupPage.isPageComplete() && context!=null) {
+    		final ConversionScheme scheme = context.getConversionScheme();
+    		selectedConversionPage = conversionPages.get(scheme);
+    		for (ConversionScheme s : conversionPages.keySet()) {
+    			if (conversionPages.get(s)!=null) conversionPages.get(s).setVisible(s==scheme);
+			}
+    	}
+    	if (setupPage.isPageComplete() && context!=null && selectedConversionPage!=null && !selectedConversionPage.isPageComplete()) {
+    		selectedConversionPage.setContext(context);
     		return false;
     	}
-    	return setupPage.isPageComplete() && customConversionPage.isPageComplete();
+    	return setupPage.isPageComplete() && (selectedConversionPage==null || selectedConversionPage.isPageComplete());
     }
 
 
@@ -92,7 +123,9 @@ public class ConvertWizard extends Wizard implements IExportWizard{
 	@Override
 	public boolean performFinish() {
 		
-		final IConversionContext context = customConversionPage.getContext();
+		final IConversionContext context = selectedConversionPage!=null
+				                         ? selectedConversionPage.getContext()
+				                         : setupPage.getContext();
 		try {
 			// Use the progressible task in the wizard
 			getContainer().run(true, true, new IRunnableWithProgress() {
@@ -115,7 +148,7 @@ public class ConvertWizard extends Wizard implements IExportWizard{
 							// it's ok
 						}
 						
-						if (customConversionPage.isOpen()) {
+						if (selectedConversionPage.isOpen()) {
 							Display.getDefault().syncExec(new Runnable() {
 								public void run() {
 									try {

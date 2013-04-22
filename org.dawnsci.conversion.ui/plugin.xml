@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
+   <extension-point id="conversionPage" name="Conversion Page" schema="schema/conversionPage.exsd"/>
    <extension
          point="org.eclipse.ui.commands">
       <command
@@ -61,6 +62,19 @@
          </action>
          
       </objectContribution>
+   </extension>
+   <extension
+         point="org.dawnsci.conversion.ui.conversionPage">
+      <conversion_page
+            conversion_page="org.dawnsci.conversion.ui.pages.AsciiConvertPage"
+            conversion_scheme="ASCII_FROM_1D"
+            id="org.dawnsci.conversion.ui.conversionAscii1D">
+      </conversion_page>
+      <conversion_page
+            conversion_page="org.dawnsci.conversion.ui.pages.ImageConvertPage"
+            conversion_scheme="TIFF_FROM_3D"
+            id="org.dawnsci.conversion.ui.conversionImage">
+      </conversion_page>
    </extension>
 
 </plugin>
