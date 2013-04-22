@@ -21,7 +21,7 @@ import uk.ac.diamond.scisoft.analysis.io.DataHolder;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 
 
-public class ConversionTest {
+public class AsciiConvertTest {
 
 	
 	@Test

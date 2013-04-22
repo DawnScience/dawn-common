@@ -19,7 +19,7 @@ import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 /**
  * This class converts neuxs data sets to .dat file syntax, @see  uk.ac.diamond.scisoft.analysis.io.DatLoader
  * 
- * @see org.dawnsci.conversion.ConversionTest
+ * @see org.dawnsci.conversion.AsciiConvertTest
  * @author fcp94556
  *
  */
