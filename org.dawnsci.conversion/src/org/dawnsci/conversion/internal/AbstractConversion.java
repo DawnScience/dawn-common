@@ -2,8 +2,6 @@ package org.dawnsci.conversion.internal;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -44,9 +42,14 @@ public abstract class AbstractConversion {
 		// Process regular expression
 		final List<File> paths = expand(context.getFilePath());
 		for (File path : paths) {
-			final List<String> data = getData(path, context.getDatasetName());
-			for (String dsPath : data) {
-				processSlice(path, dsPath, context.getSliceDimensions(), context);
+			
+			final List<String> sets  = getDataNames(path);
+			final List<String> names = context.getDatasetNames();
+			for (String nameRegExp : names) {
+				final List<String> data = getData(sets, nameRegExp);
+				for (String dsPath : data) {
+					processSlice(path, dsPath, context.getSliceDimensions(), context);
+				}
 			}
 		}
 	}
@@ -319,6 +322,21 @@ public abstract class AbstractConversion {
 		return intShape;
 	}
 
+	public List<String> getData(File path, String datasetName) throws Exception {
+        return getData(getDataNames(path), datasetName);
+	}
+	
+	private List<String> getData(List<String> sets, String datasetName) {
+
+		final List<String> ds = new ArrayList<String>(7);
+		for (String hdfPath : sets) {
+			if (hdfPath.matches(datasetName)) {
+				ds.add(hdfPath);
+			}
+		}
+
+		return ds.isEmpty() ? null : ds;
+	}
 	
 	/**
 	 * Can be used to get a list of Dataset which should be converted. Processes the
@@ -330,23 +348,17 @@ public abstract class AbstractConversion {
 	 * @return null if none match, the datasets otherwise
 	 * @throws Exception
 	 */
-	public List<String> getData(File ioFile, String datasetName) throws Exception {
+	public List<String> getDataNames(File ioFile) throws Exception {
 		
-		final List<String> ds = new ArrayList<String>(7);
 		IHierarchicalDataFile file = null;
 		try {
 			file = HierarchicalDataFactory.getReader(ioFile.getAbsolutePath());
 			final List<String> sets = file.getDatasetNames(IHierarchicalDataFile.NUMBER_ARRAY);
-			for (String hdfPath : sets) {
-				if (hdfPath.matches(datasetName)) {
-					ds.add(hdfPath);
-				}
-			}
+			return sets;
 			
 		} finally {
 			if (file!=null) file.close();
 		}
-		return ds.isEmpty() ? null : ds;
 	}
 
 	/**
@@ -371,46 +383,4 @@ public abstract class AbstractConversion {
 		return files.isEmpty() ? null : files;
 	}
 
-	/**
-	 * TODO FIXME - move these to junit tests!
-	 * @param args
-	 */
-	public static void main(String[] args)  throws Exception {
-		
-		final AbstractConversion conv = new AbstractConversion(null) {
-			@Override
-			protected void convert(AbstractDataset slice ) {
-				System.out.println(slice);
-			}
-		};
-		System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$ EXPAND");
-		System.out.println(Arrays.toString(conv.expand("C:/Work/results/i03_data/35873/35873_M3S15_1_0001.cbf").toArray()));
-		System.out.println(Arrays.toString(conv.expand("C:/Work/results/i03_data/35873/35873_M3S15_1_000(\\d+).cbf").toArray()));
-		System.out.println(Arrays.toString(conv.expand("C:/Work/results/i03_data/35873/35873_M3S15_1_00(\\d+).cbf").toArray()));
-		System.out.println(conv.expand("C:/Work/results/i03_data/35873/fred.cbf"));
-		System.out.println(conv.expand("C:/Work/results/i03_data/35873/(.*).img"));
-		System.out.println(conv.expand("C:/Work/results/i03_data/35873/(.*).cbf"));
-		System.out.println(conv.expand("C:/tmp/"));
-		
-		System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$ DATA");
-		System.out.println(conv.getData(new File("C:/Work/results/results/large test files/TomographyDataSet.hdf5"), "naff"));
-		System.out.println(conv.getData(new File("C:/Work/results/results/large test files/TomographyDataSet.hdf5"), "/entry/exchange/data"));
-		System.out.println(conv.getData(new File("C:/Work/results/results/large test files/TomographyDataSet.hdf5"), "/entry/exchange/data_(.*)"));
-		System.out.println(conv.getData(new File("C:/Work/results/results/large test files/TomographyDataSet.hdf5"), "/entry/(.*)"));
-		
-		
-		System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$ SLICE");
-		conv.processSlice(new File("C:/Work/results/results/large test files/TomographyDataSet.hdf5"), "/entry/exchange/white_z", null, null);
-		
-		final Map<Integer,String> slice = new HashMap<Integer,String>(1);
-		slice.put(0, "36");
-		conv.processSlice(new File("C:/Work/results/results/large test files/TomographyDataSet.hdf5"), "/entry/exchange/dark_data", slice, null);
-
-		slice.put(0, "12:24");
-		conv.processSlice(new File("C:/Work/results/results/large test files/TomographyDataSet.hdf5"), "/entry/exchange/dark_data", slice, null);
-
-		slice.put(0, "all");
-		conv.processSlice(new File("C:/Work/results/results/large test files/TomographyDataSet.hdf5"), "/entry/exchange/dark_data", slice, null);
-
-	}
 }

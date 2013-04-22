@@ -1,6 +1,8 @@
 package org.dawnsci.conversion;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.dawb.common.services.conversion.IConversionContext;
@@ -13,7 +15,7 @@ class ConversionContext implements IConversionContext {
 	private ConversionScheme    conversionScheme;
 	private IConversionVisitor  conversionVisitor;
 	private String              filePath;
-	private String              datasetName;
+	private List<String>        datasetNames;
 	private String              outputFolder;
 	private Map<Integer,String> sliceDimensions;
 	private Object              userObject;
@@ -33,11 +35,14 @@ class ConversionContext implements IConversionContext {
 		filePathOrRegex = filePathOrRegex.replace('\\', '/');
 		this.filePath = filePathOrRegex;
 	}
-	public String getDatasetName() {
-		return datasetName;
+	public List<String> getDatasetNames() {
+		return datasetNames;
 	}
 	public void setDatasetName(String datasetName) {
-		this.datasetName = datasetName;
+		this.datasetNames = Arrays.asList(datasetName);
+	}
+	public void setDatasetNames(List<String> datasetNames) {
+		this.datasetNames = datasetNames;
 	}
 	public String getOutputPath() {
 		return outputFolder;
@@ -45,72 +50,6 @@ class ConversionContext implements IConversionContext {
 	public void setOutputPath(String outputFolder) {
 		this.outputFolder = outputFolder;
 	}
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime
-				* result
-				+ ((conversionScheme == null) ? 0 : conversionScheme.hashCode());
-		result = prime
-				* result
-				+ ((conversionVisitor == null) ? 0 : conversionVisitor
-						.hashCode());
-		result = prime * result
-				+ ((datasetName == null) ? 0 : datasetName.hashCode());
-		result = prime * result
-				+ ((filePath == null) ? 0 : filePath.hashCode());
-		result = prime * result
-				+ ((outputFolder == null) ? 0 : outputFolder.hashCode());
-		result = prime * result
-				+ ((sliceDimensions == null) ? 0 : sliceDimensions.hashCode());
-		result = prime * result
-				+ ((userObject == null) ? 0 : userObject.hashCode());
-		return result;
-	}
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		ConversionContext other = (ConversionContext) obj;
-		if (conversionScheme != other.conversionScheme)
-			return false;
-		if (conversionVisitor == null) {
-			if (other.conversionVisitor != null)
-				return false;
-		} else if (!conversionVisitor.equals(other.conversionVisitor))
-			return false;
-		if (datasetName == null) {
-			if (other.datasetName != null)
-				return false;
-		} else if (!datasetName.equals(other.datasetName))
-			return false;
-		if (filePath == null) {
-			if (other.filePath != null)
-				return false;
-		} else if (!filePath.equals(other.filePath))
-			return false;
-		if (outputFolder == null) {
-			if (other.outputFolder != null)
-				return false;
-		} else if (!outputFolder.equals(other.outputFolder))
-			return false;
-		if (sliceDimensions == null) {
-			if (other.sliceDimensions != null)
-				return false;
-		} else if (!sliceDimensions.equals(other.sliceDimensions))
-			return false;
-		if (userObject == null) {
-			if (other.userObject != null)
-				return false;
-		} else if (!userObject.equals(other.userObject))
-			return false;
-		return true;
-	}	
 
 	
 	/**
@@ -143,7 +82,7 @@ class ConversionContext implements IConversionContext {
 		return monitor;
 	}
 	@Override
-	public void getMonitor(IMonitor monitor) {
+	public void setMonitor(IMonitor monitor) {
 		this.monitor = monitor;
 	}
 	public IConversionVisitor getConversionVisitor() {
@@ -151,6 +90,78 @@ class ConversionContext implements IConversionContext {
 	}
 	public void setConversionVisitor(IConversionVisitor conversionVisitor) {
 		this.conversionVisitor = conversionVisitor;
+	}
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime
+				* result
+				+ ((conversionScheme == null) ? 0 : conversionScheme.hashCode());
+		result = prime
+				* result
+				+ ((conversionVisitor == null) ? 0 : conversionVisitor
+						.hashCode());
+		result = prime * result
+				+ ((datasetNames == null) ? 0 : datasetNames.hashCode());
+		result = prime * result
+				+ ((filePath == null) ? 0 : filePath.hashCode());
+		result = prime * result + ((monitor == null) ? 0 : monitor.hashCode());
+		result = prime * result
+				+ ((outputFolder == null) ? 0 : outputFolder.hashCode());
+		result = prime * result
+				+ ((sliceDimensions == null) ? 0 : sliceDimensions.hashCode());
+		result = prime * result
+				+ ((userObject == null) ? 0 : userObject.hashCode());
+		return result;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ConversionContext other = (ConversionContext) obj;
+		if (conversionScheme != other.conversionScheme)
+			return false;
+		if (conversionVisitor == null) {
+			if (other.conversionVisitor != null)
+				return false;
+		} else if (!conversionVisitor.equals(other.conversionVisitor))
+			return false;
+		if (datasetNames == null) {
+			if (other.datasetNames != null)
+				return false;
+		} else if (!datasetNames.equals(other.datasetNames))
+			return false;
+		if (filePath == null) {
+			if (other.filePath != null)
+				return false;
+		} else if (!filePath.equals(other.filePath))
+			return false;
+		if (monitor == null) {
+			if (other.monitor != null)
+				return false;
+		} else if (!monitor.equals(other.monitor))
+			return false;
+		if (outputFolder == null) {
+			if (other.outputFolder != null)
+				return false;
+		} else if (!outputFolder.equals(other.outputFolder))
+			return false;
+		if (sliceDimensions == null) {
+			if (other.sliceDimensions != null)
+				return false;
+		} else if (!sliceDimensions.equals(other.sliceDimensions))
+			return false;
+		if (userObject == null) {
+			if (other.userObject != null)
+				return false;
+		} else if (!userObject.equals(other.userObject))
+			return false;
+		return true;
 	}
 
 }

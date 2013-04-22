@@ -87,22 +87,28 @@ public class AsciiConvert1D extends AbstractConversion {
 	}
 
 
-	private static void writeData(final StringBuilder        contents,
+	private void writeData(final StringBuilder        contents,
 										final Map<String, ? extends IDataset> sortedData,
 										final int                  maxSize,
 										final IConversionContext   context) {
 
 		final ConversionInfoBean bean = (ConversionInfoBean)context.getUserObject();
 		
-		contents.append("# ");
+		if (isDat()) contents.append("# ");
 		for (Iterator<String> it = sortedData.keySet().iterator(); it.hasNext(); ) {
 
 			String name = it.next();
 			if (bean!=null && bean.getAlernativeNames()!=null && bean.getAlernativeNames().containsKey(name)) {
 				name = bean.getAlernativeNames().get(name);
 			}
+			if (isCsv()) contents.append("\"");
 			contents.append(name);
-			if (it.hasNext()) contents.append("\t");
+			if (isCsv()) contents.append("\"");
+
+			if (it.hasNext()) {
+				if (isCsv()) contents.append(",");
+				contents.append("\t");
+			}
 		}
 		contents.append("\r\n"); // Intentionally windows.
 
@@ -126,7 +132,10 @@ public class AsciiConvert1D extends AbstractConversion {
 
 				
 				contents.append(value);
-				if (it.hasNext()) contents.append("\t");
+				if (it.hasNext()) {
+					if (isCsv()) contents.append(",");
+					contents.append("\t");
+				}
 
 				if (context.getMonitor()!=null && i>=(maxSize-1))	context.getMonitor().worked(1);
 
@@ -134,9 +143,22 @@ public class AsciiConvert1D extends AbstractConversion {
 			contents.append("\r\n"); // Intentionally windows because works on unix too.
 		}
 	}
+	
+	protected boolean isCsv() {
+		if (context.getUserObject()==null) return false;
+		ConversionInfoBean bean  = (ConversionInfoBean)context.getUserObject();
+		return "csv".equals(bean.getConversionType());
+	}
 
+	protected boolean isDat() {
+		if (context.getUserObject()==null) return true;
+		ConversionInfoBean bean  = (ConversionInfoBean)context.getUserObject();
+		return "dat".equals(bean.getConversionType());
+	}
 
 	public static final class ConversionInfoBean {
+	
+		private String conversionType = "dat"; // dat or csv
 		private String numberFormat;
 		private Map<String,String> alernativeNames;
 		public String getNumberFormat() {
@@ -159,6 +181,9 @@ public class AsciiConvert1D extends AbstractConversion {
 					* result
 					+ ((alernativeNames == null) ? 0 : alernativeNames
 							.hashCode());
+			result = prime
+					* result
+					+ ((conversionType == null) ? 0 : conversionType.hashCode());
 			result = prime * result
 					+ ((numberFormat == null) ? 0 : numberFormat.hashCode());
 			return result;
@@ -177,12 +202,23 @@ public class AsciiConvert1D extends AbstractConversion {
 					return false;
 			} else if (!alernativeNames.equals(other.alernativeNames))
 				return false;
+			if (conversionType == null) {
+				if (other.conversionType != null)
+					return false;
+			} else if (!conversionType.equals(other.conversionType))
+				return false;
 			if (numberFormat == null) {
 				if (other.numberFormat != null)
 					return false;
 			} else if (!numberFormat.equals(other.numberFormat))
 				return false;
 			return true;
+		}
+		public String getConversionType() {
+			return conversionType;
+		}
+		public void setConversionType(String conversionType) {
+			this.conversionType = conversionType;
 		}
 	}
 

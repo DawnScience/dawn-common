@@ -92,6 +92,44 @@ public class AsciiConvertTest {
         }
  	}
 
+	@Test
+	public void testAsciiCustomConfig2() throws Exception {
+		
+		ConversionServiceImpl service = new ConversionServiceImpl();
+		
+		// Determine path to test file
+		final String path = getTestFilePath("MoKedge_1_15.nxs");
+		
+		final IConversionContext context = service.open(path);
+		final File tmp = File.createTempFile("testConfig", ".csv");
+		tmp.deleteOnExit();
+        context.setOutputPath(tmp.getAbsolutePath());
+        context.setConversionScheme(ConversionScheme.ASCII_FROM_1D);
+        context.setDatasetName("/entry1/counterTimer01/(Energy|I0|lnI0It|It)");
+        
+        // Set some custom data
+        final AsciiConvert1D.ConversionInfoBean bean = new AsciiConvert1D.ConversionInfoBean();
+        bean.setNumberFormat("#0.00");
+        bean.setConversionType("csv");
+        final Map<String,String> alternates = new HashMap<String,String>(4);
+        alternates.put("/entry1/counterTimer01/Energy", "Energy");
+        alternates.put("/entry1/counterTimer01/I0",     "I0");
+        alternates.put("/entry1/counterTimer01/lnI0It", "lnI0It");
+        alternates.put("/entry1/counterTimer01/It",     "It");
+        bean.setAlernativeNames(alternates);
+        context.setUserObject(bean);
+
+        service.process(context);
+                
+        // Check format worked
+        final StringBuffer content = readFile(tmp);
+        final String[] sa = content.toString().split("\n");
+        final String firstDataLine = sa[1];
+        if (!"6912.00,\t134878.00,\t2040284.00,\t-2.72".equals(firstDataLine.trim())) {
+        	throw new Exception("Unexpected format!");
+        }
+ 	}
+
 
 	private String getTestFilePath(String fileName) {
 		

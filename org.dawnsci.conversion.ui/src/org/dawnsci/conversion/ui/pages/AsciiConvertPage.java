@@ -7,21 +7,24 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */ 
-package org.dawnsci.conversion.ui;
+package org.dawnsci.conversion.ui.pages;
 
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import org.dawnsci.conversion.internal.AsciiConvert1D;
+import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.ui.monitor.ProgressMonitorWrapper;
 import org.dawb.common.ui.util.EclipseUtils;
-import org.eclipse.core.resources.IContainer;
+import org.dawnsci.conversion.ui.AbstractConversionPage;
+import org.dawnsci.conversion.ui.Activator;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Path;
-import org.eclipse.emf.common.ui.dialogs.WorkspaceResourceDialog;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IContributionManager;
 import org.eclipse.jface.action.MenuManager;
@@ -32,7 +35,6 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -44,11 +46,11 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.PlatformUI;
 import org.slf4j.LoggerFactory;
 
 import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
@@ -57,34 +59,37 @@ import uk.ac.diamond.scisoft.analysis.io.IMetaData;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 
 /**
- *   ConvertWizardPage1
+ *   AsciiConvertPage used if the context is a 1D ascii one.
  *
  *   @author gerring
  *   @date Aug 31, 2010
  *   @project org.edna.workbench.actions
  **/
-public class ConvertWizardPage1 extends WizardPage {
+public class AsciiConvertPage extends AbstractConversionPage {
 
-	private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ConvertWizardPage1.class);
+	private static final org.slf4j.Logger logger = LoggerFactory.getLogger(AsciiConvertPage.class);
 	
 	private CheckboxTableViewer checkboxTableViewer;
 	private String[]            dataSetNames;
+	private int                 conversionSelection;
 
-	private Label      txtLabel;
-	private Text       txtPath;
-	private boolean overwrite = false;
 	private boolean open      = true;
-	private IFile   path;
-	private IFile   source;
+	private boolean overwrite = false;
+	private String  path;
+	private Label   txtLabel;
+	private Text    txtPath;
 
-	private IMetaData imeta;
-
-	private DataHolder holder;
+	private IMetaData          imeta;
+	private DataHolder         holder;
+	private IConversionContext context;
+	
+	private final static String[] CONVERT_OPTIONS = new String[] {"Tab Separated Values (*.dat)", 
+		                                                          "Comma Separated Values (*.cvs)"};
 
 	/**
 	 * Create the wizard.
 	 */
-	public ConvertWizardPage1() {
+	public AsciiConvertPage() {
 		super("wizardPage");
 		setTitle("Convert Data");
 		setDescription("Convert data from synchrotron formats and compressed files to common simple data formats.");
@@ -97,9 +102,6 @@ public class ConvertWizardPage1 extends WizardPage {
 	 */
 	public void createControl(Composite parent) {
 		
-		ISelection selection = EclipseUtils.getActivePage().getSelection();
-		createSource(selection);
-
 		Composite container = new Composite(parent, SWT.NULL);
 
 		setControl(container);
@@ -112,18 +114,27 @@ public class ConvertWizardPage1 extends WizardPage {
 		Label convertLabel = new Label(top, SWT.NONE);
 		convertLabel.setText("Convert to");
 		
-		Combo combo = new Combo(top, SWT.READ_ONLY);
-		combo.setItems(new String[] {"Comma Separated Values (*.csv)"});
+		final Combo combo = new Combo(top, SWT.READ_ONLY);
+		combo.setItems(CONVERT_OPTIONS);
 		combo.setToolTipText("Convert to file type by file extension");
 		combo.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 2, 1));
 		combo.select(0);
+		
+		conversionSelection = 0;
+		combo.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				conversionSelection = combo.getSelectionIndex();
+				path = null;
+				txtPath.setText(getPath());
+			}
+		});
 		
 		txtLabel = new Label(top, SWT.NULL);
 		txtLabel.setText("Export &File  ");
 		txtPath = new Text(top, SWT.BORDER);
 		txtPath.setEditable(false);
 		txtPath.setEnabled(false);
-		txtPath.setText(getPath().getFullPath().toOSString());
+		txtPath.setText(getPath());
 		GridData gd = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
 		txtPath.setLayoutData(gd);
 		txtPath.addModifyListener(new ModifyListener() {			
@@ -160,7 +171,7 @@ public class ConvertWizardPage1 extends WizardPage {
 		open.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				ConvertWizardPage1.this.open = open.getSelection();
+				AsciiConvertPage.this.open = open.getSelection();
 				pathChanged();
 			}
 		});
@@ -205,15 +216,16 @@ public class ConvertWizardPage1 extends WizardPage {
 		});
 		checkboxTableViewer.setInput(new Object());
 		checkboxTableViewer.setAllGrayed(true);
+
 		
-		// We populate the names later using a wizard task.
-        try {
-			getDataSetNames();
-		} catch (Exception e) {
-			logger.error("Cannot extract data sets!", e);
-		}
+		setPageComplete(false);
 
 	}
+	
+    public boolean isPageComplete() {
+    	if (context==null) return false;
+        return super.isPageComplete();
+    }
 	
 	private void createActions(IContributionManager toolMan) {
 		
@@ -232,30 +244,25 @@ public class ConvertWizardPage1 extends WizardPage {
         toolMan.add(tickAll1D);
 
 	}
-
-	private void createSource(ISelection selection) {
-		StructuredSelection s = (StructuredSelection)selection;
-		final Object        o = s.getFirstElement();
-		if (o instanceof IFile) source = (IFile)o;
-	}
 	
-	private static IContainer exportFolder = null;
-	IFile getPath() {
+	private static String exportFolder = null;
+	protected String getPath() {
 		if (path==null) { // We make one up from the source
-			IFile source = getSource();
-			final String strPath = source.getName().substring(0, source.getName().indexOf("."))+".csv";
+			String sourcePath = getSourcePath();
+			final File source = new File(sourcePath);
+			final String strName = source.getName().substring(0, source.getName().indexOf("."))+"."+getExtension();
 			if (exportFolder == null) {
-				this.path = source.getParent().getFile(new Path(strPath));
+				this.path = (new File(source.getParentFile(), strName)).getAbsolutePath();
 			} else {
-				this.path = exportFolder.getFile(new Path(strPath));
+				this.path = (new File(exportFolder, strName)).getAbsolutePath();
 
 			}		
 		}
 		return path;
 	}
 	
-	public IFile getSource() {
-		return source;
+	private String getExtension() {
+		return conversionSelection==0?"dat":"csv";
 	}
 
 	/**
@@ -263,14 +270,27 @@ public class ConvertWizardPage1 extends WizardPage {
 	 */
 
 	private void handleBrowse() {
-		final IFile p = WorkspaceResourceDialog.openNewFile(PlatformUI.getWorkbench().getDisplay().getActiveShell(), 
-				"Export location", "Please choose a location to export the ascii data to. This must be a cvs file.", 
-				getPath().getFullPath(), null);
-		if (p!=null) {
-			this.path = p;
-		    txtPath.setText(this.path.getFullPath().toOSString());
-		    exportFolder = p.getParent();
+		
+		final FileDialog dialog = new FileDialog(Display.getDefault().getActiveShell(), SWT.OPEN);
+		dialog.setText("Choose file");
+		final String filePath = getPath();
+		if (filePath!=null) {
+			final File file = new File(filePath);
+			if (file.isDirectory()) {
+				dialog.setFilterPath(file.getAbsolutePath());
+			} else {
+				dialog.setFilterPath(file.getParent());
+				dialog.setFileName(file.getName());
+			}
+
 		}
+		final String path = dialog.open();
+		if (path!=null) {
+			this.path    = path;
+		    txtPath.setText(this.path);
+		    exportFolder = (new File(path)).getParent();
+		}
+
 		pathChanged();
 	}
 
@@ -286,8 +306,9 @@ public class ConvertWizardPage1 extends WizardPage {
 			updateStatus("Please select a file to export to.");
 			return;
 		}
-		IFile path = getPath();
-		if (path.exists() && (!path.isAccessible() || path.isReadOnly())) {
+		String strPath = getPath();
+		final File path = new File(strPath);
+		if (path.exists() && !path.canWrite()) {
 			updateStatus("Please choose another location to export to; this one is read only.");
 			txtLabel.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_RED));
 			return;
@@ -296,8 +317,8 @@ public class ConvertWizardPage1 extends WizardPage {
 			updateStatus("Please confirm overwrite of the file.");
 			return;
 		}
-		if (!path.getName().toLowerCase().endsWith(".csv")) {
-			updateStatus("Please set the file name to export as a file with the extension 'csv'.");
+		if (!path.getName().toLowerCase().endsWith("."+getExtension())) {
+			updateStatus("Please set the file name to export as a file with the extension '"+getExtension()+"'.");
 			return;
 		}
 		updateStatus(null);
@@ -320,8 +341,10 @@ public class ConvertWizardPage1 extends WizardPage {
 				
 				try {
 
+					final String source = getSourcePath();
+					if (source==null || "".equals(source)) return;
 					// Attempt to use meta data, save memory
-					final IMetaData    meta = LoaderFactory.getMetaData(source.getLocation().toOSString(), new ProgressMonitorWrapper(monitor));
+					final IMetaData    meta = LoaderFactory.getMetaData(source, new ProgressMonitorWrapper(monitor));
 					if (meta != null) {
 						final Collection<String> names = meta.getDataNames();
 						if (names !=null) {
@@ -330,7 +353,7 @@ public class ConvertWizardPage1 extends WizardPage {
 						}
 					}
 
-					DataHolder holder = LoaderFactory.getData(source.getLocation().toOSString(), new ProgressMonitorWrapper(monitor));
+					DataHolder holder = LoaderFactory.getData(source, new ProgressMonitorWrapper(monitor));
 					final List<String> names = new ArrayList<String>(holder.getMap().keySet());
 					Collections.sort(names);
 					setDataNames(names.toArray(new String[names.size()]), null, holder);
@@ -341,7 +364,25 @@ public class ConvertWizardPage1 extends WizardPage {
 				}
 
 			}
+
 		});
+	}
+	private String getSourcePath() {
+		if (context!=null) return context.getFilePath();
+		
+		try {
+			ISelection selection = EclipseUtils.getActivePage().getSelection();
+			StructuredSelection s = (StructuredSelection)selection;
+			final Object        o = s.getFirstElement();
+			if (o instanceof IFile) {
+				IFile source = (IFile)o;
+				return source.getLocation().toOSString();
+			}
+		} catch (Throwable ignored) {
+			// default ""
+		}
+		return "";
+	        
 	}
 
 	protected void setDataNames(String[] array, final IMetaData imeta, final DataHolder holder) {
@@ -378,7 +419,7 @@ public class ConvertWizardPage1 extends WizardPage {
 		}		
 	}
 
-	protected String[] getSelected() {
+	public String[] getSelected() {
 		Object[] elements = checkboxTableViewer.getCheckedElements();
 		final String[] ret= new String[elements.length];
 		for (int i = 0; i < elements.length; i++) {
@@ -390,5 +431,34 @@ public class ConvertWizardPage1 extends WizardPage {
 	public boolean isOverwrite() {
 		return overwrite;
 	}
+
+	@Override
+	public void setContext(IConversionContext context) {
+		this.context = context;
+		if (context==null) { // new context being prepared.
+			this.imeta  = null;
+			this.holder = null;
+		}
+		// We populate the names later using a wizard task.
+        try {
+			getDataSetNames();
+		} catch (Exception e) {
+			logger.error("Cannot extract data sets!", e);
+		}
+        
+        setPageComplete(true);
+	}
+	
+	@Override
+	public IConversionContext getContext() {
+		if (context==null) return null;
+		final AsciiConvert1D.ConversionInfoBean bean = new AsciiConvert1D.ConversionInfoBean();
+		bean.setConversionType(getExtension());
+		context.setUserObject(bean);
+		context.setOutputPath(getPath()); // cvs or dat file.
+		context.setDatasetNames(Arrays.asList(getSelected()));
+		return context;
+	}
+
 
 }

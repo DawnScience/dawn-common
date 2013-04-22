@@ -16,6 +16,7 @@
 
 package org.dawb.common.services.conversion;
 
+import java.util.List;
 import java.util.Map;
 
 import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
@@ -63,7 +64,7 @@ public interface IConversionContext {
 	 * 
 	 * @param monitor
 	 */
-	public void getMonitor(IMonitor monitor);
+	public void setMonitor(IMonitor monitor);
 	
 	/**
 	 * Get the current conversion.
@@ -97,15 +98,25 @@ public interface IConversionContext {
 	public String getFilePath();
 	
 	/**
-	 * The dataset(s) we will process. Allows regular expressions for
-	 * multiple processes.
+	 * The dataset(s) we will process. Allows regular expressions inside
+	 * each set.
+	 * 
 	 * @return regexp of data set name (using / as the path separator)
 	 */
-	public String getDatasetName();
+	public List<String> getDatasetNames();
 	
 	/**
-	 * The dataset(s) we will process. Allows regular expressions for
-	 * multiple processes.
+	 * The dataset(s) we will process. Allows regular expressions inside
+	 * each set.
+	 * 
+	 * @return regexp of data set name (using / as the path separator)
+	 */
+	public void setDatasetNames(List<String> sets);
+
+	/**
+	 * The dataset(s) we will process. Allows regular expressions.
+	 * Sets the dataset names to a string list of size one.
+	 *  
 	 * @param datasetRegExp all Datasets (H5 definition) whose full path 
 	 * matches this reg exp will be converted.
 	 */

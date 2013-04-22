@@ -41,7 +41,7 @@ public class ImageConverter extends AbstractConversion {
 		if (context.getUserObject()!=null) {
 			TiffInfoBean bean = (TiffInfoBean)context.getUserObject();
 			if (bean.getAlternativeNamePrefix()!=null) {
-				fileName = fileName.replace(context.getDatasetName(), bean.getAlternativeNamePrefix());
+				fileName = fileName.replace(fileName, bean.getAlternativeNamePrefix());
 			}
 		}
 		fileName = fileName.replace('\\', '_');
