@@ -12,7 +12,7 @@ import uk.ac.diamond.scisoft.analysis.io.DataHolder;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 
 
-public class TiffConvertTest {
+public class ImageConvertTest {
 
 	
 	@Test
