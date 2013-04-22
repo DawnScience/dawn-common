@@ -31,15 +31,17 @@ public interface IConversionContext {
 	 * of the conversions we have spoken about before.
 	 */
 	public enum ConversionScheme {
-		ASCII_FROM_2D("Convert to ascii from 2D data"), 
-		ASCII_FROM_1D("Convert to ascii(dat) from 1D data"), 
-		CUSTOM_NCD("Convert to ascii from NCD data"), 
-		TIFF_FROM_3D("Convert to tiff from image stack");
+		ASCII_FROM_1D("Convert to ascii from 1D data",   1), 
+		ASCII_FROM_2D("Convert to ascii from 2D data",   2), 
+		TIFF_FROM_3D("Convert to image files from image stack", 2,3,4,5),
+		CUSTOM_NCD("Convert to ascii from NCD data",     null); // TODO not sure 
 		
 		private String uiLabel;
+		private int[] preferredRanks;
 
-		ConversionScheme(String uiLabel) {
-			this.uiLabel = uiLabel;
+		ConversionScheme(String uiLabel, int... preferredRanks) {
+			this.uiLabel       = uiLabel;
+			this.preferredRanks = preferredRanks;
 		}
 
 		public String getUiLabel() {
@@ -51,6 +53,29 @@ public interface IConversionContext {
 				if (cs.getUiLabel().equals(uiLabel)) return cs;
 			}
 			return null;
+		}
+
+		public static String[] getLabels() {
+			final String[] labels = new String[values().length];
+			for (int i = 0; i < values().length; i++)  labels[i] = values()[i].uiLabel;
+			return labels;
+		}
+
+		/**
+		 * The preferred dimensions of data sets likely to be chosen
+		 * by this wizard, if null, there is no preference.
+		 * @return
+		 */
+		public int[] getPreferredRanks() {
+			return preferredRanks;
+		}
+
+		public boolean isRankSupported(int rank) {
+			if (preferredRanks==null) return false;
+			for (int i = 0; i < preferredRanks.length; i++) {
+				if (preferredRanks[i]==rank) return true;
+			}
+			return false;
 		}
 	}
 	
