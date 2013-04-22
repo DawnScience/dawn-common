@@ -5,7 +5,7 @@
          point="org.eclipse.ui.commands">
       <command
             defaultHandler="org.dawnsci.conversion.ui.ConvertWizardHandler"
-            id="org.edna.workbench.actions.csvConvertCommand"
+            id="org.dawnsci.conversion.convertWizard"
             name="Convert">
       </command>
    </extension>
@@ -14,7 +14,7 @@
       <menuContribution
             locationURI="toolbar:org.eclipse.ui.navigator.ProjectExplorer?after=additions">
          <command
-               commandId="org.edna.workbench.actions.csvConvertCommand"
+               commandId="org.dawnsci.conversion.convertWizard"
                icon="icons/page_white_excel.png"
                label="Convert..."
                style="push"
@@ -27,7 +27,7 @@
       <menuContribution
             locationURI="menu:org.eclipse.ui.navigator.ProjectExplorer?after=additions">
          <command
-               commandId="org.edna.workbench.actions.csvConvertCommand"
+               commandId="org.dawnsci.conversion.convertWizard"
                icon="icons/page_white_excel.png"
                label="Convert..."
                style="push"
@@ -42,11 +42,11 @@
          point="org.eclipse.ui.popupMenus">
       <objectContribution
             adaptable="true"
-            id="org.edna.workbench.actions.convertContribution"
+            id="org.dawnsci.conversion.actions.convertContribution"
             objectClass="org.eclipse.core.resources.IFile">
          <menu
                icon="icons/page_white_excel.png"
-               id="org.edna.workbench.actions.convertMenu"
+               id="org.dawnsci.conversion.convertMenu"
                label="Convert"
                path="additions">
          </menu>
@@ -54,10 +54,10 @@
                class="org.dawnsci.conversion.ui.ConvertWizardHandler"
                enablesFor="+"
                icon="icons/page_white_world.png"
-               id="org.edna.workbench.actions.convertCSV"
+               id="org.dawnsci.conversion.convertWizardOpen"
                label="Open Wizard..."
-               menubarPath="org.edna.workbench.actions.convertMenu/convert"
-               tooltip="Convert to csv file in the same project location">
+               menubarPath="org.dawnsci.conversion.convertMenu/convert"
+               tooltip="Export file(s) by conversion to another format">
          </action>
          
       </objectContribution>

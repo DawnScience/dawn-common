@@ -20,7 +20,7 @@ import org.osgi.framework.BundleContext;
 public class Activator extends AbstractUIPlugin {
 
 	// The plug-in ID
-	public static final String PLUGIN_ID = "org.dawb.workbench.convert";
+	public static final String PLUGIN_ID = "org.dawnsci.conversion.ui";
 
 	// The shared instance
 	private static Activator plugin;
