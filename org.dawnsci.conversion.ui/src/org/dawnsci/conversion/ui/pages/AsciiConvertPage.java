@@ -31,6 +31,7 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -76,7 +77,7 @@ public class AsciiConvertPage extends AbstractConversionPage {
 	private DataHolder         holder;
 	
 	private final static String[] CONVERT_OPTIONS = new String[] {"Tab Separated Values (*.dat)", 
-		                                                          "Comma Separated Values (*.cvs)"};
+		                                                          "Comma Separated Values (*.csv)"};
 
 	/**
 	 * Create the wizard.
@@ -413,6 +414,8 @@ public class AsciiConvertPage extends AbstractConversionPage {
 		if (context==null) { // new context being prepared.
 			this.imeta  = null;
 			this.holder = null;
+	        setPageComplete(false);
+			return;
 		}
 		// We populate the names later using a wizard task.
         try {
@@ -435,5 +438,10 @@ public class AsciiConvertPage extends AbstractConversionPage {
 		return context;
 	}
 
+	
+	@Override
+	public IWizardPage getNextPage() {
+		return null;
+	}
 
 }

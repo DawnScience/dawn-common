@@ -42,6 +42,11 @@ public class ConversionChoicePage extends ExternalFileChoosePage implements ICon
 	@Override
 	protected void createContentBeforeFileChoose(Composite container) {
 
+		new Label(container, SWT.NONE);
+		new Label(container, SWT.NONE);
+		new Label(container, SWT.NONE);
+		new Label(container, SWT.NONE);
+		
 		// 4 col grid
 		final Label convLabel = new Label(container, SWT.NONE);
 		convLabel.setText("Conversion Type");
@@ -95,7 +100,7 @@ public class ConversionChoicePage extends ExternalFileChoosePage implements ICon
 				for (String name : shapes.keySet()) {
 					final int[] shape = shapes.get(name);
 					for (int rank : ranks) {
-						if (shape.length==rank) {
+						if (shape!=null && shape.length==rank) {
 							foundRequiredRank = true;
 							break;
 						}						
@@ -134,23 +139,26 @@ public class ConversionChoicePage extends ExternalFileChoosePage implements ICon
 	
     public boolean isPageComplete() {
     	boolean parentOk = super.isPageComplete();
+    	
+    	if (isCurrentPage()) {
+        	final IWizardPage next = getNextPage();
+        	if (next instanceof IConversionWizardPage) {
+    	    	try {
+    		    	final IConversionContext context = getContext();
+    		    	final File ourConv   = new File(context.getFilePath());
+    		    	final File theirConv = new File(((IConversionWizardPage)next).getContext().getFilePath());
+    	    	    if (!ourConv.equals(theirConv)) {
+    	    	    	((IConversionWizardPage)next).setContext(null);
+    	    	    	return false;
+    	    	    }
+    	    	} catch (Exception ne) {
+    	    		// Nowt
+    	    	}
+        	} 
+    	}
     	if (!parentOk) return false;
     	
-    	final IWizardPage next = getNextPage();
-    	if (next instanceof IConversionWizardPage) {
-	    	try {
-		    	final IConversionContext context = getContext();
-		    	final File ourConv   = new File(context.getFilePath());
-		    	final File theirConv = new File(((IConversionWizardPage)next).getContext().getFilePath());
-	    	    if (!ourConv.equals(theirConv)) {
-	    	    	((IConversionWizardPage)next).setContext(null);
-	    	    	return false;
-	    	    }
-	    	} catch (Exception ne) {
-	    		// Nowt
-	    	}
-    	} 
-    	
+   	
     	return parentOk;
     }
 

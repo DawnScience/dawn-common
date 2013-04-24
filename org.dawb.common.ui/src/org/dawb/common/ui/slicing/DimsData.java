@@ -24,6 +24,7 @@ import uk.ac.gda.doe.DOEUtils;
  */
 public class DimsData implements Serializable {
 
+	public static final int RANGE = 102;
 	
 	/**
 	 * 
@@ -84,7 +85,7 @@ public class DimsData implements Serializable {
 	}
 
 	public String getSliceRange() {
-		if (axis>-1) return null;
+		if (axis>-1&&axis!=RANGE) return null;
 		return sliceRange;
 	}
 
@@ -101,7 +102,7 @@ public class DimsData implements Serializable {
 	}
 
 	/**
-	 * -1=slice, 0=x, 1=y, 2=z
+	 * -1=slice, 0=x, 1=y, 2=z, 102=range
 	 */	
 	public int getAxis() {
 		return axis;
@@ -174,5 +175,12 @@ public class DimsData implements Serializable {
 		clone.axis       = this.axis;
 		clone.slice      = this.slice;
         return clone;
+	}
+
+	public boolean isSlice() {
+		return getAxis()<0;
+	}
+	public boolean isRange() {
+		return getAxis()==RANGE;
 	}
 }

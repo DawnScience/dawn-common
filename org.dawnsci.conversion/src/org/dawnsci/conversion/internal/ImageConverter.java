@@ -1,5 +1,7 @@
 package org.dawnsci.conversion.internal;
 
+import java.io.File;
+
 import org.dawb.common.services.conversion.IConversionContext;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
@@ -20,6 +22,9 @@ public class ImageConverter extends AbstractConversion {
 
 	public ImageConverter(IConversionContext context) {
 		super(context);
+		
+		final File dir = new File(context.getOutputPath());
+		dir.mkdirs();
 	}
 
 	@Override
@@ -29,7 +34,7 @@ public class ImageConverter extends AbstractConversion {
 		final DataHolder     dh    = new DataHolder();
 		dh.addDataset(slice.getName(), slice);
 		saver.saveFile(dh);
-
+        if (context.getMonitor()!=null) context.getMonitor().worked(1);
 	}
 	@Override
 	public void close(IConversionContext context) {
@@ -39,7 +44,7 @@ public class ImageConverter extends AbstractConversion {
 	private String getFileName(AbstractDataset slice) {
 		String fileName = slice.getName();
 		if (context.getUserObject()!=null) {
-			TiffInfoBean bean = (TiffInfoBean)context.getUserObject();
+			ConversionInfoBean bean = (ConversionInfoBean)context.getUserObject();
 			if (bean.getAlternativeNamePrefix()!=null) {
 				fileName = fileName.replace(fileName, bean.getAlternativeNamePrefix());
 			}
@@ -53,16 +58,16 @@ public class ImageConverter extends AbstractConversion {
 
 	private String getExtension() {
 		if (context.getUserObject()==null) return "tiff";
-		return ((TiffInfoBean)context.getUserObject()).getExtension();
+		return ((ConversionInfoBean)context.getUserObject()).getExtension();
 	}
 
 	private int getBits() {
 		if (context.getUserObject()==null) return 33;
-		return ((TiffInfoBean)context.getUserObject()).getBits();
+		return ((ConversionInfoBean)context.getUserObject()).getBits();
 	}
 	
 	
-	public static final class TiffInfoBean {
+	public static final class ConversionInfoBean {
 		private String alternativeNamePrefix;
 		private String extension = "tiff";
 		private int    bits      = 33;
@@ -99,7 +104,7 @@ public class ImageConverter extends AbstractConversion {
 				return false;
 			if (getClass() != obj.getClass())
 				return false;
-			TiffInfoBean other = (TiffInfoBean) obj;
+			ConversionInfoBean other = (ConversionInfoBean) obj;
 			if (alternativeNamePrefix == null) {
 				if (other.alternativeNamePrefix != null)
 					return false;

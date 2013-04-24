@@ -36,6 +36,7 @@ public class AsciiConvert1D extends AbstractConversion {
 	@Override
 	protected void convert(AbstractDataset slice) {
         sortedData.put(slice.getName(), slice);
+        if (context.getMonitor()!=null) context.getMonitor().worked(1);
 	}
 	
 	@Override
@@ -88,9 +89,9 @@ public class AsciiConvert1D extends AbstractConversion {
 
 
 	private void writeData(final StringBuilder        contents,
-										final Map<String, ? extends IDataset> sortedData,
-										final int                  maxSize,
-										final IConversionContext   context) {
+							final Map<String, ? extends IDataset> sortedData,
+							final int                  maxSize,
+							final IConversionContext   context) {
 
 		final ConversionInfoBean bean = (ConversionInfoBean)context.getUserObject();
 		
@@ -140,6 +141,7 @@ public class AsciiConvert1D extends AbstractConversion {
 				if (context.getMonitor()!=null && i>=(maxSize-1))	context.getMonitor().worked(1);
 
 			}
+			if (context.getMonitor()!=null) context.getMonitor().worked(1);
 			contents.append("\r\n"); // Intentionally windows because works on unix too.
 		}
 	}

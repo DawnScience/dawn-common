@@ -2,15 +2,25 @@ package org.dawnsci.conversion.ui.pages;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.dawb.common.services.conversion.IConversionContext;
+import org.dawb.common.ui.slicing.DimsData;
+import org.dawb.common.ui.slicing.DimsDataList;
+import org.dawb.common.ui.slicing.SliceComponent;
+import org.dawb.common.ui.util.GridUtils;
+import org.dawnsci.conversion.internal.ImageConverter;
 import org.dawnsci.conversion.ui.AbstractConversionPage;
+import org.dawnsci.conversion.ui.Activator;
 import org.dawnsci.conversion.ui.IConversionWizardPage;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
+import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -19,19 +29,38 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
+import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
+import uk.ac.diamond.scisoft.analysis.io.DataHolder;
+import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
+import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
+
 public class ImageConvertPage extends AbstractConversionPage implements IConversionWizardPage {
 
-	private CCombo  nameChoice;
-	private String  datasetName;
-	private Label   txtLabel;
-	private Text    txtPath;
-	private String  path;
+	private CCombo         nameChoice;
+	private String         datasetName;
+	private String         imageFormat;
+	private int            bitDepth;
+	private Label          txtLabel;
+	private Text           txtPath;
+	private String         path;
+	private SliceComponent sliceComponent;
+	private CLabel warningLabel;
+	
+	private static final String[] IMAGE_FORMATS = new String[]{"tiff", "png", "jpg"};
+	private static final Map<String,int[]> BIT_DEPTHS;
+	static {
+		BIT_DEPTHS = new HashMap<String, int[]>(3);
+		// TODO investigate other bit depths for different formats.
+		BIT_DEPTHS.put("tiff", new int[]{33,16});
+		BIT_DEPTHS.put("png", new int[]{16});
+		BIT_DEPTHS.put("jpg", new int[]{8});
+	}
 
 	public ImageConvertPage() {
 		super("wizardPage");
@@ -41,19 +70,64 @@ public class ImageConvertPage extends AbstractConversionPage implements IConvers
 
 	@Override
 	public void createControl(Composite parent) {
+		
 		Composite container = new Composite(parent, SWT.NULL);
 
 		setControl(container);
 		container.setLayout(new GridLayout(3, false));
+		
+		new Label(container, SWT.NULL);
+		new Label(container, SWT.NULL);
+		new Label(container, SWT.NULL);
 
 		Label label = new Label(container, SWT.NULL);
 		label.setLayoutData(new GridData());
 		label.setText("Image Format");
 		
-		CCombo imageFormat = new CCombo(container, SWT.READ_ONLY);
-		imageFormat.setItems(new String[]{"tiff", "png", "jpg"});
-		imageFormat.select(0);
-		imageFormat.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
+		final CCombo imf = new CCombo(container, SWT.READ_ONLY);
+		imf.setItems(IMAGE_FORMATS);
+		imf.select(0);
+		imageFormat = "tiff";
+		imf.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
+		
+		label = new Label(container, SWT.NULL);
+		label.setLayoutData(new GridData());
+		label.setText("Bit Depth");
+		
+		final CCombo bd = new CCombo(container, SWT.READ_ONLY);
+		bd.setItems(getStringArray(BIT_DEPTHS.get(imageFormat)));
+		bd.select(0);
+		bitDepth = 33;
+		bd.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
+		bd.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				final String str = bd.getItem(bd.getSelectionIndex());
+				bitDepth = Integer.parseInt(str);
+				GridUtils.setVisible(warningLabel, bitDepth<33);
+				warningLabel.getParent().layout();
+				pathChanged();
+			}
+		});
+		imf.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				imageFormat = imf.getItem(imf.getSelectionIndex());
+				
+				final int [] depths = BIT_DEPTHS.get(imageFormat);
+				final String[] sa   = getStringArray(depths);
+				bd.setItems(sa);
+				bitDepth = depths[0];
+				bd.select(0);
+				GridUtils.setVisible(warningLabel, bitDepth<33);
+				warningLabel.getParent().layout();
+				pathChanged();
+			}
+		});
+		
+		this.warningLabel = new CLabel(container, SWT.NONE);
+		warningLabel.setImage(Activator.getImage("icons/warning.gif"));
+		warningLabel.setText("Lower dit depths will not support larger data values.");
+		warningLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
+		GridUtils.setVisible(warningLabel, false);
 		
 		label = new Label(container, SWT.NULL);
 		label.setLayoutData(new GridData());
@@ -64,6 +138,8 @@ public class ImageConvertPage extends AbstractConversionPage implements IConvers
 		nameChoice.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				datasetName = nameChoice.getItem(nameChoice.getSelectionIndex());
+				pathChanged();
+				nameChanged();
 			}
 		});
 		
@@ -91,16 +167,59 @@ public class ImageConvertPage extends AbstractConversionPage implements IConvers
 			}
 		});
 		
-		// TODO GUI for slices.
+		this.sliceComponent = new SliceComponent("org.dawb.workbench.views.h5GalleryView");
+		final Control slicer = sliceComponent.createPartControl(container);
+		GridData data = new GridData(SWT.FILL, SWT.FILL, true, true, 3, 1);
+		data.minimumHeight=560;
+		slicer.setLayoutData(data);
+		sliceComponent.setVisible(true);
+		sliceComponent.setAxesVisible(false);
+		sliceComponent.setRangesAllowed(true);
+		sliceComponent.setToolBarEnabled(false);
 		
+		pathChanged();
 	}
 	
+	private String[] getStringArray(int[] is) {
+		final String[] sa = new String[is.length];
+		for (int i = 0; i < is.length; i++) {
+			sa[i] = String.valueOf(is[i]);
+		}
+		return sa;
+	}
+	
+	private void nameChanged() {
+
+		try {
+			DataHolder dh = LoaderFactory.getData(context.getFilePath(), new IMonitor.Stub());
+			final ILazyDataset lz = dh.getLazyDataset(datasetName);
+			sliceComponent.setData(lz, datasetName, context.getFilePath());
+			
+		} catch (Exception ne) {
+			setErrorMessage("Cannot read data set '"+datasetName+"'");
+			logger.error("Cannot get data", ne);
+		}
+	}
+
 	/**
 	 * Checks the path is ok.
 	 */
 	private void pathChanged() {
 
-		
+		final File outputDir = new File(path);
+		try {
+			if (outputDir.isFile()) {
+				setErrorMessage("The directory "+outputDir+" is a file.");
+				return;			
+			}
+			if (!outputDir.getParentFile().exists()) {
+				setErrorMessage("The directory "+outputDir.getParent()+" does not exist.");
+				return;			
+			}
+		} catch (Exception ne) {
+			setErrorMessage(ne.getMessage()); // Not very friendly...
+			return;			
+		}
 		setErrorMessage(null);
 		return;
 	}
@@ -143,18 +262,45 @@ public class ImageConvertPage extends AbstractConversionPage implements IConvers
 	}
 
 
+	@Override
+	public IConversionContext getContext() {
+		if (context == null) return null;
+		context.setDatasetName(datasetName);
+		context.setOutputPath(path);
+		
+		final ImageConverter.ConversionInfoBean bean = new ImageConverter.ConversionInfoBean();
+		bean.setExtension(imageFormat);
+		bean.setBits(bitDepth);
+		context.setUserObject(bean);
+		
+		final DimsDataList dims = sliceComponent.getDimsDataList();
+		for (DimsData dd : dims.getDimsData()) {
+			if (dd.isSlice()) {
+				context.addSliceDimension(dd.getDimension(), String.valueOf(dd.getSlice()));
+			} else if (dd.isRange()) {
+				context.addSliceDimension(dd.getDimension(), dd.getSliceRange()!=null ? dd.getSliceRange() : "all");				
+			}
+		}
+		
+		return context;
+	}
+
 
 	@Override
 	public void setContext(IConversionContext context) {
 		this.context = context;
-		
+		if (context==null) {
+			// Clear any data
+	        setPageComplete(false);
+			return;
+		}
 		// We populate the names later using a wizard task.
         try {
         	getNamesOfSupportedRank();
 		} catch (Exception e) {
 			logger.error("Cannot extract data sets!", e);
 		}
-        
+        sliceComponent.setActionActive("Slice as image");
         setPageComplete(true);
 	}
 
@@ -173,6 +319,7 @@ public class ImageConvertPage extends AbstractConversionPage implements IConvers
                     		nameChoice.setItems(names.toArray(new String[names.size()]));
                     		nameChoice.select(0);
                     		datasetName = names.get(0);
+                    		nameChanged();
                     	}
                     });
                     
@@ -183,6 +330,11 @@ public class ImageConvertPage extends AbstractConversionPage implements IConvers
 			}
 
 		});
+	}
+	
+	@Override
+	public IWizardPage getNextPage() {
+		return null;
 	}
 
 }

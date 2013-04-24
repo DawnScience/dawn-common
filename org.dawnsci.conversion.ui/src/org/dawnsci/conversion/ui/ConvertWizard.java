@@ -103,7 +103,9 @@ public class ConvertWizard extends Wizard implements IExportWizard{
     		final ConversionScheme scheme = context.getConversionScheme();
     		selectedConversionPage = conversionPages.get(scheme);
     		for (ConversionScheme s : conversionPages.keySet()) {
-    			if (conversionPages.get(s)!=null) conversionPages.get(s).setVisible(s==scheme);
+    			if (conversionPages.get(s)!=null) {
+    				conversionPages.get(s).setVisible(s==scheme);
+    			}
 			}
     	}
     	if (setupPage.isPageComplete() && context!=null && selectedConversionPage!=null && !selectedConversionPage.isPageComplete()) {
