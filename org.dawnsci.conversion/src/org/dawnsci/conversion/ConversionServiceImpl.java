@@ -6,6 +6,7 @@ import org.dawnsci.conversion.internal.AbstractConversion;
 import org.dawnsci.conversion.internal.AsciiConvert1D;
 import org.dawnsci.conversion.internal.AsciiConvert2D;
 import org.dawnsci.conversion.internal.CustomNCDConverter;
+import org.dawnsci.conversion.internal.CustomTomoConverter;
 import org.dawnsci.conversion.internal.ImageConverter;
 import org.dawnsci.conversion.internal.VisitorConversion;
 
@@ -41,6 +42,11 @@ class ConversionServiceImpl implements IConversionService {
 					break;
 				case TIFF_FROM_3D:
 					deligate = new ImageConverter(context);
+					break;
+				case CUSTOM_TOMO:
+					deligate = new CustomTomoConverter(context);
+					break;
+				default:
 					break;
 				}
 			}
