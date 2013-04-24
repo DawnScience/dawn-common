@@ -136,31 +136,31 @@ public class ConvertWizard extends Wizard implements IExportWizard{
 				@Override
 				public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 					try {
+						context.setMonitor(new ProgressMonitorWrapper(monitor));
+						monitor.setTaskName("Convert ");
 						monitor.beginTask("Convert "+context.getFilePath(), 100);
 						monitor.worked(1);
-						context.setMonitor(new ProgressMonitorWrapper(monitor));
 						service.process(context);
 						
+						IResource res = null;
 						try { // Try to refresh parent incase it is in the worspace.
 							final String workspace = ResourcesPlugin.getWorkspace().getRoot().getLocation().toOSString();
 							final File   output    = new File(context.getOutputPath());
 							final String fullPath  = output.isDirectory() ? output.getAbsolutePath() : output.getParent();
 							final String frag      = fullPath.substring(workspace.length());
-							final IResource res    = ResourcesPlugin.getWorkspace().getRoot().findMember(frag);
+							res    = ResourcesPlugin.getWorkspace().getRoot().findMember(frag);
 							res.refreshLocal(IResource.DEPTH_ONE, monitor);
 							
 						} catch (Throwable ne) {
 							// it's ok
 						}
 						
-						if (selectedConversionPage.isOpen()) {
+						final IResource finalRes = res; 
+						if (selectedConversionPage.isOpen() &&  finalRes!=null && finalRes instanceof IFile) {
 							Display.getDefault().syncExec(new Runnable() {
 								public void run() {
 									try {
-										final String workspace = ResourcesPlugin.getWorkspace().getRoot().getLocation().toOSString();
-										final String frag      = context.getOutputPath().substring(workspace.length());
-										final IResource res    = ResourcesPlugin.getWorkspace().getRoot().findMember(frag);
-										EclipseUtils.openEditor((IFile)res);
+										EclipseUtils.openEditor((IFile)finalRes);
 									} catch (PartInitException e) {
 										logger.error("Cannot open "+context.getOutputPath(), e);
 									}
@@ -168,9 +168,10 @@ public class ConvertWizard extends Wizard implements IExportWizard{
 							});
 						}
 						
-						monitor.done();
 					} catch (Exception e) {
 						throw new InterruptedException(e.getMessage());
+					} finally {
+						monitor.done();
 					}
 				}
 			});

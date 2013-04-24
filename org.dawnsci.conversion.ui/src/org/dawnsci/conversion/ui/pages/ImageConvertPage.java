@@ -11,8 +11,8 @@ import org.dawb.common.ui.slicing.DimsData;
 import org.dawb.common.ui.slicing.DimsDataList;
 import org.dawb.common.ui.slicing.SliceComponent;
 import org.dawb.common.ui.util.GridUtils;
+import org.dawb.common.ui.wizard.ResourceChoosePage;
 import org.dawnsci.conversion.internal.ImageConverter;
-import org.dawnsci.conversion.ui.AbstractConversionPage;
 import org.dawnsci.conversion.ui.Activator;
 import org.dawnsci.conversion.ui.IConversionWizardPage;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -21,40 +21,26 @@ import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.CLabel;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.events.ExpansionAdapter;
 import org.eclipse.ui.forms.events.ExpansionEvent;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
+import org.slf4j.LoggerFactory;
 
 import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 import uk.ac.diamond.scisoft.analysis.io.DataHolder;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
 
-public class ImageConvertPage extends AbstractConversionPage implements IConversionWizardPage {
-
-	private CCombo         nameChoice;
-	private String         datasetName;
-	private String         imageFormat;
-	private int            bitDepth;
-	private Label          txtLabel;
-	private Text           txtPath;
-	private Text           imagePrefixBox;
-	private String         path;
-	private SliceComponent sliceComponent;
-	private CLabel warningLabel;
+public final class ImageConvertPage extends ResourceChoosePage implements IConversionWizardPage {
 	
 	private static final String LAST_SET_KEY = "org.dawnsci.conversion.ui.pages.lastDataSet";
 	
@@ -67,21 +53,31 @@ public class ImageConvertPage extends AbstractConversionPage implements IConvers
 		BIT_DEPTHS.put("png", new int[]{16});
 		BIT_DEPTHS.put("jpg", new int[]{8});
 	}
+	private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ImageConvertPage.class);
+
+	
+	
+	private CCombo         nameChoice;
+	private String         datasetName;
+	private String         imageFormat;
+	private int            bitDepth;
+	private Text           imagePrefixBox;
+	private String         path;
+	private SliceComponent sliceComponent;
+	private CLabel warningLabel;
+	private IConversionContext context;
 
 	public ImageConvertPage() {
-		super("wizardPage");
-		setTitle("Convert Data");
-		setDescription("Convert data from synchrotron formats and compressed files to common simple data formats.");
+		super("wizardPage", "Page for slicing HDF5 data into a directory of images.", null);
+		setTitle("Convert to Images");
+		setDirectory(true);
 	}
 
 	@Override
-	public void createControl(Composite parent) {
+	public void createContentBeforeFileChoose(Composite container) {
 		
-		Composite container = new Composite(parent, SWT.NULL);
-
-		setControl(container);
-		container.setLayout(new GridLayout(3, false));
-		
+	
+		new Label(container, SWT.NULL);
 		new Label(container, SWT.NULL);
 		new Label(container, SWT.NULL);
 		new Label(container, SWT.NULL);
@@ -92,7 +88,7 @@ public class ImageConvertPage extends AbstractConversionPage implements IConvers
 		label.setText("Dataset Name");
 		
 		nameChoice = new CCombo(container, SWT.READ_ONLY);
-		nameChoice.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
+		nameChoice.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
 		nameChoice.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				datasetName = nameChoice.getItem(nameChoice.getSelectionIndex());
@@ -101,43 +97,23 @@ public class ImageConvertPage extends AbstractConversionPage implements IConvers
 				Activator.getDefault().getPreferenceStore().setValue(LAST_SET_KEY, datasetName);
 			}
 		});
-	
-		txtLabel = new Label(container, SWT.NULL);
-		txtLabel.setText("Export &Folder  ");
-		txtPath = new Text(container, SWT.BORDER);
-		txtPath.setEditable(false);
-		txtPath.setEnabled(false);
-		txtPath.setText(getPath());
-		GridData gd = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
-		txtPath.setLayoutData(gd);
-		txtPath.addModifyListener(new ModifyListener() {			
-			@Override
-			public void modifyText(ModifyEvent e) {
-				pathChanged();
-			}
-		});
-
-		Button button = new Button(container, SWT.PUSH);
-		button.setText("...");
-		button.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				handleBrowse();
-			}
-		});
 		
+	}
+	
+	@Override
+	protected void createContentAfterFileChoose(Composite container) {
+		
+		final File source = new File(getSourcePath(context));
+		setPath(source.getParent()+File.separator+"output");
+
 		createAdvanced(container);
 		
-		
-		label = new Label(container, SWT.NULL);
-		label.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
-
 		Label sep = new Label(container, SWT.HORIZONTAL|SWT.SEPARATOR);
-		sep.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
+		sep.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 4, 1));
 		
 		this.sliceComponent = new SliceComponent("org.dawb.workbench.views.h5GalleryView");
 		final Control slicer = sliceComponent.createPartControl(container);
-		GridData data = new GridData(SWT.FILL, SWT.FILL, true, true, 3, 1);
+		GridData data = new GridData(SWT.FILL, SWT.FILL, true, true, 4, 1);
 		data.minimumHeight=560;
 		slicer.setLayoutData(data);
 		sliceComponent.setVisible(true);
@@ -146,6 +122,7 @@ public class ImageConvertPage extends AbstractConversionPage implements IConvers
 		sliceComponent.setToolBarEnabled(false);
 		
 		pathChanged();
+
 	}
 	
 	private void createAdvanced(final Composite parent) {
@@ -153,11 +130,11 @@ public class ImageConvertPage extends AbstractConversionPage implements IConvers
 		final ExpandableComposite advancedComposite = new ExpandableComposite(parent, SWT.NONE);
 		advancedComposite.setExpanded(false);
 		advancedComposite.setText("Advanced");
-		advancedComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
+		advancedComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 4, 1));
 		
 		final Composite advanced = new Composite(parent, SWT.NONE);
 		advanced.setLayout(new GridLayout(3, false));
-		advanced.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
+		advanced.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 4, 1));
 			
 		Label label = new Label(advanced, SWT.NULL);
 		label.setLayoutData(new GridData());
@@ -213,7 +190,7 @@ public class ImageConvertPage extends AbstractConversionPage implements IConvers
 		label.setText("Image Prefix");
 
 		this.imagePrefixBox = new Text(advanced, SWT.BORDER);
-		imagePrefixBox.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		imagePrefixBox.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
 		imagePrefixBox.setText("image");
 		label = new Label(advanced, SWT.NULL);
 		label.setLayoutData(new GridData());
@@ -240,6 +217,11 @@ public class ImageConvertPage extends AbstractConversionPage implements IConvers
 		return sa;
 	}
 	
+	@Override
+	public boolean isOpen() {
+		return false;
+	}
+	
 	private void nameChanged() {
 
 		try {
@@ -264,9 +246,9 @@ public class ImageConvertPage extends AbstractConversionPage implements IConvers
 	/**
 	 * Checks the path is ok.
 	 */
-	private void pathChanged() {
+	protected void pathChanged() {
 
-		final File outputDir = new File(path);
+		final File outputDir = new File(getAbsoluteFilePath());
 		try {
 			if (outputDir.isFile()) {
 				setErrorMessage("The directory "+outputDir+" is a file.");
@@ -288,45 +270,12 @@ public class ImageConvertPage extends AbstractConversionPage implements IConvers
     	if (context==null) return false;
         return super.isPageComplete();
     }
-
-	protected String getPath() {
-		if (path==null) { // We make one up from the source
-			String sourcePath = getSourcePath();
-			final File source = new File(sourcePath);
-			final String strName = "convert";
-			this.path = (new File(source.getParentFile(), strName)).getAbsolutePath();
-		}
-		return path;
-	}
 	
-	private void handleBrowse() {
-		
-		final DirectoryDialog dialog = new DirectoryDialog(Display.getDefault().getActiveShell(), SWT.OPEN);
-		dialog.setText("Choose output folder");
-		final String filePath = getPath();
-		if (filePath!=null) {
-			final File file = new File(filePath);
-			if (file.isDirectory()) {
-				dialog.setFilterPath(file.getAbsolutePath());
-			} else {
-				dialog.setFilterPath(file.getParent());
-			}
-		}
-		final String path = dialog.open();
-		if (path!=null) {
-			this.path    = path;
-		    txtPath.setText(this.path);
-		}
-
-		pathChanged();
-	}
-
-
 	@Override
 	public IConversionContext getContext() {
 		if (context == null) return null;
 		context.setDatasetName(datasetName);
-		context.setOutputPath(path);
+		context.setOutputPath(getAbsoluteFilePath());
 		
 		final ImageConverter.ConversionInfoBean bean = new ImageConverter.ConversionInfoBean();
 		bean.setExtension(imageFormat);
@@ -371,7 +320,7 @@ public class ImageConvertPage extends AbstractConversionPage implements IConvers
 			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 				
 				try {
-                    final List<String> names = getActiveDatasets(monitor);
+                    final List<String> names = getActiveDatasets(context, monitor);
                     if (names==null || names.isEmpty()) return;
                     
                     Display.getDefault().asyncExec(new Runnable() {

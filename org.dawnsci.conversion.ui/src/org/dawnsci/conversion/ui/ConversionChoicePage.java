@@ -8,7 +8,7 @@ import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.services.conversion.IConversionContext.ConversionScheme;
 import org.dawb.common.services.conversion.IConversionService;
 import org.dawb.common.ui.util.EclipseUtils;
-import org.dawb.common.ui.wizard.ExternalFileChoosePage;
+import org.dawb.common.ui.wizard.ResourceChoosePage;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -27,7 +27,7 @@ import uk.ac.diamond.scisoft.analysis.io.IMetaData;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
 
-public class ConversionChoicePage extends ExternalFileChoosePage implements IConversionWizardPage {
+public class ConversionChoicePage extends ResourceChoosePage implements IConversionWizardPage {
 	
 	private static final Logger logger = LoggerFactory.getLogger(ConversionChoicePage.class);
 
