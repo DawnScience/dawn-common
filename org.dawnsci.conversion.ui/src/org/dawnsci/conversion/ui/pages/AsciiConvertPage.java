@@ -21,7 +21,6 @@ import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.ui.monitor.ProgressMonitorWrapper;
 import org.dawb.common.ui.wizard.ResourceChoosePage;
 import org.dawnsci.conversion.internal.AsciiConvert1D;
-import org.dawnsci.conversion.ui.AbstractConversionPage;
 import org.dawnsci.conversion.ui.Activator;
 import org.dawnsci.conversion.ui.IConversionWizardPage;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -35,8 +34,6 @@ import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -44,12 +41,9 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.Text;
 import org.slf4j.LoggerFactory;
 
 import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
@@ -89,6 +83,7 @@ public class AsciiConvertPage extends ResourceChoosePage implements IConversionW
 		setTitle("Convert Data");
 		dataSetNames = new String[]{"Loading..."};
 		setNewFile(true);
+		setPathEditable(true);
     }
 
 	/**
@@ -330,6 +325,7 @@ public class AsciiConvertPage extends ResourceChoosePage implements IConversionW
 	@Override
 	public void setContext(IConversionContext context) {
 		this.context = context;
+		setErrorMessage(null);
 		if (context==null) { // new context being prepared.
 			this.imeta  = null;
 			this.holder = null;
@@ -359,7 +355,7 @@ public class AsciiConvertPage extends ResourceChoosePage implements IConversionW
 		final AsciiConvert1D.ConversionInfoBean bean = new AsciiConvert1D.ConversionInfoBean();
 		bean.setConversionType(getExtension());
 		context.setUserObject(bean);
-		context.setOutputPath(getPath()); // cvs or dat file.
+		context.setOutputPath(getAbsoluteFilePath()); // cvs or dat file.
 		context.setDatasetNames(Arrays.asList(getSelected()));
 		return context;
 	}

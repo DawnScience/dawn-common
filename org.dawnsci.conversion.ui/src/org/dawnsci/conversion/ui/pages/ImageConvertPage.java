@@ -299,6 +299,7 @@ public final class ImageConvertPage extends ResourceChoosePage implements IConve
 	@Override
 	public void setContext(IConversionContext context) {
 		this.context = context;
+		setErrorMessage(null);
 		if (context==null) {
 			// Clear any data
 	        setPageComplete(false);

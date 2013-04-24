@@ -20,6 +20,7 @@ import org.dawb.common.services.conversion.IConversionContext.ConversionScheme;
 import org.dawb.common.services.conversion.IConversionService;
 import org.dawb.common.ui.monitor.ProgressMonitorWrapper;
 import org.dawb.common.ui.util.EclipseUtils;
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -27,6 +28,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.ErrorDialog;
@@ -142,25 +144,26 @@ public class ConvertWizard extends Wizard implements IExportWizard{
 						monitor.worked(1);
 						service.process(context);
 						
-						IResource res = null;
+						IFile file = null;
 						try { // Try to refresh parent incase it is in the worspace.
 							final String workspace = ResourcesPlugin.getWorkspace().getRoot().getLocation().toOSString();
 							final File   output    = new File(context.getOutputPath());
 							final String fullPath  = output.isDirectory() ? output.getAbsolutePath() : output.getParent();
 							final String frag      = fullPath.substring(workspace.length());
-							res    = ResourcesPlugin.getWorkspace().getRoot().findMember(frag);
-							res.refreshLocal(IResource.DEPTH_ONE, monitor);
+							IContainer dir    = (IContainer)ResourcesPlugin.getWorkspace().getRoot().findMember(frag);
+							dir.refreshLocal(IResource.DEPTH_ONE, monitor);
+							file = dir.getFile(new Path(output.getName()));
 							
 						} catch (Throwable ne) {
 							// it's ok
 						}
 						
-						final IResource finalRes = res; 
-						if (selectedConversionPage.isOpen() &&  finalRes!=null && finalRes instanceof IFile) {
+						final IFile finalFile = file; 
+						if (selectedConversionPage.isOpen() &&  finalFile!=null) {
 							Display.getDefault().syncExec(new Runnable() {
 								public void run() {
 									try {
-										EclipseUtils.openEditor((IFile)finalRes);
+										EclipseUtils.openEditor(finalFile);
 									} catch (PartInitException e) {
 										logger.error("Cannot open "+context.getOutputPath(), e);
 									}

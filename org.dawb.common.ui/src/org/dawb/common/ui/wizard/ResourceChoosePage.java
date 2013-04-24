@@ -9,11 +9,13 @@ import org.dawb.common.services.conversion.IConversionContext.ConversionScheme;
 import org.dawb.common.ui.Activator;
 import org.dawb.common.ui.monitor.ProgressMonitorWrapper;
 import org.dawb.common.ui.util.EclipseUtils;
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.common.ui.dialogs.WorkspaceResourceDialog;
 import org.eclipse.jface.fieldassist.ContentProposalAdapter;
 import org.eclipse.jface.fieldassist.TextContentAdapter;
@@ -51,6 +53,7 @@ public class ResourceChoosePage extends WizardPage {
 
 	private boolean directory=false;
 	private boolean newFile=false;
+	private boolean pathEditable=false;
 	private String path;
 	private Text txtPath;
 	/**
@@ -101,8 +104,7 @@ public class ResourceChoosePage extends WizardPage {
 		txtLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		
 		this.txtPath = new Text(container, SWT.BORDER);
-		txtPath.setEditable(false);
-		//txtPath.setEnabled(false);
+		txtPath.setEditable(pathEditable);
 		
 		FileContentProposalProvider prov = new FileContentProposalProvider();
 		ContentProposalAdapter ad = new ContentProposalAdapter(txtPath, new TextContentAdapter(), prov, null, null);
@@ -113,6 +115,7 @@ public class ResourceChoosePage extends WizardPage {
 		txtPath.addModifyListener(new ModifyListener() {			
 			@Override
 			public void modifyText(ModifyEvent e) {
+				path = txtPath.getText();
 				pathChanged();
 			}
 		});
@@ -155,7 +158,7 @@ public class ResourceChoosePage extends WizardPage {
 		IResource[] res = null;
 		if (isDirectory()) {
 			res = WorkspaceResourceDialog.openFolderSelection(PlatformUI.getWorkbench().getDisplay().getActiveShell(),
-					"Directory location", "Please choose a location to import from.", false, 
+					"Directory location", "Please choose a location.", false, 
 					    new Object[]{getIResource()}, null);	
 			
 		} else {
@@ -163,12 +166,12 @@ public class ResourceChoosePage extends WizardPage {
 				final IResource cur = getIResource();
 				final IPath path = cur!=null ? cur.getFullPath() : null;
 			    IFile file = WorkspaceResourceDialog.openNewFile(PlatformUI.getWorkbench().getDisplay().getActiveShell(),
-			    		                                  "File location", "Please choose a location to import from.",
+			    		                                  "File location", "Please choose a location.",
 			    		                                   path, null);	
 				res = file !=null ? new IResource[]{file} : null;
 			} else {
 			    res = WorkspaceResourceDialog.openFileSelection(PlatformUI.getWorkbench().getDisplay().getActiveShell(), 
-				           "File location", "Please choose a location to import from.", false,
+				           "File location", "Please choose a location.", false,
 				            new Object[]{getIResource()}, null);	
 			}
 		}
@@ -242,8 +245,18 @@ public class ResourceChoosePage extends WizardPage {
 	
 	public String getAbsoluteFilePath() {
 		try{
-			final IResource res = ResourcesPlugin.getWorkspace().getRoot().findMember(getPath());
+			IResource res = ResourcesPlugin.getWorkspace().getRoot().findMember(getPath());
 			if (res!=null) return res.getLocation().toOSString();
+			if (isNewFile()) { // We try for a new file
+				final File file = new File(getPath());
+				String parDir = file.getParent();
+				IContainer folder = (IContainer)ResourcesPlugin.getWorkspace().getRoot().findMember(parDir);
+				if (folder!=null) {
+					final IFile newFile = folder.getFile(new Path(file.getName()));
+					if (newFile.exists()) newFile.touch(null);
+					return newFile.getLocation().toOSString();
+				}
+			}
 			return getPath();
 		} catch (Throwable ignored) {
 			return null;
@@ -328,5 +341,13 @@ public class ResourceChoosePage extends WizardPage {
 
 	public void setNewFile(boolean newFile) {
 		this.newFile = newFile;
+	}
+
+	public boolean isPathEditable() {
+		return pathEditable;
+	}
+
+	public void setPathEditable(boolean pathEnabled) {
+		this.pathEditable = pathEnabled;
 	}
 }
