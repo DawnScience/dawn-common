@@ -62,8 +62,7 @@ public final class ImageConvertPage extends ResourceChoosePage implements IConve
 	private String         imageFormat;
 	private int            bitDepth;
 	private Text           imagePrefixBox;
-	private String         path;
-	private SliceComponent sliceComponent;
+    private SliceComponent sliceComponent;
 	private CLabel warningLabel;
 	private IConversionContext context;
 
