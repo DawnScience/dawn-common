@@ -68,10 +68,8 @@ import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider;
 import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
 import org.eclipse.jface.viewers.EditingSupport;
-import org.eclipse.jface.viewers.ICellModifier;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
@@ -691,7 +689,7 @@ public class SliceComponent {
 			final int[] shape = this.lazySet.getShape();
 			for (int dim = 0; dim < shape.length; dim++) {
 				DimsData dd = dimsDataList.getDimsData(dim);
-			    if (dd.getAxis()==-1 && shape[dim]>1) { // Slice found
+			    if (dd.isSlice() && shape[dim]>1) { // Slice found
 			    	dd.setAxis(DimsData.RANGE);
 			    	break;
 			    }
@@ -1410,6 +1408,10 @@ public class SliceComponent {
 
 	public void setDataReductionAction(IAction dataReductionAction) {
 		this.dataReductionAction = dataReductionAction;
+	}
+
+	public void refresh() {
+		viewer.refresh();
 	}
 
 }

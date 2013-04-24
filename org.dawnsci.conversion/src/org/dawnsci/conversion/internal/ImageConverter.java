@@ -46,12 +46,14 @@ public class ImageConverter extends AbstractConversion {
 		if (context.getUserObject()!=null) {
 			ConversionInfoBean bean = (ConversionInfoBean)context.getUserObject();
 			if (bean.getAlternativeNamePrefix()!=null) {
-				fileName = fileName.replace(fileName, bean.getAlternativeNamePrefix());
+				final String nameFrag = fileName.substring(0, fileName.indexOf("(Dim"));
+				fileName = fileName.replace(nameFrag, bean.getAlternativeNamePrefix());
 			}
 		}
 		fileName = fileName.replace('\\', '_');
 		fileName = fileName.replace('/', '_');
 		fileName = fileName.replace(' ', '_');
+		fileName = fileName.replace('(', '_');
 		fileName = fileName.replaceAll("[^a-zA-Z0-9_]", "");
 		return context.getOutputPath()+"/"+fileName+"."+getExtension();
 	}

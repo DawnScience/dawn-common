@@ -34,6 +34,9 @@ import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.forms.events.ExpansionAdapter;
+import org.eclipse.ui.forms.events.ExpansionEvent;
+import org.eclipse.ui.forms.widgets.ExpandableComposite;
 
 import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 import uk.ac.diamond.scisoft.analysis.io.DataHolder;
@@ -48,9 +51,12 @@ public class ImageConvertPage extends AbstractConversionPage implements IConvers
 	private int            bitDepth;
 	private Label          txtLabel;
 	private Text           txtPath;
+	private Text           imagePrefixBox;
 	private String         path;
 	private SliceComponent sliceComponent;
 	private CLabel warningLabel;
+	
+	private static final String LAST_SET_KEY = "org.dawnsci.conversion.ui.pages.lastDataSet";
 	
 	private static final String[] IMAGE_FORMATS = new String[]{"tiff", "png", "jpg"};
 	private static final Map<String,int[]> BIT_DEPTHS;
@@ -80,21 +86,94 @@ public class ImageConvertPage extends AbstractConversionPage implements IConvers
 		new Label(container, SWT.NULL);
 		new Label(container, SWT.NULL);
 
+		
 		Label label = new Label(container, SWT.NULL);
+		label.setLayoutData(new GridData());
+		label.setText("Dataset Name");
+		
+		nameChoice = new CCombo(container, SWT.READ_ONLY);
+		nameChoice.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
+		nameChoice.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				datasetName = nameChoice.getItem(nameChoice.getSelectionIndex());
+				pathChanged();
+				nameChanged();
+				Activator.getDefault().getPreferenceStore().setValue(LAST_SET_KEY, datasetName);
+			}
+		});
+	
+		txtLabel = new Label(container, SWT.NULL);
+		txtLabel.setText("Export &Folder  ");
+		txtPath = new Text(container, SWT.BORDER);
+		txtPath.setEditable(false);
+		txtPath.setEnabled(false);
+		txtPath.setText(getPath());
+		GridData gd = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
+		txtPath.setLayoutData(gd);
+		txtPath.addModifyListener(new ModifyListener() {			
+			@Override
+			public void modifyText(ModifyEvent e) {
+				pathChanged();
+			}
+		});
+
+		Button button = new Button(container, SWT.PUSH);
+		button.setText("...");
+		button.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				handleBrowse();
+			}
+		});
+		
+		createAdvanced(container);
+		
+		
+		label = new Label(container, SWT.NULL);
+		label.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
+
+		Label sep = new Label(container, SWT.HORIZONTAL|SWT.SEPARATOR);
+		sep.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
+		
+		this.sliceComponent = new SliceComponent("org.dawb.workbench.views.h5GalleryView");
+		final Control slicer = sliceComponent.createPartControl(container);
+		GridData data = new GridData(SWT.FILL, SWT.FILL, true, true, 3, 1);
+		data.minimumHeight=560;
+		slicer.setLayoutData(data);
+		sliceComponent.setVisible(true);
+		sliceComponent.setAxesVisible(false);
+		sliceComponent.setRangesAllowed(true);
+		sliceComponent.setToolBarEnabled(false);
+		
+		pathChanged();
+	}
+	
+	private void createAdvanced(final Composite parent) {
+		
+		final ExpandableComposite advancedComposite = new ExpandableComposite(parent, SWT.NONE);
+		advancedComposite.setExpanded(false);
+		advancedComposite.setText("Advanced");
+		advancedComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
+		
+		final Composite advanced = new Composite(parent, SWT.NONE);
+		advanced.setLayout(new GridLayout(3, false));
+		advanced.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
+			
+		Label label = new Label(advanced, SWT.NULL);
 		label.setLayoutData(new GridData());
 		label.setText("Image Format");
 		
-		final CCombo imf = new CCombo(container, SWT.READ_ONLY);
+		final CCombo imf = new CCombo(advanced, SWT.READ_ONLY);
 		imf.setItems(IMAGE_FORMATS);
 		imf.select(0);
 		imageFormat = "tiff";
 		imf.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
 		
-		label = new Label(container, SWT.NULL);
+		label = new Label(advanced, SWT.NULL);
 		label.setLayoutData(new GridData());
 		label.setText("Bit Depth");
 		
-		final CCombo bd = new CCombo(container, SWT.READ_ONLY);
+		final CCombo bd = new CCombo(advanced, SWT.READ_ONLY);
 		bd.setItems(getStringArray(BIT_DEPTHS.get(imageFormat)));
 		bd.select(0);
 		bitDepth = 33;
@@ -123,63 +202,36 @@ public class ImageConvertPage extends AbstractConversionPage implements IConvers
 			}
 		});
 		
-		this.warningLabel = new CLabel(container, SWT.NONE);
+		this.warningLabel = new CLabel(advanced, SWT.NONE);
 		warningLabel.setImage(Activator.getImage("icons/warning.gif"));
 		warningLabel.setText("Lower dit depths will not support larger data values.");
 		warningLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
 		GridUtils.setVisible(warningLabel, false);
-		
-		label = new Label(container, SWT.NULL);
-		label.setLayoutData(new GridData());
-		label.setText("Dataset Name");
-		
-		nameChoice = new CCombo(container, SWT.READ_ONLY);
-		nameChoice.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
-		nameChoice.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				datasetName = nameChoice.getItem(nameChoice.getSelectionIndex());
-				pathChanged();
-				nameChanged();
-			}
-		});
-		
-		txtLabel = new Label(container, SWT.NULL);
-		txtLabel.setText("Export &Folder  ");
-		txtPath = new Text(container, SWT.BORDER);
-		txtPath.setEditable(false);
-		txtPath.setEnabled(false);
-		txtPath.setText(getPath());
-		GridData gd = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
-		txtPath.setLayoutData(gd);
-		txtPath.addModifyListener(new ModifyListener() {			
-			@Override
-			public void modifyText(ModifyEvent e) {
-				pathChanged();
-			}
-		});
 
-		Button button = new Button(container, SWT.PUSH);
-		button.setText("...");
-		button.addSelectionListener(new SelectionAdapter() {
+		label = new Label(advanced, SWT.NULL);
+		label.setLayoutData(new GridData());
+		label.setText("Image Prefix");
+
+		this.imagePrefixBox = new Text(advanced, SWT.BORDER);
+		imagePrefixBox.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		imagePrefixBox.setText("image");
+		label = new Label(advanced, SWT.NULL);
+		label.setLayoutData(new GridData());
+
+		GridUtils.setVisible(advanced, false);
+		ExpansionAdapter expansionListener = new ExpansionAdapter() {
 			@Override
-			public void widgetSelected(SelectionEvent e) {
-				handleBrowse();
+			public void expansionStateChanged(ExpansionEvent e) {
+				GridUtils.setVisible(advanced, !advanced.isVisible());
+				parent.layout(new Control[]{advanced, advancedComposite});
+				parent.layout();
+				parent.getParent().layout();
 			}
-		});
+		};
+		advancedComposite.addExpansionListener(expansionListener);
 		
-		this.sliceComponent = new SliceComponent("org.dawb.workbench.views.h5GalleryView");
-		final Control slicer = sliceComponent.createPartControl(container);
-		GridData data = new GridData(SWT.FILL, SWT.FILL, true, true, 3, 1);
-		data.minimumHeight=560;
-		slicer.setLayoutData(data);
-		sliceComponent.setVisible(true);
-		sliceComponent.setAxesVisible(false);
-		sliceComponent.setRangesAllowed(true);
-		sliceComponent.setToolBarEnabled(false);
-		
-		pathChanged();
 	}
-	
+
 	private String[] getStringArray(int[] is) {
 		final String[] sa = new String[is.length];
 		for (int i = 0; i < is.length; i++) {
@@ -194,6 +246,14 @@ public class ImageConvertPage extends AbstractConversionPage implements IConvers
 			DataHolder dh = LoaderFactory.getData(context.getFilePath(), new IMonitor.Stub());
 			final ILazyDataset lz = dh.getLazyDataset(datasetName);
 			sliceComponent.setData(lz, datasetName, context.getFilePath());
+			
+			try {
+				final String name = datasetName.substring(datasetName.lastIndexOf('/')+1);
+				imagePrefixBox.setText(name);
+			} catch (Exception ignored) {
+				imagePrefixBox.setText(datasetName);
+			}
+
 			
 		} catch (Exception ne) {
 			setErrorMessage("Cannot read data set '"+datasetName+"'");
@@ -271,6 +331,7 @@ public class ImageConvertPage extends AbstractConversionPage implements IConvers
 		final ImageConverter.ConversionInfoBean bean = new ImageConverter.ConversionInfoBean();
 		bean.setExtension(imageFormat);
 		bean.setBits(bitDepth);
+		bean.setAlternativeNamePrefix(imagePrefixBox.getText());
 		context.setUserObject(bean);
 		
 		final DimsDataList dims = sliceComponent.getDimsDataList();
@@ -300,9 +361,8 @@ public class ImageConvertPage extends AbstractConversionPage implements IConvers
 		} catch (Exception e) {
 			logger.error("Cannot extract data sets!", e);
 		}
-        sliceComponent.setActionActive("Slice as image");
         setPageComplete(true);
-	}
+ 	}
 
 	protected void getNamesOfSupportedRank() throws Exception {
 		
@@ -314,11 +374,18 @@ public class ImageConvertPage extends AbstractConversionPage implements IConvers
                     final List<String> names = getActiveDatasets(monitor);
                     if (names==null || names.isEmpty()) return;
                     
-                    Display.getDefault().syncExec(new Runnable() {
+                    Display.getDefault().asyncExec(new Runnable() {
                     	public void run() {
                     		nameChoice.setItems(names.toArray(new String[names.size()]));
-                    		nameChoice.select(0);
-                    		datasetName = names.get(0);
+                    		final String lastName = Activator.getDefault().getPreferenceStore().getString(LAST_SET_KEY);
+                    		
+                    		int index = 0;
+                    		if (lastName!=null && names.contains(lastName)) {
+                    			index = names.indexOf(lastName);
+                    		}
+                    		
+                    		nameChoice.select(index);
+                    		datasetName = names.get(index);
                     		nameChanged();
                     	}
                     });

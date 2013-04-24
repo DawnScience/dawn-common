@@ -39,6 +39,7 @@ public class ConversionChoicePage extends ExternalFileChoosePage implements ICon
 		this.service = service;
 	}
 	
+	private final static String SCHEME_KEY = "org.dawnsci.conversion.ui.schemeKey";
 	@Override
 	protected void createContentBeforeFileChoose(Composite container) {
 
@@ -56,10 +57,19 @@ public class ConversionChoicePage extends ExternalFileChoosePage implements ICon
 		choice.setItems(ConversionScheme.getLabels());
 		choice.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
 		choice.select(0);
-		this.chosenConversion = ConversionScheme.values()[0];
+		this.chosenConversion = ConversionScheme.values()[0]; // Is user visible
+		if (Activator.getDefault().getPreferenceStore().contains(SCHEME_KEY)) {
+			try {
+				this.chosenConversion = ConversionScheme.valueOf(Activator.getDefault().getPreferenceStore().getString(SCHEME_KEY));
+				choice.select(choice.indexOf(chosenConversion.getUiLabel()));
+			} catch (Throwable ne) {
+				logger.warn("Problem with old conversion scheme key!", ne);
+			}
+		}
 		choice.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				chosenConversion = ConversionScheme.values()[choice.getSelectionIndex()];
+				chosenConversion = ConversionScheme.fromLabel(choice.getItem(choice.getSelectionIndex()));
+				Activator.getDefault().getPreferenceStore().setValue(SCHEME_KEY, chosenConversion.toString());
 				pathChanged();
 				getWizard().canFinish();
 			}

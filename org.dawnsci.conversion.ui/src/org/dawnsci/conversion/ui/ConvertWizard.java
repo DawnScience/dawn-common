@@ -81,12 +81,14 @@ public class ConvertWizard extends Wizard implements IExportWizard{
 			
 			final String schemeName  = e.getAttribute("conversion_scheme");
 			final ConversionScheme s = Enum.valueOf(ConversionScheme.class, schemeName);
-			try {
-				final IConversionWizardPage p = (IConversionWizardPage)e.createExecutableExtension("conversion_page");
-				conversionPages.put(s, p);
-				addPage(p);
-			} catch (CoreException e1) {
-				logger.error("Cannot get page "+e.getAttribute("conversion_page"), e1);
+			if (s.isUserVisible()) {
+				try {
+					final IConversionWizardPage p = (IConversionWizardPage)e.createExecutableExtension("conversion_page");
+					conversionPages.put(s, p);
+					addPage(p);
+				} catch (CoreException e1) {
+					logger.error("Cannot get page "+e.getAttribute("conversion_page"), e1);
+				}
 			}
 		}
 		this.selectedConversionPage = conversionPages.get(ConversionScheme.values()[0]);
@@ -135,6 +137,7 @@ public class ConvertWizard extends Wizard implements IExportWizard{
 				public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 					try {
 						monitor.beginTask("Convert "+context.getFilePath(), 100);
+						monitor.worked(1);
 						context.setMonitor(new ProgressMonitorWrapper(monitor));
 						service.process(context);
 						
