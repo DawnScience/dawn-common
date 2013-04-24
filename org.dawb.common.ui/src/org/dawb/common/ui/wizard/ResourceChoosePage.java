@@ -55,6 +55,7 @@ public class ResourceChoosePage extends WizardPage {
 	private boolean newFile=false;
 	private boolean pathEditable=false;
 	private String path;
+	private String fileLabel="File location";
 	private Text txtPath;
 	/**
 	 * 
@@ -109,7 +110,7 @@ public class ResourceChoosePage extends WizardPage {
 		FileContentProposalProvider prov = new FileContentProposalProvider();
 		ContentProposalAdapter ad = new ContentProposalAdapter(txtPath, new TextContentAdapter(), prov, null, null);
 		ad.setProposalAcceptanceStyle(ContentProposalAdapter.PROPOSAL_REPLACE);
-		txtPath.setToolTipText("File location");
+		txtPath.setToolTipText(getFileLabel());
         if (getPath()!=null) txtPath.setText(getPath());
 		txtPath.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		txtPath.addModifyListener(new ModifyListener() {			
@@ -349,5 +350,13 @@ public class ResourceChoosePage extends WizardPage {
 
 	public void setPathEditable(boolean pathEnabled) {
 		this.pathEditable = pathEnabled;
+	}
+
+	public String getFileLabel() {
+		return fileLabel;
+	}
+
+	public void setFileLabel(String fileLabel) {
+		this.fileLabel = fileLabel;
 	}
 }

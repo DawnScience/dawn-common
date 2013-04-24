@@ -70,6 +70,7 @@ public final class ImageConvertPage extends ResourceChoosePage implements IConve
 		super("wizardPage", "Page for slicing HDF5 data into a directory of images.", null);
 		setTitle("Convert to Images");
 		setDirectory(true);
+		setFileLabel("Export to");
 	}
 
 	@Override

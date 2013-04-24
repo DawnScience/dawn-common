@@ -54,6 +54,8 @@ public class ImageConvertTest {
         }
    	}
 	
+	// TODO Test wih slicing other than "all"
+	
 	@Test
 	public void testPNGCustomConfig() throws Exception {
 		

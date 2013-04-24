@@ -32,11 +32,11 @@ public interface IConversionContext {
 	 * of the conversions we have spoken about before.
 	 */
 	public enum ConversionScheme {
-		ASCII_FROM_1D("Convert to ascii from 1D data",   true,  1), 
-		ASCII_FROM_2D("Convert to ascii from 2D data",   false, 2), 
-		TIFF_FROM_3D("Convert to image files from image stack", true, 2,3,4,5),
-		CUSTOM_NCD("Convert to ascii from NCD data",     false, null), // TODO not sure
-		CUSTOM_TOMO("Convert to tiff from TOMO data",    true, 3);
+		ASCII_FROM_1D("ascii from 1D data",   true,  1), 
+		ASCII_FROM_2D("ascii from 2D data",   false, 2), 
+		TIFF_FROM_3D("image files from image stack", true, 2,3,4,5),
+		CUSTOM_NCD("ascii from NCD data",     false, null), // TODO not sure
+		CUSTOM_TOMO("tiff from TOMO data",    true, 3);
 		
 		private String uiLabel;
 		private int[] preferredRanks;
