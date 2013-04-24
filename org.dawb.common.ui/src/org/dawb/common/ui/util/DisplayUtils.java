@@ -28,6 +28,17 @@ public class DisplayUtils {
 	 * @param runnable
 	 */
 	public static void runInDisplayThread(boolean async, Control control, Runnable runnable) {
+		runInDisplayThread(false, async, control, runnable);
+	}
+
+	/**
+	 * Run a runnable in the display thread
+	 * @param newThread if true and in display thread then run in new thread
+	 * @param async if true and not in display thread then run asynchronously or non-blocking
+	 * @param control used to get the display (if null, then {@link Display#getDefault()} is used)
+	 * @param runnable
+	 */
+	public static void runInDisplayThread(boolean newThread, boolean async, Control control, Runnable runnable) {
 		Display display = control == null ? Display.getDefault() : control.getDisplay();
 		if (display.getThread() != Thread.currentThread()) {
 			if (async)
@@ -35,8 +46,10 @@ public class DisplayUtils {
 			else
 				display.syncExec(runnable);
 		} else {
-			runnable.run();
+			if (newThread)
+				new Thread(runnable).start();
+			else
+				runnable.run();
 		}
-
 	}
 }
