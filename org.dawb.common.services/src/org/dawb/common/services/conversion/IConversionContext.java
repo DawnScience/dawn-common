@@ -34,7 +34,8 @@ public interface IConversionContext {
 		ASCII_FROM_1D("Convert to ascii from 1D data",   1), 
 		ASCII_FROM_2D("Convert to ascii from 2D data",   2), 
 		TIFF_FROM_3D("Convert to image files from image stack", 2,3,4,5),
-		CUSTOM_NCD("Convert to ascii from NCD data",     null); // TODO not sure 
+		CUSTOM_NCD("Convert to ascii from NCD data",     null), // TODO not sure
+		CUSTOM_TOMO("Convert to tiff from TOMO data", 3);
 		
 		private String uiLabel;
 		private int[] preferredRanks;
