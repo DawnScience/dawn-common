@@ -90,6 +90,8 @@
                   </enumeration>
                   <enumeration value="CUSTOM_NCD">
                   </enumeration>
+                  <enumeration value="CUSTOM_TOMO">
+                  </enumeration>
                </restriction>
             </simpleType>
          </attribute>
