@@ -23,29 +23,40 @@ import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.io.DataHolder;
 import uk.ac.diamond.scisoft.analysis.io.JavaImageSaver;
 
+/**
+ * Custom converter for tomography data.
+ * 
+ * Manages the conversion of tomography nexus files containing NXtomo into image files
+ *
+ */
 public class CustomTomoConverter extends AbstractConversion {
 
 	private final static String DEF = "definition";
 	private final static String NXTOMO = "nxtomo";
 	private final static String DATA_LOCATION = "instrument/detector/data";
 	private final static String KEY_LOCATION = "instrument/detector/image_key";
+	private int counter;
+	private int nImages;
 	
 	public CustomTomoConverter(IConversionContext context) {
 		super(context);
 	}
 
+	
 	@Override
 	public void processSlice(final File                 path, 
 							 final String               dsPath,
 							 final Map<Integer, String> sliceDimensions,
 							 final IConversionContext   context) throws Exception {
 		
+		//Overriding processSlice allows us to process the tomography bean before calling the super
 		if (context.getUserObject() != null && context.getUserObject() instanceof TomoInfoBean) {
 			processTomoInfoBeanContext(path, context);
 		} else {
 			throw new IllegalArgumentException("Not a recognised tomography file");
 		}
-		
+		counter = 0;
+		nImages = ((TomoInfoBean)context.getUserObject()).getNumberOfImages();
 		super.processSlice(path, dsPath, sliceDimensions, context);	
 	}
 	
@@ -53,7 +64,7 @@ public class CustomTomoConverter extends AbstractConversion {
 	protected void convert(AbstractDataset slice) throws Exception {
 		
 		String filename = ((TomoInfoBean)context.getUserObject()).getNextFileName();
-		int nBits = ((TomoInfoBean)context.getUserObject()).getTiffBitdepth();
+		int nBits = ((TomoInfoBean)context.getUserObject()).getBits();
 		
 		File file = new File(filename);
 		file.getParentFile().mkdirs();
@@ -62,6 +73,13 @@ public class CustomTomoConverter extends AbstractConversion {
 		final DataHolder     dh    = new DataHolder();
 		dh.addDataset(slice.getName(), slice);
 		saver.saveFile(dh);
+		
+		if (nImages < 101 || counter%(nImages/100) == 0) {
+			if (context.getMonitor()!=null) context.getMonitor().worked((counter*100)/(nImages));
+		}
+		
+		counter++;
+		
 	}
 
 	private void processTomoInfoBeanContext(File path, IConversionContext context) {
@@ -151,14 +169,37 @@ public class CustomTomoConverter extends AbstractConversion {
 		return null;
 	}
 	
+	/**
+	 * Bean to handle the custom aspects of converting tomography data
+	 *
+	 */
 	public static final class TomoInfoBean {
 		private IDataset imageKey;
 		//paths contain %s for path to full fill (-minus ext)
 		//also contain %xd for number position and width
-		private String darkPath, flatPath, projectionPath,outputPath,tomoPath,filePath;
+		private String darkPath, flatPath, projectionPath;
+		private String outputPath,tomoPath,filePath;
+		private String extension = "tiff";
 		private int dark,flat,projection = 0;
 		private int nBits = 8;
 		
+		/**
+		 * Method to produce a full file path when given the path and
+		 * a filename containing %s and %0xd where x is integer
+		 */
+		public static String convertToFullPath(String path, String filename) {
+			
+			String output = createFullPath(path,filename,123);
+			
+			return output;
+		}
+		
+		
+		/**
+		 * Method to check is a valid tomograpy file (returns true)
+		 * and populate some internal data
+		 *
+		 */
 		public boolean setTomographyDefinition(String path) {
 			
 			HObject ob = findGroupContainingDefinition(path);
@@ -168,6 +209,16 @@ public class CustomTomoConverter extends AbstractConversion {
 			tomoPath = ob.getPath();
 			return true;
 			
+		}
+		
+		public int getNumberOfImages() {
+			
+			if (imageKey != null) {
+				return imageKey.getShape()[0];
+			}
+			
+			
+			return -1;
 		}
 		
 		public void setImageKey(IDataset imageKey) {
@@ -182,14 +233,15 @@ public class CustomTomoConverter extends AbstractConversion {
 			this.outputPath = path;
 		}
 		
+		public String getOutputPath(){
+			return this.outputPath;
+		}
+		
 		public String getTomoDataName() {
 			if (tomoPath == null) return null;
 			return tomoPath + DATA_LOCATION;
 		}
 		
-		public String getOutputPath(){
-			return this.outputPath;
-		}
 		
 		public void setDarkFieldPath(String path){
 			this.darkPath = path;
@@ -201,14 +253,6 @@ public class CustomTomoConverter extends AbstractConversion {
 		
 		public void setProjectionPath(String path) {
 			this.projectionPath = path;
-		}
-		
-		public void setTiffBitdepth(int bits) {
-			nBits = bits;
-		}
-		
-		public int getTiffBitdepth() {
-			return nBits;
 		}
 		
 		public String getNextFileName() {
@@ -251,18 +295,44 @@ public class CustomTomoConverter extends AbstractConversion {
 				outputPath = filePath.substring(0, index);
 			}
 			
-			String output = path.replace("%s", outputPath);
+			return createFullPath(outputPath,path, number);
+		}
+		
+		private static String createFullPath(String path, String name, int number) {
+			String output = name.replace("%s", path);
 			
-			Pattern p = Pattern.compile("%\\d+d");
-			Matcher m = p.matcher(path);
+			Pattern p = Pattern.compile("%0\\d+d");
+			Matcher m = p.matcher(name);
 			
 			while (m.find()) {
-				String sub = path.substring(m.start(), m.end());
+				String sub = name.substring(m.start(), m.end());
 				String result = String.format(sub, number);
 				output = output.replace(sub, result);
 			}
 			
 			return output;
 		}
+		
+
+		public void setExtension(String imageFormat) {
+			extension = imageFormat;
+			
+		}
+		
+		public String getExtension() {
+			return extension;
+			
+		}
+
+		public void setBits(int bitDepth) {
+			nBits = bitDepth;
+			
+		}
+		
+		public int getBits() {
+			return nBits;
+			
+		}
+		
 	}
 }

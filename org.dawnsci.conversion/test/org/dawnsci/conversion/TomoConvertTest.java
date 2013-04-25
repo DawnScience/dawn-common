@@ -41,7 +41,7 @@ public class TomoConvertTest {
         context.addSliceDimension(0, "all");
         
         //TODO test for different %xds
-        bean.setTiffBitdepth(8);
+        bean.setBits(8);
         bean.setDarkFieldPath("%s/d_%05d");
         bean.setFlatFieldPath("%s/f_%05d");
         bean.setProjectionPath("%s/p_%05d");
@@ -96,7 +96,7 @@ public class TomoConvertTest {
         context.addSliceDimension(0, "all");
         
         //TODO test for different %xds
-        bean.setTiffBitdepth(16);
+        bean.setBits(16);
         bean.setDarkFieldPath(dir.getAbsolutePath() + "/dark/d_%05d");
         bean.setFlatFieldPath(dir.getAbsolutePath() +"/flat/f_%05d");
         bean.setProjectionPath(dir.getAbsolutePath() + "/proj/p_%05d");
@@ -155,7 +155,7 @@ public class TomoConvertTest {
         context.addSliceDimension(0, "all");
         
         //TODO test for different %xds
-        bean.setTiffBitdepth(33);
+        bean.setBits(33);
         bean.setDarkFieldPath("%s/d_%01d_%06d");
         bean.setFlatFieldPath("%s/f_%02d");
         bean.setProjectionPath("%s/p_%03d");
