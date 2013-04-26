@@ -22,6 +22,7 @@ import uk.ac.diamond.scisoft.analysis.dataset.LongDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ShortDataset;
 import uk.ac.diamond.scisoft.analysis.io.DataHolder;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
+import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
 
 /**
  * AbstractConversion details converting from hdf/nexus to other
@@ -251,6 +252,12 @@ public abstract class AbstractConversion {
 				data = data.squeeze();
 				data.setName(dsPath+" (Dim "+sliceIndex+"; index="+index+")");
 				convert(data);
+				
+				if (context.getMonitor() != null) {
+					IMonitor mon = context.getMonitor();
+					if (mon.isCancelled()) return;
+				}
+				
 			}
 
 		} else {
@@ -258,6 +265,10 @@ public abstract class AbstractConversion {
 			data = data.squeeze();
 			data.setName(dsPath+" (Dim "+sliceIndex+"; index="+start[sliceIndex] +")");
 			convert(data);
+			if (context.getMonitor() != null) {
+				IMonitor mon = context.getMonitor();
+				if (mon.isCancelled()) return;
+			}
 		}
 	}
 	
