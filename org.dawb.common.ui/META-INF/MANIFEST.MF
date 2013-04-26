@@ -53,6 +53,7 @@ Export-Package: org.dawb.common.ui,
  org.eclipse.nebula.widgets.gallery
 Import-Package: org.apache.commons.beanutils,
  org.dawb.common.services,
+ org.dawb.common.services.conversion,
  org.eclipse.draw2d,
  org.eclipse.draw2d.geometry,
  org.eclipse.emf.common.ui.dialogs,

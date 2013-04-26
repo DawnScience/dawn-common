@@ -16,6 +16,7 @@
 
 package org.dawb.common.services.conversion;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -31,17 +32,19 @@ public interface IConversionContext {
 	 * of the conversions we have spoken about before.
 	 */
 	public enum ConversionScheme {
-		ASCII_FROM_1D("Convert to ascii from 1D data",   1), 
-		ASCII_FROM_2D("Convert to ascii from 2D data",   2), 
-		TIFF_FROM_3D("Convert to image files from image stack", 2,3,4,5),
-		CUSTOM_NCD("Convert to ascii from NCD data",     null), // TODO not sure
-		CUSTOM_TOMO("Convert to tiff from TOMO data", 3);
+		ASCII_FROM_1D("ascii from 1D data",   true,  1), 
+		ASCII_FROM_2D("ascii from 2D data",   false, 2), 
+		TIFF_FROM_3D("image files from image stack", true, 2,3,4,5),
+		CUSTOM_NCD("ascii from NCD data",     false, null), // TODO not sure
+		CUSTOM_TOMO("tiff from TOMO data",    true, 3);
 		
 		private String uiLabel;
 		private int[] preferredRanks;
+		private boolean userVisible;
 
-		ConversionScheme(String uiLabel, int... preferredRanks) {
+		ConversionScheme(String uiLabel, boolean userVisible, int... preferredRanks) {
 			this.uiLabel       = uiLabel;
+			this.userVisible    = userVisible;
 			this.preferredRanks = preferredRanks;
 		}
 
@@ -49,17 +52,23 @@ public interface IConversionContext {
 			return uiLabel;
 		}
 		
-		public ConversionScheme fromLabel(String uiLabel) {
+		public static ConversionScheme fromLabel(String uiLabel) {
 			for (ConversionScheme cs : values()) {
 				if (cs.getUiLabel().equals(uiLabel)) return cs;
 			}
 			return null;
 		}
 
+		/**
+		 * The labels of the active user interface schemes.
+		 * @return
+		 */
 		public static String[] getLabels() {
-			final String[] labels = new String[values().length];
-			for (int i = 0; i < values().length; i++)  labels[i] = values()[i].uiLabel;
-			return labels;
+			final List<String> labels = new ArrayList<String>(3);
+			for (int i = 0; i < values().length; i++)  {
+				if (values()[i].isUserVisible()) labels.add(values()[i].getUiLabel());
+			}
+			return labels.toArray(new String[labels.size()]);
 		}
 
 		/**
@@ -77,6 +86,15 @@ public interface IConversionContext {
 				if (preferredRanks[i]==rank) return true;
 			}
 			return false;
+		}
+
+		/**
+		 * 
+		 * @return true if scheme should appear in UI choices such as the
+		 * conversion wizard.
+		 */
+		public boolean isUserVisible() {
+			return userVisible;
 		}
 	}
 	

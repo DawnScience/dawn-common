@@ -20,6 +20,7 @@ import org.dawb.common.services.conversion.IConversionContext.ConversionScheme;
 import org.dawb.common.services.conversion.IConversionService;
 import org.dawb.common.ui.monitor.ProgressMonitorWrapper;
 import org.dawb.common.ui.util.EclipseUtils;
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -27,6 +28,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.ErrorDialog;
@@ -81,12 +83,14 @@ public class ConvertWizard extends Wizard implements IExportWizard{
 			
 			final String schemeName  = e.getAttribute("conversion_scheme");
 			final ConversionScheme s = Enum.valueOf(ConversionScheme.class, schemeName);
-			try {
-				final IConversionWizardPage p = (IConversionWizardPage)e.createExecutableExtension("conversion_page");
-				conversionPages.put(s, p);
-				addPage(p);
-			} catch (CoreException e1) {
-				logger.error("Cannot get page "+e.getAttribute("conversion_page"), e1);
+			if (s.isUserVisible()) {
+				try {
+					final IConversionWizardPage p = (IConversionWizardPage)e.createExecutableExtension("conversion_page");
+					conversionPages.put(s, p);
+					addPage(p);
+				} catch (CoreException e1) {
+					logger.error("Cannot get page "+e.getAttribute("conversion_page"), e1);
+				}
 			}
 		}
 		this.selectedConversionPage = conversionPages.get(ConversionScheme.values()[0]);
@@ -103,7 +107,9 @@ public class ConvertWizard extends Wizard implements IExportWizard{
     		final ConversionScheme scheme = context.getConversionScheme();
     		selectedConversionPage = conversionPages.get(scheme);
     		for (ConversionScheme s : conversionPages.keySet()) {
-    			if (conversionPages.get(s)!=null) conversionPages.get(s).setVisible(s==scheme);
+    			if (conversionPages.get(s)!=null) {
+    				conversionPages.get(s).setVisible(s==scheme);
+    			}
 			}
     	}
     	if (setupPage.isPageComplete() && context!=null && selectedConversionPage!=null && !selectedConversionPage.isPageComplete()) {
@@ -132,30 +138,32 @@ public class ConvertWizard extends Wizard implements IExportWizard{
 				@Override
 				public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 					try {
-						monitor.beginTask("Convert "+context.getFilePath(), 100);
 						context.setMonitor(new ProgressMonitorWrapper(monitor));
+						monitor.setTaskName("Convert ");
+						monitor.beginTask("Convert "+context.getFilePath(), 100);
+						monitor.worked(1);
 						service.process(context);
 						
+						IFile file = null;
 						try { // Try to refresh parent incase it is in the worspace.
 							final String workspace = ResourcesPlugin.getWorkspace().getRoot().getLocation().toOSString();
 							final File   output    = new File(context.getOutputPath());
 							final String fullPath  = output.isDirectory() ? output.getAbsolutePath() : output.getParent();
 							final String frag      = fullPath.substring(workspace.length());
-							final IResource res    = ResourcesPlugin.getWorkspace().getRoot().findMember(frag);
-							res.refreshLocal(IResource.DEPTH_ONE, monitor);
+							IContainer dir    = (IContainer)ResourcesPlugin.getWorkspace().getRoot().findMember(frag);
+							dir.refreshLocal(IResource.DEPTH_ONE, monitor);
+							file = dir.getFile(new Path(output.getName()));
 							
 						} catch (Throwable ne) {
 							// it's ok
 						}
 						
-						if (selectedConversionPage.isOpen()) {
+						final IFile finalFile = file; 
+						if (selectedConversionPage.isOpen() &&  finalFile!=null) {
 							Display.getDefault().syncExec(new Runnable() {
 								public void run() {
 									try {
-										final String workspace = ResourcesPlugin.getWorkspace().getRoot().getLocation().toOSString();
-										final String frag      = context.getOutputPath().substring(workspace.length());
-										final IResource res    = ResourcesPlugin.getWorkspace().getRoot().findMember(frag);
-										EclipseUtils.openEditor((IFile)res);
+										EclipseUtils.openEditor(finalFile);
 									} catch (PartInitException e) {
 										logger.error("Cannot open "+context.getOutputPath(), e);
 									}
@@ -163,9 +171,10 @@ public class ConvertWizard extends Wizard implements IExportWizard{
 							});
 						}
 						
-						monitor.done();
 					} catch (Exception e) {
 						throw new InterruptedException(e.getMessage());
+					} finally {
+						monitor.done();
 					}
 				}
 			});

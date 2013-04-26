@@ -24,6 +24,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.dawb.common.ui.Activator;
 import org.dawb.common.ui.DawbUtils;
@@ -52,23 +54,26 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
+import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider;
 import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
-import org.eclipse.jface.viewers.ICellModifier;
+import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
+import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTError;
@@ -91,6 +96,7 @@ import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Scale;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.PartInitException;
@@ -117,6 +123,7 @@ import uk.ac.gda.richbeans.event.ValueEvent;
  */
 public class SliceComponent {
 	
+
 	private static final Logger logger = LoggerFactory.getLogger(SliceComponent.class);
 
 	private static final List<String> COLUMN_PROPERTIES = Arrays.asList(new String[]{"Dimension","Axis","Slice","Axis Data"});
@@ -152,6 +159,8 @@ public class SliceComponent {
 	 */
 	private NumberFormat format;
 
+	private ToolBarManager sliceToolbar;
+
 	public SliceComponent(final String sliceReceiverId) {
 		this.sliceReceiverId = sliceReceiverId;
 		this.sliceJob        = new SliceJob();
@@ -176,8 +185,8 @@ public class SliceComponent {
 		eData.heightHint=44;
 		explain.setLayoutData(eData);
 	
-		final ToolBarManager toolMan = createSliceActions();
-		final ToolBar        tool    = toolMan.createControl(area);
+		this.sliceToolbar = createSliceActions();
+		final ToolBar        tool    = sliceToolbar.createControl(area);
 		tool.setLayoutData(new GridData(SWT.RIGHT, SWT.TOP, true, false));
 		
 		final Composite tableComp = new Composite(area, SWT.NONE);
@@ -205,10 +214,7 @@ public class SliceComponent {
 
 		createColumns(viewer, tableColumnLayout);
 		viewer.setUseHashlookup(true);
-		viewer.setColumnProperties(COLUMN_PROPERTIES.toArray(new String[COLUMN_PROPERTIES.size()]));
-		viewer.setCellEditors(createCellEditors(viewer));
-		viewer.setCellModifier(createModifier(viewer));
-			
+		viewer.setColumnProperties(COLUMN_PROPERTIES.toArray(new String[COLUMN_PROPERTIES.size()]));			
 		
 		this.errorLabel = new CLabel(area, SWT.WRAP);
 		errorLabel.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false));
@@ -284,9 +290,40 @@ public class SliceComponent {
 		});
 		viewer.setInput(new Object());
 		
-		toolMan.update(true);
+		sliceToolbar.update(true);
     	
 		return area;
+	}
+	
+	private boolean axesVisible = true;
+	public void setAxesVisible(boolean isVis) {
+		axesVisible = isVis;
+		if (!isVis) {
+		    viewer.getTable().getColumn(3).setWidth(0);
+		    viewer.getTable().getColumn(3).setMoveable(false);
+		} else {
+		    viewer.getTable().getColumn(3).setWidth(200);
+		    viewer.getTable().getColumn(3).setMoveable(true);
+		}
+	}
+	private boolean rangesAllowed = false;
+	public void setRangesAllowed(boolean isVis) {
+		rangesAllowed = isVis;
+	}
+
+	public void setToolBarEnabled(boolean enabled) {
+		sliceToolbar.getControl().setEnabled(enabled);
+	}
+	/**
+	 * 
+	 * @param actionId
+	 * @throws NPE if action not found.
+	 */
+	public void setActionActive(String actionId) {
+		IContributionItem item = sliceToolbar.find(actionId);
+    	ActionContributionItem iaction = (ActionContributionItem)item;
+    	iaction.getAction().setChecked(!iaction.getAction().isChecked());
+    	iaction.getAction().run();
 	}
 	
 	private Map<PlotType, Action> plotTypeActions;
@@ -318,6 +355,7 @@ public class SliceComponent {
         		updatePlottingType();
         	}
 		};
+		xyPlot.setId(xyPlot.getText());
 		man.add(xyPlot);
 		xyPlot.setImageDescriptor(Activator.getImageDescriptor("icons/TraceLine.png"));
 		grp.add(xyPlot);
@@ -333,6 +371,7 @@ public class SliceComponent {
         		updatePlottingType();
          	}
 		};
+		stackPlot.setId(stackPlot.getText());
 		stackPlot.setImageDescriptor(Activator.getImageDescriptor("icons/TraceLines.png"));
 		grp.add(stackPlot);
 		plotTypeActions.put(PlotType.XY_STACKED, stackPlot);
@@ -347,6 +386,7 @@ public class SliceComponent {
         		updatePlottingType();
         	}
 		};
+		stackPlot3D.setId(stackPlot3D.getText());
 		man.add(stackPlot3D);
 		stackPlot3D.setImageDescriptor(Activator.getImageDescriptor("icons/TraceLines3D.png"));
 		grp.add(stackPlot3D);
@@ -360,6 +400,7 @@ public class SliceComponent {
         		updatePlottingType();
         	}
 		};
+		imagePlot.setId(imagePlot.getText());
 		man.add(imagePlot);
 		imagePlot.setImageDescriptor(Activator.getImageDescriptor("icons/TraceImage.png"));
 		grp.add(imagePlot);
@@ -373,6 +414,7 @@ public class SliceComponent {
         		updatePlottingType();
         	}
 		};
+		surfacePlot.setId(surfacePlot.getText());
 		man.add(surfacePlot);
 		surfacePlot.setImageDescriptor(Activator.getImageDescriptor("icons/TraceSurface.png"));
 		grp.add(surfacePlot);
@@ -397,6 +439,7 @@ public class SliceComponent {
 				openGallery();
 			}
 		};
+		openGallery.setId(openGallery.getText());
 		man.add(openGallery);
 		man.add(new Separator("group4"));
 
@@ -407,7 +450,6 @@ public class SliceComponent {
 		
 		final Action asScale = new Action("Sliding scale", IAction.AS_CHECK_BOX) {
 			public void run () {
-				updateSliceEditor(0);
 				Activator.getDefault().getPreferenceStore().setValue(ViewConstants.SLICE_EDITOR, 0);
 			}
 		};
@@ -417,7 +459,6 @@ public class SliceComponent {
 		
 		final Action asSpinner = new Action("Slice index (only)", IAction.AS_CHECK_BOX) {
 			public void run () {
-				updateSliceEditor(1);
 				Activator.getDefault().getPreferenceStore().setValue(ViewConstants.SLICE_EDITOR, 1);
 			}
 		};
@@ -442,28 +483,11 @@ public class SliceComponent {
 		return man;
 	}
 	
-	public void updateSliceEditor(int index) {
-		final boolean editing = viewer.isCellEditorActive();
-		final Object edit = ((StructuredSelection)viewer.getSelection()).getFirstElement();
-		
-		final CellEditor[] editors = viewer.getCellEditors();
-		if (index==0) {
-			editors[2] = scaleEditor;
-		} else if (index==1) {
-			editors[2] = spinnerEditor;
-		}
-		if (editing) {
-			viewer.cancelEditing();
-			viewer.editElement(edit, 2);
-		}
-
-	}
-	
 	private void updatePlottingType() {
 		viewer.cancelEditing();
 		
 		final String[] items = getAxisItems();
-		((CComboCellEditor)viewer.getCellEditors()[1]).setItems(items);
+		typeEditor.setItems(items);
 		
 		viewer.refresh();
 		reverse.setEnabled(plotType==PlotType.IMAGE||plotType==PlotType.SURFACE);
@@ -659,6 +683,18 @@ public class SliceComponent {
 
 		if (plotType==null) plotType = PlotType.XY;
 		reverse.setEnabled(plotType==PlotType.IMAGE||plotType==PlotType.SURFACE);
+		
+		// Parse if ranges allowed to try to assign at least one dims data to a range
+		if (rangesAllowed) {
+			final int[] shape = this.lazySet.getShape();
+			for (int dim = 0; dim < shape.length; dim++) {
+				DimsData dd = dimsDataList.getDimsData(dim);
+			    if (dd.isSlice() && shape[dim]>1) { // Slice found
+			    	dd.setAxis(DimsData.RANGE);
+			    	break;
+			    }
+			}
+		}
 	}
 
 	/**
@@ -720,225 +756,7 @@ public class SliceComponent {
 		return ok;
 	}
 
-	private ICellModifier createModifier(final TableViewer viewer) {
-		return new ICellModifier() {
-			
-			@Override
-			public boolean canModify(Object element, String property) {
-				final DimsData data = (DimsData)element;
-				final int       col  = COLUMN_PROPERTIES.indexOf(property);
-				if (col==0) return false;
-				if (col==1) return true;
-				if (col==2) {
-					if (dataShape[data.getDimension()]<2) return false;
-					return data.getAxis()<0;
-				}
-				if (col==3) {
-					boolean isSliceIndex = Activator.getDefault().getPreferenceStore().getInt(ViewConstants.SLICE_EDITOR)==1;
-					return isSliceIndex ? data.getAxis()>-1 : true;
-				}
-				return false;
-			}
 
-			@Override
-			public void modify(Object item, String property, Object value) {
-
-				final DimsData data  = (DimsData)((IStructuredSelection)viewer.getSelection()).getFirstElement();
-				if (data==null) return;
-				
-				final int       col   = COLUMN_PROPERTIES.indexOf(property);
-				if (col==0) return;
-				if (col==1) {
-					int axis = (Integer)value;
-					if (plotType==PlotType.XY) axis = axis>-1 ? 0 : -1;
-					data.setAxis(axis);
-					updateAxesChoices();
-				}
-				if (col==2) {
-					if (value instanceof Integer) {
-						data.setSlice((Integer)value);
-					} else {
-						data.setSliceRange((String)value);
-					}
-					// If there is only one other axis, set it to X
-				}
-				if (col==3) {
-
-					final int idim  = data.getDimension()+1;
-					if (value instanceof Integer) {
-						final List<String> names = dimensionNames.get(idim);
-						sliceObject.setNexusAxis(idim, names.get(((Integer)value).intValue()));
-					} else {
-						sliceObject.setNexusAxis(idim, (String)value);
-				    }
-				}
-				final boolean isValidData = synchronizeSliceData(data);
-				viewer.cancelEditing();
-				viewer.refresh();
-				
-				if (isValidData) {
-					slice(false);
-				}
-			}
-			
-			@Override
-			public Object getValue(Object element, String property) {
-				final DimsData data = (DimsData)element;
-				final int       col  = COLUMN_PROPERTIES.indexOf(property);
-				if (col==0) return data.getDimension();
-				if (col==1) return data.getAxis();
-				if (col==2) {
-					// Set the bounds
-					if (viewer.getCellEditors()[2] instanceof SpinnerCellEditorWithPlayButton) {
-						final SpinnerCellEditorWithPlayButton editor = (SpinnerCellEditorWithPlayButton)viewer.getCellEditors()[2];
-						editor.setMaximum(dataShape[data.getDimension()]-1);
-					} else if (viewer.getCellEditors()[2] instanceof ScaleCellEditor) {
-						final Scale scale = (Scale)((ScaleCellEditor)viewer.getCellEditors()[2]).getControl();
-						scale.setMaximum(dataShape[data.getDimension()]-1);
-						scale.setPageIncrement(scale.getMaximum()/10);
-
-						scale.setToolTipText(getScaleTooltip(data, scale.getMinimum(), scale.getMaximum()));
-
-					}
-					return data.getSliceRange() != null ? data.getSliceRange() : data.getSlice();
-				}
-				if (col==3) {
-					final int idim  = data.getDimension()+1;
-					final String dimensionDataName = sliceObject.getNexusAxis(idim);
-					final List<String> names = dimensionNames.get(idim);
-					int selection = names.indexOf(dimensionDataName);
-					return selection>-1 ? selection : 0;
-				}
-
-				return null;
-			}
-		};
-	}
-
-	private ScaleCellEditor                 scaleEditor;
-	private SpinnerCellEditorWithPlayButton spinnerEditor;
-
-	
-	/**
-	 * A better way than this is to use the *EditingSupport* functionality 
-	 * of TableViewerColumn.
-	 * 
-	 * @param viewer
-	 * @return
-	 */
-	private CellEditor[] createCellEditors(final TableViewer viewer) {
-		
-		final CellEditor[] editors  = new CellEditor[4];
-		editors[0] = null;
-		editors[1] = new CComboCellEditor(viewer.getTable(), new String[]{"X","Y","(Slice)"}, SWT.READ_ONLY) {
-			protected int getDoubleClickTimeout() {
-				return 0;
-			}	
-
-			public void activate() {
-				String[] items = getAxisItems();
-				if (!Arrays.equals(this.getCombo().getItems(), items)) {
-					this.getCombo().setItems(items);
-				}
-				super.activate();
-			}
-
-		};
-		final CCombo combo = ((CComboCellEditor)editors[1]).getCombo();
-		combo.addModifyListener(new ModifyListener() {
-			@Override
-			public void modifyText(ModifyEvent e) {
-				
-				final CComboCellEditor editor = (CComboCellEditor)editors[1];
-				if (!editor.isActivated()) return;
-				final String   value = combo.getText();
-				if ("".equals(value) || "(Slice)".equals(value)) {
-					editor.applyEditorValueAndDeactivate(-1);
-					return; // Bit of a bodge
-				}
-				final String[] items = editor.getItems();
-				if (items!=null) for (int i = 0; i < items.length; i++) {
-					if (items[i].equalsIgnoreCase(value)) {
-						editor.applyEditorValueAndDeactivate(i);
-						return;
-					}
-				}
-			}
-		});
-
-		this.scaleEditor = new ScaleCellEditor((Composite)viewer.getControl(), SWT.NO_FOCUS);
-		final Scale scale = (Scale)scaleEditor.getControl();
-		scale.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
-		scaleEditor.setMinimum(0);
-		scale.setIncrement(1);
-		scale.addMouseListener(new MouseAdapter() {			
-			@Override
-			public void mouseUp(MouseEvent e) {
-				if (!plotType.is3D()) return;
-				updateSlice(true);
-			}
-		});
-		scaleEditor.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				updateSlice(!plotType.is3D());
-			}
-		});
-		
-		final ScopedPreferenceStore store = new ScopedPreferenceStore(InstanceScope.INSTANCE, "org.dawb.workbench.ui");
-		this.spinnerEditor = new SpinnerCellEditorWithPlayButton(viewer, "Play through slices", store.getInt("data.format.slice.play.speed"));
-		spinnerEditor.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
-		spinnerEditor.addValueListener(new ValueAdapter() {
-			@Override
-			public void valueChangePerformed(ValueEvent e) {
-                final DimsData data  = (DimsData)((IStructuredSelection)viewer.getSelection()).getFirstElement();
-                if (e.getValue() instanceof Number) {
-                	data.setSlice(((Number)e.getValue()).intValue());
-                	data.setSliceRange(null);
-                } else {
-                	if (((RangeBox)e.getSource()).isError()) return;
-                	data.setSliceRange((String)e.getValue());
-                }
-         		if (synchronizeSliceData(data)) slice(false);
-			}
-			
-		});
-
-		if (Activator.getDefault().getPreferenceStore().getInt(ViewConstants.SLICE_EDITOR)==1) {
-		    editors[2] = spinnerEditor;
-		} else {
-		    editors[2] = scaleEditor;
-		}
-
-		
-		
-		CComboCellEditor axisDataEditor = new CComboCellEditor(viewer.getTable(), new String[]{"indices"}, SWT.READ_ONLY) {
-			protected int getDoubleClickTimeout() {
-				return 0;
-			}		
-			
-			public void activate() {
-				final DimsData     data  = (DimsData)((IStructuredSelection)viewer.getSelection()).getFirstElement();
-				final int idim  = data.getDimension()+1;
-				final List<String> names = dimensionNames.get(idim);
-				final String[] items = names.toArray(new String[names.size()]);
-				
-				if (!Arrays.equals(this.getCombo().getItems(), items)) {
-					this.getCombo().setItems(items);
-				}
-				
-				final int isel = names.indexOf(sliceObject.getNexusAxis(idim));
-				if (isel>-1 && getCombo().getSelectionIndex()!=isel) {
-					this.getCombo().select(isel);
-				}
-				super.activate();
-			}
-		};
-		
-		
-		editors[3] = axisDataEditor;
-		
-		return editors;
-	}
 
 	protected void updateSlice(boolean doSlice) {
 		final DimsData data  = (DimsData)((IStructuredSelection)viewer.getSelection()).getFirstElement();
@@ -950,20 +768,35 @@ public class SliceComponent {
 		if (doSlice&&synchronizeSliceData(data)) slice(false);
 	}
 
+	@SuppressWarnings("unused")
 	protected String[] getAxisItems() {
 		String[] items = null;
 		if (plotType==PlotType.XY) {
-			items = new String[]{"X","(Slice)"};
+			items = new String[]{"X"};
 		} else if (plotType==PlotType.XY_STACKED) {
-			items = new String[]{"X","Y (Many)", "(Slice)"};
+			items = new String[]{"X","Y (Many)"};
 		} else {
 			if (isReversedImage()) {
-				items = new String[]{"Y","X","(Slice)"};
+				items = new String[]{"Y","X"};
 			} else {
-				items = new String[]{"X","Y","(Slice)"};
+				items = new String[]{"X","Y"};
 			}
 		}
-		return items;
+		if (items!=null) {
+			if (rangesAllowed) {
+				String[] ret = new String[items.length+2];
+				for (int i = 0; i < items.length; i++) ret[i] = items[i];
+				ret[ret.length-2] = "(Slice)";
+				ret[ret.length-1] = "(Range)";
+				return ret;
+			} else {
+				String[] ret = new String[items.length+1];
+				for (int i = 0; i < items.length; i++) ret[i] = items[i];
+				ret[ret.length-1] = "(Slice)";
+				return ret;
+			}
+		}
+		return null;
 	}
 
 	protected String getScaleTooltip(DimsData data, int minimum, int maximum) {
@@ -972,7 +805,7 @@ public class SliceComponent {
         final StringBuffer buf = new StringBuffer();
         
         AbstractDataset axis = null;
-        try {
+        if (axesVisible) try {
 			final String axisName = SliceUtils.getNexusAxisName(sliceObject, data);
             axis = SliceUtils.getNexusAxis(this.sliceObject, axisName, false, null);
         } catch (Exception ne) {
@@ -1007,20 +840,296 @@ public class SliceComponent {
 		layout.setColumnData(dim.getColumn(), new ColumnWeightData(42));
 		dim.setLabelProvider(new DelegatingStyledCellLabelProvider(new SliceColumnLabelProvider(0)));
 		
-		final TableViewerColumn axis   = new TableViewerColumn(viewer, SWT.LEFT, 1);
-		axis.getColumn().setText("Axis");
-		layout.setColumnData(axis.getColumn(), new ColumnWeightData(65));
-		axis.setLabelProvider(new DelegatingStyledCellLabelProvider(new SliceColumnLabelProvider(1)));
+		final TableViewerColumn type   = new TableViewerColumn(viewer, SWT.LEFT, 1);
+		type.getColumn().setText("Type");
+		layout.setColumnData(type.getColumn(), new ColumnWeightData(65));
+		type.setLabelProvider(new DelegatingStyledCellLabelProvider(new SliceColumnLabelProvider(1)));
+		type.setEditingSupport(new TypeEditingSupport(viewer));
 
 		final TableViewerColumn slice   = new TableViewerColumn(viewer, SWT.LEFT, 2);
 		slice.getColumn().setText("Slice Value");
 		layout.setColumnData(slice.getColumn(), new ColumnWeightData(140));
 		slice.setLabelProvider(new DelegatingStyledCellLabelProvider(new SliceColumnLabelProvider(2)));
+		slice.setEditingSupport(new SliceEditingSupport(viewer));
 		
-		final TableViewerColumn data   = new TableViewerColumn(viewer, SWT.LEFT, 3);
-		data.getColumn().setText("Axis Data");
-		layout.setColumnData(data.getColumn(), new ColumnWeightData(140));
-		data.setLabelProvider(new DelegatingStyledCellLabelProvider(new SliceColumnLabelProvider(3)));
+		final TableViewerColumn axis   = new TableViewerColumn(viewer, SWT.LEFT, 3);
+		axis.getColumn().setText("Axis Data");
+		layout.setColumnData(axis.getColumn(), new ColumnWeightData(140));
+		axis.setLabelProvider(new DelegatingStyledCellLabelProvider(new SliceColumnLabelProvider(3)));
+		axis.setEditingSupport(new AxisEditingSupport(viewer));
+	}	
+
+	private class AxisEditingSupport extends EditingSupport {
+	
+		private CComboCellEditor axisDataEditor;
+
+		public AxisEditingSupport(ColumnViewer viewer) {
+			super(viewer);
+			this.axisDataEditor = new CComboCellEditor(((TableViewer)viewer).getTable(), new String[]{"indices"}, SWT.READ_ONLY) {
+				protected int getDoubleClickTimeout() {
+					return 0;
+				}		
+				
+				public void activate() {
+					final DimsData     data  = (DimsData)((IStructuredSelection)((TableViewer)getViewer()).getSelection()).getFirstElement();
+					final int idim  = data.getDimension()+1;
+					final List<String> names = dimensionNames.get(idim);
+					final String[] items = names.toArray(new String[names.size()]);
+					
+					if (!Arrays.equals(this.getCombo().getItems(), items)) {
+						this.getCombo().setItems(items);
+					}
+					
+					final int isel = names.indexOf(sliceObject.getNexusAxis(idim));
+					if (isel>-1 && getCombo().getSelectionIndex()!=isel) {
+						this.getCombo().select(isel);
+					}
+					super.activate();
+				}
+			};
+			
+		}
+		@Override
+		protected CellEditor getCellEditor(Object element) {
+			return axisDataEditor;
+		}
+	
+		@Override
+		protected boolean canEdit(Object element) {
+			final DimsData data = (DimsData)element;
+		    boolean isSliceIndex = Activator.getDefault().getPreferenceStore().getInt(ViewConstants.SLICE_EDITOR)==1;
+			return isSliceIndex ? data.getAxis()>-1 : true;
+		}
+	
+		@Override
+		protected Object getValue(Object element) {
+			final DimsData data = (DimsData)element;
+			final int idim  = data.getDimension()+1;
+			final String dimensionDataName = sliceObject.getNexusAxis(idim);
+			final List<String> names = dimensionNames.get(idim);
+			int selection = names.indexOf(dimensionDataName);
+			return selection>-1 ? selection : 0;
+		}
+	
+		@Override
+		protected void setValue(Object element, Object value) {
+			final DimsData data = (DimsData)element;
+			final int idim  = data.getDimension()+1;
+			if (value instanceof Integer) {
+				final List<String> names = dimensionNames.get(idim);
+				sliceObject.setNexusAxis(idim, names.get(((Integer)value).intValue()));
+			} else {
+				sliceObject.setNexusAxis(idim, (String)value);
+		    }
+			update(data);
+		}
+	
+	}
+	private ScaleCellEditor                 scaleEditor;
+	private SpinnerCellEditorWithPlayButton spinnerEditor;
+	private TextCellEditor                  rangeEditor;
+	private CComboCellEditor                typeEditor;
+
+	private class SliceEditingSupport extends EditingSupport {
+
+		public SliceEditingSupport(ColumnViewer viewer) {
+			super(viewer);
+			
+			scaleEditor = new ScaleCellEditor((Composite)viewer.getControl(), SWT.NO_FOCUS);
+			final Scale scale = (Scale)scaleEditor.getControl();
+			scale.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
+			scaleEditor.setMinimum(0);
+			scale.setIncrement(1);
+			scale.addMouseListener(new MouseAdapter() {			
+				@Override
+				public void mouseUp(MouseEvent e) {
+					if (!plotType.is3D()) return;
+					updateSlice(true);
+				}
+			});
+			scaleEditor.addSelectionListener(new SelectionAdapter() {
+				public void widgetSelected(SelectionEvent e) {
+					updateSlice(!plotType.is3D());
+				}
+			});
+			
+			final ScopedPreferenceStore store = new ScopedPreferenceStore(InstanceScope.INSTANCE, "org.dawb.workbench.ui");
+			spinnerEditor = new SpinnerCellEditorWithPlayButton((TableViewer)viewer, "Play through slices", store.getInt("data.format.slice.play.speed"));
+			spinnerEditor.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
+			spinnerEditor.addValueListener(new ValueAdapter() {
+				@Override
+				public void valueChangePerformed(ValueEvent e) {
+	                final DimsData data  = (DimsData)((IStructuredSelection)((TableViewer)getViewer()).getSelection()).getFirstElement();
+	                if (e.getValue() instanceof Number) {
+	                	data.setSlice(((Number)e.getValue()).intValue());
+	                	data.setSliceRange(null);
+	                } else {
+	                	if (((RangeBox)e.getSource()).isError()) return;
+	                	data.setSliceRange((String)e.getValue());
+	                }
+	         		if (synchronizeSliceData(data)) slice(false);
+				}
+				
+			});
+
+			rangeEditor = new TextCellEditor((Composite)viewer.getControl(), SWT.NONE);
+			((Text)rangeEditor.getControl()).addModifyListener(new ModifyListener() {			
+				@Override
+				public void modifyText(ModifyEvent e) {
+	                final DimsData data  = (DimsData)((IStructuredSelection)((TableViewer)getViewer()).getSelection()).getFirstElement();
+					final Text text = (Text)e.getSource();
+					final String range = text.getText();
+					
+					final Matcher matcher = Pattern.compile("(\\d+)\\:(\\d+)").matcher(range);
+					if ("all".equals(range)) {
+						text.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_BLACK));
+					} else if (matcher.matches()) {
+						final int[] shape = lazySet.getShape();
+						int start = Integer.parseInt(matcher.group(1));
+						int end   = Integer.parseInt(matcher.group(2));
+						if (start>-1&&end>-1&&start<shape[data.getDimension()]&&end<shape[data.getDimension()]) {
+						    text.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_BLACK));
+						} else {
+							text.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_RED));
+						}
+					} else {
+						text.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_RED));
+					}			
+				}
+			});
+			((Text)rangeEditor.getControl()).setToolTipText("Please enter \"all\" or a range of the form <int>:<int>.");
+
+		}
+
+		@Override
+		protected CellEditor getCellEditor(Object element) {
+			
+			final DimsData data = (DimsData)element;
+			if (data.isRange()) return rangeEditor;
+			if (Activator.getDefault().getPreferenceStore().getInt(ViewConstants.SLICE_EDITOR)==1) {
+	            spinnerEditor.setMaximum(dataShape[data.getDimension()]-1);
+			    return spinnerEditor;
+			} else {
+				final Scale scale = (Scale)scaleEditor.getControl();
+				scale.setMaximum(dataShape[data.getDimension()]-1);
+				scale.setPageIncrement(scale.getMaximum()/10);
+
+				scale.setToolTipText(getScaleTooltip(data, scale.getMinimum(), scale.getMaximum()));
+				return scaleEditor;
+			}
+		}
+
+		@Override
+		protected boolean canEdit(Object element) {
+			final DimsData data = (DimsData)element;
+			if (dataShape[data.getDimension()]<2) return false;
+			if (data.isRange()) return true;
+			return data.getAxis()<0;
+		}
+
+		@Override
+		protected Object getValue(Object element) {
+			final DimsData data = (DimsData)element;
+			if (data.isRange()) return data.getSliceRange() != null ? data.getSliceRange() : "all";
+			return data.getSlice();
+		}
+
+		@Override
+		protected void setValue(Object element, Object value) {
+			final DimsData data = (DimsData)element;
+			if (value instanceof Integer) {
+				data.setSlice((Integer)value);
+			} else {
+				data.setSliceRange((String)value);
+			}
+			update(data);
+		}
+
+	}
+
+	private String[] getAxisChoices() {
+		return rangesAllowed ? new String[]{"X","Y","(Slice)","(Range)"} : new String[]{"X","Y","(Slice)"};
+	}
+
+	private class TypeEditingSupport extends EditingSupport {
+
+		public TypeEditingSupport(ColumnViewer viewer) {
+			super(viewer);
+			typeEditor = new CComboCellEditor(((TableViewer)viewer).getTable(), getAxisChoices(), SWT.READ_ONLY) {
+				protected int getDoubleClickTimeout() {
+					return 0;
+				}	
+
+				public void activate() {
+					String[] items = getAxisItems();
+					if (!Arrays.equals(this.getCombo().getItems(), items)) {
+						this.getCombo().setItems(items);
+					}
+					super.activate();
+				}
+
+			};
+			final CCombo combo = typeEditor.getCombo();
+			combo.addModifyListener(new ModifyListener() {
+				@Override
+				public void modifyText(ModifyEvent e) {
+					
+					if (!typeEditor.isActivated()) return;
+					final String   value = combo.getText();
+					if ("".equals(value) || "(Slice)".equals(value)) {
+						typeEditor.applyEditorValueAndDeactivate(-1);
+						return; // Bit of a bodge
+					}
+					if ("(Range)".equals(value)) {
+						typeEditor.applyEditorValueAndDeactivate(DimsData.RANGE);
+						return; // Bit of a bodge
+					}
+					final String[] items = typeEditor.getItems();
+					if (items!=null) for (int i = 0; i < items.length; i++) {
+						if (items[i].equalsIgnoreCase(value)) {
+							typeEditor.applyEditorValueAndDeactivate(i);
+							return;
+						}
+					}
+				}
+			});
+		}
+
+		@Override
+		protected CellEditor getCellEditor(Object element) {
+			return typeEditor;
+		}
+
+		@Override
+		protected boolean canEdit(Object element) {
+			return true;
+		}
+
+		@Override
+		protected Object getValue(Object element) {
+			final DimsData data = (DimsData)element;
+			return data.getAxis();
+		}
+
+		@Override
+		protected void setValue(Object element, Object value) {
+			final DimsData data  = (DimsData)((IStructuredSelection)viewer.getSelection()).getFirstElement();
+			if (data==null) return;
+			int axis = (Integer)value;
+			if (plotType==PlotType.XY) axis = axis>-1 ? 0 : -1;
+			data.setAxis(axis);
+			updateAxesChoices();
+			update(data);
+		}
+
+	}
+
+	private void update(DimsData data) {
+		final boolean isValidData = synchronizeSliceData(data);
+		viewer.cancelEditing();
+		viewer.refresh();
+		
+		if (isValidData) slice(false);
 	}
 
 	private class SliceColumnLabelProvider extends ColumnLabelProvider implements IStyledLabelProvider {
@@ -1031,6 +1140,9 @@ public class SliceComponent {
 		}
 		@Override
 		public StyledString getStyledText(Object element) {
+			
+			if (viewer.getTable().getColumn(col).getWidth()<1) return new StyledString();
+					
 			final DimsData data = (DimsData)element;
 			final StyledString ret = new StyledString();
 			switch (col) {
@@ -1041,19 +1153,23 @@ public class SliceComponent {
 				ret.append( getAxisLabel(data) );
 				break;
 			case 2:
-				if (data.getSliceRange()!=null) {
-					ret.append( data.getSliceRange() );
+				if (data.isRange()) {
+					ret.append(data.getSliceRange()!=null? new StyledString(data.getSliceRange()) : new StyledString("all"));
 				} else {
 					final int slice = data.getSlice();
 					String formatValue = String.valueOf(slice);
 					try {
-						formatValue = format.format(SliceUtils.getNexusAxisValue(sliceObject, data, slice, null));
+						if (axesVisible) {
+							formatValue = format.format(SliceUtils.getNexusAxisValue(sliceObject, data, slice, null));
+						} else {
+							formatValue = String.valueOf(slice);
+						}
 					} catch (Throwable ne) {
 						formatValue = String.valueOf(slice);
 					}
 					ret.append( slice>-1 ? formatValue : "" );
 				}
-				if (data.getAxis()<0 && !errorLabel.isVisible()) {
+				if ((data.isSlice() || data.isRange())&& !errorLabel.isVisible()) {
 					ret.append(new StyledString(" (click to change)", StyledString.QUALIFIER_STYLER));
 				}
 				break;
@@ -1096,10 +1212,8 @@ public class SliceComponent {
 		setDataShape(lazySet.getShape());
 		
 		explain.setText("Create a slice of "+sliceObject.getName()+".\nIt has the shape "+Arrays.toString(dataShape));
-		if (viewer.getCellEditors()[2] instanceof SpinnerCellEditorWithPlayButton) {
-			((SpinnerCellEditorWithPlayButton)viewer.getCellEditors()[2]).setRangeDialogTitle("Range for slice in '"+sliceObject.getName()+"'");
-			((SpinnerCellEditorWithPlayButton)viewer.getCellEditors()[2]).setPlayButtonVisible(false);
-		}
+		spinnerEditor.setRangeDialogTitle("Range for slice in '"+sliceObject.getName()+"'");
+		spinnerEditor.setPlayButtonVisible(false);
 		
 		createDimsData();
 		updateAxesChoices();
@@ -1114,13 +1228,14 @@ public class SliceComponent {
 		}
 		
 		final String[] items = getAxisItems();
-		((CComboCellEditor)viewer.getCellEditors()[1]).setItems(items);
+		typeEditor.setItems(items);
 
 	}
 
 	public String getAxisLabel(DimsData data) {
 
 		final int axis = data.getAxis();
+		if (data.isRange()) return "(Range)";
 		if (plotType==PlotType.XY) {
 			return axis>-1 ? "X" : "(Slice)";
 		}
@@ -1157,7 +1272,7 @@ public class SliceComponent {
 	 * Does slice in monitored job
 	 */
 	public void slice(final boolean force) {
-		
+		if (plottingSystem==null) return;
 		if (!force) {
 		    if (updateAutomatically!=null && !updateAutomatically.isChecked()) return;
 		}
@@ -1294,4 +1409,9 @@ public class SliceComponent {
 	public void setDataReductionAction(IAction dataReductionAction) {
 		this.dataReductionAction = dataReductionAction;
 	}
+
+	public void refresh() {
+		viewer.refresh();
+	}
+
 }

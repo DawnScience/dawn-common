@@ -2,17 +2,17 @@ package org.dawnsci.conversion.ui.pages;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.dawb.common.services.conversion.IConversionContext;
-import org.dawb.common.ui.slicing.DimsData;
-import org.dawb.common.ui.slicing.DimsDataList;
-import org.dawb.common.ui.slicing.SliceComponent;
+import org.dawb.common.services.conversion.IConversionContext.ConversionScheme;
 import org.dawb.common.ui.util.GridUtils;
 import org.dawb.common.ui.wizard.ResourceChoosePage;
-import org.dawnsci.conversion.internal.ImageConverter;
+import org.dawnsci.conversion.internal.CustomTomoConverter;
+import org.dawnsci.conversion.internal.CustomTomoConverter.TomoInfoBean;
 import org.dawnsci.conversion.ui.Activator;
 import org.dawnsci.conversion.ui.IConversionWizardPage;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -21,6 +21,8 @@ import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -35,14 +37,7 @@ import org.eclipse.ui.forms.events.ExpansionEvent;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.slf4j.LoggerFactory;
 
-import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
-import uk.ac.diamond.scisoft.analysis.io.DataHolder;
-import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
-import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
-
-public final class ImageConvertPage extends ResourceChoosePage implements IConversionWizardPage {
-	
-	private static final String LAST_SET_KEY = "org.dawnsci.conversion.ui.pages.lastDataSet";
+public final class TomoConvertPage extends ResourceChoosePage implements IConversionWizardPage {
 	
 	private static final String[] IMAGE_FORMATS = new String[]{"tiff", "png", "jpg"};
 	private static final Map<String,int[]> BIT_DEPTHS;
@@ -53,24 +48,23 @@ public final class ImageConvertPage extends ResourceChoosePage implements IConve
 		BIT_DEPTHS.put("png", new int[]{16});
 		BIT_DEPTHS.put("jpg", new int[]{8});
 	}
-	private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ImageConvertPage.class);
-
+	private static final org.slf4j.Logger logger = LoggerFactory.getLogger(TomoConvertPage.class);
 	
-	
-	private CCombo         nameChoice;
+	private Label         nameChoice;
 	private String         datasetName;
 	private String         imageFormat;
 	private int            bitDepth;
-	private Text           imagePrefixBox;
-    private SliceComponent sliceComponent;
+	private Text           projPrefixBox;
+	private Text           darkPrefixBox;
+	private Text           flatPrefixBox;
+	private Label           exampleFilePath;
 	private CLabel warningLabel;
 	private IConversionContext context;
 
-	public ImageConvertPage() {
-		super("wizardPage", "Page for slicing HDF5 data into a directory of images.", null);
-		setTitle("Convert to Images");
+	public TomoConvertPage() {
+		super("wizardPage", "Page for slicing Tomography HDF5 data into a directory of images.", null);
+		setTitle("Convert Tomography to Images");
 		setDirectory(true);
-		setFileLabel("Export to");
 	}
 
 	@Override
@@ -85,18 +79,11 @@ public final class ImageConvertPage extends ResourceChoosePage implements IConve
 		
 		Label label = new Label(container, SWT.NULL);
 		label.setLayoutData(new GridData());
-		label.setText("Dataset Name");
+		label.setText("Dataset Name:");
 		
-		nameChoice = new CCombo(container, SWT.READ_ONLY);
+		nameChoice = new Label(container, SWT.NULL);
 		nameChoice.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
-		nameChoice.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				datasetName = nameChoice.getItem(nameChoice.getSelectionIndex());
-				pathChanged();
-				nameChanged();
-				Activator.getDefault().getPreferenceStore().setValue(LAST_SET_KEY, datasetName);
-			}
-		});
+		nameChoice.setText("");
 		
 	}
 	
@@ -105,21 +92,16 @@ public final class ImageConvertPage extends ResourceChoosePage implements IConve
 		
 		final File source = new File(getSourcePath(context));
 		setPath(source.getParent()+File.separator+"output");
-
-		createAdvanced(container);
 		
 		Label sep = new Label(container, SWT.HORIZONTAL|SWT.SEPARATOR);
 		sep.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 4, 1));
 		
-		this.sliceComponent = new SliceComponent("org.dawb.workbench.views.h5GalleryView");
-		final Control slicer = sliceComponent.createPartControl(container);
-		GridData data = new GridData(SWT.FILL, SWT.FILL, true, true, 4, 1);
-		data.minimumHeight=560;
-		slicer.setLayoutData(data);
-		sliceComponent.setVisible(true);
-		sliceComponent.setAxesVisible(false);
-		sliceComponent.setRangesAllowed(true);
-		sliceComponent.setToolBarEnabled(false);
+		addTomographyFileBoxes(container);
+
+		createAdvanced(container);
+		
+		sep = new Label(container, SWT.HORIZONTAL|SWT.SEPARATOR);
+		sep.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 4, 1));
 		
 		pathChanged();
 
@@ -185,16 +167,6 @@ public final class ImageConvertPage extends ResourceChoosePage implements IConve
 		warningLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
 		GridUtils.setVisible(warningLabel, false);
 
-		label = new Label(advanced, SWT.NULL);
-		label.setLayoutData(new GridData());
-		label.setText("Image Prefix");
-
-		this.imagePrefixBox = new Text(advanced, SWT.BORDER);
-		imagePrefixBox.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
-		imagePrefixBox.setText("image");
-		label = new Label(advanced, SWT.NULL);
-		label.setLayoutData(new GridData());
-
 		GridUtils.setVisible(advanced, false);
 		ExpansionAdapter expansionListener = new ExpansionAdapter() {
 			@Override
@@ -221,27 +193,6 @@ public final class ImageConvertPage extends ResourceChoosePage implements IConve
 	public boolean isOpen() {
 		return false;
 	}
-	
-	private void nameChanged() {
-
-		try {
-			DataHolder dh = LoaderFactory.getData(context.getFilePath(), new IMonitor.Stub());
-			final ILazyDataset lz = dh.getLazyDataset(datasetName);
-			sliceComponent.setData(lz, datasetName, context.getFilePath());
-			
-			try {
-				final String name = datasetName.substring(datasetName.lastIndexOf('/')+1);
-				imagePrefixBox.setText(name);
-			} catch (Exception ignored) {
-				imagePrefixBox.setText(datasetName);
-			}
-
-			
-		} catch (Exception ne) {
-			setErrorMessage("Cannot read data set '"+datasetName+"'");
-			logger.error("Cannot get data", ne);
-		}
-	}
 
 	/**
 	 * Checks the path is ok.
@@ -258,6 +209,7 @@ public final class ImageConvertPage extends ResourceChoosePage implements IConve
 				setErrorMessage("The directory "+outputDir.getParent()+" does not exist.");
 				return;			
 			}
+			updatePaths();
 		} catch (Exception ne) {
 			setErrorMessage(ne.getMessage()); // Not very friendly...
 			return;			
@@ -276,23 +228,31 @@ public final class ImageConvertPage extends ResourceChoosePage implements IConve
 		if (context == null) return null;
 		context.setDatasetName(datasetName);
 		context.setOutputPath(getAbsoluteFilePath());
-		
-		final ImageConverter.ConversionInfoBean bean = new ImageConverter.ConversionInfoBean();
+		context.addSliceDimension(0, "all");
+		final CustomTomoConverter.TomoInfoBean bean = new CustomTomoConverter.TomoInfoBean();
+		bean.setTomographyDefinition(getSourcePath(context));
 		bean.setExtension(imageFormat);
 		bean.setBits(bitDepth);
-		bean.setAlternativeNamePrefix(imagePrefixBox.getText());
+		bean.setDarkFieldPath(darkPrefixBox.getText());
+		bean.setFlatFieldPath(flatPrefixBox.getText());
+		bean.setProjectionPath(projPrefixBox.getText());
 		context.setUserObject(bean);
 		
-		final DimsDataList dims = sliceComponent.getDimsDataList();
-		for (DimsData dd : dims.getDimsData()) {
-			if (dd.isSlice()) {
-				context.addSliceDimension(dd.getDimension(), String.valueOf(dd.getSlice()));
-			} else if (dd.isRange()) {
-				context.addSliceDimension(dd.getDimension(), dd.getSliceRange()!=null ? dd.getSliceRange() : "all");				
-			}
+		return context;
+	}
+	
+	private void updatePaths() {
+		
+		String ext = "";
+		
+		if (imageFormat == null) {
+			ext = imageFormat;
+		} else {
+			ext = IMAGE_FORMATS[0];
 		}
 		
-		return context;
+		exampleFilePath.setText(TomoInfoBean.convertToFullPath(getAbsoluteFilePath(), projPrefixBox.getText()) +"." + ext);
+		exampleFilePath.getShell().layout(true,true);
 	}
 
 
@@ -317,38 +277,97 @@ public final class ImageConvertPage extends ResourceChoosePage implements IConve
 	protected void getNamesOfSupportedRank() throws Exception {
 		
 		getContainer().run(true, true, new IRunnableWithProgress() {
-
 			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-				
 				try {
                     final List<String> names = getActiveDatasets(context, monitor);
                     if (names==null || names.isEmpty()) return;
                     
                     Display.getDefault().asyncExec(new Runnable() {
                     	public void run() {
-                    		nameChoice.setItems(names.toArray(new String[names.size()]));
-                    		final String lastName = Activator.getDefault().getPreferenceStore().getString(LAST_SET_KEY);
-                    		
-                    		int index = 0;
-                    		if (lastName!=null && names.contains(lastName)) {
-                    			index = names.indexOf(lastName);
-                    		}
-                    		
-                    		nameChoice.select(index);
-                    		datasetName = names.get(index);
-                    		nameChanged();
+                    		nameChoice.setText(names.get(0));
+                    		datasetName = names.get(0);
                     	}
                     });
                     
 				} catch (Exception ne) {
 					throw new InvocationTargetException(ne);
 				}
-
 			}
-
 		});
 	}
 	
+	@Override
+	protected List<String> getActiveDatasets(IConversionContext context, IProgressMonitor monitor) throws Exception {
+		
+		final String source = getSourcePath(context);
+		if (source==null || "".equals(source)) return null;
+		final ConversionScheme scheme = context.getConversionScheme();
+		
+		if (scheme == null || scheme != ConversionScheme.CUSTOM_TOMO) return null;
+		
+		TomoInfoBean bean = new TomoInfoBean();
+		
+		if (!bean.setTomographyDefinition(source)) return null;
+		
+		return Arrays.asList(bean.getTomoDataName());
+	
+	}
+	
+	private void addTomographyFileBoxes(Composite composite) {
+		
+		Label label = new Label(composite, SWT.NULL);
+		label.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 4, 1));
+		label.setText("Set paths for tomography images:");
+		
+		label = new Label(composite, SWT.NULL);
+		label.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 4, 1));
+		label.setText("Use %s to refer to the output folder path");
+		label = new Label(composite, SWT.NULL);
+		label.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 4, 1));
+		label.setText("Use %0d (where d is an integer) to set the leading zero width of the file name");
+		
+		label = new Label(composite, SWT.NULL);
+		label.setLayoutData(new GridData());
+		label.setText("Projection Images");
+		
+		this.projPrefixBox = new Text(composite, SWT.BORDER);
+		projPrefixBox.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
+		projPrefixBox.setText("%s/projection/p_%05d");
+		projPrefixBox.addModifyListener(new ModifyListener() {
+			
+			@Override
+			public void modifyText(ModifyEvent e) {
+				updatePaths();
+				
+			}
+		});
+		
+		label = new Label(composite, SWT.NULL);
+		label.setLayoutData(new GridData());
+		label.setText("Dark Field Images");
+		
+		this.darkPrefixBox = new Text(composite, SWT.BORDER);
+		darkPrefixBox.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
+		darkPrefixBox.setText("%s/dark/d_%05d");
+		
+		label = new Label(composite, SWT.NULL);
+		label.setLayoutData(new GridData());
+		label.setText("Flat Field Images");
+		
+		this.flatPrefixBox = new Text(composite, SWT.BORDER);
+		flatPrefixBox.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
+		flatPrefixBox.setText("%s/flat/f_%05d");
+		
+		label = new Label(composite, SWT.NULL);
+		label.setLayoutData(new GridData());
+		label.setText("Current:");
+		
+		exampleFilePath = new Label(composite, SWT.WRAP);
+		exampleFilePath.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 2));
+		exampleFilePath.setText(TomoInfoBean.convertToFullPath(getAbsoluteFilePath(), projPrefixBox.getText()) +"." + IMAGE_FORMATS[0]);
+
+	}
+
 	@Override
 	public IWizardPage getNextPage() {
 		return null;

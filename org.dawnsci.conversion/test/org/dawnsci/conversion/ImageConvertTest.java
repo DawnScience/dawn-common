@@ -54,6 +54,8 @@ public class ImageConvertTest {
         }
    	}
 	
+	// TODO Test wih slicing other than "all"
+	
 	@Test
 	public void testPNGCustomConfig() throws Exception {
 		
@@ -73,7 +75,7 @@ public class ImageConvertTest {
         context.setDatasetName("/entry/edf/data");
         context.addSliceDimension(0, "all");
         
-        ImageConverter.TiffInfoBean bean = new ImageConverter.TiffInfoBean();
+        ImageConverter.ConversionInfoBean bean = new ImageConverter.ConversionInfoBean();
         bean.setExtension("png");
         bean.setBits(16);
         bean.setAlternativeNamePrefix("Export");

@@ -14,7 +14,7 @@ import org.dawb.common.ui.monitor.ProgressMonitorWrapper;
 import org.dawb.common.ui.plot.region.RegionService;
 import org.dawb.common.ui.util.EclipseUtils;
 import org.dawb.common.ui.wizard.CheckWizardPage;
-import org.dawb.common.ui.wizard.ExternalFileChoosePage;
+import org.dawb.common.ui.wizard.ResourceChoosePage;
 import org.dawb.common.util.io.FileUtils;
 import org.dawnsci.plotting.api.IPlottingSystem;
 import org.dawnsci.plotting.api.region.IRegion;
@@ -55,14 +55,14 @@ import uk.ac.diamond.scisoft.analysis.roi.IROI;
 public class PersistenceImportWizard extends AbstractPerstenceWizard implements IImportWizard {
 
 	public static final String ID = "org.dawnsci.plotting.importMask";
-	private ExternalFileChoosePage fcp;
+	private ResourceChoosePage fcp;
 	private CheckWizardPage options;
 
 	public PersistenceImportWizard() {
 		
 		setWindowTitle("Import");
 		
-		this.fcp = new ExternalFileChoosePage("Import File", null, null);
+		this.fcp = new ResourceChoosePage("Import File", null, null);
 		fcp.setDescription("Choose the file (*.nxs or *.msk) to import.");
 		addPage(fcp);
 		

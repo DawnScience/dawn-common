@@ -19,9 +19,10 @@ import java.util.List;
 
 import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.ui.monitor.ProgressMonitorWrapper;
+import org.dawb.common.ui.wizard.ResourceChoosePage;
 import org.dawnsci.conversion.internal.AsciiConvert1D;
-import org.dawnsci.conversion.ui.AbstractConversionPage;
 import org.dawnsci.conversion.ui.Activator;
+import org.dawnsci.conversion.ui.IConversionWizardPage;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IContributionManager;
@@ -31,9 +32,8 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -41,12 +41,10 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.Text;
+import org.slf4j.LoggerFactory;
 
 import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 import uk.ac.diamond.scisoft.analysis.io.DataHolder;
@@ -60,92 +58,62 @@ import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
  *   @date Aug 31, 2010
  *   @project org.edna.workbench.actions
  **/
-public class AsciiConvertPage extends AbstractConversionPage {
+public class AsciiConvertPage extends ResourceChoosePage implements IConversionWizardPage {
 	
+	private static final org.slf4j.Logger logger = LoggerFactory.getLogger(AsciiConvertPage.class);
+
 	private CheckboxTableViewer checkboxTableViewer;
 	private String[]            dataSetNames;
 	private int                 conversionSelection;
 
 	private boolean open      = true;
 	private boolean overwrite = false;
-	private String  path;
-	private Label   txtLabel;
-	private Text    txtPath;
 
 	private IMetaData          imeta;
 	private DataHolder         holder;
 	
 	private final static String[] CONVERT_OPTIONS = new String[] {"Tab Separated Values (*.dat)", 
-		                                                          "Comma Separated Values (*.cvs)"};
+		                                                          "Comma Separated Values (*.csv)"};
 
 	/**
 	 * Create the wizard.
 	 */
 	public AsciiConvertPage() {
-		super("wizardPage");
+		super("wizardPage", "Convert data from synchrotron formats and compressed files to common simple data formats.", null);
 		setTitle("Convert Data");
-		setDescription("Convert data from synchrotron formats and compressed files to common simple data formats.");
 		dataSetNames = new String[]{"Loading..."};
+		setNewFile(true);
+		setPathEditable(true);
     }
 
 	/**
 	 * Create contents of the wizard.
 	 * @param parent
 	 */
-	public void createControl(Composite parent) {
+	public void createContentBeforeFileChoose(Composite container) {
 		
-		Composite container = new Composite(parent, SWT.NULL);
-
-		setControl(container);
-		container.setLayout(new GridLayout(1, false));
 		
-		Composite top = new Composite(container, SWT.NONE);
-		top.setLayout(new GridLayout(3, false));
-		top.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false, 1, 1));
-		
-		Label convertLabel = new Label(top, SWT.NONE);
+		Label convertLabel = new Label(container, SWT.NONE);
 		convertLabel.setText("Convert to");
 		
-		final Combo combo = new Combo(top, SWT.READ_ONLY);
+		final Combo combo = new Combo(container, SWT.READ_ONLY);
 		combo.setItems(CONVERT_OPTIONS);
 		combo.setToolTipText("Convert to file type by file extension");
-		combo.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 2, 1));
+		combo.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 3, 1));
 		combo.select(0);
 		
 		conversionSelection = 0;
 		combo.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				conversionSelection = combo.getSelectionIndex();
-				path = null;
-				txtPath.setText(getPath());
 			}
 		});
+	}
+	
+	public void createContentAfterFileChoose(Composite container) {
+	
 		
-		txtLabel = new Label(top, SWT.NULL);
-		txtLabel.setText("Export &File  ");
-		txtPath = new Text(top, SWT.BORDER);
-		txtPath.setEditable(false);
-		txtPath.setEnabled(false);
-		txtPath.setText(getPath());
-		GridData gd = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
-		txtPath.setLayoutData(gd);
-		txtPath.addModifyListener(new ModifyListener() {			
-			@Override
-			public void modifyText(ModifyEvent e) {
-				pathChanged();
-			}
-		});
-
-		Button button = new Button(top, SWT.PUSH);
-		button.setText("...");
-		button.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				handleBrowse();
-			}
-		});
-		
-		final Button over = new Button(top, SWT.CHECK);
+		final Button over = new Button(container, SWT.CHECK);
 		over.setText("Overwrite file if it exists.");
 		over.setSelection(overwrite);
 		over.addSelectionListener(new SelectionAdapter() {
@@ -155,9 +123,9 @@ public class AsciiConvertPage extends AbstractConversionPage {
 				pathChanged();
 			}
 		});
-		over.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 3, 1));
+		over.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 4, 1));
 		
-		final Button open = new Button(top, SWT.CHECK);
+		final Button open = new Button(container, SWT.CHECK);
 		open.setText("Open file after export.");
 		open.setSelection(true);
 		open.addSelectionListener(new SelectionAdapter() {
@@ -167,15 +135,12 @@ public class AsciiConvertPage extends AbstractConversionPage {
 				pathChanged();
 			}
 		});
-		open.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 3, 1));
-
-
-		pathChanged();
+		open.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 4, 1));
 
 		
 		Composite main = new Composite(container, SWT.NONE);
 		main.setLayout(new GridLayout(2, false));
-		main.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+		main.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 4, 1));
 		
 		final Label chooseData = new Label(main, SWT.LEFT);
 		chooseData.setText("Please tick data to export:");
@@ -237,88 +202,36 @@ public class AsciiConvertPage extends AbstractConversionPage {
 
 	}
 	
-	private static String exportFolder = null;
-	protected String getPath() {
-		if (path==null) { // We make one up from the source
-			String sourcePath = getSourcePath();
-			final File source = new File(sourcePath);
-			final String strName = source.getName().substring(0, source.getName().indexOf("."))+"."+getExtension();
-			if (exportFolder == null) {
-				this.path = (new File(source.getParentFile(), strName)).getAbsolutePath();
-			} else {
-				this.path = (new File(exportFolder, strName)).getAbsolutePath();
-
-			}		
-		}
-		return path;
-	}
 	
 	private String getExtension() {
 		return conversionSelection==0?"dat":"csv";
 	}
 
-	/**
-	 * Uses the standard container selection dialog to choose the new value for the container field.
-	 */
-
-	private void handleBrowse() {
-		
-		final FileDialog dialog = new FileDialog(Display.getDefault().getActiveShell(), SWT.OPEN);
-		dialog.setText("Choose file");
-		final String filePath = getPath();
-		if (filePath!=null) {
-			final File file = new File(filePath);
-			if (file.isDirectory()) {
-				dialog.setFilterPath(file.getAbsolutePath());
-			} else {
-				dialog.setFilterPath(file.getParent());
-				dialog.setFileName(file.getName());
-			}
-
-		}
-		final String path = dialog.open();
-		if (path!=null) {
-			this.path    = path;
-		    txtPath.setText(this.path);
-		    exportFolder = (new File(path)).getParent();
-		}
-
-		pathChanged();
-	}
 
 	/**
 	 * Ensures that both text fields are set.
 	 */
+	protected void pathChanged() {
 
-	private void pathChanged() {
-
-        final String p = txtPath.getText();
-        txtLabel.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_BLACK));
+        final String p = getAbsoluteFilePath();
 		if (p==null || p.length() == 0) {
-			updateStatus("Please select a file to export to.");
+			setErrorMessage("Please select a file to export to.");
 			return;
 		}
-		String strPath = getPath();
-		final File path = new File(strPath);
+		final File path = new File(p);
 		if (path.exists() && !path.canWrite()) {
-			updateStatus("Please choose another location to export to; this one is read only.");
-			txtLabel.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_RED));
+			setErrorMessage("Please choose another location to export to; this one is read only.");
 			return;
 		}
 		if (path.exists() && !overwrite) {
-			updateStatus("Please confirm overwrite of the file.");
+			setErrorMessage("Please confirm overwrite of the file.");
 			return;
 		}
 		if (!path.getName().toLowerCase().endsWith("."+getExtension())) {
-			updateStatus("Please set the file name to export as a file with the extension '"+getExtension()+"'.");
+			setErrorMessage("Please set the file name to export as a file with the extension '"+getExtension()+"'.");
 			return;
 		}
-		updateStatus(null);
-	}
-
-	private void updateStatus(String message) {
-		setErrorMessage(message);
-		setPageComplete(message == null);
+		setErrorMessage(null);
 	}
 
 	public boolean isOpen() {
@@ -333,7 +246,7 @@ public class AsciiConvertPage extends AbstractConversionPage {
 				
 				try {
 
-					final String source = getSourcePath();
+					final String source = getSourcePath(context);
 					if (source==null || "".equals(source)) return;
 					// Attempt to use meta data, save memory
 					final IMetaData    meta = LoaderFactory.getMetaData(source, new ProgressMonitorWrapper(monitor));
@@ -407,12 +320,17 @@ public class AsciiConvertPage extends AbstractConversionPage {
 		return overwrite;
 	}
 
+	protected IConversionContext context;
+	
 	@Override
 	public void setContext(IConversionContext context) {
 		this.context = context;
+		setErrorMessage(null);
 		if (context==null) { // new context being prepared.
 			this.imeta  = null;
 			this.holder = null;
+	        setPageComplete(false);
+			return;
 		}
 		// We populate the names later using a wizard task.
         try {
@@ -421,8 +339,15 @@ public class AsciiConvertPage extends AbstractConversionPage {
 			logger.error("Cannot extract data sets!", e);
 		}
         
+		String sourcePath = getSourcePath(context);
+		final File source = new File(sourcePath);
+		final String strName = source.getName().substring(0, source.getName().indexOf("."))+"."+getExtension();
+		setPath((new File(source.getParentFile(), strName)).getAbsolutePath());
+       
         setPageComplete(true);
 	}
+	
+	
 	
 	@Override
 	public IConversionContext getContext() {
@@ -430,10 +355,15 @@ public class AsciiConvertPage extends AbstractConversionPage {
 		final AsciiConvert1D.ConversionInfoBean bean = new AsciiConvert1D.ConversionInfoBean();
 		bean.setConversionType(getExtension());
 		context.setUserObject(bean);
-		context.setOutputPath(getPath()); // cvs or dat file.
+		context.setOutputPath(getAbsoluteFilePath()); // cvs or dat file.
 		context.setDatasetNames(Arrays.asList(getSelected()));
 		return context;
 	}
 
+	
+	@Override
+	public IWizardPage getNextPage() {
+		return null;
+	}
 
 }

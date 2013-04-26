@@ -64,6 +64,15 @@
       </objectContribution>
    </extension>
    <extension
+         point="org.eclipse.ui.exportWizards">
+      <wizard
+            class="org.dawnsci.conversion.ui.ConvertWizard"
+            icon="icons/page_white_world.png"
+            id="org.dawnsci.conversion.ui.convertExportWizard"
+            name="File Convert Wizard">
+      </wizard>
+   </extension>
+   <extension
          point="org.dawnsci.conversion.ui.conversionPage">
       <conversion_page
             conversion_page="org.dawnsci.conversion.ui.pages.AsciiConvertPage"
@@ -74,6 +83,11 @@
             conversion_page="org.dawnsci.conversion.ui.pages.ImageConvertPage"
             conversion_scheme="TIFF_FROM_3D"
             id="org.dawnsci.conversion.ui.conversionImage">
+      </conversion_page>
+      <conversion_page
+            conversion_page="org.dawnsci.conversion.ui.pages.TomoConvertPage"
+            conversion_scheme="CUSTOM_TOMO"
+            id="org.dawnsci.conversion.ui.conversionTomo">
       </conversion_page>
    </extension>
 
