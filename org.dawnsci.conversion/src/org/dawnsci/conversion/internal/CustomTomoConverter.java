@@ -75,7 +75,7 @@ public class CustomTomoConverter extends AbstractConversion {
 		saver.saveFile(dh);
 		
 		if (nImages < 101 || counter%(nImages/100) == 0) {
-			if (context.getMonitor()!=null) context.getMonitor().worked((counter*100)/(nImages));
+			if (context.getMonitor()!=null) context.getMonitor().worked((100)/(nImages));
 		}
 		
 		counter++;

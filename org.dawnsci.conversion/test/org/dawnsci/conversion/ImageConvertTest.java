@@ -36,6 +36,7 @@ public class ImageConvertTest {
         
         service.process(context);
         
+        double lastVal = 0;
         final File[] fa = dir.listFiles();
         for (File file : fa) {
         	file.deleteOnExit();
@@ -44,6 +45,10 @@ public class ImageConvertTest {
         	if (set.getShape()[0]!=2048 || set.getShape()[1]!=2048) {
         		throw new Exception("Incorrect shape of exported dataset!");
         	}
+        	
+        	double val = set.getDouble(820,1000);
+        	if (val == lastVal) throw new Exception("Same data loaded each time");
+        	lastVal = val;
         }
         
         // Check that 4 datasets were exported.
@@ -85,7 +90,9 @@ public class ImageConvertTest {
         
         final File[] fa = dir.listFiles();
         for (File file : fa) file.deleteOnExit();
-        	
+        
+        double lastVal = 0;
+        
         for (File file : fa) {
         	
         	if (!file.getName().startsWith("Export")) throw new Exception("Alternative name did not work!");
@@ -95,6 +102,10 @@ public class ImageConvertTest {
         	if (set.getShape()[0]!=2048 || set.getShape()[1]!=2048) {
         		throw new Exception("Incorrect shape of exported dataset!");
         	}
+        	
+        	double val = set.getDouble(820,1000);
+        	if (val == lastVal) throw new Exception("Same data loaded each time");
+        	lastVal = val;
         }
          
         // Check that 4 datasets were exported.

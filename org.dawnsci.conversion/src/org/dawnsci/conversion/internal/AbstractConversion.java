@@ -82,9 +82,9 @@ public abstract class AbstractConversion {
 				            final IConversionContext   context) throws Exception {
 		
 		// TODO Should have used ILazyDataset here, but it is very slow
-		// in comparison to direct.
-		processSliceDirect(path, dsPath, sliceDimensions, context);
-		//processSliceLazy(path, dsPath, sliceDimensions, context);  // Slow!
+		// in comparison to direct. -- seems to return the same data each time!?
+		//processSliceDirect(path, dsPath, sliceDimensions, context);
+		processSliceLazy(path, dsPath, sliceDimensions, context);  // Slow!
 	}
 
 	/**

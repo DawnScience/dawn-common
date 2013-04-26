@@ -71,7 +71,7 @@ public class ConvertWizard extends Wizard implements IExportWizard{
 			logger.error("Cannot get conversion service!", e);
 			return;
 		}
-		
+		setNeedsProgressMonitor(true);
 		// Add choice of file(s) and conversion type page.
 		this.setupPage = new ConversionChoicePage("Conversion Type", service);
 		addPage(setupPage);

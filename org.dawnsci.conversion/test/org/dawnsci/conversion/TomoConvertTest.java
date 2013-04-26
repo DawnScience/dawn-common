@@ -124,7 +124,6 @@ public class TomoConvertTest {
         		}
         	}
         }
-        
    	}
 	
 	@Test
@@ -165,6 +164,8 @@ public class TomoConvertTest {
         
         final File[] fa = dir.listFiles();
         
+        double lastVal = 0;
+        
         for (File file : fa) {
         	file.deleteOnExit();
         	final DataHolder holder = LoaderFactory.getData(file.getAbsolutePath());
@@ -172,6 +173,10 @@ public class TomoConvertTest {
         	if (set.getShape()[0]!=100 || set.getShape()[1]!=100) {
         		throw new Exception("Incorrect shape of exported dataset!");
         	}
+        	
+        	double val = set.getDouble(10,10);
+        	if (val == lastVal) throw new Exception("Same data loaded each time");
+        	lastVal = val;
         }
         
         // Check that 7 datasets were exported.
