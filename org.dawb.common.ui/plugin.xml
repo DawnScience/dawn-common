@@ -515,7 +515,7 @@
           point="org.eclipse.ui.importWizards">
        <wizard
              class="org.dawb.common.ui.wizard.persistence.PersistenceImportWizard"
-             icon="icons/mask-export-wiz.png"
+             icon="icons/mask-import-wiz.png"
              id="org.dawnsci.plotting.importMask"
              name="Import File">
        </wizard>
@@ -524,7 +524,7 @@
           point="org.eclipse.ui.exportWizards">
        <wizard
              class="org.dawb.common.ui.wizard.persistence.PersistenceExportWizard"
-             icon="icons/mask-import-wiz.png"
+             icon="icons/mask-export-wiz.png"
              id="org.dawnsci.plotting.exportMask"
              name="Export File">
        </wizard>
