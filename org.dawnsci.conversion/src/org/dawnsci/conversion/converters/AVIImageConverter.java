@@ -10,14 +10,8 @@ import static org.monte.media.VideoFormatKeys.QualityKey;
 import static org.monte.media.VideoFormatKeys.WidthKey;
 
 import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
-import java.awt.image.DirectColorModel;
-import java.awt.image.IndexColorModel;
-import java.awt.image.WritableRaster;
 import java.io.File;
 import java.io.IOException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import org.dawb.common.services.IPaletteService;
 import org.dawb.common.services.ServiceManager;
@@ -32,13 +26,13 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.PaletteData;
-import org.eclipse.swt.graphics.RGB;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.monte.media.Format;
 import org.monte.media.FormatKeys.MediaType;
 import org.monte.media.avi.AVIWriter;
 import org.monte.media.math.Rational;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 
@@ -84,7 +78,7 @@ public class AVIImageConverter extends AbstractImageConversion {
 			if (first) {
 				Format format = new Format(EncodingKey, ENCODING_AVI_MJPG, DepthKey, 24, QualityKey, 1f);
 				format = format.prepend(MediaTypeKey, MediaType.VIDEO, //
-										FrameRateKey, new Rational(1, 1),//
+										FrameRateKey, new Rational(1, 1),// frame rate
 										WidthKey,     slice.getShape()[1], //
 										HeightKey,    slice.getShape()[0]);
 
@@ -144,11 +138,5 @@ public class AVIImageConverter extends AbstractImageConversion {
 	public void close(IConversionContext context) throws IOException {
         out.close();
 	}
-	
-	private int getBits() {
-		if (context.getUserObject()==null) return 24;
-		return ((ConversionInfoBean)context.getUserObject()).getBits();
-	}
-	
 
 }
