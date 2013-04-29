@@ -89,6 +89,11 @@
             conversion_scheme="CUSTOM_TOMO"
             id="org.dawnsci.conversion.ui.conversionTomo">
       </conversion_page>
+      <conversion_page
+            conversion_page="org.dawnsci.conversion.ui.pages.AVIConvertPage"
+            conversion_scheme="AVI_FROM_3D"
+            id="org.dawnsci.conversion.ui.conversionVideo">
+      </conversion_page>
    </extension>
 
 </plugin>

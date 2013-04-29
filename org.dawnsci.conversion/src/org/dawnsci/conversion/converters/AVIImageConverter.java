@@ -57,6 +57,14 @@ public class AVIImageConverter extends AbstractImageConversion {
 		super(context);
 		
 		final File avi = new File(context.getOutputPath());
+		if (!avi.exists()) {
+			avi.getParentFile().mkdirs();
+			try {
+				avi.createNewFile();
+			} catch (Throwable ne) {
+				logger.error("Cannot create file "+avi, ne);
+			}
+		}
 		if (!avi.isFile()) throw new RuntimeException("The output path must be a file!");
 		avi.getParentFile().mkdirs();
 		
@@ -73,12 +81,15 @@ public class AVIImageConverter extends AbstractImageConversion {
 		
 		try {
 		
+			if (context.getMonitor()!=null && context.getMonitor().isCancelled()) {
+				throw new Exception(getClass().getSimpleName()+" is cancelled");
+			}
 			slice = getDownsampled(slice);
 
 			if (first) {
 				Format format = new Format(EncodingKey, ENCODING_AVI_MJPG, DepthKey, 24, QualityKey, 1f);
 				format = format.prepend(MediaTypeKey, MediaType.VIDEO, //
-										FrameRateKey, new Rational(1, 1),// frame rate
+										FrameRateKey, new Rational(getFrameRate(), 1),// frame rate
 										WidthKey,     slice.getShape()[1], //
 										HeightKey,    slice.getShape()[0]);
 
@@ -100,6 +111,10 @@ public class AVIImageConverter extends AbstractImageConversion {
 		} finally {
 			first = false;
 		}
+	}
+	private long getFrameRate() {
+		if (context.getUserObject()==null) return 1;
+		return ((ConversionInfoBean)context.getUserObject()).getFrameRate();
 	}
 	private ImageServiceBean createImageServiceBean() {
 		

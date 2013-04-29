@@ -30,6 +30,9 @@ public class ImageConverter extends AbstractImageConversion {
 	@Override
 	protected void convert(AbstractDataset slice) throws Exception {
 		
+		if (context.getMonitor()!=null && context.getMonitor().isCancelled()) {
+			throw new Exception(getClass().getSimpleName()+" is cancelled");
+		}
 		slice = getDownsampled(slice);
 
 		final JavaImageSaver saver = new JavaImageSaver(getFilePath(slice), getExtension(), getBits(), true);

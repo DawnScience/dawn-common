@@ -67,6 +67,7 @@ public abstract class AbstractImageConversion extends AbstractConversion {
 	}
 	
 	public static final class ConversionInfoBean {
+		private int frameRate;
 		private ImageServiceBean imageServiceBean;
 		private int downsampleBin=1;
 		private DownsampleMode downsampleMode=DownsampleMode.MAXIMUM;
@@ -100,6 +101,7 @@ public abstract class AbstractImageConversion extends AbstractConversion {
 					+ ((downsampleMode == null) ? 0 : downsampleMode.hashCode());
 			result = prime * result
 					+ ((extension == null) ? 0 : extension.hashCode());
+			result = prime * result + frameRate;
 			result = prime
 					* result
 					+ ((imageServiceBean == null) ? 0 : imageServiceBean
@@ -132,6 +134,8 @@ public abstract class AbstractImageConversion extends AbstractConversion {
 					return false;
 			} else if (!extension.equals(other.extension))
 				return false;
+			if (frameRate != other.frameRate)
+				return false;
 			if (imageServiceBean == null) {
 				if (other.imageServiceBean != null)
 					return false;
@@ -162,6 +166,12 @@ public abstract class AbstractImageConversion extends AbstractConversion {
 		}
 		public void setImageServiceBean(ImageServiceBean imageServiceBean) {
 			this.imageServiceBean = imageServiceBean;
+		}
+		public int getFrameRate() {
+			return frameRate;
+		}
+		public void setFrameRate(int frameRate) {
+			this.frameRate = frameRate;
 		}
 	}
 

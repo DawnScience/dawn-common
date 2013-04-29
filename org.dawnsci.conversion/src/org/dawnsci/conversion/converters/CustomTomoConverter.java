@@ -63,6 +63,10 @@ public class CustomTomoConverter extends AbstractConversion {
 	@Override
 	protected void convert(AbstractDataset slice) throws Exception {
 		
+		if (context.getMonitor()!=null && context.getMonitor().isCancelled()) {
+			throw new Exception(getClass().getSimpleName()+" is cancelled");
+		}
+
 		String filename = ((TomoInfoBean)context.getUserObject()).getNextFileName();
 		int nBits = ((TomoInfoBean)context.getUserObject()).getBits();
 		
