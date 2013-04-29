@@ -13,5 +13,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/uk.ac.diamond.scisoft.analysis"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/uk.ac.diamond.scisoft.analysis.api"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.dawb.common.services"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.monte.media"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
