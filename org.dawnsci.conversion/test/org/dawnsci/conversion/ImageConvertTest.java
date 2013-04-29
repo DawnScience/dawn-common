@@ -4,7 +4,7 @@ import java.io.File;
 
 import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.services.conversion.IConversionContext.ConversionScheme;
-import org.dawnsci.conversion.internal.ImageConverter;
+import org.dawnsci.conversion.converters.ImageConverter;
 import org.junit.Test;
 
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;

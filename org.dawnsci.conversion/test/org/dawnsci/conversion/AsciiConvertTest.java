@@ -12,8 +12,8 @@ import java.util.Map;
 
 import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.services.conversion.IConversionContext.ConversionScheme;
-import org.dawnsci.conversion.internal.AbstractConversion;
-import org.dawnsci.conversion.internal.AsciiConvert1D;
+import org.dawnsci.conversion.converters.AbstractConversion;
+import org.dawnsci.conversion.converters.AsciiConvert1D;
 import org.junit.Test;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;

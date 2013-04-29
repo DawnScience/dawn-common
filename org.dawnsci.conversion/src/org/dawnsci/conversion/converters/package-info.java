@@ -5,4 +5,4 @@
  * @author fcp94556
  *
  */
-package org.dawnsci.conversion.internal;
+package org.dawnsci.conversion.converters;

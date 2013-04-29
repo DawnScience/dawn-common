@@ -2,13 +2,13 @@ package org.dawnsci.conversion;
 
 import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.services.conversion.IConversionService;
-import org.dawnsci.conversion.internal.AbstractConversion;
-import org.dawnsci.conversion.internal.AsciiConvert1D;
-import org.dawnsci.conversion.internal.AsciiConvert2D;
-import org.dawnsci.conversion.internal.CustomNCDConverter;
-import org.dawnsci.conversion.internal.CustomTomoConverter;
-import org.dawnsci.conversion.internal.ImageConverter;
-import org.dawnsci.conversion.internal.VisitorConversion;
+import org.dawnsci.conversion.converters.AbstractConversion;
+import org.dawnsci.conversion.converters.AsciiConvert1D;
+import org.dawnsci.conversion.converters.AsciiConvert2D;
+import org.dawnsci.conversion.converters.CustomNCDConverter;
+import org.dawnsci.conversion.converters.CustomTomoConverter;
+import org.dawnsci.conversion.converters.ImageConverter;
+import org.dawnsci.conversion.converters.VisitorConversion;
 
 class ConversionServiceImpl implements IConversionService {
 

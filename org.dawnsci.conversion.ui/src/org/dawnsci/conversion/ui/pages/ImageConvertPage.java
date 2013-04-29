@@ -12,7 +12,7 @@ import org.dawb.common.ui.slicing.DimsDataList;
 import org.dawb.common.ui.slicing.SliceComponent;
 import org.dawb.common.ui.util.GridUtils;
 import org.dawb.common.ui.wizard.ResourceChoosePage;
-import org.dawnsci.conversion.internal.ImageConverter;
+import org.dawnsci.conversion.converters.ImageConverter;
 import org.dawnsci.conversion.ui.Activator;
 import org.dawnsci.conversion.ui.IConversionWizardPage;
 import org.eclipse.core.runtime.IProgressMonitor;

@@ -1,4 +1,4 @@
-package org.dawnsci.conversion.internal;
+package org.dawnsci.conversion.converters;
 
 import java.io.File;
 

@@ -1,4 +1,4 @@
-package org.dawnsci.conversion.internal;
+package org.dawnsci.conversion.converters;
 
 import org.dawb.common.services.conversion.IConversionContext;
 

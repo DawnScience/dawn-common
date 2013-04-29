@@ -20,7 +20,7 @@ import java.util.List;
 import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.ui.monitor.ProgressMonitorWrapper;
 import org.dawb.common.ui.wizard.ResourceChoosePage;
-import org.dawnsci.conversion.internal.AsciiConvert1D;
+import org.dawnsci.conversion.converters.AsciiConvert1D;
 import org.dawnsci.conversion.ui.Activator;
 import org.dawnsci.conversion.ui.IConversionWizardPage;
 import org.eclipse.core.runtime.IProgressMonitor;
