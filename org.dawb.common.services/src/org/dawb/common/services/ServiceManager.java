@@ -30,6 +30,7 @@ public class ServiceManager {
 	static {
 		OFFLINE_SERVICES = new HashSet<Class<? extends Object>>(4);
 		OFFLINE_SERVICES.add(IHardwareService.class);
+		OFFLINE_SERVICES.add(IPaletteService.class);
 		OFFLINE_SERVICES.add(ILoaderService.class);
 		OFFLINE_SERVICES.add(IThumbnailService.class);
 		OFFLINE_SERVICES.add(IUserInputService.class);

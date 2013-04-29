@@ -34,7 +34,10 @@ public class AsciiConvert1D extends AbstractConversion {
 	}
 
 	@Override
-	protected void convert(AbstractDataset slice) {
+	protected void convert(AbstractDataset slice) throws Exception {
+		if (context.getMonitor()!=null && context.getMonitor().isCancelled()) {
+			throw new Exception(getClass().getSimpleName()+" is cancelled");
+		}
         sortedData.put(slice.getName(), slice);
         if (context.getMonitor()!=null) context.getMonitor().worked(1);
 	}

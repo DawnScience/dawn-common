@@ -2,6 +2,7 @@ package org.dawnsci.conversion;
 
 import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.services.conversion.IConversionService;
+import org.dawnsci.conversion.converters.AVIImageConverter;
 import org.dawnsci.conversion.converters.AbstractConversion;
 import org.dawnsci.conversion.converters.AsciiConvert1D;
 import org.dawnsci.conversion.converters.AsciiConvert2D;
@@ -42,6 +43,9 @@ class ConversionServiceImpl implements IConversionService {
 					break;
 				case TIFF_FROM_3D:
 					deligate = new ImageConverter(context);
+					break;
+				case AVI_FROM_3D:
+					deligate = new AVIImageConverter(context);
 					break;
 				case CUSTOM_TOMO:
 					deligate = new CustomTomoConverter(context);

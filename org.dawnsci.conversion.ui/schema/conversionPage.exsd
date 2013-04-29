@@ -92,6 +92,8 @@
                   </enumeration>
                   <enumeration value="CUSTOM_TOMO">
                   </enumeration>
+                  <enumeration value="AVI_FROM_3D">
+                  </enumeration>
                </restriction>
             </simpleType>
          </attribute>

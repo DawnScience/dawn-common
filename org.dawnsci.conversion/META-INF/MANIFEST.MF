@@ -9,13 +9,18 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.dawnsci.conversion.Activator
 Bundle-Vendor: Diamond Light Source
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Import-Package: org.osgi.framework
+Import-Package: org.eclipse.core.runtime.preferences;version="3.3.0",
+ org.osgi.framework,
+ org.slf4j;version="1.5.6"
 Require-Bundle: org.dawb.common.services;bundle-version="1.2.0",
  org.dawb.hdf5;bundle-version="1.2.0",
  ncsa.hdf;bundle-version="2.8.0",
  uk.ac.diamond.scisoft.analysis;bundle-version="1.3.0",
  uk.ac.diamond.scisoft.analysis.api;bundle-version="1.0.0",
- org.junit
+ org.junit,
+ org.monte.media;bundle-version="0.7.7",
+ org.eclipse.ui;bundle-version="3.8.0",
+ org.dawnsci.plotting.api;bundle-version="1.0.0"
 Important-Note: This plugin SHOULD NOT be lazy activated because we always want this 
  plugin to be loaded to contribute the service.
 Export-Package: org.dawnsci.conversion,

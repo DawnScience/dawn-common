@@ -1,61 +1,66 @@
 package org.dawnsci.conversion.ui.pages;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.ui.util.GridUtils;
 import org.dawnsci.conversion.converters.ImageConverter;
-import org.dawnsci.conversion.ui.Activator;
+import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
-import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.events.ExpansionAdapter;
 import org.eclipse.ui.forms.events.ExpansionEvent;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
-import org.slf4j.LoggerFactory;
 
-public final class ImageConvertPage extends AbstractImageConvertPage {
-	
-	private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ImageConvertPage.class);
-	
-	private static final String[] IMAGE_FORMATS = new String[]{"tiff", "png", "jpg"};
-	private static final Map<String,int[]> BIT_DEPTHS;
+import uk.ac.diamond.scisoft.analysis.dataset.function.DownsampleMode;
+
+/**
+ * Page for exporting slice to video.
+ * 
+ * @author fcp94556
+ *
+ */
+public final class AVIConvertPage extends AbstractImageConvertPage {
+		
+	private static final String[] DOWNSAMPLE_TYPES;
 	static {
-		BIT_DEPTHS = new HashMap<String, int[]>(3);
-		// TODO investigate other bit depths for different formats.
-		BIT_DEPTHS.put("tiff", new int[]{33,16});
-		BIT_DEPTHS.put("png", new int[]{16});
-		BIT_DEPTHS.put("jpg", new int[]{8});
+		DownsampleMode[] modes = DownsampleMode.values();
+		DOWNSAMPLE_TYPES = new String[modes.length];
+		for (int i = 0; i < modes.length; i++) {
+			DOWNSAMPLE_TYPES[i] = modes[i].name();
+		}
 	}
+	private static final String[] DOWNSAMPLE_SIZES =  new String[]{"1","2","4","8"};
+	
+	
+	private String         downsampleName;
+	private int            downsampleSize;
+	private int            frameRate;
 
-
-	private String         imageFormat;
-	private int            bitDepth;
-	private Text           imagePrefixBox;
-	private CLabel         warningLabel;
-
-	public ImageConvertPage() {
-		super("wizardPage", "Page for slicing HDF5 data into a directory of images.", null);
+	public AVIConvertPage() {
+		super("wizardPage", "Page for exporting HDF5 data slices into a video.", null);
 		setTitle("Convert to Images");
-		setDirectory(true);
-		setFileLabel("Export to");
+		setDirectory(false);
+		setFileLabel("Export video");
 	}
+
 	
 	@Override
 	protected void createAdvanced(final Composite parent) {
-				
+		
 		final File source = new File(getSourcePath(context));
-		setPath(source.getParent()+File.separator+"output");
+		setPath(source.getParent()+File.separator+getFileNameNoExtension(source)+".avi");
 
 		final ExpandableComposite advancedComposite = new ExpandableComposite(parent, SWT.NONE);
 		advancedComposite.setExpanded(false);
@@ -68,62 +73,61 @@ public final class ImageConvertPage extends AbstractImageConvertPage {
 			
 		Label label = new Label(advanced, SWT.NULL);
 		label.setLayoutData(new GridData());
-		label.setText("Image Format");
+		label.setText("Downsample Type");
 		
 		final CCombo imf = new CCombo(advanced, SWT.READ_ONLY);
-		imf.setItems(IMAGE_FORMATS);
-		imf.select(0);
-		imageFormat = "tiff";
+		imf.setItems(DOWNSAMPLE_TYPES);
+		imf.select(2);
+		downsampleName = DOWNSAMPLE_TYPES[2];
 		imf.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
 		
 		label = new Label(advanced, SWT.NULL);
 		label.setLayoutData(new GridData());
-		label.setText("Bit Depth");
+		label.setText("Downsample Bin");
 		
 		final CCombo bd = new CCombo(advanced, SWT.READ_ONLY);
-		bd.setItems(getStringArray(BIT_DEPTHS.get(imageFormat)));
-		bd.select(0);
-		bitDepth = 33;
+		bd.setItems(DOWNSAMPLE_SIZES);
+		bd.select(1);
+		downsampleSize = 2;
 		bd.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
 		bd.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				final String str = bd.getItem(bd.getSelectionIndex());
-				bitDepth = Integer.parseInt(str);
-				GridUtils.setVisible(warningLabel, bitDepth<33);
-				warningLabel.getParent().layout();
+				downsampleSize = Integer.parseInt(str);
 				pathChanged();
 			}
 		});
 		imf.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				imageFormat = imf.getItem(imf.getSelectionIndex());
-				
-				final int [] depths = BIT_DEPTHS.get(imageFormat);
-				final String[] sa   = getStringArray(depths);
-				bd.setItems(sa);
-				bitDepth = depths[0];
-				bd.select(0);
-				GridUtils.setVisible(warningLabel, bitDepth<33);
-				warningLabel.getParent().layout();
+				downsampleName = imf.getItem(imf.getSelectionIndex());				
 				pathChanged();
 			}
 		});
 		
-		this.warningLabel = new CLabel(advanced, SWT.NONE);
-		warningLabel.setImage(Activator.getImage("icons/warning.gif"));
-		warningLabel.setText("Lower dit depths will not support larger data values.");
-		warningLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
-		GridUtils.setVisible(warningLabel, false);
-
+		
 		label = new Label(advanced, SWT.NULL);
 		label.setLayoutData(new GridData());
-		label.setText("Image Prefix");
+		label.setText("Frame rate");
 
-		this.imagePrefixBox = new Text(advanced, SWT.BORDER);
-		imagePrefixBox.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
-		imagePrefixBox.setText("image");
+        final Text rate = new Text(advanced, SWT.BORDER);
+        rate.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+        rate.setText("1");
+        frameRate = 1;
+        rate.addModifyListener(new ModifyListener() {			
+			@Override
+			public void modifyText(ModifyEvent e) {
+				try {
+					frameRate = Integer.parseInt(rate.getText());
+					rate.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_BLACK));
+				} catch (Throwable ne) {
+					rate.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_RED));
+				}
+			}
+		});
+		
 		label = new Label(advanced, SWT.NULL);
-		label.setLayoutData(new GridData());
+		label.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
+		label.setText("image/s");
 
 		GridUtils.setVisible(advanced, false);
 		ExpansionAdapter expansionListener = new ExpansionAdapter() {
@@ -138,48 +142,29 @@ public final class ImageConvertPage extends AbstractImageConvertPage {
 		advancedComposite.addExpansionListener(expansionListener);
 		
 	}
-
-	private String[] getStringArray(int[] is) {
-		final String[] sa = new String[is.length];
-		for (int i = 0; i < is.length; i++) {
-			sa[i] = String.valueOf(is[i]);
-		}
-		return sa;
-	}
 	
+	private static String getFileNameNoExtension(File file) {
+		final String fileName = file.getName();
+		int posExt = fileName.lastIndexOf(".");
+		// No File Extension
+		return posExt == -1 ? fileName : fileName.substring(0, posExt);
+	}
+
 	@Override
 	public boolean isOpen() {
-		return false;
+		return true;
 	}
 	
-	protected void nameChanged() {
-
-		try {
-			super.nameChanged();
-			try {
-				final String name = datasetName.substring(datasetName.lastIndexOf('/')+1);
-				imagePrefixBox.setText(name);
-			} catch (Exception ignored) {
-				imagePrefixBox.setText(datasetName);
-			}
-
-			
-		} catch (Exception ne) {
-			setErrorMessage("Cannot read data set '"+datasetName+"'");
-			logger.error("Cannot get data", ne);
-		}
-	}
-
 	/**
 	 * Checks the path is ok.
 	 */
 	protected void pathChanged() {
 
 		super.pathChanged();
-		final File outputDir = new File(getAbsoluteFilePath());
+		final File outputAVI = new File(getAbsoluteFilePath());
 		try {
-			if (outputDir.isFile()) {
-				setErrorMessage("The directory "+outputDir+" is a file.");
+			if (outputAVI.exists() && !outputAVI.isFile()) {
+				setErrorMessage("The file '"+outputAVI+"' is not a valid file.");
 				return;			
 			}
 		} catch (Exception ne) {
@@ -189,6 +174,7 @@ public final class ImageConvertPage extends AbstractImageConvertPage {
 		setErrorMessage(null);
 		return;
 	}
+
 	
 	@Override
 	public IConversionContext getContext() {
@@ -196,13 +182,18 @@ public final class ImageConvertPage extends AbstractImageConvertPage {
 		IConversionContext context = super.getContext();
 		
 		final ImageConverter.ConversionInfoBean bean = new ImageConverter.ConversionInfoBean();
-		bean.setExtension(imageFormat);
-		bean.setBits(bitDepth);
-		bean.setAlternativeNamePrefix(imagePrefixBox.getText());
+		bean.setDownsampleMode(DownsampleMode.valueOf(downsampleName));
+		bean.setDownsampleBin(downsampleSize);
+		bean.setFrameRate(frameRate);
 		context.setUserObject(bean);
 		
 		return context;
 	}
 
+	
+	@Override
+	public IWizardPage getNextPage() {
+		return null;
+	}
 
 }

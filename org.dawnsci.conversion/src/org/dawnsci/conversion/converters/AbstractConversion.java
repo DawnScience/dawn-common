@@ -393,5 +393,4 @@ public abstract class AbstractConversion {
 		
 		return files.isEmpty() ? null : files;
 	}
-
 }
