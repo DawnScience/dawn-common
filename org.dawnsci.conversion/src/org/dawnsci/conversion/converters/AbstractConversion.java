@@ -40,16 +40,26 @@ public abstract class AbstractConversion {
 	}
 
 	public void process(IConversionContext context) throws Exception {
-		// Process regular expression
-		final List<File> paths = expand(context.getFilePath());
-		for (File path : paths) {
-			
-			final List<String> sets  = getDataNames(path);
-			final List<String> names = context.getDatasetNames();
-			for (String nameRegExp : names) {
-				final List<String> data = getData(sets, nameRegExp);
-				for (String dsPath : data) {
-					processSlice(path, dsPath, context.getSliceDimensions(), context);
+		
+		// If they directly specify an ILazyDataset, loop it and only
+		// it directly. Ignore file paths.
+		if (context.getLazyDataset()!=null) {
+			final ILazyDataset lz = context.getLazyDataset();
+			if (lz!=null) iterate(lz, lz.getName(), context);
+
+		} else {
+			// Process regular expression
+			final List<File> paths = expand(context.getFilePath());
+			for (File path : paths) {
+				
+				final List<String> sets  = getDataNames(path);
+				final List<String> names = context.getDatasetNames();
+				for (String nameRegExp : names) {
+					final List<String> data = getData(sets, nameRegExp);
+					for (String dsPath : data) {
+						final ILazyDataset lz = getLazyDataset(path, dsPath, context);
+						if (lz!=null) iterate(lz, dsPath, context);
+					}
 				}
 			}
 		}
@@ -77,16 +87,6 @@ public abstract class AbstractConversion {
 	 */
 	protected abstract void convert(AbstractDataset slice) throws Exception;
 	
-	public void processSlice(final File                 path, 
-				            final String               dsPath,
-				            final Map<Integer, String> sliceDimensions,
-				            final IConversionContext   context) throws Exception {
-		
-		// TODO Should have used ILazyDataset here, but it is very slow
-		// in comparison to direct. -- seems to return the same data each time!?
-		//processSliceDirect(path, dsPath, sliceDimensions, context);
-		processSliceLazy(path, dsPath, sliceDimensions, context);  // Slow!
-	}
 
 	/**
 	 * 
@@ -97,109 +97,26 @@ public abstract class AbstractConversion {
 	 * @return
 	 * @throws Exception
 	 */
-	private void processSliceDirect(final File                 path, 
-			                  final String               dsPath,
-			                  final Map<Integer, String> sliceDimensions,
-			                  final IConversionContext   context) throws Exception {
-		
-		IHierarchicalDataFile file = null;
-		try {
-			file = HierarchicalDataFactory.getReader(path.getAbsolutePath());
-			final Dataset dataset = (Dataset)file.getData(dsPath);
-			
-			long[] fullDims = dataset.getDims(); // the selected size of the dataset
-			long[] selected = dataset.getSelectedDims(); // the selected size of the dataset
-			for (int i = 0; i < fullDims.length; i++) selected[i] = fullDims[i];
-			
-			if (sliceDimensions==null) {
-				AbstractDataset data = getSet(dataset.getData(),selected,dataset);
-				data.setName(dsPath);
-				convert(data);
-				return;
-			}
-			
-			if (dataset.getStartDims()==null) dataset.getMetadata();
-  		    long[] start    = dataset.getStartDims(); // the off set of the selection
-			long[] stride   = dataset.getStride(); // the stride of the dataset
-			
-			List<Long> dims = new ArrayList<Long>(stride.length);
-			String sliceRange=null;
-			int    sliceIndex=-1;
-			for (int i = 0; i < stride.length; i++) {
-				stride[i] = 1;
+	protected ILazyDataset getLazyDataset(final File                   path, 
+						                  final String               dsPath,
+						                  final IConversionContext   context) throws Exception {
 				
-				// Any that parse statically to a single int are not ranges.
-				if (sliceDimensions.containsKey(i)) {
-					try {
-						start[i]    = Long.parseLong(sliceDimensions.get(i));
-						selected[i] = 1;
-						sliceIndex  = i;
-					} catch (Throwable ne) {
-						sliceRange = sliceDimensions.get(i);
-						sliceIndex = i;
-						continue;
-					}
-				} else {
-					dims.add(selected[i]);
-				}
-			}
-			
-			long[] dim = new long[dims.size()];
-			for (int i = 0; i < dim.length; i++) dim[i] = dims.get(i);
-			
-			if (sliceRange!=null) { // We compute the range to slice.
-				long s = 0;
-				long e = fullDims[sliceIndex];
-				if (sliceRange.indexOf(":")>0) {
-					final String[] sa = sliceRange.split(":");
-					s = Long.parseLong(sa[0]);
-					e = Long.parseLong(sa[1]);
-				}
-
-				for (long index = s; index < e; index++) {
-					start[sliceIndex]    = index;
-					selected[sliceIndex] = 1;
-					
-					AbstractDataset data = getSet(dataset.getData(),dim,dataset);
-					data.setName(dsPath+" (Dim "+sliceIndex+"; index="+index+")");
-					convert(data);
-				}
-				
-			} else {
-				AbstractDataset data = getSet(dataset.getData(),dim,dataset);
-				data.setName(dsPath+" (Dim "+sliceIndex+"; index="+start[sliceIndex] +")");
-				convert(data);
-			}
-			
-		} finally {
-			file.close();
-		}
-	}
-	
-	/**
-	 * 
-	 * @param path
-	 * @param dsPath
-	 * @param sliceDimensions
-	 * @param context, might be null for testing
-	 * @return
-	 * @throws Exception
-	 */
-	private void processSliceLazy(final File                 path, 
-				                  final String               dsPath,
-				                  final Map<Integer, String> sliceDimensions,
-				                  final IConversionContext   context) throws Exception {
-		
-		
 		final DataHolder   dh = LoaderFactory.getData(path.getAbsolutePath());
-		if (sliceDimensions==null) {
+		if (context.getSliceDimensions()==null) {
 			AbstractDataset data = LoaderFactory.getDataSet(path.getAbsolutePath(), dsPath, null);
 			data.setName(dsPath);
 			convert(data);
-			return;
+			return null;
 		}
+		return dh.getLazyDataset(dsPath);
+	}
 		
-		final ILazyDataset lz = dh.getLazyDataset(dsPath);
+	protected void iterate(final ILazyDataset         lz, 
+			               final String               nameFrag,
+		                   final IConversionContext   context) throws Exception {
+		
+		final Map<Integer, String> sliceDimensions = context.getSliceDimensions();
+
 		final int[] fullDims = lz.getShape();
 
 		int[] start  = new int[fullDims.length];
@@ -250,7 +167,7 @@ public abstract class AbstractConversion {
 
 				AbstractDataset data = (AbstractDataset)lz.getSlice(start, stop, step);
 				data = data.squeeze();
-				data.setName(dsPath+" (Dim "+sliceIndex+"; index="+index+")");
+				data.setName(nameFrag+" (Dim "+sliceIndex+"; index="+index+")");
 				convert(data);
 				
 				if (context.getMonitor() != null) {
@@ -263,7 +180,7 @@ public abstract class AbstractConversion {
 		} else {
 			AbstractDataset data = (AbstractDataset)lz.getSlice(start, stop, step);
 			data = data.squeeze();
-			data.setName(dsPath+" (Dim "+sliceIndex+"; index="+start[sliceIndex] +")");
+			data.setName(nameFrag+" (Dim "+sliceIndex+"; index="+start[sliceIndex] +")");
 			convert(data);
 			if (context.getMonitor() != null) {
 				IMonitor mon = context.getMonitor();

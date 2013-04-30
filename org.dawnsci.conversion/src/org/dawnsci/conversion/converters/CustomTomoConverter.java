@@ -2,7 +2,6 @@ package org.dawnsci.conversion.converters;
 
 import java.io.File;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -20,6 +19,7 @@ import org.dawb.hdf5.nexus.NexusUtils;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 import uk.ac.diamond.scisoft.analysis.io.DataHolder;
 import uk.ac.diamond.scisoft.analysis.io.JavaImageSaver;
 
@@ -44,10 +44,9 @@ public class CustomTomoConverter extends AbstractConversion {
 
 	
 	@Override
-	public void processSlice(final File                 path, 
-							 final String               dsPath,
-							 final Map<Integer, String> sliceDimensions,
-							 final IConversionContext   context) throws Exception {
+	protected ILazyDataset getLazyDataset(final File                   path, 
+							              final String               dsPath,
+							              final IConversionContext   context) throws Exception {
 		
 		//Overriding processSlice allows us to process the tomography bean before calling the super
 		if (context.getUserObject() != null && context.getUserObject() instanceof TomoInfoBean) {
@@ -57,7 +56,8 @@ public class CustomTomoConverter extends AbstractConversion {
 		}
 		counter = 0;
 		nImages = ((TomoInfoBean)context.getUserObject()).getNumberOfImages();
-		super.processSlice(path, dsPath, sliceDimensions, context);	
+		
+		return super.getLazyDataset(path, dsPath, context);	
 	}
 	
 	@Override

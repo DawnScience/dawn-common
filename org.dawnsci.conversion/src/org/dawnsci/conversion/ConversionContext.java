@@ -8,6 +8,7 @@ import java.util.Map;
 import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.services.conversion.IConversionVisitor;
 
+import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
 
 class ConversionContext implements IConversionContext {
@@ -15,6 +16,7 @@ class ConversionContext implements IConversionContext {
 	private ConversionScheme    conversionScheme;
 	private IConversionVisitor  conversionVisitor;
 	private String              filePath;
+	private ILazyDataset        lazyDataset;
 	private List<String>        datasetNames;
 	private String              outputFolder;
 	private Map<Integer,String> sliceDimensions;
@@ -106,6 +108,8 @@ class ConversionContext implements IConversionContext {
 				+ ((datasetNames == null) ? 0 : datasetNames.hashCode());
 		result = prime * result
 				+ ((filePath == null) ? 0 : filePath.hashCode());
+		result = prime * result
+				+ ((lazyDataset == null) ? 0 : lazyDataset.hashCode());
 		result = prime * result + ((monitor == null) ? 0 : monitor.hashCode());
 		result = prime * result
 				+ ((outputFolder == null) ? 0 : outputFolder.hashCode());
@@ -141,6 +145,11 @@ class ConversionContext implements IConversionContext {
 				return false;
 		} else if (!filePath.equals(other.filePath))
 			return false;
+		if (lazyDataset == null) {
+			if (other.lazyDataset != null)
+				return false;
+		} else if (!lazyDataset.equals(other.lazyDataset))
+			return false;
 		if (monitor == null) {
 			if (other.monitor != null)
 				return false;
@@ -162,6 +171,12 @@ class ConversionContext implements IConversionContext {
 		} else if (!userObject.equals(other.userObject))
 			return false;
 		return true;
+	}
+	public ILazyDataset getLazyDataset() {
+		return lazyDataset;
+	}
+	public void setLazyDataset(ILazyDataset lazyDataset) {
+		this.lazyDataset = lazyDataset;
 	}
 
 }

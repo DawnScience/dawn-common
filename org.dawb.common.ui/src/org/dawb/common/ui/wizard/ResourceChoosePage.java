@@ -2,8 +2,11 @@ package org.dawb.common.ui.wizard;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.dawb.common.services.IExpressionObject;
 import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.services.conversion.IConversionContext.ConversionScheme;
 import org.dawb.common.ui.Activator;
@@ -37,6 +40,8 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 
 import uk.ac.diamond.scisoft.analysis.io.IMetaData;
@@ -291,8 +296,6 @@ public class ResourceChoosePage extends WizardPage {
 		this.directory = directory;
 	}
 	
-	
-	
 	protected String getSourcePath(IConversionContext context) {
 		if (context!=null) return context.getFilePath();
 		
@@ -311,6 +314,7 @@ public class ResourceChoosePage extends WizardPage {
 	        
 	}
 	
+	private Map<String, IExpressionObject> expressions;
 	/**
 	 * All datasets of the right rank in the conversion file.
 	 * 
@@ -331,6 +335,31 @@ public class ResourceChoosePage extends WizardPage {
 			}
 		}
         
+        // Process any expressions
+        final IWorkbenchPage page = EclipseUtils.getPage();
+        final IViewPart dataPart = page.findView("org.dawb.workbench.views.dataSetView");
+        if (dataPart!=null) {
+        	final IFile currentData = (IFile)dataPart.getAdapter(IFile.class);
+        	final String sourcePath = getSourcePath(context);
+        	if (currentData!=null && sourcePath!=null) {
+        		final String curPath = currentData.getLocation().toOSString();
+        		if (curPath!=null && curPath.replace('\\','/').equals(sourcePath)) {
+        	
+		            final List<IExpressionObject> exprs = (List<IExpressionObject>)dataPart.getAdapter(List.class);
+		            if (exprs!=null && exprs.size()>0) {
+		            	
+		            	for (IExpressionObject iExpressionObject : exprs) {
+		            		final String name = iExpressionObject.getExpressionString()+" [Expression]";
+							names.add(name);
+							if (expressions==null) expressions = new HashMap<String, IExpressionObject>(exprs.size());
+							expressions.put(name, iExpressionObject);
+						}
+		            	
+		            }
+        		}
+        	}
+        }
+       
         return names;
 
 	}
@@ -357,5 +386,9 @@ public class ResourceChoosePage extends WizardPage {
 
 	public void setFileLabel(String fileLabel) {
 		this.fileLabel = fileLabel;
+	}
+
+	protected IExpressionObject getExpression(String datasetName) {
+		return expressions!=null ? expressions.get(datasetName) : null;
 	}
 }

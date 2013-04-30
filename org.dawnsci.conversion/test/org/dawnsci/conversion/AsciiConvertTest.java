@@ -12,11 +12,9 @@ import java.util.Map;
 
 import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.services.conversion.IConversionContext.ConversionScheme;
-import org.dawnsci.conversion.converters.AbstractConversion;
 import org.dawnsci.conversion.converters.AsciiConvert1D;
 import org.junit.Test;
 
-import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.io.DataHolder;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 
@@ -137,59 +135,7 @@ public class AsciiConvertTest {
 		return test.getAbsolutePath();
 	
 	}
-	
-	
-	/**
-	 * TODO FIXME - move this to proper junit test!
-	 * @param args
-	 */
-	//@Test
-	public void testInternals()  throws Exception {
 		
-		final AbstractConversion conv = new AbstractConversion(null) {
-			@Override
-			protected void convert(AbstractDataset slice ) {
-				System.out.println(slice);
-			}
-		};
-		final StringBuffer buf = new StringBuffer();
-		buf.append("$$$$$$$$$$$$$$$$$$$$$$$$$$$$ EXPAND");
-		buf.append(Arrays.toString(conv.expand("C:/Work/results/i03_data/35873/35873_M3S15_1_0001.cbf").toArray()));
-		buf.append(Arrays.toString(conv.expand("C:/Work/results/i03_data/35873/35873_M3S15_1_000(\\d+).cbf").toArray()));
-		buf.append(Arrays.toString(conv.expand("C:/Work/results/i03_data/35873/35873_M3S15_1_00(\\d+).cbf").toArray()));
-		buf.append(conv.expand("C:/Work/results/i03_data/35873/fred.cbf"));
-		buf.append(conv.expand("C:/Work/results/i03_data/35873/(.*).img"));
-		buf.append(conv.expand("C:/Work/results/i03_data/35873/(.*).cbf"));
-		buf.append(conv.expand("C:/tmp/"));
-		
-		buf.append("$$$$$$$$$$$$$$$$$$$$$$$$$$$$ DATA");
-		buf.append(conv.getData(new File("C:/Work/results/results/large test files/TomographyDataSet.hdf5"), "naff"));
-		buf.append(conv.getData(new File("C:/Work/results/results/large test files/TomographyDataSet.hdf5"), "/entry/exchange/data"));
-		buf.append(conv.getData(new File("C:/Work/results/results/large test files/TomographyDataSet.hdf5"), "/entry/exchange/data_(.*)"));
-		buf.append(conv.getData(new File("C:/Work/results/results/large test files/TomographyDataSet.hdf5"), "/entry/(.*)"));
-		
-		
-		buf.append("$$$$$$$$$$$$$$$$$$$$$$$$$$$$ SLICE");
-		conv.processSlice(new File("C:/Work/results/results/large test files/TomographyDataSet.hdf5"), "/entry/exchange/white_z", null, null);
-		
-		final Map<Integer,String> slice = new HashMap<Integer,String>(1);
-		slice.put(0, "36");
-		conv.processSlice(new File("C:/Work/results/results/large test files/TomographyDataSet.hdf5"), "/entry/exchange/dark_data", slice, null);
-
-		slice.put(0, "12:24");
-		conv.processSlice(new File("C:/Work/results/results/large test files/TomographyDataSet.hdf5"), "/entry/exchange/dark_data", slice, null);
-
-		slice.put(0, "all");
-		conv.processSlice(new File("C:/Work/results/results/large test files/TomographyDataSet.hdf5"), "/entry/exchange/dark_data", slice, null);
-
-		final StringBuffer result = readFile(new File(getTestFilePath("Conversion.txt")));
-		
-		if (result.toString().trim().equals(buf.toString().trim())) {
-			throw new Exception("Unexpected output from service internals!");
-		}
-	}
-	
-	
 	/**
 	 * @param file
 	 * @return StringBuffer

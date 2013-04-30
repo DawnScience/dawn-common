@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
 
 /**
@@ -157,6 +158,25 @@ public interface IConversionContext {
 	 * @return regexp of data set name (using / as the path separator)
 	 */
 	public void setDatasetNames(List<String> sets);
+	
+	/**
+	 * Instead of specifying a dataset name(s) to loop over
+	 * one can specify an ILazyDataset to use instead. In this
+	 * case the datasetName(s) will be ignored.
+	 * 
+	 * @return ILazyDataset
+	 */
+	public ILazyDataset getLazyDataset();
+	
+	/**
+	 * Instead of specifying a dataset name(s) to loop over
+	 * one can specify an ILazyDataset to use instead. In this
+	 * case the datasetName(s) will be ignored.
+	 * 
+	 * @return ILazyDataset
+	 */
+	public void setLazyDataset(ILazyDataset lazy);
+
 
 	/**
 	 * The dataset(s) we will process. Allows regular expressions.

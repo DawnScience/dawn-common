@@ -4,6 +4,7 @@ import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
+import org.dawb.common.services.IExpressionObject;
 import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.ui.slicing.DimsData;
 import org.dawb.common.ui.slicing.DimsDataList;
@@ -118,6 +119,7 @@ public abstract class AbstractImageConvertPage extends ResourceChoosePage implem
 			setErrorMessage(ne.getMessage()); // Not very friendly...
 			return;			
 		}
+	
 		setErrorMessage(null);
 		return;
 	}
@@ -130,18 +132,30 @@ public abstract class AbstractImageConvertPage extends ResourceChoosePage implem
     
 	protected void nameChanged() {
 		try {
-			DataHolder dh = LoaderFactory.getData(context.getFilePath(), new IMonitor.Stub());
-			final ILazyDataset lz = dh.getLazyDataset(datasetName);
+
+            ILazyDataset lz = getLazyExpression();				
+			if (lz==null) {
+				DataHolder dh = LoaderFactory.getData(context.getFilePath(), new IMonitor.Stub());
+				lz = dh.getLazyDataset(datasetName);
+			}
 			sliceComponent.setData(lz, datasetName, context.getFilePath());
-			
+
 		} catch (Exception ne) {
 			setErrorMessage("Cannot read data set '"+datasetName+"'");
 			logger.error("Cannot get data", ne);
 		}
 
 	}
-	
-	
+
+	private ILazyDataset getLazyExpression() {
+		if (datasetName!=null && datasetName.endsWith("[Expression]")) {
+			
+			final IExpressionObject object = getExpression(datasetName);
+			if (object==null) return null;
+			return object.getLazyDataSet(datasetName, new IMonitor.Stub());
+		}
+		return null;
+	}
 
 	@Override
 	public void setContext(IConversionContext context) {
@@ -158,6 +172,7 @@ public abstract class AbstractImageConvertPage extends ResourceChoosePage implem
 		} catch (Exception e) {
 			logger.error("Cannot extract data sets!", e);
 		}
+        
         setPageComplete(true);
  	}
 	
@@ -175,16 +190,20 @@ public abstract class AbstractImageConvertPage extends ResourceChoosePage implem
 				context.addSliceDimension(dd.getDimension(), dd.getSliceRange()!=null ? dd.getSliceRange() : "all");				
 			}
 		}
-		
+		        
+        // Set any lazy dataset which can be an expression.
+        ILazyDataset set = getLazyExpression();
+        context.setLazyDataset(set);
+
 		return context;
 	}
 
-
-	protected void getNamesOfSupportedRank() throws Exception {
+ 	protected void getNamesOfSupportedRank() throws Exception {
 		
 		getContainer().run(true, true, new IRunnableWithProgress() {
 
 			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+				
 				
 				try {
                     final List<String> names = getActiveDatasets(context, monitor);

@@ -128,6 +128,7 @@ public class ConversionChoicePage extends ResourceChoosePage implements IConvers
 		}
 		
 		setErrorMessage(null);
+		
 		return;
 
 	}
