@@ -186,4 +186,41 @@ public class IOUtils {
 		}
 	}
 
+	/**
+	 * Checks if the path given is a directory (readable or writable)
+	 * @param path
+	 * @param forRead
+	 * @return boolean
+	 */
+	public static boolean checkDirectory(final String path, boolean forRead) {
+		if (path == null || path.length() == 0) {
+			logger .warn("No path given");
+			return false;
+		}
+		File f = new File(path);
+		if (!f.exists() || f.isFile()) {
+			logger.warn("Path does not exist or is not a directory");
+			return false;
+		}
+		return forRead ? f.canRead() : f.canWrite();
+	}
+
+	/**
+	 * Checks if the path given links to a file (readable or writable)
+	 * @param path
+	 * @param forWrite
+	 * @return boolean
+	 */
+	public static boolean checkFile(final String path, boolean forWrite) {
+		if (path == null || path.length() == 0) {
+			logger.warn("No path given");
+			return false;
+		}
+		File f = new File(path);
+		if (!f.exists() || !f.isFile()) {
+			logger.warn("Path does not exist or is not a file");
+			return false;
+		}
+		return forWrite ? f.canWrite() : f.canRead();
+	}
 }
