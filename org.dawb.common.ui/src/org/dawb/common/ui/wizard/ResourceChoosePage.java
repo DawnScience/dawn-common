@@ -46,6 +46,7 @@ import org.eclipse.ui.PlatformUI;
 
 import uk.ac.diamond.scisoft.analysis.io.IMetaData;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
+import uk.ac.gda.common.rcp.util.GridUtils;
 import uk.ac.gda.ui.content.FileContentProposalProvider;
 
 /**
@@ -59,9 +60,14 @@ public class ResourceChoosePage extends WizardPage {
 	private boolean directory=false;
 	private boolean newFile=false;
 	private boolean pathEditable=false;
+	private boolean buttonsEnabled=true;
+	
 	private String path;
 	private String fileLabel=null;
-	private Text txtPath;
+	private Label  txtLabel;
+	private Text   txtPath;
+	private Button resourceButton;
+	private Button fileButton;
 	/**
 	 * 
 	 * @param pageName
@@ -105,7 +111,7 @@ public class ResourceChoosePage extends WizardPage {
 	 */
 	protected final void createFileChooser(Composite container) {
 		
-		Label txtLabel = new Label(container, SWT.NULL);
+		this.txtLabel = new Label(container, SWT.NULL);
 		txtLabel.setText(getFileLabel()!=null ? getFileLabel() : (isDirectory() ? "&Folder  " : "&File  "));
 		txtLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		
@@ -125,27 +131,29 @@ public class ResourceChoosePage extends WizardPage {
 			}
 		});
 
-		Button button = new Button(container, SWT.PUSH);
-		button.setText("...");
-		button.setImage(Activator.getImageDescriptor("icons/Project-data.png").createImage());
-		button.setToolTipText("Browse to "+(isDirectory()?"folder":"file")+" inside a project");
-		button.addSelectionListener(new SelectionAdapter() {
+		this.resourceButton = new Button(container, SWT.PUSH);
+		resourceButton.setText("...");
+		resourceButton.setImage(Activator.getImageDescriptor("icons/Project-data.png").createImage());
+		resourceButton.setToolTipText("Browse to "+(isDirectory()?"folder":"file")+" inside a project");
+		resourceButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				handleResourceBrowse();
 			}
 		});
+		resourceButton.setEnabled(buttonsEnabled);
 		
-		button = new Button(container, SWT.PUSH);
-		button.setText("...");
-		button.setImage(Activator.getImageDescriptor("icons/data_folder_link.gif").createImage());
-		button.setToolTipText("Browse to an external "+(isDirectory()?"folder":"file")+".");
-		button.addSelectionListener(new SelectionAdapter() {
+		this.fileButton = new Button(container, SWT.PUSH);
+		fileButton.setText("...");
+		fileButton.setImage(Activator.getImageDescriptor("icons/data_folder_link.gif").createImage());
+		fileButton.setToolTipText("Browse to an external "+(isDirectory()?"folder":"file")+".");
+		fileButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				handleFileBrowse();
 			}
 		});
+		resourceButton.setEnabled(buttonsEnabled);
 		
 	}
 	
@@ -297,23 +305,44 @@ public class ResourceChoosePage extends WizardPage {
 	}
 	
 	protected String getSourcePath(IConversionContext context) {
-		if (context!=null) return context.getFilePath();
+		if (context!=null) return context.getFilePaths().get(0);
 		
-		try {
-			ISelection selection = EclipseUtils.getActivePage().getSelection();
-			StructuredSelection s = (StructuredSelection)selection;
-			final Object        o = s.getFirstElement();
-			if (o instanceof IFile) {
-				IFile source = (IFile)o;
-				return source.getLocation().toOSString();
-			}
-		} catch (Throwable ignored) {
-			// default ""
-		}
-		return "";
+		List<IFile> files = getSelectedFiles();
+		return files!=null ? files.get(0).getLocation().toOSString(): "";
 	        
 	}
 	
+	protected List<IFile> getSelectedFiles() {
+		try {
+			ISelection selection = EclipseUtils.getActivePage().getSelection();
+			StructuredSelection s = (StructuredSelection)selection;
+			if (s.isEmpty())       return null;
+			if (s.toArray()==null) return null;
+			
+			final List<IFile> ret = new ArrayList<IFile>(s.size());
+			final Object[] oa = s.toArray();
+			for (Object object : oa) {
+				if (object instanceof IFile) {
+					ret.add((IFile)object);
+				}
+			}
+			return ret.size()>0 ? ret : null;
+		} catch (Throwable ignored) {
+			return null;
+		}
+	}
+	
+	protected String[] getSelectedPaths() {
+		final List<IFile> files = getSelectedFiles();
+		if (files==null || files.isEmpty()) return null;
+		final String[] sa = new String[files.size()];
+		for (int i = 0; i < files.size(); i++) {
+			sa[i] = files.get(i).getLocation().toOSString();
+		}
+		return sa;
+	}
+
+
 	private Map<String, IExpressionObject> expressions;
 	/**
 	 * All datasets of the right rank in the conversion file.
@@ -378,6 +407,30 @@ public class ResourceChoosePage extends WizardPage {
 
 	public void setPathEditable(boolean pathEnabled) {
 		this.pathEditable = pathEnabled;
+		if (txtPath!=null && !txtPath.isDisposed()) {
+			txtPath.setEditable(pathEnabled);
+		}
+	}
+	
+	public void setButtonsEnabled(boolean enabled) {
+		this.buttonsEnabled = enabled;
+		if (resourceButton!=null && !resourceButton.isDisposed()) {
+			resourceButton.setEnabled(enabled);
+		}
+		if (fileButton!=null && !fileButton.isDisposed()) {
+			fileButton.setEnabled(enabled);
+		}
+	}
+	
+	/**
+	 * To be called only after file chooser has been created.
+	 */
+	public void setFileChoosingEnabled(boolean enabled) {
+		GridUtils.setVisible(txtLabel,       enabled);
+		GridUtils.setVisible(txtPath,        enabled);
+		GridUtils.setVisible(resourceButton, enabled);
+		GridUtils.setVisible(fileButton,     enabled);
+		txtLabel.getParent().layout();
 	}
 
 	public String getFileLabel() {
@@ -386,6 +439,9 @@ public class ResourceChoosePage extends WizardPage {
 
 	public void setFileLabel(String fileLabel) {
 		this.fileLabel = fileLabel;
+		if (txtLabel!=null  && !txtLabel.isDisposed()) {
+			txtLabel.setText(fileLabel);
+		}
 	}
 
 	protected IExpressionObject getExpression(String datasetName) {

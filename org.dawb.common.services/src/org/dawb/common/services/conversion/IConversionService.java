@@ -54,7 +54,9 @@ public interface IConversionService {
 	 * The context returned should be configured and then the 'convert'
 	 * method called to run a conversion.
 	 * 
-	 * @param filePath may be a folder path, or a regex. If a regex all matching files in the
+	 * @param filePath may be a folder path(s), or a regex(s). 
+	 * 
+	 * If a regex all matching files in the
 	 * directory will be converted, for instance "C:/tmp/(.+).h5". The path separator must always
 	 * be "/" even on windows. The regex is done after the last / the path preceeding the last /
 	 * is the directory path and does not support regex. If the path ends with a / then all
@@ -62,7 +64,7 @@ public interface IConversionService {
 	 * 
 	 * @return
 	 */
-	public IConversionContext open(String filePathRegEx);
+	public IConversionContext open(String... filePathRegEx);
 	
 	/**
 	 * Call to run the conversion. Process all files matching the filePathRegEx

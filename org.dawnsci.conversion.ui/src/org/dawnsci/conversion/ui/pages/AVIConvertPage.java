@@ -54,14 +54,10 @@ public final class AVIConvertPage extends AbstractImageConvertPage {
 		setDirectory(false);
 		setFileLabel("Export video");
 	}
-
 	
 	@Override
 	protected void createAdvanced(final Composite parent) {
 		
-		final File source = new File(getSourcePath(context));
-		setPath(source.getParent()+File.separator+getFileNameNoExtension(source)+".avi");
-
 		final ExpandableComposite advancedComposite = new ExpandableComposite(parent, SWT.NONE);
 		advancedComposite.setExpanded(false);
 		advancedComposite.setText("Advanced");
@@ -161,18 +157,43 @@ public final class AVIConvertPage extends AbstractImageConvertPage {
 	protected void pathChanged() {
 
 		super.pathChanged();
-		final File outputAVI = new File(getAbsoluteFilePath());
-		try {
-			if (outputAVI.exists() && !outputAVI.isFile()) {
-				setErrorMessage("The file '"+outputAVI+"' is not a valid file.");
+		final String path = getAbsoluteFilePath();
+		if (path!=null) {
+			final File outputAVI = new File(path);
+			try {
+				if (outputAVI.exists() && !outputAVI.isFile()) {
+					setErrorMessage("The file '"+outputAVI+"' is not a valid file.");
+					return;			
+				}
+			} catch (Exception ne) {
+				setErrorMessage(ne.getMessage()); // Not very friendly...
 				return;			
 			}
-		} catch (Exception ne) {
-			setErrorMessage(ne.getMessage()); // Not very friendly...
-			return;			
+			setErrorMessage(null);
+			return;
 		}
-		setErrorMessage(null);
-		return;
+	}
+	
+	@Override
+	public void setContext(IConversionContext context) {
+		super.setContext(context);
+		
+		// We either are directories if we are choosing multiple files or
+		// we are single file output and specifying a single output file.
+        if (context.getFilePaths().size()>1) { // Multi
+    		final File source = new File(getSourcePath(context));
+    		setPath(source.getParent());
+       	    setDirectory(true);
+        	setFileLabel("Output folder");
+    		GridUtils.setVisible(multiFileMessage, true);
+        } else {
+    		final File source = new File(getSourcePath(context));
+    		setPath(source.getParent()+File.separator+getFileNameNoExtension(source)+".avi");
+        	setDirectory(false);
+        	setFileLabel("Export video");
+    		GridUtils.setVisible(multiFileMessage, false);
+        }
+        multiFileMessage.getParent().layout();
 	}
 
 	

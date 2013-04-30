@@ -14,12 +14,9 @@ import org.dawnsci.conversion.converters.VisitorConversion;
 class ConversionServiceImpl implements IConversionService {
 
 	@Override
-	public IConversionContext open(String filePathRegEx) {
-		if (filePathRegEx.startsWith("file:/")) {
-			filePathRegEx = filePathRegEx.substring("file:/".length());
-		}
+	public IConversionContext open(String... paths) {
 		ConversionContext context = new ConversionContext();
-		context.setFilePath(filePathRegEx);
+		context.setFilePaths(paths);
 		return context;
 	}
 

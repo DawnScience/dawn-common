@@ -9,6 +9,7 @@ import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.ui.slicing.DimsData;
 import org.dawb.common.ui.slicing.DimsDataList;
 import org.dawb.common.ui.slicing.SliceComponent;
+import org.dawb.common.ui.util.GridUtils;
 import org.dawb.common.ui.wizard.ResourceChoosePage;
 import org.dawnsci.conversion.ui.Activator;
 import org.dawnsci.conversion.ui.IConversionWizardPage;
@@ -42,6 +43,7 @@ public abstract class AbstractImageConvertPage extends ResourceChoosePage implem
 	protected String         datasetName;
 	protected IConversionContext context;
 	protected SliceComponent sliceComponent;
+	protected Label          multiFileMessage;
 
 	public AbstractImageConvertPage(String pageName, String description, ImageDescriptor icon) {
 		super(pageName, description, icon);
@@ -85,6 +87,11 @@ public abstract class AbstractImageConvertPage extends ResourceChoosePage implem
 	@Override
 	protected void createContentAfterFileChoose(Composite container) {
 		
+		this.multiFileMessage = new Label(container, SWT.WRAP);
+		multiFileMessage.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 4, 1));
+		multiFileMessage.setText("(Directory will contain exported files named after the data file.)");
+		GridUtils.setVisible(multiFileMessage, false);
+		
 		createAdvanced(container);
 		
 		Label sep = new Label(container, SWT.HORIZONTAL|SWT.SEPARATOR);
@@ -109,7 +116,12 @@ public abstract class AbstractImageConvertPage extends ResourceChoosePage implem
 	 */
 	protected void pathChanged() {
 
-		final File output = new File(getAbsoluteFilePath());
+		final String path = getAbsoluteFilePath();
+		if (path == null) {
+			setErrorMessage("Please set an output folder.");
+			return;
+		}
+		final File output = new File(path);
 		try {
 			if (!output.getParentFile().exists()) {
 				setErrorMessage("The directory "+output.getParent()+" does not exist.");
@@ -135,10 +147,10 @@ public abstract class AbstractImageConvertPage extends ResourceChoosePage implem
 
             ILazyDataset lz = getLazyExpression();				
 			if (lz==null) {
-				DataHolder dh = LoaderFactory.getData(context.getFilePath(), new IMonitor.Stub());
+				DataHolder dh = LoaderFactory.getData(context.getFilePaths().get(0), new IMonitor.Stub());
 				lz = dh.getLazyDataset(datasetName);
 			}
-			sliceComponent.setData(lz, datasetName, context.getFilePath());
+			sliceComponent.setData(lz, datasetName, context.getFilePaths().get(0));
 
 		} catch (Exception ne) {
 			setErrorMessage("Cannot read data set '"+datasetName+"'");

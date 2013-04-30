@@ -2,23 +2,25 @@ package org.dawnsci.conversion.ui;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.services.conversion.IConversionContext.ConversionScheme;
 import org.dawb.common.services.conversion.IConversionService;
-import org.dawb.common.ui.util.EclipseUtils;
+import org.dawb.common.ui.util.GridUtils;
 import org.dawb.common.ui.wizard.ResourceChoosePage;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +35,9 @@ public class ConversionChoicePage extends ResourceChoosePage implements IConvers
 
 	private IConversionService service;
 	private ConversionScheme chosenConversion;
+	private Composite        conversionGroup;
+	private Label            multiFilesLabel;
+	private boolean          multiFileSelection=false;
 
 	protected ConversionChoicePage(String pageName, IConversionService service) {
 		super(pageName, "Please choose what you would like to convert", null);
@@ -74,16 +79,77 @@ public class ConversionChoicePage extends ResourceChoosePage implements IConvers
 				getWizard().canFinish();
 			}
 		});
+		
+		this.conversionGroup = new Composite(container, SWT.NONE);
+		conversionGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 4, 1));
+		conversionGroup.setLayout(new GridLayout(2, false));
+		
+		final Button useFiles = new Button(conversionGroup, SWT.RADIO);
+		useFiles.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
+		useFiles.setText("All files selected");
+		useFiles.setSelection(true);
+		
+		final Button singleFile = new Button(conversionGroup, SWT.RADIO);
+		singleFile.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+		singleFile.setText("Single file");
+		singleFile.setSelection(false);
+
+		multiFilesLabel = new Label(container, SWT.WRAP);
+		multiFilesLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 4, 1));
+		
+		SelectionAdapter selAd = new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				multiFileSelection = useFiles.getSelection();
+				GridUtils.setVisible(multiFilesLabel, multiFileSelection);
+				setFileChoosingEnabled(!multiFileSelection);
+			}
+		};
+		useFiles.addSelectionListener(selAd);
+		singleFile.addSelectionListener(selAd);
 	}
 	
 	protected void createContentAfterFileChoose(Composite container) {
-		ISelection selection = EclipseUtils.getActivePage().getSelection();
-		StructuredSelection s = (StructuredSelection)selection;
-		final Object        o = s.getFirstElement();
-		if (o instanceof IFile) {
-			IFile source = (IFile)o;
-			setPath(source.getFullPath().toString());
+		
+		if (false) { // TODO FIXME Not using regular expressions for now.
+			Label spacer = new Label(container, SWT.NONE);
+			spacer.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 4, 1));
+			
+			new Label(container, SWT.NONE);
+			final Button check = new Button(container, SWT.CHECK);
+			check.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
+			check.setText("File name regular expression");
+			check.setSelection(false);
+			
+			new Label(container, SWT.NONE);
+			final Label information = new Label(container, SWT.WRAP);
+			information.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 3, 1));
+			information.setText("Help with regular expressions:\n\nX* = none or more\nX+ =  one or more\nX? = none or one\nWhere X could be a number or character or '.' to match any character.\n\nFor example: /dls/results/945(.*)nxs or C:\\results\\945([0-9]+)nxs\n\n(Note back slash operator is not supported, so \\d is not allowed for instance.)");
+			information.setVisible(false);
+			
+			check.addSelectionListener(new SelectionAdapter() {
+				public void widgetSelected(SelectionEvent e) {
+					setPathEditable(check.getSelection());
+					setButtonsEnabled(!check.getSelection());
+					GridUtils.setVisible(information, check.getSelection());
+					information.getParent().layout(new Control[]{information});
+				}
+			});
 		}
+		
+		final List<IFile> selected = getSelectedFiles();
+		if (selected!=null) setPath(selected.get(0).getFullPath().toString());
+		
+        if (selected==null || selected.size()<2) {
+        	GridUtils.setVisible(conversionGroup, false);
+        	GridUtils.setVisible(multiFilesLabel, false);
+        } else {
+        	multiFileSelection = true;
+          	GridUtils.setVisible(conversionGroup, true);
+        	GridUtils.setVisible(multiFilesLabel, true);
+        	multiFilesLabel.setText("Selected files:   "+selected.get(0).getName()+" - "+selected.get(selected.size()-1).getName()+"  (List of "+selected.size()+" files)");
+        	setFileChoosingEnabled(false);
+       }
+        
 	}
 	
 	protected void pathChanged()  {
@@ -136,10 +202,17 @@ public class ConversionChoicePage extends ResourceChoosePage implements IConvers
 	
 	@Override
 	public IConversionContext getContext() {
-		final String filePath = getAbsoluteFilePath();
-		IConversionContext context = service.open(filePath);
+		IConversionContext context;
+		if (multiFileSelection) {
+			final String[] paths = getSelectedPaths();
+			context = service.open(paths);
+			context.setOutputPath((new File(paths[0])).getParent());
+		} else {
+			final String filePath = getAbsoluteFilePath();
+		    context = service.open(filePath);
+			context.setOutputPath((new File(filePath)).getParent());
+		}
 		context.setConversionScheme(chosenConversion);
-		context.setOutputPath((new File(filePath)).getParent());
 		return context;
 	}
 
@@ -156,8 +229,8 @@ public class ConversionChoicePage extends ResourceChoosePage implements IConvers
         	if (next instanceof IConversionWizardPage) {
     	    	try {
     		    	final IConversionContext context = getContext();
-    		    	final File ourConv   = new File(context.getFilePath());
-    		    	final File theirConv = new File(((IConversionWizardPage)next).getContext().getFilePath());
+    		    	final File ourConv   = new File(context.getFilePaths().get(0));
+    		    	final File theirConv = new File(((IConversionWizardPage)next).getContext().getFilePaths().get(0));
     	    	    if (!ourConv.equals(theirConv)) {
     	    	    	((IConversionWizardPage)next).setContext(null);
     	    	    	return false;

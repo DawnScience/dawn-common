@@ -11,6 +11,7 @@ package org.dawnsci.conversion.ui;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -112,7 +113,7 @@ public class ConvertWizard extends Wizard implements IExportWizard{
     			}
 			}
     	}
-    	if (setupPage.isPageComplete() && context!=null && selectedConversionPage!=null && !selectedConversionPage.isPageComplete()) {
+    	if (setupPage.isPageComplete() && context!=null && selectedConversionPage!=null) {
     		selectedConversionPage.setContext(context);
     		return false;
     	}
@@ -140,7 +141,7 @@ public class ConvertWizard extends Wizard implements IExportWizard{
 					try {
 						context.setMonitor(new ProgressMonitorWrapper(monitor));
 						monitor.setTaskName("Convert ");
-						monitor.beginTask("Convert "+context.getFilePath(), 100);
+						monitor.beginTask("Convert to "+context.getConversionScheme().getUiLabel(), 100);
 						monitor.worked(1);
 						service.process(context);
 						
@@ -179,9 +180,9 @@ public class ConvertWizard extends Wizard implements IExportWizard{
 				}
 			});
 		} catch (Throwable ne) {
-			final String message = "The file '"+context.getFilePath()+"' was not converted!";
+			final String message = "The file(s) "+Arrays.toString(context.getFilePaths().toArray())+" were not converted!";
 			ErrorDialog.openError(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-					"File Not Converted", 
+					"File(s) Not Converted", 
 					ne.getMessage(),
 					new Status(IStatus.WARNING, "org.edna.workbench.actions", message, ne));
 

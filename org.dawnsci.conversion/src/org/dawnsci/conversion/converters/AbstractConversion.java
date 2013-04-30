@@ -48,17 +48,19 @@ public abstract class AbstractConversion {
 			if (lz!=null) iterate(lz, lz.getName(), context);
 
 		} else {
-			// Process regular expression
-			final List<File> paths = expand(context.getFilePath());
-			for (File path : paths) {
-				
-				final List<String> sets  = getDataNames(path);
-				final List<String> names = context.getDatasetNames();
-				for (String nameRegExp : names) {
-					final List<String> data = getData(sets, nameRegExp);
-					for (String dsPath : data) {
-						final ILazyDataset lz = getLazyDataset(path, dsPath, context);
-						if (lz!=null) iterate(lz, dsPath, context);
+			final List<String> filePaths = context.getFilePaths();
+			for (String filePathRegEx : filePaths) {
+				final List<File> paths = expand(filePathRegEx);
+				for (File path : paths) {
+					
+					final List<String> sets  = getDataNames(path);
+					final List<String> names = context.getDatasetNames();
+					for (String nameRegExp : names) {
+						final List<String> data = getData(sets, nameRegExp);
+						for (String dsPath : data) {
+							final ILazyDataset lz = getLazyDataset(path, dsPath, context);
+							if (lz!=null) iterate(lz, dsPath, context);
+						}
 					}
 				}
 			}
@@ -296,6 +298,7 @@ public abstract class AbstractConversion {
 	 */
 	public List<File> expand(String path) {
 		final List<File> files = new ArrayList<File>(7);
+		path = path.replace('\\', '/');
 		final String dir    = path.substring(0, path.lastIndexOf("/"));
 		final String regexp = path.substring(path.lastIndexOf("/")+1);
 		

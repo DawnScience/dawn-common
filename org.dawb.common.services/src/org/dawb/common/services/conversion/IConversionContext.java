@@ -141,7 +141,7 @@ public interface IConversionContext {
 	 * The file that we are converting
 	 * @return
 	 */
-	public String getFilePath();
+	public List<String> getFilePaths();
 	
 	/**
 	 * The dataset(s) we will process. Allows regular expressions inside

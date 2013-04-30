@@ -1,5 +1,6 @@
 package org.dawnsci.conversion;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -15,7 +16,7 @@ class ConversionContext implements IConversionContext {
 
 	private ConversionScheme    conversionScheme;
 	private IConversionVisitor  conversionVisitor;
-	private String              filePath;
+	private List<String>        filePaths;
 	private ILazyDataset        lazyDataset;
 	private List<String>        datasetNames;
 	private String              outputFolder;
@@ -29,13 +30,20 @@ class ConversionContext implements IConversionContext {
 	public void setConversionScheme(ConversionScheme conversionScheme) {
 		this.conversionScheme = conversionScheme;
 	}
-	public String getFilePath() {
-		return filePath;
+	public List<String> getFilePaths() {
+		return filePaths;
 	}
-	public void setFilePath(String filePathOrRegex) {
-		// In order to parse the regex, it must have / not \
-		filePathOrRegex = filePathOrRegex.replace('\\', '/');
-		this.filePath = filePathOrRegex;
+	public void setFilePaths(String... paths) {
+		this.filePaths = new ArrayList<String>(paths.length);
+		
+		for (int i = 0; i < paths.length; i++) {
+			// In order to parse the regex, it must have / not \
+			String path = paths[i].replace('\\', '/');
+			if (path.startsWith("file:/")) {
+				path = path.substring("file:/".length());
+			}
+			filePaths.add(path);
+		}
 	}
 	public List<String> getDatasetNames() {
 		return datasetNames;
@@ -107,7 +115,7 @@ class ConversionContext implements IConversionContext {
 		result = prime * result
 				+ ((datasetNames == null) ? 0 : datasetNames.hashCode());
 		result = prime * result
-				+ ((filePath == null) ? 0 : filePath.hashCode());
+				+ ((filePaths == null) ? 0 : filePaths.hashCode());
 		result = prime * result
 				+ ((lazyDataset == null) ? 0 : lazyDataset.hashCode());
 		result = prime * result + ((monitor == null) ? 0 : monitor.hashCode());
@@ -140,10 +148,10 @@ class ConversionContext implements IConversionContext {
 				return false;
 		} else if (!datasetNames.equals(other.datasetNames))
 			return false;
-		if (filePath == null) {
-			if (other.filePath != null)
+		if (filePaths == null) {
+			if (other.filePaths != null)
 				return false;
-		} else if (!filePath.equals(other.filePath))
+		} else if (!filePaths.equals(other.filePaths))
 			return false;
 		if (lazyDataset == null) {
 			if (other.lazyDataset != null)
