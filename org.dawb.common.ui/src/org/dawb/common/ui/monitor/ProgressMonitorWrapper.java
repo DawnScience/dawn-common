@@ -40,4 +40,9 @@ public class ProgressMonitorWrapper implements IMonitor {
 		if (monitor!=null) monitor.worked(amount);
 	}
 
+	@Override
+	public void subTask(String taskName) {
+		if (monitor!=null) monitor.subTask(taskName);
+	}
+
 }

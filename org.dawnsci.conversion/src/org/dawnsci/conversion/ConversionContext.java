@@ -1,5 +1,6 @@
 package org.dawnsci.conversion;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -23,6 +24,7 @@ class ConversionContext implements IConversionContext {
 	private Map<Integer,String> sliceDimensions;
 	private Object              userObject;
 	private IMonitor            monitor;
+	private File                selectedConversionFile;
 	
 	public ConversionScheme getConversionScheme() {
 		return conversionScheme;
@@ -185,6 +187,12 @@ class ConversionContext implements IConversionContext {
 	}
 	public void setLazyDataset(ILazyDataset lazyDataset) {
 		this.lazyDataset = lazyDataset;
+	}
+	public File getSelectedConversionFile() {
+		return selectedConversionFile;
+	}
+	public void setSelectedConversionFile(File selectedConversionFile) {
+		this.selectedConversionFile = selectedConversionFile;
 	}
 
 }

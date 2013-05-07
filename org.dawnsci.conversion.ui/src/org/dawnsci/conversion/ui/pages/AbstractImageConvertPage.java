@@ -183,6 +183,7 @@ public abstract class AbstractImageConvertPage extends ResourceChoosePage implem
         	getNamesOfSupportedRank();
 		} catch (Exception e) {
 			logger.error("Cannot extract data sets!", e);
+			return;
 		}
         
         setPageComplete(true);

@@ -148,7 +148,7 @@ public final class AVIConvertPage extends AbstractImageConvertPage {
 
 	@Override
 	public boolean isOpen() {
-		return true;
+		return false;
 	}
 	
 	/**

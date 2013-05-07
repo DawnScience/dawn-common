@@ -16,6 +16,7 @@
 
 package org.dawb.common.services.conversion;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -230,4 +231,19 @@ public interface IConversionContext {
 	 * @return
 	 */
 	public void setUserObject(Object object);
+	
+	/**
+	 * During converting many files the current active file being converted may be returned here.
+	 * @return current conversion file, may be null.
+	 */
+	public File getSelectedConversionFile();
+	
+	/**
+	 * Set the current active file to convert from. For instance when the conversion API loops over
+	 * a directory of images, this path will be the current image file we are packing.
+	 * 
+	 * @param selectedConversionFile current conversion file, may be null.
+	 */
+	public void setSelectedConversionFile(File selectedConversionFile);
+
 }

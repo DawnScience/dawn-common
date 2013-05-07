@@ -46,9 +46,7 @@ public class AVIImageConverter extends AbstractImageConversion {
 	
 	private static final Logger logger = LoggerFactory.getLogger(AVIImageConverter.class);
 
-	private AVIWriter        out;
 	private IImageService    service;
-	private ImageServiceBean bean;
 
 	/**
 	 * dir where we put the temporary images which we will later write to video.
@@ -60,24 +58,35 @@ public class AVIImageConverter extends AbstractImageConversion {
 		if (!avi.exists()) {
 			avi.getParentFile().mkdirs();
 			try {
-				avi.createNewFile();
+				if (context.getFilePaths().size()<2) {
+					avi.createNewFile();
+				} else {
+					avi.mkdir();
+				}
 			} catch (Throwable ne) {
 				logger.error("Cannot create file "+avi, ne);
 			}
 		}
-		if (!avi.isFile()) throw new RuntimeException("The output path must be a file!");
+		if (!avi.isFile() && context.getFilePaths().size()<2) {
+			throw new RuntimeException("The output path must be a single file when converting one file!");
+		}
 		avi.getParentFile().mkdirs();
-		
-		this.out = new AVIWriter(avi);
+				
 		this.service = (IImageService)ServiceManager.getService(IImageService.class);
-		this.bean = createImageServiceBean();
 
 	}
 
-	private boolean first=true;
+	private File       selected=null;
+	private AVIWriter  out;
+	private ImageServiceBean bean;
 	
+	/**
+	 * This convert cannot be asynchronous. (Like most actually)
+	 * @param slice
+	 * @throws Exception
+	 */
 	@Override
-	protected void convert(AbstractDataset slice) throws Exception {
+	protected synchronized void convert(AbstractDataset slice) throws Exception {
 		
 		try {
 		
@@ -86,7 +95,14 @@ public class AVIImageConverter extends AbstractImageConversion {
 			}
 			slice = getDownsampled(slice);
 
-			if (first) {
+			boolean newAVIFile = selected==null || !selected.equals(context.getSelectedConversionFile());
+			if (newAVIFile) {
+				if (out!=null) out.close();
+				
+				this.bean = createImageServiceBean();
+
+				final File outputFile = getAVIFile();
+				this.out = new AVIWriter(outputFile);
 				Format format = new Format(EncodingKey, ENCODING_AVI_MJPG, DepthKey, 24, QualityKey, 1f);
 				format = format.prepend(MediaTypeKey, MediaType.VIDEO, //
 										FrameRateKey, new Rational(getFrameRate(), 1),// frame rate
@@ -94,6 +110,10 @@ public class AVIImageConverter extends AbstractImageConversion {
 										HeightKey,    slice.getShape()[0]);
 
 				out.addTrack(format);
+				
+				if (context.getMonitor()!=null) {
+					context.getMonitor().subTask("Converting '"+context.getSelectedConversionFile().getName()+"' to '"+outputFile.getName()+"'");
+				}
 			}
 			
 			bean.setImage(slice);
@@ -101,7 +121,7 @@ public class AVIImageConverter extends AbstractImageConversion {
 			
 			final ImageData data = service.getImageData(bean);
 			BufferedImage   img  = service.getBufferedImage(data);
-	        if (first) {
+	        if (newAVIFile) {
 	        	out.setPalette(0, img.getColorModel());	       
 	        }
 	        out.write(0, img, 1);
@@ -109,9 +129,27 @@ public class AVIImageConverter extends AbstractImageConversion {
 	        if (context.getMonitor()!=null) context.getMonitor().worked(1);
 	        
 		} finally {
-			first = false;
+			selected = context.getSelectedConversionFile();
 		}
 	}
+	
+	private File getAVIFile() {
+		if (context.getFilePaths().size()<2 || context.getSelectedConversionFile()==null) {
+			return new File(context.getOutputPath());
+		} else {
+			final String name = getFileNameNoExtension(context.getSelectedConversionFile());
+			return new File(context.getOutputPath()+"/"+name+".avi");
+		}
+	}
+	
+	private String getFileNameNoExtension(File file) {
+		final String fileName = file.getName();
+		int posExt = fileName.lastIndexOf(".");
+		// No File Extension
+		return posExt == -1 ? fileName : fileName.substring(0, posExt);
+	}
+
+	
 	private long getFrameRate() {
 		if (context.getUserObject()==null) return 1;
 		return ((ConversionInfoBean)context.getUserObject()).getFrameRate();

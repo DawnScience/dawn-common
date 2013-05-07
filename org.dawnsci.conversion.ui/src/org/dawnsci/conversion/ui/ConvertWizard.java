@@ -115,7 +115,7 @@ public class ConvertWizard extends Wizard implements IExportWizard{
     	}
     	if (setupPage.isPageComplete() && context!=null && selectedConversionPage!=null) {
     		selectedConversionPage.setContext(context);
-    		return false;
+    		return selectedConversionPage.isPageComplete();
     	}
     	return setupPage.isPageComplete() && (selectedConversionPage==null || selectedConversionPage.isPageComplete());
     }

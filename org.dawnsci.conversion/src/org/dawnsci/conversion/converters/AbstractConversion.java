@@ -53,6 +53,7 @@ public abstract class AbstractConversion {
 				final List<File> paths = expand(filePathRegEx);
 				for (File path : paths) {
 					
+					context.setSelectedConversionFile(path);
 					final List<String> sets  = getDataNames(path);
 					final List<String> names = context.getDatasetNames();
 					for (String nameRegExp : names) {
