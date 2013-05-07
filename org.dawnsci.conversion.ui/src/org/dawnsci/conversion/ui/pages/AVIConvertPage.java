@@ -178,6 +178,8 @@ public final class AVIConvertPage extends AbstractImageConvertPage {
 	public void setContext(IConversionContext context) {
 		super.setContext(context);
 		
+		if (context==null) return;
+		
 		// We either are directories if we are choosing multiple files or
 		// we are single file output and specifying a single output file.
         if (context.getFilePaths().size()>1) { // Multi

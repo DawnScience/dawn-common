@@ -38,6 +38,12 @@ public abstract class AbstractImageConversion extends AbstractConversion {
 		fileName = fileName.replace(' ', '_');
 		fileName = fileName.replace('(', '_');
 		fileName = fileName.replaceAll("[^a-zA-Z0-9_]", "");
+		
+		if (context.getFilePaths().size()>1 && context.getSelectedConversionFile()!=null) {
+			final String originalName = getFileNameNoExtension(context.getSelectedConversionFile());
+			fileName  = originalName+"_"+fileName;
+		}
+		
 		return fileName+"."+getExtension();
 	}
 

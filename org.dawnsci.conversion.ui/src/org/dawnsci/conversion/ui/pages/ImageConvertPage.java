@@ -204,5 +204,20 @@ public final class ImageConvertPage extends AbstractImageConvertPage {
 		return context;
 	}
 
+	@Override
+	public void setContext(IConversionContext context) {
+		super.setContext(context);
+		
+		if (context==null) return;
+		
+		// We either are directories if we are choosing multiple files or
+		// we are single file output and specifying a single output file.
+        if (context.getFilePaths().size()>1) { // Multi
+     		GridUtils.setVisible(multiFileMessage, true);
+        } else {
+    		GridUtils.setVisible(multiFileMessage, false);
+        }
+        multiFileMessage.getParent().layout();
+	}
 
 }
