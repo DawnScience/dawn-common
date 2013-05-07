@@ -58,6 +58,7 @@ public abstract class AbstractConversion {
 					final List<String> names = context.getDatasetNames();
 					for (String nameRegExp : names) {
 						final List<String> data = getData(sets, nameRegExp);
+						if (data == null) continue;
 						for (String dsPath : data) {
 							final ILazyDataset lz = getLazyDataset(path, dsPath, context);
 							if (lz!=null) iterate(lz, dsPath, context);

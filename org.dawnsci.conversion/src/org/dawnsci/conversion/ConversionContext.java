@@ -25,6 +25,7 @@ class ConversionContext implements IConversionContext {
 	private Object              userObject;
 	private IMonitor            monitor;
 	private File                selectedConversionFile;
+	private String              axisDatasetName;
 	
 	public ConversionScheme getConversionScheme() {
 		return conversionScheme;
@@ -196,6 +197,15 @@ class ConversionContext implements IConversionContext {
 	}
 	public void setSelectedConversionFile(File selectedConversionFile) {
 		this.selectedConversionFile = selectedConversionFile;
+	}
+	@Override
+	public String getAxisDatasetName() {
+		return axisDatasetName;
+	}
+	@Override
+	public void setAxisDatasetName(String axisDatasetName) {
+		this.axisDatasetName = axisDatasetName;
+		
 	}
 
 }

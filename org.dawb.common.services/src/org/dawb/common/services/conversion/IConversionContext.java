@@ -245,5 +245,17 @@ public interface IConversionContext {
 	 * @param selectedConversionFile current conversion file, may be null.
 	 */
 	public void setSelectedConversionFile(File selectedConversionFile);
+	
+	/**
+	 * get the dataset name to be used for an axis when saving 2d data as text
+	 * @return.
+	 */
+	public String getAxisDatasetName();
+	
+	/**
+	 * set the dataset name to be used for an axis when saving 2d data as text
+	 * @param axisDatasetName
+	 */
+	public void setAxisDatasetName(String axisDatasetName);
 
 }
