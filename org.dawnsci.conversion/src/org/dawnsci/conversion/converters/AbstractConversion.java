@@ -314,4 +314,13 @@ public abstract class AbstractConversion {
 		
 		return files.isEmpty() ? null : files;
 	}
+	
+	
+	protected String getFileNameNoExtension(File file) {
+		final String fileName = file.getName();
+		int posExt = fileName.lastIndexOf(".");
+		// No File Extension
+		return posExt == -1 ? fileName : fileName.substring(0, posExt);
+	}
+
 }

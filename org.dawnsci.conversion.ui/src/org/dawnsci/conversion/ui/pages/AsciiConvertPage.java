@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.ui.monitor.ProgressMonitorWrapper;
+import org.dawb.common.ui.util.GridUtils;
 import org.dawb.common.ui.wizard.ResourceChoosePage;
 import org.dawnsci.conversion.converters.AsciiConvert1D;
 import org.dawnsci.conversion.ui.Activator;
@@ -65,7 +66,10 @@ public class AsciiConvertPage extends ResourceChoosePage implements IConversionW
 	private CheckboxTableViewer checkboxTableViewer;
 	private String[]            dataSetNames;
 	private int                 conversionSelection;
-
+	private Label               multiFileMessage;
+    private Button              overwriteButton;
+    private Button              openButton;
+    
 	private boolean open      = true;
 	private boolean overwrite = false;
 
@@ -82,8 +86,10 @@ public class AsciiConvertPage extends ResourceChoosePage implements IConversionW
 		super("wizardPage", "Convert data from synchrotron formats and compressed files to common simple data formats.", null);
 		setTitle("Convert Data");
 		dataSetNames = new String[]{"Loading..."};
+		setDirectory(false);
 		setNewFile(true);
 		setPathEditable(true);
+    	setFileLabel("Output file");
     }
 
 	/**
@@ -91,8 +97,7 @@ public class AsciiConvertPage extends ResourceChoosePage implements IConversionW
 	 * @param parent
 	 */
 	public void createContentBeforeFileChoose(Composite container) {
-		
-		
+				
 		Label convertLabel = new Label(container, SWT.NONE);
 		convertLabel.setText("Convert to");
 		
@@ -108,34 +113,39 @@ public class AsciiConvertPage extends ResourceChoosePage implements IConversionW
 				conversionSelection = combo.getSelectionIndex();
 			}
 		});
+
 	}
 	
 	public void createContentAfterFileChoose(Composite container) {
 	
+		this.multiFileMessage = new Label(container, SWT.WRAP);
+		multiFileMessage.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 4, 1));
+		multiFileMessage.setText("(Directory will contain exported files named after the data file.)");
+		GridUtils.setVisible(multiFileMessage, false);
 		
-		final Button over = new Button(container, SWT.CHECK);
-		over.setText("Overwrite file if it exists.");
-		over.setSelection(overwrite);
-		over.addSelectionListener(new SelectionAdapter() {
+		this.overwriteButton = new Button(container, SWT.CHECK);
+		overwriteButton.setText("Overwrite file if it exists.");
+		overwriteButton.setSelection(overwrite);
+		overwriteButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				overwrite = over.getSelection();
+				overwrite = overwriteButton.getSelection();
 				pathChanged();
 			}
 		});
-		over.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 4, 1));
+		overwriteButton.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 4, 1));
 		
-		final Button open = new Button(container, SWT.CHECK);
-		open.setText("Open file after export.");
-		open.setSelection(true);
-		open.addSelectionListener(new SelectionAdapter() {
+		this.openButton = new Button(container, SWT.CHECK);
+		openButton.setText("Open file after export.");
+		openButton.setSelection(true);
+		openButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				AsciiConvertPage.this.open = open.getSelection();
+				AsciiConvertPage.this.open = openButton.getSelection();
 				pathChanged();
 			}
 		});
-		open.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 4, 1));
+		openButton.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 4, 1));
 
 		
 		Composite main = new Composite(container, SWT.NONE);
@@ -223,13 +233,20 @@ public class AsciiConvertPage extends ResourceChoosePage implements IConversionW
 			setErrorMessage("Please choose another location to export to; this one is read only.");
 			return;
 		}
-		if (path.exists() && !overwrite) {
-			setErrorMessage("Please confirm overwrite of the file.");
-			return;
-		}
-		if (!path.getName().toLowerCase().endsWith("."+getExtension())) {
-			setErrorMessage("Please set the file name to export as a file with the extension '"+getExtension()+"'.");
-			return;
+		if (context.getFilePaths().size()<2) {
+			if (path.exists() && !overwrite) {
+				setErrorMessage("Please confirm overwrite of the file.");
+				return;
+			}
+			if (!path.getName().toLowerCase().endsWith("."+getExtension())) {
+				setErrorMessage("Please set the file name to export as a file with the extension '"+getExtension()+"'.");
+				return;
+			}
+		} else {
+			if (!path.exists()) {
+				setErrorMessage("Please choose an existing folder to export to.");
+				return;
+			}
 		}
 		setErrorMessage(null);
 	}
@@ -324,6 +341,9 @@ public class AsciiConvertPage extends ResourceChoosePage implements IConversionW
 	
 	@Override
 	public void setContext(IConversionContext context) {
+		
+		if (context!=null && context.equals(this.context)) return;
+		
 		this.context = context;
 		setErrorMessage(null);
 		if (context==null) { // new context being prepared.
@@ -339,14 +359,39 @@ public class AsciiConvertPage extends ResourceChoosePage implements IConversionW
 			logger.error("Cannot extract data sets!", e);
 		}
         
-		String sourcePath = getSourcePath(context);
-		final File source = new File(sourcePath);
-		final String strName = source.getName().substring(0, source.getName().indexOf("."))+"."+getExtension();
-		setPath((new File(source.getParentFile(), strName)).getAbsolutePath());
+		final File source = new File(getSourcePath(context));
        
         setPageComplete(true);
+        
+        if (context.getFilePaths().size()>1) { // Multi
+    		setPath(source.getParent());
+       	    setDirectory(true);
+        	setFileLabel("Output folder");
+    		GridUtils.setVisible(multiFileMessage, true);
+    		this.overwriteButton.setSelection(true);
+    		this.overwrite = true;
+    		this.overwriteButton.setEnabled(false);
+    		this.openButton.setSelection(false);
+    		this.open = false;
+    		this.openButton.setEnabled(false);
+       } else {
+    		final String strName = source.getName().substring(0, source.getName().indexOf("."))+"."+getExtension();
+    		setPath((new File(source.getParentFile(), strName)).getAbsolutePath());
+        	setDirectory(false);
+        	setFileLabel("Output file");
+    		GridUtils.setVisible(multiFileMessage, false);
+    		this.overwriteButton.setEnabled(true);
+       		this.openButton.setEnabled(true);
+      }
+
 	}
 	
+	private static final String getFileNameNoExtension(File file) {
+		final String fileName = file.getName();
+		int posExt = fileName.lastIndexOf(".");
+		// No File Extension
+		return posExt == -1 ? fileName : fileName.substring(0, posExt);
+	}
 	
 	
 	@Override

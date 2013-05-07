@@ -33,10 +33,21 @@ public class AsciiConvert1D extends AbstractConversion {
 		this.sortedData = new TreeMap<String, IDataset>();
 	}
 
+	private File selected = null;
+	
 	@Override
 	protected void convert(AbstractDataset slice) throws Exception {
 		if (context.getMonitor()!=null && context.getMonitor().isCancelled()) {
 			throw new Exception(getClass().getSimpleName()+" is cancelled");
+		}
+		if (selected==null || !selected.equals(context.getSelectedConversionFile())) {
+			if (!sortedData.isEmpty() && selected!=null) {
+				writeFile(selected, context);
+			}
+			
+			// New sort with new input file.
+			sortedData.clear();
+			selected = context.getSelectedConversionFile();
 		}
         sortedData.put(slice.getName(), slice);
         if (context.getMonitor()!=null) context.getMonitor().worked(1);
@@ -44,10 +55,26 @@ public class AsciiConvert1D extends AbstractConversion {
 	
 	@Override
 	public void close(IConversionContext context) throws Exception {
+		writeFile(selected, context);
+	}
+	
+	private void writeFile(File selectedConversionFile, IConversionContext context) throws Exception {
 		
-		final String filePath = context.getOutputPath();
-		final File   file     = new File(filePath);
-		if (file.isDirectory()) throw new Exception("AsciiConvert1D must be written with an output file!");
+		if (sortedData.isEmpty()) return;
+		if (context.getMonitor()!=null && context.getMonitor().isCancelled()) {
+			throw new Exception(getClass().getSimpleName()+" is cancelled");
+		}
+		
+		final File   file;
+		if (context.getFilePaths().size()>1) {
+			final String name = getFileNameNoExtension(selectedConversionFile);
+			file = new File(context.getOutputPath()+"/"+name+"."+getExtension());
+
+		} else {
+			final String filePath = context.getOutputPath();
+			file     = new File(filePath);
+			if (file.isDirectory()) throw new Exception("AsciiConvert1D must be written with an output file!");
+		}
 		
 	    int maxSize = Integer.MIN_VALUE;
 		for (String name : sortedData.keySet()) {
@@ -68,8 +95,9 @@ public class AsciiConvert1D extends AbstractConversion {
     	file.createNewFile();
 
         write(file, contents.toString(), "US-ASCII");
+        sortedData.clear();
 	}
-	
+
 	/**
 	 * @param file
 	 * @param text
@@ -147,6 +175,10 @@ public class AsciiConvert1D extends AbstractConversion {
 			if (context.getMonitor()!=null) context.getMonitor().worked(1);
 			contents.append("\r\n"); // Intentionally windows because works on unix too.
 		}
+	}
+	
+	private String getExtension() {
+		return isDat() ? "dat" : "csv";
 	}
 	
 	protected boolean isCsv() {

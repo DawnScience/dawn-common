@@ -139,7 +139,7 @@ public final class AVIConvertPage extends AbstractImageConvertPage {
 		
 	}
 	
-	private static String getFileNameNoExtension(File file) {
+	private static final String getFileNameNoExtension(File file) {
 		final String fileName = file.getName();
 		int posExt = fileName.lastIndexOf(".");
 		// No File Extension

@@ -171,6 +171,9 @@ public abstract class AbstractImageConvertPage extends ResourceChoosePage implem
 
 	@Override
 	public void setContext(IConversionContext context) {
+		
+		if (context!=null && context.equals(this.context)) return;
+		
 		this.context = context;
 		setErrorMessage(null);
 		if (context==null) {

@@ -142,14 +142,6 @@ public class AVIImageConverter extends AbstractImageConversion {
 		}
 	}
 	
-	private String getFileNameNoExtension(File file) {
-		final String fileName = file.getName();
-		int posExt = fileName.lastIndexOf(".");
-		// No File Extension
-		return posExt == -1 ? fileName : fileName.substring(0, posExt);
-	}
-
-	
 	private long getFrameRate() {
 		if (context.getUserObject()==null) return 1;
 		return ((ConversionInfoBean)context.getUserObject()).getFrameRate();

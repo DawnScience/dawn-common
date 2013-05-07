@@ -120,9 +120,12 @@ class ConversionContext implements IConversionContext {
 				+ ((filePaths == null) ? 0 : filePaths.hashCode());
 		result = prime * result
 				+ ((lazyDataset == null) ? 0 : lazyDataset.hashCode());
-		result = prime * result + ((monitor == null) ? 0 : monitor.hashCode());
 		result = prime * result
 				+ ((outputFolder == null) ? 0 : outputFolder.hashCode());
+		result = prime
+				* result
+				+ ((selectedConversionFile == null) ? 0
+						: selectedConversionFile.hashCode());
 		result = prime * result
 				+ ((sliceDimensions == null) ? 0 : sliceDimensions.hashCode());
 		result = prime * result
@@ -160,15 +163,15 @@ class ConversionContext implements IConversionContext {
 				return false;
 		} else if (!lazyDataset.equals(other.lazyDataset))
 			return false;
-		if (monitor == null) {
-			if (other.monitor != null)
-				return false;
-		} else if (!monitor.equals(other.monitor))
-			return false;
 		if (outputFolder == null) {
 			if (other.outputFolder != null)
 				return false;
 		} else if (!outputFolder.equals(other.outputFolder))
+			return false;
+		if (selectedConversionFile == null) {
+			if (other.selectedConversionFile != null)
+				return false;
+		} else if (!selectedConversionFile.equals(other.selectedConversionFile))
 			return false;
 		if (sliceDimensions == null) {
 			if (other.sliceDimensions != null)
