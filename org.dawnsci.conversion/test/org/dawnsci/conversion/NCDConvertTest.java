@@ -36,8 +36,6 @@ public class NCDConvertTest {
         context.addSliceDimension(0, "all");
         service.process(context);
         
-        service.process(context);
-        
         final File[] fa = dir.listFiles();
         for (File file : fa) {
         	file.deleteOnExit();
@@ -45,7 +43,7 @@ public class NCDConvertTest {
             String[] names = dh.getNames();
             assertEquals(61, names.length);
             assertEquals("x",names[0]);
-            assertEquals("Data0",names[1]);
+            assertEquals("Column_0",names[1]);
         }
    	}
 	
@@ -80,7 +78,7 @@ public class NCDConvertTest {
             String[] names = dh.getNames();
             assertEquals(3, names.length);
             assertEquals("x",names[0]);
-            assertEquals("Data0",names[1]);
+            assertEquals("Column_0",names[1]);
         }
    	}
 	
@@ -114,7 +112,7 @@ public class NCDConvertTest {
             String[] names = dh.getNames();
             assertEquals(2, names.length);
             assertEquals("x",names[0]);
-            assertEquals("Data0",names[1]);
+            assertEquals("Column_0",names[1]);
         }
    	}
 	
@@ -154,7 +152,7 @@ public class NCDConvertTest {
         	final DataHolder   dh    = LoaderFactory.getData(file.getAbsolutePath());
             String[] names = dh.getNames();
             assertEquals("x",names[0]);
-            assertEquals("Data0",names[1]);
+            assertEquals("Column_0",names[1]);
         }
    	}
 	

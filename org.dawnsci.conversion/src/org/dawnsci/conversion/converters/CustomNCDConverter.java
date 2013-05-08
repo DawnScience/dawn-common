@@ -3,6 +3,7 @@ package org.dawnsci.conversion.converters;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.dawb.common.services.conversion.IConversionContext;
@@ -26,7 +27,9 @@ public class CustomNCDConverter extends AbstractConversion  {
 
 	public CustomNCDConverter(IConversionContext context) {
 		super(context);
-		// TODO Auto-generated constructor stub
+		
+		final File dir = new File(context.getOutputPath());
+		dir.mkdirs();
 	}
 
 	@Override
@@ -61,15 +64,19 @@ public class CustomNCDConverter extends AbstractConversion  {
 		}
 		
 		DataHolder dh = new  DataHolder();
-		
-		String header = "Data extracted from file: " + nameFrag;
+		final String separator = System.getProperty("line.separator");
+		StringBuilder sb = new StringBuilder();
+		sb.append("Data extracted from file: " + context.getSelectedConversionFile().getAbsolutePath());
+		sb.append(separator);
+		sb.append("Dataset name: " + nameFrag);
 		
 		List<String> headings = new ArrayList<String>(stop[lz.getRank()-2]);
 		
+		//TODO get from axis name
 		if (axis != null) headings.add("x");
 		
 		for (int i = 0; i< stop[lz.getRank()-2]; i++) {
-			headings.add("Data" +i);
+			headings.add("Column_" +i);
 		}
 		
 		for (int i = 0; iterator.hasNext();) {
@@ -101,11 +108,17 @@ public class CustomNCDConverter extends AbstractConversion  {
 			
 			String fileName = buildFileName(context.getSelectedConversionFile().getAbsolutePath(),nameFrag);
 			
-			data.setName(nameFrag + stringFromSliceArray(slices));
-			dh.addDataset(data.getName(), data);
-			ASCIIDataWithHeadingSaver saver = new ASCIIDataWithHeadingSaver(pathToFolder + "/" + fileName +stringFromSliceArray(slices) +".dat");
+			String nameSuffix = "";
+			nameSuffix = nameStringFromSliceArray(slices);
 			
-			saver.setHeader(header);
+			data.setName(nameFrag + nameStringFromSliceArray(slices));
+			dh.addDataset(data.getName(), data);
+			
+			String fullName = pathToFolder + File.separator + fileName + nameSuffix +".dat";
+			
+			ASCIIDataWithHeadingSaver saver = new ASCIIDataWithHeadingSaver(fullName);
+			
+			saver.setHeader(sb.toString());
 			saver.setHeadings(headings);
 			saver.saveFile(dh);
 			
@@ -116,7 +129,7 @@ public class CustomNCDConverter extends AbstractConversion  {
 		}
 	}
 	
-	private String stringFromSliceArray(Slice[] slices) {
+	private String nameStringFromSliceArray(Slice[] slices) {
 		StringBuilder t = new StringBuilder();
 		t.append('[');
 		for (int idx = 0; idx < slices.length; idx++) {

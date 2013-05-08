@@ -38,7 +38,7 @@ public interface IConversionContext {
 		ASCII_FROM_2D("ascii from 2D data",   false, 2), 
 		TIFF_FROM_3D("image files from image stack", true, 2,3,4,5),
 		AVI_FROM_3D("video from image stack", true, 2,3,4,5),
-		CUSTOM_NCD("ascii from NCD data",     false, null), // TODO not sure
+		CUSTOM_NCD("ascii from NCD data",     true, 2,3,4,5,6),
 		CUSTOM_TOMO("tiff from TOMO data",    true, 3);
 		
 		private String uiLabel;
