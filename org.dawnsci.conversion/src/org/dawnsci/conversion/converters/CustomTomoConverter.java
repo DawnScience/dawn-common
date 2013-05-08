@@ -48,7 +48,7 @@ public class CustomTomoConverter extends AbstractConversion {
 							              final String               dsPath,
 							              final IConversionContext   context) throws Exception {
 		
-		//Overriding processSlice allows us to process the tomography bean before calling the super
+		//Overriding getLazyDataset allows us to process the tomography bean before calling the super
 		if (context.getUserObject() != null && context.getUserObject() instanceof TomoInfoBean) {
 			processTomoInfoBeanContext(path, context);
 		} else {
