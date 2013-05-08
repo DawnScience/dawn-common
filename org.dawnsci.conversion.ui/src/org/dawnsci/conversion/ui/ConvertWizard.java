@@ -64,6 +64,10 @@ public class ConvertWizard extends Wizard implements IExportWizard{
 	private ConversionChoicePage setupPage;
 
 	public ConvertWizard() {
+		setNeedsProgressMonitor(true);
+	}
+	
+	public void addPages() {
 		
 		// It's an OSGI service, not required to use ServiceManager
 		try {
@@ -72,7 +76,6 @@ public class ConvertWizard extends Wizard implements IExportWizard{
 			logger.error("Cannot get conversion service!", e);
 			return;
 		}
-		setNeedsProgressMonitor(true);
 		// Add choice of file(s) and conversion type page.
 		this.setupPage = new ConversionChoicePage("Conversion Type", service);
 		addPage(setupPage);
@@ -97,6 +100,7 @@ public class ConvertWizard extends Wizard implements IExportWizard{
 		this.selectedConversionPage = conversionPages.get(ConversionScheme.values()[0]);
 		
 		setWindowTitle("Convert Data Wizard");
+
 	}
 	
     public boolean canFinish() {
