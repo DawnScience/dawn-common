@@ -13,6 +13,7 @@ import org.dawb.common.ui.util.EclipseUtils;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
@@ -65,7 +66,8 @@ public class ConvertWizardHandler extends AbstractHandler implements IObjectActi
 		if (selection instanceof StructuredSelection) {
 			StructuredSelection s = (StructuredSelection)selection;
 			final Object        o = s.getFirstElement();
-			if (o instanceof IFile) return true;
+			if (o instanceof IFile)      return true;
+			if (o instanceof IContainer) return true;
 		}
         return false;
 	}

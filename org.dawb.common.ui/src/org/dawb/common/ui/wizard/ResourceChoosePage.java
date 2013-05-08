@@ -16,6 +16,7 @@ import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
@@ -319,8 +320,9 @@ public class ResourceChoosePage extends WizardPage {
 			if (s.isEmpty())       return null;
 			if (s.toArray()==null) return null;
 			
-			final List<IFile> ret = new ArrayList<IFile>(s.size());
-			final Object[] oa = s.toArray();
+			final Object[] oa = s.size() > 1 ? s.toArray() : getObjects(s.getFirstElement());
+			
+			final List<IFile> ret = new ArrayList<IFile>(oa.length);
 			for (Object object : oa) {
 				if (object instanceof IFile) {
 					ret.add((IFile)object);
@@ -332,6 +334,21 @@ public class ResourceChoosePage extends WizardPage {
 		}
 	}
 	
+	/**
+	 * If IContainer, iterate contents, else return object in array.
+	 * @param firstElement
+	 * @return
+	 * @throws CoreException 
+	 */
+	private Object[] getObjects(Object firstElement) throws CoreException {
+		if (firstElement instanceof IContainer) {
+			IContainer cont = (IContainer)firstElement;
+			return cont.members();
+		} else {
+			return new Object[]{firstElement};
+		}
+	}
+
 	protected String[] getSelectedPaths() {
 		final List<IFile> files = getSelectedFiles();
 		if (files==null || files.isEmpty()) return null;
