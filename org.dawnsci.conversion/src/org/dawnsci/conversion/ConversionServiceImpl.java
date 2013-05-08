@@ -10,9 +10,10 @@ import org.dawnsci.conversion.converters.CustomNCDConverter;
 import org.dawnsci.conversion.converters.CustomTomoConverter;
 import org.dawnsci.conversion.converters.ImageConverter;
 import org.dawnsci.conversion.converters.VisitorConversion;
+import org.slf4j.LoggerFactory;
 
 class ConversionServiceImpl implements IConversionService {
-
+	
 	@Override
 	public IConversionContext open(String... paths) {
 		ConversionContext context = new ConversionContext();
@@ -52,7 +53,10 @@ class ConversionServiceImpl implements IConversionService {
 				}
 			}
 			deligate.process(context);
-		} finally {
+		} catch (Exception e){
+			e.printStackTrace();
+		}
+		finally {
 			if (deligate!=null) deligate.close(context);
 		}
 	}

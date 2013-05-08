@@ -114,6 +114,11 @@
             conversion_scheme="AVI_FROM_3D"
             id="org.dawnsci.conversion.ui.conversionVideo">
       </conversion_page>
+      <conversion_page
+            conversion_page="org.dawnsci.conversion.ui.pages.NCDConvertPage"
+            conversion_scheme="CUSTOM_NCD"
+            id="org.dawnsci.conversion.ui.conversionNCD">
+      </conversion_page>
    </extension>
 
 </plugin>
