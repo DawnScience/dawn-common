@@ -136,19 +136,27 @@ public class ConversionChoicePage extends ResourceChoosePage implements IConvers
 			});
 		}
 		
+		Label helpLabel = new Label(container, SWT.WRAP);
+		helpLabel.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, true, true, 4, 3));
+		helpLabel.setText("(This wizard has been started in single file mode. To select multiple files, cancel and use the 'Project Explorer' to select a folder or hold down control and select several files with the mouse. Afterwards restart this wizard and the files selected will be the conversion input files. The files selected should all be of the same type please.)");
+		
 		final List<IFile> selected = getSelectedFiles();
 		if (selected!=null) setPath(selected.get(0).getFullPath().toString());
 		
         if (selected==null || selected.size()<2) {
         	GridUtils.setVisible(conversionGroup, false);
         	GridUtils.setVisible(multiFilesLabel, false);
+        	GridUtils.setVisible(helpLabel, true);
         } else {
         	multiFileSelection = true;
           	GridUtils.setVisible(conversionGroup, true);
         	GridUtils.setVisible(multiFilesLabel, true);
         	multiFilesLabel.setText("Selected files:   "+selected.get(0).getName()+" - "+selected.get(selected.size()-1).getName()+"  (List of "+selected.size()+" files)");
         	setFileChoosingEnabled(false);
-       }
+        	GridUtils.setVisible(helpLabel, false);
+      }
+       
+        
         
 	}
 	
