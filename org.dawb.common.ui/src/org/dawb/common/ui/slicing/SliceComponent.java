@@ -298,6 +298,7 @@ public class SliceComponent {
 	private boolean axesVisible = true;
 	public void setAxesVisible(boolean isVis) {
 		axesVisible = isVis;
+		if (viewer==null || viewer.getTable()==null || viewer.getTable().getColumnCount()<4) return;
 		if (!isVis) {
 		    viewer.getTable().getColumn(3).setWidth(0);
 		    viewer.getTable().getColumn(3).setMoveable(false);
@@ -852,11 +853,13 @@ public class SliceComponent {
 		slice.setLabelProvider(new DelegatingStyledCellLabelProvider(new SliceColumnLabelProvider(2)));
 		slice.setEditingSupport(new SliceEditingSupport(viewer));
 		
-		final TableViewerColumn axis   = new TableViewerColumn(viewer, SWT.LEFT, 3);
-		axis.getColumn().setText("Axis Data");
-		layout.setColumnData(axis.getColumn(), new ColumnWeightData(140));
-		axis.setLabelProvider(new DelegatingStyledCellLabelProvider(new SliceColumnLabelProvider(3)));
-		axis.setEditingSupport(new AxisEditingSupport(viewer));
+		if (axesVisible) {
+			final TableViewerColumn axis   = new TableViewerColumn(viewer, SWT.LEFT, 3);
+			axis.getColumn().setText("Axis Data");
+			layout.setColumnData(axis.getColumn(), new ColumnWeightData(140));
+			axis.setLabelProvider(new DelegatingStyledCellLabelProvider(new SliceColumnLabelProvider(3)));
+			axis.setEditingSupport(new AxisEditingSupport(viewer));
+		}
 	}	
 
 	private class AxisEditingSupport extends EditingSupport {

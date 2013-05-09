@@ -98,12 +98,13 @@ public abstract class AbstractImageConvertPage extends ResourceChoosePage implem
 		sep.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 4, 1));
 		
 		this.sliceComponent = new SliceComponent("org.dawb.workbench.views.h5GalleryView");
+		sliceComponent.setAxesVisible(false);
+
 		final Control slicer = sliceComponent.createPartControl(container);
 		GridData data = new GridData(SWT.FILL, SWT.FILL, true, true, 4, 1);
 		data.minimumHeight=560;
 		slicer.setLayoutData(data);
 		sliceComponent.setVisible(true);
-		sliceComponent.setAxesVisible(false);
 		sliceComponent.setRangesAllowed(true);
 		sliceComponent.setToolBarEnabled(false);
 		
