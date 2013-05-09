@@ -71,7 +71,7 @@ public final class AVIConvertPage extends AbstractImageConvertPage {
 		label.setLayoutData(new GridData());
 		label.setText("Downsample Type");
 		
-		final CCombo imf = new CCombo(advanced, SWT.READ_ONLY);
+		final CCombo imf = new CCombo(advanced, SWT.READ_ONLY|SWT.BORDER);
 		imf.setItems(DOWNSAMPLE_TYPES);
 		imf.select(2);
 		downsampleName = DOWNSAMPLE_TYPES[2];
@@ -81,7 +81,7 @@ public final class AVIConvertPage extends AbstractImageConvertPage {
 		label.setLayoutData(new GridData());
 		label.setText("Downsample Bin");
 		
-		final CCombo bd = new CCombo(advanced, SWT.READ_ONLY);
+		final CCombo bd = new CCombo(advanced, SWT.READ_ONLY|SWT.BORDER);
 		bd.setItems(DOWNSAMPLE_SIZES);
 		bd.select(1);
 		downsampleSize = 2;

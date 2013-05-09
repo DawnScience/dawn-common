@@ -101,7 +101,7 @@ public class AsciiConvertPage extends ResourceChoosePage implements IConversionW
 		Label convertLabel = new Label(container, SWT.NONE);
 		convertLabel.setText("Convert to");
 		
-		final Combo combo = new Combo(container, SWT.READ_ONLY);
+		final Combo combo = new Combo(container, SWT.READ_ONLY|SWT.BORDER);
 		combo.setItems(CONVERT_OPTIONS);
 		combo.setToolTipText("Convert to file type by file extension");
 		combo.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 3, 1));

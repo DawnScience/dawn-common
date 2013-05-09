@@ -10,8 +10,10 @@ import org.dawb.common.services.IExpressionObject;
 import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.services.conversion.IConversionContext.ConversionScheme;
 import org.dawb.common.ui.Activator;
+import org.dawb.common.ui.content.FileContentProposalProvider;
 import org.dawb.common.ui.monitor.ProgressMonitorWrapper;
 import org.dawb.common.ui.util.EclipseUtils;
+import org.dawb.common.ui.util.GridUtils;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
@@ -47,8 +49,6 @@ import org.eclipse.ui.PlatformUI;
 
 import uk.ac.diamond.scisoft.analysis.io.IMetaData;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
-import uk.ac.gda.common.rcp.util.GridUtils;
-import uk.ac.gda.ui.content.FileContentProposalProvider;
 
 /**
  * A page with a field for choosing an external file.

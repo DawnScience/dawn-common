@@ -10,6 +10,7 @@ import java.util.Map;
 import org.dawb.common.ui.Activator;
 import org.dawb.common.ui.menu.MenuAction;
 import org.dawb.common.ui.util.EclipseUtils;
+import org.dawb.common.ui.util.GridUtils;
 import org.dawb.common.ui.widgets.ActionBarWrapper;
 import org.dawb.common.ui.widgets.EmptyActionBars;
 import org.dawnsci.plotting.api.ActionType;
@@ -46,8 +47,6 @@ import org.eclipse.ui.PartInitException;
 import org.osgi.framework.Bundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import uk.ac.gda.common.rcp.util.GridUtils;
 
 
 /**

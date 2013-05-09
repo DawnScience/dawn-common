@@ -13,12 +13,12 @@ import org.dawb.common.ui.wizard.ResourceChoosePage;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -48,19 +48,17 @@ public class ConversionChoicePage extends ResourceChoosePage implements IConvers
 	@Override
 	protected void createContentBeforeFileChoose(Composite container) {
 
-		new Label(container, SWT.NONE);
-		new Label(container, SWT.NONE);
-		new Label(container, SWT.NONE);
-		new Label(container, SWT.NONE);
+		Label label = new Label(container, SWT.NONE);
+		label.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 4, 1));
 		
 		// 4 col grid
 		final Label convLabel = new Label(container, SWT.NONE);
 		convLabel.setText("Conversion Type");
 		convLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
 		
-		final CCombo choice = new CCombo(container, SWT.READ_ONLY);
+		final Combo choice = new Combo(container, SWT.READ_ONLY|SWT.BORDER);
 		choice.setItems(ConversionScheme.getLabels());
-		choice.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
+		choice.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
 		choice.select(0);
 		this.chosenConversion = ConversionScheme.values()[0]; // Is user visible
 		if (Activator.getDefault().getPreferenceStore().contains(SCHEME_KEY)) {
@@ -80,10 +78,13 @@ public class ConversionChoicePage extends ResourceChoosePage implements IConvers
 			}
 		});
 		
+		label = new Label(container, SWT.NONE);
+		label.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 4, 1));
+
 		this.conversionGroup = new Composite(container, SWT.NONE);
 		conversionGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 4, 1));
 		conversionGroup.setLayout(new GridLayout(2, false));
-		
+				
 		final Button useFiles = new Button(conversionGroup, SWT.RADIO);
 		useFiles.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
 		useFiles.setText("All files selected");

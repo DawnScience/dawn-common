@@ -70,7 +70,7 @@ public final class ImageConvertPage extends AbstractImageConvertPage {
 		label.setLayoutData(new GridData());
 		label.setText("Image Format");
 		
-		final CCombo imf = new CCombo(advanced, SWT.READ_ONLY);
+		final CCombo imf = new CCombo(advanced, SWT.READ_ONLY|SWT.BORDER);
 		imf.setItems(IMAGE_FORMATS);
 		imf.select(0);
 		imageFormat = "tiff";
@@ -80,7 +80,7 @@ public final class ImageConvertPage extends AbstractImageConvertPage {
 		label.setLayoutData(new GridData());
 		label.setText("Bit Depth");
 		
-		final CCombo bd = new CCombo(advanced, SWT.READ_ONLY);
+		final CCombo bd = new CCombo(advanced, SWT.READ_ONLY|SWT.BORDER);
 		bd.setItems(getStringArray(BIT_DEPTHS.get(imageFormat)));
 		bd.select(0);
 		bitDepth = 33;

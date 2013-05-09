@@ -71,7 +71,7 @@ public abstract class AbstractImageConvertPage extends ResourceChoosePage implem
 		label.setLayoutData(new GridData());
 		label.setText("Dataset Name");
 		
-		nameChoice = new CCombo(container, SWT.READ_ONLY);
+		nameChoice = new CCombo(container, SWT.READ_ONLY|SWT.BORDER);
 		nameChoice.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
 		nameChoice.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
