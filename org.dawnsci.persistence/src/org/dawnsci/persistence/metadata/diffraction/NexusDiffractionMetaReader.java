@@ -145,7 +145,7 @@ public class NexusDiffractionMetaReader {
 	}
 	
 	/**
-	 * Have enough values to perform downstream calcuations been read (ie exposure time not read)
+	 * Have enough values to perform downstream calculations been read (ie exposure time not read)
 	 */
 	public boolean isPartialRead() {
 		return successMap.get(DiffractionMetaValue.BEAM_CENTRE) &&
@@ -168,7 +168,7 @@ public class NexusDiffractionMetaReader {
 		//Find nxDetectors in instrument
 		// TODO should probably change to find data then locate correct
 		// detector from image size
-		List<Group> nxDetectors = findNXdetetors(nxInstrument, "pixel");
+		List<Group> nxDetectors = findNXDetectors(nxInstrument, "pixel");
 
 		if (nxDetectors.size() == 1 || imageSize == null) {
 			//only one nxdetector or we dont know the image size
@@ -456,7 +456,7 @@ public class NexusDiffractionMetaReader {
 		return null;
 	}
 	
-	private List<Group> findNXdetetors(Group nxInstrument, String childNameContains) {
+	private List<Group> findNXDetectors(Group nxInstrument, String childNameContains) {
 		final String groupText = "NXdetector";
 		final String childText = childNameContains;;
 		
