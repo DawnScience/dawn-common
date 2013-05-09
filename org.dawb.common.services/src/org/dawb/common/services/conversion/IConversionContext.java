@@ -41,13 +41,18 @@ public interface IConversionContext {
 		CUSTOM_NCD(" ascii from NCD data",     true, 2,3,4,5,6),
 		CUSTOM_TOMO(" tiff from tomography nexus file(s) [nxtomo]",    true, 3);
 		
-		private String uiLabel;
-		private int[] preferredRanks;
-		private boolean userVisible;
+		private final String  uiLabel;
+		private final int[]   preferredRanks;
+		private final boolean userVisible;
+		private final boolean nexusOnly;
 
 		ConversionScheme(String uiLabel, boolean userVisible, int... preferredRanks) {
-			this.uiLabel       = uiLabel;
+			this(uiLabel, userVisible, true, preferredRanks);
+		}
+		ConversionScheme(String uiLabel, boolean userVisible, boolean nexusOnly, int... preferredRanks) {
+			this.uiLabel        = uiLabel;
 			this.userVisible    = userVisible;
+			this.nexusOnly      = nexusOnly;
 			this.preferredRanks = preferredRanks;
 		}
 
@@ -98,6 +103,9 @@ public interface IConversionContext {
 		 */
 		public boolean isUserVisible() {
 			return userVisible;
+		}
+		public boolean isNexusOnly() {
+			return nexusOnly;
 		}
 	}
 	

@@ -308,12 +308,12 @@ public class ResourceChoosePage extends WizardPage {
 	protected String getSourcePath(IConversionContext context) {
 		if (context!=null) return context.getFilePaths().get(0);
 		
-		List<IFile> files = getSelectedFiles();
-		return files!=null ? files.get(0).getLocation().toOSString(): "";
+		List<String> files = getSelectedFiles();
+		return files!=null ? files.get(0) : "";
 	        
 	}
 	
-	protected List<IFile> getSelectedFiles() {
+	protected List<String> getSelectedFiles() {
 		try {
 			ISelection selection = EclipseUtils.getActivePage().getSelection();
 			StructuredSelection s = (StructuredSelection)selection;
@@ -322,10 +322,14 @@ public class ResourceChoosePage extends WizardPage {
 			
 			final Object[] oa = s.size() > 1 ? s.toArray() : getObjects(s.getFirstElement());
 			
-			final List<IFile> ret = new ArrayList<IFile>(oa.length);
+			final List<String> ret = new ArrayList<String>(oa.length);
 			for (Object object : oa) {
 				if (object instanceof IFile) {
-					ret.add((IFile)object);
+					ret.add(((IFile)object).getLocation().toOSString());
+				}
+				if (object instanceof File) {
+					final File file = (File)object;
+					if (file.isFile()) ret.add(file.getAbsolutePath());
 				}
 			}
 			return ret.size()>0 ? ret : null;
@@ -344,19 +348,17 @@ public class ResourceChoosePage extends WizardPage {
 		if (firstElement instanceof IContainer) {
 			IContainer cont = (IContainer)firstElement;
 			return cont.members();
+		} else if (firstElement instanceof File && ((File)firstElement).isDirectory()){
+			return ((File)firstElement).listFiles();
 		} else {
 			return new Object[]{firstElement};
 		}
 	}
 
 	protected String[] getSelectedPaths() {
-		final List<IFile> files = getSelectedFiles();
+		final List<String> files = getSelectedFiles();
 		if (files==null || files.isEmpty()) return null;
-		final String[] sa = new String[files.size()];
-		for (int i = 0; i < files.size(); i++) {
-			sa[i] = files.get(i).getLocation().toOSString();
-		}
-		return sa;
+		return files.toArray(new String[files.size()]);
 	}
 
 

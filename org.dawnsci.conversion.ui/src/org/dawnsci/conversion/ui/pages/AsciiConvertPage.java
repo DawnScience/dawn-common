@@ -363,26 +363,28 @@ public class AsciiConvertPage extends ResourceChoosePage implements IConversionW
        
         setPageComplete(true);
         
-        if (context.getFilePaths().size()>1) { // Multi
-    		setPath(source.getParent());
-       	    setDirectory(true);
+        if (context.getFilePaths().size()>1 || source.isDirectory()) { // Multi
+        	setPath(source.getParent());
+        	setDirectory(true);
         	setFileLabel("Output folder");
-    		GridUtils.setVisible(multiFileMessage, true);
-    		this.overwriteButton.setSelection(true);
-    		this.overwrite = true;
-    		this.overwriteButton.setEnabled(false);
-    		this.openButton.setSelection(false);
-    		this.open = false;
-    		this.openButton.setEnabled(false);
-       } else {
-    		final String strName = source.getName().substring(0, source.getName().indexOf("."))+"."+getExtension();
-    		setPath((new File(source.getParentFile(), strName)).getAbsolutePath());
-        	setDirectory(false);
-        	setFileLabel("Output file");
-    		GridUtils.setVisible(multiFileMessage, false);
-    		this.overwriteButton.setEnabled(true);
-       		this.openButton.setEnabled(true);
-      }
+        	GridUtils.setVisible(multiFileMessage, true);
+        	this.overwriteButton.setSelection(true);
+        	this.overwrite = true;
+        	this.overwriteButton.setEnabled(false);
+        	this.openButton.setSelection(false);
+        	this.open = false;
+        	this.openButton.setEnabled(false);
+        } else {
+        	if (source.isFile()) {
+        	    final String strName = source.getName().substring(0, source.getName().indexOf("."))+"."+getExtension();
+	        	setPath((new File(source.getParentFile(), strName)).getAbsolutePath());
+	        	setDirectory(false);
+	        	setFileLabel("Output file");
+	        	GridUtils.setVisible(multiFileMessage, false);
+	        	this.overwriteButton.setEnabled(true);
+	        	this.openButton.setEnabled(true);
+        	} 
+        }
 
 	}
 	

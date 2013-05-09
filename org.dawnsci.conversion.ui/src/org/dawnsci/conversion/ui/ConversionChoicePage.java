@@ -1,7 +1,9 @@
 package org.dawnsci.conversion.ui;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -10,7 +12,6 @@ import org.dawb.common.services.conversion.IConversionContext.ConversionScheme;
 import org.dawb.common.services.conversion.IConversionService;
 import org.dawb.common.ui.util.GridUtils;
 import org.dawb.common.ui.wizard.ResourceChoosePage;
-import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -34,10 +35,10 @@ public class ConversionChoicePage extends ResourceChoosePage implements IConvers
 	private static final Logger logger = LoggerFactory.getLogger(ConversionChoicePage.class);
 
 	private IConversionService service;
-	private ConversionScheme chosenConversion;
-	private Composite        conversionGroup;
-	private Label            multiFilesLabel;
-	private boolean          multiFileSelection=false;
+	private ConversionScheme   chosenConversion;
+	private Composite          conversionGroup;
+	private Label              multiFilesLabel;
+	private boolean            multiFileSelection=false;
 
 	protected ConversionChoicePage(String pageName, IConversionService service) {
 		super(pageName, "Please choose what you would like to convert", null);
@@ -141,8 +142,8 @@ public class ConversionChoicePage extends ResourceChoosePage implements IConvers
 		helpLabel.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, true, true, 4, 3));
 		helpLabel.setText("(This wizard has been started in single file mode. To select multiple files, cancel and use the 'Project Explorer' to select a folder or hold down control and select several files with the mouse. Afterwards restart this wizard and the files selected will be the conversion input files. The files selected should all be of the same type please.)");
 		
-		final List<IFile> selected = getSelectedFiles();
-		if (selected!=null) setPath(selected.get(0).getFullPath().toString());
+		final List<String> selected = getSelectedFiles();
+		if (selected!=null) setPath(selected.get(0));
 		
         if (selected==null || selected.size()<2) {
         	GridUtils.setVisible(conversionGroup, false);
@@ -152,12 +153,14 @@ public class ConversionChoicePage extends ResourceChoosePage implements IConvers
         	multiFileSelection = true;
           	GridUtils.setVisible(conversionGroup, true);
         	GridUtils.setVisible(multiFilesLabel, true);
-        	multiFilesLabel.setText("Selected files:   "+selected.get(0).getName()+" - "+selected.get(selected.size()-1).getName()+"  (List of "+selected.size()+" files)");
+        	final File start = new File(selected.get(0));
+        	final File end   = new File(selected.get(selected.size()-1));
+        	multiFilesLabel.setText("Selected files:   "+start.getName()+" - "+end.getName()+"  (List of "+selected.size()+" files)");
         	setFileChoosingEnabled(false);
         	GridUtils.setVisible(helpLabel, false);
       }
        
-        
+       pathChanged();
         
 	}
 	
@@ -166,6 +169,22 @@ public class ConversionChoicePage extends ResourceChoosePage implements IConvers
 		if (filePath==null || "".equals(filePath)) {
 			setErrorMessage("The file to convert has not been specified");
 			return;
+		}
+		
+		if (chosenConversion!=null && chosenConversion.isNexusOnly()) {
+			if (getSelectedFiles()!=null && getSelectedFiles().size()>1 && multiFileSelection) {		
+				for (String path : getSelectedFiles()) {
+					if (!isH5(path)) {
+						setErrorMessage("The conversion '"+chosenConversion.getUiLabel()+"' supports nexus/hdf5 files only. The file '"+((new File(path).getName())+"' is not a nexus/hdf5 file."));
+						return;
+					}				
+				}
+			} else {
+				if (!isH5(filePath)) {
+					setErrorMessage("The conversion '"+chosenConversion.getUiLabel()+"' supports nexus/hdf5 files only.");
+					return;
+				}
+			}
 		}
 		
 		final File file = new File(filePath);
@@ -258,6 +277,29 @@ public class ConversionChoicePage extends ResourceChoosePage implements IConvers
 	@Override
 	public boolean isOpen() {
 		return false;
+	}
+
+	public final static List<String> EXT;
+	static {
+		List<String> tmp = new ArrayList<String>(7);
+		tmp.add("h5");
+		tmp.add("nxs");
+		tmp.add("hd5");
+		tmp.add("hdf5");
+		tmp.add("hdf");
+		tmp.add("nexus");
+		EXT = Collections.unmodifiableList(tmp);
+	}	
+
+	private final static boolean isH5(final String filePath) {
+		final String ext = getFileExtension(filePath);
+		if (ext==null) return false;
+		return EXT.contains(ext.toLowerCase());
+	}
+	private final static String getFileExtension(String fileName) {
+		int posExt = fileName.lastIndexOf(".");
+		// No File Extension
+		return posExt == -1 ? "" : fileName.substring(posExt + 1);
 	}
 
 

@@ -9,6 +9,8 @@
  */ 
 package org.dawnsci.conversion.ui;
 
+import java.io.File;
+
 import org.dawb.common.ui.util.EclipseUtils;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -68,6 +70,7 @@ public class ConvertWizardHandler extends AbstractHandler implements IObjectActi
 			final Object        o = s.getFirstElement();
 			if (o instanceof IFile)      return true;
 			if (o instanceof IContainer) return true;
+			if (o instanceof File)       return true;
 		}
         return false;
 	}
