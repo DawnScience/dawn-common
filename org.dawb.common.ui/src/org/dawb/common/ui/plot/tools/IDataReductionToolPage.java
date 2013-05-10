@@ -10,6 +10,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.io.h5.H5Utils;
 
 /**
  * Interface used  to define this tool as a data reduction tool. 
@@ -93,6 +94,11 @@ public interface IDataReductionToolPage extends IToolPage {
 		public void setData(AbstractDataset set) {
 			this.data = set;
 		}
+
+		public void appendData(AbstractDataset more) throws Exception {
+			H5Utils.appendDataset(file, parent, more);
+		}
+
 		public Object getUserData() {
 			return userData;
 		}
