@@ -41,6 +41,7 @@ import org.dawnsci.plotting.api.trace.TraceWillPlotEvent;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.draw2d.MouseListener;
 import org.eclipse.draw2d.MouseMotionListener;
+import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelectionProvider;
@@ -821,7 +822,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	 */
 	@Deprecated
 	public void setSelectedCursor(Cursor des) {
-			    
+		throw new UnsupportedOperationException();
 	}
 
 	/**
@@ -830,7 +831,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	 */
 	@Deprecated
 	public void addMouseMotionListener(MouseMotionListener mml) {
-		
+		throw new UnsupportedOperationException();
 	}
 	
 	/**
@@ -839,7 +840,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	 */
 	@Deprecated
 	public void addMouseClickListener(MouseListener mcl) {
-		
+		throw new UnsupportedOperationException();
 	}
 	/**
 	 * Please override for draw2d listeners.
@@ -847,7 +848,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	 */
 	@Deprecated
 	public void removeMouseMotionListener(MouseMotionListener mml) {
-		
+		throw new UnsupportedOperationException();		
 	}
 	
 	/**
@@ -856,7 +857,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	 */
 	@Deprecated
 	public void removeMouseClickListener(MouseListener mcl) {
-		
+		throw new UnsupportedOperationException();
 	}
 
 	/**
@@ -865,5 +866,21 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	 */
 	public void setKeepAspect(boolean checked){
 		
+	}
+
+    /**
+     * Call this method to set a point. When the shift key is pressed the plotting system
+     * draws a line from the 
+     * @param object
+ 	 * @deprecated draw2d Specific. Can still be used for code that does not mind draw2d link.
+    */
+	@Deprecated
+	public void setShiftPoint(Point object) {
+		throw new UnsupportedOperationException();
+	}
+	
+	@Deprecated
+	public Point getShiftPoint() {
+		throw new UnsupportedOperationException();
 	}
 }

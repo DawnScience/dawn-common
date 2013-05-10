@@ -125,7 +125,7 @@ public class HierarchicalDataUtils {
 			// To make things faster, we only check for Datasets
 			if (!(set instanceof Dataset)) return null;
 			
-			List attributes = set.getMetadata(); // Appears in stack traces of VM exists
+			List<?> attributes = set.getMetadata(); // Appears in stack traces of VM exists
 			if (attributes==null || attributes.isEmpty()) return null;
 
 			for (Object attribute : attributes) {

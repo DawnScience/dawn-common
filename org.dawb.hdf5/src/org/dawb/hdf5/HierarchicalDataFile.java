@@ -221,7 +221,7 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 		
 		final String[] sa    = fullAttributeKey.split("@");
 		final HObject object = getData(sa[0]);
-		List attributes = object.getMetadata();
+		List<?> attributes = object.getMetadata();
 		if (attributes==null || attributes.isEmpty()) return null;
 
 		for (Object attribute : attributes) {
@@ -242,7 +242,7 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
     private Map<String, Object> getAttributeValues(HObject object, Map<String, Object> allAttributes) {
     	
     	try {
-	    	final List attributes = object.getMetadata();
+	    	final List<?> attributes = object.getMetadata();
 	    	if (attributes!=null && !attributes.isEmpty()) {
 	    		for (Object attribute : attributes) {
 	    			if (attribute instanceof Attribute) {
@@ -483,7 +483,7 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 	
 	private HObject checkExists(String name, Group group, Class<? extends HObject> clazz) throws Exception{
 		
-		final List childs = group.getMemberList();
+		final List<?> childs = group.getMemberList();
 		for (Object object : childs) {
 			if (object instanceof HObject) {
 				final HObject ho = (HObject)object;

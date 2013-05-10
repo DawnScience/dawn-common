@@ -17,8 +17,6 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.TreeMap;
 
-import javax.swing.plaf.ListUI;
-
 import ncsa.hdf.object.Attribute;
 import ncsa.hdf.object.Dataset;
 import ncsa.hdf.object.Datatype;
@@ -82,7 +80,8 @@ public class NexusUtils {
 									final String     entryKey) throws Exception {
 	
 		// Check if attribute is already there
-		final List attrList = entry.getMetadata();
+		@SuppressWarnings("unchecked")
+		final List<Object> attrList = entry.getMetadata();
 		if (attrList!=null) for (Object object : attrList) {
 			if (object instanceof Attribute) {
 				final Attribute a      = (Attribute)object;
@@ -127,8 +126,8 @@ public class NexusUtils {
 							           final String    name,
 							           final int       value) throws Exception {
 
-		
-		final List attrList = entry.getMetadata();
+		@SuppressWarnings("unchecked")
+		final List<Object> attrList = entry.getMetadata();
 		if (attrList!=null) for (Object object : attrList) {
 			if (object instanceof Attribute) {
 				final Attribute a      = (Attribute)object;
