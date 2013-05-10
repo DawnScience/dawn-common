@@ -730,6 +730,18 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 		NexusUtils.setAttribute(file, object, name, value);
 	}
 
+	@Override
+	public long getDimensionSize(String datasetName, int dimension) throws Exception {
+		
+		Dataset signal = (Dataset)getData(datasetName);
+		try {
+	        signal.getMetadata();
+	        return signal.getDims()[dimension-1];
+		} catch (Throwable ne) {
+			return -1;
+		}
+	}
+
 
 
 }

@@ -247,5 +247,13 @@ public interface IHierarchicalDataFile {
 	public Dataset appendDataset(String datasetName, Datatype d, long[] bufferShape, Object buffer, Group group)  throws Exception;
 
 
+	/**
+	 * Gets the size of a dimension of the dataset.
+	 * @param datasetName
+	 * @param dimension
+	 * @return the size of a dimension of the dataset or -1 if a problem occurred
+	 * @throws Exception
+	 */
+	public long getDimensionSize(String datasetName, int dimension) throws Exception;
 
 }
