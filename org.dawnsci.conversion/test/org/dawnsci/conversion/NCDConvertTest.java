@@ -42,7 +42,7 @@ public class NCDConvertTest {
         	final DataHolder   dh    = LoaderFactory.getData(file.getAbsolutePath());
             String[] names = dh.getNames();
             assertEquals(61, names.length);
-            assertEquals("x",names[0]);
+            assertEquals("q",names[0]);
             assertEquals("Column_0",names[1]);
         }
    	}
@@ -77,7 +77,7 @@ public class NCDConvertTest {
         	final DataHolder   dh    = LoaderFactory.getData(file.getAbsolutePath());
             String[] names = dh.getNames();
             assertEquals(3, names.length);
-            assertEquals("x",names[0]);
+            assertEquals("q",names[0]);
             assertEquals("Column_0",names[1]);
         }
    	}
@@ -111,7 +111,7 @@ public class NCDConvertTest {
         	final DataHolder   dh    = LoaderFactory.getData(file.getAbsolutePath());
             String[] names = dh.getNames();
             assertEquals(2, names.length);
-            assertEquals("x",names[0]);
+            assertEquals("q",names[0]);
             assertEquals("Column_0",names[1]);
         }
    	}
@@ -151,7 +151,7 @@ public class NCDConvertTest {
         	file.deleteOnExit();
         	final DataHolder   dh    = LoaderFactory.getData(file.getAbsolutePath());
             String[] names = dh.getNames();
-            assertEquals("x",names[0]);
+            assertEquals("q",names[0]);
             assertEquals("Column_0",names[1]);
         }
    	}
