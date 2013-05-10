@@ -16,6 +16,8 @@
 
 package org.dawb.common.services;
 
+import java.util.List;
+
 /**
  * Returns objects implementing IExpressionObject which can be used
  * as items in the workbench for evaluating expressions in tables. Usually
@@ -36,10 +38,11 @@ public interface IExpressionObjectService {
 	/**
 	 * Create an IExpressionObject
 	 * @param manager
-	 * @param expression, may be null.
+	 * @param expressionName, may be null.
+	 * @param expression,     may be null.
 	 * @return
 	 */
-	public IExpressionObject createExpressionObject(IVariableManager manager, String expression);
+	public IExpressionObject createExpressionObject(IVariableManager manager, String expressionName, String expression);
 
 	/**
 	 * Creates a safe variable name from the suggested name, may return the 
@@ -49,4 +52,13 @@ public interface IExpressionObjectService {
 	 * @return
 	 */
 	public String getSafeName(String name);
+	
+	/**
+	 * Returns the active expressions for a given file path. 
+	 * @param sourcePath
+	 * @return
+	 * @throws Exception
+	 */
+	public List<IExpressionObject> getActiveExpressions(String sourcePath) throws Exception;
+
 } 

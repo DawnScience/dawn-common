@@ -29,6 +29,21 @@ import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
 public interface IExpressionObject {
 
 	/**
+	 * The name of the expression, e.g. "Q"
+	 * @return
+	 */
+	public String getExpressionName();
+	
+	/**
+	 * Method to set the expression string. For instance when the user
+	 * types in a new string.
+	 * 
+	 * @param expression
+	 */
+	public void setExpressionName(String name);
+
+
+	/**
 	 * The string expression, e.g. "x*y"
 	 * @return
 	 */
