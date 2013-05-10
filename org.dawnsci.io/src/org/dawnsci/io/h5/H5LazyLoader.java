@@ -1,4 +1,4 @@
-package org.dawb.gda.extensions.loaders;
+package org.dawnsci.io.h5;
 
 import gda.analysis.io.ScanFileHolderException;
 

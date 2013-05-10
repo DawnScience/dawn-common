@@ -4,8 +4,8 @@ import java.util.List;
 
 import ncsa.hdf.object.Group;
 
-import org.dawb.gda.extensions.loaders.H5Utils;
 import org.dawb.hdf5.IHierarchicalDataFile;
+import org.dawnsci.io.h5.H5Utils;
 import org.dawnsci.plotting.api.tool.IToolPage;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
