@@ -19,7 +19,7 @@ public class H5LazyDataset extends LazyDataset {
 	 * @param filePath
 	 * @throws Exception 
 	 */
-	public H5LazyDataset(final Dataset set, final String filePath) throws Exception {
+	public H5LazyDataset(final Dataset set) throws Exception {
 		
 	    super(set.getFullName(), 
               H5Utils.getDataType(set.getDatatype()), 

@@ -191,7 +191,7 @@ public class H5Loader extends AbstractFileLoader implements IMetaLoader, IDataSe
 			
 			final Dataset      set = (Dataset)file.getData(fullPath);
 			set.getMetadata();
-			final LazyDataset  lazy   = new H5LazyDataset(set, file.getPath());
+			final LazyDataset  lazy   = new H5LazyDataset(set);
 			
 			ret.put(fullPath, lazy);
 		}
@@ -221,7 +221,7 @@ public class H5Loader extends AbstractFileLoader implements IMetaLoader, IDataSe
 	public IMetaData getMetaData() {
 		
  		return new MetaDataAdapter() {
-			private static final long serialVersionUID = MetaDataAdapter.serialVersionUID;
+			private static final long serialVersionUID = IMetaData.serialVersionUID;
 			private Map<String, Object> attributeValues;
 			
 			@Override
