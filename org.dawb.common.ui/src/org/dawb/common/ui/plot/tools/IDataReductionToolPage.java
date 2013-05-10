@@ -11,6 +11,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 
 /**
  * Interface used  to define this tool as a data reduction tool. 
@@ -58,7 +59,7 @@ public interface IDataReductionToolPage extends IToolPage {
 		/**
 		 * May be null, 0 = x, 1 = y. Y may be omitted, in which case use indexes
 		 */
-		private List<AbstractDataset> axes;
+		private List<IDataset> axes;
 		/**
 		 * May be null, data which the tool may need for persistence.
 		 */
@@ -167,10 +168,10 @@ public interface IDataReductionToolPage extends IToolPage {
 				return false;
 			return true;
 		}
-		public List<AbstractDataset> getAxes() {
+		public List<IDataset> getAxes() {
 			return axes;
 		}
-		public void setAxes(List<AbstractDataset> axes) {
+		public void setAxes(List<IDataset> axes) {
 			this.axes = axes;
 		}
 
