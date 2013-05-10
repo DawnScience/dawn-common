@@ -4,13 +4,13 @@ import java.util.List;
 
 import ncsa.hdf.object.Group;
 
+import org.dawb.gda.extensions.loaders.H5Utils;
 import org.dawb.hdf5.IHierarchicalDataFile;
 import org.dawnsci.plotting.api.tool.IToolPage;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
-import uk.ac.diamond.scisoft.analysis.io.h5.H5Utils;
 
 /**
  * Interface used  to define this tool as a data reduction tool. 

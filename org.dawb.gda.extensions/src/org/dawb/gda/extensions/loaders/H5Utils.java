@@ -48,7 +48,7 @@ public class H5Utils {
 		case 32:
 			if (type==Datatype.CLASS_INTEGER) return AbstractDataset.INT32;
 			if (type==Datatype.CLASS_FLOAT)   return AbstractDataset.FLOAT32;
-			
+			//$FALL-THROUGH$
 		case 64:
 			if (type==Datatype.CLASS_INTEGER) return AbstractDataset.INT64;
 			if (type==Datatype.CLASS_FLOAT)   return AbstractDataset.FLOAT64;
@@ -58,10 +58,10 @@ public class H5Utils {
 	}
 	
 	/**
-	 * Gets a data set from the complete dims.
+	 * Gets a dataset from the complete dims.
 	 * @param val
 	 * @param set
-	 * @return
+	 * @return dataset
 	 * @throws Exception
 	 */
 	public static AbstractDataset getSet(final Object  val, final Dataset set) throws Exception {
@@ -73,7 +73,7 @@ public class H5Utils {
 	 * @param val
 	 * @param longShape
 	 * @param set
-	 * @return
+	 * @return dataset
 	 * @throws Exception
 	 */
 	public static AbstractDataset getSet(final Object  val, final long[] longShape, final Dataset set) throws Exception {
@@ -121,7 +121,7 @@ public class H5Utils {
 	/**
 	 * Get a int[] from a long[]
 	 * @param longShape
-	 * @return
+	 * @return int shape
 	 */
 	public static int[] getInt(long[] longShape) {
 		final int[] intShape  = new int[longShape.length];
@@ -131,18 +131,18 @@ public class H5Utils {
 
 	/**
 	 * Get a long[] from a int[]
-	 * @param longShape
-	 * @return
+	 * @param intShape
+	 * @return long shape
 	 */
 	public static long[] getLong(int[] intShape) {
 		final long[] longShape  = new long[intShape.length];
-		for (int i = 0; i < intShape.length; i++) longShape[i] = (long)intShape[i];
+		for (int i = 0; i < intShape.length; i++) longShape[i] = intShape[i];
 		return longShape;
 	}
 	/**
 	 * Determines the HDF5 Datatype for an abstract dataset.
 	 * @param a
-	 * @return
+	 * @return data type
 	 */
 	public static Datatype getDatatype(IDataset a) throws Exception {
 		
