@@ -26,7 +26,6 @@ import org.dawb.hdf5.nexus.NexusUtils;
 import org.dawnsci.persistence.Activator;
 import org.dawnsci.persistence.function.FunctionBean;
 import org.dawnsci.persistence.function.FunctionBeanConverter;
-import org.dawnsci.persistence.metadata.diffraction.NexusDiffractionMetaReader;
 import org.dawnsci.persistence.roi.ROIBean;
 import org.dawnsci.persistence.roi.ROIBeanConverter;
 import org.dawnsci.persistence.util.PersistenceUtils;
@@ -46,6 +45,7 @@ import uk.ac.diamond.scisoft.analysis.fitting.functions.IFunction;
 import uk.ac.diamond.scisoft.analysis.io.DataHolder;
 import uk.ac.diamond.scisoft.analysis.io.IDiffractionMetadata;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
+import uk.ac.diamond.scisoft.analysis.io.NexusDiffractionMetaReader;
 import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
 import uk.ac.diamond.scisoft.analysis.roi.IROI;
 

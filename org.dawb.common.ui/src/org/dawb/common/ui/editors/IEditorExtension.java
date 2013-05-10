@@ -1,6 +1,6 @@
 package org.dawb.common.ui.editors;
 
-import org.dawb.common.ui.plot.AbstractPlottingSystem;
+import org.dawb.common.ui.parts.IPlottingPart;
 import org.eclipse.ui.IEditorPart;
 
 /**
@@ -13,7 +13,7 @@ import org.eclipse.ui.IEditorPart;
  * @author fcp94556
  *
  */
-public interface IEditorExtension extends IEditorPart {
+public interface IEditorExtension extends IEditorPart, IPlottingPart {
 
 	/**
 	 * Ensure that this method returns false as quickly as possible without parsing the data.
@@ -54,10 +54,4 @@ public interface IEditorExtension extends IEditorPart {
 	 */
 	// TODO
 	//public int getPreferredEditorIndex();
-
-	/**
-	 * The plotting system of editor extension.
-	 * @return plotting system
-	 */
-	public AbstractPlottingSystem getPlottingSystem();
 }

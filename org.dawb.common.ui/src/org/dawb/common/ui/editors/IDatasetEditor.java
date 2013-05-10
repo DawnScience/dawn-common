@@ -12,8 +12,8 @@ package org.dawb.common.ui.editors;
 import java.util.Map;
 
 import org.dawb.common.services.IVariableManager;
+import org.dawb.common.ui.parts.IPlottingPart;
 import org.dawb.common.ui.slicing.ISlicablePlottingPart;
-import org.dawnsci.plotting.api.IPlottingSystem;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 
@@ -22,7 +22,7 @@ import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
 
-public interface IDatasetEditor extends IVariableManager, IEditorPart, ISlicablePlottingPart {
+public interface IDatasetEditor extends IVariableManager, IEditorPart, ISlicablePlottingPart, IPlottingPart {
 
 	/**
 	 * Update the plot with checkables selected by the user.
@@ -69,10 +69,4 @@ public interface IDatasetEditor extends IVariableManager, IEditorPart, ISlicable
 	 * @return true if there is a dataset of given name
 	 */
 	public boolean containsDatasetName(String name, IMonitor monitor);
-	
-	/**
-	 * May return null, if data not plotting
-	 * @return plotting system
-	 */
-	public IPlottingSystem getPlottingSystem();
 }
