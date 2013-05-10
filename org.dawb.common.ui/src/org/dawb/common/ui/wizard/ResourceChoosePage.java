@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.dawb.common.services.IExpressionObject;
+import org.dawb.common.services.IExpressionObjectService;
 import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.services.conversion.IConversionContext.ConversionScheme;
 import org.dawb.common.ui.Activator;
@@ -43,8 +44,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.IViewPart;
-import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 
 import uk.ac.diamond.scisoft.analysis.io.IMetaData;
@@ -384,28 +383,20 @@ public class ResourceChoosePage extends WizardPage {
 		}
         
         // Process any expressions
-        final IWorkbenchPage page = EclipseUtils.getPage();
-        final IViewPart dataPart = page.findView("org.dawb.workbench.views.dataSetView");
-        if (dataPart!=null) {
-        	final IFile currentData = (IFile)dataPart.getAdapter(IFile.class);
-        	final String sourcePath = getSourcePath(context);
-        	if (currentData!=null && sourcePath!=null) {
-        		final String curPath = currentData.getLocation().toOSString();
-        		if (curPath!=null && curPath.replace('\\','/').equals(sourcePath)) {
+        
+    	final String sourcePath = getSourcePath(context);
+    	final IExpressionObjectService service = (IExpressionObjectService)PlatformUI.getWorkbench().getService(IExpressionObjectService.class);
+        final List<IExpressionObject>  exprs   = service.getActiveExpressions(sourcePath);
+        
+        if (exprs!=null && exprs.size()>0) {
         	
-		            final List<IExpressionObject> exprs = (List<IExpressionObject>)dataPart.getAdapter(List.class);
-		            if (exprs!=null && exprs.size()>0) {
-		            	
-		            	for (IExpressionObject iExpressionObject : exprs) {
-		            		final String name = iExpressionObject.getExpressionString()+" [Expression]";
-							names.add(name);
-							if (expressions==null) expressions = new HashMap<String, IExpressionObject>(exprs.size());
-							expressions.put(name, iExpressionObject);
-						}
-		            	
-		            }
-        		}
-        	}
+        	for (IExpressionObject iExpressionObject : exprs) {
+        		final String name = iExpressionObject.getExpressionName()+" [Expression]";
+				names.add(name);
+				if (expressions==null) expressions = new HashMap<String, IExpressionObject>(exprs.size());
+				expressions.put(name, iExpressionObject);
+			}
+        	
         }
        
         return names;

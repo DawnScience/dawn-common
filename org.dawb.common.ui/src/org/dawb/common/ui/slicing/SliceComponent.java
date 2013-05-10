@@ -27,6 +27,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.dawb.common.services.IExpressionObject;
+import org.dawb.common.services.IExpressionObjectService;
 import org.dawb.common.ui.Activator;
 import org.dawb.common.ui.DawbUtils;
 import org.dawb.common.ui.components.cell.ScaleCellEditor;
@@ -37,6 +39,7 @@ import org.dawb.common.ui.preferences.ViewConstants;
 import org.dawb.common.ui.util.EclipseUtils;
 import org.dawb.common.ui.util.GridUtils;
 import org.dawb.hdf5.HierarchicalDataFactory;
+import org.dawb.hdf5.IHierarchicalDataFile;
 import org.dawb.hdf5.nexus.NexusUtils;
 import org.dawnsci.plotting.api.IPlottingSystem;
 import org.dawnsci.plotting.api.PlotType;
@@ -100,13 +103,16 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 import uk.ac.diamond.scisoft.analysis.io.SliceObject;
+import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
 import uk.ac.gda.richbeans.components.cell.CComboCellEditor;
 import uk.ac.gda.richbeans.components.cell.SpinnerCellEditorWithPlayButton;
 import uk.ac.gda.richbeans.components.scalebox.RangeBox;
@@ -554,15 +560,39 @@ public class SliceComponent {
 	 * @param idim 1 based index of axis.
 	 */
 	private void updateAxis(int idim) {
+		
+		IHierarchicalDataFile file=null;
 		try {    	
 			if (!HierarchicalDataFactory.isHDF5(sliceObject.getPath())) {
 				sliceObject.setNexusAxis(idim, "indices");
 				dimensionNames.put(idim, Arrays.asList("indices"));
 				return;
 			}
-			
+				
+			// Nexus axes
 			List<String> names = NexusUtils.getAxisNames(sliceObject.getPath(), sliceObject.getName(), idim);
 			names = names!=null ? names : new ArrayList<String>(1);
+			
+			// Add any expressions 
+	    	final IExpressionObjectService service = (IExpressionObjectService)PlatformUI.getWorkbench().getService(IExpressionObjectService.class);
+	        final List<IExpressionObject>  exprs   = service.getActiveExpressions(sliceObject.getPath());
+
+	        if (exprs!=null) {
+		        file = HierarchicalDataFactory.getReader(sliceObject.getPath());
+				final int size = (int)file.getDimensionSize(sliceObject.getName(), idim);
+				
+				for (IExpressionObject iExpressionObject : exprs) {
+					final ILazyDataset set = iExpressionObject.getLazyDataSet(iExpressionObject.getExpressionName(), new IMonitor.Stub());
+					if (set.getRank()==1 && set.getSize()==size){
+						final String name = iExpressionObject.getExpressionName()+" [Expression]";
+						names.add(name);
+						final IDataset axisData = iExpressionObject.getDataSet(iExpressionObject.getExpressionName(), new IMonitor.Stub());
+						sliceObject.putExpressionAxis(name, axisData);
+					}
+				}				
+	        }
+
+	        // indices, last but not least.
 			names.add("indices");
 			dimensionNames.put(idim, names);
 			
@@ -586,11 +616,22 @@ public class SliceComponent {
 				}
 			}
 			
+
+			
 		} catch (Exception e) {
 			logger.info("Cannot assign axes!", e);
 			sliceObject.setNexusAxis(idim, "indices");
 			dimensionNames.put(idim, Arrays.asList("indices"));
-		}		
+			
+		} finally {
+			if (file!=null) {
+				try {
+					file.close();
+				} catch (Exception e) {
+					logger.error(e.getMessage(), e);
+				}
+			}
+		}
 	}
 	
 	protected void openGallery() {
@@ -1163,7 +1204,8 @@ public class SliceComponent {
 					String formatValue = String.valueOf(slice);
 					try {
 						if (axesVisible) {
-							formatValue = format.format(SliceUtils.getNexusAxisValue(sliceObject, data, slice, null));
+							Number value = SliceUtils.getNexusAxisValue(sliceObject, data, slice, null);
+							formatValue = format.format(value);
 						} else {
 							formatValue = String.valueOf(slice);
 						}

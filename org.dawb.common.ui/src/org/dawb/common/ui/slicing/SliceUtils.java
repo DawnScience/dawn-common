@@ -34,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.DatasetUtils;
 import uk.ac.diamond.scisoft.analysis.dataset.DoubleDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
@@ -266,7 +267,7 @@ public class SliceUtils {
 		
 		if (type==PlotType.XY) {
 			plottingSystem.clear();
-			final AbstractDataset x = getNexusAxis(currentSlice, slice.getShape()[0], currentSlice.getX()+1, true, monitor);
+			final IDataset x = getNexusAxis(currentSlice, slice.getShape()[0], currentSlice.getX()+1, true, monitor);
 			plottingSystem.setXfirst(true);
 			plottingSystem.setPlotType(type);
 			plottingSystem.createPlot1D(x, Arrays.asList((IDataset)slice), slice.getName(), monitor);
@@ -279,7 +280,7 @@ public class SliceUtils {
 			
 		} else if (type==PlotType.XY_STACKED || type==PlotType.XY_STACKED_3D) {
 			
-			final AbstractDataset xAxis = getNexusAxis(currentSlice, slice.getShape()[0], currentSlice.getX()+1, true, monitor);
+			final IDataset xAxis = getNexusAxis(currentSlice, slice.getShape()[0], currentSlice.getX()+1, true, monitor);
 			plottingSystem.clear();
 			// We separate the 2D image into several 1d plots
 			final int[]         shape = slice.getShape();
@@ -313,8 +314,8 @@ public class SliceUtils {
 			
 		} else if (type==PlotType.IMAGE || type==PlotType.SURFACE){
 			plottingSystem.setPlotType(type);
-			AbstractDataset y = getNexusAxis(currentSlice, slice.getShape()[0], currentSlice.getX()+1, true, monitor);
-			AbstractDataset x = getNexusAxis(currentSlice, slice.getShape()[1], currentSlice.getY()+1, true, monitor);		
+			IDataset y = getNexusAxis(currentSlice, slice.getShape()[0], currentSlice.getX()+1, true, monitor);
+			IDataset x = getNexusAxis(currentSlice, slice.getShape()[1], currentSlice.getY()+1, true, monitor);		
 			if (monitor!=null&&monitor.isCanceled()) return;
 			
 			// Nullify user objects because the ImageHistoryTool uses
@@ -355,13 +356,19 @@ public class SliceUtils {
 	 * @return
 	 * @throws Exception
 	 */
-	public static AbstractDataset getNexusAxis(SliceObject currentSlice, int length, int inexusAxis, boolean requireIndicesOnError, final IProgressMonitor  monitor) throws Exception {
+	public static IDataset getNexusAxis(SliceObject currentSlice, int length, int inexusAxis, boolean requireIndicesOnError, final IProgressMonitor  monitor) throws Exception {
+		
 		
 		String axisName = currentSlice.getNexusAxis(inexusAxis);
 		if ("indices".equals(axisName) || axisName==null) {
 			AbstractDataset indices = IntegerDataset.arange(length, IntegerDataset.INT); // Save time
 			indices.setName("");
 			return indices;
+		}
+		
+		if (axisName.endsWith("[Expression]")) {
+			final IDataset set = currentSlice.getExpressionAxis(axisName);
+			return DatasetUtils.convertToAbstractDataset(set);
 		}
 		
 		try {
@@ -403,6 +410,11 @@ public class SliceUtils {
 		}
 		
 		AbstractDataset axis = null;
+		
+		if (axisName.endsWith("[Expression]")) {
+			final IDataset set = currentSlice.getExpressionAxis(axisName);
+			return DatasetUtils.convertToAbstractDataset(set);
+		}
 		
 		if (requireUnit) { // Slower
 			IHierarchicalDataFile file = null;
