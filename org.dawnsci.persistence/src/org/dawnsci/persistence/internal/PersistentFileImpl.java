@@ -17,12 +17,12 @@ import ncsa.hdf.object.h5.H5Datatype;
 
 import org.dawb.common.services.IPersistentFile;
 import org.dawb.common.util.eclipse.BundleUtils;
-import org.dawb.gda.extensions.loaders.H5LazyDataset;
-import org.dawb.gda.extensions.loaders.H5Utils;
 import org.dawb.hdf5.HierarchicalDataFactory;
 import org.dawb.hdf5.IHierarchicalDataFile;
 import org.dawb.hdf5.Nexus;
 import org.dawb.hdf5.nexus.NexusUtils;
+import org.dawnsci.io.h5.H5LazyDataset;
+import org.dawnsci.io.h5.H5Utils;
 import org.dawnsci.persistence.Activator;
 import org.dawnsci.persistence.function.FunctionBean;
 import org.dawnsci.persistence.function.FunctionBeanConverter;

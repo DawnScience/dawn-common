@@ -80,7 +80,7 @@
    <extension
          point="uk.ac.diamond.scisoft.analysis.io.loader">
       <loader
-            class="org.dawb.gda.extensions.loaders.H5Loader"
+            class="org.dawnsci.io.h5.H5Loader"
             file_extension="h5, nxs, hdf5, hd5, hdf, nexus"
             high_priority="true">
       </loader>

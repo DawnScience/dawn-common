@@ -29,7 +29,7 @@ import org.dawb.common.ui.plot.AbstractPlottingSystem;
 import org.dawb.common.ui.plot.PlottingFactory;
 import org.dawb.common.util.io.FileUtils;
 import org.dawb.gda.extensions.Activator;
-import org.dawb.gda.extensions.loaders.H5Loader;
+import org.dawnsci.io.h5.H5Loader;
 import org.dawnsci.plotting.api.PlotType;
 import org.dawnsci.plotting.api.histogram.IImageService;
 import org.dawnsci.plotting.api.histogram.ImageServiceBean;

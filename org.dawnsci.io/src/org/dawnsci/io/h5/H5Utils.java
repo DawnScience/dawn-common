@@ -7,7 +7,7 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */ 
-package org.dawb.gda.extensions.loaders;
+package org.dawnsci.io.h5;
 
 import ncsa.hdf.object.Dataset;
 import ncsa.hdf.object.Datatype;
