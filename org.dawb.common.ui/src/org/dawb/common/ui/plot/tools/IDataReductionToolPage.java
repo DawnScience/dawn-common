@@ -56,11 +56,11 @@ public interface IDataReductionToolPage extends IToolPage {
 		private AbstractDataset       data;
 		
 		/**
-		 * May be null, 0 = x, 1 = y. Y may be ommited, in which case use indixes
+		 * May be null, 0 = x, 1 = y. Y may be omitted, in which case use indexes
 		 */
 		private List<AbstractDataset> axes;
 		/**
-		 * May be null, data which the tool may need for persistance.
+		 * May be null, data which the tool may need for persistence.
 		 */
 		private Object                userData;
 		private IProgressMonitor      monitor;
