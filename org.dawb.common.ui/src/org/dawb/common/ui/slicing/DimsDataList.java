@@ -24,6 +24,7 @@ public class DimsDataList implements Serializable {
 	
 	
 	private List<DimsData> dimsData;
+	private boolean        expression;
 		
 	public DimsDataList() {
 	}
@@ -315,5 +316,13 @@ public class DimsDataList implements Serializable {
 				continue;
 			}
 		}
+	}
+
+	public boolean isExpression() {
+		return expression;
+	}
+
+	public void setExpression(boolean expression) {
+		this.expression = expression;
 	}
 }

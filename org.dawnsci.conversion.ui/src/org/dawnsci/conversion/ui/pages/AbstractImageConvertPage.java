@@ -151,7 +151,7 @@ public abstract class AbstractImageConvertPage extends ResourceChoosePage implem
 				DataHolder dh = LoaderFactory.getData(context.getFilePaths().get(0), new IMonitor.Stub());
 				lz = dh.getLazyDataset(datasetName);
 			}
-			sliceComponent.setData(lz, datasetName, context.getFilePaths().get(0));
+			sliceComponent.setData(lz, datasetName, context.getFilePaths().get(0), false);
 
 		} catch (Exception ne) {
 			setErrorMessage("Cannot read data set '"+datasetName+"'");

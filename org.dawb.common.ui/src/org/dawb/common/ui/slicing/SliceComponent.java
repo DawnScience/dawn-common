@@ -561,16 +561,23 @@ public class SliceComponent {
 	 */
 	private void updateAxis(int idim) {
 		
-		IHierarchicalDataFile file=null;
 		try {    	
-			if (!HierarchicalDataFactory.isHDF5(sliceObject.getPath())) {
+			if (!dimsDataList.isExpression() && !HierarchicalDataFactory.isHDF5(sliceObject.getPath())) {
 				sliceObject.setNexusAxis(idim, "indices");
 				dimensionNames.put(idim, Arrays.asList("indices"));
 				return;
 			}
-				
+
+			List<String> names = null;
 			// Nexus axes
-			List<String> names = NexusUtils.getAxisNames(sliceObject.getPath(), sliceObject.getName(), idim);
+			try {
+				if (sliceObject.getPath()!=null && sliceObject.getName()!=null) {
+				    names = NexusUtils.getAxisNames(sliceObject.getPath(), sliceObject.getName(), idim);
+				}
+			} catch (Exception ne) {
+				if (!dimsDataList.isExpression()) throw ne; // Expressions, we don't care that
+				                                            // cannot read nexus
+			}
 			names = names!=null ? names : new ArrayList<String>(1);
 			
 			// Add any expressions 
@@ -578,8 +585,7 @@ public class SliceComponent {
 	        final List<IExpressionObject>  exprs   = service.getActiveExpressions(sliceObject.getPath());
 
 	        if (exprs!=null) {
-		        file = HierarchicalDataFactory.getReader(sliceObject.getPath());
-				final int size = (int)file.getDimensionSize(sliceObject.getName(), idim);
+				final int size = this.lazySet.getShape()[idim-1];
 				
 				for (IExpressionObject iExpressionObject : exprs) {
 					final ILazyDataset set = iExpressionObject.getLazyDataSet(iExpressionObject.getExpressionName(), new IMonitor.Stub());
@@ -612,7 +618,7 @@ public class SliceComponent {
 				}
 				if (!found) {
 					sliceObject.setNexusAxis(idim, "indices");
-					dimensionNames.put(idim, Arrays.asList("indices"));
+					//dimensionNames.put(idim, Arrays.asList("indices"));
 				}
 			}
 			
@@ -623,14 +629,6 @@ public class SliceComponent {
 			sliceObject.setNexusAxis(idim, "indices");
 			dimensionNames.put(idim, Arrays.asList("indices"));
 			
-		} finally {
-			if (file!=null) {
-				try {
-					file.close();
-				} catch (Exception e) {
-					logger.error(e.getMessage(), e);
-				}
-			}
 		}
 	}
 	
@@ -652,7 +650,7 @@ public class SliceComponent {
 		
 	}
 
-	private void createDimsData() {
+	private void createDimsData(boolean isExpression) {
 		
 		final int dims = dataShape.length;
 		
@@ -737,6 +735,8 @@ public class SliceComponent {
 			    }
 			}
 		}
+		
+		dimsDataList.setExpression(isExpression);
 	}
 
 	/**
@@ -1241,7 +1241,10 @@ public class SliceComponent {
 	 * 
 	 * This method is not thread safe, please call in the UI thread.
 	 */
-	public void setData(final ILazyDataset lazySet, final String dataName, final String filePath) {
+	public void setData(final ILazyDataset lazySet, 
+			            final String dataName, 
+			            final String filePath,
+			            final boolean isExpression) {
 		
 		if (Display.getDefault().getThread()!=Thread.currentThread()) {
 			throw new SWTError("Please call setData(...) in slice component from the UI thread only!");
@@ -1260,7 +1263,7 @@ public class SliceComponent {
 		spinnerEditor.setRangeDialogTitle("Range for slice in '"+sliceObject.getName()+"'");
 		spinnerEditor.setPlayButtonVisible(false);
 		
-		createDimsData();
+		createDimsData(isExpression);
 		updateAxesChoices();
 		viewer.refresh();
     	
