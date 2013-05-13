@@ -47,6 +47,38 @@ public class NCDConvertTest {
         }
    	}
 	
+	@Test
+	public void testNCDSimpleNoAxis() throws Exception {
+		
+		ConversionServiceImpl service = new ConversionServiceImpl();
+		
+		// Determine path to test file
+		final String path = getTestFilePath("results_i22-102527_Pilatus2M_280313_112434.nxs");
+		
+		final IConversionContext context = service.open(path);
+		final File tmp = File.createTempFile("NCDtestSimple", ".dat");
+		tmp.deleteOnExit();
+		final File dir = new File(tmp.getParent(), "NCD_export"+System.currentTimeMillis());
+		dir.mkdirs();
+		dir.deleteOnExit();
+		
+        context.setOutputPath(dir.getAbsolutePath());
+        context.setConversionScheme(ConversionScheme.CUSTOM_NCD);
+        context.setDatasetName("/entry1/Pilatus2M_result/data");
+        context.addSliceDimension(0, "all");
+        service.process(context);
+        
+        final File[] fa = dir.listFiles();
+        for (File file : fa) {
+        	file.deleteOnExit();
+        	final DataHolder   dh    = LoaderFactory.getData(file.getAbsolutePath());
+            String[] names = dh.getNames();
+            assertEquals(60, names.length);
+            assertEquals("Column_0",names[0]);
+            assertEquals("Column_1",names[1]);
+        }
+   	}
+	
 	
 	@Test
 	public void testNCDMultiDims() throws Exception {

@@ -88,7 +88,7 @@ public class CustomNCDConverter extends AbstractConversion  {
 		
 		if (axis != null) {
 			String axisName = getAxisName(context.getAxisDatasetName());
-			headings.add("#" + axisName);
+			headings.add(axisName);
 		}
 		
 		if (stop.length == 1) {
@@ -127,6 +127,8 @@ public class CustomNCDConverter extends AbstractConversion  {
 			
 			if (axis != null) {
 				data = DatasetUtils.concatenate(new IDataset[]{axis,data.transpose(null)}, 1);
+			} else {
+				data =data.transpose(null);
 			}
 			
 			String pathToFolder = context.getOutputPath();
