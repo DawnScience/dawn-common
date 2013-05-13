@@ -324,7 +324,7 @@ public class SliceUtils {
 			// nullify the user object.
 			final IImageTrace trace = getImageTrace(plottingSystem);
 			if (trace!=null) trace.setUserObject(null);
-			plottingSystem.updatePlot2D(slice, Arrays.asList((IDataset)x,y), monitor); 			
+			plottingSystem.updatePlot2D(slice, Arrays.asList(x,y), monitor); 			
 		}
 
 		plottingSystem.repaint(requireScale);
