@@ -1,6 +1,6 @@
 package org.dawb.common.ui.editors;
 
-import org.dawb.common.ui.parts.IPlottingPart;
+import org.dawnsci.plotting.api.IPlottingContainer;
 import org.eclipse.ui.IEditorPart;
 
 /**
@@ -13,7 +13,7 @@ import org.eclipse.ui.IEditorPart;
  * @author fcp94556
  *
  */
-public interface IEditorExtension extends IEditorPart, IPlottingPart {
+public interface IEditorExtension extends IEditorPart, IPlottingContainer {
 
 	/**
 	 * Ensure that this method returns false as quickly as possible without parsing the data.
