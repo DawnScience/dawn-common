@@ -1,5 +1,6 @@
 package org.dawb.common.ui.parts;
 
+import org.dawnsci.plotting.api.IPlottingContainer;
 import org.dawnsci.plotting.api.IPlottingSystem;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPart;
@@ -25,8 +26,8 @@ public class PartUtils {
 		}
 
 		IPlottingSystem system = null;
-		if (part instanceof IPlottingPart) {
-			system = ((IPlottingPart) part).getPlottingSystem();
+		if (part instanceof IPlottingContainer) {
+			system = ((IPlottingContainer) part).getPlottingSystem();
 		}
 
 		return system;

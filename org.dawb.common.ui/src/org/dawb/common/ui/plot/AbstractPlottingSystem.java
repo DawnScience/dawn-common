@@ -359,6 +359,16 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	}
 
 	/**
+	 * Shows or not the intensity scale
+	 * The intensity scale is displayed (set to True) every time there is an image update
+	 * If you want to hide it (set to False), make sure this method is called after each update.
+	 * @param b
+	 */
+	public void setShowIntensity(boolean b){
+		
+	}
+
+	/**
 	 * Please override if you allow your plotter to create images
 	 * @param size
 	 * @return
