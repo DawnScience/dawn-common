@@ -174,6 +174,8 @@ public class NexusUtils {
         final Map<Integer, String> axesMap = new TreeMap<Integer, String>();
 		
         signal.getMetadata();
+       
+        if (dimension>signal.getDims().length) return null;
         final long size = signal.getDims()[dimension-1];
 
         final String parentPath = signal.getFullName().substring(0, signal.getFullName().lastIndexOf("/"));
