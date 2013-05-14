@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory;
 import uk.ac.diamond.scisoft.analysis.roi.CircularROI;
 import uk.ac.diamond.scisoft.analysis.roi.EllipticalFitROI;
 import uk.ac.diamond.scisoft.analysis.roi.EllipticalROI;
+import uk.ac.diamond.scisoft.analysis.roi.GridROI;
 import uk.ac.diamond.scisoft.analysis.roi.IROI;
 import uk.ac.diamond.scisoft.analysis.roi.LinearROI;
 import uk.ac.diamond.scisoft.analysis.roi.PerimeterBoxROI;
@@ -409,7 +410,7 @@ public class ROIEditTable  {
 			}
 			ret = pr;
 			
-		} else if (roi instanceof PointROI) {
+		} else if (roi instanceof PointROI || roi==null) {
 			PointROI pr = new PointROI(getImage(coords, rows.get(0)));
 			ret = pr;
 			
@@ -425,10 +426,18 @@ public class ROIEditTable  {
 								                         Math.toRadians(rows.get(2).getxLikeVal()));
 				ret = pr;
 				
+			} else if (roi instanceof GridROI) {
+				GridROI gr = ((GridROI)roi).copy();
+				gr.setPoint(start);
+				gr.setLengths(end[0]-start[0],  end[1]-start[1]);
+				gr.setAngle(Math.toRadians(rows.get(2).getxLikeVal()));
+				
+				ret = gr;
+
 			} else {
 				RectangularROI rr = new RectangularROI(start[0],          start[1],
-								                       end[0]-start[0],   end[1]-start[1], 
-								                       Math.toRadians(rows.get(2).getxLikeVal()));
+														end[0]-start[0],   end[1]-start[1], 
+														Math.toRadians(rows.get(2).getxLikeVal()));
 				ret = rr;
 			}
 			
