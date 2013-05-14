@@ -574,7 +574,7 @@ public class SliceComponent {
 				if (sliceObject.getPath()!=null && sliceObject.getName()!=null) {
 				    names = NexusUtils.getAxisNames(sliceObject.getPath(), sliceObject.getName(), idim);
 				}
-			} catch (Exception ne) {
+			} catch (Throwable ne) {
 				if (!dimsDataList.isExpression()) throw ne; // Expressions, we don't care that
 				                                            // cannot read nexus
 			}
@@ -624,7 +624,7 @@ public class SliceComponent {
 			
 
 			
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			logger.info("Cannot assign axes!", e);
 			sliceObject.setNexusAxis(idim, "indices");
 			dimensionNames.put(idim, Arrays.asList("indices"));
@@ -846,7 +846,7 @@ public class SliceComponent {
 		int value = data.getSlice();
         final StringBuffer buf = new StringBuffer();
         
-        AbstractDataset axis = null;
+        IDataset axis = null;
         if (axesVisible) try {
 			final String axisName = SliceUtils.getNexusAxisName(sliceObject, data);
             axis = SliceUtils.getNexusAxis(this.sliceObject, axisName, false, null);

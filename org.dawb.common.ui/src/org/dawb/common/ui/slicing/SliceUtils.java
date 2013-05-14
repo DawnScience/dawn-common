@@ -174,7 +174,7 @@ public class SliceUtils {
      * @return the nexus axis value or the index if no nexus axis can be found.
      */
 	public static Number getNexusAxisValue(SliceObject sliceObject, DimsData data, int value, IProgressMonitor monitor) {
-        AbstractDataset axis = null;
+        IDataset axis = null;
         try {
         	final String axisName = getNexusAxisName(sliceObject, data);
             axis = SliceUtils.getNexusAxis(sliceObject, axisName, false, monitor);
@@ -396,10 +396,10 @@ public class SliceUtils {
 	 * @param monitor
 	 * @return
 	 */
-	public static AbstractDataset getNexusAxis(final SliceObject currentSlice, 
-			                                         String origName, 
-			                                   final boolean requireUnit,
-			                                   final IProgressMonitor  monitor) throws Exception {
+	public static IDataset getNexusAxis(final SliceObject currentSlice, 
+										      String origName, 
+										final boolean requireUnit,
+										final IProgressMonitor  monitor) throws Exception {
 		
 		int dimension = -1;
 		String axisName = origName;
