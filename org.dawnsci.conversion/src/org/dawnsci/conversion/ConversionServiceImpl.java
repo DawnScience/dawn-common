@@ -10,7 +10,6 @@ import org.dawnsci.conversion.converters.CustomNCDConverter;
 import org.dawnsci.conversion.converters.CustomTomoConverter;
 import org.dawnsci.conversion.converters.ImageConverter;
 import org.dawnsci.conversion.converters.VisitorConversion;
-import org.slf4j.LoggerFactory;
 
 class ConversionServiceImpl implements IConversionService {
 	

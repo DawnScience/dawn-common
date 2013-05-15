@@ -190,7 +190,7 @@ public class TomoConvertTest {
 	
 	private String getTestFilePath(String fileName) {
 
-		final File test = new File("test/org/dawnsci/conversion/"+fileName);
+		final File test = new File("testfiles/"+fileName);
 		return test.getAbsolutePath();
 
 	}
