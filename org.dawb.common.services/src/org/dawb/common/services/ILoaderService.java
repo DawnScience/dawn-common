@@ -9,11 +9,10 @@
  */ 
 package org.dawb.common.services;
 
-import java.io.File;
-
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
+import uk.ac.diamond.scisoft.analysis.io.IDataHolder;
 import uk.ac.diamond.scisoft.analysis.io.IDiffractionMetadata;
 import uk.ac.diamond.scisoft.analysis.io.IMetaData;
 
@@ -28,15 +27,16 @@ import uk.ac.diamond.scisoft.analysis.io.IMetaData;
  *
  */
 public interface ILoaderService {
-
+	
 	/**
 	 * Reads a dataset and returns it as an AbstractDataset
 	 * @param filePath
 	 * @return
 	 * @throws Throwable
 	 */
-    public IDataset getDataset(String filePath) throws Throwable;
-	
+    public IDataHolder getData(String filePath, final IProgressMonitor monitor) throws Throwable;
+
+
 	/**
 	 * Reads a dataset and returns it as an AbstractDataset, with progress
 	 * @param filePath
@@ -54,13 +54,6 @@ public interface ILoaderService {
 	 */
     public IDataset getDataset(String filePath, final String datasetPath, final IProgressMonitor monitor) throws Throwable;
 
-	 /**
-	  * Reads a file and returns it as an AbstractDataset, used for image files.
-	  * @param filePath
-	  * @return
-	  * @throws Throwable
-	  */
-	 public IDataset getDataset(File f) throws Throwable;
 	 
 	 /**
 	  * This method can be used to load meta data. It will use Fabio if

@@ -9,25 +9,20 @@
  */ 
 package org.dawb.gda.extensions.loaders;
 
-import java.io.File;
 import java.net.URL;
 
 import org.dawb.common.services.ILoaderService;
 import org.dawb.common.ui.monitor.ProgressMonitorWrapper;
-import org.dawb.common.util.eclipse.BundleUtils;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.preferences.InstanceScope;
-import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.eclipse.ui.services.AbstractServiceFactory;
 import org.eclipse.ui.services.IServiceLocator;
 
-import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
-import uk.ac.diamond.scisoft.analysis.io.DataHolder;
+import uk.ac.diamond.scisoft.analysis.io.IDataHolder;
 import uk.ac.diamond.scisoft.analysis.io.IDiffractionMetadata;
 import uk.ac.diamond.scisoft.analysis.io.IMetaData;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
+import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
 //import org.dawb.fabio.FabioFile;
 
 /**
@@ -40,10 +35,12 @@ import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
  */
 public class LoaderService extends AbstractServiceFactory implements ILoaderService {
 
-	public IDataset getDataset(String filePath) throws Throwable {
-		
-        return getDataset(filePath, new NullProgressMonitor());
+	
+	public IDataHolder getData(String filePath, final IProgressMonitor monitor) throws Throwable {
+	    IMonitor mon = monitor!=null ? new ProgressMonitorWrapper(monitor) : new IMonitor.Stub(); 
+		return LoaderFactory.getData(filePath, mon);
 	}
+
 	
 	public IDataset getDataset(String filePath, final IProgressMonitor monitor) throws Throwable {
 	    try {
@@ -52,31 +49,25 @@ public class LoaderService extends AbstractServiceFactory implements ILoaderServ
 		} catch (Throwable ignored) {
 		    // We try the file path anyway
 		}
-		return getDataset(new File(filePath), new NullProgressMonitor());
+	    
+	    IMonitor mon = monitor!=null ? new ProgressMonitorWrapper(monitor) : new IMonitor.Stub(); 
+		final IDataHolder dh  = LoaderFactory.getData(filePath, mon);
+		return dh!=null ? dh.getDataset(0) : null;
 	}
-
-	public IDataset getDataset(File f) throws Throwable {
-		return getDataset(f, new NullProgressMonitor());
+	
+	
+	public IDataset getDataset(final String path, final String datasetName, final IProgressMonitor monitor) throws Throwable {
+	    
+	    IMonitor mon = monitor!=null ? new ProgressMonitorWrapper(monitor) : new IMonitor.Stub(); 
+		return LoaderFactory.getDataSet(path, datasetName, mon);
 	}
 	
 	public IMetaData getMetaData(final String filePath, final IProgressMonitor monitor) throws Exception {
 				
-		return LoaderFactory.getMetaData(filePath, new ProgressMonitorWrapper(monitor));
+	    IMonitor mon = monitor!=null ? new ProgressMonitorWrapper(monitor) : new IMonitor.Stub(); 
+		return LoaderFactory.getMetaData(filePath, mon);
 	}
 
-	private IDataset getDataset(final File f, final IProgressMonitor monitor) throws Throwable {
-		
-		AbstractDataset set = null;
-		
-		final DataHolder      dh  = LoaderFactory.getData(f.getAbsolutePath(), new ProgressMonitorWrapper(monitor));
-		set = dh.getDataset(0);
-		set.setName(f.getName());
-		return set;
-	}
-	
-	public IDataset getDataset(final String path, final String datasetName, final IProgressMonitor monitor) throws Throwable {
-		return LoaderFactory.getDataSet(path, datasetName, new ProgressMonitorWrapper(monitor));
-	}
 
 
 	@Override
