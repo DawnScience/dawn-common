@@ -44,6 +44,15 @@ public interface ILoaderService {
 	 * @throws Throwable
 	 */
     public IDataset getDataset(String filePath, final IProgressMonitor monitor) throws Throwable;
+    
+	/**
+	 * Reads a dataset and returns it as an AbstractDataset, with progress
+	 * @param filePath
+	 * @param datasetPath for instance nexus path, may be null.
+	 * @return
+	 * @throws Throwable
+	 */
+    public IDataset getDataset(String filePath, final String datasetPath, final IProgressMonitor monitor) throws Throwable;
 
 	 /**
 	  * Reads a file and returns it as an AbstractDataset, used for image files.
