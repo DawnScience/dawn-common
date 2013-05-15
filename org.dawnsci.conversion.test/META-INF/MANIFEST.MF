@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Conversion Tools Tests
+Bundle-SymbolicName: org.dawnsci.conversion.test
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: Diamond Light Source
+Fragment-Host: org.dawnsci.conversion;bundle-version="[1.0.0,1.1.0)"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Export-Package: org.dawnsci.conversion
+Require-Bundle: org.junit

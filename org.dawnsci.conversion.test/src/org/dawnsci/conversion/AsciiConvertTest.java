@@ -21,6 +21,7 @@ import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 
 public class AsciiConvertTest {
 
+	private String testfile = "MoKedge_1_15.nxs";
 	
 	@Test
 	public void testAsciiSimple() throws Exception {
@@ -28,7 +29,7 @@ public class AsciiConvertTest {
 		ConversionServiceImpl service = new ConversionServiceImpl();
 		
 		// Determine path to test file
-		final String path = getTestFilePath("MoKedge_1_15.nxs");
+		final String path = getTestFilePath(testfile);
 		
 		final IConversionContext context = service.open(path);
 		final File tmp = File.createTempFile("testSimple", ".dat");
@@ -52,7 +53,7 @@ public class AsciiConvertTest {
 		ConversionServiceImpl service = new ConversionServiceImpl();
 		
 		// Determine path to test file
-		final String path = getTestFilePath("MoKedge_1_15.nxs");
+		final String path = getTestFilePath(testfile);
 		
 		final IConversionContext context = service.open(path);
 		final File tmp = File.createTempFile("testConfig", ".dat");
@@ -96,7 +97,7 @@ public class AsciiConvertTest {
 		ConversionServiceImpl service = new ConversionServiceImpl();
 		
 		// Determine path to test file
-		final String path = getTestFilePath("MoKedge_1_15.nxs");
+		final String path = getTestFilePath(testfile);
 		
 		final IConversionContext context = service.open(path);
 		final File tmp = File.createTempFile("testConfig", ".csv");
@@ -131,7 +132,7 @@ public class AsciiConvertTest {
 
 	private String getTestFilePath(String fileName) {
 		
-		final File test = new File("test/org/dawnsci/conversion/"+fileName);
+		final File test = new File("testfiles/"+fileName);
 		return test.getAbsolutePath();
 	
 	}
