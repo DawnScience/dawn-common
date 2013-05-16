@@ -1,5 +1,11 @@
 package org.dawnsci.conversion.converters;
 
+import java.io.File;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.dawb.common.services.conversion.IConversionContext;
 import org.dawnsci.plotting.api.histogram.ImageServiceBean;
 
@@ -20,17 +26,35 @@ public abstract class AbstractImageConversion extends AbstractConversion {
 	 * @return
 	 */
 	protected final String getFilePath(AbstractDataset slice) {
-		final String fileName = getFileName(slice);
-		return context.getOutputPath()+"/"+fileName;
+		final String sliceFileName = getFileName(slice);
+		
+		final File selectedFile = context.getSelectedConversionFile();
+		final String fileNameFrag = selectedFile!=null ? getFileNameNoExtension(selectedFile)+"/" : "";
+		
+		return context.getOutputPath()+"/"+fileNameFrag+sliceFileName;
 	}
 
+	private Pattern INDEX_PATTERN = Pattern.compile("(.+index=)(\\d+)\\)");
+	
 	private String getFileName(AbstractDataset slice) {
+		
 		String fileName = slice.getName();
 		if (context.getUserObject()!=null) {
 			ConversionInfoBean bean = (ConversionInfoBean)context.getUserObject();
-			if (bean.getAlternativeNamePrefix()!=null) {
-				final String nameFrag = fileName.substring(0, fileName.indexOf("(Dim"));
-				fileName = fileName.replace(nameFrag, bean.getAlternativeNamePrefix());
+			
+			String namePrefix = null;
+			if (bean.getAlternativeNamePrefix()!=null && !"".equals(bean.getAlternativeNamePrefix())) {
+				namePrefix = bean.getAlternativeNamePrefix();
+			}
+			
+			// fileName example " data(Dim 0; index=0) "
+			if (bean.getSliceIndexFormat()!=null) {
+				final Matcher matcher = INDEX_PATTERN.matcher(fileName);
+				if (matcher.matches()) {
+					final NumberFormat format = new DecimalFormat(bean.getSliceIndexFormat());
+					namePrefix = namePrefix!=null ? namePrefix :  matcher.group(1);
+					fileName   = namePrefix+format.format(Integer.parseInt(matcher.group(2)))+")";
+				}
 			}
 		}
 		fileName = fileName.replace('\\', '_');
@@ -80,6 +104,8 @@ public abstract class AbstractImageConversion extends AbstractConversion {
 		private String alternativeNamePrefix;
 		private String extension = "tiff";
 		private int    bits      = 33;
+		private String sliceIndexFormat = "#000";
+		
 		public String getExtension() {
 			return extension;
 		}
@@ -111,6 +137,10 @@ public abstract class AbstractImageConversion extends AbstractConversion {
 			result = prime
 					* result
 					+ ((imageServiceBean == null) ? 0 : imageServiceBean
+							.hashCode());
+			result = prime
+					* result
+					+ ((sliceIndexFormat == null) ? 0 : sliceIndexFormat
 							.hashCode());
 			return result;
 		}
@@ -147,6 +177,11 @@ public abstract class AbstractImageConversion extends AbstractConversion {
 					return false;
 			} else if (!imageServiceBean.equals(other.imageServiceBean))
 				return false;
+			if (sliceIndexFormat == null) {
+				if (other.sliceIndexFormat != null)
+					return false;
+			} else if (!sliceIndexFormat.equals(other.sliceIndexFormat))
+				return false;
 			return true;
 		}
 		public String getAlternativeNamePrefix() {
@@ -178,6 +213,12 @@ public abstract class AbstractImageConversion extends AbstractConversion {
 		}
 		public void setFrameRate(int frameRate) {
 			this.frameRate = frameRate;
+		}
+		public String getSliceIndexFormat() {
+			return sliceIndexFormat;
+		}
+		public void setSliceIndexFormat(String sliceIndexFormat) {
+			this.sliceIndexFormat = sliceIndexFormat;
 		}
 	}
 

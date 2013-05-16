@@ -44,6 +44,8 @@ public final class ImageConvertPage extends AbstractImageConvertPage {
 	private Text           imagePrefixBox;
 	private CLabel         warningLabel;
 
+	private Text sliceIndexFormat;
+
 	public ImageConvertPage() {
 		super("wizardPage", "Page for slicing HDF5 data into a directory of images.", null);
 		setTitle("Convert to Images");
@@ -122,8 +124,18 @@ public final class ImageConvertPage extends AbstractImageConvertPage {
 		this.imagePrefixBox = new Text(advanced, SWT.BORDER);
 		imagePrefixBox.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
 		imagePrefixBox.setText("image");
+		
+		
 		label = new Label(advanced, SWT.NULL);
 		label.setLayoutData(new GridData());
+		label.setText("Slice Index Format");
+
+		this.sliceIndexFormat = new Text(advanced, SWT.BORDER);
+		sliceIndexFormat.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
+		sliceIndexFormat.setText("#000");
+		label = new Label(advanced, SWT.NULL);
+		label.setLayoutData(new GridData());
+
 
 		GridUtils.setVisible(advanced, false);
 		ExpansionAdapter expansionListener = new ExpansionAdapter() {
@@ -199,6 +211,7 @@ public final class ImageConvertPage extends AbstractImageConvertPage {
 		bean.setExtension(imageFormat);
 		bean.setBits(bitDepth);
 		bean.setAlternativeNamePrefix(imagePrefixBox.getText());
+		bean.setSliceIndexFormat(sliceIndexFormat.getText());
 		context.setUserObject(bean);
 		
 		return context;
