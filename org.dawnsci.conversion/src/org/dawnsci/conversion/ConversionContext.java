@@ -26,6 +26,7 @@ class ConversionContext implements IConversionContext {
 	private IMonitor            monitor;
 	private File                selectedConversionFile;
 	private String              axisDatasetName;
+	private int                 workSize=100;
 	
 	public ConversionScheme getConversionScheme() {
 		return conversionScheme;
@@ -108,6 +109,8 @@ class ConversionContext implements IConversionContext {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result
+				+ ((axisDatasetName == null) ? 0 : axisDatasetName.hashCode());
 		result = prime
 				* result
 				+ ((conversionScheme == null) ? 0 : conversionScheme.hashCode());
@@ -123,14 +126,11 @@ class ConversionContext implements IConversionContext {
 				+ ((lazyDataset == null) ? 0 : lazyDataset.hashCode());
 		result = prime * result
 				+ ((outputFolder == null) ? 0 : outputFolder.hashCode());
-		result = prime
-				* result
-				+ ((selectedConversionFile == null) ? 0
-						: selectedConversionFile.hashCode());
 		result = prime * result
 				+ ((sliceDimensions == null) ? 0 : sliceDimensions.hashCode());
 		result = prime * result
 				+ ((userObject == null) ? 0 : userObject.hashCode());
+		result = prime * result + workSize;
 		return result;
 	}
 	@Override
@@ -142,6 +142,11 @@ class ConversionContext implements IConversionContext {
 		if (getClass() != obj.getClass())
 			return false;
 		ConversionContext other = (ConversionContext) obj;
+		if (axisDatasetName == null) {
+			if (other.axisDatasetName != null)
+				return false;
+		} else if (!axisDatasetName.equals(other.axisDatasetName))
+			return false;
 		if (conversionScheme != other.conversionScheme)
 			return false;
 		if (conversionVisitor == null) {
@@ -169,11 +174,6 @@ class ConversionContext implements IConversionContext {
 				return false;
 		} else if (!outputFolder.equals(other.outputFolder))
 			return false;
-		if (selectedConversionFile == null) {
-			if (other.selectedConversionFile != null)
-				return false;
-		} else if (!selectedConversionFile.equals(other.selectedConversionFile))
-			return false;
 		if (sliceDimensions == null) {
 			if (other.sliceDimensions != null)
 				return false;
@@ -183,6 +183,8 @@ class ConversionContext implements IConversionContext {
 			if (other.userObject != null)
 				return false;
 		} else if (!userObject.equals(other.userObject))
+			return false;
+		if (workSize != other.workSize)
 			return false;
 		return true;
 	}
@@ -206,6 +208,12 @@ class ConversionContext implements IConversionContext {
 	public void setAxisDatasetName(String axisDatasetName) {
 		this.axisDatasetName = axisDatasetName;
 		
+	}
+	public int getWorkSize() {
+		return workSize;
+	}
+	public void setWorkSize(int workSize) {
+		this.workSize = workSize;
 	}
 
 }

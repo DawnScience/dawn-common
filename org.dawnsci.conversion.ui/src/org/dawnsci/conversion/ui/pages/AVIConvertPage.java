@@ -53,6 +53,7 @@ public final class AVIConvertPage extends AbstractImageConvertPage {
 		setTitle("Convert to Images");
 		setDirectory(false);
 		setFileLabel("Export video");
+		setPathEditable(true);
 	}
 	
 	@Override
@@ -107,8 +108,8 @@ public final class AVIConvertPage extends AbstractImageConvertPage {
 
         final Text rate = new Text(advanced, SWT.BORDER);
         rate.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-        rate.setText("1");
-        frameRate = 1;
+        rate.setText("20");
+        frameRate = 20;
         rate.addModifyListener(new ModifyListener() {			
 			@Override
 			public void modifyText(ModifyEvent e) {

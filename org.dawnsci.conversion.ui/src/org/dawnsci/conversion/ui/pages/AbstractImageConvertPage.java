@@ -204,7 +204,12 @@ public abstract class AbstractImageConvertPage extends ResourceChoosePage implem
 			if (dd.isSlice()) {
 				context.addSliceDimension(dd.getDimension(), String.valueOf(dd.getSlice()));
 			} else if (dd.isRange()) {
-				context.addSliceDimension(dd.getDimension(), dd.getSliceRange()!=null ? dd.getSliceRange() : "all");				
+				context.addSliceDimension(dd.getDimension(), dd.getSliceRange()!=null ? dd.getSliceRange() : "all");
+				try {
+				    context.setWorkSize(sliceComponent.getLazyDataset().getShape()[dd.getDimension()]);
+				} catch (Exception ne) {
+					logger.error("Cannot set work size!", ne);
+				}
 			}
 		}
 		        

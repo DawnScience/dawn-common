@@ -1462,4 +1462,8 @@ public class SliceComponent {
 		viewer.refresh();
 	}
 
+	public ILazyDataset getLazyDataset() {
+		return lazySet;
+	}
+
 }

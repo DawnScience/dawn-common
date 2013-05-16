@@ -266,4 +266,19 @@ public interface IConversionContext {
 	 */
 	public void setAxisDatasetName(String axisDatasetName);
 
+	/**
+	 * Amount of work to be done which will be 
+	 * progressed if the task is run in a wizard.
+	 * @return
+	 */
+	public int getWorkSize();
+	
+	
+	/**
+	 * Amount of work to be done which will be 
+	 * progressed if the task is run in a wizard.
+	 * @return
+	 */
+	public void setWorkSize(int workSize);
+
 }

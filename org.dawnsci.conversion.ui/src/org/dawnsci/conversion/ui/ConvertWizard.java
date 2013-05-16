@@ -145,7 +145,7 @@ public class ConvertWizard extends Wizard implements IExportWizard{
 					try {
 						context.setMonitor(new ProgressMonitorWrapper(monitor));
 						monitor.setTaskName("Convert ");
-						monitor.beginTask("Convert to "+context.getConversionScheme().getUiLabel(), 100);
+						monitor.beginTask("Convert to "+context.getConversionScheme().getUiLabel(), context.getWorkSize());
 						monitor.worked(1);
 						service.process(context);
 						
