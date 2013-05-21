@@ -223,4 +223,24 @@ public abstract class AbstractRegion extends Figure implements IRegion, IRegionC
 		return userObject;
 	}
 
+	private boolean isActive = false;
+
+	/**
+	 * Returns whether the region is active or not
+	 */
+	@Override
+	public boolean isActive(){
+		return isActive;
+	}
+
+	/**
+	 * Set whether the region is active or not
+	 * @param b
+	 */
+	@Override
+	public void setActive(boolean b){
+		this.isActive = b;
+	}
+
 }
+

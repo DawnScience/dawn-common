@@ -141,6 +141,17 @@ public interface IRegion {
 	public void setROI(ROIBase roi);
 
 	/**
+	 * Returns whether the region is active or not
+	 */
+	public boolean isActive();
+
+	/**
+	 * Set whether the region is active or not
+	 * @param b
+	 */
+	public void setActive(boolean b);
+
+	/**
 	 * Add a listener which is notified when this region is resized or moved.
 	 * 
 	 * @param l
