@@ -389,7 +389,9 @@ public class NexusUtils {
 				i++;
 			}
 		}
-		logger.debug("This many times through loop: " + i.toString());
+		
+		if (i > 50) logger.debug("This many times through loop (For node "+ rootGroup.getName() +"): " + i.toString());
+		
 		return out;
 	}
 }
