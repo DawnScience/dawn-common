@@ -849,7 +849,7 @@ class PersistentFileImpl implements IPersistentFile{
 		
 		double[] beamCentre = detprop.getBeamCentreCoords();
 		
-		double dist = detprop.getDetectorDistance();
+		double dist = detprop.getBeamCentreDistance();
 		
 		final Dataset centre = file.replaceDataset("beam_centre", doubleType, new long[] {2}, beamCentre, parent);
 		file.setAttribute(centre,NexusUtils.UNIT, "pixels");
