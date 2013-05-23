@@ -1,7 +1,7 @@
 <?xml version="1.0" standalone="no"?>
 <!DOCTYPE entity PUBLIC "-//UC Berkeley//DTD MoML 1//EN"
     "http://ptolemy.eecs.berkeley.edu/xml/dtd/MoML_1.dtd">
-<entity name="newModel" class="ptolemy.actor.TypedCompositeActor" source="C:\dawnwindows\icat-workflow\examples-icat\icat_connection.moml">
+<entity name="newModel" class="ptolemy.actor.TypedCompositeActor" source="/home/smw81327/DAWN_snapshot/workflows/examples-icat/icat_connection.moml">
     <property name="_createdBy" class="ptolemy.kernel.attributes.VersionAttribute" value="7.0.1">
     </property>
     <property name="_workbenchVersion" class="ptolemy.kernel.attributes.VersionAttribute" value="null">
@@ -11,7 +11,7 @@
         </property>
     </property>
     <property name="Note" class="ptolemy.vergil.kernel.attributes.TextAttribute">
-<display name="Note"/>        <property name="_hideName" class="ptolemy.data.expr.SingletonParameter" value="true">
+        <property name="_hideName" class="ptolemy.data.expr.SingletonParameter" value="true">
         </property>
         <property name="_hideAllParameters" class="ptolemy.data.expr.Parameter" value="true">
         </property>
@@ -25,7 +25,7 @@
         </property>
         <property name="italic" class="ptolemy.data.expr.Parameter" value="false">
         </property>
-        <property name="text" class="ptolemy.kernel.util.StringAttribute" value="Please remove the example ICAT connection and replace it &#13;&#10;with a new one in order for it to compute the new truststore path&#13;&#10;">
+        <property name="text" class="ptolemy.kernel.util.StringAttribute" value="Please remove the example ICAT connection and replace it &#13;&#10;with a new one in order for it to compute the new truststore path and download directory&#13;&#10;">
             <property name="_style" class="ptolemy.actor.gui.style.TextStyle">
                 <property name="height" class="ptolemy.data.expr.Parameter" value="20">
                 </property>
@@ -33,7 +33,7 @@
                 </property>
             </property>
         </property>
-        <property name="_location" class="ptolemy.kernel.util.Location" value="{304.0, 392.0}">
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{150.0, 332.0}">
         </property>
     </property>
     <entity name="Version" class="uk.ac.diamond.actors.icat.VersionTransformer">
@@ -107,13 +107,17 @@
         </property>
         <property name="WSDL URL" class="ptolemy.data.expr.StringParameter" value="https://icatdls.esc.rl.ac.uk/ICATService/ICAT?wsdl">
         </property>
-        <property name="Truststore Path" class="com.isencia.passerelle.util.ptolemy.FileParameter" value="C:\dawnextract\plugins\uk.ac.diamond.scisoft.icat.actors_1.0.0.v20130513-1317.jar\certs\jssecacerts">
+        <property name="Truststore Path" class="com.isencia.passerelle.util.ptolemy.FileParameter" value="/dls_sw/apps/DawnDiamond/master/builds-snapshot/DawnDiamond-1.1.0.v20130523-0932-linux64/plugins/uk.ac.diamond.scisoft.icat.actors_1.0.0.v20130521-1556.jar/certs/jssecacerts">
         </property>
         <property name="Truststore Password" class="ptolemy.data.expr.StringParameter" value="changeit">
         </property>
-        <property name="Download Directory" class="com.isencia.passerelle.util.ptolemy.ResourceParameter" value="C:\Documents and Settings\smw81327">
+        <property name="Download Directory" class="com.isencia.passerelle.util.ptolemy.DirectoryParameter" value="/home/smw81327">
+            <property name="allowFiles" class="ptolemy.data.expr.Parameter" value="false">
+            </property>
+            <property name="allowDirectories" class="ptolemy.data.expr.Parameter" value="true">
+            </property>
         </property>
-        <property name="_location" class="ptolemy.kernel.util.Location" value="{331.0, 234.0}">
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{312.0, 224.0}">
         </property>
         <port name="requestFinish" class="com.isencia.passerelle.core.ControlPort">
             <property name="input"/>
