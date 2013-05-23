@@ -131,7 +131,7 @@ public class ActionBarWrapper extends SubActionBars2 {
 	    	}
 	    };
 	    rightMan.add(menuAction);
-
+	    rightMan.update(false);
 		ActionBarWrapper wrapper = new ActionBarWrapper(toolMan,menuMan,null,originalBars!=null?(IActionBars2)originalBars: new EmptyActionBars());
 		wrapper.rightManager     = rightMan;                
 		wrapper.toolbarControl   = toolbarControl;
