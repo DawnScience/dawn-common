@@ -1,7 +1,7 @@
 <?xml version="1.0" standalone="no"?>
 <!DOCTYPE entity PUBLIC "-//UC Berkeley//DTD MoML 1//EN"
     "http://ptolemy.eecs.berkeley.edu/xml/dtd/MoML_1.dtd">
-<entity name="test_model" class="ptolemy.actor.TypedCompositeActor" source="C:\dawnwindows\icat-workflow\examples-icat\icat_generic_actor.moml">
+<entity name="test_model" class="ptolemy.actor.TypedCompositeActor" source="/home/smw81327/DAWN_snapshot/workflows/examples-icat/icat_generic_actor.moml">
     <property name="_createdBy" class="ptolemy.kernel.attributes.VersionAttribute" value="7.0.1">
     </property>
     <property name="_workbenchVersion" class="ptolemy.kernel.attributes.VersionAttribute" value="8.3.0">
@@ -25,7 +25,7 @@
         </property>
         <property name="italic" class="ptolemy.data.expr.Parameter" value="false">
         </property>
-        <property name="text" class="ptolemy.kernel.util.StringAttribute" value="Please remove the example ICAT connection and replace it with a new one in order for it to compute the new truststore path&#13;&#10;">
+        <property name="text" class="ptolemy.kernel.util.StringAttribute" value="Please remove the example ICAT connection and replace it with &#10;a new one in order for it to compute the new truststore path&#13;&#10;">
             <property name="_style" class="ptolemy.actor.gui.style.TextStyle">
                 <property name="height" class="ptolemy.data.expr.Parameter" value="20">
                 </property>
@@ -33,11 +33,11 @@
                 </property>
             </property>
         </property>
-        <property name="_location" class="ptolemy.kernel.util.Location" value="{20.0, 139.0}">
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{60.0, 152.0}">
         </property>
     </property>
     <property name="Note" class="ptolemy.vergil.kernel.attributes.TextAttribute">
-<display name="Note"/>        <property name="_hideName" class="ptolemy.data.expr.SingletonParameter" value="true">
+        <property name="_hideName" class="ptolemy.data.expr.SingletonParameter" value="true">
         </property>
         <property name="_hideAllParameters" class="ptolemy.data.expr.Parameter" value="true">
         </property>
@@ -59,53 +59,9 @@
                 </property>
             </property>
         </property>
-        <property name="_location" class="ptolemy.kernel.util.Location" value="{270.0, 450.0}">
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{77.0, 426.0}">
         </property>
     </property>
-    <entity name="ICAT Connection" class="uk.ac.diamond.actors.icat.ConnectionTransformer">
-        <property name="Receiver Q Capacity (-1)" class="ptolemy.data.expr.Parameter" value="-1">
-        </property>
-        <property name="Receiver Q warning size (-1)" class="ptolemy.data.expr.Parameter" value="-1">
-        </property>
-        <property name="Expression Mode" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="Evaluate on every data input">
-        </property>
-        <property name="Memory Mode" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="Create copy of data leaving original data intact.">
-        </property>
-        <property name="Name Mode" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="Attempt to use image name if there is one.">
-        </property>
-        <property name="_break_point" class="ptolemy.data.expr.Parameter" value="false">
-        </property>
-        <property name="WSDL URL" class="ptolemy.data.expr.StringParameter" value="https://icatdls.esc.rl.ac.uk/ICATService/ICAT?wsdl">
-        </property>
-        <property name="Truststore Path" class="com.isencia.passerelle.util.ptolemy.FileParameter" value="/home/smw81327/dawn_workspace_git/scisoft-icat.git/uk.ac.diamond.scisoft.icat.actors/certs/jssecacerts">
-        </property>
-        <property name="Truststore Password" class="ptolemy.data.expr.StringParameter" value="changeit">
-        </property>
-        <property name="Download Directory" class="com.isencia.passerelle.util.ptolemy.ResourceParameter" value="/home/smw81327">
-        </property>
-        <property name="_location" class="ptolemy.kernel.util.Location" value="{200.0, 218.0}">
-        </property>
-    </entity>
-    <entity name="Generic Actor" class="uk.ac.diamond.actors.icat.GenericActorTransformer">
-        <property name="Receiver Q Capacity (-1)" class="ptolemy.data.expr.Parameter" value="-1">
-        </property>
-        <property name="Receiver Q warning size (-1)" class="ptolemy.data.expr.Parameter" value="-1">
-        </property>
-        <property name="Expression Mode" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="Evaluate on every data input">
-        </property>
-        <property name="Memory Mode" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="Create copy of data leaving original data intact.">
-        </property>
-        <property name="Name Mode" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="Attempt to use image name if there is one.">
-        </property>
-        <property name="_break_point" class="ptolemy.data.expr.Parameter" value="false">
-        </property>
-        <property name="Query" class="ptolemy.data.expr.StringParameter" value="Investigation INCLUDE InvestigationParameter, Instrument, Dataset, DatasetParameter, Datafile, DatafileParameter">
-        </property>
-        <property name="Result File" class="com.isencia.passerelle.util.ptolemy.FileParameter" value="/home/smw81327/result.xml">
-        </property>
-        <property name="_location" class="ptolemy.kernel.util.Location" value="{305.0, 339.0}">
-        </property>
-    </entity>
     <entity name="Token" class="org.dawb.passerelle.actors.ui.MessageSink">
         <property name="Receiver Q Capacity (-1)" class="ptolemy.data.expr.Parameter" value="-1">
         </property>
@@ -162,7 +118,131 @@
         <property name="_location" class="ptolemy.kernel.util.Location" value="{60.0, 225.0}">
         </property>
     </entity>
+    <entity name="Generic Actor" class="uk.ac.diamond.actors.icat.GenericActorTransformer">
+        <property name="Receiver Q Capacity (-1)" class="ptolemy.data.expr.Parameter" value="-1">
+        </property>
+        <property name="Receiver Q warning size (-1)" class="ptolemy.data.expr.Parameter" value="-1">
+        </property>
+        <property name="_icon" class="com.isencia.passerelle.actor.gui.EditorIcon">
+        </property>
+        <property name="Expression Mode" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="Evaluate on every data input">
+        </property>
+        <property name="Memory Mode" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="Create copy of data leaving original data intact.">
+        </property>
+        <property name="Name Mode" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="Attempt to use image name if there is one.">
+        </property>
+        <property name="_break_point" class="ptolemy.data.expr.Parameter" value="false">
+        </property>
+        <property name="Query" class="ptolemy.data.expr.StringParameter" value="Investigation INCLUDE InvestigationParameter, Instrument">
+        </property>
+        <property name="Result File" class="com.isencia.passerelle.util.ptolemy.FileParameter" value="/home/smw81327/result.xml">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{337.0, 332.0}">
+        </property>
+        <port name="requestFinish" class="com.isencia.passerelle.core.ControlPort">
+            <property name="input"/>
+            <property name="multiport"/>
+            <property name="control" class="ptolemy.kernel.util.StringAttribute">
+            </property>
+        </port>
+        <port name="error" class="com.isencia.passerelle.core.ErrorPort">
+            <property name="output"/>
+            <property name="multiport"/>
+            <property name="error" class="ptolemy.kernel.util.StringAttribute">
+            </property>
+        </port>
+        <port name="hasFired" class="com.isencia.passerelle.core.ControlPort">
+            <property name="output"/>
+            <property name="multiport"/>
+            <property name="control" class="ptolemy.kernel.util.StringAttribute">
+            </property>
+        </port>
+        <port name="hasFinished" class="com.isencia.passerelle.core.ControlPort">
+            <property name="output"/>
+            <property name="multiport"/>
+            <property name="control" class="ptolemy.kernel.util.StringAttribute">
+            </property>
+        </port>
+        <port name="input" class="com.isencia.passerelle.core.Port">
+            <property name="input"/>
+            <property name="multiport"/>
+        </port>
+        <port name="output" class="com.isencia.passerelle.core.Port">
+            <property name="output"/>
+            <property name="multiport"/>
+        </port>
+    </entity>
+    <entity name="ICAT Connection" class="uk.ac.diamond.actors.icat.ConnectionTransformer">
+        <property name="Receiver Q Capacity (-1)" class="ptolemy.data.expr.Parameter" value="-1">
+        </property>
+        <property name="Receiver Q warning size (-1)" class="ptolemy.data.expr.Parameter" value="-1">
+        </property>
+        <property name="_icon" class="com.isencia.passerelle.actor.gui.EditorIcon">
+        </property>
+        <property name="Expression Mode" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="Evaluate on every data input">
+        </property>
+        <property name="Memory Mode" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="Create copy of data leaving original data intact.">
+        </property>
+        <property name="Name Mode" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="Attempt to use image name if there is one.">
+        </property>
+        <property name="_break_point" class="ptolemy.data.expr.Parameter" value="false">
+        </property>
+        <property name="WSDL URL" class="ptolemy.data.expr.StringParameter" value="https://icatdls.esc.rl.ac.uk/ICATService/ICAT?wsdl">
+        </property>
+        <property name="Truststore Path" class="com.isencia.passerelle.util.ptolemy.FileParameter" value="/dls_sw/apps/DawnDiamond/master/builds-snapshot/DawnDiamond-1.1.0.v20130523-0932-linux64/plugins/uk.ac.diamond.scisoft.icat.actors_1.0.0.v20130521-1556.jar/certs/jssecacerts">
+        </property>
+        <property name="Truststore Password" class="ptolemy.data.expr.StringParameter" value="changeit">
+        </property>
+        <property name="Download Directory" class="com.isencia.passerelle.util.ptolemy.DirectoryParameter" value="/home/smw81327">
+            <property name="allowFiles" class="ptolemy.data.expr.Parameter" value="false">
+            </property>
+            <property name="allowDirectories" class="ptolemy.data.expr.Parameter" value="true">
+            </property>
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{256.0, 233.0}">
+        </property>
+        <port name="requestFinish" class="com.isencia.passerelle.core.ControlPort">
+            <property name="input"/>
+            <property name="multiport"/>
+            <property name="control" class="ptolemy.kernel.util.StringAttribute">
+            </property>
+        </port>
+        <port name="error" class="com.isencia.passerelle.core.ErrorPort">
+            <property name="output"/>
+            <property name="multiport"/>
+            <property name="error" class="ptolemy.kernel.util.StringAttribute">
+            </property>
+        </port>
+        <port name="hasFired" class="com.isencia.passerelle.core.ControlPort">
+            <property name="output"/>
+            <property name="multiport"/>
+            <property name="control" class="ptolemy.kernel.util.StringAttribute">
+            </property>
+        </port>
+        <port name="hasFinished" class="com.isencia.passerelle.core.ControlPort">
+            <property name="output"/>
+            <property name="multiport"/>
+            <property name="control" class="ptolemy.kernel.util.StringAttribute">
+            </property>
+        </port>
+        <port name="input" class="com.isencia.passerelle.core.Port">
+            <property name="input"/>
+            <property name="multiport"/>
+        </port>
+        <port name="output" class="com.isencia.passerelle.core.Port">
+            <property name="output"/>
+            <property name="multiport"/>
+        </port>
+    </entity>
+    <relation name="_R" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
     <relation name="_R_2" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <relation name="_R_3" class="ptolemy.actor.TypedIORelation">
         <property name="width" class="ptolemy.data.expr.Parameter" value="1">
         </property>
     </relation>
@@ -170,20 +250,12 @@
         <property name="width" class="ptolemy.data.expr.Parameter" value="1">
         </property>
     </relation>
-    <relation name="_R_5" class="ptolemy.actor.TypedIORelation">
-        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
-        </property>
-    </relation>
-    <relation name="_R" class="ptolemy.actor.TypedIORelation">
-        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
-        </property>
-    </relation>
-    <link port="ICAT Connection.input" relation="_R"/>
-    <link port="ICAT Connection.output" relation="_R_4"/>
-    <link port="ICAT Connection.output" relation="_R_5"/>
-    <link port="Generic Actor.input" relation="_R_5"/>
-    <link port="Generic Actor.output" relation="_R_2"/>
-    <link port="Token.input" relation="_R_4"/>
-    <link port="Open File.input" relation="_R_2"/>
+    <link port="Token.input" relation="_R_2"/>
+    <link port="Open File.input" relation="_R_4"/>
     <link port="Input.output" relation="_R"/>
+    <link port="Generic Actor.input" relation="_R_3"/>
+    <link port="Generic Actor.output" relation="_R_4"/>
+    <link port="ICAT Connection.input" relation="_R"/>
+    <link port="ICAT Connection.output" relation="_R_2"/>
+    <link port="ICAT Connection.output" relation="_R_3"/>
 </entity>
