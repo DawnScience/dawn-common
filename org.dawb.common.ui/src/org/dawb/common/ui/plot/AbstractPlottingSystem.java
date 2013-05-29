@@ -350,20 +350,12 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 		return title;
 	}
 
-	/**
-	 * Override this method to provide an implementation of show legend setting.
-	 * @param b
-	 */
+	@Override
 	public void setShowLegend(boolean b) {
 		//TODO
 	}
 
-	/**
-	 * Shows or not the intensity scale
-	 * The intensity scale is displayed (set to True) every time there is an image update
-	 * If you want to hide it (set to False), make sure this method is called after each update.
-	 * @param b
-	 */
+	@Override
 	public void setShowIntensity(boolean b){
 		
 	}
@@ -870,10 +862,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 		throw new UnsupportedOperationException();
 	}
 
-	/**
-	 * Set the plotting System aspect ratio on/off
-	 * @param checked
-	 */
+	@Override
 	public void setKeepAspect(boolean checked){
 		
 	}
