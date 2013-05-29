@@ -771,6 +771,19 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	public IPlotActionSystem getPlotActionSystem() {
 		return this.actionBarManager;
 	}
+	
+	/**
+	 * Often used as:
+	 * <code>
+	 * IToolPageSystem system = (IToolPageSystem)iplottingSystem.getAdapter(IToolPageSystem.class);
+	 * </code>
+	 */
+	public Object getAdapter(Class adapter) {
+		if (adapter==IToolPageSystem.class) {
+			return this;
+		}
+		return null;
+	}
 
 
 	@Override
