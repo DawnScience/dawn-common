@@ -147,6 +147,7 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 		return rescale;
 	}
 
+	@Override
 	public void setRescale(boolean rescale) {
 		final boolean oldRescale = rescale;
 		this.rescale = rescale;
