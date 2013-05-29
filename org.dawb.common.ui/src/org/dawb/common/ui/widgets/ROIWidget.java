@@ -6,9 +6,9 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 
-import org.dawb.common.ui.plot.AbstractPlottingSystem;
 import org.dawb.common.ui.plot.PlottingFactory;
 import org.dawb.common.ui.plot.roi.AxisPixelROIEditTable;
+import org.dawnsci.plotting.api.IPlottingSystem;
 import org.dawnsci.plotting.api.region.IROIListener;
 import org.dawnsci.plotting.api.region.IRegion;
 import org.dawnsci.plotting.api.region.IRegion.RegionType;
@@ -47,7 +47,7 @@ public class ROIWidget implements IROIListener {
 	private boolean roiChanged;
 	private Composite regionComposite;
 	private IRegionListener regionListener;
-	private AbstractPlottingSystem plottingSystem;
+	private IPlottingSystem plottingSystem;
 
 	private AxisPixelROIEditTable roiViewer;
 
@@ -68,7 +68,7 @@ public class ROIWidget implements IROIListener {
 	 * @param parent
 	 * @param viewName the name of the plottingSystem
 	 */
-	public ROIWidget(Composite parent, AbstractPlottingSystem plottingSystem, String tableTitle) {
+	public ROIWidget(Composite parent, IPlottingSystem plottingSystem, String tableTitle) {
 
 		this.parent = parent;
 		this.plottingSystem = plottingSystem;
@@ -160,7 +160,7 @@ public class ROIWidget implements IROIListener {
 	 * Update the widget with the correct roi information
 	 */
 	public void update(){
-		this.plottingSystem = (AbstractPlottingSystem)PlottingFactory.getPlottingSystem(viewName);
+		this.plottingSystem = PlottingFactory.getPlottingSystem(viewName);
 		if(plottingSystem != null){
 			Collection<IRegion> regions = plottingSystem.getRegions();
 			if(regions.size()>0){
@@ -237,7 +237,7 @@ public class ROIWidget implements IROIListener {
 		return regionComposite;
 	}
 
-	private IRegionListener getRegionListener(final AbstractPlottingSystem plottingSystem){
+	private IRegionListener getRegionListener(final IPlottingSystem plottingSystem){
 		return new IRegionListener.Stub() {
 			@Override
 			public void regionRemoved(RegionEvent evt) {
@@ -303,7 +303,7 @@ public class ROIWidget implements IROIListener {
 		};
 	}
 
-	private void clearListeners(AbstractPlottingSystem plotSystem, IRegionListener listener) {
+	private void clearListeners(IPlottingSystem plotSystem, IRegionListener listener) {
 		if (plotSystem==null) return;
 		Collection<IRegion> regions = plotSystem.getRegions();
 		if(regions != null && regions.size() > 0){
@@ -320,7 +320,7 @@ public class ROIWidget implements IROIListener {
 	 * Add a region listener
 	 * @param plotSystem
 	 */
-	public void addRegionListener(AbstractPlottingSystem plotSystem){
+	public void addRegionListener(IPlottingSystem plotSystem){
 		
 		if (plotSystem==null) return;
 		Collection<IRegion> regions = plotSystem.getRegions();
