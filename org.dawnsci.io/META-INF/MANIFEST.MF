@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Io
 Bundle-SymbolicName: org.dawnsci.io
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 1.2.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: org.dawnsci.io.h5
 Require-Bundle: ncsa.hdf;bundle-version="2.8.0",
