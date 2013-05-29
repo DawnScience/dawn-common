@@ -86,7 +86,7 @@
       </loader>
       <loader
             class="org.dawb.gda.extensions.spec.SpecLoader"
-            file_extension="dat"
+            file_extension="spec"
             high_priority="false">
       </loader>
    </extension>
