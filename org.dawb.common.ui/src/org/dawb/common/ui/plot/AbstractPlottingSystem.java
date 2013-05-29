@@ -32,6 +32,7 @@ import org.dawnsci.plotting.api.tool.IToolPage;
 import org.dawnsci.plotting.api.tool.IToolPageSystem;
 import org.dawnsci.plotting.api.tool.ToolChangeEvent;
 import org.dawnsci.plotting.api.tool.IToolPage.ToolPageRole;
+import org.dawnsci.plotting.api.trace.ColorOption;
 import org.dawnsci.plotting.api.trace.IImageTrace;
 import org.dawnsci.plotting.api.trace.ILineTrace;
 import org.dawnsci.plotting.api.trace.ITrace;
@@ -107,11 +108,6 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	public AbstractPlottingSystem() {
 		this.actionBarManager = createActionBarManager();
 	}
-
-	public static enum ColorOption {
-		BY_DATA, BY_NAME, NONE
-	}
-	
 
 	public void setPointControls(Text pointControls) {
 		this.pointControls = pointControls;
@@ -751,11 +747,12 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	public void setFocus() {
 		if (getPlotComposite()!=null) getPlotComposite().setFocus();
 	}
-	
-	public boolean  isDisposed() {
+
+	@Override
+	public boolean isDisposed() {
 		return getPlotComposite().isDisposed();
 	}
-	
+
 	public boolean setToolVisible(final String toolId, final ToolPageRole role, final String viewId) throws Exception {
 		return actionBarManager.setToolVisible(toolId, role, viewId);
 	}
