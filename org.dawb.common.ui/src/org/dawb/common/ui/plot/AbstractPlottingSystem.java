@@ -751,11 +751,12 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 	public void setFocus() {
 		if (getPlotComposite()!=null) getPlotComposite().setFocus();
 	}
-	
-	public boolean  isDisposed() {
+
+	@Override
+	public boolean isDisposed() {
 		return getPlotComposite().isDisposed();
 	}
-	
+
 	public boolean setToolVisible(final String toolId, final ToolPageRole role, final String viewId) throws Exception {
 		return actionBarManager.setToolVisible(toolId, role, viewId);
 	}
