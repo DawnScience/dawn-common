@@ -1,8 +1,8 @@
 package org.dawb.common.ui.plot.roi;
 
 import org.dawb.common.ui.databinding.AbstractModelObject;
-import org.dawb.common.ui.plot.AbstractPlottingSystem;
 import org.dawb.common.util.number.DoubleUtils;
+import org.dawnsci.plotting.api.IPlottingSystem;
 import org.dawnsci.plotting.api.trace.IImageTrace;
 import org.dawnsci.plotting.api.trace.ITrace;
 import org.eclipse.core.databinding.beans.BeanProperties;
@@ -47,7 +47,7 @@ public class AxisPixelROIEditTable {
 
 	private AxisPixelTableViewModel viewModel;
 
-	private AbstractPlottingSystem plottingSystem;
+	private IPlottingSystem plottingSystem;
 
 	private Logger logger = LoggerFactory.getLogger(AxisPixelROIEditTable.class);
 
@@ -67,7 +67,7 @@ public class AxisPixelROIEditTable {
 	 * @param parent
 	 * @param plottingSystem
 	 */
-	public AxisPixelROIEditTable(Composite parent, AbstractPlottingSystem plottingSystem) {
+	public AxisPixelROIEditTable(Composite parent, IPlottingSystem plottingSystem) {
 		this.parent = parent;
 		this.plottingSystem = plottingSystem;
 	}

@@ -137,18 +137,17 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 		return colorOption;
 	}
 
+	@Override
 	public void setColorOption(ColorOption colorOption) {
 		this.colorOption = colorOption;
 	}
 
-	/**
-	 * Whether the plot should rescale when replotted.
-	 * @return rescale
-	 */	
+	@Override
 	public boolean isRescale() {
 		return rescale;
 	}
 
+	@Override
 	public void setRescale(boolean rescale) {
 		final boolean oldRescale = rescale;
 		this.rescale = rescale;
