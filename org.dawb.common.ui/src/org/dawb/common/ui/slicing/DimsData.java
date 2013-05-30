@@ -15,9 +15,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.beanutils.BeanUtils;
+import org.dawnsci.doe.DOEField;
+import org.dawnsci.doe.DOEUtils;
 
-import uk.ac.gda.doe.DOEField;
-import uk.ac.gda.doe.DOEUtils;
 
 /**
  * Bean to hold slice data

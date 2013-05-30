@@ -368,6 +368,7 @@ public class H5GalleryView extends ViewPart implements MouseListener, SelectionL
 
 	}
 	
+	
 	private void createImageThread() {
 
 		final IPreferenceStore store = new ScopedPreferenceStore(InstanceScope.INSTANCE, "org.dawb.common.ui");
@@ -398,8 +399,10 @@ public class H5GalleryView extends ViewPart implements MouseListener, SelectionL
 							public void run() {
 								if (ii.getItem().isDisposed()) return;
 								if (ii.getItem().getParent().isDisposed()) return;
-								if (image.isDisposed()) return;
-			                   	if (image!=null) ii.getItem().setImage(image);
+			                   	if (image!=null) {
+									if (image.isDisposed()) return;
+			                   		ii.getItem().setImage(image);
+			                   	}
 							}
 	                   	});
 	                }
@@ -442,6 +445,8 @@ public class H5GalleryView extends ViewPart implements MouseListener, SelectionL
         for (int i = 0; i < start.length; i++) {
 			if (i==info.getSliceDimension()) {
 				start[i] = index;
+			} else if (info.isNonAxisDimension(i)) {
+				start[i] = 0; // TODO FIXME
 			} else{
 				start[i] = info.getStart(i); // 0 for 2D, the current slice index for this dim for 1D
 			}
@@ -455,6 +460,8 @@ public class H5GalleryView extends ViewPart implements MouseListener, SelectionL
         for (int i = 0; i < stop.length; i++) {
 			if (i==info.getSliceDimension()) {
 				stop[i] = index+1;
+			} else if (info.isNonAxisDimension(i)) {
+				stop[i] = 1; // TODO FIXME
 			} else{
 				stop[i] = info.getStop(i);  // size dim for 2D, the current slice index for this dim  +1 for 1D
 			}
