@@ -39,8 +39,9 @@ import org.dawb.common.ui.preferences.ViewConstants;
 import org.dawb.common.ui.util.EclipseUtils;
 import org.dawb.common.ui.util.GridUtils;
 import org.dawb.hdf5.HierarchicalDataFactory;
-import org.dawb.hdf5.IHierarchicalDataFile;
 import org.dawb.hdf5.nexus.NexusUtils;
+import org.dawnsci.common.widgets.celleditor.CComboCellEditor;
+import org.dawnsci.common.widgets.celleditor.SpinnerCellEditorWithPlayButton;
 import org.dawnsci.plotting.api.IPlottingSystem;
 import org.dawnsci.plotting.api.PlotType;
 import org.dawnsci.plotting.api.histogram.ImageServiceBean.ImageOrigin;
@@ -99,6 +100,7 @@ import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Scale;
+import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IViewPart;
@@ -108,16 +110,10 @@ import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 import uk.ac.diamond.scisoft.analysis.io.SliceObject;
 import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
-import uk.ac.gda.richbeans.components.cell.CComboCellEditor;
-import uk.ac.gda.richbeans.components.cell.SpinnerCellEditorWithPlayButton;
-import uk.ac.gda.richbeans.components.scalebox.RangeBox;
-import uk.ac.gda.richbeans.event.ValueAdapter;
-import uk.ac.gda.richbeans.event.ValueEvent;
 
 
 /**
@@ -457,6 +453,8 @@ public class SliceComponent {
 		
 		final Action asScale = new Action("Sliding scale", IAction.AS_CHECK_BOX) {
 			public void run () {
+				
+				viewer.cancelEditing();
 				Activator.getDefault().getPreferenceStore().setValue(ViewConstants.SLICE_EDITOR, 0);
 			}
 		};
@@ -466,6 +464,7 @@ public class SliceComponent {
 		
 		final Action asSpinner = new Action("Slice index (only)", IAction.AS_CHECK_BOX) {
 			public void run () {
+				viewer.cancelEditing();
 				Activator.getDefault().getPreferenceStore().setValue(ViewConstants.SLICE_EDITOR, 1);
 			}
 		};
@@ -1000,17 +999,13 @@ public class SliceComponent {
 			final ScopedPreferenceStore store = new ScopedPreferenceStore(InstanceScope.INSTANCE, "org.dawb.workbench.ui");
 			spinnerEditor = new SpinnerCellEditorWithPlayButton((TableViewer)viewer, "Play through slices", store.getInt("data.format.slice.play.speed"));
 			spinnerEditor.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
-			spinnerEditor.addValueListener(new ValueAdapter() {
+			spinnerEditor.addSelectionListener(new SelectionAdapter() {
 				@Override
-				public void valueChangePerformed(ValueEvent e) {
+				public void widgetSelected(SelectionEvent e) {
 	                final DimsData data  = (DimsData)((IStructuredSelection)((TableViewer)getViewer()).getSelection()).getFirstElement();
-	                if (e.getValue() instanceof Number) {
-	                	data.setSlice(((Number)e.getValue()).intValue());
-	                	data.setSliceRange(null);
-	                } else {
-	                	if (((RangeBox)e.getSource()).isError()) return;
-	                	data.setSliceRange((String)e.getValue());
-	                }
+	                final int value = ((Spinner)e.getSource()).getSelection();
+	                data.setSlice(value);
+	                data.setSliceRange(null);
 	         		if (synchronizeSliceData(data)) slice(false);
 				}
 				
@@ -1260,7 +1255,6 @@ public class SliceComponent {
 		setDataShape(lazySet.getShape());
 		
 		explain.setText("Create a slice of "+sliceObject.getName()+".\nIt has the shape "+Arrays.toString(dataShape));
-		spinnerEditor.setRangeDialogTitle("Range for slice in '"+sliceObject.getName()+"'");
 		spinnerEditor.setPlayButtonVisible(false);
 		
 		createDimsData(isExpression);
