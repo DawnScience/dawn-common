@@ -10,7 +10,6 @@ import org.dawnsci.plotting.api.tool.IToolPage;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 
-import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 
 /**
@@ -54,7 +53,7 @@ public interface IDataReductionToolPage extends IToolPage {
 		/**
 		 * The actual sliced data to operate on.
 		 */
-		private AbstractDataset       data;
+		private IDataset       data;
 		
 		/**
 		 * May be null, 0 = x, 1 = y. Y may be omitted, in which case use indexes
@@ -68,7 +67,7 @@ public interface IDataReductionToolPage extends IToolPage {
 		
 		public DataReductionSlice(IHierarchicalDataFile hf,
 				                  Group group,
-				                  AbstractDataset set, 
+				                  IDataset set, 
 				                  Object ud, 
 				                  IProgressMonitor mon) {
 			this.file    = hf;
@@ -89,14 +88,14 @@ public interface IDataReductionToolPage extends IToolPage {
 		public void setParent(Group parent) {
 			this.parent = parent;
 		}
-		public AbstractDataset getData() {
+		public IDataset getData() {
 			return data;
 		}
-		public void setData(AbstractDataset set) {
+		public void setData(IDataset set) {
 			this.data = set;
 		}
 
-		public void appendData(AbstractDataset more) throws Exception {
+		public void appendData(IDataset more) throws Exception {
 			H5Utils.appendDataset(file, parent, more);
 		}
 

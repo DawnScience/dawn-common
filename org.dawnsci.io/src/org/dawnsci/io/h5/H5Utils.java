@@ -178,10 +178,10 @@ public class H5Utils {
 	 * @param a
 	 * @throws Exception
 	 */
-	public static void appendDataset(IHierarchicalDataFile file, Group parent, AbstractDataset a) throws Exception {
+	public static void appendDataset(IHierarchicalDataFile file, Group parent, IDataset a) throws Exception {
 
 		long[] shape = H5Utils.getLong(a.getShape());
-		Dataset s = file.appendDataset(a.getName(),  H5Utils.getDatatype(a), shape, a.getBuffer(), parent);
+		Dataset s = file.appendDataset(a.getName(),  H5Utils.getDatatype(a), shape, ((AbstractDataset)a).getBuffer(), parent);
 		file.setNexusAttribute(s, Nexus.SDS);			
 	}
 

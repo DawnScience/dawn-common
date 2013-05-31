@@ -17,7 +17,6 @@ import org.dawnsci.plotting.api.IPlottingContainer;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 
-import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
@@ -60,7 +59,7 @@ public interface IDatasetEditor extends IVariableManager, IEditorPart, ISlicable
 	 * @param monitor
 	 * @return dataset
 	 */
-	public AbstractDataset getDataset(final String name, final IMonitor monitor);
+	public IDataset getDataset(final String name, final IMonitor monitor);
 
 	/**
 	 * Test if editor contains dataset of given name
