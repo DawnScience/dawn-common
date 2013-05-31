@@ -37,7 +37,7 @@
          point="org.eclipse.ui.views">
       <view
             allowMultiple="false"
-            category="org.dawb.workbench.application.data.ac"
+            category="uk.ac.diamond.scisoft.analysis.rcp"
             class="org.dawb.common.ui.views.monitor.MonitorView"
             icon="icons/dashboard.png"
             id="org.dawb.common.ui.views.dashboardView"
@@ -45,7 +45,7 @@
             restorable="true">
       </view>
       <view
-            category="org.dawb.workbench.application.data.ac"
+            category="uk.ac.diamond.scisoft.analysis.rcp"
             class="org.dawb.common.ui.views.ImageMonitorView"
             icon="icons/image.gif"
             id="org.dawb.workbench.views.imageMonitorView"
@@ -423,14 +423,14 @@
    <extension
          point="org.eclipse.ui.views">
       <view
-            category="org.dawb.workbench.application.data.analysis"
+            category="uk.ac.diamond.scisoft.analysis.rcp"
             class="org.dawb.common.ui.views.ValuePageView"
             icon="icons/variable_xml.png"
             id="org.dawb.passerelle.views.ValueView"
             name="Value">
       </view>
       <view
-            category="org.dawb.workbench.application.data.ac"
+            category="uk.ac.diamond.scisoft.analysis.rcp"
             class="org.dawb.common.ui.views.H5GalleryView"
             icon="icons/imageStack.png"
             id="org.dawb.workbench.views.h5GalleryView"
@@ -471,7 +471,7 @@
          point="org.eclipse.ui.views">
          
       <view
-            category="org.dawb.workbench.application.data.analysis"
+            category="uk.ac.diamond.scisoft.analysis.rcp"
             class="org.dawb.common.ui.views.PlotDataView"
             icon="icons/data.gif"
             id="org.dawb.workbench.views.dataSetView"
@@ -480,7 +480,7 @@
       </view>
        <view
             allowMultiple="false"
-            category="org.dawb.workbench.application.data.analysis"
+            category="uk.ac.diamond.sda.meta.category"
             class="org.dawb.common.ui.views.HeaderTableView"
             icon="icons/header_table.gif"
             id="fable.imageviewer.views.HeaderView"
