@@ -296,7 +296,7 @@ public class SliceComponent {
     	
 		return area;
 	}
-	
+
 	private boolean axesVisible = true;
 	public void setAxesVisible(boolean isVis) {
 		axesVisible = isVis;
@@ -345,6 +345,7 @@ public class SliceComponent {
         final CheckableActionGroup grp = new CheckableActionGroup();
         final Action xyPlot = new Action("Slice as line plots", IAction.AS_CHECK_BOX) {
         	public void run() {
+        		saveSliceSettings();
         		boolean wasImage = plotType==PlotType.IMAGE || plotType==PlotType.SURFACE;
         		plotType = PlotType.XY;
         		// Loop over DimsData to ensure 1X only.
@@ -367,6 +368,7 @@ public class SliceComponent {
 		
         final Action stackPlot = new Action("Slice as a stack of line plots", IAction.AS_CHECK_BOX) {
         	public void run() {
+        		saveSliceSettings();
         		setChecked(true);
         		plotType = PlotType.XY_STACKED;
          		// Loop over DimsData to ensure 1X only.
@@ -382,6 +384,7 @@ public class SliceComponent {
 
         final Action stackPlot3D = new Action("Slice as a stack of line plots in 3D", IAction.AS_CHECK_BOX) {
         	public void run() {
+        		saveSliceSettings();
         		setChecked(true);
         		plotType = PlotType.XY_STACKED_3D;
         		// Loop over DimsData to ensure 1X only.
@@ -397,7 +400,8 @@ public class SliceComponent {
 			
         final Action imagePlot = new Action("Slice as image", IAction.AS_CHECK_BOX) {
         	public void run() {
-        		plotType = PlotType.IMAGE;
+        		saveSliceSettings();
+       		    plotType = PlotType.IMAGE;
         		if (dimsDataList!=null) dimsDataList.setTwoAxisOnly(0, 1);   		
         		viewer.refresh();
         		updatePlottingType();
@@ -411,6 +415,7 @@ public class SliceComponent {
 		
         final Action surfacePlot = new Action("Slice as surface", IAction.AS_CHECK_BOX) {
         	public void run() {
+        		saveSliceSettings();
         		plotType = PlotType.SURFACE;
         		if (dimsDataList!=null) dimsDataList.setTwoAxisOnly(0, 1);   		
         		viewer.refresh();
@@ -489,8 +494,21 @@ public class SliceComponent {
 		return man;
 	}
 	
+	private Map<PlotType, DimsDataList> sliceSettings;
+	private void saveSliceSettings() {
+		if (dimsDataList==null || dimsDataList.isEmpty()) return;
+		if (sliceSettings == null) sliceSettings = new HashMap<PlotType, DimsDataList>(3);
+		final DimsDataList ddl = dimsDataList.clone();
+		sliceSettings.put(plotType, ddl);
+	}
+
+	
 	private void updatePlottingType() {
+		
 		viewer.cancelEditing();
+		if (sliceSettings!=null && sliceSettings.containsKey(plotType) && !dimsDataList.isEmpty()) {
+			this.dimsDataList = sliceSettings.get(plotType);
+		}
 		
 		final String[] items = getAxisItems();
 		typeEditor.setItems(items);
@@ -706,7 +724,7 @@ public class SliceComponent {
 
 			if (plotType==null) plotType = dimsDataList.getAxisCount()>1 ? PlotType.IMAGE : PlotType.XY;
 			final Action action = plotTypeActions.get(plotType);
-			action.run();
+			action.setChecked(true);
 			
 			// We make sure that the size is not outside
 			for (int i = 0; i < dims; i++) {
@@ -1246,6 +1264,7 @@ public class SliceComponent {
 		}
 		sliceJob.cancel();
 		saveSettings();
+		if (sliceSettings!=null) sliceSettings.clear();
 
 		this.lazySet = lazySet;
 		final SliceObject object = new SliceObject();

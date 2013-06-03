@@ -183,8 +183,9 @@ public class DimsDataList implements Serializable {
 		final DimsDataList clone = new DimsDataList();
 		for (DimsData dd : getDimsData()) {
 			DimsData dnew = dd.clone();
-			add(dnew);
+			clone.add(dnew);
 		}
+		clone.expression = expression;
 		return clone;
 	}
 
@@ -324,5 +325,9 @@ public class DimsDataList implements Serializable {
 
 	public void setExpression(boolean expression) {
 		this.expression = expression;
+	}
+
+	public boolean isEmpty() {
+		return dimsData==null || dimsData.isEmpty();
 	}
 }
