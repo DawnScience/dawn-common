@@ -23,8 +23,6 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
-import uk.ac.diamond.scisoft.analysis.SDAPlotter;
-import uk.ac.diamond.scisoft.analysis.dataset.FFT;
 import uk.ac.diamond.scisoft.analysis.dataset.Image;
 import uk.ac.diamond.scisoft.analysis.dataset.Maths;
 
@@ -47,8 +45,9 @@ public class ExpressionEngineImpl implements IExpressionEngine{
 		funcs.put("dnp", Maths.class);
 		funcs.put("dat", JexlGeneralFunctions.class);
 		funcs.put("im", Image.class);
-		funcs.put("fft", FFT.class);
-		funcs.put("plt", SDAPlotter.class);
+		//TODO determine which function classes should be loaded as default
+//		funcs.put("fft", FFT.class);
+//		funcs.put("plt", SDAPlotter.class);
 		jexl.setFunctions(funcs);
 		
 		expressionListeners = new HashSet<IExpressionEngineListener>();
