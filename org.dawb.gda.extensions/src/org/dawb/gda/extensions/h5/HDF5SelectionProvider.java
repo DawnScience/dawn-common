@@ -95,6 +95,7 @@ public class HDF5SelectionProvider implements IH5DoubleClickSelectionProvider {
         		n = n.getParent();
         	}
         	boolean isGDA = false;
+        	if (prev == null) return HDF5Utils.createDatasetSelection(link, isGDA);
 			HObject object = (HObject) ((DefaultMutableTreeNode) prev).getUserObject();
 			if (object instanceof Group) {
 				for (HObject o : ((Group) object).getMemberList()) {
