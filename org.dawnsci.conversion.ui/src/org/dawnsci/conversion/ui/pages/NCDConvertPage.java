@@ -122,11 +122,13 @@ public class NCDConvertPage extends ResourceChoosePage implements
 		
 		if (hasQAxis(qAxisName)) {
 			axisButton.setEnabled(true);
+			axisButton.setSelection(true);
 			axisMessage.setText(qAxisName);
 			axisMessage.setEnabled(true);
 			axisMessage.getShell().layout(true,true);
 		} else {
 			axisButton.setEnabled(true);
+			axisButton.setSelection(false);
 			axisMessage.setText("");
 			axisMessage.setEnabled(true);
 		}
@@ -181,7 +183,7 @@ public class NCDConvertPage extends ResourceChoosePage implements
 		
 		// We either are directories if we are choosing multiple files or
 		// we are single file output and specifying a single output file.
-        if (context.getFilePaths().size()>1) { // Multi
+        if (context.getFilePaths().size() > 1) { // Multi
      		GridUtils.setVisible(multiFileMessage, true);
         } else {
     		GridUtils.setVisible(multiFileMessage, false);
