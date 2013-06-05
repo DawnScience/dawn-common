@@ -138,10 +138,16 @@ public class PlottingActionBarManager implements IPlotActionSystem {
     	IAction action = null;
     	if (type.is1D()) {
     		clearTool(ToolPageRole.ROLE_2D);
+    		clearTool(ToolPageRole.ROLE_3D);
     		action = findAction(ToolPageRole.ROLE_1D.getId());
     	} else if (type.is2D()) {
     		clearTool(ToolPageRole.ROLE_1D);
+    		clearTool(ToolPageRole.ROLE_3D);
     		action = findAction(ToolPageRole.ROLE_2D.getId());
+    	} else if (type.is3D()) {
+    		clearTool(ToolPageRole.ROLE_1D);
+    		clearTool(ToolPageRole.ROLE_2D);
+    		action = findAction(ToolPageRole.ROLE_3D.getId());
     	}
     	
     	if (action instanceof MenuAction) {
