@@ -18,9 +18,12 @@ import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.ToolItem;
 
 /**
  * Simple action which will have other actions in a drop down menu.
@@ -71,6 +74,8 @@ public class MenuAction extends Action implements IMenuCreator {
 
 	@Override
 	public Menu getMenu(Control parent) {
+		
+		if (parent==null) return null;
 		if (fMenu != null) fMenu.dispose();
 
 		fMenu= new Menu(parent);
@@ -82,7 +87,6 @@ public class MenuAction extends Action implements IMenuCreator {
 			addSeparatorToMenu(fMenu, i);
 		return fMenu;
 	}
-
 
 	protected void addActionToMenu(Menu parent, IAction action) {
 		ActionContributionItem item= new ActionContributionItem(action);
@@ -141,10 +145,30 @@ public class MenuAction extends Action implements IMenuCreator {
 		new MenuItem(parent, SWT.SEPARATOR, indexes.get(index));
 	}
 
+	public void runWithEvent(Event e) {
+		if (selectedAction==null) {
+			
+			final Control parent = e.widget !=null && e.widget instanceof ToolItem
+					             ? ((ToolItem)e.widget).getParent()
+					             : null;
+			Menu m = getMenu(parent);
+			if (m != null) {
+				// position the menu below the drop down item
+				Point point = parent.toDisplay(new Point(e.x, e.y));
+				m.setLocation(point.x, point.y); // waiting
+											     // for SWT
+				// 0.42
+				m.setVisible(true);// for SWT
+			}
+		
+		} else {
+			run();
+		}
+	}
 	public void run() {
 		if (selectedAction!=null) {
 			selectedAction.run();
-		}
+		} 
 	}
 	
 	public String toString() {
