@@ -59,7 +59,7 @@ public class HeaderTablePage extends Page implements IAdaptable{
 	@SuppressWarnings("rawtypes")
 	public Object getAdapter(Class type) {
 		if (type == String.class) {
-			return "Meta Data";
+			return "Metadata";
 		}
 		return null;
 	}

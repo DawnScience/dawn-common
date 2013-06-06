@@ -102,7 +102,7 @@ public class PersistenceImportWizard extends AbstractPerstenceWizard implements 
 			options.setOptionEnabled("Mask",          false);
 			options.setOptionEnabled("Regions",       false);
 			options.setOptionEnabled("Functions",       false);
-			options.setOptionEnabled("Diffraction Meta Data",       false);
+			options.setOptionEnabled("Diffraction Metadata",       false);
 			final File   file         = new File(absolutePath);
 			if (file.exists())  {
 				final String ext = FileUtils.getFileExtension(file);
@@ -144,7 +144,7 @@ public class PersistenceImportWizard extends AbstractPerstenceWizard implements 
 							}
 
 							if (pf.containsDiffractionMetadata()) {
-								options.setOptionEnabled("Diffraction Meta Data", true);
+								options.setOptionEnabled("Diffraction Metadata", true);
 							}
 
 						} catch (Throwable ne) {
@@ -294,7 +294,7 @@ public class PersistenceImportWizard extends AbstractPerstenceWizard implements 
 				}
 			}
 			
-			if (options.is("Diffraction Meta Data") && trace instanceof IImageTrace) {
+			if (options.is("Diffraction Metadata") && trace instanceof IImageTrace) {
 				//check loader service and overwrite if not null
 				//check image and overwrite if none in service
 				ILoaderService loaderService = (ILoaderService)PlatformUI.getWorkbench().getService(ILoaderService.class);

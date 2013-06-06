@@ -22,7 +22,7 @@ public abstract class AbstractPerstenceWizard extends Wizard {
 		options.put("Mask",                 true);
 		options.put("Regions",              true);
 		options.put("Functions",            true);
-		options.put("Diffraction Meta Data",true);
+		options.put("Diffraction Metadata",true);
 		return options;
 	}
 

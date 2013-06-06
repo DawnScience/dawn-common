@@ -99,7 +99,7 @@ public class PersistenceExportWizard extends AbstractPerstenceWizard implements 
     		options.setOptionEnabled("Original Data", false);
     		options.setOptionEnabled("Mask",          false);
     		options.setOptionEnabled("Regions",       false);
-    		options.setOptionEnabled("Diffraction Meta Data",       false);
+    		options.setOptionEnabled("Diffraction Metadata",       false);
     		options.setOptionEnabled("Functions",       false);
 
     		File                file=null;
@@ -141,7 +141,7 @@ public class PersistenceExportWizard extends AbstractPerstenceWizard implements 
     				if (trace!=null && trace instanceof IImageTrace && trace.getData() != null) {
     					IMetaData meta = ((AbstractDataset)trace.getData()).getMetadata();
     					if (meta != null && (meta instanceof IDiffractionMetadata)) {
-    						options.setOptionEnabled("Diffraction Meta Data", true);
+    						options.setOptionEnabled("Diffraction Metadata", true);
     					}
     				}
     				
@@ -221,7 +221,7 @@ public class PersistenceExportWizard extends AbstractPerstenceWizard implements 
 							 }
 						 }
 						 
-						 if (options.is("Diffraction Meta Data")) {
+						 if (options.is("Diffraction Metadata")) {
 							 if (trace!=null && trace instanceof IImageTrace && trace.getData() != null) {
 								 IMetaData meta = trace.getData().getMetadata();
 								 if (meta == null || meta instanceof IDiffractionMetadata) {

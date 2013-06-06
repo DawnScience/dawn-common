@@ -192,7 +192,7 @@ public class HeaderTableView extends ViewPart implements ISelectionListener, IPa
 
 	private void getMetaData(final String filePath) throws InterruptedException {
 		
-		final Job metaJob = new Job("Extra Meta Data "+filePath) {
+		final Job metaJob = new Job("Extra Metadata "+filePath) {
 
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
