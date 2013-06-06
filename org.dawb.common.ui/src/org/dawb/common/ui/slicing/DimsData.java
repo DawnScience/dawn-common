@@ -93,6 +93,10 @@ public class DimsData implements Serializable {
 		this.sliceRange = sliceRange;
 	}
 
+	/**
+	 * 0-based dimension.
+	 * @return
+	 */
 	public int getDimension() {
 		return dimension;
 	}

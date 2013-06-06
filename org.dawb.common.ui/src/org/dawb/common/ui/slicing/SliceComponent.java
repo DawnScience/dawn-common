@@ -1153,7 +1153,7 @@ public class SliceComponent {
 		}
 
 		@Override
-		protected CellEditor getCellEditor(Object element) {
+		protected CellEditor getCellEditor(Object element) {			
 			return typeEditor;
 		}
 
@@ -1165,7 +1165,12 @@ public class SliceComponent {
 		@Override
 		protected Object getValue(Object element) {
 			final DimsData data = (DimsData)element;
-			return data.getAxis();
+			int axis = data.getAxis();
+			if (axis==-1) {
+				final String[] items = typeEditor.getCombo().getItems();
+				axis = items.length-1; // (Slice)
+			}
+			return axis;
 		}
 
 		@Override
@@ -1227,8 +1232,13 @@ public class SliceComponent {
 					}
 					ret.append( slice>-1 ? formatValue : "" );
 				}
-				if ((data.isSlice() || data.isRange())&& !errorLabel.isVisible()) {
-					ret.append(new StyledString(" (click to change)", StyledString.QUALIFIER_STYLER));
+				
+				try {
+					if ((data.isSlice() || data.isRange()) && !errorLabel.isVisible() && lazySet.getShape()[data.getDimension()]>1) {
+						ret.append(new StyledString(" (click to change)", StyledString.QUALIFIER_STYLER));
+					}
+				} catch (Throwable largelyIgnored) {
+					logger.error("Unable to determine if editable.");
 				}
 				break;
 			case 3:
