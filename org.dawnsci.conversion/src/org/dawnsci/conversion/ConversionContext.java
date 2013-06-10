@@ -27,6 +27,7 @@ class ConversionContext implements IConversionContext {
 	private File                selectedConversionFile;
 	private String              axisDatasetName;
 	private int                 workSize=100;
+	private boolean             expression=false;
 	
 	public ConversionScheme getConversionScheme() {
 		return conversionScheme;
@@ -114,18 +115,19 @@ class ConversionContext implements IConversionContext {
 		result = prime
 				* result
 				+ ((conversionScheme == null) ? 0 : conversionScheme.hashCode());
-		result = prime
-				* result
-				+ ((conversionVisitor == null) ? 0 : conversionVisitor
-						.hashCode());
 		result = prime * result
 				+ ((datasetNames == null) ? 0 : datasetNames.hashCode());
+		result = prime * result + (expression ? 1231 : 1237);
 		result = prime * result
 				+ ((filePaths == null) ? 0 : filePaths.hashCode());
 		result = prime * result
 				+ ((lazyDataset == null) ? 0 : lazyDataset.hashCode());
 		result = prime * result
 				+ ((outputFolder == null) ? 0 : outputFolder.hashCode());
+		result = prime
+				* result
+				+ ((selectedConversionFile == null) ? 0
+						: selectedConversionFile.hashCode());
 		result = prime * result
 				+ ((sliceDimensions == null) ? 0 : sliceDimensions.hashCode());
 		result = prime * result
@@ -149,15 +151,12 @@ class ConversionContext implements IConversionContext {
 			return false;
 		if (conversionScheme != other.conversionScheme)
 			return false;
-		if (conversionVisitor == null) {
-			if (other.conversionVisitor != null)
-				return false;
-		} else if (!conversionVisitor.equals(other.conversionVisitor))
-			return false;
 		if (datasetNames == null) {
 			if (other.datasetNames != null)
 				return false;
 		} else if (!datasetNames.equals(other.datasetNames))
+			return false;
+		if (expression != other.expression)
 			return false;
 		if (filePaths == null) {
 			if (other.filePaths != null)
@@ -173,6 +172,11 @@ class ConversionContext implements IConversionContext {
 			if (other.outputFolder != null)
 				return false;
 		} else if (!outputFolder.equals(other.outputFolder))
+			return false;
+		if (selectedConversionFile == null) {
+			if (other.selectedConversionFile != null)
+				return false;
+		} else if (!selectedConversionFile.equals(other.selectedConversionFile))
 			return false;
 		if (sliceDimensions == null) {
 			if (other.sliceDimensions != null)
@@ -214,6 +218,12 @@ class ConversionContext implements IConversionContext {
 	}
 	public void setWorkSize(int workSize) {
 		this.workSize = workSize;
+	}
+	public boolean isExpression() {
+		return expression;
+	}
+	public void setExpression(boolean expression) {
+		this.expression = expression;
 	}
 
 }

@@ -96,6 +96,7 @@ public class AVIImageConverter extends AbstractImageConversion {
 			slice = getDownsampled(slice);
 
 			boolean newAVIFile = selected==null || !selected.equals(context.getSelectedConversionFile());
+			if (context.isExpression() && out!=null) newAVIFile=false;
 			if (newAVIFile) {
 				if (out!=null) out.close();
 				
@@ -112,7 +113,8 @@ public class AVIImageConverter extends AbstractImageConversion {
 				out.addTrack(format);
 				
 				if (context.getMonitor()!=null) {
-					context.getMonitor().subTask("Converting '"+context.getSelectedConversionFile().getName()+"' to '"+outputFile.getName()+"'");
+					final String selectedName = context.getSelectedConversionFile()!=null ? context.getSelectedConversionFile().getName() : "";
+					context.getMonitor().subTask("Converting '"+selectedName+"' to '"+outputFile.getName()+"'");
 				}
 			}
 			

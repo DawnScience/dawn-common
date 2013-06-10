@@ -281,4 +281,9 @@ public interface IConversionContext {
 	 */
 	public void setWorkSize(int workSize);
 
+	
+	public boolean isExpression();
+	
+	
+	public void setExpression(boolean expression) ;
 }

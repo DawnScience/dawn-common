@@ -142,16 +142,18 @@ public abstract class AbstractImageConvertPage extends ResourceChoosePage implem
         return super.isPageComplete();
     }
 
-    
+    private boolean isExpression;
 	protected void nameChanged() {
 		try {
 
+			isExpression = true;
             ILazyDataset lz = getLazyExpression();				
 			if (lz==null) {
 				DataHolder dh = LoaderFactory.getData(context.getFilePaths().get(0), new IMonitor.Stub());
 				lz = dh.getLazyDataset(datasetName);
+				isExpression = false;
 			}
-			sliceComponent.setData(lz, datasetName, context.getFilePaths().get(0), false);
+			sliceComponent.setData(lz, datasetName, context.getFilePaths().get(0), isExpression);
 
 		} catch (Exception ne) {
 			setErrorMessage("Cannot read data set '"+datasetName+"'");
@@ -198,7 +200,7 @@ public abstract class AbstractImageConvertPage extends ResourceChoosePage implem
 		if (context == null) return null;
 		context.setDatasetName(datasetName);
 		context.setOutputPath(getAbsoluteFilePath());
-	
+		context.setExpression(isExpression);
 		final DimsDataList dims = sliceComponent.getDimsDataList();
 		for (DimsData dd : dims.getDimsData()) {
 			if (dd.isSlice()) {
