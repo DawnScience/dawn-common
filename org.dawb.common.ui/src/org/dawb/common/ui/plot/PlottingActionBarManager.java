@@ -417,13 +417,13 @@ public class PlottingActionBarManager implements IPlotActionSystem {
     		return null;
     	}
     	if (role==null) role = tool.getToolPageRole();
+    	tool.setToolId(e.getAttribute("id"));	    
     	if (tool.getToolPageRole()!=role) return null;
-	    
+    	
     	tool.setToolSystem(system);
     	tool.setPlottingSystem(system);
     	tool.setTitle(e.getAttribute("label"));
     	tool.setPart(system.getPart());
-    	tool.setToolId(e.getAttribute("id"));
     	tool.setCheatSheetId(e.getAttribute("cheat_sheet_id"));
     	
     	// Save tool page
