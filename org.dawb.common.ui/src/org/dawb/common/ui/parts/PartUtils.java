@@ -25,8 +25,9 @@ public class PartUtils {
 			}
 		}
 
-		IPlottingSystem system = null;
-		if (part instanceof IPlottingContainer) {
+		IPlottingSystem system = (IPlottingSystem)part.getAdapter(IPlottingSystem.class);
+		
+		if (system==null && part instanceof IPlottingContainer) {
 			system = ((IPlottingContainer) part).getPlottingSystem();
 		}
 
