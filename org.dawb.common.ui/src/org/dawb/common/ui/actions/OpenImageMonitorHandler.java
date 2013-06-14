@@ -9,11 +9,15 @@
  */ 
 package org.dawb.common.ui.actions;
 
+import java.io.File;
+
 import org.dawb.common.ui.util.EclipseUtils;
 import org.dawb.common.ui.views.ImageMonitorView;
+import org.dawb.common.util.io.FileUtils;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
@@ -58,28 +62,29 @@ public class OpenImageMonitorHandler extends AbstractHandler implements IObjectA
 		
 		final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 		final IStructuredSelection sel = (IStructuredSelection)page.getSelection();
+		ImageMonitorView view=null;
+		try {
+			view = (ImageMonitorView)EclipseUtils.getPage().showView(ImageMonitorView.ID);
+		} catch (PartInitException e1) {
+			return null;
+		}
 		
-		Runnable job = new Runnable() {
+		if (sel!=null && view!=null && sel.getFirstElement()!=null) {
 			
-			@Override
-			public void run() {
+			final ImageMonitorView finalView = view;
+			Runnable job = new Runnable() {
 				
-				if (sel != null) {
-					Object[] selObjects = sel.toArray();
-					if(selObjects[0] instanceof IFolder) {
-						try {
-							final ImageMonitorView view = (ImageMonitorView)EclipseUtils.getPage().showView(ImageMonitorView.ID);
-						    view.setDirectoryPath(((IFolder)selObjects[0]).getLocation().toOSString());
-						    
-						} catch (PartInitException e) {
-							logger.error("Cannot find view "+ImageMonitorView.ID, e);
-						}
-						
-					}
+				@Override
+				public void run() {
+					
+					final Object object = sel.getFirstElement();
+					final String path = FileUtils.getDirectoryPath(object);
+					if (path!=null) finalView.setDirectoryPath(path);
+
 				}
-			}
-		};
-		PlatformUI.getWorkbench().getDisplay().asyncExec(job);
+			};
+			PlatformUI.getWorkbench().getDisplay().asyncExec(job);
+		}
 		
 		
 		return Boolean.TRUE;

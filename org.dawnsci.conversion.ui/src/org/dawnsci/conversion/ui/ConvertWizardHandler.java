@@ -10,13 +10,18 @@
 package org.dawnsci.conversion.ui;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import org.dawb.common.ui.util.EclipseUtils;
+import org.dawb.common.util.io.FileUtils;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -68,12 +73,35 @@ public class ConvertWizardHandler extends AbstractHandler implements IObjectActi
 		if (selection instanceof StructuredSelection) {
 			StructuredSelection s = (StructuredSelection)selection;
 			final Object        o = s.getFirstElement();
-			if (o instanceof IFile)      return true;
-			if (o instanceof IContainer) return true;
-			if (o instanceof File)       return true;
+			
+			// Currently can only parse nexus files with conversion
+			// tool
+			final String path = FileUtils.getPath(o);
+			if (path!=null && isH5(path)) return true;
 		}
         return false;
 	}
+	
+	public final static List<String> EXT;
+	static {
+		List<String> tmp = new ArrayList<String>(7);
+		tmp.add("h5");
+		tmp.add("nxs");
+		tmp.add("hd5");
+		tmp.add("hdf5");
+		tmp.add("hdf");
+		tmp.add("nexus");
+		EXT = Collections.unmodifiableList(tmp);
+	}	
+
+	public static boolean isH5(final String filePath) {
+		if (filePath==null) return false;
+		final String ext = FileUtils.getFileExtension(filePath);
+		if (ext==null) return false;
+		return EXT.contains(ext.toLowerCase());
+	}
+
+	
 	public boolean isHandled() {
 		return  isEnabled();
 	}

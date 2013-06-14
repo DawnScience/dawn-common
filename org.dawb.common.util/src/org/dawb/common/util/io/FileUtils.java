@@ -32,6 +32,10 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IResource;
+
 /**
  * A class with a collection of file management static utility classes. Several method contents copied from code
  * snippets available on the web.
@@ -1140,6 +1144,33 @@ public final class FileUtils {
 		File dir = new File(filePath);
 		if (!dir.isDirectory()) dir = dir.getParentFile();
 		return dir.getAbsolutePath();
+	}
+	
+	public static String getDirectoryPath(final Object fileOrResource) {
+		String path=null;
+		if (fileOrResource instanceof IFolder) {
+			path = ((IFolder)fileOrResource).getLocation().toOSString();
+				
+		} else if(fileOrResource instanceof IFile) {
+			path = ((IFile)fileOrResource).getParent().getLocation().toOSString();
+				  
+		} else if (fileOrResource instanceof File) {
+			File file = (File)fileOrResource;
+			path = file.isDirectory() ? file.getAbsolutePath() : file.getParent();
+		}
+        return path;
+	}
+
+	public static String getPath(final Object fileOrResource) {
+		String path=null;
+		if (fileOrResource instanceof IResource) {
+			path = ((IResource)fileOrResource).getLocation().toOSString();
+							  
+		} else if (fileOrResource instanceof File) {
+			File file = (File)fileOrResource;
+			path = file.getAbsolutePath();
+		}
+        return path;
 	}
 
 	/**

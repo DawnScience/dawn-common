@@ -497,7 +497,31 @@
           <action
                 class="org.dawb.common.ui.actions.OpenImageMonitorHandler"
                 enablesFor="1"
-                id="org.dawb.workbench.views.imageMonitorViewOpenAction"
+                id="org.dawb.workbench.views.imageMonitorViewOpenActionIFolder"
+                label="Open folder in image monitor"
+                tooltip="View images in folder and monitor directory for more as they appear.">
+          </action>
+       </objectContribution>
+       <objectContribution
+             adaptable="true"
+             id="org.dawb.workbench.views.imageMonitorView"
+             objectClass="org.eclipse.core.resources.IFile">
+          <action
+                class="org.dawb.common.ui.actions.OpenImageMonitorHandler"
+                enablesFor="1"
+                id="org.dawb.workbench.views.imageMonitorViewOpenActionIFile"
+                label="Open folder in image monitor"
+                tooltip="View images in folder and monitor directory for more as they appear.">
+          </action>
+       </objectContribution>
+       <objectContribution
+             adaptable="true"
+             id="org.dawb.workbench.views.imageMonitorView"
+             objectClass="java.io.File">
+          <action
+                class="org.dawb.common.ui.actions.OpenImageMonitorHandler"
+                enablesFor="1"
+                id="org.dawb.workbench.views.imageMonitorViewOpenActionFile"
                 label="Open folder in image monitor"
                 tooltip="View images in folder and monitor directory for more as they appear.">
           </action>
