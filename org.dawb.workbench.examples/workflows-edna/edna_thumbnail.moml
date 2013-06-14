@@ -1,7 +1,7 @@
 <?xml version="1.0" standalone="no"?>
 <!DOCTYPE entity PUBLIC "-//UC Berkeley//DTD MoML 1//EN"
     "http://ptolemy.eecs.berkeley.edu/xml/dtd/MoML_1.dtd">
-<entity name="newModel" class="ptolemy.actor.TypedCompositeActor" source="C:\Work\debug_dawb_workspace\workflows\examples-edna\edna_thumbnail.moml">
+<entity name="newModel" class="ptolemy.actor.TypedCompositeActor" source="/mntdirect/_scisoft/users/svensson/workspaces/dawn_runtime/test_forkjoin/workflows/workflow_edna_examples/edna_thumbnail.moml">
     <property name="_createdBy" class="ptolemy.kernel.attributes.VersionAttribute" value="7.0.1">
     </property>
     <property name="_workbenchVersion" class="ptolemy.kernel.attributes.VersionAttribute" value="0.8.2">
@@ -15,15 +15,15 @@
         </property>
         <property name="Receiver Q warning size (-1)" class="ptolemy.data.expr.Parameter" value="-1">
         </property>
-        <property name="Expression Mode" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="Evaluate after all data received">
+        <property name="Expression Mode" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="Evaluate on every data input">
         </property>
         <property name="Memory Mode" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="Create copy of data leaving original data intact.">
         </property>
         <property name="Plugin Name" class="ptolemy.data.expr.StringParameter" value="EDPluginExecThumbnailv10">
         </property>
-        <property name="Input Template" class="com.isencia.passerelle.util.ptolemy.ResourceParameter" value="/${project_name}/edna-xml/XSDataInputExecThumbnail1.xml">
+        <property name="Input Template" class="com.isencia.passerelle.util.ptolemy.ResourceParameter" value="/workflows/edna-xml/XSDataInputExecThumbnail1.xml">
         </property>
-        <property name="Output Template" class="com.isencia.passerelle.util.ptolemy.ResourceParameter" value="/${project_name}/edna-xml/XSDataOutputExecThumbnail1.properties">
+        <property name="Output Template" class="com.isencia.passerelle.util.ptolemy.ResourceParameter" value="/workflows/edna-xml/XSDataOutputExecThumbnail1.properties">
         </property>
         <property name="Pass Inputs On" class="ptolemy.data.expr.Parameter" value="true">
         </property>
@@ -55,8 +55,6 @@
         </property>
         <property name="Folder" class="ptolemy.data.expr.Parameter" value="false">
         </property>
-        <property name="Include Meta Data" class="ptolemy.data.expr.Parameter" value="false">
-        </property>
         <property name="File Filter" class="com.isencia.passerelle.util.ptolemy.RegularExpressionParameter" value="">
         </property>
         <property name="Path" class="com.isencia.passerelle.util.ptolemy.ResourceParameter" value="/${project_name}/data/ref-testscale_1_001.img">
@@ -64,6 +62,8 @@
         <property name="Data Sets" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="">
         </property>
         <property name="Rename Data Sets" class="com.isencia.passerelle.util.ptolemy.StringMapParameter" value="">
+        </property>
+        <property name="Include Meta Data" class="ptolemy.data.expr.Parameter" value="false">
         </property>
         <property name="_location" class="ptolemy.kernel.util.Location" value="{60.0, 189.0}">
         </property>

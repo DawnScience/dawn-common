@@ -1,7 +1,7 @@
 <?xml version="1.0" standalone="no"?>
 <!DOCTYPE entity PUBLIC "-//UC Berkeley//DTD MoML 1//EN"
     "http://ptolemy.eecs.berkeley.edu/xml/dtd/MoML_1.dtd">
-<entity name="newModel" class="ptolemy.actor.TypedCompositeActor" source="C:\Work\debug_dawb_workspace\workflows\examples\python_numpy_example1.moml">
+<entity name="newModel" class="ptolemy.actor.TypedCompositeActor" source="/mntdirect/_scisoft/users/svensson/workspaces/dawn_runtime/test_forkjoin/workflows/workflow_examples/python_numpy_example1.moml">
     <property name="_createdBy" class="ptolemy.kernel.attributes.VersionAttribute" value="7.0.1">
     </property>
     <property name="_workbenchVersion" class="ptolemy.kernel.attributes.VersionAttribute" value="0.8.2">
@@ -21,8 +21,6 @@
         </property>
         <property name="Folder" class="ptolemy.data.expr.Parameter" value="false">
         </property>
-        <property name="Include Meta Data" class="ptolemy.data.expr.Parameter" value="false">
-        </property>
         <property name="File Filter" class="com.isencia.passerelle.util.ptolemy.RegularExpressionParameter" value="">
         </property>
         <property name="Path" class="com.isencia.passerelle.util.ptolemy.ResourceParameter" value="/${project_name}/data/MoKedge_1_15.dat">
@@ -31,11 +29,13 @@
         </property>
         <property name="Rename Data Sets" class="com.isencia.passerelle.util.ptolemy.StringMapParameter" value="">
         </property>
-        <property name="_location" class="ptolemy.kernel.util.Location" value="{31.0, 147.0}">
+        <property name="Include Meta Data" class="ptolemy.data.expr.Parameter" value="false">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{31.0, 156.0}">
         </property>
     </entity>
     <entity name="numpy" class="org.dawb.passerelle.actors.scripts.PythonScript">
-<display name="numpy"/>        <property name="Receiver Q Capacity (-1)" class="ptolemy.data.expr.Parameter" value="-1">
+        <property name="Receiver Q Capacity (-1)" class="ptolemy.data.expr.Parameter" value="-1">
         </property>
         <property name="Receiver Q warning size (-1)" class="ptolemy.data.expr.Parameter" value="-1">
         </property>
@@ -57,7 +57,7 @@
         </property>
         <property name="Python Debug" class="org.dawb.passerelle.actors.scripts.PythonScript$3" value="Start new python rcp server">
         </property>
-        <property name="_location" class="ptolemy.kernel.util.Location" value="{179.0, 147.0}">
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{179.0, 156.0}">
         </property>
     </entity>
     <entity name="Data Export" class="org.dawb.passerelle.actors.data.DataExportTransformer">
@@ -77,7 +77,7 @@
         </property>
         <property name="Output" class="com.isencia.passerelle.util.ptolemy.ResourceParameter" value="/${project_name}/output/">
         </property>
-        <property name="_location" class="ptolemy.kernel.util.Location" value="{310.0, 147.0}">
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{310.0, 156.0}">
         </property>
     </entity>
     <entity name="Open File" class="org.dawb.passerelle.actors.file.OpenFileSink">
@@ -87,13 +87,13 @@
         </property>
         <property name="PassThrough" class="ptolemy.data.expr.Parameter" value="false">
         </property>
-        <property name="Expression Mode" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="Evaluate after all data received">
+        <property name="Expression Mode" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="Evaluate on every data input">
         </property>
         <property name="Memory Mode" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="Create copy of data leaving original data intact.">
         </property>
         <property name="File Path" class="ptolemy.data.expr.StringParameter" value="${file_path}">
         </property>
-        <property name="_location" class="ptolemy.kernel.util.Location" value="{453.0, 147.0}">
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{477.0, 159.0}">
         </property>
     </entity>
     <relation name="_R" class="ptolemy.actor.TypedIORelation">
@@ -104,7 +104,7 @@
         <property name="width" class="ptolemy.data.expr.Parameter" value="1">
         </property>
     </relation>
-    <relation name="_R3" class="ptolemy.actor.TypedIORelation">
+    <relation name="_R_2" class="ptolemy.actor.TypedIORelation">
         <property name="width" class="ptolemy.data.expr.Parameter" value="1">
         </property>
     </relation>
@@ -112,6 +112,6 @@
     <link port="numpy.input" relation="_R"/>
     <link port="numpy.output" relation="_R2"/>
     <link port="Data Export.input" relation="_R2"/>
-    <link port="Data Export.output" relation="_R3"/>
-    <link port="Open File.input" relation="_R3"/>
+    <link port="Data Export.output" relation="_R_2"/>
+    <link port="Open File.input" relation="_R_2"/>
 </entity>

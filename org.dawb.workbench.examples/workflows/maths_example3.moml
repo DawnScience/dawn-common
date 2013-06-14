@@ -1,7 +1,7 @@
 <?xml version="1.0" standalone="no"?>
 <!DOCTYPE entity PUBLIC "-//UC Berkeley//DTD MoML 1//EN"
     "http://ptolemy.eecs.berkeley.edu/xml/dtd/MoML_1.dtd">
-<entity name="new_model" class="ptolemy.actor.TypedCompositeActor" source="C:\Work\debug_dawb_workspace\workflows\examples\maths_example3.moml">
+<entity name="new_model" class="ptolemy.actor.TypedCompositeActor" source="/mntdirect/_scisoft/users/svensson/workspaces/dawn_runtime/test_forkjoin/workflows/workflow_examples/maths_example3.moml">
     <property name="_createdBy" class="ptolemy.kernel.attributes.VersionAttribute" value="7.0.1">
     </property>
     <property name="_workbenchVersion" class="ptolemy.kernel.attributes.VersionAttribute" value="1.0.0">
@@ -47,8 +47,6 @@
         </property>
         <property name="Folder" class="ptolemy.data.expr.Parameter" value="false">
         </property>
-        <property name="Include Meta Data" class="ptolemy.data.expr.Parameter" value="false">
-        </property>
         <property name="File Filter" class="com.isencia.passerelle.util.ptolemy.RegularExpressionParameter" value="">
         </property>
         <property name="Path" class="com.isencia.passerelle.util.ptolemy.ResourceParameter" value="/${project_name}/output/maths_example2.h5">
@@ -60,6 +58,8 @@
         <property name="Data Set Slice" class="org.dawb.passerelle.actors.data.config.SliceParameter" value="PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4gCjxqYXZhIHZlcnNpb249IjEuNi4wXzI5IiBjbGFzcz0iamF2YS5iZWFucy5YTUxEZWNvZGVyIj4gCiA8b2JqZWN0IGNsYXNzPSJvcmcuZGF3Yi5jb21tb24udWkuc2xpY2luZy5EaW1zRGF0YUxpc3QiPiAKICA8dm9pZCBwcm9wZXJ0eT0iZGltc0RhdGEiPiAKICAgPG9iamVjdCBjbGFzcz0iamF2YS51dGlsLkFycmF5TGlzdCI+IAogICAgPHZvaWQgbWV0aG9kPSJhZGQiPiAKICAgICA8b2JqZWN0IGNsYXNzPSJvcmcuZGF3Yi5jb21tb24udWkuc2xpY2luZy5EaW1zRGF0YSI+IAogICAgICA8dm9pZCBwcm9wZXJ0eT0iZGltZW5zaW9uIj4gCiAgICAgICA8aW50PjA8L2ludD4gCiAgICAgIDwvdm9pZD4gCiAgICAgPC9vYmplY3Q+IAogICAgPC92b2lkPiAKICAgIDx2b2lkIG1ldGhvZD0iYWRkIj4gCiAgICAgPG9iamVjdCBjbGFzcz0ib3JnLmRhd2IuY29tbW9uLnVpLnNsaWNpbmcuRGltc0RhdGEiPiAKICAgICAgPHZvaWQgcHJvcGVydHk9ImF4aXMiPiAKICAgICAgIDxpbnQ+MDwvaW50PiAKICAgICAgPC92b2lkPiAKICAgICAgPHZvaWQgcHJvcGVydHk9ImRpbWVuc2lvbiI+IAogICAgICAgPGludD4xPC9pbnQ+IAogICAgICA8L3ZvaWQ+IAogICAgIDwvb2JqZWN0PiAKICAgIDwvdm9pZD4gCiAgICA8dm9pZCBtZXRob2Q9ImFkZCI+IAogICAgIDxvYmplY3QgY2xhc3M9Im9yZy5kYXdiLmNvbW1vbi51aS5zbGljaW5nLkRpbXNEYXRhIj4gCiAgICAgIDx2b2lkIHByb3BlcnR5PSJheGlzIj4gCiAgICAgICA8aW50PjE8L2ludD4gCiAgICAgIDwvdm9pZD4gCiAgICAgIDx2b2lkIHByb3BlcnR5PSJkaW1lbnNpb24iPiAKICAgICAgIDxpbnQ+MjwvaW50PiAKICAgICAgPC92b2lkPiAKICAgICA8L29iamVjdD4gCiAgICA8L3ZvaWQ+IAogICA8L29iamVjdD4gCiAgPC92b2lkPiAKIDwvb2JqZWN0PiAKPC9qYXZhPiAK">
         </property>
         <property name="Data Type" class="org.dawb.passerelle.actors.data.DataImportSource$3" value="Complete data as numerical arrays">
+        </property>
+        <property name="Include Meta Data" class="ptolemy.data.expr.Parameter" value="false">
         </property>
         <property name="_location" class="ptolemy.kernel.util.Location" value="{62.0, 279.0}">
         </property>
@@ -73,8 +73,6 @@
         </property>
         <property name="Folder" class="ptolemy.data.expr.Parameter" value="false">
         </property>
-        <property name="Include Meta Data" class="ptolemy.data.expr.Parameter" value="false">
-        </property>
         <property name="File Filter" class="com.isencia.passerelle.util.ptolemy.RegularExpressionParameter" value="">
         </property>
         <property name="Path" class="com.isencia.passerelle.util.ptolemy.ResourceParameter" value="/${project_name}/output/maths_example2.h5">
@@ -86,6 +84,8 @@
         <property name="Data Set Slice" class="org.dawb.passerelle.actors.data.config.SliceParameter" value="PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4gCjxqYXZhIHZlcnNpb249IjEuNi4wXzI5IiBjbGFzcz0iamF2YS5iZWFucy5YTUxEZWNvZGVyIj4gCiA8b2JqZWN0IGNsYXNzPSJvcmcuZGF3Yi5jb21tb24udWkuc2xpY2luZy5EaW1zRGF0YUxpc3QiPiAKICA8dm9pZCBwcm9wZXJ0eT0iZGltc0RhdGEiPiAKICAgPG9iamVjdCBjbGFzcz0iamF2YS51dGlsLkFycmF5TGlzdCI+IAogICAgPHZvaWQgbWV0aG9kPSJhZGQiPiAKICAgICA8b2JqZWN0IGNsYXNzPSJvcmcuZGF3Yi5jb21tb24udWkuc2xpY2luZy5EaW1zRGF0YSI+IAogICAgICA8dm9pZCBwcm9wZXJ0eT0iZGltZW5zaW9uIj4gCiAgICAgICA8aW50PjA8L2ludD4gCiAgICAgIDwvdm9pZD4gCiAgICAgPC9vYmplY3Q+IAogICAgPC92b2lkPiAKICAgIDx2b2lkIG1ldGhvZD0iYWRkIj4gCiAgICAgPG9iamVjdCBjbGFzcz0ib3JnLmRhd2IuY29tbW9uLnVpLnNsaWNpbmcuRGltc0RhdGEiPiAKICAgICAgPHZvaWQgcHJvcGVydHk9ImF4aXMiPiAKICAgICAgIDxpbnQ+MDwvaW50PiAKICAgICAgPC92b2lkPiAKICAgICAgPHZvaWQgcHJvcGVydHk9ImRpbWVuc2lvbiI+IAogICAgICAgPGludD4xPC9pbnQ+IAogICAgICA8L3ZvaWQ+IAogICAgIDwvb2JqZWN0PiAKICAgIDwvdm9pZD4gCiAgIDwvb2JqZWN0PiAKICA8L3ZvaWQ+IAogPC9vYmplY3Q+IAo8L2phdmE+IAo=">
         </property>
         <property name="Data Type" class="org.dawb.passerelle.actors.data.DataImportSource$3" value="Complete data as numerical arrays">
+        </property>
+        <property name="Include Meta Data" class="ptolemy.data.expr.Parameter" value="false">
         </property>
         <property name="_location" class="ptolemy.kernel.util.Location" value="{62.0, 141.0}">
         </property>
@@ -157,8 +157,52 @@
         </property>
         <property name="File Path" class="ptolemy.data.expr.StringParameter" value="${file_path}">
         </property>
-        <property name="_location" class="ptolemy.kernel.util.Location" value="{563.0, 272.0}">
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{649.0, 272.0}">
         </property>
+    </entity>
+    <entity name="Combiner" class="org.dawb.passerelle.common.actors.DataMessageCombiner">
+        <property name="Receiver Q Capacity (-1)" class="ptolemy.data.expr.Parameter" value="-1">
+        </property>
+        <property name="Receiver Q warning size (-1)" class="ptolemy.data.expr.Parameter" value="-1">
+        </property>
+        <property name="_icon" class="com.isencia.passerelle.actor.gui.EditorIcon">
+        </property>
+        <property name="_break_point" class="ptolemy.data.expr.Parameter" value="false">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{540.0, 269.0}">
+        </property>
+        <port name="requestFinish" class="com.isencia.passerelle.core.ControlPort">
+            <property name="input"/>
+            <property name="multiport"/>
+            <property name="control" class="ptolemy.kernel.util.StringAttribute">
+            </property>
+        </port>
+        <port name="error" class="com.isencia.passerelle.core.ErrorPort">
+            <property name="output"/>
+            <property name="multiport"/>
+            <property name="error" class="ptolemy.kernel.util.StringAttribute">
+            </property>
+        </port>
+        <port name="hasFired" class="com.isencia.passerelle.core.ControlPort">
+            <property name="output"/>
+            <property name="multiport"/>
+            <property name="control" class="ptolemy.kernel.util.StringAttribute">
+            </property>
+        </port>
+        <port name="hasFinished" class="com.isencia.passerelle.core.ControlPort">
+            <property name="output"/>
+            <property name="multiport"/>
+            <property name="control" class="ptolemy.kernel.util.StringAttribute">
+            </property>
+        </port>
+        <port name="input" class="com.isencia.passerelle.core.Port">
+            <property name="input"/>
+            <property name="multiport"/>
+        </port>
+        <port name="output" class="com.isencia.passerelle.core.Port">
+            <property name="output"/>
+            <property name="multiport"/>
+        </port>
     </entity>
     <relation name="_R" class="ptolemy.actor.TypedIORelation">
         <property name="width" class="ptolemy.data.expr.Parameter" value="1">
@@ -180,6 +224,10 @@
         <property name="width" class="ptolemy.data.expr.Parameter" value="1">
         </property>
     </relation>
+    <relation name="_R_6" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
     <link port="maths_example2-2d.output" relation="_R_2"/>
     <link port="maths_example2-1d.output" relation="_R"/>
     <link port="Multiply.a" relation="_R_3"/>
@@ -187,7 +235,9 @@
     <link port="Multiply.b" relation="_R_2"/>
     <link port="Tile.input" relation="_R"/>
     <link port="Tile.output" relation="_R_3"/>
-    <link port="Data Export.hasFinished" relation="_R_5"/>
     <link port="Data Export.input" relation="_R_4"/>
-    <link port="Open File.input" relation="_R_5"/>
+    <link port="Data Export.output" relation="_R_5"/>
+    <link port="Open File.input" relation="_R_6"/>
+    <link port="Combiner.input" relation="_R_5"/>
+    <link port="Combiner.output" relation="_R_6"/>
 </entity>

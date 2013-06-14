@@ -1,7 +1,7 @@
 <?xml version="1.0" standalone="no"?>
 <!DOCTYPE entity PUBLIC "-//UC Berkeley//DTD MoML 1//EN"
     "http://ptolemy.eecs.berkeley.edu/xml/dtd/MoML_1.dtd">
-<entity name="newModel" class="ptolemy.actor.TypedCompositeActor" source="/users/svensson/dawb_workspace_ifactor/workflows/examples/if_example.moml">
+<entity name="newModel" class="ptolemy.actor.TypedCompositeActor" source="/mntdirect/_scisoft/users/svensson/workspaces/dawn_runtime/test_forkjoin/workflows/workflow_examples/if_example.moml">
     <property name="_createdBy" class="ptolemy.kernel.attributes.VersionAttribute" value="7.0.1">
     </property>
     <property name="_workbenchVersion" class="ptolemy.kernel.attributes.VersionAttribute" value="0.8.2">
@@ -29,7 +29,7 @@
         </property>
         <property name="PassThrough" class="ptolemy.data.expr.Parameter" value="false">
         </property>
-        <property name="Expression Mode" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="Evaluate after all data received">
+        <property name="Expression Mode" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="Evaluate on every data input">
         </property>
         <property name="Memory Mode" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="Create copy of data leaving original data intact.">
         </property>
@@ -69,7 +69,7 @@
         </property>
         <property name="PassThrough" class="ptolemy.data.expr.Parameter" value="false">
         </property>
-        <property name="Expression Mode" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="Evaluate after all data received">
+        <property name="Expression Mode" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="Evaluate on every data input">
         </property>
         <property name="Memory Mode" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="Create copy of data leaving original data intact.">
         </property>
@@ -83,8 +83,6 @@
         </property>
         <property name="Receiver Q warning size (-1)" class="ptolemy.data.expr.Parameter" value="-1">
         </property>
-        <property name="_icon" class="com.isencia.passerelle.actor.gui.EditorIcon">
-        </property>
         <property name="Expression Mode" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="Evaluate on every data input">
         </property>
         <property name="Memory Mode" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="Create copy of data leaving original data intact.">
@@ -93,42 +91,8 @@
         </property>
         <property name="Expressions" class="org.dawb.passerelle.actors.ifdynaport.ExpressionParameter" value="PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPGphdmEgdmVyc2lvbj0iMS42LjBfMjMiIGNsYXNzPSJqYXZhLmJlYW5zLlhNTERlY29kZXIiPgogPG9iamVjdCBjbGFzcz0ib3JnLmRhd2IucGFzc2VyZWxsZS5hY3RvcnMuaWZkeW5hcG9ydC5FeHByZXNzaW9uQ29udGFpbmVyIj4KICA8dm9pZCBwcm9wZXJ0eT0iZXhwcmVzc2lvbnMiPgogICA8dm9pZCBpbmRleD0iMCI+CiAgICA8dm9pZCBwcm9wZXJ0eT0iZXhwcmVzc2lvbiI+CiAgICAgPHN0cmluZz54IT0xPC9zdHJpbmc+CiAgICA8L3ZvaWQ+CiAgIDwvdm9pZD4KICAgPHZvaWQgbWV0aG9kPSJhZGQiPgogICAgPG9iamVjdCBjbGFzcz0ib3JnLmRhd2IucGFzc2VyZWxsZS5hY3RvcnMuaWZkeW5hcG9ydC5FeHByZXNzaW9uQmVhbiI+CiAgICAgPHZvaWQgcHJvcGVydHk9ImV4cHJlc3Npb24iPgogICAgICA8c3RyaW5nPng9PTE8L3N0cmluZz4KICAgICA8L3ZvaWQ+CiAgICAgPHZvaWQgcHJvcGVydHk9Im91dHB1dFBvcnROYW1lIj4KICAgICAgPHN0cmluZz54PT0xPC9zdHJpbmc+CiAgICAgPC92b2lkPgogICAgPC9vYmplY3Q+CiAgIDwvdm9pZD4KICA8L3ZvaWQ+CiA8L29iamVjdD4KPC9qYXZhPgo=">
         </property>
-        <property name="output port setter builder" class="com.isencia.passerelle.actor.dynaport.OutputPortSetterBuilder">
-        </property>
         <property name="_location" class="ptolemy.kernel.util.Location" value="{157.0, 194.0}">
         </property>
-        <port name="requestFinish" class="com.isencia.passerelle.core.ControlPort">
-            <property name="input"/>
-            <property name="multiport"/>
-            <property name="control" class="ptolemy.kernel.util.StringAttribute">
-            </property>
-        </port>
-        <port name="error" class="com.isencia.passerelle.core.ErrorPort">
-            <property name="output"/>
-            <property name="multiport"/>
-            <property name="error" class="ptolemy.kernel.util.StringAttribute">
-            </property>
-        </port>
-        <port name="hasFired" class="com.isencia.passerelle.core.ControlPort">
-            <property name="output"/>
-            <property name="multiport"/>
-            <property name="control" class="ptolemy.kernel.util.StringAttribute">
-            </property>
-        </port>
-        <port name="hasFinished" class="com.isencia.passerelle.core.ControlPort">
-            <property name="output"/>
-            <property name="multiport"/>
-            <property name="control" class="ptolemy.kernel.util.StringAttribute">
-            </property>
-        </port>
-        <port name="input" class="com.isencia.passerelle.core.Port">
-            <property name="input"/>
-            <property name="multiport"/>
-        </port>
-        <port name="output" class="com.isencia.passerelle.core.Port">
-            <property name="output"/>
-            <property name="multiport"/>
-        </port>
         <port name="x==1" class="com.isencia.passerelle.core.Port">
             <property name="output"/>
             <property name="multiport"/>
