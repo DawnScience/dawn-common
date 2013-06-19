@@ -52,6 +52,7 @@ public final class AVIConvertPage extends AbstractSliceConversionPage {
 		super("wizardPage", "Page for exporting HDF5 data slices into a video.", null);
 		setTitle("Convert to Images");
 		setDirectory(false);
+		setOverwriteVisible(true);
 		setFileLabel("Export video");
 		setPathEditable(true);
 	}

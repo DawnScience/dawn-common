@@ -1323,6 +1323,10 @@ public class SliceComponent {
 		typeEditor.setItems(items);
 
 	}
+	
+	public void setExplanationText(final String text) {
+		explain.setText(text);
+	}
 
 	public String getAxisLabel(DimsData data) {
 
