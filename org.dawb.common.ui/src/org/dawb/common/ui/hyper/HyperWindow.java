@@ -77,18 +77,20 @@ public class HyperWindow {
 	private IPlottingSystem mainSystem;
 	private IPlottingSystem sideSystem;
 	private ILazyDataset lazy;
-	private List<ILazyDataset> daxes;
 	private IRegionListener regionListenerLeft;
 	private IROIListener roiListenerLeft;
 	private IROIListener roiListenerRight;
-	private AbstractHyperJob leftJob;
-	private AbstractHyperJob rightJob;
+	private HyperDeligateJob leftJob;
+	private HyperDeligateJob rightJob;
 	private IAction reselect;
 	private IAction baseline;
 	private int traceDim;
 	private IRegion windowRegion;
 	private Composite mainComposite;
 	
+	public enum HyperType {
+		IMAGE_TRACE, IMAGE_IMAGE
+	}
 
 	public void createControl(Composite parent) {
 		parent.setLayout(new FillLayout());
@@ -102,11 +104,25 @@ public class HyperWindow {
 	public void setData(ILazyDataset lazy, List<ILazyDataset> daxes, int traceDim) {
 		
 		this.lazy = lazy;
-		this.daxes = daxes;
 		//this.leftJob = new HyperJob();
-		this.leftJob = new HyperTraceJob(sideSystem);
+		
+		IDatasetROIReducer traceReducer = new TraceReducer();
+		
+		this.leftJob = new HyperDeligateJob("Trace update",
+				sideSystem,
+				lazy,
+				daxes,
+				traceDim,
+				traceReducer);
 		//this.rightJob = new HyperSideJob();
-		this.rightJob = new HyperImageJob(mainSystem);
+		
+		IDatasetROIReducer imageReducer = new ImageTrapizumBaselineReducer();
+		this.rightJob = new HyperDeligateJob("Image update",
+				mainSystem,
+				lazy,
+				daxes,
+				traceDim,
+				imageReducer);
 		this.traceDim = traceDim;
 		
 		mainSystem.clear();
@@ -125,25 +141,25 @@ public class HyperWindow {
 		int[] imageSize = new int[]{lazy.getShape()[axPos[1]],lazy.getShape()[axPos[0]]};
 		
 		try {
-			IRegion region = mainSystem.createRegion("Image Region 1", RegionType.BOX);
+			IRegion region = mainSystem.createRegion("Image Region 1", traceReducer.getSupportedRegionType().get(0));
 			
 			mainSystem.addRegion(region);
 			//TODO make roi positioning a bit more clever
-			RectangularROI rroi = new RectangularROI(imageSize[1]/10, imageSize[0]/10, imageSize[1]/10, imageSize[0]/10, 0);
+			//RectangularROI rroi = new RectangularROI(imageSize[1]/10, imageSize[0]/10, imageSize[1]/10, imageSize[0]/10, 0);
+			
+			IDataset imageTemplate = AbstractDataset.zeros(imageSize, AbstractDataset.ARRAYINT16);
+			IROI rroi = traceReducer.getInitialROI(imageTemplate);
 			region.setROI(rroi);
 			//region.setUserRegion(false);
 			region.addROIListener(this.roiListenerLeft);
 			
 			updateRight(region, rroi);
 			
-			windowRegion = sideSystem.createRegion("Trace Region 1", RegionType.XAXIS);
+			windowRegion = sideSystem.createRegion("Trace Region 1", imageReducer.getSupportedRegionType().get(0));
 			
 			sideSystem.addRegion(windowRegion);
 			
-			double min = daxes.get(traceDim).getSlice().min().doubleValue();
-			double max = daxes.get(traceDim).getSlice().max().doubleValue();
-			
-			XAxisBoxROI broi = new XAxisBoxROI(min,0,(max-min)/10, 0, 0);
+			IROI broi = imageReducer.getInitialROI(daxes.get(traceDim).getSlice());
 			windowRegion.setROI(broi);
 			windowRegion.setUserRegion(false);
 			windowRegion.addROIListener(this.roiListenerRight);
@@ -462,144 +478,61 @@ public class HyperWindow {
 	}
 	
 	//TODO consider abstracting out plotting and data reducting from Jobs
-//	private void updateImage(final IPlottingSystem plot, final IDataset image) {
-//		
-//		Display.getDefault().syncExec(new Runnable() {
-//			@Override
-//			public void run() {
-//				plot.updatePlot2D(image, null, null);
-//			}
-//		});
-//	}
-//	
-//	private void updateTrace(final IPlottingSystem plot, final IDataset axis, final IDataset data, final boolean update, final IRegion region) {
-//		Display.getDefault().syncExec(new Runnable() {
-//			@Override
-//			public void run() {
-//				
-//				if (update) {
-//					plot.updatePlot1D(axis,Arrays.asList(new IDataset[] {data}), null);
-//					plot.repaint();	
-//				} else {
-//					List<ITrace> traceOut = plot.createPlot1D(axis,Arrays.asList(new IDataset[] {data}), null);
-//					
-//					for (ITrace trace : traceOut) {
-//						trace.setUserObject(region);
-//						if (trace instanceof ILineTrace){
-//							region.setRegionColor(((ILineTrace)trace).getTraceColor());
-//						}
-//					}
-//				}
-//			}
-//		});
-//	}
-	
-	private final class HyperImageJob extends AbstractHyperJob {
-
-		HyperImageJob(IPlottingSystem plot) {
-			super("Update Image",plot);
-			this.plot = plot;
-			setSystem(false);
-			setUser(false);
-			setPriority(Job.INTERACTIVE);
-		}
-
-		@Override
-		protected IStatus run(IProgressMonitor monitor) {
-			try {
-				if (currentROI instanceof RectangularROI) {
-					final IDataset image = ROISliceUtils.getAxisDatasetTrapzSumBaselined(daxes.get(traceDim).getSlice(),
-							lazy,
-							(RectangularROI)currentROI,
-							traceDim,
-							baseline.isChecked());
-					
-					image.setName("IntegatedImage");
-					
-					Display.getDefault().syncExec(new Runnable() {
-						@Override
-						public void run() {
-							plot.updatePlot2D(image, null, null);
-						}
-					});
-				}
-			} catch (Throwable ne) {
-				ne.printStackTrace();
-				return Status.CANCEL_STATUS;
+	private void updateImage(final IPlottingSystem plot, final IDataset image) {
+		Display.getDefault().syncExec(new Runnable() {
+			@Override
+			public void run() {
+				plot.updatePlot2D(image, null, null);
 			}
-			return Status.OK_STATUS;
-		}
+		});
 	}
 	
-	private final class HyperTraceJob extends AbstractHyperJob {
-
-		HyperTraceJob(IPlottingSystem plot) {
-			super("Update Trace",plot);
-			setSystem(false);
-			setUser(false);
-			setPriority(Job.INTERACTIVE);
-		}
-
-		@Override
-		protected IStatus run(IProgressMonitor monitor) {
-
-			try {
-				if (currentROI instanceof RectangularROI) {
-					int[] dims = getImageAxis();
+	private void updateTrace(final IPlottingSystem plot, final IDataset axis, final IDataset data, final boolean update, final IRegion region) {
+		Display.getDefault().syncExec(new Runnable() {
+			@Override
+			public void run() {
+				
+				if (update) {
+					plot.updatePlot1D(axis,Arrays.asList(new IDataset[] {data}), null);
+					plot.repaint();	
+				} else {
+					List<ITrace> traceOut = plot.createPlot1D(axis,Arrays.asList(new IDataset[] {data}), null);
 					
-					//TODO check the dims used in the mean are sensible
-					Collection<ITrace> traces = sideSystem.getTraces();
-					for (ITrace trace : traces) {
-						Object uo = trace.getUserObject();
-						if (uo == currentRegion) {
-							final IDataset dataset1 = ((AbstractDataset)ROISliceUtils.getDataset(lazy, (RectangularROI)currentROI, dims)).mean(dims[0]).mean(dims[1]);
-							dataset1.setName(trace.getName());
-							
-							Display.getDefault().syncExec(new Runnable() {
-								@Override
-								public void run() {
-									plot.updatePlot1D(daxes.get(traceDim).getSlice(),Arrays.asList(new IDataset[] {dataset1}), null);
-									plot.repaint();						
-								}
-							});
-							
-							return Status.OK_STATUS;
+					for (ITrace trace : traceOut) {
+						trace.setUserObject(region);
+						if (trace instanceof ILineTrace){
+							region.setRegionColor(((ILineTrace)trace).getTraceColor());
 						}
 					}
-					final IDataset dataset1 = ((AbstractDataset)ROISliceUtils.getDataset(lazy, (RectangularROI)currentROI, dims)).mean(dims[0]).mean(dims[1]);
-					String name = TraceUtils.getUniqueTrace("trace", sideSystem, (String[])null);
-					dataset1.setName(name);
-					
-					Display.getDefault().syncExec(new Runnable() {
-						@Override
-						public void run() {
-							List<ITrace> traceOut = sideSystem.createPlot1D(daxes.get(traceDim).getSlice(),Arrays.asList(new IDataset[] {dataset1}), null);
-							
-							for (ITrace trace : traceOut) {
-								trace.setUserObject(currentRegion);
-								if (trace instanceof ILineTrace){
-									currentRegion.setRegionColor(((ILineTrace)trace).getTraceColor());
-								}
-							}					
-						}
-					});
 				}
-			} catch (Throwable ne) {
-				return Status.CANCEL_STATUS;
 			}
-			return Status.OK_STATUS;
-		}
+		});
 	}
-	
-	private abstract class AbstractHyperJob extends Job {
+
+	private class HyperDeligateJob extends Job {
 		
-		protected IRegion currentRegion;
-		protected IROI currentROI;
-		protected IPlottingSystem plot;
+		private IRegion currentRegion;
+		private IROI currentROI;
+		private IPlottingSystem plot;
+		private ILazyDataset data;
+		private List<ILazyDataset> axes;
+		private int dimension;
+		private IDatasetROIReducer reducer;
 		
-		public AbstractHyperJob(String name, IPlottingSystem plot) {
+		
+		public HyperDeligateJob(String name,
+				IPlottingSystem plot,
+				ILazyDataset data,
+				List<ILazyDataset> axes,
+				int dim,
+				IDatasetROIReducer reducer) {
+			
 			super(name);
 			this.plot = plot;
+			this.data = data;
+			this.axes = axes;
+			this.dimension = dim;
+			this.reducer = reducer;
 		}
 		
 		public void profile(IRegion r, IROI rb) {
@@ -608,6 +541,120 @@ public class HyperWindow {
 	        
           	schedule();		
 		}
+
+		@Override
+		protected IStatus run(IProgressMonitor monitor) {
+
+			try {
+
+				IDataset output = this.reducer.reduce(data, axes, dimension, currentROI);
+
+				if (!this.reducer.isOutput1D()) {
+					output.setName("Image");
+					updateImage(plot,output);
+				} else {
+					Collection<ITrace> traces = plot.getTraces();
+					for (ITrace trace : traces) {
+						Object uo = trace.getUserObject();
+						if (uo == currentRegion) {
+							output.setName(trace.getName());
+							updateTrace(plot,axes.get(dimension).getSlice(),output,true,currentRegion);
+							return Status.OK_STATUS;
+						}
+					}
+
+					String name = TraceUtils.getUniqueTrace("trace", plot, (String[])null);
+					output.setName(name);
+					updateTrace(plot,axes.get(dimension).getSlice(),output,false,currentRegion);
+				}
+
+				return Status.OK_STATUS;
+			} catch (Throwable ne) {
+				return Status.CANCEL_STATUS;
+			}
+		}
 	}
 	
+	private class TraceReducer implements IDatasetROIReducer{
+		
+		private final RegionType regionType = RegionType.BOX;
+		
+		@Override
+		public IDataset reduce(ILazyDataset data, List<ILazyDataset> axes,
+				int dim, IROI roi) {
+			if (roi instanceof RectangularROI) {
+				//TODO push to utils so getDataset runs off single dim
+				int[] dims = getImageAxis();
+				IDataset output = ((AbstractDataset)ROISliceUtils.getDataset(lazy, (RectangularROI)roi, dims)).mean(dims[0]).mean(dims[1]);
+				return output;
+			}
+			return null;
+		}
+
+		@Override
+		public boolean isOutput1D() {
+			return true;
+		}
+
+		@Override
+		public List<RegionType> getSupportedRegionType() {
+			
+			List<IRegion.RegionType> regionList = new ArrayList<IRegion.RegionType>();
+			regionList.add(regionType);
+			
+			return regionList;
+		}
+
+		
+		
+		@Override
+		public IROI getInitialROI(IDataset dataset) {
+			int[] imageSize = dataset.getShape();
+			return new RectangularROI(imageSize[1]/10, imageSize[0]/10, imageSize[1]/10, imageSize[0]/10, 0);
+		}
+		
+	}
+	
+	private class ImageTrapizumBaselineReducer implements IDatasetROIReducer{
+
+		private final RegionType regionType = RegionType.XAXIS;
+		
+		@Override
+		public IDataset reduce(ILazyDataset data, List<ILazyDataset> axes,
+				int dim, IROI roi) {
+			if (roi instanceof RectangularROI) {
+				final IDataset image = ROISliceUtils.getAxisDatasetTrapzSumBaselined(axes.get(dim).getSlice(),
+						data,
+						(RectangularROI)roi,
+						dim,
+						HyperWindow.this.baseline.isChecked());
+				
+				return image;
+			}
+			
+			return null;
+		}
+
+		@Override
+		public boolean isOutput1D() {
+			return false;
+		}
+
+		@Override
+		public List<RegionType> getSupportedRegionType() {
+			
+			List<IRegion.RegionType> regionList = new ArrayList<IRegion.RegionType>();
+			regionList.add(regionType);
+			
+			return regionList;
+		}
+		
+		@Override
+		public IROI getInitialROI(IDataset dataset) {
+			double min = dataset.min().doubleValue();
+			double max = dataset.max().doubleValue();
+			
+			return new XAxisBoxROI(min,0,(max-min)/10, 0, 0);
+		}
+	}
 }
