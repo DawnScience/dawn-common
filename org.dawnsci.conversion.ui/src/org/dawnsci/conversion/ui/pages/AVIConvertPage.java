@@ -31,7 +31,7 @@ import uk.ac.diamond.scisoft.analysis.dataset.function.DownsampleMode;
  * @author fcp94556
  *
  */
-public final class AVIConvertPage extends AbstractImageConvertPage {
+public final class AVIConvertPage extends AbstractSliceConversionPage {
 		
 	private static final String[] DOWNSAMPLE_TYPES;
 	static {

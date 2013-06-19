@@ -1,18 +1,17 @@
-package org.dawnsci.conversion.ui.pages;
+package org.dawb.common.ui.wizard;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 import java.util.List;
 
 import org.dawb.common.services.IExpressionObject;
 import org.dawb.common.services.conversion.IConversionContext;
+import org.dawb.common.ui.Activator;
 import org.dawb.common.ui.slicing.DimsData;
 import org.dawb.common.ui.slicing.DimsDataList;
 import org.dawb.common.ui.slicing.SliceComponent;
 import org.dawb.common.ui.util.GridUtils;
-import org.dawb.common.ui.wizard.ResourceChoosePage;
-import org.dawnsci.conversion.ui.Activator;
-import org.dawnsci.conversion.ui.IConversionWizardPage;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -22,6 +21,7 @@ import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -33,9 +33,9 @@ import uk.ac.diamond.scisoft.analysis.io.DataHolder;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
 
-public abstract class AbstractImageConvertPage extends ResourceChoosePage implements IConversionWizardPage {
+public abstract class AbstractSliceConversionPage extends ResourceChoosePage {
 
-	private static final org.slf4j.Logger logger = LoggerFactory.getLogger(AbstractImageConvertPage.class);
+	private static final org.slf4j.Logger logger = LoggerFactory.getLogger(AbstractSliceConversionPage.class);
 
 	private static final String LAST_SET_KEY = "org.dawnsci.conversion.ui.pages.lastDataSet";
 	
@@ -45,7 +45,7 @@ public abstract class AbstractImageConvertPage extends ResourceChoosePage implem
 	protected SliceComponent sliceComponent;
 	protected Label          multiFileMessage;
 
-	public AbstractImageConvertPage(String pageName, String description, ImageDescriptor icon) {
+	public AbstractSliceConversionPage(String pageName, String description, ImageDescriptor icon) {
 		super(pageName, description, icon);
 	}
 
@@ -72,13 +72,22 @@ public abstract class AbstractImageConvertPage extends ResourceChoosePage implem
 		label.setText("Dataset Name");
 		
 		nameChoice = new CCombo(container, SWT.READ_ONLY|SWT.BORDER);
-		nameChoice.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
+		nameChoice.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
 		nameChoice.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				datasetName = nameChoice.getItem(nameChoice.getSelectionIndex());
 				pathChanged();
 				nameChanged();
 				Activator.getDefault().getPreferenceStore().setValue(LAST_SET_KEY, datasetName);
+			}
+		});
+		
+		final Button editable = new Button(container, SWT.CHECK);
+		editable.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+		editable.setToolTipText("Click to enter a regular expression for dataset name.");
+		editable.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				nameChoice.setEditable(editable.getSelection());
 			}
 		});
 		
@@ -98,7 +107,6 @@ public abstract class AbstractImageConvertPage extends ResourceChoosePage implem
 		sep.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 4, 1));
 		
 		this.sliceComponent = new SliceComponent("org.dawb.workbench.views.h5GalleryView");
-		sliceComponent.setAxesVisible(false);
 
 		final Control slicer = sliceComponent.createPartControl(container);
 		GridData data = new GridData(SWT.FILL, SWT.FILL, true, true, 4, 1);
@@ -116,33 +124,56 @@ public abstract class AbstractImageConvertPage extends ResourceChoosePage implem
 	 * Checks the path is ok.
 	 */
 	protected void pathChanged() {
+		isPageValid();
+		return;
+	}
+	
+	/**
+	 * 
+	 * @return true if page is valid
+	 */
+	public boolean isPageValid() {
 
 		final String path = getAbsoluteFilePath();
 		if (path == null) {
 			setErrorMessage("Please set an output folder.");
-			return;
+			return false;
 		}
 		final File output = new File(path);
 		try {
 			if (!output.getParentFile().exists()) {
 				setErrorMessage("The directory "+output.getParent()+" does not exist.");
-				return;			
+				return false;			
 			}
 		} catch (Exception ne) {
 			setErrorMessage(ne.getMessage()); // Not very friendly...
-			return;			
+			return false;			
+		}
+		
+		// Check that two ranges have not been set.
+		final DimsDataList dl = sliceComponent.getDimsDataList();
+		if (dl.getRangeCount()>1) {
+			setErrorMessage("There is a limitation that only one range may be set, curently."); // Not very friendly...
+			return false;			
 		}
 	
 		setErrorMessage(null);
-		return;
+		return true;
 	}
-	
-    public boolean isPageComplete() {
+
+	public boolean isPageComplete() {
     	if (context==null) return false;
         return super.isPageComplete();
     }
 
-    private boolean isExpression;
+	public boolean isContextSet() {
+		if (context==null) return false;
+		return true;
+	}
+
+    private boolean      isExpression;
+	private DimsDataList defaultDimsList;
+
 	protected void nameChanged() {
 		try {
 
@@ -162,6 +193,15 @@ public abstract class AbstractImageConvertPage extends ResourceChoosePage implem
 
 	}
 
+	/**
+	 * Must be called before setContext(...) or defaultDimsList will be null!
+	 * @param dimsList
+	 */
+	public void setDefaltSliceDims(DimsDataList dimsList) {
+		this.defaultDimsList = dimsList;
+	}
+
+
 	private ILazyDataset getLazyExpression() {
 		if (datasetName!=null && datasetName.endsWith("[Expression]")) {
 			
@@ -172,7 +212,6 @@ public abstract class AbstractImageConvertPage extends ResourceChoosePage implem
 		return null;
 	}
 
-	@Override
 	public void setContext(IConversionContext context) {
 		
 		if (context!=null && context.equals(this.context)) return;
@@ -191,11 +230,25 @@ public abstract class AbstractImageConvertPage extends ResourceChoosePage implem
 			logger.error("Cannot extract data sets!", e);
 			return;
 		}
-        
+        if (context.getDatasetNames()!=null && context.getDatasetNames().size()>0) {
+        	final List<String> names = Arrays.asList(nameChoice.getItems());
+        	if (names.contains(context.getDatasetNames().get(0))) {
+            	datasetName = context.getDatasetNames().get(0);
+      		    nameChoice.select(names.indexOf(datasetName));
+        		nameChanged();
+        	}
+        }
+		if (defaultDimsList!=null) {
+			try {
+				sliceComponent.setDimsDataList(defaultDimsList);
+			} catch (Throwable ne) {
+				logger.error("Cannot set dimensional data "+defaultDimsList, ne);
+			}
+		}
+      
         setPageComplete(true);
  	}
 	
-	@Override
 	public IConversionContext getContext() {
 		if (context == null) return null;
 		context.setDatasetName(datasetName);

@@ -9,6 +9,7 @@ import java.util.Map;
 import org.dawb.common.services.IExpressionObject;
 import org.dawb.common.services.IExpressionObjectService;
 import org.dawb.common.services.conversion.IConversionContext;
+import org.dawb.common.services.conversion.IConversionVisitor;
 import org.dawb.common.services.conversion.IConversionContext.ConversionScheme;
 import org.dawb.common.ui.Activator;
 import org.dawb.common.ui.monitor.ProgressMonitorWrapper;
@@ -252,10 +253,18 @@ public class ResourceChoosePage extends WizardPage {
 		
 	}
 
+	/**
+	 * 
+	 * @return the output file path
+	 */
 	public String getPath() {
 		return path;
 	}
 	
+	/**
+	 * 
+	 * @return the output file path
+	 */
 	public String getAbsoluteFilePath() {
 		try{
 			IResource res = ResourcesPlugin.getWorkspace().getRoot().findMember(getPath());
@@ -373,11 +382,14 @@ public class ResourceChoosePage extends WizardPage {
 		if (source==null || "".equals(source)) return null;
 
 		final ConversionScheme scheme = context.getConversionScheme();
+		IConversionVisitor     visitor= context.getConversionVisitor();
 		final IMetaData        meta   = LoaderFactory.getMetaData(source, new ProgressMonitorWrapper(monitor));
         final List<String>     names  = new ArrayList<String>(7);
         for (String name : meta.getDataShapes().keySet()) {
 			final int[] shape = meta.getDataShapes().get(name);
-			if (scheme.isRankSupported(shape.length)) {
+			if (scheme!=null && scheme.isRankSupported(shape.length)) {
+				names.add(name);
+			} else if (visitor!=null && visitor.isRankSupported(shape.length)) {
 				names.add(name);
 			}
 		}

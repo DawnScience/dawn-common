@@ -90,6 +90,7 @@ public class DimsData implements Serializable {
 	}
 
 	public void setSliceRange(String sliceRange) {
+		if (sliceRange!=null) setAxis(RANGE);
 		this.sliceRange = sliceRange;
 	}
 

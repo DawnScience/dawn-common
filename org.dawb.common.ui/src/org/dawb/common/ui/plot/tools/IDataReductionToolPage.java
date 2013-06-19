@@ -7,10 +7,10 @@ import ncsa.hdf.object.Group;
 import org.dawb.hdf5.IHierarchicalDataFile;
 import org.dawnsci.io.h5.H5Utils;
 import org.dawnsci.plotting.api.tool.IToolPage;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
+import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
 
 /**
  * Interface used  to define this tool as a data reduction tool. 
@@ -63,13 +63,13 @@ public interface IDataReductionToolPage extends IToolPage {
 		 * May be null, data which the tool may need for persistence.
 		 */
 		private Object                userData;
-		private IProgressMonitor      monitor;
+		private IMonitor              monitor;
 		
 		public DataReductionSlice(IHierarchicalDataFile hf,
 				                  Group group,
 				                  IDataset set, 
 				                  Object ud, 
-				                  IProgressMonitor mon) {
+				                  IMonitor mon) {
 			this.file    = hf;
 			this.parent  = group;
 			this.data    = set;
@@ -105,10 +105,10 @@ public interface IDataReductionToolPage extends IToolPage {
 		public void setUserData(Object userData) {
 			this.userData = userData;
 		}
-		public IProgressMonitor getMonitor() {
+		public IMonitor getMonitor() {
 			return monitor;
 		}
-		public void setMonitor(IProgressMonitor monitor) {
+		public void setMonitor(IMonitor monitor) {
 			this.monitor = monitor;
 		}
 		@Override
