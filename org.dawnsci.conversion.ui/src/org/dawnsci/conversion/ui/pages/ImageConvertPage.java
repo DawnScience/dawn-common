@@ -24,7 +24,7 @@ import org.eclipse.ui.forms.events.ExpansionEvent;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.slf4j.LoggerFactory;
 
-public final class ImageConvertPage extends AbstractImageConvertPage {
+public final class ImageConvertPage extends AbstractSliceConversionPage {
 	
 	private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ImageConvertPage.class);
 	

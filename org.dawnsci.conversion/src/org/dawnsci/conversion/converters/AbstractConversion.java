@@ -112,6 +112,10 @@ public abstract class AbstractConversion {
 			convert(data);
 			return null;
 		}
+		context.setSelectedH5Path(dsPath);
+		if (context.getMonitor()!=null) {
+			context.getMonitor().subTask("Process '"+dsPath+"'");
+		}
 		return dh.getLazyDataset(dsPath);
 	}
 		
@@ -142,7 +146,7 @@ public abstract class AbstractConversion {
 				try {
 					start[i]    = Integer.parseInt(sliceDimensions.get(i));
 					stop[i]     = start[i]+1;
-					sliceIndex  = i;
+					sliceIndex  = sliceIndex<0 ? i : sliceIndex;
 				} catch (Throwable ne) {
 					sliceRange = sliceDimensions.get(i);
 					sliceIndex = i;

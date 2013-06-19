@@ -255,6 +255,20 @@ public interface IConversionContext {
 	public void setSelectedConversionFile(File selectedConversionFile);
 	
 	/**
+	 * During converting many data sets, the current dataset path being converted 
+	 * may be retrieved here.
+	 * @return current path being converted
+	 */
+	public String getSelectedH5Path();
+	
+	/**
+	 * During converting many data sets, the current dataset path being converted 
+	 * may be set here.
+	 * @param h5Path
+	 */
+	public void setSelectedH5Path(String h5Path);
+	
+	/**
 	 * get the dataset name to be used for an axis when saving 2d data as text
 	 * @return.
 	 */

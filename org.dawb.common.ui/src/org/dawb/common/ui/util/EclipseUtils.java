@@ -38,6 +38,8 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -718,6 +720,39 @@ public class EclipseUtils {
 			return wizard;
 		}
 		return null;
+	}
+
+	public static void refreshAndOpen(String outputPath, boolean isOpen, IProgressMonitor monitor) throws Exception {
+		
+		IFile file = null;
+		try { // Try to refresh parent incase it is in the worspace.
+			final String workspace = ResourcesPlugin.getWorkspace().getRoot().getLocation().toOSString();
+			final File   output    = new File(outputPath);
+			final String fullPath  = output.isDirectory() ? output.getAbsolutePath() : output.getParent();
+			final String frag      = fullPath.substring(workspace.length());
+			IContainer dir    = (IContainer)ResourcesPlugin.getWorkspace().getRoot().findMember(frag);
+			dir.refreshLocal(IResource.DEPTH_ONE, monitor);
+			file = dir.getFile(new Path(output.getName()));
+			
+		} catch (Throwable ne) {
+			// it's ok
+		}
+		
+		final IFile finalFile = file; 
+		if (isOpen &&  finalFile!=null) {
+			final Exception[] ex = new Exception[1];
+			ex[0] = null;
+			Display.getDefault().syncExec(new Runnable() {
+				public void run() {
+					try {
+						EclipseUtils.openEditor(finalFile);
+					} catch (PartInitException e) {
+						ex[0] = e;
+					}
+				}
+			});
+			if (ex[0] != null) throw ex[0];
+		}		
 	}
 
 }

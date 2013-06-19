@@ -170,7 +170,15 @@ public class DimsDataList implements Serializable {
 		if (dimsData==null) return -1;
 		int count = 0;
 		for (DimsData dd : dimsData) {
-			if (dd.getAxis()>-1) count++;
+			if (dd.getAxis()>-1 && dd.getAxis()!=DimsData.RANGE) count++;
+		}
+		return count;
+	}
+	
+	public int getRangeCount() {
+		int count = 0;
+		for (DimsData dd : dimsData) {
+			if (dd.getAxis()==DimsData.RANGE) count++;
 		}
 		return count;
 	}
@@ -330,4 +338,6 @@ public class DimsDataList implements Serializable {
 	public boolean isEmpty() {
 		return dimsData==null || dimsData.isEmpty();
 	}
+
+
 }

@@ -1099,10 +1099,21 @@ public final class FileUtils {
 	 * @return String filename minus its extension
 	 */
 	public static String getFileNameNoExtension(File file) {
-		final String fileName = file.getName();
+		return getFileNameNoExtension(file.getName());
+	}
+	
+	/**
+	 * Get Filename minus it's extension if present
+	 * 
+	 * @param file
+	 *            File to get filename from
+	 * @return String filename minus its extension
+	 */
+	public static String getFileNameNoExtension(String fileName) {
 		int posExt = fileName.lastIndexOf(".");
 		// No File Extension
 		return posExt == -1 ? fileName : fileName.substring(0, posExt);
+
 	}
 
 	/**

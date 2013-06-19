@@ -149,32 +149,7 @@ public class ConvertWizard extends Wizard implements IExportWizard{
 						monitor.worked(1);
 						service.process(context);
 						
-						IFile file = null;
-						try { // Try to refresh parent incase it is in the worspace.
-							final String workspace = ResourcesPlugin.getWorkspace().getRoot().getLocation().toOSString();
-							final File   output    = new File(context.getOutputPath());
-							final String fullPath  = output.isDirectory() ? output.getAbsolutePath() : output.getParent();
-							final String frag      = fullPath.substring(workspace.length());
-							IContainer dir    = (IContainer)ResourcesPlugin.getWorkspace().getRoot().findMember(frag);
-							dir.refreshLocal(IResource.DEPTH_ONE, monitor);
-							file = dir.getFile(new Path(output.getName()));
-							
-						} catch (Throwable ne) {
-							// it's ok
-						}
-						
-						final IFile finalFile = file; 
-						if (selectedConversionPage.isOpen() &&  finalFile!=null) {
-							Display.getDefault().syncExec(new Runnable() {
-								public void run() {
-									try {
-										EclipseUtils.openEditor(finalFile);
-									} catch (PartInitException e) {
-										logger.error("Cannot open "+context.getOutputPath(), e);
-									}
-								}
-							});
-						}
+						EclipseUtils.refreshAndOpen(context.getOutputPath(), selectedConversionPage.isOpen(), monitor);
 						
 					} catch (Exception e) {
 						throw new InterruptedException(e.getMessage());

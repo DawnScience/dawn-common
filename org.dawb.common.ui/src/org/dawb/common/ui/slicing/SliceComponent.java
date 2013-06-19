@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -807,7 +808,7 @@ public class SliceComponent {
 		if (!ok) {
 			errorLabel.setText(errorMessage);
 		}
-		GridUtils.setVisible(errorLabel,         !(ok));
+		GridUtils.setVisible(errorLabel,         !(ok||rangesAllowed));
 		isErrorCondition = errorLabel.isVisible();
 		updateAutomatically.setEnabled(ok&&plottingSystem!=null);
 		errorLabel.getParent().layout(new Control[]{errorLabel});
@@ -1182,8 +1183,28 @@ public class SliceComponent {
 			data.setAxis(axis);
 			updateAxesChoices();
 			update(data);
+			fireDimensionalListeners();
 		}
 
+	}
+	
+	private Collection<DimensionalListener> dimensionalListeners;
+	public void addDimensionalListener(DimensionalListener l) {
+		if (dimensionalListeners==null) dimensionalListeners= new HashSet<DimensionalListener>(7);
+		dimensionalListeners.add(l);
+	}
+	
+	public void removeDimensionalListener(DimensionalListener l) {
+		if (dimensionalListeners==null) return;
+		dimensionalListeners.remove(l);
+	}
+	
+	protected void fireDimensionalListeners() {
+		if (dimensionalListeners==null) return;
+		final DimensionalEvent evt = new DimensionalEvent(this, dimsDataList);
+		for (DimensionalListener l : dimensionalListeners) {
+			l.dimensionsChanged(evt);
+		}
 	}
 
 	private void update(DimsData data) {
@@ -1356,6 +1377,8 @@ public class SliceComponent {
 		if (plottingSystem!=null && traceListener!=null) {
 			plottingSystem.removeTraceListener(traceListener);	
 		}
+		if (dimensionalListeners!=null) dimensionalListeners.clear();
+		dimensionalListeners = null;
 		sliceJob.cancel();
 		saveSettings();
 	}
@@ -1487,6 +1510,10 @@ public class SliceComponent {
 
 	public ILazyDataset getLazyDataset() {
 		return lazySet;
+	}
+
+	public SliceObject getCurrentSlice() {
+		return sliceObject;
 	}
 
 }

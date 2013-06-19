@@ -32,10 +32,31 @@ public interface IConversionVisitor {
 	String getConversionSchemeName();
 
 	/**
+	 * Called at start of processing
+	 * @param context
+	 * @param slice
+	 */
+	void init(IConversionContext context) throws Exception;
+
+	/**
 	 * Called to process the slices for conversion.
 	 * @param context
 	 * @param slice
 	 */
-	void visit(IConversionContext context, IDataset slice);
+	void visit(IConversionContext context, IDataset slice) throws Exception;
+
+	/**
+	 * Called at end of processing
+	 * @param context
+	 * @param slice
+	 */
+	void close(IConversionContext context) throws Exception;
+
+	/**
+	 * Defines if a given data set rank is supported by this visitor.
+	 * @param length
+	 * @return
+	 */
+	boolean isRankSupported(int length);
 
 }

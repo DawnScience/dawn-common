@@ -25,6 +25,7 @@ class ConversionContext implements IConversionContext {
 	private Object              userObject;
 	private IMonitor            monitor;
 	private File                selectedConversionFile;
+	private String              selectedH5Path;
 	private String              axisDatasetName;
 	private int                 workSize=100;
 	private boolean             expression=false;
@@ -224,6 +225,12 @@ class ConversionContext implements IConversionContext {
 	}
 	public void setExpression(boolean expression) {
 		this.expression = expression;
+	}
+	public String getSelectedH5Path() {
+		return selectedH5Path;
+	}
+	public void setSelectedH5Path(String selectedH5Path) {
+		this.selectedH5Path = selectedH5Path;
 	}
 
 }
