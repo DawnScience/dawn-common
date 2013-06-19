@@ -89,7 +89,7 @@ public class HyperWindow {
 	private HyperDeligateJob rightJob;
 	private IAction reselect;
 	private IAction baseline;
-	private int traceDim;
+	private IAction export;
 	private IRegion windowRegion;
 	private Composite mainComposite;
 	
@@ -107,28 +107,40 @@ public class HyperWindow {
 	}
 	
 	public void setData(ILazyDataset lazy, List<ILazyDataset> daxes, int traceDim) {
+		this.setData(lazy, daxes, traceDim, new TraceReducer(), new ImageTrapizumBaselineReducer());
+	}
+	
+	public void setData(ILazyDataset lazy, List<ILazyDataset> daxes, int traceDim, IDatasetROIReducer mainReducer, IDatasetROIReducer sideReducer) {
 		
 		this.lazy = lazy;
-		//this.leftJob = new HyperJob();
 		
-		IDatasetROIReducer traceReducer = new TraceReducer();
-		
-		this.leftJob = new HyperDeligateJob("Trace update",
+		this.leftJob = new HyperDeligateJob("Left update",
 				sideSystem,
 				lazy,
 				daxes,
 				traceDim,
-				traceReducer);
-		//this.rightJob = new HyperSideJob();
+				mainReducer);
 		
-		IDatasetROIReducer imageReducer = new ImageTrapizumBaselineReducer();
-		this.rightJob = new HyperDeligateJob("Image update",
+		this.rightJob = new HyperDeligateJob("Right update",
 				mainSystem,
 				lazy,
 				daxes,
 				traceDim,
-				imageReducer);
-		this.traceDim = traceDim;
+				sideReducer);
+		
+		if (mainReducer.isOutput1D()) {
+			baseline.setEnabled(true);
+			export.setEnabled(true);
+		} else {
+			baseline.setEnabled(false);
+			export.setEnabled(false);
+		}
+		
+		if (mainReducer.supportsMultipleRegions()) {
+			reselect.setEnabled(true);
+		} else {
+			reselect.setEnabled(false);
+		}
 		
 		mainSystem.clear();
 		
@@ -141,30 +153,26 @@ public class HyperWindow {
 		for (IRegion region : sideSystem.getRegions()) {
 			sideSystem.removeRegion(region);
 		}
-
-		int[] axPos = getImageAxis();
-		int[] imageSize = new int[]{lazy.getShape()[axPos[1]],lazy.getShape()[axPos[0]]};
 		
 		try {
-			IRegion region = mainSystem.createRegion("Image Region 1", traceReducer.getSupportedRegionType().get(0));
+			IRegion region = mainSystem.createRegion("Image Region 1", mainReducer.getSupportedRegionType().get(0));
 			
 			mainSystem.addRegion(region);
 			//TODO make roi positioning a bit more clever
 			//RectangularROI rroi = new RectangularROI(imageSize[1]/10, imageSize[0]/10, imageSize[1]/10, imageSize[0]/10, 0);
 			
-			IDataset imageTemplate = AbstractDataset.zeros(imageSize, AbstractDataset.ARRAYINT16);
-			IROI rroi = traceReducer.getInitialROI(imageTemplate);
+			IROI rroi = mainReducer.getInitialROI(daxes,traceDim);
 			region.setROI(rroi);
 			//region.setUserRegion(false);
 			region.addROIListener(this.roiListenerLeft);
 			
 			updateRight(region, rroi);
 			
-			windowRegion = sideSystem.createRegion("Trace Region 1", imageReducer.getSupportedRegionType().get(0));
+			windowRegion = sideSystem.createRegion("Trace Region 1", sideReducer.getSupportedRegionType().get(0));
 			
 			sideSystem.addRegion(windowRegion);
 			
-			IROI broi = imageReducer.getInitialROI(daxes.get(traceDim).getSlice());
+			IROI broi = sideReducer.getInitialROI(daxes,traceDim);
 			windowRegion.setROI(broi);
 			windowRegion.setUserRegion(false);
 			windowRegion.addROIListener(this.roiListenerRight);
@@ -302,7 +310,7 @@ public class HyperWindow {
 				}
 			};
 			
-			IAction export = new Action("Export...") {
+			export = new Action("Export...") {
 				@Override
 				public void run() {
 					FileDialog fd = new FileDialog(mainComposite.getShell(),SWT.SAVE);
@@ -354,7 +362,7 @@ public class HyperWindow {
 	protected final void createNewRegion() {
 		// Start with a selection of the right type
 		try {
-			IRegion region = mainSystem.createRegion(RegionUtils.getUniqueName("Image Region", mainSystem), RegionType.BOX);
+			IRegion region = mainSystem.createRegion(RegionUtils.getUniqueName("Image Region", mainSystem),leftJob.getReducer().getSupportedRegionType().get(0));
 			region.addROIListener(roiListenerLeft);
 		} catch (Exception e) {
 			// FIXME Please use slf4j logger
@@ -386,7 +394,7 @@ public class HyperWindow {
 					}
 				}
 			}
-				
+			
 			@Override
 			public void regionAdded(RegionEvent evt) {
 				if (evt.getRegion() != null) {
@@ -404,8 +412,9 @@ public class HyperWindow {
 	}
 	
 	private IROIListener getROIListenerToRight() {
+
 		return new IROIListener.Stub() {
-			
+						
 			@Override
 			public void roiDragged(ROIEvent evt) {
 				updateRight((IRegion)evt.getSource(), evt.getROI());
@@ -436,21 +445,6 @@ public class HyperWindow {
 		};
 	}
 	
-	private int[] getImageAxis() {
-		int[] allDims = new int[]{2,1,0};
-		int[] dims = new int[2];
-		
-		int i =0;
-		for(int j : allDims) {
-			if (j != traceDim) {
-				dims[i] = j;
-				i++;
-			}
-		}
-		
-		return dims;
-	}
-	
 	protected void updateRight(IRegion r, IROI rb) {
 		
 		leftJob.profile(r, rb);
@@ -461,7 +455,6 @@ public class HyperWindow {
 		rightJob.profile(r,rb);
 	}
 	
-	//TODO consider abstracting out plotting and data reducting from Jobs
 	private void updateImage(final IPlottingSystem plot, final IDataset image) {
 		
 		// FIXME syncExec not required, please read API documentation! :)
@@ -531,12 +524,15 @@ public class HyperWindow {
 	        
           	schedule();		
 		}
+		
+		public IDatasetROIReducer getReducer() {
+			return reducer;
+		}
 
 		@Override
 		protected IStatus run(IProgressMonitor monitor) {
 
 			try {
-
 				IDataset output = this.reducer.reduce(data, axes, dimension, currentROI);
 
 				if (!this.reducer.isOutput1D()) {
@@ -573,8 +569,7 @@ public class HyperWindow {
 		public IDataset reduce(ILazyDataset data, List<ILazyDataset> axes,
 				int dim, IROI roi) {
 			if (roi instanceof RectangularROI) {
-				//TODO push to utils so getDataset runs off single dim
-				int[] dims = getImageAxis();
+				int[] dims = ROISliceUtils.getImageAxis(dim);
 				IDataset output = ((AbstractDataset)ROISliceUtils.getDataset(lazy, (RectangularROI)roi, dims)).mean(dims[0]).mean(dims[1]);
 				return output;
 			}
@@ -598,9 +593,23 @@ public class HyperWindow {
 		
 		
 		@Override
-		public IROI getInitialROI(IDataset dataset) {
-			int[] imageSize = dataset.getShape();
-			return new RectangularROI(imageSize[1]/10, imageSize[0]/10, imageSize[1]/10, imageSize[0]/10, 0);
+		public IROI getInitialROI(List<ILazyDataset> axes, int dim) {
+			int[] imageAxis = ROISliceUtils.getImageAxis(dim);
+			IDataset x = axes.get(imageAxis[1]).getSlice();
+			IDataset y = axes.get(imageAxis[0]).getSlice();
+			
+			double xMin = x.min().doubleValue();
+			double xMax = x.max().doubleValue();
+			
+			double yMin = y.min().doubleValue();
+			double yMax = y.max().doubleValue();
+			
+			return new RectangularROI((yMax-yMin)/10, (xMax-xMin)/10, (yMax-yMin)/10, (xMax-xMin)/10, 0);
+		}
+		
+		@Override
+		public boolean supportsMultipleRegions() {
+			return true;
 		}
 		
 	}
@@ -640,11 +649,16 @@ public class HyperWindow {
 		}
 		
 		@Override
-		public IROI getInitialROI(IDataset dataset) {
-			double min = dataset.min().doubleValue();
-			double max = dataset.max().doubleValue();
+		public IROI getInitialROI(List<ILazyDataset> axes, int dim) {
+			double min = axes.get(dim).getSlice().min().doubleValue();
+			double max = axes.get(dim).getSlice().max().doubleValue();
 			
 			return new XAxisBoxROI(min,0,(max-min)/10, 0, 0);
+		}
+		
+		@Override
+		public boolean supportsMultipleRegions() {
+			return false;
 		}
 	}
 }

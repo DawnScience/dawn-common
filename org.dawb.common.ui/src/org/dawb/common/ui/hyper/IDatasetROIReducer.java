@@ -16,6 +16,8 @@ public interface IDatasetROIReducer {
 	
 	public List<RegionType> getSupportedRegionType();
 	
-	public IROI getInitialROI(IDataset dataset);
+	public IROI getInitialROI(List<ILazyDataset> axes, int dim);
+	
+	public boolean supportsMultipleRegions();
 
 }
