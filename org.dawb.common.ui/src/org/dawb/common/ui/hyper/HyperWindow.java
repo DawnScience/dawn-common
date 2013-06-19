@@ -72,7 +72,12 @@ import uk.ac.diamond.scisoft.analysis.roi.XAxisBoxROI;
 /**
  * Display a 3D dataset across two plots with ROI slicing
  */
-public class HyperWindow {
+public class HyperWindow { 
+	
+	// FIXME - called HyperWindow but is not a org.eclipse.jface.window.Window or SWT Window.
+	// FIXME - add public dispose() method which disposes plotting system and clears any member
+	// data that may need it, for instance collections. Also removes all IRegionListener, IROIListener
+	// and ensures jobs are cancelled.
 	
 	private IPlottingSystem mainSystem;
 	private IPlottingSystem sideSystem;
@@ -166,7 +171,7 @@ public class HyperWindow {
 			updateLeft(windowRegion,broi);
 			
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+			// FIXME Please use slf4j logger
 			e.printStackTrace();
 		}
 
@@ -333,7 +338,7 @@ public class HyperWindow {
 													 actionBarWrapper1, 
 													 PlotType.XY, 
 													 null);
-			sideSystem.repaint();
+			sideSystem.repaint();// FIXME Why repaint after creation. This should not be required.
 			
 			regionListenerLeft = getRegionListenerToLeft();
 			mainSystem.addRegionListener(regionListenerLeft);
@@ -341,6 +346,7 @@ public class HyperWindow {
 			roiListenerRight = getROIListenerLeft();
 			
 		} catch (Exception e) {
+			// FIXME Please use slf4j logger
 			e.printStackTrace();
 		}
 	}
@@ -351,12 +357,13 @@ public class HyperWindow {
 			IRegion region = mainSystem.createRegion(RegionUtils.getUniqueName("Image Region", mainSystem), RegionType.BOX);
 			region.addROIListener(roiListenerLeft);
 		} catch (Exception e) {
+			// FIXME Please use slf4j logger
 			e.printStackTrace();
 		}
 	}
 	
 	private IRegionListener getRegionListenerToLeft() {
-		return new IRegionListener() {
+		return new IRegionListener.Stub() {
 			
 			@Override
 			public void regionsRemoved(RegionEvent evt) {
@@ -379,18 +386,7 @@ public class HyperWindow {
 					}
 				}
 			}
-			
-			@Override
-			public void regionCreated(RegionEvent evt) {
 				
-			}
-			
-			@Override
-			public void regionCancelled(RegionEvent evt) {
-				// TODO Auto-generated method stub
-				
-			}
-			
 			@Override
 			public void regionAdded(RegionEvent evt) {
 				if (evt.getRegion() != null) {
@@ -408,13 +404,7 @@ public class HyperWindow {
 	}
 	
 	private IROIListener getROIListenerToRight() {
-		return new IROIListener() {
-			
-			@Override
-			public void roiSelected(ROIEvent evt) {
-				// TODO Auto-generated method stub
-				
-			}
+		return new IROIListener.Stub() {
 			
 			@Override
 			public void roiDragged(ROIEvent evt) {
@@ -430,13 +420,7 @@ public class HyperWindow {
 	}
 	
 	private IROIListener getROIListenerLeft() {
-		return new IROIListener() {
-			
-			@Override
-			public void roiSelected(ROIEvent evt) {
-				// TODO Auto-generated method stub
-				
-			}
+		return new IROIListener.Stub() {
 			
 			@Override
 			public void roiDragged(ROIEvent evt) {
@@ -479,6 +463,8 @@ public class HyperWindow {
 	
 	//TODO consider abstracting out plotting and data reducting from Jobs
 	private void updateImage(final IPlottingSystem plot, final IDataset image) {
+		
+		// FIXME syncExec not required, please read API documentation! :)
 		Display.getDefault().syncExec(new Runnable() {
 			@Override
 			public void run() {
@@ -488,6 +474,8 @@ public class HyperWindow {
 	}
 	
 	private void updateTrace(final IPlottingSystem plot, final IDataset axis, final IDataset data, final boolean update, final IRegion region) {
+		
+		// FIXME syncExec not required, please read API documentation! :)
 		Display.getDefault().syncExec(new Runnable() {
 			@Override
 			public void run() {
@@ -533,6 +521,8 @@ public class HyperWindow {
 			this.axes = axes;
 			this.dimension = dim;
 			this.reducer = reducer;
+			// FIXME This job will popup a dialog if long running.
+			// consider if setSystem(true) setUser(false) are good ideas
 		}
 		
 		public void profile(IRegion r, IROI rb) {
