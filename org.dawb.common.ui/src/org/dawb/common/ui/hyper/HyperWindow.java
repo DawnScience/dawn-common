@@ -57,6 +57,8 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.DatasetUtils;
@@ -92,6 +94,7 @@ public class HyperWindow {
 	private IAction export;
 	private IRegion windowRegion;
 	private Composite mainComposite;
+	private final static Logger logger = LoggerFactory.getLogger(HyperWindow.class);
 	
 	public enum HyperType {
 		IMAGE_TRACE, IMAGE_IMAGE
@@ -179,8 +182,7 @@ public class HyperWindow {
 			updateLeft(windowRegion,broi);
 			
 		} catch (Exception e) {
-			// FIXME Please use slf4j logger
-			e.printStackTrace();
+			logger.error("Error adding regions to hyperview: " + e.getMessage());
 		}
 
 	}
@@ -346,7 +348,6 @@ public class HyperWindow {
 													 actionBarWrapper1, 
 													 PlotType.XY, 
 													 null);
-			sideSystem.repaint();// FIXME Why repaint after creation. This should not be required.
 			
 			regionListenerLeft = getRegionListenerToLeft();
 			mainSystem.addRegionListener(regionListenerLeft);
@@ -354,8 +355,7 @@ public class HyperWindow {
 			roiListenerRight = getROIListenerLeft();
 			
 		} catch (Exception e) {
-			// FIXME Please use slf4j logger
-			e.printStackTrace();
+			logger.error("Error creating hyperview plotting systems: " + e.getMessage());
 		}
 	}
 	
@@ -365,8 +365,7 @@ public class HyperWindow {
 			IRegion region = mainSystem.createRegion(RegionUtils.getUniqueName("Image Region", mainSystem),leftJob.getReducer().getSupportedRegionType().get(0));
 			region.addROIListener(roiListenerLeft);
 		} catch (Exception e) {
-			// FIXME Please use slf4j logger
-			e.printStackTrace();
+			logger.error("Error creating hyperview new region: " + e.getMessage());
 		}
 	}
 	
@@ -457,28 +456,21 @@ public class HyperWindow {
 	
 	private void updateImage(final IPlottingSystem plot, final IDataset image) {
 		
-		// FIXME syncExec not required, please read API documentation! :)
-		Display.getDefault().syncExec(new Runnable() {
-			@Override
-			public void run() {
-				plot.updatePlot2D(image, null, null);
-			}
-		});
+		plot.updatePlot2D(image, null, null);
+		
 	}
 	
 	private void updateTrace(final IPlottingSystem plot, final IDataset axis, final IDataset data, final boolean update, final IRegion region) {
-		
-		// FIXME syncExec not required, please read API documentation! :)
-		Display.getDefault().syncExec(new Runnable() {
-			@Override
-			public void run() {
-				
-				if (update) {
-					plot.updatePlot1D(axis,Arrays.asList(new IDataset[] {data}), null);
-					plot.repaint();	
-				} else {
-					List<ITrace> traceOut = plot.createPlot1D(axis,Arrays.asList(new IDataset[] {data}), null);
-					
+
+		if (update) {
+			plot.updatePlot1D(axis,Arrays.asList(new IDataset[] {data}), null);
+			plot.repaint();	
+		} else {
+			final List<ITrace> traceOut = plot.createPlot1D(axis,Arrays.asList(new IDataset[] {data}), null);
+
+			Display.getDefault().syncExec(new Runnable() {
+				@Override
+				public void run() {
 					for (ITrace trace : traceOut) {
 						trace.setUserObject(region);
 						if (trace instanceof ILineTrace){
@@ -486,8 +478,8 @@ public class HyperWindow {
 						}
 					}
 				}
-			}
-		});
+			});
+		}
 	}
 
 	private class HyperDeligateJob extends Job {
@@ -514,6 +506,8 @@ public class HyperWindow {
 			this.axes = axes;
 			this.dimension = dim;
 			this.reducer = reducer;
+			setSystem(false);
+			setUser(false);
 			// FIXME This job will popup a dialog if long running.
 			// consider if setSystem(true) setUser(false) are good ideas
 		}
