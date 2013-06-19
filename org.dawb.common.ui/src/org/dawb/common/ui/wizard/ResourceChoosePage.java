@@ -63,12 +63,13 @@ public class ResourceChoosePage extends WizardPage {
 	private boolean pathEditable=false;
 	private boolean buttonsEnabled=true;
 	
-	private String path;
-	private String fileLabel=null;
-	private Label  txtLabel;
-	private Text   txtPath;
-	private Button resourceButton;
-	private Button fileButton;
+	private String   path;
+	private String   fileLabel=null;
+	private Label    txtLabel;
+	private Text     txtPath;
+	private Button   resourceButton;
+	private Button   fileButton;
+	protected Button overwrite;
 	/**
 	 * 
 	 * @param pageName
@@ -156,8 +157,28 @@ public class ResourceChoosePage extends WizardPage {
 		});
 		resourceButton.setEnabled(buttonsEnabled);
 		
+		if (!isDirectory() && overwriteVisible) {
+			final Label filler = new Label(container, SWT.NONE);
+			filler.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+	
+			this.overwrite = new Button(container, SWT.CHECK);
+			overwrite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
+			overwrite.setToolTipText("Overwrite existing file(s) of the same name during processing.");
+			overwrite.setText("Overwrite file if it already exists");
+			overwrite.setSelection(true);
+			overwrite.addSelectionListener(new SelectionAdapter() {
+				public void widgetSelected(SelectionEvent e) {
+					pathChanged();
+				}
+			});
+		}
 	}
 	
+	public boolean isPageComplete() {
+    	if (getErrorMessage()!=null) return false;
+        return super.isPageComplete();
+    }
+
 	/**
 	 * 
 	 * @param container with a 4-column grid layout
@@ -311,8 +332,17 @@ public class ResourceChoosePage extends WizardPage {
 
 	public void setDirectory(boolean directory) {
 		this.directory = directory;
+		setOverwriteVisible(!directory);
 	}
 	
+	private boolean overwriteVisible = true;
+	public void setOverwriteVisible(boolean isVis) {
+		overwriteVisible = isVis;
+		if (overwrite!=null) {
+			GridUtils.setVisible(overwrite, isVis);
+		}
+	}
+
 	protected String getSourcePath(IConversionContext context) {
 		if (context!=null) return context.getFilePaths().get(0);
 		

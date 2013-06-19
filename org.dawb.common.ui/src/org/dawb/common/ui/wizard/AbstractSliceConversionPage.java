@@ -64,10 +64,8 @@ public abstract class AbstractSliceConversionPage extends ResourceChoosePage {
 	public void createContentBeforeFileChoose(Composite container) {
 		
 	
-		new Label(container, SWT.NULL);
-		new Label(container, SWT.NULL);
-		new Label(container, SWT.NULL);
-		new Label(container, SWT.NULL);
+		Label filler = new Label(container, SWT.NULL);
+		filler.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 4, 1));
 
 		
 		Label label = new Label(container, SWT.NULL);
@@ -91,6 +89,9 @@ public abstract class AbstractSliceConversionPage extends ResourceChoosePage {
 				datasetName = nameChoice.getText();
 				pathChanged();
 				nameChanged();
+				if (getErrorMessage()==null) {
+				    sliceComponent.setExplanationText("Slices matching '"+datasetName+"', based on '"+sliceComponent.getCurrentSlice().getName()+"'.\nWith the shape "+Arrays.toString(sliceComponent.getLazyDataset().getShape()));
+				}
 			}
 		});
 		
@@ -162,11 +163,21 @@ public abstract class AbstractSliceConversionPage extends ResourceChoosePage {
 			return false;			
 		}
 		
+		if (!isDirectory() && overwrite!=null) {
+			boolean isOver = overwrite.getSelection();
+			if (!isOver && !output.isDirectory() && output.exists()) {
+				setErrorMessage("The file '"+output.getName()+"' exists. Check overwrite to replace this file."); // Not very friendly...
+				return false;			
+			}
+		}
+		
 		// Check that two ranges have not been set.
-		final DimsDataList dl = sliceComponent.getDimsDataList();
-		if (dl.getRangeCount()>1) {
-			setErrorMessage("There is a limitation that only one range may be set, curently."); // Not very friendly...
-			return false;			
+		if (sliceComponent!=null) {
+			final DimsDataList dl = sliceComponent.getDimsDataList();
+			if (dl!=null && dl.getRangeCount()>1) {
+				setErrorMessage("There is a limitation that only one range may be set, curently."); // Not very friendly...
+				return false;			
+			}
 		}
 	
 		setErrorMessage(null);
@@ -188,12 +199,13 @@ public abstract class AbstractSliceConversionPage extends ResourceChoosePage {
 
 	protected void nameChanged() {
 		
+		
 		// Probably should check if regular expression a better way
 		if (datasetName.contains("*") || datasetName.contains("+") || datasetName.contains("?")) {
 			try {
 				Pattern.compile(datasetName);
 				setErrorMessage(null);
-	            return;
+				return;
 			} catch (Exception neOther) {
 				setErrorMessage("The regular expression is invalid '"+datasetName+"'");
 				return;

@@ -87,6 +87,7 @@ public class AsciiConvertPage extends ResourceChoosePage implements IConversionW
 		setTitle("Convert Data");
 		dataSetNames = new String[]{"Loading..."};
 		setDirectory(false);
+		setOverwriteVisible(false);
 		setNewFile(true);
 		setPathEditable(true);
     	setFileLabel("Output file");

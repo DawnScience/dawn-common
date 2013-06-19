@@ -49,7 +49,6 @@ public class NCDConvertPage extends ResourceChoosePage implements
 		super("wizardPage", "Page for slicing NCD nxs results into ascii.", null);
 		setTitle("Convert Tomography to Images");
 		setDirectory(true);
-
 	}
 	
 	
