@@ -113,6 +113,9 @@ public abstract class AbstractConversion {
 			return null;
 		}
 		context.setSelectedH5Path(dsPath);
+		if (context.getMonitor()!=null) {
+			context.getMonitor().subTask("Process '"+dsPath+"'");
+		}
 		return dh.getLazyDataset(dsPath);
 	}
 		

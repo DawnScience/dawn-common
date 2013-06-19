@@ -4,6 +4,7 @@ import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.dawb.common.services.IExpressionObject;
 import org.dawb.common.services.conversion.IConversionContext;
@@ -18,6 +19,8 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -79,6 +82,15 @@ public abstract class AbstractSliceConversionPage extends ResourceChoosePage {
 				pathChanged();
 				nameChanged();
 				Activator.getDefault().getPreferenceStore().setValue(LAST_SET_KEY, datasetName);
+			}
+		});
+		nameChoice.addModifyListener(new ModifyListener() {
+			
+			@Override
+			public void modifyText(ModifyEvent e) {
+				datasetName = nameChoice.getText();
+				pathChanged();
+				nameChanged();
 			}
 		});
 		
@@ -175,8 +187,20 @@ public abstract class AbstractSliceConversionPage extends ResourceChoosePage {
 	private DimsDataList defaultDimsList;
 
 	protected void nameChanged() {
-		try {
+		
+		// Probably should check if regular expression a better way
+		if (datasetName.contains("*") || datasetName.contains("+") || datasetName.contains("?")) {
+			try {
+				Pattern.compile(datasetName);
+				setErrorMessage(null);
+	            return;
+			} catch (Exception neOther) {
+				setErrorMessage("The regular expression is invalid '"+datasetName+"'");
+				return;
+			}
+		}
 
+		try {
 			isExpression = true;
             ILazyDataset lz = getLazyExpression();				
 			if (lz==null) {
@@ -184,11 +208,18 @@ public abstract class AbstractSliceConversionPage extends ResourceChoosePage {
 				lz = dh.getLazyDataset(datasetName);
 				isExpression = false;
 			}
-			sliceComponent.setData(lz, datasetName, context.getFilePaths().get(0), isExpression);
+			if (lz!=null) {
+				sliceComponent.setData(lz, datasetName, context.getFilePaths().get(0), isExpression);
+				setErrorMessage(null);
+  		    } else {
+  				setErrorMessage("Cannot read data set '"+datasetName+"'");
+			}
 
 		} catch (Exception ne) {
+			
 			setErrorMessage("Cannot read data set '"+datasetName+"'");
 			logger.error("Cannot get data", ne);
+			return;
 		}
 
 	}
