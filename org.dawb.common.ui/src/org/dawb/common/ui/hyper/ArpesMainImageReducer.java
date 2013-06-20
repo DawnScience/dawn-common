@@ -16,6 +16,7 @@ import uk.ac.diamond.scisoft.analysis.roi.ROISliceUtils;
 public class ArpesMainImageReducer implements IDatasetROIReducer{
 	
 	private final RegionType regionType = RegionType.LINE;
+	private List<IDataset> imageAxes;
 	
 	@Override
 	public IDataset reduce(ILazyDataset data, List<ILazyDataset> axes,
@@ -23,6 +24,13 @@ public class ArpesMainImageReducer implements IDatasetROIReducer{
 		if (roi instanceof LinearROI) {
 			int[] dims = ROISliceUtils.getImageAxis(dim);
 			final IDataset image = ((AbstractDataset)ROISliceUtils.getDataset(data, (LinearROI)roi, dims)).transpose();
+			
+			IDataset length = AbstractDataset.arange(image.getShape()[1], AbstractDataset.INT32);
+			length.setName("Line Length");
+			
+			this.imageAxes = new ArrayList<IDataset>();
+			this.imageAxes.add(length);
+			this.imageAxes.add(axes.get(dim).getSlice());
 			
 			return image;
 		}
@@ -48,17 +56,11 @@ public class ArpesMainImageReducer implements IDatasetROIReducer{
 	public IROI getInitialROI(List<ILazyDataset> axes, int dim) {
 		int[] imageAxis = ROISliceUtils.getImageAxis(dim);
 		
-		IDataset x = axes.get(imageAxis[1]).getSlice();
-		IDataset y = axes.get(imageAxis[0]).getSlice();
+		int[] x = axes.get(imageAxis[1]).getShape();
+		int[] y = axes.get(imageAxis[0]).getShape();
 		
-		double xMin = x.min().doubleValue();
-		double xMax = x.max().doubleValue();
-		
-		double yMin = y.min().doubleValue();
-		double yMax = y.max().doubleValue();
-		
-		double[] start = new double[]{yMin,xMin};
-		double[] end = new double[]{yMax/10,xMax/10};
+		double[] start = new double[]{0,0};
+		double[] end = new double[]{y[0]/10,x[0]/10};
 		
 		return new LinearROI(start, end);
 	}
@@ -66,5 +68,10 @@ public class ArpesMainImageReducer implements IDatasetROIReducer{
 	@Override
 	public boolean supportsMultipleRegions() {
 		return false;
+	}
+
+	@Override
+	public List<IDataset> getAxes() {
+		return imageAxes;
 	}
 }

@@ -146,12 +146,14 @@ public class HyperWindow {
 		}
 		
 		mainSystem.clear();
+		mainSystem.getAxes().clear();
 		
 		for (IRegion region : mainSystem.getRegions()) {
 			mainSystem.removeRegion(region);
 		}
 		
 		sideSystem.clear();
+		sideSystem.getAxes().clear();
 		
 		for (IRegion region : sideSystem.getRegions()) {
 			sideSystem.removeRegion(region);
@@ -454,9 +456,9 @@ public class HyperWindow {
 		rightJob.profile(r,rb);
 	}
 	
-	private void updateImage(final IPlottingSystem plot, final IDataset image) {
+	private void updateImage(final IPlottingSystem plot, final IDataset image, final List<IDataset> axes) {
 		
-		plot.updatePlot2D(image, null, null);
+		plot.updatePlot2D(image, axes, null);
 		
 	}
 	
@@ -528,24 +530,33 @@ public class HyperWindow {
 
 			try {
 				IDataset output = this.reducer.reduce(data, axes, dimension, currentROI);
+				List<IDataset> outputAxes = this.reducer.getAxes();
 
 				if (!this.reducer.isOutput1D()) {
 					output.setName("Image");
-					updateImage(plot,output);
+					updateImage(plot,output,outputAxes);
 				} else {
+					
+					IDataset axis = null;
+					
+					if (outputAxes != null && !outputAxes.isEmpty()) {
+						axis = outputAxes.get(0);
+					}
+					
 					Collection<ITrace> traces = plot.getTraces();
 					for (ITrace trace : traces) {
 						Object uo = trace.getUserObject();
 						if (uo == currentRegion) {
 							output.setName(trace.getName());
-							updateTrace(plot,axes.get(dimension).getSlice(),output,true,currentRegion);
+							updateTrace(plot,axis,output,true,currentRegion);
 							return Status.OK_STATUS;
 						}
 					}
 
 					String name = TraceUtils.getUniqueTrace("trace", plot, (String[])null);
 					output.setName(name);
-					updateTrace(plot,axes.get(dimension).getSlice(),output,false,currentRegion);
+					
+					updateTrace(plot,axis,output,false,currentRegion);
 				}
 
 				return Status.OK_STATUS;
@@ -558,6 +569,7 @@ public class HyperWindow {
 	private class TraceReducer implements IDatasetROIReducer{
 		
 		private final RegionType regionType = RegionType.BOX;
+		private List<IDataset> traceAxes;
 		
 		@Override
 		public IDataset reduce(ILazyDataset data, List<ILazyDataset> axes,
@@ -565,6 +577,10 @@ public class HyperWindow {
 			if (roi instanceof RectangularROI) {
 				int[] dims = ROISliceUtils.getImageAxis(dim);
 				IDataset output = ((AbstractDataset)ROISliceUtils.getDataset(lazy, (RectangularROI)roi, dims)).mean(dims[0]).mean(dims[1]);
+				
+				this.traceAxes = new ArrayList<IDataset>();
+				this.traceAxes.add(axes.get(dim).getSlice());
+				
 				return output;
 			}
 			return null;
@@ -589,21 +605,20 @@ public class HyperWindow {
 		@Override
 		public IROI getInitialROI(List<ILazyDataset> axes, int dim) {
 			int[] imageAxis = ROISliceUtils.getImageAxis(dim);
-			IDataset x = axes.get(imageAxis[1]).getSlice();
-			IDataset y = axes.get(imageAxis[0]).getSlice();
+			int[] x = axes.get(imageAxis[1]).getShape();
+			int[] y = axes.get(imageAxis[0]).getShape();
 			
-			double xMin = x.min().doubleValue();
-			double xMax = x.max().doubleValue();
-			
-			double yMin = y.min().doubleValue();
-			double yMax = y.max().doubleValue();
-			
-			return new RectangularROI((yMax-yMin)/10, (xMax-xMin)/10, (yMax-yMin)/10, (xMax-xMin)/10, 0);
+			return new RectangularROI(y[0]/10, x[0]/10, y[0]/10, x[0]/10, 0);
 		}
 		
 		@Override
 		public boolean supportsMultipleRegions() {
 			return true;
+		}
+
+		@Override
+		public List<IDataset> getAxes() {
+			return traceAxes;
 		}
 		
 	}
@@ -611,6 +626,7 @@ public class HyperWindow {
 	private class ImageTrapizumBaselineReducer implements IDatasetROIReducer{
 
 		private final RegionType regionType = RegionType.XAXIS;
+		private List<IDataset> imageAxes;
 		
 		@Override
 		public IDataset reduce(ILazyDataset data, List<ILazyDataset> axes,
@@ -621,6 +637,12 @@ public class HyperWindow {
 						(RectangularROI)roi,
 						dim,
 						HyperWindow.this.baseline.isChecked());
+				
+				
+				int[] imageAxis = ROISliceUtils.getImageAxis(dim);
+				this.imageAxes = new ArrayList<IDataset>();
+				this.imageAxes.add(axes.get(imageAxis[0]).getSlice());
+				this.imageAxes.add(axes.get(imageAxis[1]).getSlice());
 				
 				return image;
 			}
@@ -653,6 +675,11 @@ public class HyperWindow {
 		@Override
 		public boolean supportsMultipleRegions() {
 			return false;
+		}
+
+		@Override
+		public List<IDataset> getAxes() {
+			return imageAxes;
 		}
 	}
 }

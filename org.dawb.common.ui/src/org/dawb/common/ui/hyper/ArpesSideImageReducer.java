@@ -16,12 +16,18 @@ import uk.ac.diamond.scisoft.analysis.roi.YAxisLineBoxROI;
 public class ArpesSideImageReducer implements IDatasetROIReducer {
 	
 	private final RegionType regionType = RegionType.YAXIS_LINE;
+	private List<IDataset> imageAxes;
 	
 	@Override
 	public IDataset reduce(ILazyDataset data, List<ILazyDataset> axes,
 			int dim, IROI roi) {
 		if (roi instanceof RectangularROI) {
 			final IDataset image = ROISliceUtils.getAxisDataset(data, (RectangularROI)roi, dim);
+			
+			int[] imageAxis = ROISliceUtils.getImageAxis(dim);
+			this.imageAxes = new ArrayList<IDataset>();
+			this.imageAxes.add(axes.get(imageAxis[0]).getSlice());
+			this.imageAxes.add(axes.get(imageAxis[1]).getSlice());
 			
 			return image;
 		}
@@ -55,6 +61,11 @@ public class ArpesSideImageReducer implements IDatasetROIReducer {
 	@Override
 	public boolean supportsMultipleRegions() {
 		return false;
+	}
+
+	@Override
+	public List<IDataset> getAxes() {
+		return imageAxes;
 	}
 }
 
