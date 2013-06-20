@@ -77,7 +77,6 @@ import uk.ac.diamond.scisoft.analysis.roi.XAxisBoxROI;
 public class HyperWindow { 
 	
 	// FIXME - called HyperWindow but is not a org.eclipse.jface.window.Window or SWT Window.
-	// FIXME - add public dispose() method which disposes plotting system and clears any member
 	// data that may need it, for instance collections. Also removes all IRegionListener, IROIListener
 	// and ensures jobs are cancelled.
 	
@@ -253,6 +252,13 @@ public class HyperWindow {
 
 	public void setFocus() {
 		mainComposite.setFocus();
+	}
+	
+	public void dispose() {
+		
+		if (mainSystem != null && !mainSystem.isDisposed()) mainSystem.dispose();
+		if (sideSystem != null && !sideSystem.isDisposed()) sideSystem.dispose();
+		
 	}
 	
 	private void createPlottingSystems(SashForm sashForm) {
