@@ -106,13 +106,13 @@ public abstract class AbstractConversion {
 						                  final IConversionContext   context) throws Exception {
 				
 		final DataHolder   dh = LoaderFactory.getData(path.getAbsolutePath());
+		context.setSelectedH5Path(dsPath);
 		if (context.getSliceDimensions()==null) {
 			AbstractDataset data = LoaderFactory.getDataSet(path.getAbsolutePath(), dsPath, null);
 			data.setName(dsPath);
 			convert(data);
 			return null;
 		}
-		context.setSelectedH5Path(dsPath);
 		if (context.getMonitor()!=null) {
 			context.getMonitor().subTask("Process '"+dsPath+"'");
 		}
