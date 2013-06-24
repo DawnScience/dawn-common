@@ -50,9 +50,6 @@ public class CustomNCDConverter extends AbstractConversion  {
             final String               nameFrag,
             final IConversionContext   context) throws Exception {
 		
-		// Remove 1 dimensions
-		lz.squeeze();
-		
 		//get the x axis if required
 		AbstractDataset axis = null;
 		if (context.getAxisDatasetName() != null) {
