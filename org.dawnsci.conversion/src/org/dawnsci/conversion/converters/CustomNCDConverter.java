@@ -6,7 +6,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import ncsa.hdf.object.Dataset;
+
 import org.dawb.common.services.conversion.IConversionContext;
+import org.dawb.hdf5.HierarchicalDataFactory;
+import org.dawb.hdf5.IHierarchicalDataFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,6 +30,8 @@ public class CustomNCDConverter extends AbstractConversion  {
 	private final static Logger logger = LoggerFactory.getLogger(CustomNCDConverter.class);
 	private final static String DEFAULT_AXIS_NAME = "x";
 	private final static String DEFAULT_COLUMN_NAME = "Column_";
+	private final static String DEFAULT_TITLE_NODE = "/entry1/title";
+	private final static String DEFAULT_SCAN_COMMAND_NODE = "/entry1/scan_command";
 
 	public CustomNCDConverter(IConversionContext context) {
 		super(context);
@@ -74,15 +80,36 @@ public class CustomNCDConverter extends AbstractConversion  {
 		}
 		
 		//Make file header and column names
+		String selFilePath = context.getSelectedConversionFile().getAbsolutePath();
 		final String separator = System.getProperty("line.separator");
 		StringBuilder sb = new StringBuilder();
-		sb.append("#Diamond Light Source Ltd.");
+		sb.append("# Diamond Light Source Ltd.");
 		sb.append(separator);
-		sb.append("#Non Crystalline Diffraction Results Export File");
+		sb.append("# Non Crystalline Diffraction Results Export File");
 		sb.append(separator);
-		sb.append("#Data extracted from file: " + context.getSelectedConversionFile().getAbsolutePath());
+		sb.append("# Data extracted from file: " + selFilePath);
 		sb.append(separator);
-		sb.append("#Dataset name: " + nameFrag);
+		sb.append("# Dataset name: " + nameFrag);
+		
+		IHierarchicalDataFile hdf5Reader = HierarchicalDataFactory.getReader(selFilePath);
+		Dataset titleData = (Dataset)hdf5Reader.getData(DEFAULT_TITLE_NODE);
+		if(titleData != null){
+			String[] str = (String[])titleData.getData();
+			if (str.length > 0) {
+				String title = str[0];
+				sb.append(separator);
+				sb.append("# Title: " + title);
+			}
+		}
+		Dataset scanCommandData = (Dataset)hdf5Reader.getData(DEFAULT_SCAN_COMMAND_NODE);
+		if(scanCommandData != null){
+			String[] str = (String[])scanCommandData.getData();
+			if (str.length > 0) {
+				String scanCommand = str[0];
+				sb.append(separator);
+				sb.append("# Scan command: " + scanCommand);
+			}
+		}
 		
 		List<String> headings = new ArrayList<String>();
 		
