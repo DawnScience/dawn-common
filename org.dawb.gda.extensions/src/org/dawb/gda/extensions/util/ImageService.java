@@ -411,9 +411,12 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 	/**
 	 * Fast statistics as a rough guide - this is faster than AbstractDataset.getMin()
 	 * and getMax() which may cache but slows the opening of images too much.
+	 * The return array[2] was added in "Updated for Diffraction Tool." commit,
+	 * but no trace of such usage. However it should not be removed, because
+	 * it is useful as return array[3].
 	 * 
 	 * @param bean
-	 * @return [0] = min [1] = max
+	 * @return [0] = min [1] = max(=mean*constant) [2] = mean [3] max
 	 */
 	public float[] getFastStatistics(ImageServiceBean bean) {
 		
@@ -503,7 +506,7 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 		if (bean.isLogColorScale()) {
 			return new float[]{(float) Math.pow(retMin,10), (float) Math.pow(retMax,10), (float) Math.pow(retExtra,10)};
 		}		
-		return new float[]{retMin, retMax, retExtra};
+		return new float[]{retMin, retMax, retExtra, max};
 
 	}
 
