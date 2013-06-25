@@ -30,7 +30,6 @@ import org.dawnsci.plotting.api.IPlottingSystem;
 import org.dawnsci.plotting.api.PlotType;
 import org.dawnsci.plotting.api.region.IROIListener;
 import org.dawnsci.plotting.api.region.IRegion;
-import org.dawnsci.plotting.api.region.IRegion.RegionType;
 import org.dawnsci.plotting.api.region.IRegionListener;
 import org.dawnsci.plotting.api.region.ROIEvent;
 import org.dawnsci.plotting.api.region.RegionEvent;
@@ -64,12 +63,10 @@ import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.DatasetUtils;
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.Slice;
 import uk.ac.diamond.scisoft.analysis.io.ASCIIDataWithHeadingSaver;
 import uk.ac.diamond.scisoft.analysis.io.DataHolder;
 import uk.ac.diamond.scisoft.analysis.roi.IROI;
-import uk.ac.diamond.scisoft.analysis.roi.ROISliceUtils;
-import uk.ac.diamond.scisoft.analysis.roi.RectangularROI;
-import uk.ac.diamond.scisoft.analysis.roi.XAxisBoxROI;
 
 /**
  * Display a 3D dataset across two plots with ROI slicing
@@ -82,7 +79,6 @@ public class HyperWindow {
 	
 	private IPlottingSystem mainSystem;
 	private IPlottingSystem sideSystem;
-	private ILazyDataset lazy;
 	private IRegionListener regionListenerLeft;
 	private IROIListener roiListenerLeft;
 	private IROIListener roiListenerRight;
@@ -108,27 +104,29 @@ public class HyperWindow {
 		createPlottingSystems(sashForm);
 	}
 	
-	public void setData(ILazyDataset lazy, List<ILazyDataset> daxes, int traceDim) {
-		this.setData(lazy, daxes, traceDim, new TraceReducer(), new ImageTrapizumBaselineReducer());
+	public void setData(ILazyDataset lazy, List<AbstractDataset> daxes, Slice[] slices, int[] order) {
+		this.setData(lazy, daxes, slices, order, new TraceReducer(), new ImageTrapeziumBaselineReducer());
 	}
 	
-	public void setData(ILazyDataset lazy, List<ILazyDataset> daxes, int traceDim, IDatasetROIReducer mainReducer, IDatasetROIReducer sideReducer) {
-		
-		this.lazy = lazy;
+	public void setData(ILazyDataset lazy, List<AbstractDataset> daxes, Slice[] slices, int[] order,
+			IDatasetROIReducer mainReducer, IDatasetROIReducer sideReducer) {
 		
 		this.leftJob = new HyperDeligateJob("Left update",
 				sideSystem,
 				lazy,
 				daxes,
-				traceDim,
-				mainReducer);
+				slices, order, mainReducer);
 		
 		this.rightJob = new HyperDeligateJob("Right update",
 				mainSystem,
 				lazy,
 				daxes,
-				traceDim,
-				sideReducer);
+				slices,
+				order, sideReducer);
+		
+		if (sideReducer instanceof ImageTrapeziumBaselineReducer) {
+			((ImageTrapeziumBaselineReducer)rightJob.getReducer()).setSubtractBaseline(baseline.isChecked());
+		}
 		
 		if (mainReducer.isOutput1D()) {
 			baseline.setEnabled(true);
@@ -146,6 +144,10 @@ public class HyperWindow {
 		
 		mainSystem.clear();
 		mainSystem.getAxes().clear();
+		List<AbstractDataset> ax2d = new ArrayList<AbstractDataset>();
+		ax2d.add(daxes.get(0));
+		ax2d.add(daxes.get(1));
+		mainSystem.createPlot2D(AbstractDataset.zeros(new int[] {(int)daxes.get(0).count(), (int)daxes.get(1).count()}, AbstractDataset.INT16), ax2d, null);
 		
 		for (IRegion region : mainSystem.getRegions()) {
 			mainSystem.removeRegion(region);
@@ -153,6 +155,17 @@ public class HyperWindow {
 		
 		sideSystem.clear();
 		sideSystem.getAxes().clear();
+		
+		if (mainReducer.isOutput1D()) {
+			List<AbstractDataset> xd = new ArrayList<AbstractDataset>();
+			xd.add(AbstractDataset.zeros(new int[] {(int)daxes.get(2).count()},AbstractDataset.INT16));
+			sideSystem.createPlot1D(daxes.get(2),xd, null);
+		} else {
+			List<AbstractDataset> xd = new ArrayList<AbstractDataset>();
+			xd.add(AbstractDataset.arange(10, AbstractDataset.INT32));
+			xd.add(daxes.get(2));
+			sideSystem.createPlot2D(AbstractDataset.ones(new int[] {10,(int)xd.get(1).count()}, AbstractDataset.INT32), xd, null);
+		}
 		
 		for (IRegion region : sideSystem.getRegions()) {
 			sideSystem.removeRegion(region);
@@ -165,27 +178,27 @@ public class HyperWindow {
 			//TODO make roi positioning a bit more clever
 			//RectangularROI rroi = new RectangularROI(imageSize[1]/10, imageSize[0]/10, imageSize[1]/10, imageSize[0]/10, 0);
 			
-			IROI rroi = mainReducer.getInitialROI(daxes,traceDim);
+			IROI rroi = mainReducer.getInitialROI(daxes,order);
 			region.setROI(rroi);
 			//region.setUserRegion(false);
 			region.addROIListener(this.roiListenerLeft);
-			
+			sideSystem.clear();
 			updateRight(region, rroi);
 			
 			windowRegion = sideSystem.createRegion("Trace Region 1", sideReducer.getSupportedRegionType().get(0));
 			
-			sideSystem.addRegion(windowRegion);
 			
-			IROI broi = sideReducer.getInitialROI(daxes,traceDim);
+			
+			IROI broi = sideReducer.getInitialROI(daxes,order);
 			windowRegion.setROI(broi);
-			windowRegion.setUserRegion(false);
+			windowRegion.setUserRegion(true);
 			windowRegion.addROIListener(this.roiListenerRight);
+			sideSystem.addRegion(windowRegion);
 			updateLeft(windowRegion,broi);
 			
 		} catch (Exception e) {
 			logger.error("Error adding regions to hyperview: " + e.getMessage());
 		}
-
 	}
 	
 	private void saveLineTracesAsAscii(String filename) {
@@ -315,6 +328,11 @@ public class HyperWindow {
 			baseline = new Action("Linear baseline", SWT.TOGGLE) {
 				@Override
 				public void run() {
+					if (rightJob != null && rightJob.getReducer() instanceof ImageTrapeziumBaselineReducer) {
+						ImageTrapeziumBaselineReducer reducer = (ImageTrapeziumBaselineReducer)rightJob.getReducer();
+						reducer.setSubtractBaseline(isChecked());
+					}
+					
 					IROI roi = windowRegion.getROI();
 					updateLeft(windowRegion,roi);
 				}
@@ -496,23 +514,26 @@ public class HyperWindow {
 		private IROI currentROI;
 		private IPlottingSystem plot;
 		private ILazyDataset data;
-		private List<ILazyDataset> axes;
-		private int dimension;
+		private List<AbstractDataset> axes;
+		private int[] order;
+		private Slice[] slices;
 		private IDatasetROIReducer reducer;
 		
 		
 		public HyperDeligateJob(String name,
 				IPlottingSystem plot,
 				ILazyDataset data,
-				List<ILazyDataset> axes,
-				int dim,
+				List<AbstractDataset> axes,
+				Slice[] slices,
+				int[] order,
 				IDatasetROIReducer reducer) {
 			
 			super(name);
 			this.plot = plot;
 			this.data = data;
 			this.axes = axes;
-			this.dimension = dim;
+			this.order = order;
+			this.slices = slices;
 			this.reducer = reducer;
 			setSystem(false);
 			setUser(false);
@@ -535,7 +556,8 @@ public class HyperWindow {
 		protected IStatus run(IProgressMonitor monitor) {
 
 			try {
-				IDataset output = this.reducer.reduce(data, axes, dimension, currentROI);
+				//ILazyDataset data, List<ILazyDataset> axes, IROI roi, Slice[] slices, int[] order
+				IDataset output = this.reducer.reduce(data, axes, currentROI, slices, order);
 				List<IDataset> outputAxes = this.reducer.getAxes();
 
 				if (!this.reducer.isOutput1D()) {
@@ -572,120 +594,120 @@ public class HyperWindow {
 		}
 	}
 	
-	private class TraceReducer implements IDatasetROIReducer{
-		
-		private final RegionType regionType = RegionType.BOX;
-		private List<IDataset> traceAxes;
-		
-		@Override
-		public IDataset reduce(ILazyDataset data, List<ILazyDataset> axes,
-				int dim, IROI roi) {
-			if (roi instanceof RectangularROI) {
-				int[] dims = ROISliceUtils.getImageAxis(dim);
-				IDataset output = ((AbstractDataset)ROISliceUtils.getDataset(lazy, (RectangularROI)roi, dims)).mean(dims[0]).mean(dims[1]);
-				
-				this.traceAxes = new ArrayList<IDataset>();
-				this.traceAxes.add(axes.get(dim).getSlice());
-				
-				return output;
-			}
-			return null;
-		}
-
-		@Override
-		public boolean isOutput1D() {
-			return true;
-		}
-
-		@Override
-		public List<RegionType> getSupportedRegionType() {
-			
-			List<IRegion.RegionType> regionList = new ArrayList<IRegion.RegionType>();
-			regionList.add(regionType);
-			
-			return regionList;
-		}
-
-		
-		
-		@Override
-		public IROI getInitialROI(List<ILazyDataset> axes, int dim) {
-			int[] imageAxis = ROISliceUtils.getImageAxis(dim);
-			int[] x = axes.get(imageAxis[1]).getShape();
-			int[] y = axes.get(imageAxis[0]).getShape();
-			
-			return new RectangularROI(y[0]/10, x[0]/10, y[0]/10, x[0]/10, 0);
-		}
-		
-		@Override
-		public boolean supportsMultipleRegions() {
-			return true;
-		}
-
-		@Override
-		public List<IDataset> getAxes() {
-			return traceAxes;
-		}
-		
-	}
-	
-	private class ImageTrapizumBaselineReducer implements IDatasetROIReducer{
-
-		private final RegionType regionType = RegionType.XAXIS;
-		private List<IDataset> imageAxes;
-		
-		@Override
-		public IDataset reduce(ILazyDataset data, List<ILazyDataset> axes,
-				int dim, IROI roi) {
-			if (roi instanceof RectangularROI) {
-				final IDataset image = ROISliceUtils.getAxisDatasetTrapzSumBaselined(axes.get(dim).getSlice(),
-						data,
-						(RectangularROI)roi,
-						dim,
-						HyperWindow.this.baseline.isChecked());
-				
-				
-				int[] imageAxis = ROISliceUtils.getImageAxis(dim);
-				this.imageAxes = new ArrayList<IDataset>();
-				this.imageAxes.add(axes.get(imageAxis[0]).getSlice());
-				this.imageAxes.add(axes.get(imageAxis[1]).getSlice());
-				
-				return image;
-			}
-			
-			return null;
-		}
-
-		@Override
-		public boolean isOutput1D() {
-			return false;
-		}
-
-		@Override
-		public List<RegionType> getSupportedRegionType() {
-			
-			List<IRegion.RegionType> regionList = new ArrayList<IRegion.RegionType>();
-			regionList.add(regionType);
-			
-			return regionList;
-		}
-		
-		@Override
-		public IROI getInitialROI(List<ILazyDataset> axes, int dim) {
-			double min = axes.get(dim).getSlice().min().doubleValue();
-			double max = axes.get(dim).getSlice().max().doubleValue();
-			
-			return new XAxisBoxROI(min,0,(max-min)/10, 0, 0);
-		}
-		
-		@Override
-		public boolean supportsMultipleRegions() {
-			return false;
-		}
-
-		@Override
-		public List<IDataset> getAxes() {
-			return imageAxes;
-		}
-	}
+//	private class TraceReducer implements IDatasetROIReducer{
+//		
+//		private final RegionType regionType = RegionType.BOX;
+//		private List<IDataset> traceAxes;
+//		
+//		@Override
+//		public IDataset reduce(ILazyDataset data, List<ILazyDataset> axes,
+//				int dim, IROI roi) {
+//			if (roi instanceof RectangularROI) {
+//				int[] dims = ROISliceUtils.getImageAxis(dim);
+//				IDataset output = ((AbstractDataset)ROISliceUtils.getDataset(lazy, (RectangularROI)roi, dims)).mean(dims[0]).mean(dims[1]);
+//				
+//				this.traceAxes = new ArrayList<IDataset>();
+//				this.traceAxes.add(axes.get(dim).getSlice());
+//				
+//				return output;
+//			}
+//			return null;
+//		}
+//
+//		@Override
+//		public boolean isOutput1D() {
+//			return true;
+//		}
+//
+//		@Override
+//		public List<RegionType> getSupportedRegionType() {
+//			
+//			List<IRegion.RegionType> regionList = new ArrayList<IRegion.RegionType>();
+//			regionList.add(regionType);
+//			
+//			return regionList;
+//		}
+//
+//		
+//		
+//		@Override
+//		public IROI getInitialROI(List<ILazyDataset> axes, int dim) {
+//			int[] imageAxis = ROISliceUtils.getImageAxis(dim);
+//			int[] x = axes.get(imageAxis[1]).getShape();
+//			int[] y = axes.get(imageAxis[0]).getShape();
+//			
+//			return new RectangularROI(y[0]/10, x[0]/10, y[0]/10, x[0]/10, 0);
+//		}
+//		
+//		@Override
+//		public boolean supportsMultipleRegions() {
+//			return true;
+//		}
+//
+//		@Override
+//		public List<IDataset> getAxes() {
+//			return traceAxes;
+//		}
+//		
+//	}
+//	
+//	private class ImageTrapizumBaselineReducer implements IDatasetROIReducer{
+//
+//		private final RegionType regionType = RegionType.XAXIS;
+//		private List<IDataset> imageAxes;
+//		
+//		@Override
+//		public IDataset reduce(ILazyDataset data, List<ILazyDataset> axes,
+//				int dim, IROI roi) {
+//			if (roi instanceof RectangularROI) {
+//				final IDataset image = ROISliceUtils.getAxisDatasetTrapzSumBaselined(axes.get(dim).getSlice(),
+//						data,
+//						(RectangularROI)roi,
+//						dim,
+//						HyperWindow.this.baseline.isChecked());
+//				
+//				
+//				int[] imageAxis = ROISliceUtils.getImageAxis(dim);
+//				this.imageAxes = new ArrayList<IDataset>();
+//				this.imageAxes.add(axes.get(imageAxis[0]).getSlice());
+//				this.imageAxes.add(axes.get(imageAxis[1]).getSlice());
+//				
+//				return image;
+//			}
+//			
+//			return null;
+//		}
+//
+//		@Override
+//		public boolean isOutput1D() {
+//			return false;
+//		}
+//
+//		@Override
+//		public List<RegionType> getSupportedRegionType() {
+//			
+//			List<IRegion.RegionType> regionList = new ArrayList<IRegion.RegionType>();
+//			regionList.add(regionType);
+//			
+//			return regionList;
+//		}
+//		
+//		@Override
+//		public IROI getInitialROI(List<ILazyDataset> axes, int dim) {
+//			double min = axes.get(dim).getSlice().min().doubleValue();
+//			double max = axes.get(dim).getSlice().max().doubleValue();
+//			
+//			return new XAxisBoxROI(min,0,(max-min)/10, 0, 0);
+//		}
+//		
+//		@Override
+//		public boolean supportsMultipleRegions() {
+//			return false;
+//		}
+//
+//		@Override
+//		public List<IDataset> getAxes() {
+//			return imageAxes;
+//		}
+//	}
 }

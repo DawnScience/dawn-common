@@ -4,21 +4,27 @@ import java.util.List;
 
 import org.dawnsci.plotting.api.region.IRegion.RegionType;
 
+import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.Slice;
 import uk.ac.diamond.scisoft.analysis.roi.IROI;
 
+/**
+ * Interface for creating an object to reduce an ND array for display in the Hyperwindow
+ */
 public interface IDatasetROIReducer {
+
+	boolean isOutput1D();
 	
-	public boolean isOutput1D();
+	IDataset reduce(ILazyDataset data, List<AbstractDataset> axes, IROI roi, Slice[] slices, int[] order);
 	
-	public IDataset reduce(ILazyDataset data, List<ILazyDataset> axes, int dim, IROI roi);
+	List<RegionType> getSupportedRegionType();
 	
-	public List<RegionType> getSupportedRegionType();
+	IROI getInitialROI(List<AbstractDataset> axes, int[] order);
 	
-	public IROI getInitialROI(List<ILazyDataset> axes, int dim);
+	boolean supportsMultipleRegions();
 	
-	public boolean supportsMultipleRegions();
+	List<IDataset> getAxes();
 	
-	public List<IDataset> getAxes();
 }

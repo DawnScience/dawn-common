@@ -13,20 +13,22 @@ import uk.ac.diamond.scisoft.analysis.dataset.Slice;
 import uk.ac.diamond.scisoft.analysis.roi.IROI;
 import uk.ac.diamond.scisoft.analysis.roi.ROISliceUtils;
 import uk.ac.diamond.scisoft.analysis.roi.RectangularROI;
-import uk.ac.diamond.scisoft.analysis.roi.YAxisLineBoxROI;
+import uk.ac.diamond.scisoft.analysis.roi.XAxisBoxROI;
 
-public class ArpesSideImageReducer implements IDatasetROIReducer {
-	
-	private final RegionType regionType = RegionType.YAXIS_LINE;
+public class ImageTrapeziumBaselineReducer implements IDatasetROIReducer {
+
+	private final RegionType regionType = RegionType.XAXIS;
 	private List<IDataset> imageAxes;
+	private boolean subtractBaseline = false;
 	
 	@Override
 	public IDataset reduce(ILazyDataset data, List<AbstractDataset> axes,
 			IROI roi, Slice[] slices, int[] order) {
 		if (roi instanceof RectangularROI) {
-			IDataset image = ROISliceUtils.getYAxisDataset2D(data, (RectangularROI)roi, slices, order[2]);
+			IDataset image = ROISliceUtils.getAxisDatasetTrapzSumBaselined(data,axes.get(2).getSlice(),(RectangularROI)roi, slices, order[2],1, subtractBaseline);
 			
 			if (order[0] < order[1]) image = ((AbstractDataset)image).transpose();
+			
 			
 			this.imageAxes = new ArrayList<IDataset>();
 			this.imageAxes.add(axes.get(1).getSlice());
@@ -35,27 +37,16 @@ public class ArpesSideImageReducer implements IDatasetROIReducer {
 			return image;
 		}
 		
-
 		return null;
 	}
-	
-//	@Override
-//	public IDataset reduce(ILazyDataset data, List<ILazyDataset> axes,
-//			int dim, IROI roi) {
-//		if (roi instanceof RectangularROI) {
-//			getAxisDataset(ILazyDataset lz, IDataset axis, RectangularROI roi, Slice[] slices, int dim, int step)
-//			final IDataset image = ROISliceUtils.getAxisDataset(data, (RectangularROI)roi, dim);
-//			
-//			int[] imageAxis = ROISliceUtils.getImageAxis(dim);
-//			this.imageAxes = new ArrayList<IDataset>();
-//			this.imageAxes.add(axes.get(imageAxis[0]).getSlice());
-//			this.imageAxes.add(axes.get(imageAxis[1]).getSlice());
-//			
-//			return image;
-//		}
-//		
-//		return null;
-//	}
+
+	public boolean isSubtractBaseline() {
+		return subtractBaseline;
+	}
+
+	public void setSubtractBaseline(boolean subtractBaseline) {
+		this.subtractBaseline = subtractBaseline;
+	}
 
 	@Override
 	public boolean isOutput1D() {
@@ -71,6 +62,13 @@ public class ArpesSideImageReducer implements IDatasetROIReducer {
 		return regionList;
 	}
 	
+	@Override
+	public IROI getInitialROI(List<AbstractDataset> axes, int[] order) {
+		double min = axes.get(2).getSlice().min().doubleValue();
+		double max = axes.get(2).getSlice().max().doubleValue();
+		
+		return new XAxisBoxROI(min,0,(max-min)/10, 0, 0);
+	}
 	
 	@Override
 	public boolean supportsMultipleRegions() {
@@ -82,11 +80,4 @@ public class ArpesSideImageReducer implements IDatasetROIReducer {
 		return imageAxes;
 	}
 
-	@Override
-	public IROI getInitialROI(List<AbstractDataset> axes, int[] order) {
-		double len = axes.get(2).count();
-		
-		return new YAxisLineBoxROI(0,len/10,0,0, 0);
-	}
 }
-
