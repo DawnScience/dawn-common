@@ -71,11 +71,7 @@ import uk.ac.diamond.scisoft.analysis.roi.IROI;
 /**
  * Display a 3D dataset across two plots with ROI slicing
  */
-public class HyperWindow { 
-	
-	// FIXME - called HyperWindow but is not a org.eclipse.jface.window.Window or SWT Window.
-	// data that may need it, for instance collections. Also removes all IRegionListener, IROIListener
-	// and ensures jobs are cancelled.
+public class HyperComponent { 
 	
 	private IPlottingSystem mainSystem;
 	private IPlottingSystem sideSystem;
@@ -89,7 +85,7 @@ public class HyperWindow {
 	private IAction export;
 	private IRegion windowRegion;
 	private Composite mainComposite;
-	private final static Logger logger = LoggerFactory.getLogger(HyperWindow.class);
+	private final static Logger logger = LoggerFactory.getLogger(HyperComponent.class);
 	
 	public enum HyperType {
 		IMAGE_TRACE, IMAGE_IMAGE
@@ -175,23 +171,17 @@ public class HyperWindow {
 			IRegion region = mainSystem.createRegion("Image Region 1", mainReducer.getSupportedRegionType().get(0));
 			
 			mainSystem.addRegion(region);
-			//TODO make roi positioning a bit more clever
-			//RectangularROI rroi = new RectangularROI(imageSize[1]/10, imageSize[0]/10, imageSize[1]/10, imageSize[0]/10, 0);
-			
 			IROI rroi = mainReducer.getInitialROI(daxes,order);
 			region.setROI(rroi);
-			//region.setUserRegion(false);
 			region.addROIListener(this.roiListenerLeft);
 			sideSystem.clear();
 			updateRight(region, rroi);
 			
 			windowRegion = sideSystem.createRegion("Trace Region 1", sideReducer.getSupportedRegionType().get(0));
 			
-			
-			
 			IROI broi = sideReducer.getInitialROI(daxes,order);
 			windowRegion.setROI(broi);
-			windowRegion.setUserRegion(true);
+			windowRegion.setUserRegion(false);
 			windowRegion.addROIListener(this.roiListenerRight);
 			sideSystem.addRegion(windowRegion);
 			updateLeft(windowRegion,broi);
@@ -271,6 +261,9 @@ public class HyperWindow {
 		
 		if (mainSystem != null && !mainSystem.isDisposed()) mainSystem.dispose();
 		if (sideSystem != null && !sideSystem.isDisposed()) sideSystem.dispose();
+		
+		if (leftJob != null) leftJob.cancel();
+		if (rightJob != null) rightJob.cancel();
 		
 	}
 	
@@ -537,8 +530,6 @@ public class HyperWindow {
 			this.reducer = reducer;
 			setSystem(false);
 			setUser(false);
-			// FIXME This job will popup a dialog if long running.
-			// consider if setSystem(true) setUser(false) are good ideas
 		}
 		
 		public void profile(IRegion r, IROI rb) {
@@ -554,9 +545,7 @@ public class HyperWindow {
 
 		@Override
 		protected IStatus run(IProgressMonitor monitor) {
-
 			try {
-				//ILazyDataset data, List<ILazyDataset> axes, IROI roi, Slice[] slices, int[] order
 				IDataset output = this.reducer.reduce(data, axes, currentROI, slices, order);
 				List<IDataset> outputAxes = this.reducer.getAxes();
 
@@ -593,121 +582,4 @@ public class HyperWindow {
 			}
 		}
 	}
-	
-//	private class TraceReducer implements IDatasetROIReducer{
-//		
-//		private final RegionType regionType = RegionType.BOX;
-//		private List<IDataset> traceAxes;
-//		
-//		@Override
-//		public IDataset reduce(ILazyDataset data, List<ILazyDataset> axes,
-//				int dim, IROI roi) {
-//			if (roi instanceof RectangularROI) {
-//				int[] dims = ROISliceUtils.getImageAxis(dim);
-//				IDataset output = ((AbstractDataset)ROISliceUtils.getDataset(lazy, (RectangularROI)roi, dims)).mean(dims[0]).mean(dims[1]);
-//				
-//				this.traceAxes = new ArrayList<IDataset>();
-//				this.traceAxes.add(axes.get(dim).getSlice());
-//				
-//				return output;
-//			}
-//			return null;
-//		}
-//
-//		@Override
-//		public boolean isOutput1D() {
-//			return true;
-//		}
-//
-//		@Override
-//		public List<RegionType> getSupportedRegionType() {
-//			
-//			List<IRegion.RegionType> regionList = new ArrayList<IRegion.RegionType>();
-//			regionList.add(regionType);
-//			
-//			return regionList;
-//		}
-//
-//		
-//		
-//		@Override
-//		public IROI getInitialROI(List<ILazyDataset> axes, int dim) {
-//			int[] imageAxis = ROISliceUtils.getImageAxis(dim);
-//			int[] x = axes.get(imageAxis[1]).getShape();
-//			int[] y = axes.get(imageAxis[0]).getShape();
-//			
-//			return new RectangularROI(y[0]/10, x[0]/10, y[0]/10, x[0]/10, 0);
-//		}
-//		
-//		@Override
-//		public boolean supportsMultipleRegions() {
-//			return true;
-//		}
-//
-//		@Override
-//		public List<IDataset> getAxes() {
-//			return traceAxes;
-//		}
-//		
-//	}
-//	
-//	private class ImageTrapizumBaselineReducer implements IDatasetROIReducer{
-//
-//		private final RegionType regionType = RegionType.XAXIS;
-//		private List<IDataset> imageAxes;
-//		
-//		@Override
-//		public IDataset reduce(ILazyDataset data, List<ILazyDataset> axes,
-//				int dim, IROI roi) {
-//			if (roi instanceof RectangularROI) {
-//				final IDataset image = ROISliceUtils.getAxisDatasetTrapzSumBaselined(axes.get(dim).getSlice(),
-//						data,
-//						(RectangularROI)roi,
-//						dim,
-//						HyperWindow.this.baseline.isChecked());
-//				
-//				
-//				int[] imageAxis = ROISliceUtils.getImageAxis(dim);
-//				this.imageAxes = new ArrayList<IDataset>();
-//				this.imageAxes.add(axes.get(imageAxis[0]).getSlice());
-//				this.imageAxes.add(axes.get(imageAxis[1]).getSlice());
-//				
-//				return image;
-//			}
-//			
-//			return null;
-//		}
-//
-//		@Override
-//		public boolean isOutput1D() {
-//			return false;
-//		}
-//
-//		@Override
-//		public List<RegionType> getSupportedRegionType() {
-//			
-//			List<IRegion.RegionType> regionList = new ArrayList<IRegion.RegionType>();
-//			regionList.add(regionType);
-//			
-//			return regionList;
-//		}
-//		
-//		@Override
-//		public IROI getInitialROI(List<ILazyDataset> axes, int dim) {
-//			double min = axes.get(dim).getSlice().min().doubleValue();
-//			double max = axes.get(dim).getSlice().max().doubleValue();
-//			
-//			return new XAxisBoxROI(min,0,(max-min)/10, 0, 0);
-//		}
-//		
-//		@Override
-//		public boolean supportsMultipleRegions() {
-//			return false;
-//		}
-//
-//		@Override
-//		public List<IDataset> getAxes() {
-//			return imageAxes;
-//		}
-//	}
 }
