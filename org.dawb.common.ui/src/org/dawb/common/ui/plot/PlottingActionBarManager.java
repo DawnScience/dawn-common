@@ -235,7 +235,7 @@ public class PlottingActionBarManager implements IPlotActionSystem {
 		toolActions.setId(role.getId());
 	       	
 		// This list will not be large so we loop over it more than once for each ToolPageRole type
-	    final IConfigurationElement[] configs = Platform.getExtensionRegistry().getConfigurationElementsFor("org.dawb.common.ui.toolPage");
+	    final IConfigurationElement[] configs = Platform.getExtensionRegistry().getConfigurationElementsFor("org.dawnsci.plotting.api.toolPage");
 	    boolean foundSomeActions = false;
 	    for (final IConfigurationElement e : configs) {
 	    	
@@ -438,7 +438,7 @@ public class PlottingActionBarManager implements IPlotActionSystem {
 		if (id==null)        return null;
 		IToolPage page = toolPages.get(id);
 		if (page==null) {
-		    final IConfigurationElement[] configs = Platform.getExtensionRegistry().getConfigurationElementsFor("org.dawb.common.ui.toolPage");
+		    final IConfigurationElement[] configs = Platform.getExtensionRegistry().getConfigurationElementsFor("org.dawnsci.plotting.api.toolPage");
 		    for (final IConfigurationElement e : configs) {
 		    	if (id.equals(e.getAttribute("id"))) {
 		    		page = createToolPage(e, null);
@@ -470,7 +470,7 @@ public class PlottingActionBarManager implements IPlotActionSystem {
 	 */
 	public boolean setToolVisible(final String toolId, final ToolPageRole role, final String viewId) throws Exception {
 	    
-		final IConfigurationElement[] configs = Platform.getExtensionRegistry().getConfigurationElementsFor("org.dawb.common.ui.toolPage");
+		final IConfigurationElement[] configs = Platform.getExtensionRegistry().getConfigurationElementsFor("org.dawnsci.plotting.api.toolPage");
 	    for (IConfigurationElement e : configs) {
 			
 	    	if (!toolId.equals(e.getAttribute("id"))) continue;

@@ -7,7 +7,7 @@
         Can move to own fragment but no-one is using Diamond plotting in dawb anyway.
         
    <extension
-         point="org.dawb.common.ui.plottingClass">
+         point="org.dawnsci.plotting.api.plottingClass">
       <plottingSystem
             class="org.dawb.gda.extensions.plot.DiamondPlottingSystem"
             id="org.dawb.gda.extensions.plot.diamondPlottingSystem"

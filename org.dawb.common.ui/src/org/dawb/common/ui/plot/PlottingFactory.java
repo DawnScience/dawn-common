@@ -86,7 +86,7 @@ public class PlottingFactory {
         IPlottingSystem system = createPlottingSystem(plotType);
         if (system!=null) return system;
 		
-        IConfigurationElement[] systems = Platform.getExtensionRegistry().getConfigurationElementsFor("org.dawb.common.ui.plottingClass");
+        IConfigurationElement[] systems = Platform.getExtensionRegistry().getConfigurationElementsFor("org.dawnsci.plotting.api.plottingClass");
         AbstractPlottingSystem ifnotfound = (AbstractPlottingSystem)systems[0].createExecutableExtension("class");
 		store.setValue("org.dawb.plotting.system.choice", systems[0].getAttribute("id"));
 		return ifnotfound;
@@ -105,7 +105,7 @@ public class PlottingFactory {
 	
 	private static final IPlottingSystem createPlottingSystem(final String plottingSystemId) throws CoreException {
 		
-        IConfigurationElement[] systems = Platform.getExtensionRegistry().getConfigurationElementsFor("org.dawb.common.ui.plottingClass");
+        IConfigurationElement[] systems = Platform.getExtensionRegistry().getConfigurationElementsFor("org.dawnsci.plotting.api.plottingClass");
         for (IConfigurationElement ia : systems) {
 			if (ia.getAttribute("id").equals(plottingSystemId)) return (AbstractPlottingSystem)ia.createExecutableExtension("class");
 		}
@@ -117,7 +117,7 @@ public class PlottingFactory {
 	public static String[][] getPlottingPreferenceChoices() {
 		
 		final List<String[]> choices = new ArrayList<String[]>(7);
-        IConfigurationElement[] systems = Platform.getExtensionRegistry().getConfigurationElementsFor("org.dawb.common.ui.plottingClass");
+        IConfigurationElement[] systems = Platform.getExtensionRegistry().getConfigurationElementsFor("org.dawnsci.plotting.api.plottingClass");
         for (IConfigurationElement ia : systems) {
         	choices.add(new String[]{ia.getAttribute("visible_type"), ia.getAttribute("id")});
 		}
