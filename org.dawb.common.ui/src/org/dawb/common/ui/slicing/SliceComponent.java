@@ -35,7 +35,6 @@ import org.dawb.common.ui.DawbUtils;
 import org.dawb.common.ui.components.cell.ScaleCellEditor;
 import org.dawb.common.ui.menu.CheckableActionGroup;
 import org.dawb.common.ui.menu.MenuAction;
-import org.dawb.common.ui.plot.AbstractPlottingSystem;
 import org.dawb.common.ui.preferences.ViewConstants;
 import org.dawb.common.ui.util.EclipseUtils;
 import org.dawb.common.ui.util.GridUtils;
@@ -46,6 +45,7 @@ import org.dawnsci.common.widgets.celleditor.SpinnerCellEditorWithPlayButton;
 import org.dawnsci.plotting.api.IPlottingSystem;
 import org.dawnsci.plotting.api.PlotType;
 import org.dawnsci.plotting.api.histogram.ImageServiceBean.ImageOrigin;
+import org.dawnsci.plotting.api.tool.IToolPageSystem;
 import org.dawnsci.plotting.api.tool.IToolPage.ToolPageRole;
 import org.dawnsci.plotting.api.trace.IImageTrace;
 import org.dawnsci.plotting.api.trace.IPaletteListener;
@@ -134,7 +134,7 @@ public class SliceComponent {
 	private ILazyDataset    lazySet; // The dataset that we are slicing.
 	private SliceObject     sliceObject;
 	private int[]           dataShape;
-	private AbstractPlottingSystem plottingSystem;
+	private IPlottingSystem plottingSystem;
 
 	private TableViewer     viewer;
 	private DimsDataList    dimsDataList;
@@ -232,7 +232,8 @@ public class SliceComponent {
 			public void widgetSelected(SelectionEvent e) {
 				if (plottingSystem!=null) {
 					try {
-						plottingSystem.setToolVisible("org.dawb.workbench.plotting.tools.windowTool", ToolPageRole.ROLE_3D, 
+						final IToolPageSystem system = (IToolPageSystem)plottingSystem.getAdapter(IToolPageSystem.class);
+						system.setToolVisible("org.dawb.workbench.plotting.tools.windowTool", ToolPageRole.ROLE_3D, 
 								                      "org.dawb.workbench.plotting.views.toolPageView.3D");
 					} catch (Exception e1) {
 						logger.error("Cannot open window tool!", e1);
@@ -1428,7 +1429,7 @@ public class SliceComponent {
 	 * @param plotWindow
 	 */
 	public void setPlottingSystem(IPlottingSystem plotWindow) {
-		this.plottingSystem = (AbstractPlottingSystem)plotWindow;
+		this.plottingSystem = plotWindow;
 	}
 
 	/**

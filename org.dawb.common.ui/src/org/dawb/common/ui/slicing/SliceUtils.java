@@ -21,7 +21,6 @@ import java.util.Map;
 import ncsa.hdf.object.Group;
 
 import org.dawb.common.ui.monitor.ProgressMonitorWrapper;
-import org.dawb.common.ui.plot.AbstractPlottingSystem;
 import org.dawb.hdf5.HierarchicalDataFactory;
 import org.dawb.hdf5.IHierarchicalDataFile;
 import org.dawnsci.doe.DOEUtils;
@@ -245,7 +244,7 @@ public class SliceUtils {
 			                     final SliceObject       currentSlice,
 			                     final int[]             dataShape,
 			                     final PlotType          type,
-			                     final AbstractPlottingSystem   plottingSystem,
+			                     final IPlottingSystem   plottingSystem,
 			                     final IProgressMonitor  monitor) throws Exception {
 
 		if (plottingSystem==null) return;

@@ -25,12 +25,13 @@ import org.dawb.common.services.ILoaderService;
 import org.dawb.common.services.IPaletteService;
 import org.dawb.common.services.IThumbnailService;
 import org.dawb.common.services.ServiceManager;
-import org.dawb.common.ui.plot.AbstractPlottingSystem;
-import org.dawb.common.ui.plot.PlottingFactory;
 import org.dawb.common.util.io.FileUtils;
 import org.dawb.gda.extensions.Activator;
 import org.dawnsci.io.h5.H5Loader;
+import org.dawnsci.plotting.AbstractPlottingSystem;
+import org.dawnsci.plotting.api.IPlottingSystem;
 import org.dawnsci.plotting.api.PlotType;
+import org.dawnsci.plotting.api.PlottingFactory;
 import org.dawnsci.plotting.api.histogram.IImageService;
 import org.dawnsci.plotting.api.histogram.ImageServiceBean;
 import org.dawnsci.plotting.api.histogram.ImageServiceBean.ImageOrigin;
@@ -241,7 +242,7 @@ public class ImageThumbnailCreator extends AbstractServiceFactory implements ITh
 		} else if (set.getShape().length==1) {
 
 			// We plot to an offscreen plotting system, then take a screen shot of this.
-			final AbstractPlottingSystem system = (AbstractPlottingSystem)PlottingFactory.getLightWeightPlottingSystem();
+			final IPlottingSystem system = PlottingFactory.getLightWeightPlottingSystem();
 			
 			final Image[] scaled = new Image[1];
 			
@@ -257,7 +258,7 @@ public class ImageThumbnailCreator extends AbstractServiceFactory implements ITh
 					
 					system.createPlot1D(null, Arrays.asList(set), new NullProgressMonitor());
 					
-		            final Image unscaled = system.getImage(new Rectangle(0, 0, 300, 300));
+		            final Image unscaled = ((AbstractPlottingSystem)system).getImage(new Rectangle(0, 0, 300, 300));
 		            scaled[0]   = new Image(display, unscaled.getImageData().scaledTo(size, size));
 				}
 			});

@@ -23,11 +23,11 @@ import java.util.Collection;
 import java.util.List;
 
 import org.dawb.common.ui.Activator;
-import org.dawb.common.ui.plot.PlottingFactory;
 import org.dawb.common.ui.util.GridUtils;
 import org.dawb.common.ui.widgets.ActionBarWrapper;
 import org.dawnsci.plotting.api.IPlottingSystem;
 import org.dawnsci.plotting.api.PlotType;
+import org.dawnsci.plotting.api.PlottingFactory;
 import org.dawnsci.plotting.api.region.IROIListener;
 import org.dawnsci.plotting.api.region.IRegion;
 import org.dawnsci.plotting.api.region.IRegionListener;
