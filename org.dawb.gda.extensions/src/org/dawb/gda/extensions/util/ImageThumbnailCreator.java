@@ -241,7 +241,7 @@ public class ImageThumbnailCreator extends AbstractServiceFactory implements ITh
 		} else if (set.getShape().length==1) {
 
 			// We plot to an offscreen plotting system, then take a screen shot of this.
-			final AbstractPlottingSystem system = PlottingFactory.getLightWeightPlottingSystem();
+			final AbstractPlottingSystem system = (AbstractPlottingSystem)PlottingFactory.getLightWeightPlottingSystem();
 			
 			final Image[] scaled = new Image[1];
 			

@@ -76,14 +76,14 @@ public class PlottingFactory {
 	 * 
 	 * @return
 	 */
-	public static AbstractPlottingSystem createPlottingSystem() throws Exception {
+	public static IPlottingSystem createPlottingSystem() throws Exception {
 				
 		final ScopedPreferenceStore store = new ScopedPreferenceStore(InstanceScope.INSTANCE,"org.dawb.workbench.ui");
 		String plotType = store.getString("org.dawb.plotting.system.choice");
 		if (plotType==null) plotType = System.getProperty("org.dawb.plotting.system.choice");// For Geoff et. al. can override.
 		if (plotType==null) plotType = "org.dawb.workbench.editors.plotting.lightWeightPlottingSystem"; // That is usually around
 		
-        AbstractPlottingSystem system = createPlottingSystem(plotType);
+        IPlottingSystem system = createPlottingSystem(plotType);
         if (system!=null) return system;
 		
         IConfigurationElement[] systems = Platform.getExtensionRegistry().getConfigurationElementsFor("org.dawb.common.ui.plottingClass");
@@ -98,12 +98,12 @@ public class PlottingFactory {
 	 * 
 	 * @return
 	 */
-	public static AbstractPlottingSystem getLightWeightPlottingSystem() throws Exception {
+	public static IPlottingSystem getLightWeightPlottingSystem() throws Exception {
 				
 		return  createPlottingSystem("org.dawb.workbench.editors.plotting.lightWeightPlottingSystem");		
 	}
 	
-	private static final AbstractPlottingSystem createPlottingSystem(final String plottingSystemId) throws CoreException {
+	private static final IPlottingSystem createPlottingSystem(final String plottingSystemId) throws CoreException {
 		
         IConfigurationElement[] systems = Platform.getExtensionRegistry().getConfigurationElementsFor("org.dawb.common.ui.plottingClass");
         for (IConfigurationElement ia : systems) {
@@ -129,7 +129,7 @@ public class PlottingFactory {
         return ret;
 	}
 
-	private static Map<String, AbstractPlottingSystem> plottingSystems;
+	private static Map<String, IPlottingSystem> plottingSystems;
 	
 	public static void clear() {
 		if (plottingSystems!=null) plottingSystems.clear();
@@ -140,7 +140,7 @@ public class PlottingFactory {
 	 * @param plotName
 	 * @return the removed system
 	 */
-	public static AbstractPlottingSystem removePlottingSystem(String plotName) {
+	public static IPlottingSystem removePlottingSystem(String plotName) {
 		try {
 			unregisterRemote(plotName);
 		} catch (Exception e) {
@@ -158,7 +158,7 @@ public class PlottingFactory {
 	 * @param abstractPlottingSystem
 	 * @return the replaced system if any or null otherwise.
 	 */
-	public static AbstractPlottingSystem registerPlottingSystem(final String                 plotName,
+	public static IPlottingSystem registerPlottingSystem(final String                 plotName,
 			                                                    final AbstractPlottingSystem abstractPlottingSystem) {
 		
 		
@@ -167,7 +167,7 @@ public class PlottingFactory {
 		} catch (Exception e) {
 			logger.error("Cannot register JMX plotting system!", e);
 		}
-		if (plottingSystems==null) plottingSystems = new HashMap<String, AbstractPlottingSystem>(7);
+		if (plottingSystems==null) plottingSystems = new HashMap<String, IPlottingSystem>(7);
 		return plottingSystems.put(plotName, abstractPlottingSystem);
 	}
 	
@@ -268,7 +268,7 @@ public class PlottingFactory {
 	 */
 	public static IPlottingSystem getPlottingSystem(String plotName, boolean threadSafe) {
 		if (plottingSystems==null) return null;
-		AbstractPlottingSystem ps = plottingSystems.get(plotName);
+		IPlottingSystem ps = plottingSystems.get(plotName);
 	    try {
 			return threadSafe ? new ThreadSafePlottingSystem(ps) : ps;
 		} catch (Exception e) {
@@ -286,6 +286,6 @@ public class PlottingFactory {
 	 */
 	public static IToolPageSystem getToolSystem(String plotName) {
 		if (plottingSystems==null) return null;
-		return plottingSystems.get(plotName);
+		return (IToolPageSystem)plottingSystems.get(plotName).getAdapter(IToolPageSystem.class);
 	}
 }

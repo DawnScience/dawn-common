@@ -9,7 +9,7 @@
  */ 
 package org.dawb.common.ui.editors;
 
-import org.dawb.common.ui.plot.AbstractPlottingSystem;
+import org.dawnsci.plotting.api.IPlottingSystem;
 import org.dawnsci.plotting.api.PlotType;
 
 public interface IPlotUpdateParticipant {
@@ -37,7 +37,7 @@ public interface IPlotUpdateParticipant {
 	void setSlicerData(ICheckableObject object, 
 			           String filePath, 
 			           int[] dims,
-			           AbstractPlottingSystem plottingSystem);
+			           IPlottingSystem plottingSystem);
 
 	/**
 	 * The mode of plotting the user prefers when the plot is updated.

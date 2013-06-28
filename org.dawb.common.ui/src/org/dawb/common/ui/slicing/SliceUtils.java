@@ -268,7 +268,7 @@ public class SliceUtils {
 		if (type==PlotType.XY) {
 			plottingSystem.clear();
 			final IDataset x = getNexusAxis(currentSlice, slice.getShape()[0], currentSlice.getX()+1, true, monitor);
-			plottingSystem.setXfirst(true);
+			plottingSystem.setXFirst(true);
 			plottingSystem.setPlotType(type);
 			plottingSystem.createPlot1D(x, Arrays.asList((IDataset)slice), slice.getName(), monitor);
 			Display.getDefault().syncExec(new Runnable() {
@@ -301,7 +301,7 @@ public class SliceUtils {
 				ys.add(dds);
 				++index;
 			}
-			plottingSystem.setXfirst(true);
+			plottingSystem.setXFirst(true);
 			plottingSystem.setPlotType(type);
 			plottingSystem.createPlot1D(xAxis, ys, monitor);
 			

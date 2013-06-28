@@ -228,11 +228,11 @@ public abstract class AbstractPlottingSystem implements IPlottingSystem, IToolPa
 		this.plottingMode = plotType;
 	}
 
-	public boolean isXfirst() {
+	public boolean isXFirst() {
 		return xfirst;
 	}
 
-	public void setXfirst(boolean xfirst) {
+	public void setXFirst(boolean xfirst) {
 		this.xfirst = xfirst;
 	}
 
