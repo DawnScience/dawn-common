@@ -20,9 +20,12 @@ import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.PositionIterator;
 import uk.ac.diamond.scisoft.analysis.dataset.Slice;
+import uk.ac.diamond.scisoft.analysis.hdf5.HDF5Dataset;
+import uk.ac.diamond.scisoft.analysis.hdf5.HDF5File;
+import uk.ac.diamond.scisoft.analysis.hdf5.HDF5Node;
 import uk.ac.diamond.scisoft.analysis.io.ASCIIDataWithHeadingSaver;
 import uk.ac.diamond.scisoft.analysis.io.DataHolder;
-import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
+import uk.ac.diamond.scisoft.analysis.io.HDF5Loader;
 import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
 
 public class CustomNCDConverter extends AbstractConversion  {
@@ -51,7 +54,7 @@ public class CustomNCDConverter extends AbstractConversion  {
             final IConversionContext   context) throws Exception {
 		
 		//get the x axis if required
-		AbstractDataset axis = null;
+		IDataset axis = null;
 		if (context.getAxisDatasetName() != null) {
 			axis = getAxis(context.getAxisDatasetName(), context.getSelectedConversionFile());
 		}
@@ -111,8 +114,8 @@ public class CustomNCDConverter extends AbstractConversion  {
 		List<String> headings = new ArrayList<String>();
 		
 		if (axis != null) {
-			String axisName = getAxisName(context.getAxisDatasetName());
-			headings.add(axisName);
+			String axisName = axis.getName();
+			headings.add(" ".concat(axisName));
 		}
 		
 		if (stop.length == 1) {
@@ -136,7 +139,7 @@ public class CustomNCDConverter extends AbstractConversion  {
 			}
 			
 			Slice[] slices = Slice.convertToSlice(start, stop, step);
-			AbstractDataset data = (AbstractDataset)lz.getSlice(slices);
+			IDataset data = lz.getSlice(slices);
 			data = data.squeeze();
 			String nameSuffix = "";
 			
@@ -150,9 +153,9 @@ public class CustomNCDConverter extends AbstractConversion  {
 			}
 			
 			if (axis != null) {
-				data = DatasetUtils.concatenate(new IDataset[]{axis,data.transpose(null)}, 1);
+				data = DatasetUtils.concatenate(new IDataset[]{axis,DatasetUtils.transpose(data, null)}, 1);
 			} else {
-				data =data.transpose(null);
+				data = DatasetUtils.transpose(data, null);
 			}
 			
 			String pathToFolder = context.getOutputPath();
@@ -179,7 +182,7 @@ public class CustomNCDConverter extends AbstractConversion  {
 		}
 	}
 	
-	private String getAxisName(String axisDatasetName) {
+	private String getAxisDatasetName(String axisDatasetName) {
 		
 		if (!(axisDatasetName.contains("/"))) {
 			return DEFAULT_AXIS_NAME;
@@ -202,13 +205,22 @@ public class CustomNCDConverter extends AbstractConversion  {
 		return t.toString();
 	}
 	
-	private AbstractDataset getAxis(String datasetName, File path) {
+	private IDataset getAxis(String datasetName, File path) {
 		
-		AbstractDataset data = null;
+		IDataset data = null;
 		try {
-			data = LoaderFactory.getDataSet(path.getAbsolutePath(), datasetName, null);
+			HDF5File tree = new HDF5Loader(path.getAbsolutePath()).loadTree();
+			HDF5Node node = tree.findNodeLink(datasetName).getDestination();
+			data = ((HDF5Dataset) node).getDataset().getSlice();
 			//expand so the concatenation works later
 			data.setShape(data.getShape()[0],1);
+			
+			if (node.containsAttribute("unit")) {
+				String qaxisUnit = node.getAttribute("unit").getFirstElement();
+				data.setName(getAxisDatasetName(datasetName).concat(" / ").concat(qaxisUnit));
+			} else {
+				data.setName(getAxisDatasetName(datasetName));
+			}
 		} catch (Exception e) {
 			logger.warn("Couldn't get dataset: " + datasetName);
 		}
