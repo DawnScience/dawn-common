@@ -140,7 +140,7 @@ public class CustomNCDConverter extends AbstractConversion  {
 			
 			Slice[] slices = Slice.convertToSlice(start, stop, step);
 			IDataset data = lz.getSlice(slices);
-			data = data.squeeze();
+			data = (IDataset)data.squeeze();
 			String nameSuffix = "";
 			
 			if (!(Arrays.equals(lz.getShape(), data.getShape()))) {
