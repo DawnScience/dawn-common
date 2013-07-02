@@ -47,7 +47,7 @@ public class DisplayUtils {
 				display.syncExec(runnable);
 		} else {
 			if (newThread)
-				new Thread(runnable).start();
+				new Thread(runnable).start(); // TODO FIXME Not the display thread!
 			else
 				runnable.run();
 		}
