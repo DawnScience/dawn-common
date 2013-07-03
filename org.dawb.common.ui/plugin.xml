@@ -549,6 +549,12 @@
              id="org.dawnsci.plotting.exportMask"
              name="Export File">
        </wizard>
+       <wizard
+             class="org.dawb.common.ui.wizard.PlotDataConversionWizard"
+             icon="icons/convert.png"
+             id="org.dawb.common.ui.wizard.plotdataconversion"
+             name="Plot Data Conversion">
+       </wizard>
     </extension>
    
 </plugin>

@@ -55,6 +55,7 @@ public final class AVIConvertPage extends AbstractSliceConversionPage {
 		setOverwriteVisible(true);
 		setFileLabel("Export video");
 		setPathEditable(true);
+		setNewFile(true);
 	}
 	
 	@Override
