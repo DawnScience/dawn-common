@@ -30,8 +30,9 @@ import ncsa.hdf.object.HObject;
  */
 public interface IHierarchicalDataFile {
 
-	public static final int NUMBER_ARRAY = 17061;
-	public static final int TEXT         = 17062;
+	public static final int NUMBER_ARRAY              = 17061;
+	public static final int SCALAR                    = 17063;
+	public static final int TEXT                      = 17062;
 	/**
 	 * Must be called to close the file.
 	 * @throws Exception
@@ -205,6 +206,19 @@ public interface IHierarchicalDataFile {
 	 * @param data
 	 */
 	public Dataset createDataset(final String name, final Datatype dtype, final long[] shape, final Object buffer, final Group data) throws Exception;
+
+	
+	/**
+	 * Creates and returns a new dataset with the given name and parent
+	 * If it already exists then an integer will be appended to the name and it will still be written.
+     *
+	 * @param name
+	 * @param shape
+	 * @param buffer
+	 * @param data
+	 * @param overwrite
+	 */
+	public Dataset createDataset(final String name, final Datatype dtype, final long[] shape, final Object buffer, final Group data, final boolean overwrite) throws Exception;
 
 	/**
 	 * Creates and returns a new dataset with the given name and parent

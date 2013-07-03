@@ -100,11 +100,21 @@ public class HierarchicalDataUtils {
         		long[]shape = getDims(set);
                 if (shape==null) return true;
         		return shape.length>1 || shape[0]>1;
+        	} else if (IHierarchicalDataFile.SCALAR==requiredType) {
+        		long[]shape = getDims(set);
+                if (shape==null) return true;
+        		return shape.length==1 && shape[0]==1;
         	}
         }
         
         if (type==Datatype.CLASS_STRING) {
-        	return IHierarchicalDataFile.TEXT==requiredType;
+        	if (IHierarchicalDataFile.TEXT==requiredType) {
+        		return true;
+        	} else if (IHierarchicalDataFile.SCALAR==requiredType) {
+        		long[]shape = getDims(set);
+                if (shape==null) return true;
+        		return shape.length==1 && shape[0]==1;
+        	}
         }
 
         return requiredType==type;

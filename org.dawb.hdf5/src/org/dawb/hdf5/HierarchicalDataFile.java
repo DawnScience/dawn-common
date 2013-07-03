@@ -597,14 +597,17 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 		}
 	}
 	
-
-	private Dataset createDataset(String         name,  
+    @Override
+	public Dataset createDataset(String         name,  
 			                     final Datatype dtype,
 			                     final long[]   shape,
 			                     final Object   buffer,
 			                           Group    parent,
 			                     final boolean  overwrite) throws Exception {
 		
+    	if (name.indexOf('/')>-1) {
+    		name = name.substring(name.lastIndexOf('/')+1);
+    	}
 		final int id = parent.open();
 		try {
 			if (!overwrite) {
@@ -619,7 +622,7 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 			}
 			
 			Dataset dataset = file.createScalarDS(name, parent, dtype, shape, null, null, 0, buffer);
-			
+
 			return dataset;
 			
 		} finally {
