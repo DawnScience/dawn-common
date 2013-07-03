@@ -400,6 +400,67 @@ public class HyperComponent {
 			});
 		}
 	}
+	
+	private void updateTrace(final IPlottingSystem plot, final IDataset axis, final IDataset data) {
+
+		Display.getDefault().syncExec(new Runnable() {
+			@Override
+			public void run() {
+
+				Collection<ITrace> traces = plot.getTraces(ILineTrace.class);
+
+				List<IDataset> datasets = convertFrom2DToListOf1D(axis, data);
+
+				if (traces == null || traces.isEmpty()) {
+					plot.createPlot1D(axis, datasets, null);
+					return;
+				}
+				int i = 0;
+				for (ITrace trace : traces) {
+					if (i < datasets.size()) ((ILineTrace)trace).setData(axis, datasets.get(i));
+					else plot.removeTrace(trace);
+					i++;
+				}
+
+				if (i >= datasets.size()) {
+					plot.repaint();
+					return;
+				}
+
+				List<IDataset> subdatasets = new ArrayList<IDataset>(datasets.size() - i);
+
+				for (; i < datasets.size(); ++i) {
+					subdatasets.add(datasets.get(i));
+				}
+
+				plot.createPlot1D(axis, subdatasets, null);
+				plot.repaint();
+			}
+		});
+	}
+	
+	private List<IDataset> convertFrom2DToListOf1D(IDataset axis, IDataset data) {
+		
+		int[] dataShape = data.getShape();
+		
+		List<IDataset> datasets = new ArrayList<IDataset>(dataShape[0]);
+		Slice[] slices = new Slice[2];
+		slices[0] = new Slice(0,1,1);
+		
+		for (int i = 0; i < dataShape[0]; i++) {
+			slices[0].setStart(i);
+			slices[0].setStop(i+1);
+			
+			IDataset out = data.getSlice(slices);
+			
+			out.setName("trace_" + i);
+			
+			datasets.add(out);
+		}
+		
+		return datasets;
+		
+	}
 
 	private class HyperDeligateJob extends Job {
 		
@@ -460,20 +521,25 @@ public class HyperComponent {
 						axis = outputAxes.get(0);
 					}
 					
-					Collection<ITrace> traces = plot.getTraces();
-					for (ITrace trace : traces) {
-						Object uo = trace.getUserObject();
-						if (uo == currentRegion) {
-							output.setName(trace.getName());
-							updateTrace(plot,axis,output,true,currentRegion);
-							return Status.OK_STATUS;
+					if (output.getRank() == 1) {
+						Collection<ITrace> traces = plot.getTraces();
+						for (ITrace trace : traces) {
+							Object uo = trace.getUserObject();
+							if (uo == currentRegion) {
+								output.setName(trace.getName());
+								updateTrace(plot,axis,output,true,currentRegion);
+								return Status.OK_STATUS;
+							}
 						}
-					}
 
-					String name = TraceUtils.getUniqueTrace("trace", plot, (String[])null);
-					output.setName(name);
+						String name = TraceUtils.getUniqueTrace("trace", plot, (String[])null);
+						output.setName(name);
+						
+						updateTrace(plot,axis,output,false,currentRegion);
+					} else {
+						updateTrace(plot,axis,output);
+					}
 					
-					updateTrace(plot,axis,output,false,currentRegion);
 				}
 
 				return Status.OK_STATUS;
