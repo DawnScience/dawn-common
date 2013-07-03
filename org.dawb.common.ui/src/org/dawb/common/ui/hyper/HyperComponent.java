@@ -16,7 +16,6 @@
 
 package org.dawb.common.ui.hyper;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -55,17 +54,13 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.FileDialog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
-import uk.ac.diamond.scisoft.analysis.dataset.DatasetUtils;
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.Slice;
-import uk.ac.diamond.scisoft.analysis.io.ASCIIDataWithHeadingSaver;
-import uk.ac.diamond.scisoft.analysis.io.DataHolder;
 import uk.ac.diamond.scisoft.analysis.roi.IROI;
 
 /**
@@ -82,14 +77,9 @@ public class HyperComponent {
 	private HyperDeligateJob rightJob;
 	private IAction reselect;
 	private IAction baseline;
-	private IAction export;
 	private IRegion windowRegion;
 	private Composite mainComposite;
 	private final static Logger logger = LoggerFactory.getLogger(HyperComponent.class);
-	
-	public enum HyperType {
-		IMAGE_TRACE, IMAGE_IMAGE
-	}
 
 	public void createControl(Composite parent) {
 		parent.setLayout(new FillLayout());
@@ -126,10 +116,8 @@ public class HyperComponent {
 		
 		if (mainReducer.isOutput1D()) {
 			baseline.setEnabled(true);
-			export.setEnabled(true);
 		} else {
 			baseline.setEnabled(false);
-			export.setEnabled(false);
 		}
 		
 		if (mainReducer.supportsMultipleRegions()) {
@@ -188,68 +176,6 @@ public class HyperComponent {
 			
 		} catch (Exception e) {
 			logger.error("Error adding regions to hyperview: " + e.getMessage());
-		}
-	}
-	
-	private void saveLineTracesAsAscii(String filename) {
-		
-		Collection<ITrace> traces = sideSystem.getTraces(ILineTrace.class);
-		
-		boolean firstTrace = true;
-		List<IDataset> datasets = new ArrayList<IDataset>();
-		List<String> headings = new ArrayList<String>();
-		IDataset data;
-		
-		int dtype = 0;
-		
-		int i = 0;
-		
-		for (ITrace trace : traces ) {
-			
-			if (firstTrace) {
-				int ddtype = AbstractDataset.getDType(((ILineTrace)trace).getData());
-				data = ((ILineTrace)trace).getXData();
-				int axdtype = AbstractDataset.getDType(data);
-				
-				if (ddtype == axdtype) {
-					dtype = ddtype;
-				} else if (ddtype > axdtype) {
-					data = DatasetUtils.cast((AbstractDataset)data, ddtype);
-					dtype = ddtype;
-				} else {
-					dtype = axdtype;
-				}
-				
-				data.setShape(data.getShape()[0],1);
-				datasets.add(data);
-				headings.add("x");
-				firstTrace = false;
-			}
-			
-			data = ((ILineTrace)trace).getData();
-			
-			if (dtype != AbstractDataset.getDType(data)) {
-				data = DatasetUtils.cast((AbstractDataset)data, dtype);
-			}
-			
-			data.setShape(data.getShape()[0],1);
-			datasets.add(data);
-			headings.add("dataset_" + i);
-			i++;
-		}
-		
-		AbstractDataset allTraces = DatasetUtils.concatenate(datasets.toArray(new IDataset[datasets.size()]), 1);
-		
-		ASCIIDataWithHeadingSaver saver = new ASCIIDataWithHeadingSaver(filename);
-		DataHolder dh = new DataHolder();
-		dh.addDataset("AllTraces", allTraces);
-		saver.setHeader("#Traces extracted from Hyperview");
-		saver.setHeadings(headings);
-		
-		try {
-			saver.saveFile(dh);
-		} catch(Exception e) {
-			e.printStackTrace();
 		}
 	}
 
@@ -331,35 +257,9 @@ public class HyperComponent {
 				}
 			};
 			
-			export = new Action("Export...") {
-				@Override
-				public void run() {
-					FileDialog fd = new FileDialog(mainComposite.getShell(),SWT.SAVE);
-					fd.setFileName("export.dat");
-					final String path = fd.open();
-					
-					if (path == null) return;
-					
-					File file = new File(path);
-					//TODO throw error
-					if (file.exists()) return;
-					
-					Job exportJob = new Job("Export Traces") {
-						
-						@Override
-						protected IStatus run(IProgressMonitor monitor) {
-							saveLineTracesAsAscii(path);
-							return Status.OK_STATUS;
-						}
-					};
-					exportJob.schedule();
-				}
-			};
-			
 			baseline.setImageDescriptor(Activator.getImageDescriptor("icons/LinearBase.png"));
 			actionBarWrapper1.getToolBarManager().add(new Separator("uk.ac.diamond.scisoft.analysis.rcp.views.HyperPlotView.newBaselineGroup"));
 			actionBarWrapper1.getToolBarManager().add(baseline);
-			actionBarWrapper1.getToolBarManager().add(export);
 			actionBarWrapper1.getToolBarManager().add(new Separator("uk.ac.diamond.scisoft.analysis.rcp.views.HyperPlotView.newBaselineGroup"));
 			
 			sideSystem.createPlotPart(sidePlotComp, 

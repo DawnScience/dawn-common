@@ -29,8 +29,8 @@ public class ArpesSideImageReducer implements IDatasetROIReducer {
 			if (order[0] < order[1]) image = ((AbstractDataset)image).transpose();
 			
 			this.imageAxes = new ArrayList<IDataset>();
-			this.imageAxes.add(axes.get(1).getSlice());
 			this.imageAxes.add(axes.get(0).getSlice());
+			this.imageAxes.add(axes.get(1).getSlice());
 			
 			return image;
 		}

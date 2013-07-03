@@ -31,8 +31,8 @@ public class ImageTrapeziumBaselineReducer implements IDatasetROIReducer {
 			
 			
 			this.imageAxes = new ArrayList<IDataset>();
-			this.imageAxes.add(axes.get(1).getSlice());
 			this.imageAxes.add(axes.get(0).getSlice());
+			this.imageAxes.add(axes.get(1).getSlice());
 			
 			return image;
 		}
