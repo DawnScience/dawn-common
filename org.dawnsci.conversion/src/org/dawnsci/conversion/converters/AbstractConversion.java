@@ -2,12 +2,15 @@ package org.dawnsci.conversion.converters;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import ncsa.hdf.object.Dataset;
 
 import org.dawb.common.services.conversion.IConversionContext;
+import org.dawb.common.util.io.FileUtils;
 import org.dawb.hdf5.HierarchicalDataFactory;
 import org.dawb.hdf5.IHierarchicalDataFile;
 
@@ -54,15 +57,20 @@ public abstract class AbstractConversion {
 				for (File path : paths) {
 					
 					context.setSelectedConversionFile(path);
-					final List<String> sets  = getDataNames(path);
-					final List<String> names = context.getDatasetNames();
-					for (String nameRegExp : names) {
-						final List<String> data = getData(sets, nameRegExp);
-						if (data == null) continue;
-						for (String dsPath : data) {
-							final ILazyDataset lz = getLazyDataset(path, dsPath, context);
-							if (lz!=null) iterate(lz, dsPath, context);
+					if (path.isFile()) {
+						final List<String> sets  = getDataNames(path);
+						final List<String> names = context.getDatasetNames();
+						for (String nameRegExp : names) {
+							final List<String> data = getData(sets, nameRegExp);
+							if (data == null) continue;
+							for (String dsPath : data) {
+								final ILazyDataset lz = getLazyDataset(path, dsPath, context);
+								if (lz!=null) iterate(lz, dsPath, context);
+							}
 						}
+					} else { 
+						final ILazyDataset lz = getLazyDataset(path, null, context);
+						iterate(lz, path.getName(), context);
 					}
 				}
 			}
@@ -93,6 +101,8 @@ public abstract class AbstractConversion {
 	
 
 	/**
+	 * This method can be overridden for returning stacks of images from 
+	 * a directory for instance.
 	 * 
 	 * @param path
 	 * @param dsPath
@@ -101,7 +111,7 @@ public abstract class AbstractConversion {
 	 * @return
 	 * @throws Exception
 	 */
-	protected ILazyDataset getLazyDataset(final File                   path, 
+	protected ILazyDataset getLazyDataset(final File                 path, 
 						                  final String               dsPath,
 						                  final IConversionContext   context) throws Exception {
 				
@@ -286,6 +296,8 @@ public abstract class AbstractConversion {
 	 */
 	public List<String> getDataNames(File ioFile) throws Exception {
 		
+		if (ioFile.isDirectory())            return Collections.emptyList();
+		if (!isH5(ioFile.getAbsolutePath())) return Collections.emptyList();
 		IHierarchicalDataFile file = null;
 		try {
 			file = HierarchicalDataFactory.getReader(ioFile.getAbsolutePath());
@@ -296,6 +308,24 @@ public abstract class AbstractConversion {
 			if (file!=null) file.close();
 		}
 	}
+	public final static List<String> EXT;
+	static {
+		List<String> tmp = new ArrayList<String>(7);
+		tmp.add("h5");
+		tmp.add("nxs");
+		tmp.add("hd5");
+		tmp.add("hdf5");
+		tmp.add("hdf");
+		tmp.add("nexus");
+		EXT = Collections.unmodifiableList(tmp);
+	}	
+
+	public static boolean isH5(final String filePath) {
+		final String ext = FileUtils.getFileExtension(filePath);
+		if (ext==null) return false;
+		return EXT.contains(ext.toLowerCase());
+	}
+
 
 	/**
 	 * expand the regex according to the javadoc for getFilePath().
@@ -303,6 +333,7 @@ public abstract class AbstractConversion {
 	 * @return
 	 */
 	public List<File> expand(String path) {
+		
 		final List<File> files = new ArrayList<File>(7);
 		path = path.replace('\\', '/');
 		final String dir    = path.substring(0, path.lastIndexOf("/"));

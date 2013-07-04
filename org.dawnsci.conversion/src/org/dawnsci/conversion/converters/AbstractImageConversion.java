@@ -96,6 +96,11 @@ public abstract class AbstractImageConversion extends AbstractConversion {
 		return slice;
 	}
 	
+	/**
+	 * To be used as the user object to convey data about the conversion.
+	 * @author fcp94556
+	 *
+	 */
 	public static final class ConversionInfoBean {
 		private int frameRate;
 		private ImageServiceBean imageServiceBean;

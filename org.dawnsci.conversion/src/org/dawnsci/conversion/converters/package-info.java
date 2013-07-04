@@ -1,5 +1,5 @@
 /**
- * Please use this packge for the implementation of the individual converters
+ * Please use this package for the implementation of the individual converters
  */
 /**
  * @author fcp94556

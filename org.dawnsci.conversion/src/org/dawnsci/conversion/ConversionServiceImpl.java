@@ -9,6 +9,7 @@ import org.dawnsci.conversion.converters.AsciiConvert2D;
 import org.dawnsci.conversion.converters.CustomNCDConverter;
 import org.dawnsci.conversion.converters.CustomTomoConverter;
 import org.dawnsci.conversion.converters.ImageConverter;
+import org.dawnsci.conversion.converters.ImagesToHDFConverter;
 import org.dawnsci.conversion.converters.VisitorConversion;
 
 class ConversionServiceImpl implements IConversionService {
@@ -40,6 +41,9 @@ class ConversionServiceImpl implements IConversionService {
 					break;
 				case TIFF_FROM_3D:
 					deligate = new ImageConverter(context);
+					break;
+				case H5_FROM_IMAGEDIR:
+					deligate = new ImagesToHDFConverter(context);
 					break;
 				case AVI_FROM_3D:
 					deligate = new AVIImageConverter(context);

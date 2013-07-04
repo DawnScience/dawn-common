@@ -697,7 +697,6 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 		} finally {
 			parent.close(id);
 		}
-		
 	}
 
 	private String getUnique(String name, final Group parent, final Class<? extends HObject> clazz) throws Exception {
