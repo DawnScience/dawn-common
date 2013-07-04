@@ -63,8 +63,9 @@ public class ImagesToHDFConverter extends AbstractConversion{
 			for (int i = 1; i < paths.length-1; i++) {
 				final String path = paths[i];
 				group = file.group(path, group);
-				if (i<(paths.length-1)) file.setNexusAttribute(group, Nexus.ENTRY);
+				if (i<(paths.length-2)) file.setNexusAttribute(group, Nexus.ENTRY);
 			}
+			file.setNexusAttribute(group, Nexus.DATA);
 		}
 		name = paths[paths.length-1];
 
