@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 
 import ncsa.hdf.object.Dataset;
+import ncsa.hdf.object.Datatype;
+import ncsa.hdf.object.h5.H5Datatype;
 
 import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.util.io.FileUtils;
@@ -15,10 +17,12 @@ import org.dawb.hdf5.HierarchicalDataFactory;
 import org.dawb.hdf5.IHierarchicalDataFile;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.BooleanDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ByteDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.DatasetUtils;
 import uk.ac.diamond.scisoft.analysis.dataset.DoubleDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.FloatDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.IntegerDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.LongDataset;
@@ -357,6 +361,44 @@ public abstract class AbstractConversion {
 		int posExt = fileName.lastIndexOf(".");
 		// No File Extension
 		return posExt == -1 ? fileName : fileName.substring(0, posExt);
+	}
+
+	
+	/**
+	 * Determines the HDF5 Datatype for an abstract dataset.
+	 * @param a
+	 * @return data type
+	 */
+	public static Datatype getDatatype(IDataset a) throws Exception {
+		
+		// There is a smarter way of doing this, but am in a hurry...
+		if (a instanceof ByteDataset || a instanceof BooleanDataset) {
+         	return new H5Datatype(Datatype.CLASS_INTEGER, 8/8, Datatype.NATIVE, Datatype.SIGN_NONE);
+         	
+        } else if (a instanceof ShortDataset) {
+        	return new H5Datatype(Datatype.CLASS_INTEGER, 16/8, Datatype.NATIVE, Datatype.NATIVE); 
+        	
+        } else if (a instanceof IntegerDataset) {
+        	return new H5Datatype(Datatype.CLASS_INTEGER, 32/8, Datatype.NATIVE, Datatype.NATIVE); 
+       	
+        } else if (a instanceof LongDataset) {
+        	return new H5Datatype(Datatype.CLASS_INTEGER, 64/8, Datatype.NATIVE, Datatype.NATIVE); 
+        	
+        } else if (a instanceof FloatDataset) {
+        	return new H5Datatype(Datatype.CLASS_FLOAT, 32/8, Datatype.NATIVE, Datatype.NATIVE); 
+        	
+        } else if (a instanceof DoubleDataset) {
+        	return new H5Datatype(Datatype.CLASS_FLOAT, 64/8, Datatype.NATIVE, Datatype.NATIVE); 
+      	    
+        }
+        
+        throw new Exception("Cannot deal with data type "+a.getClass().getName());
+	}
+	
+	public static long[] getLong(int[] intShape) {
+		final long[] longShape  = new long[intShape.length];
+		for (int i = 0; i < intShape.length; i++) longShape[i] = intShape[i];
+		return longShape;
 	}
 
 }
