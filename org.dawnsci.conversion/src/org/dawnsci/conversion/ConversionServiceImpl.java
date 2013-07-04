@@ -6,6 +6,7 @@ import org.dawnsci.conversion.converters.AVIImageConverter;
 import org.dawnsci.conversion.converters.AbstractConversion;
 import org.dawnsci.conversion.converters.AsciiConvert1D;
 import org.dawnsci.conversion.converters.AsciiConvert2D;
+import org.dawnsci.conversion.converters.Convert1DtoND;
 import org.dawnsci.conversion.converters.CustomNCDConverter;
 import org.dawnsci.conversion.converters.CustomTomoConverter;
 import org.dawnsci.conversion.converters.ImageConverter;
@@ -51,6 +52,8 @@ class ConversionServiceImpl implements IConversionService {
 				case CUSTOM_TOMO:
 					deligate = new CustomTomoConverter(context);
 					break;
+				case H5_FROM_1D:
+					deligate = new Convert1DtoND(context);
 				default:
 					break;
 				}
