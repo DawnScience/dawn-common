@@ -57,7 +57,7 @@ public class ImageToH5Test {
 		
 		
 		final ILazyDataset set = LoaderFactory.getData(output.getAbsolutePath(), null).getLazyDataset(0);
-		if (!Arrays.equals(set.getShape(), new int[]{100,1024,1024})) {
+		if (!Arrays.equals(set.getShape(), new int[]{100,2048,2048})) {
 			throw new Exception("Did not write dataset of expected shape!");
 		}
 		
