@@ -14,24 +14,23 @@ import uk.ac.diamond.scisoft.analysis.roi.IROI;
 import uk.ac.diamond.scisoft.analysis.roi.LinearROI;
 import uk.ac.diamond.scisoft.analysis.roi.ROISliceUtils;
 
-public class ArpesMainImageReducer implements IDatasetROIReducer{
-	
+public class TraceLineReducer implements IDatasetROIReducer {
+
 	private final RegionType regionType = RegionType.LINE;
-	private List<IDataset> imageAxes;
+	private List<IDataset> traceAxes;
 	
 	
 	@Override
 	public IDataset reduce(ILazyDataset data, List<AbstractDataset> axes,
 			IROI roi, Slice[] slices, int[] order) {
 		if (roi instanceof LinearROI) {
-			final IDataset image = ((AbstractDataset)ROISliceUtils.getDataset(data, (LinearROI)roi, slices,new int[]{order[0],order[1]},1)).transpose();
+			final IDataset image = ((AbstractDataset)ROISliceUtils.getDataset(data, (LinearROI)roi, slices,new int[]{order[0],order[1]},1));
 			
 			IDataset length = AbstractDataset.arange(image.getShape()[1], AbstractDataset.INT32);
 			length.setName("Line Length");
 			
-			this.imageAxes = new ArrayList<IDataset>();
-			this.imageAxes.add(length);
-			this.imageAxes.add(axes.get(2).getSlice());
+			this.traceAxes = new ArrayList<IDataset>();
+			this.traceAxes.add(axes.get(2).getSlice());
 			
 			return image;
 		}
@@ -42,7 +41,7 @@ public class ArpesMainImageReducer implements IDatasetROIReducer{
 
 	@Override
 	public boolean isOutput1D() {
-		return false;
+		return true;
 	}
 
 	@Override
@@ -75,6 +74,6 @@ public class ArpesMainImageReducer implements IDatasetROIReducer{
 
 	@Override
 	public List<IDataset> getAxes() {
-		return imageAxes;
+		return traceAxes;
 	}
 }
