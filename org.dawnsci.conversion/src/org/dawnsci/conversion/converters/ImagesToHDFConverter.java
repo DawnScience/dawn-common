@@ -32,7 +32,7 @@ import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 public class ImagesToHDFConverter extends AbstractConversion{
 	
 
-	private IHierarchicalDataFile file;
+	private IHierarchicalDataFile hFile;
 	private Group                 group;
 	private String                name;
 
@@ -41,45 +41,52 @@ public class ImagesToHDFConverter extends AbstractConversion{
 		super(context);
 		
 		// We open the file here, and create the group.
-		file   = HierarchicalDataFactory.getWriter(context.getOutputPath());
+		hFile   = HierarchicalDataFactory.getWriter(context.getOutputPath());
 
 		// We make the group
 		final String datasetNameStr = context.getDatasetNames().get(0);
 		String[]  paths = datasetNameStr.split("/");
 		if ("".equals(paths[0])) paths = Arrays.copyOfRange(paths, 1, paths.length);
- 		final Group entry = file.group(paths[0]);
-		file.setNexusAttribute(entry, Nexus.ENTRY);
+ 		final Group entry = hFile.group(paths[0]);
+ 		hFile.setNexusAttribute(entry, Nexus.ENTRY);
 
 		group = entry;
 		if (paths.length>2) {
 			for (int i = 1; i < paths.length-1; i++) {
 				final String path = paths[i];
-				group = file.group(path, group);
-				if (i<(paths.length-2)) file.setNexusAttribute(group, Nexus.ENTRY);
+				group = hFile.group(path, group);
+				if (i<(paths.length-2)) hFile.setNexusAttribute(group, Nexus.ENTRY);
 			}
-			file.setNexusAttribute(group, Nexus.DATA);
+			hFile.setNexusAttribute(group, Nexus.DATA);
 		}
 		name = paths[paths.length-1];
 
 		// We put the many files in one ILazyDataset and set that in the context as an override.
-		if (context.getFilePaths().size()>1) throw new Exception(getClass().getSimpleName()+" can only be used with one path regex at the moment!");
-		ILazyDataset set = getLazyDataset(context.getFilePaths().get(0));
+		ILazyDataset set = getLazyDataset();
 		context.setLazyDataset(set);
 		
 		context.addSliceDimension(0, "all");
 		
 	}
 
-	private ILazyDataset getLazyDataset(final String dir) throws Exception {
+	private ILazyDataset getLazyDataset() throws Exception {
 
-		final List<File>   files = expand(dir);
-		final List<String> paths = new ArrayList<String>(files.size());
-		for (File file : files) {
-			try {
-				ILazyDataset data = LoaderFactory.getData(file.getAbsolutePath(), context.getMonitor()).getLazyDataset(0);
-				if (data.getRank()==2) paths.add(file.getAbsolutePath());
-			} catch (Exception ignored) {
-				continue;
+		final List<String> regexs = context.getFilePaths();
+		final List<String> paths = new ArrayList<String>(Math.max(regexs.size(),10));
+		for (String regex : regexs) {
+			final List<File>   files = expand(regex);
+			for (File file : files) {
+				try {
+					ILazyDataset data = LoaderFactory.getData(file.getAbsolutePath(), context.getMonitor()).getLazyDataset(0);
+					if (data.getRank()==2) paths.add(file.getAbsolutePath());
+				} catch (Exception ignored) {
+					continue;
+				}
+				
+				if (context.getMonitor()!=null && context.getMonitor().isCancelled()) {
+					hFile.close();
+					throw new Exception("Conversion is cancelled!");
+				}
 			}
 		}
 		
@@ -97,17 +104,22 @@ public class ImagesToHDFConverter extends AbstractConversion{
         final String datasetPath = context.getDatasetNames().get(0);
 		final Datatype        dt = getDatatype(slice);
 		
-		Dataset d = file.appendDataset(name, dt, getLong(slice.getShape()), slice.getBuffer(), group);
+		Dataset d = hFile.appendDataset(name, dt, getLong(slice.getShape()), slice.getBuffer(), group);
 		if (first) {
-			file.setNexusAttribute(d, Nexus.SDS);
-			file.setAttribute(d, "original_name", datasetPath);
+			hFile.setNexusAttribute(d, Nexus.SDS);
+			hFile.setAttribute(d, "original_name", datasetPath);
 			first = false;
+		}
+		
+		if (context.getMonitor()!=null && context.getMonitor().isCancelled()) {
+			hFile.close();
+			throw new Exception("Conversion is cancelled!");
 		}
 	}
 	
 	
 	public void close(IConversionContext context) throws Exception{
-		file.close();
+		hFile.close();
 	}
 
 }

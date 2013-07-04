@@ -119,6 +119,11 @@
             conversion_scheme="CUSTOM_NCD"
             id="org.dawnsci.conversion.ui.conversionNCD">
       </conversion_page>
+      <conversion_page
+            conversion_page="org.dawnsci.conversion.ui.pages.ImageToH5ConversionPage"
+            conversion_scheme="H5_FROM_IMAGEDIR"
+            id="org.dawnsci.conversion.ui.conversionImageToH5">
+      </conversion_page>
    </extension>
 
 </plugin>

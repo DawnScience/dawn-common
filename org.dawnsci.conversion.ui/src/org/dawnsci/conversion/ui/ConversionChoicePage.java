@@ -43,6 +43,7 @@ public class ConversionChoicePage extends ResourceChoosePage implements IConvers
 	protected ConversionChoicePage(String pageName, IConversionService service) {
 		super(pageName, "Please choose what you would like to convert", null);
 		this.service = service;
+		setOverwriteVisible(false);
 	}
 	
 	private final static String SCHEME_KEY = "org.dawnsci.conversion.ui.schemeKey";
@@ -198,7 +199,20 @@ public class ConversionChoicePage extends ResourceChoosePage implements IConvers
 			
 			final int ranks[] = chosenConversion.getPreferredRanks();
 			if (ranks!=null) {
-				final IMetaData meta = LoaderFactory.getMetaData(filePath, new IMonitor.Stub());
+				IMetaData meta = null;
+				if (getSelectedFiles()!=null && getSelectedFiles().size()>1) {		
+					for (String path : getSelectedFiles()) {
+						try {
+						    meta = LoaderFactory.getMetaData(path, new IMonitor.Stub());
+						    if (meta==null) continue;
+						    break;
+						} catch (Throwable ne) {
+							continue;
+						}
+					}
+				} else {
+					meta  = LoaderFactory.getMetaData(filePath, new IMonitor.Stub());
+				}
 				final Map<String,int[]> shapes = meta.getDataShapes();
 				boolean foundRequiredRank = false;
 				for (String name : shapes.keySet()) {
