@@ -97,7 +97,10 @@ public class ResourceChoosePage extends WizardPage {
 		setControl(container);
 
 	}
-
+    public void setErrorMessage(String newMessage) {
+        super.setErrorMessage(newMessage);
+        setPageComplete(newMessage==null);
+    }
 
 	/**
 	 * 
