@@ -10,7 +10,9 @@
 package org.dawb.common.services;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
@@ -50,6 +52,7 @@ public class ServiceManager {
 		return getService(serviceClass, true);
 	}
 
+	private static Map<Class<?>, Object> overrides;
 	/**
 	 * Tries eclipse service, then osgi service, then reading eclipse extension points.
      *
@@ -61,6 +64,11 @@ public class ServiceManager {
 	 * @return
 	 */
 	public static Object getService(final Class<?> serviceClass, boolean exceptionOnError) throws Exception {
+		
+		
+		if (overrides!=null && overrides.containsKey(serviceClass)) {
+			return overrides.get(serviceClass);
+		}
 		
 		if (PlatformUI.isWorkbenchRunning()) {
 			Object instance = PlatformUI.getWorkbench().getService(serviceClass);
@@ -92,5 +100,15 @@ public class ServiceManager {
 		}
 		
 		return null;
+	}
+	
+	/**
+	 * 
+	 * @param serviceClass
+	 * @param service
+	 */
+	public static void setService(final Class<?> serviceClass, Object service) {
+		if (overrides==null) overrides = new HashMap<Class<?>, Object>(7);
+		overrides.put(serviceClass, service);
 	}
 }

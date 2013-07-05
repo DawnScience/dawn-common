@@ -3,15 +3,19 @@ package org.dawnsci.conversion;
 import java.awt.Dimension;
 import java.io.File;
 
+import org.dawb.common.services.IPaletteService;
+import org.dawb.common.services.ServiceManager;
 import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.services.conversion.IConversionContext.ConversionScheme;
+import org.dawb.gda.extensions.util.ImageService;
 import org.dawnsci.conversion.converters.AbstractImageConversion.ConversionInfoBean;
+import org.dawnsci.plotting.api.histogram.IImageService;
+import org.dawnsci.rcp.service.PaletteService;
 import org.junit.Test;
 import org.monte.media.avi.AVIReader;
 import org.monte.media.math.Rational;
 
 import uk.ac.diamond.scisoft.analysis.dataset.function.DownsampleMode;
-
 
 public class AVIImageConvertTest {
 
@@ -20,6 +24,10 @@ public class AVIImageConvertTest {
 	public void testAVISimple() throws Exception {
 		
 		ConversionServiceImpl service = new ConversionServiceImpl();
+		
+		// Not sure of this will work...
+		ServiceManager.setService(IImageService.class,   new ImageService());
+		ServiceManager.setService(IPaletteService.class, new PaletteService());
 		
 		// Determine path to test file
 		final String path = getTestFilePath("export.h5");
