@@ -77,11 +77,19 @@ public class ConvertWizardHandler extends AbstractHandler implements IObjectActi
 			// Currently can only parse nexus files with conversion
 			// tool
 			final String path = FileUtils.getPath(o);
-			if (path!=null && isH5(path)) return true;
+			if (path!=null) {
+				if (isH5(path))  return true;
+				if (isDir(path)) return true;
+			}
 		}
         return false;
 	}
 	
+	private boolean isDir(String path) {
+		final File file = new File(path);
+		return file.isDirectory();
+	}
+
 	public final static List<String> EXT;
 	static {
 		List<String> tmp = new ArrayList<String>(7);
