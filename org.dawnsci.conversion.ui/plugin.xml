@@ -124,6 +124,11 @@
             conversion_scheme="H5_FROM_IMAGEDIR"
             id="org.dawnsci.conversion.ui.conversionImageToH5">
       </conversion_page>
+      <conversion_page
+            conversion_page="org.dawnsci.conversion.ui.pages.H5From1DConvertPage"
+            conversion_scheme="H5_FROM_1D"
+            id="org.dawnsci.conversion.ui.conversionH5From1D">
+      </conversion_page>
    </extension>
 
 </plugin>

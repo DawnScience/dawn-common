@@ -96,6 +96,8 @@
                   </enumeration>
                   <enumeration value="AVI_FROM_3D">
                   </enumeration>
+                  <enumeration value="H5_FROM_1D">
+                  </enumeration>
                </restriction>
             </simpleType>
          </attribute>
