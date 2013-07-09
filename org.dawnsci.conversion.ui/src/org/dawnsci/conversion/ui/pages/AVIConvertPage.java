@@ -161,7 +161,7 @@ public final class AVIConvertPage extends AbstractSliceConversionPage {
 
 		super.pathChanged();
 		final String path = getAbsoluteFilePath();
-		if (path!=null) {
+		if (path!=null && getErrorMessage()==null) {
 			final File outputAVI = new File(path);
 			try {
 				if (outputAVI.exists() && !outputAVI.isFile()) {
@@ -179,6 +179,7 @@ public final class AVIConvertPage extends AbstractSliceConversionPage {
 	
 	@Override
 	public void setContext(IConversionContext context) {
+		
 		super.setContext(context);
 		
 		if (context==null) return;

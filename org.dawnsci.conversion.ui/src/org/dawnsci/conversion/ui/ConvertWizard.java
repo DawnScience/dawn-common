@@ -9,7 +9,6 @@
  */ 
 package org.dawnsci.conversion.ui;
 
-import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -21,25 +20,19 @@ import org.dawb.common.services.conversion.IConversionContext.ConversionScheme;
 import org.dawb.common.services.conversion.IConversionService;
 import org.dawb.common.ui.monitor.ProgressMonitorWrapper;
 import org.dawb.common.ui.util.EclipseUtils;
-import org.eclipse.core.resources.IContainer;
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IExportWizard;
 import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -103,32 +96,42 @@ public class ConvertWizard extends Wizard implements IExportWizard{
 
 	}
 	
-    public boolean canFinish() {
-    	
-   		IConversionContext context = setupPage.getContext();
-   		
-     	// We select only the preferred page.
-    	if (setupPage.isPageComplete() && context!=null) {
-    		final ConversionScheme scheme = context.getConversionScheme();
-    		selectedConversionPage = conversionPages.get(scheme);
-    		for (ConversionScheme s : conversionPages.keySet()) {
-    			if (conversionPages.get(s)!=null) {
-    				conversionPages.get(s).setVisible(s==scheme);
-    			}
-			}
-    	}
-    	if (setupPage.isPageComplete() && context!=null && selectedConversionPage!=null) {
-    		selectedConversionPage.setContext(context);
-    		return selectedConversionPage.isPageComplete();
-    	}
-    	return setupPage.isPageComplete() && (selectedConversionPage==null || selectedConversionPage.isPageComplete());
-    }
-
 
 	@Override
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
 		      
  	}
+	
+    public boolean canFinish() {
+       if (setupPage!=null && !setupPage.isPageComplete()) return false;
+       if (selectedConversionPage!=null && !selectedConversionPage.isPageComplete()) return false;
+       return true;
+    }
+    
+	@Override
+    public IWizardPage getNextPage(IWizardPage page) {
+
+    	if (page==setupPage) {
+       		IConversionContext.ConversionScheme scheme = setupPage.getScheme();
+       		selectedConversionPage = conversionPages.get(scheme);
+       		selectedConversionPage.setContext(setupPage.getContext());
+       		return selectedConversionPage;
+    	} else if (page instanceof IConversionWizardPage) {
+    		return null; // Only 1 allowed.
+    	}
+    	return null;
+    }
+	
+	@Override
+    public IWizardPage getPreviousPage(IWizardPage page) {
+
+    	if (page==setupPage) {
+       		return null;
+     	} else if (page instanceof IConversionWizardPage) {
+    		return setupPage;
+    	}
+    	return null;
+	}
 
 
 	@Override

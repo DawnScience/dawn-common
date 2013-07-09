@@ -46,6 +46,8 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import uk.ac.diamond.scisoft.analysis.io.IMetaData;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
@@ -57,6 +59,8 @@ import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
  *
  */
 public class ResourceChoosePage extends WizardPage {
+	
+	private static final Logger logger = LoggerFactory.getLogger(ResourceChoosePage.class);
 
 	private boolean directory=false;
 	private boolean newFile=false;
@@ -431,19 +435,28 @@ public class ResourceChoosePage extends WizardPage {
         
     	final String sourcePath = getSourcePath(context);
     	final IExpressionObjectService service = (IExpressionObjectService)PlatformUI.getWorkbench().getService(IExpressionObjectService.class);
-        final List<IExpressionObject>  exprs   = service.getActiveExpressions(sourcePath);
-        
-        if (exprs!=null && exprs.size()>0) {
-        	
-        	for (IExpressionObject iExpressionObject : exprs) {
-        		final String name = iExpressionObject.getExpressionName()+" [Expression]";
-				names.add(name);
-				if (expressions==null) expressions = new HashMap<String, IExpressionObject>(exprs.size());
-				expressions.put(name, iExpressionObject);
-			}
-        	
-        }
        
+    	Display.getDefault().syncExec(new Runnable() {
+    		public void run() {
+    			try {
+	    		   	final List<IExpressionObject>  exprs   = service.getActiveExpressions(sourcePath);
+	    	        
+	    	        if (exprs!=null && exprs.size()>0) {
+	    	        	
+	    	        	for (IExpressionObject iExpressionObject : exprs) {
+	    	        		final String name = iExpressionObject.getExpressionName()+" [Expression]";
+	    					names.add(name);
+	    					if (expressions==null) expressions = new HashMap<String, IExpressionObject>(exprs.size());
+	    					expressions.put(name, iExpressionObject);
+	    				}
+	    	        	
+	    	        }
+    			} catch (Exception ne) {
+    				logger.error("Cannot process error!", ne);
+    			}
+    		}
+    	});
+        
         return names;
 
 	}

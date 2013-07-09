@@ -26,6 +26,7 @@ import org.eclipse.swt.widgets.Label;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.ac.diamond.scisoft.analysis.io.DataHolder;
 import uk.ac.diamond.scisoft.analysis.io.IMetaData;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
@@ -199,24 +200,24 @@ public class ConversionChoicePage extends ResourceChoosePage implements IConvers
 			
 			final int ranks[] = chosenConversion.getPreferredRanks();
 			if (ranks!=null) {
-				IMetaData meta = null;
+				DataHolder holder = null;
 				if (getSelectedFiles()!=null && getSelectedFiles().size()>1) {		
 					for (String path : getSelectedFiles()) {
 						try {
-						    meta = LoaderFactory.getMetaData(path, new IMonitor.Stub());
-						    if (meta==null) continue;
+							holder = LoaderFactory.getData(path, new IMonitor.Stub());
+						    if (holder==null) continue;
+						    if (holder.size()<1) continue;
 						    break;
 						} catch (Throwable ne) {
 							continue;
 						}
 					}
 				} else {
-					meta  = LoaderFactory.getMetaData(filePath, new IMonitor.Stub());
+					holder = LoaderFactory.getData(filePath, new IMonitor.Stub());
 				}
-				final Map<String,int[]> shapes = meta.getDataShapes();
 				boolean foundRequiredRank = false;
-				for (String name : shapes.keySet()) {
-					final int[] shape = shapes.get(name);
+				for (int i = 0; i < holder.size(); i++) {
+					final int[] shape = holder.getLazyDataset(i).getShape();
 					for (int rank : ranks) {
 						if (shape!=null && shape.length==rank) {
 							foundRequiredRank = true;
@@ -257,6 +258,11 @@ public class ConversionChoicePage extends ResourceChoosePage implements IConvers
 		context.setConversionScheme(chosenConversion);
 		return context;
 	}
+
+	public ConversionScheme getScheme() {
+		return chosenConversion;
+	}
+
 
 	@Override
 	public void setContext(IConversionContext context) {
@@ -315,6 +321,5 @@ public class ConversionChoicePage extends ResourceChoosePage implements IConvers
 		// No File Extension
 		return posExt == -1 ? "" : fileName.substring(posExt + 1);
 	}
-
 
 }
