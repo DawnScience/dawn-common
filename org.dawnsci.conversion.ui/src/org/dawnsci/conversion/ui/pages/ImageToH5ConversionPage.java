@@ -36,6 +36,7 @@ public class ImageToH5ConversionPage extends ResourceChoosePage implements IConv
 
 		final Label label = new Label(container, SWT.NONE);
 		label.setText("Dataset path");
+		label.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
 		
 		this.datasetPath = new Text(container, SWT.BORDER);
 		datasetPath.setText("/entry/data");
