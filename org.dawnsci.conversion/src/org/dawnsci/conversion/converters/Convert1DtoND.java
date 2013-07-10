@@ -193,6 +193,11 @@ public class Convert1DtoND extends AbstractConversion {
 	
 	private String[] getNexusPathAndNameFromKey(String key) {
 		String[]  paths = key.split("/");
+		
+		if (paths.length == 1) {
+			return new String[] {"entry1", paths[0]};
+		}
+		
 		if ("".equals(paths[0])) paths = Arrays.copyOfRange(paths, 1, paths.length);
 		return paths;
 	}

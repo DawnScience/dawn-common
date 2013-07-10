@@ -12,9 +12,6 @@ import ncsa.hdf.object.Datatype;
 import ncsa.hdf.object.h5.H5Datatype;
 
 import org.dawb.common.services.conversion.IConversionContext;
-import org.dawb.common.util.io.FileUtils;
-import org.dawb.hdf5.HierarchicalDataFactory;
-import org.dawb.hdf5.IHierarchicalDataFile;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.BooleanDataset;
@@ -288,6 +285,7 @@ public abstract class AbstractConversion {
 		return ds.isEmpty() ? null : ds;
 	}
 	
+
 	/**
 	 * Can be used to get a list of Dataset which should be converted. Processes the
 	 * regexp for the dataset path and returns the Dataset which can be sliced to get
@@ -298,38 +296,15 @@ public abstract class AbstractConversion {
 	 * @return null if none match, the datasets otherwise
 	 * @throws Exception
 	 */
+	
 	public List<String> getDataNames(File ioFile) throws Exception {
+
+		if (ioFile.isDirectory()) return Collections.emptyList();
+		final DataHolder   dh    = LoaderFactory.getData(ioFile.getAbsolutePath());
 		
-		if (ioFile.isDirectory())            return Collections.emptyList();
-		if (!isH5(ioFile.getAbsolutePath())) return Collections.emptyList();
-		IHierarchicalDataFile file = null;
-		try {
-			file = HierarchicalDataFactory.getReader(ioFile.getAbsolutePath());
-			final List<String> sets = file.getDatasetNames(IHierarchicalDataFile.NUMBER_ARRAY);
-			return sets;
-			
-		} finally {
-			if (file!=null) file.close();
-		}
+		if (dh == null || dh.getNames() == null) return Collections.emptyList();
+		return Arrays.asList(dh.getNames());
 	}
-	public final static List<String> EXT;
-	static {
-		List<String> tmp = new ArrayList<String>(7);
-		tmp.add("h5");
-		tmp.add("nxs");
-		tmp.add("hd5");
-		tmp.add("hdf5");
-		tmp.add("hdf");
-		tmp.add("nexus");
-		EXT = Collections.unmodifiableList(tmp);
-	}	
-
-	public static boolean isH5(final String filePath) {
-		final String ext = FileUtils.getFileExtension(filePath);
-		if (ext==null) return false;
-		return EXT.contains(ext.toLowerCase());
-	}
-
 
 	/**
 	 * expand the regex according to the javadoc for getFilePath().

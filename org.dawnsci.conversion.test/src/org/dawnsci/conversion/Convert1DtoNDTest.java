@@ -35,7 +35,8 @@ import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 
 public class Convert1DtoNDTest {
 	
-private String testfile = "MoKedge_1_15.nxs";
+	private String testfile = "MoKedge_1_15.nxs";
+	private String nonNexusTest = "HyperOut.dat";
 	
 	@Test
 	public void test1DSimple() throws Exception {
@@ -104,6 +105,38 @@ private String testfile = "MoKedge_1_15.nxs";
 		}
         ILazyDataset ds = dh.getLazyDataset("/entry1/counterTimer01/Energy");
         assertArrayEquals(new int[] {489},ds.getShape());
+   	}
+	
+	@Test
+	public void test1DNotNexus() throws Exception {
+		
+		ConversionServiceImpl service = new ConversionServiceImpl();
+		
+		// Determine path to test file
+		final String path = getTestFilePath(nonNexusTest);
+		
+		String[] paths = new String[]{path,path,path,path};
+		
+		final IConversionContext context = service.open(paths);
+		
+		final File tmp = File.createTempFile("testSimple", ".nxs");
+		tmp.deleteOnExit();
+        context.setOutputPath(tmp.getAbsolutePath());
+        context.setConversionScheme(ConversionScheme.H5_FROM_1D);
+        context.setAxisDatasetName("x");
+        context.setDatasetName("(dataset_0|dataset_1)");
+        
+        service.process(context);
+        
+        final DataHolder   dh    = LoaderFactory.getData(tmp.getAbsolutePath());
+        final List<String> names = Arrays.asList("/entry1/dataset_0","/entry1/dataset_1");
+        for (String name : names) {
+            ILazyDataset ds = dh.getLazyDataset(name);
+            assertArrayEquals(new int[] {4,1608},ds.getShape());
+		}
+        
+        ILazyDataset ds = dh.getLazyDataset("/entry1/x");
+        assertArrayEquals(new int[] {1608},ds.getShape());
    	}
 	
 private String getTestFilePath(String fileName) {
