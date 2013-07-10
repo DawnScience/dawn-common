@@ -64,6 +64,9 @@ private String testfile = "MoKedge_1_15.nxs";
             ILazyDataset ds = dh.getLazyDataset(name);
             assertArrayEquals(new int[] {4,489},ds.getShape());
 		}
+        
+        ILazyDataset ds = dh.getLazyDataset("/entry1/counterTimer01/Energy");
+        assertArrayEquals(new int[] {489},ds.getShape());
    	}
 	
 	@Test
@@ -99,6 +102,8 @@ private String testfile = "MoKedge_1_15.nxs";
             ILazyDataset ds = dh.getLazyDataset(name);
             assertArrayEquals(new int[] {3,4,489},ds.getShape());
 		}
+        ILazyDataset ds = dh.getLazyDataset("/entry1/counterTimer01/Energy");
+        assertArrayEquals(new int[] {489},ds.getShape());
    	}
 	
 private String getTestFilePath(String fileName) {

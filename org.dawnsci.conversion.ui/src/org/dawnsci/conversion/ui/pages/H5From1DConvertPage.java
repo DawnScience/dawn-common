@@ -25,8 +25,11 @@ import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -60,6 +63,8 @@ IConversionWizardPage {
 	private Spinner slowSpinner;
 	private CheckBoxGroup checkBoxGroup;
 	private Label sizeOkLabel;
+	protected CCombo         nameChoice;
+	protected String         datasetName;
 
 	public H5From1DConvertPage() {
 		super("wizardPage", "Page for converting 1D data to a HDF5 file", null);
@@ -67,6 +72,7 @@ IConversionWizardPage {
 		dataSetNames = new String[]{"Loading..."};
 		setDirectory(false);
 		setNewFile(true);
+		setPathEditable(true);
 	}
 
 
@@ -107,7 +113,29 @@ IConversionWizardPage {
 		});
 		checkboxTableViewer.setInput(new Object());
 		checkboxTableViewer.setAllGrayed(true);
-
+		
+		CheckBoxGroup axisCheckBox = new CheckBoxGroup(main, SWT.None);
+		axisCheckBox.setLayout(new GridLayout(2, false));
+		axisCheckBox.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
+		axisCheckBox.setText("Save axis dataset");
+		
+		final Composite content = axisCheckBox.getContent();
+		
+		nameChoice = new CCombo(content, SWT.READ_ONLY|SWT.BORDER);
+		nameChoice.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
+		nameChoice.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				datasetName = nameChoice.getItem(nameChoice.getSelectionIndex());
+			}
+		});
+		
+		nameChoice.setItems(dataSetNames);
+		
+		Label label = new Label(content, SWT.WRAP);
+		label.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
+		label.setText("Select a dataset to be used as an axis. Nexus signal/axis tags will be added to appropriately sized datasets.");
+		axisCheckBox.deactivate();
+		
 		createAdvanced(container);
 		
 		setPageComplete(false);
@@ -119,7 +147,7 @@ IConversionWizardPage {
 		context.setDatasetNames(Arrays.asList(getSelected()));
 		context.setOutputPath(getAbsoluteFilePath());
 		
-		if (fastSpinner.isEnabled()) {
+		if (checkBoxGroup.isActivated()) {
 			int val = fastSpinner.getSelection()*slowSpinner.getSelection();
 			
 			if (context.getFilePaths() != null & val == context.getFilePaths().size()) {
@@ -129,6 +157,10 @@ IConversionWizardPage {
 				
 				context.setUserObject(bean);
 			}
+		}
+		
+		if (nameChoice.isEnabled()) {
+			context.setAxisDatasetName(nameChoice.getText());
 		}
 		
 		return context;
@@ -248,6 +280,9 @@ IConversionWizardPage {
 				checkboxTableViewer.setAllChecked(false);
 				checkboxTableViewer.setAllGrayed(false);
 				setAll1DChecked();
+				
+				nameChoice.setItems(dataSetNames);
+				nameChoice.select(0);
 			}
 		});
 	}
@@ -308,6 +343,7 @@ IConversionWizardPage {
 		sizeOkLabel.setLayoutData(new GridData());
 		sizeOkLabel.setText("Are axis dimensions ok?");
 		
+		checkBoxGroup.deactivate();
 		GridUtils.setVisible(advanced, false);
 		ExpansionAdapter expansionListener = new ExpansionAdapter() {
 			@Override
@@ -346,8 +382,33 @@ IConversionWizardPage {
 			Color blue = display.getSystemColor(SWT.COLOR_BLUE);
 			sizeOkLabel.setForeground(blue);
 		}
-		
-		
+	}
+	
+	/**
+	 * Checks the path is ok.
+	 */
+	@Override
+	protected void pathChanged() {
+
+		super.pathChanged();
+		final String path = getAbsoluteFilePath();
+		if (path!=null) {
+			final File output = new File(path);
+			try {
+				if (output.exists() && !output.isFile()) {
+					setErrorMessage("The file '"+output+"' is not a valid file.");
+					return;			
+				} else if (output.exists() && overwrite != null && !overwrite.getSelection()){
+					setErrorMessage("The file '"+output+"' exists, please set to overwrite.");
+					return;
+				}
+			} catch (Exception ne) {
+				setErrorMessage(ne.getMessage()); // Not very friendly...
+				return;			
+			}
+			setErrorMessage(null);
+			return;
+		}
 	}
 
 }

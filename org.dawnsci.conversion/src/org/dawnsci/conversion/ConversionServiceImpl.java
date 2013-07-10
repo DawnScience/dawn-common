@@ -59,10 +59,7 @@ class ConversionServiceImpl implements IConversionService {
 				}
 			}
 			deligate.process(context);
-		} catch (Exception e){
-			e.printStackTrace();
-		}
-		finally {
+		} finally {
 			if (deligate!=null) deligate.close(context);
 		}
 	}
