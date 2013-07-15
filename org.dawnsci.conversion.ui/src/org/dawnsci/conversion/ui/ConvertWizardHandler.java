@@ -19,9 +19,6 @@ import org.dawb.common.util.io.FileUtils;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.resources.IContainer;
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -29,6 +26,7 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IObjectActionDelegate;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.handlers.HandlerUtil;
 
@@ -69,7 +67,11 @@ public class ConvertWizardHandler extends AbstractHandler implements IObjectActi
 	}
 	
 	public boolean isEnabled() {
-		final ISelection selection = EclipseUtils.getActivePage().getSelection();
+		IWorkbenchPage page = EclipseUtils.getActivePage();
+		if (page == null)
+			return false;
+
+		final ISelection selection = page.getSelection();
 		if (selection instanceof StructuredSelection) {
 			StructuredSelection s = (StructuredSelection)selection;
 			final Object        o = s.getFirstElement();
