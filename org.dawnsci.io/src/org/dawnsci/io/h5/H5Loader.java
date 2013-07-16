@@ -165,7 +165,21 @@ public class H5Loader extends AbstractFileLoader implements IMetaLoader, IDataSe
 			resetDims(set);
 			final Object  val = set.read(); // Dangerous if data large!
 			if (mon!=null) mon.worked(1);
-			return H5Utils.getSet(val,set);
+			
+
+			AbstractDataset ret =  H5Utils.getSet(val,set);
+			
+			final String errorPath = getErrorPath(fullPath);
+			if (errorPath!=null) {
+				final Dataset errSet = (Dataset)file.getData(errorPath);
+				if (errSet!=null) {
+					resetDims(errSet);
+					final Object  errVal = set.read(); // Dangerous if data large!
+					ret.setError(H5Utils.getSet(errVal,errSet));
+				}
+			}
+			
+			return ret;
 		} finally {
 			if (file!=null) file.close();
 		}
@@ -189,15 +203,34 @@ public class H5Loader extends AbstractFileLoader implements IMetaLoader, IDataSe
 		for (String fullPath : fullPaths) {
 			if (mon!=null) mon.worked(1);
 			
+			if (ret.containsKey(fullPath)) continue;
+			
 			final Dataset      set = (Dataset)file.getData(fullPath);
 			set.getMetadata();
 			final LazyDataset  lazy   = new H5LazyDataset(set);
-			
 			ret.put(fullPath, lazy);
+			
+			final String errorPath = getErrorPath(fullPath);
+			if (fullPaths.contains(errorPath)) {
+				final Dataset error = (Dataset)file.getData(errorPath);
+				if (error!=null) {
+					error.getMetadata();
+					final LazyDataset errLazy = new H5LazyDataset(error);
+					lazy.setLazyErrors(errLazy);
+					ret.put(errorPath, errLazy);
+				}
+			}
 		}
 		return ret;
 	}
 
+	private String getErrorPath(String fullPath) {
+		if (fullPath==null) return  null;
+		if (fullPath.endsWith("/data")) {
+			return fullPath.substring(0, fullPath.lastIndexOf('/'))+"/errors";
+		}
+		return fullPath+"_errors";
+	}
 
 
 	private HierarchicalInfo metaInfo;
