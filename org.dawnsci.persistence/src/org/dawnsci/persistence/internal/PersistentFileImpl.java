@@ -583,14 +583,17 @@ class PersistentFileImpl implements IPersistentFile{
 	 */
 	private IROI readH5ROI(String roiName) throws Exception{
 
-		String json = file.getAttributeValue(ROI_ENTRY+"/"+roiName);
-		if(json == null) throw new Exception("Reading Exception: " +ROI_ENTRY+ " entry does not exist in the file " + filePath);
-		// JSON deserialization
 		GsonBuilder builder = new GsonBuilder();
 		//TODO: deserialiser to be worked on...
 		//builder.registerTypeAdapter(ROIBean.class, new ROIDeserializer());
 		Gson gson = builder.create();
-		ROIBean roibean = gson.fromJson(json, ROIBean.class);
+
+		String json = file.getAttributeValue(ROI_ENTRY+"/"+roiName+"@JSON");
+		if(json == null) throw new Exception("Reading Exception: " +ROI_ENTRY+ " entry does not exist in the file " + filePath);
+		// JSON deserialization
+		json = json.substring(1, json.length()-1); // this is needed as somehow, the getAttribute adds [ ] around the json string...
+		ROIBean roibean = ROIBeanConverter.getROIBeanfromJSON(gson, json);
+
 		//convert the bean to roibase
 		IROI roi = ROIBeanConverter.ROIBeanToROIBase(roibean);
 
