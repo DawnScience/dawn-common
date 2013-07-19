@@ -4,5 +4,7 @@
 /bin
 /build.xml
 /javaCompiler...args
+/test-reports
+/test-scratch
 
 # Ignores that are specific to this Eclipse project
