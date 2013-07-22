@@ -15,6 +15,10 @@ import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.io.DataHolder;
 import uk.ac.diamond.scisoft.analysis.io.JavaImageSaver;
 
+/**
+ * TODO FIXME This is not a UI class. Suggest move to data/algorithm plugin like org.dawnsci.persistence perhaps.
+ *
+ */
 public class Plot2DConversionVisitor extends AbstractPlotConversionVisitor {
 
 	public Plot2DConversionVisitor(IPlottingSystem system) {

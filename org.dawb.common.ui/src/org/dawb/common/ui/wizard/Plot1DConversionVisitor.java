@@ -18,6 +18,10 @@ import uk.ac.diamond.scisoft.analysis.io.ASCIIDataHolderSaver;
 import uk.ac.diamond.scisoft.analysis.io.ASCIIDataWithHeadingSaver;
 import uk.ac.diamond.scisoft.analysis.io.DataHolder;
 
+/**
+ * TODO FIXME This is not a UI class. Suggest move to data/algorithm plugin like org.dawnsci.persistence perhaps.
+ *
+ */
 public class Plot1DConversionVisitor extends AbstractPlotConversionVisitor {
 	
 	public Plot1DConversionVisitor(IPlottingSystem system) {
