@@ -64,10 +64,11 @@ class PersistentFileImpl implements IPersistentFile{
 	private static final Logger logger = LoggerFactory.getLogger(PersistentFileImpl.class);
 	private IHierarchicalDataFile file;
 	private String filePath;
-	private final String ENTRY = "/entry";
-	private final String DATA_ENTRY = "/entry/data";
-	private final String MASK_ENTRY = "/entry/mask";
-	private final String ROI_ENTRY = "/entry/region";
+	private final String ENTRY          = "/entry";
+	private final String DATA_ENTRY     = "/entry/data";
+	private final String HISTORY_ENTRY  = "/entry/history";
+	private final String MASK_ENTRY     = "/entry/mask";
+	private final String ROI_ENTRY      = "/entry/region";
 	private final String FUNCTION_ENTRY = "/entry/function";
 	private final String DIFFRACTIONMETADATA_ENTRY = "/entry/diffraction_metadata";
 
@@ -137,6 +138,29 @@ class PersistentFileImpl implements IPersistentFile{
 	@Override
 	public void setData(IDataset data) throws Exception {
 		writeH5Data(data, null, null);
+	}
+	
+	@Override
+	public void setHistory(IDataset... sets) throws Exception {
+		
+		if(file == null) file = HierarchicalDataFactory.getWriter(filePath);
+
+		Group parent = createParentEntry(HISTORY_ENTRY);
+
+		int index = 0;
+		for (IDataset data : sets) {
+			index++;
+			if(data != null){
+
+				String dataName = !data.getName().equals("") ? data.getName() : "history"+index;
+				final Datatype      datatype = H5Utils.getDatatype(data);
+				final long[]         shape = new long[data.getShape().length];
+				for (int i = 0; i < shape.length; i++) shape[i] = data.getShape()[i];
+
+				final Dataset dataset = file.replaceDataset(dataName,  datatype, shape, ((AbstractDataset)data).getBuffer(), parent);
+				file.setNexusAttribute(dataset, Nexus.SDS);
+			}
+		}
 	}
 
 	@Override
@@ -208,6 +232,25 @@ class PersistentFileImpl implements IPersistentFile{
 
 		return data;
 	}
+
+	/**
+	 * Method to set datasets which persist history
+	 * 
+	 * @param data
+	 * @throws Exception 
+	 */
+	@Override
+	public Map<String, ILazyDataset> getHistory(IMonitor mon) throws Exception {
+		DataHolder dh = LoaderFactory.getData(filePath, true, mon);
+		Map<String, ILazyDataset> sets = new HashMap<String, ILazyDataset>(dh.size());
+        for (String name : dh.getNames()) {
+			if (name.startsWith(HISTORY_ENTRY)) {
+				sets.put(name, dh.getLazyDataset(name));
+			}
+		}
+        return sets;
+	}
+
 
 	@Override
 	public List<ILazyDataset> getAxes(String xAxisName, String yAxisName, IMonitor mon) throws Exception {

@@ -80,6 +80,22 @@ public interface IPersistentFile {
 	 * @throws Exception 
 	 */
 	public void setData(IDataset data) throws Exception;
+	
+	/**
+	 * Method to set datasets which persist history
+	 * 
+	 * @param data
+	 * @throws Exception 
+	 */
+	public void setHistory(IDataset... data) throws Exception;
+
+	/**
+	 * Method to set datasets which persist history
+	 * 
+	 * @param data
+	 * @throws Exception 
+	 */
+	public Map<String, ILazyDataset> getHistory(IMonitor mon) throws Exception;
 
 	/**
 	 * Method to set the axes<br>

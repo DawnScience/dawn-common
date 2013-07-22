@@ -7,6 +7,7 @@ import org.dawnsci.persistence.internal.PersistenceServiceImpl;
  * Class used to test the PersistenceServiceImpl
  * @author wqk87977
  *
+ * @internal only use in unit tests.
  */
 public class PersistenceServiceCreator {
 
