@@ -229,10 +229,9 @@ class PersistentFileImpl implements IPersistentFile{
 
 	@Override
 	public BooleanDataset getMask(String maskName, IMonitor mon) throws Exception {
-		BooleanDataset mask = null;
-		DataHolder dh = LoaderFactory.getData(filePath, true, mon);
-		mask = readH5Mask(dh, maskName);
-		return mask;
+		ShortDataset sdata = (ShortDataset)LoaderFactory.getDataSet(filePath, MASK_ENTRY+"/"+maskName, mon);
+		BooleanDataset bd = (BooleanDataset) DatasetUtils.cast(sdata, AbstractDataset.BOOL);
+		return bd;
 	}
 
 	@Override
