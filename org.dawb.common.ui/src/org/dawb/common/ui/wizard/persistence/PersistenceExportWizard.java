@@ -11,11 +11,14 @@ import org.dawb.common.services.IPersistenceService;
 import org.dawb.common.services.IPersistentFile;
 import org.dawb.common.services.ServiceManager;
 import org.dawb.common.ui.monitor.ProgressMonitorWrapper;
+import org.dawb.common.ui.plot.tools.HistoryType;
 import org.dawb.common.ui.util.EclipseUtils;
 import org.dawb.common.ui.wizard.CheckWizardPage;
 import org.dawb.common.ui.wizard.NewFileChoosePage;
 import org.dawnsci.plotting.api.IPlottingSystem;
 import org.dawnsci.plotting.api.region.IRegion;
+import org.dawnsci.plotting.api.tool.IToolPage;
+import org.dawnsci.plotting.api.tool.IToolPageSystem;
 import org.dawnsci.plotting.api.trace.IImageTrace;
 import org.dawnsci.plotting.api.trace.ITrace;
 import org.eclipse.core.resources.IFile;
@@ -96,10 +99,11 @@ public class PersistenceExportWizard extends AbstractPerstenceWizard implements 
     public boolean canFinish() {
     	if (fcp.isPageComplete()) {
     		options.setDescription("Please choose the things to save in '"+fcp.getFileName()+"'.");
-    		options.setOptionEnabled("Original Data", false);
-    		options.setOptionEnabled("Mask",          false);
-    		options.setOptionEnabled("Regions",       false);
-    		options.setOptionEnabled("Diffraction Metadata",       false);
+    		options.setOptionEnabled("Original Data",   false);
+    		options.setOptionEnabled("Image History",    false);
+    		options.setOptionEnabled("Mask",            false);
+    		options.setOptionEnabled("Regions",         false);
+    		options.setOptionEnabled("Diffraction Metadata", false);
     		options.setOptionEnabled("Functions",       false);
 
     		File                file=null;
@@ -133,6 +137,16 @@ public class PersistenceExportWizard extends AbstractPerstenceWizard implements 
     						options.setOptionEnabled("Mask", true);
     					}
     				}
+    				
+    				boolean requireHistory = false;
+    				final IToolPageSystem tsystem = (IToolPageSystem)system.getAdapter(IToolPageSystem.class);
+    				final IToolPage       tool    = tsystem.getActiveTool();
+    				if (tool != null && tool.getToolId().equals("org.dawb.workbench.plotting.tools.imageCompareTool")) {
+    					final Map<String, IDataset> data = (Map<String, IDataset>)tool.getToolData();
+    					if (data!=null && !data.isEmpty()) requireHistory = true;
+    				}
+      				options.setOptionEnabled("Image History", requireHistory);
+    				
     				final Collection<IRegion> regions = system.getRegions();
     				if (regions != null && !regions.isEmpty()) {
     					options.setOptionEnabled("Regions", true);
@@ -198,6 +212,16 @@ public class PersistenceExportWizard extends AbstractPerstenceWizard implements 
 									 if (iaxes!=null) file.setAxes(iaxes);
 								 }
 							 }
+						 }
+						 if (options.is("Image History")) {
+			    				final IToolPageSystem tsystem = (IToolPageSystem)system.getAdapter(IToolPageSystem.class);
+			    				final IToolPage       tool    = tsystem.getActiveTool();
+			    				if (tool != null && tool.getToolId().equals("org.dawb.workbench.plotting.tools.imageCompareTool")) {
+			    					final Map<String, IDataset> data = (Map<String, IDataset>)tool.getToolData();
+			    					if (data!=null && !data.isEmpty()) {
+			    						file.setHistory(data.values().toArray(new IDataset[data.size()]));
+			    					}
+			    				}
 						 }
 						 
 						 final ITrace trace = system.getTraces().iterator().next();
