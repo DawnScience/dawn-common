@@ -148,7 +148,7 @@ public class PythonService {
 		try {
 			final File dir  = (new File(scriptPath)).getParentFile();
 			path = getUniqueDir(dir, "python_tmp");
-			if (!path.canWrite() || !path.isDirectory() || canTouch(path)) {
+			if (!path.canWrite() || !path.isDirectory() || !canTouch(path)) {
 				path = null;
 			}
 		} catch (Throwable ne) {
