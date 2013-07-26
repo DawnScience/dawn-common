@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.services.conversion.IConversionContext.ConversionScheme;
@@ -42,7 +44,7 @@ public class NCDConvertTest {
         	final DataHolder   dh    = LoaderFactory.getData(file.getAbsolutePath());
             String[] names = dh.getNames();
             assertEquals(61, names.length);
-            assertEquals("q",names[0]);
+            assertEquals("q / nm^-1",names[0]);
             assertEquals("Column_0",names[1]);
         }
    	}
@@ -109,7 +111,7 @@ public class NCDConvertTest {
         	final DataHolder   dh    = LoaderFactory.getData(file.getAbsolutePath());
             String[] names = dh.getNames();
             assertEquals(3, names.length);
-            assertEquals("q",names[0]);
+            assertEquals("q / Angstrom^-1",names[0]);
             assertEquals("Column_0",names[1]);
         }
    	}
@@ -143,7 +145,7 @@ public class NCDConvertTest {
         	final DataHolder   dh    = LoaderFactory.getData(file.getAbsolutePath());
             String[] names = dh.getNames();
             assertEquals(2, names.length);
-            assertEquals("q",names[0]);
+            assertEquals("q / Angstrom^-1",names[0]);
             assertEquals("Column_0",names[1]);
         }
    	}
@@ -157,6 +159,10 @@ public class NCDConvertTest {
 		final String path = getTestFilePath("results_i22-118040_Pilatus2M_010513_125108.nxs");
 		final String path1 = getTestFilePath("results_i22-102527_Pilatus2M_280313_112434.nxs");
 		final String path2 = getTestFilePath("results_i22-114346_Pilatus2M_220313_090939.nxs");
+		Map<String, String> unitMap = new HashMap<String, String>();
+		unitMap.put(path , "q / Angstrom^-1");
+		unitMap.put(path1, "q / nm^-1");
+		unitMap.put(path2, "q / Angstrom^-1");
 		
 		final IConversionContext context = service.open(path);
 		///TODO fix in interface
@@ -179,13 +185,18 @@ public class NCDConvertTest {
         
         final File[] fa = dir.listFiles();
         assertEquals(27, fa.length);
-        for (File file : fa) {
-        	file.deleteOnExit();
-        	final DataHolder   dh    = LoaderFactory.getData(file.getAbsolutePath());
-            String[] names = dh.getNames();
-            assertEquals("q",names[0]);
-            assertEquals("Column_0",names[1]);
-        }
+		for (File file : fa) {
+			for (String pathName : unitMap.keySet()) {
+				if (file.getName().contains(pathName)) {
+					file.deleteOnExit();
+					final DataHolder dh = LoaderFactory.getData(file.getAbsolutePath());
+					String[] names = dh.getNames();
+					String unitName = unitMap.get(pathName);
+					assertEquals(unitName, names[0]);
+					assertEquals("Column_0", names[1]);
+				}
+			}
+		}
    	}
 	
 	private String getTestFilePath(String fileName) {
