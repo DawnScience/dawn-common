@@ -21,10 +21,10 @@ public class TomoConvertTest {
 		
 		final IConversionContext context = service.open(path);
 		final File tmp = File.createTempFile("whatever", ".unknown");
-		tmp.deleteOnExit();
-		final File dir = new File(tmp.getParent(), "tomo_export"+System.currentTimeMillis());
+		final File dir = new File(tmp.getParent(), "tomo_export_testTomoSimple_"+System.currentTimeMillis());
+		tmp.delete();
 		dir.mkdirs();
-		dir.deleteOnExit();
+		//dir.deleteOnExit();
 		
         context.setConversionScheme(ConversionScheme.CUSTOM_TOMO);
         
@@ -52,7 +52,7 @@ public class TomoConvertTest {
         final File[] fa = dir.listFiles();
         fa.toString();
         for (File file : fa) {
-        	file.deleteOnExit();
+        	//file.deleteOnExit();
         	final DataHolder holder = LoaderFactory.getData(file.getAbsolutePath());
         	final IDataset   set    = holder.getDataset(0);
         	if (set.getShape()[0]!=100 || set.getShape()[1]!=100) {
@@ -76,10 +76,10 @@ public class TomoConvertTest {
 		
 		final IConversionContext context = service.open(path);
 		final File tmp = File.createTempFile("whatever", ".unknown");
-		tmp.deleteOnExit();
-		final File dir = new File(tmp.getParent(), "tomo_export"+System.currentTimeMillis());
+		final File dir = new File(tmp.getParent(), "tomo_export_testTomoDifferentPaths_"+System.currentTimeMillis());
+		tmp.delete();
 		dir.mkdirs();
-		dir.deleteOnExit();
+		//dir.deleteOnExit();
 		
         context.setConversionScheme(ConversionScheme.CUSTOM_TOMO);
         
@@ -114,9 +114,9 @@ public class TomoConvertTest {
         
         for (File folder : fa) {
         	final File[] fa1 = folder.listFiles();
-        	folder.deleteOnExit();
+        	//folder.deleteOnExit();
         	for (File file : fa1) {
-        		file.deleteOnExit();
+        		//file.deleteOnExit();
         		final DataHolder holder = LoaderFactory.getData(file.getAbsolutePath());
         		final IDataset   set    = holder.getDataset(0);
         		if (set.getShape()[0]!=100 || set.getShape()[1]!=100) {
@@ -134,10 +134,10 @@ public class TomoConvertTest {
 		
 		final IConversionContext context = service.open(path);
 		final File tmp = File.createTempFile("whatever", ".unknown");
-		tmp.deleteOnExit();
-		final File dir = new File(tmp.getParent(), "tomo_export"+System.currentTimeMillis());
+		final File dir = new File(tmp.getParent(), "tomo_export_testTomoDifferentNumberWidth_"+System.currentTimeMillis());
+		tmp.delete();
 		dir.mkdirs();
-		dir.deleteOnExit();
+		//dir.deleteOnExit();
 		
         context.setConversionScheme(ConversionScheme.CUSTOM_TOMO);
         
@@ -167,7 +167,7 @@ public class TomoConvertTest {
         double lastVal = 0;
         
         for (File file : fa) {
-        	file.deleteOnExit();
+        	//file.deleteOnExit();
         	final DataHolder holder = LoaderFactory.getData(file.getAbsolutePath());
         	final IDataset   set    = holder.getDataset(0);
         	if (set.getShape()[0]!=100 || set.getShape()[1]!=100) {
