@@ -82,7 +82,7 @@
       <loader
             class="org.dawnsci.io.h5.H5Loader"
             file_extension="h5, nxs, hdf5, hd5, hdf, nexus"
-            high_priority="true">
+            high_priority="false">
       </loader>
       <loader
             class="org.dawb.gda.extensions.spec.SpecLoader"
