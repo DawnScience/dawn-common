@@ -163,7 +163,7 @@ public class PyDevUtils {
 					String projectRoot = project.getFullPath().toString();
 					pathSetSorted.add(projectRoot);
 					pathInfo.setProjectSourcePath(StringUtils.join("|",
-							pathSetSorted));
+							pathSetSorted.toArray(new String[pathSetSorted.size()])));
 					PythonNature.getPythonNature(project).rebuildPath();
 				}
 			} catch (CoreException e) {
