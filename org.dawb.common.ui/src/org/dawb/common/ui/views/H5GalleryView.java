@@ -39,7 +39,6 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.nebula.jface.galleryviewer.GalleryTreeViewer;
 import org.eclipse.nebula.widgets.gallery.DefaultGalleryGroupRenderer;
 import org.eclipse.nebula.widgets.gallery.DefaultGalleryItemRenderer;
 import org.eclipse.nebula.widgets.gallery.Gallery;
@@ -165,7 +164,7 @@ public class H5GalleryView extends ViewPart implements MouseListener, SelectionL
 		initializeToolBar();
 		initializeMenu();
 		
-		getSite().setSelectionProvider(new GalleryTreeViewer(gallery));
+		//getSite().setSelectionProvider(new GalleryTreeViewer(gallery));
 		
 		gallery.addMouseListener(this);
 		gallery.addSelectionListener(this);
