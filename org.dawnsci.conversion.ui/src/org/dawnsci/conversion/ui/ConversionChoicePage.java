@@ -77,7 +77,6 @@ public class ConversionChoicePage extends ResourceChoosePage implements IConvers
 				chosenConversion = ConversionScheme.fromLabel(choice.getItem(choice.getSelectionIndex()));
 				Activator.getDefault().getPreferenceStore().setValue(SCHEME_KEY, chosenConversion.toString());
 				pathChanged();
-				getWizard().canFinish();
 			}
 		});
 		
@@ -170,6 +169,7 @@ public class ConversionChoicePage extends ResourceChoosePage implements IConvers
 		final String filePath = getAbsoluteFilePath();
 		if (filePath==null || "".equals(filePath)) {
 			setErrorMessage("The file to convert has not been specified");
+			setPageComplete(false);
 			return;
 		}
 		
@@ -178,12 +178,14 @@ public class ConversionChoicePage extends ResourceChoosePage implements IConvers
 				for (String path : getSelectedFiles()) {
 					if (!isH5(path)) {
 						setErrorMessage("The conversion '"+chosenConversion.getUiLabel()+"' supports nexus/hdf5 files only. The file '"+((new File(path).getName())+"' is not a nexus/hdf5 file."));
+						setPageComplete(false);
 						return;
 					}				
 				}
 			} else {
 				if (!isH5(filePath)) {
 					setErrorMessage("The conversion '"+chosenConversion.getUiLabel()+"' supports nexus/hdf5 files only.");
+					setPageComplete(false);
 					return;
 				}
 			}
@@ -192,6 +194,7 @@ public class ConversionChoicePage extends ResourceChoosePage implements IConvers
 		final File file = new File(filePath);
 		if (!file.exists()) {
 			setErrorMessage("The file '"+filePath+"' does not exist and cannot be converted.");
+			setPageComplete(false);
 			return;
 		}
 		
@@ -228,15 +231,18 @@ public class ConversionChoicePage extends ResourceChoosePage implements IConvers
 				
 				if (!foundRequiredRank) {
 					setErrorMessage("Conversion '"+chosenConversion.getUiLabel()+"', requires datasets of rank(s) "+Arrays.toString(ranks)+" to be in the file.");
+					setPageComplete(false);
 					return;
 				}
 			}
 		} catch (Throwable ne) {
 			setErrorMessage("Error, cannot read file '"+filePath+"'. Reason: "+ne.getMessage());
+			setPageComplete(false);
 			logger.error("Cannot  '"+filePath+"'", ne);
 		}
 		
 		setErrorMessage(null);
+		setPageComplete(true);
 		
 		return;
 
