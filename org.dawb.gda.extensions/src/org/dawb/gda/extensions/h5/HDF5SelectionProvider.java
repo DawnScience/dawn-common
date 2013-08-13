@@ -84,37 +84,7 @@ public class HDF5SelectionProvider implements IH5DoubleClickSelectionProvider {
 
         	final HDF5NodeLink link = new HDF5NodeLink(file, filePath, fullName, parent, dest);
 
-        	// find out if it is a GDA NeXus tree by looking for the top-level group that
-        	// contains the node and then seeing if has a string dataset called program_name
-        	TreeNode root = null;
-        	TreeNode prev = null;
-        	TreeNode n = parNode;
-        	while (n != null) {
-        		prev = root;
-        		root = n;
-        		n = n.getParent();
-        	}
-        	boolean isGDA = false;
-        	if (prev == null) return HDF5Utils.createDatasetSelection(link, isGDA);
-			HObject object = (HObject) ((DefaultMutableTreeNode) prev).getUserObject();
-			if (object instanceof Group) {
-				for (HObject o : ((Group) object).getMemberList()) {
-					if (o instanceof Dataset) {
-						String name = o.getName();
-						if ("program_name".equals(name)) {
-							Dataset d = (Dataset) o;
-							d.setConvertByteToString(true);
-							Object obj = d.getData();
-							if (obj instanceof String[]) {
-								isGDA = ((String[]) obj)[0].startsWith("GDA ");
-							}
-							break;
-						}
-					}
-				}
-			}
-        	
-        	return HDF5Utils.createDatasetSelection(link, isGDA);
+        	return HDF5Utils.createDatasetSelection(link, true);
         }
         
         return null;
