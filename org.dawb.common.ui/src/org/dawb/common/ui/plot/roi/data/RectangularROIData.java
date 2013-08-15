@@ -51,7 +51,8 @@ public class RectangularROIData extends ROIData {
 
 		setROI(rroi.copy());
 		roi.downsample(subFactor);
-		profileData = ROIProfile.box(data, mask, (RectangularROI) roi);
+		if (data != null)
+			profileData = ROIProfile.box(data, mask, (RectangularROI) roi);
 		if (profileData != null && profileData[0].getShape()[0] > 1 && profileData[1].getShape()[0] > 1) {
 			AbstractDataset pdata;
 			for (int i = 0; i < 2; i++) {
