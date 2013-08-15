@@ -92,14 +92,16 @@ public class CustomNCDConverter extends AbstractConversion  {
 		sb.append("# Dataset name: " + nameFrag);
 		
 		IHierarchicalDataFile hdf5Reader = HierarchicalDataFactory.getReader(selFilePath);
-		Dataset titleData = (Dataset)hdf5Reader.getData(DEFAULT_TITLE_NODE);
-		if(titleData != null){
-			String[] str = (String[])titleData.getData();
+		try {
+			Dataset titleData = (Dataset) hdf5Reader.getData(DEFAULT_TITLE_NODE);
+			String[] str = (String[]) titleData.getData();
 			if (str.length > 0) {
 				String title = str[0];
 				sb.append(separator);
 				sb.append("# Title: " + title);
 			}
+		} catch (Exception e) {
+			logger.info("Default title node {} was not found", DEFAULT_TITLE_NODE);
 		}
 		Dataset scanCommandData = (Dataset)hdf5Reader.getData(DEFAULT_SCAN_COMMAND_NODE);
 		if(scanCommandData != null){
