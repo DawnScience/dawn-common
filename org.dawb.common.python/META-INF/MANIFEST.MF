@@ -15,7 +15,7 @@ Require-Bundle: org.eclipse.ui,
  org.python.pydev;bundle-version="[2.6.0.2012080908,2.7.0)",
  org.python.pydev.core;bundle-version="[2.6.0.2012080908,2.7.0)",
  com.python.pydev.debug;bundle-version="[2.6.0.2012080908,2.7.0)"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Import-Package: com.isencia.util.commandline;version="7.0.0",
  jep,
