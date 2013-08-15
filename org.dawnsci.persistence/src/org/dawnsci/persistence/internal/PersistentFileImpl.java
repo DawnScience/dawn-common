@@ -18,6 +18,7 @@ import ncsa.hdf.object.h5.H5Datatype;
 import org.dawb.common.services.IPersistentFile;
 import org.dawb.common.util.eclipse.BundleUtils;
 import org.dawb.hdf5.HierarchicalDataFactory;
+import org.dawb.hdf5.HierarchicalDataFileUtils;
 import org.dawb.hdf5.IHierarchicalDataFile;
 import org.dawb.hdf5.Nexus;
 import org.dawb.hdf5.nexus.NexusUtils;
@@ -128,9 +129,7 @@ class PersistentFileImpl implements IPersistentFile{
 		Group parent = (Group)file.getData(MASK_ENTRY);
 		if(parent == null) parent = createParentEntry(MASK_ENTRY);
 		final Datatype datatype = H5Utils.getDatatype(id);
-		final long[] shape = new long[id.getShape().length];
-
-		for (int i = 0; i < shape.length; i++) shape[i] = id.getShape()[i];
+		long[] shape = H5Utils.getLong(id.getShape());
 		final Dataset dataset = file.replaceDataset(name, datatype, shape, id.getBuffer(), parent);
 		file.setNexusAttribute(dataset, Nexus.SDS);
 	}
@@ -154,8 +153,7 @@ class PersistentFileImpl implements IPersistentFile{
 
 				String dataName = !data.getName().equals("") ? data.getName() : "history"+index;
 				final Datatype      datatype = H5Utils.getDatatype(data);
-				final long[]         shape = new long[data.getShape().length];
-				for (int i = 0; i < shape.length; i++) shape[i] = data.getShape()[i];
+				long[] shape = H5Utils.getLong(data.getShape());
 
 				final Dataset dataset = file.replaceDataset(dataName,  datatype, shape, ((AbstractDataset)data).getBuffer(), parent);
 				file.setNexusAttribute(dataset, Nexus.SDS);
@@ -421,8 +419,7 @@ class PersistentFileImpl implements IPersistentFile{
 
 			String dataName = !data.getName().equals("") ? data.getName() : "data";
 			final Datatype      datatype = H5Utils.getDatatype(data);
-			final long[]         shape = new long[data.getShape().length];
-			for (int i = 0; i < shape.length; i++) shape[i] = data.getShape()[i];
+			long[] shape = H5Utils.getLong(data.getShape());
 
 			final Dataset dataset = file.replaceDataset(dataName,  datatype, shape, ((AbstractDataset)data).getBuffer(), parent);
 			file.setNexusAttribute(dataset, Nexus.SDS);
@@ -430,36 +427,22 @@ class PersistentFileImpl implements IPersistentFile{
 		if(xAxisData != null){
 			String xAxisName = !xAxisData.getName().equals("") ? xAxisData.getName() : "X Axis";
 			final Datatype      xDatatype = H5Utils.getDatatype(xAxisData);
-			final long[]         xShape = new long[xAxisData.getShape().length];
-			for (int i = 0; i < xShape.length; i++) xShape[i] = xAxisData.getShape()[i];
+			long[] shape = H5Utils.getLong(data.getShape());
 
-			final Dataset xDataset = file.replaceDataset(xAxisName,  xDatatype, xShape, ((AbstractDataset)xAxisData).getBuffer(), parent);
+			final Dataset xDataset = file.replaceDataset(xAxisName,  xDatatype, shape, ((AbstractDataset)xAxisData).getBuffer(), parent);
 			file.setNexusAttribute(xDataset, Nexus.SDS);
 		}
 
 		if(yAxisData != null){
 			String yAxisName = !yAxisData.getName().equals("") ? yAxisData.getName() : "Y Axis";
 			final Datatype      yDatatype = H5Utils.getDatatype(yAxisData);
-			final long[]         yShape = new long[yAxisData.getShape().length];
-			for (int i = 0; i < yShape.length; i++) yShape[i] = yAxisData.getShape()[i];
+			long[] shape = H5Utils.getLong(data.getShape());
 
-			final Dataset yDataset = file.replaceDataset(yAxisName,  yDatatype, yShape,((AbstractDataset)yAxisData).getBuffer(), parent);
+			final Dataset yDataset = file.replaceDataset(yAxisName,  yDatatype, shape,((AbstractDataset)yAxisData).getBuffer(), parent);
 			file.setNexusAttribute(yDataset, Nexus.SDS);
 		}
 	}
 
-	// delete empty strings
-	private static String[] cleanArray(String[] array){
-
-		List<String> list = new ArrayList<String>();
-		for (int i = 0; i < array.length; i++) {
-			if(!array[i].isEmpty()){
-				list.add(array[i]);
-			}
-		}
-		String[] result = new String[list.size()];
-		return list.toArray(result);
-	}
 
 	/**
 	 * Method to write mask data to an HDF5 file given a specific path entry to save the data.
@@ -543,32 +526,8 @@ class PersistentFileImpl implements IPersistentFile{
 		return dat;
 	}
 
-
 	private Group createParentEntry(String fullEntry) throws Exception {
-		return createParentEntry(fullEntry, Nexus.DATA);
-	}
-
-	private Group createParentEntry(String fullEntry, String nexusEntry) throws Exception{
-		String[] entries = fullEntry.split("/");
-		entries = cleanArray(entries);
-		Group parent = null;
-		for (int i = 0; i < entries.length; i++) {
-			Group entry = null;
-			if(i == 0){
-				entry = file.group(entries[i]);
-				file.setNexusAttribute(entry, Nexus.ENTRY);
-				parent = entry;
-			} else if(i == entries.length-1) {
-				entry = file.group(entries[i], parent);
-				file.setNexusAttribute(entry, nexusEntry);
-				parent = entry;
-			} else {
-				entry = file.group(entries[i], parent);
-				file.setNexusAttribute(entry, Nexus.ENTRY);
-				parent = entry;
-			}
-		}
-		return parent;
+		return HierarchicalDataFileUtils.createParentEntry(file, fullEntry, Nexus.DATA);
 	}
 
 	/**
@@ -871,7 +830,7 @@ class PersistentFileImpl implements IPersistentFile{
 	private void writeH5DiffractionMetadata(IDiffractionMetadata metadata) throws Exception {
 		if (file == null) file = HierarchicalDataFactory.getWriter(filePath);
 
-		Group parent = createParentEntry(DIFFRACTIONMETADATA_ENTRY,Nexus.DETECT);
+		Group parent = HierarchicalDataFileUtils.createParentEntry(file, DIFFRACTIONMETADATA_ENTRY,Nexus.DETECT);
 
 		DetectorProperties detprop = metadata.getDetector2DProperties();
 
