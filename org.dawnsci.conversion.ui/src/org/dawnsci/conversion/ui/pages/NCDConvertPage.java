@@ -23,6 +23,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
@@ -33,17 +34,18 @@ import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 public class NCDConvertPage extends ResourceChoosePage implements
 		IConversionWizardPage {
 	
-	protected CCombo         nameChoice;
-	protected String         datasetName;
-	protected IConversionContext context;
-	protected Label          multiFileMessage;
-	protected Label          axisMessage;
-	protected Button         axisButton;
+	private static final Logger logger = LoggerFactory.getLogger(NCDConvertPage.class);
+	
+	private CCombo         nameChoice;
+	private String         datasetName;
+	private IConversionContext context;
+	private Label          multiFileMessage;
+	private Label          axisMessage;
+	private Button         axisButton;
 	
 	private static final String QAXISNAME = "/q";
 	private static final String DATANAME = "/data";
 	private static final String LAST_SET_KEY = "org.dawnsci.conversion.ui.pages.lastDataSetNCD";
-	private static final org.slf4j.Logger logger = LoggerFactory.getLogger(NCDConvertPage.class);
 
 	public NCDConvertPage(){
 		super("wizardPage", "Page for slicing NCD nxs results into ascii.", null);
@@ -105,7 +107,9 @@ public class NCDConvertPage extends ResourceChoosePage implements
 
 	@Override
 	public IConversionContext getContext() {
-		if (context == null) return null;
+		if (context == null) {
+			return null;
+		}
 		context.setDatasetName(datasetName);
 		context.setOutputPath(getAbsoluteFilePath());
 		context.addSliceDimension(0, "all");
@@ -116,10 +120,10 @@ public class NCDConvertPage extends ResourceChoosePage implements
 		return context;
 	}
 	
-	protected void nameChanged() {
+	private void nameChanged() {
 		String qAxisName = datasetName.replaceAll(DATANAME, QAXISNAME);
 		
-		if (hasQAxis(qAxisName)) {
+		if (hasDataset(qAxisName)) {
 			axisButton.setEnabled(true);
 			axisButton.setSelection(true);
 			axisMessage.setText(qAxisName);
@@ -136,6 +140,7 @@ public class NCDConvertPage extends ResourceChoosePage implements
 	/**
 	 * Checks the path is ok.
 	 */
+	@Override
 	protected void pathChanged() {
 
 		final String path = getAbsoluteFilePath();
@@ -190,23 +195,25 @@ public class NCDConvertPage extends ResourceChoosePage implements
         multiFileMessage.getParent().layout();	
  	}
 	
-	private boolean hasQAxis(String qAxisDatasetName) {
+	private boolean hasDataset(String datasetName) {
 		
 		final String source = getSourcePath(context);
-		if (source==null || "".equals(source)) return false;
+		if (source == null || "".equals(source)) {
+			return false;
+		}
 		
 		IDataset ds = null;
 		try {
-			ds = LoaderFactory.getDataSet(source,qAxisDatasetName, null);
+			ds = LoaderFactory.getDataSet(source, "add", null);
 		} catch (Exception e) {
+			logger.error("Failed to read dataset {}", datasetName, e);
 		}
 		
-		if (ds == null) return false;
-		else return true;
+		return (ds == null) ? false : true;
 		
 	}
 
-	protected void getSupportedNames() throws Exception {
+	private void getSupportedNames() throws Exception {
 
 		getContainer().run(true, true, new IRunnableWithProgress() {
 
@@ -215,7 +222,9 @@ public class NCDConvertPage extends ResourceChoosePage implements
 
 				try {
 					final List<String> names = getActiveDatasets(context, monitor);
-                    if (names==null || names.isEmpty()) return;
+                    if (names==null || names.isEmpty()) {
+                    	return;
+                    }
                     
                     Iterator<String> iter = names.iterator();
                     
@@ -226,7 +235,9 @@ public class NCDConvertPage extends ResourceChoosePage implements
                     	}
                     }
                     
-                    if (names.isEmpty()) return;
+                    if (names.isEmpty()) {
+                    	return;
+                    }
                     
                     Display.getDefault().asyncExec(new Runnable() {
                     	public void run() {
