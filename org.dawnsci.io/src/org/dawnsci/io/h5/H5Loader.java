@@ -53,8 +53,9 @@ public class H5Loader extends AbstractFileLoader implements IMetaLoader, IDataSe
 	}	
 
 	public static boolean isH5(final String filePath) {
+		if (filePath == null) { return false; }
 		final String ext = FileUtils.getFileExtension(filePath);
-		if (ext==null) return false;
+		if (ext == null) { return false; }
 		return EXT.contains(ext.toLowerCase());
 	}
 
