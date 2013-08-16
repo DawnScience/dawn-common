@@ -12,6 +12,8 @@ import uk.ac.diamond.scisoft.analysis.roi.IROI;
 
 /**
  * Interface for creating an object to reduce an ND array for display in the Hyperwindow
+ * 
+ * TODO FIXME Interfaces require Javadoc!
  */
 public interface IDatasetROIReducer {
 
