@@ -33,6 +33,7 @@ import org.dawnsci.plotting.api.region.IRegionListener;
 import org.dawnsci.plotting.api.region.ROIEvent;
 import org.dawnsci.plotting.api.region.RegionEvent;
 import org.dawnsci.plotting.api.region.RegionUtils;
+import org.dawnsci.plotting.api.tool.IToolPageSystem;
 import org.dawnsci.plotting.api.trace.ColorOption;
 import org.dawnsci.plotting.api.trace.ILineTrace;
 import org.dawnsci.plotting.api.trace.ITrace;
@@ -54,6 +55,8 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.part.Page;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,7 +82,12 @@ public class HyperComponent {
 	private IAction baseline;
 	private IRegion windowRegion;
 	private Composite mainComposite;
+	private IWorkbenchPart part;
 	private final static Logger logger = LoggerFactory.getLogger(HyperComponent.class);
+	
+	public HyperComponent(IWorkbenchPart part) {
+		this.part = part;
+	}
 
 	public void createControl(Composite parent) {
 		parent.setLayout(new FillLayout());
@@ -230,7 +238,7 @@ public class HyperComponent {
 													 "HyperImage", 
 													 actionBarWrapper, 
 													 PlotType.IMAGE, 
-													 null);
+													 part);
 			
 			mainSystem.repaint();
 			
@@ -277,6 +285,17 @@ public class HyperComponent {
 			logger.error("Error creating hyperview plotting systems: " + e.getMessage());
 		}
 	}
+	
+    public Object getAdapter(@SuppressWarnings("rawtypes") final Class clazz) {
+		
+		if (clazz == Page.class) {
+			// TODO Page for helping with part
+		} else if (clazz == IToolPageSystem.class || clazz == IPlottingSystem.class) {
+			return mainSystem;
+		}
+		return null;
+	}
+
 	
 	protected final void createNewRegion() {
 		// Start with a selection of the right type
