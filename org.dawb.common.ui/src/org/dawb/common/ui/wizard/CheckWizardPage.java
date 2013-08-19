@@ -38,6 +38,7 @@ public class CheckWizardPage extends WizardPage implements SelectionListener{
 	private Map<String, Control> textCache;
 	private Map<String, Button>  buttonCache;
 	private boolean isDisposed=false;
+	private boolean validationActive=true;
 
 	/**
 	 * The map is a map of labels to values.
@@ -169,20 +170,34 @@ public class CheckWizardPage extends WizardPage implements SelectionListener{
 		validate();
 	}
 
+	/**
+	 * 
+	 * @return true if valid
+	 */
 	private void validate() {
-		for (String label : values.keySet()) {
-			if (stringValues!=null&&stringValues.containsKey(label) && values.get(label)) {
-				String value = stringValues.get(label);
-				if (value==null || value.equals("")) {
-					setErrorMessage("Please set a value for '"+label+"'.");
-					return;
+		
+		if (!validationActive) return;
+		try {
+			validationActive = false;
+			for (String label : values.keySet()) {
+				if (stringValues!=null&&stringValues.containsKey(label) && values.get(label)) {
+					String value = stringValues.get(label);
+					if (value==null || value.equals("")) {
+						setErrorMessage("Please set a value for '"+label+"'.");
+						setPageComplete(false);
+						return;
+					}
 				}
 			}
+			setErrorMessage(null);
+			setPageComplete(true);
+			return;
+		} finally {
+			validationActive = true;
 		}
-		setErrorMessage(null);
 	}
 
-	public void setOptionEnabled(String label, boolean isEnabled) {
+    public void setOptionEnabled(String label, boolean isEnabled) {
 		values.put(label, isEnabled);
 		if (buttonCache!=null && buttonCache.containsKey(label)) {
 			buttonCache.get(label).setEnabled(isEnabled);
