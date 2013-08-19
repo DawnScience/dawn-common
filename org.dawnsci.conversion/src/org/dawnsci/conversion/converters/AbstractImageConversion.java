@@ -102,7 +102,7 @@ public abstract class AbstractImageConversion extends AbstractConversion {
 	 *
 	 */
 	public static final class ConversionInfoBean {
-		private int frameRate;
+		private int frameRate = 20;
 		private ImageServiceBean imageServiceBean;
 		private int downsampleBin=1;
 		private DownsampleMode downsampleMode=DownsampleMode.MAXIMUM;

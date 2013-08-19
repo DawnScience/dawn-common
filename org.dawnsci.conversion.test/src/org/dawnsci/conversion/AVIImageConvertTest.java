@@ -7,9 +7,14 @@ import org.dawb.common.services.IPaletteService;
 import org.dawb.common.services.ServiceManager;
 import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.services.conversion.IConversionContext.ConversionScheme;
+import org.dawb.common.ui.image.PaletteFactory;
 import org.dawb.gda.extensions.util.ImageService;
 import org.dawnsci.conversion.converters.AbstractImageConversion.ConversionInfoBean;
+import org.dawnsci.plotting.api.histogram.HistogramBound;
 import org.dawnsci.plotting.api.histogram.IImageService;
+import org.dawnsci.plotting.api.histogram.ImageServiceBean;
+import org.dawnsci.plotting.api.histogram.ImageServiceBean.HistoType;
+import org.dawnsci.plotting.api.histogram.ImageServiceBean.ImageOrigin;
 import org.dawnsci.rcp.service.PaletteService;
 import org.junit.Test;
 import org.monte.media.avi.AVIReader;
@@ -41,8 +46,9 @@ public class AVIImageConvertTest {
         context.addSliceDimension(0, "all");
         
         final ConversionInfoBean info = new ConversionInfoBean();
+        info.setImageServiceBean(createTestingBean());
         info.setDownsampleBin(2);
-        info.setDownsampleMode(DownsampleMode.MEAN);
+        info.setDownsampleMode(DownsampleMode.MAXIMUM);
         context.setUserObject(info);
         
         service.process(context);
@@ -51,8 +57,6 @@ public class AVIImageConvertTest {
         final AVIReader reader = new AVIReader(avi);
         int trackCount = reader.getTrackCount();
         if (trackCount!=1) throw new Exception("Incorrect number of tracks!");
-        Rational r = reader.getDuration(0);
-        if (r.getNumerator()!=4) throw new Exception("Incorrect number of frames!");
         Dimension d = reader.getVideoDimension();
         if (d.width!=1024) throw new Exception("Incorrect downsampling applied!");
         if (d.height!=1024) throw new Exception("Incorrect downsampling applied!");
@@ -61,6 +65,20 @@ public class AVIImageConvertTest {
         System.out.println("Test passed, avi file written!");
    	}
 	
+	private ImageServiceBean createTestingBean() {
+		ImageServiceBean imageServiceBean = new ImageServiceBean();
+		imageServiceBean.setPalette(PaletteFactory.makeBluesPalette());
+		imageServiceBean.setOrigin(ImageOrigin.TOP_LEFT);
+		imageServiceBean.setHistogramType(HistoType.MEAN);
+		imageServiceBean.setMinimumCutBound(HistogramBound.DEFAULT_MINIMUM);
+		imageServiceBean.setMaximumCutBound(HistogramBound.DEFAULT_MAXIMUM);
+		imageServiceBean.setNanBound(HistogramBound.DEFAULT_NAN);
+		imageServiceBean.setLo(0);
+		imageServiceBean.setHi(300);		
+		
+		return imageServiceBean;
+	}
+
 	private String getTestFilePath(String fileName) {
 		
 		final File test = new File("testfiles/"+fileName);
