@@ -26,7 +26,7 @@ public class ImageConvertTest {
 		final IConversionContext context = service.open(path);
 		final File tmp = File.createTempFile("whatever", ".unknown");
 		tmp.deleteOnExit();
-		final File dir = new File(tmp.getParent(), "tiff_export"+System.currentTimeMillis());
+		File dir = new File(tmp.getParent(), "tiff_export"+System.currentTimeMillis());
 		dir.mkdirs();
 		dir.deleteOnExit();
         context.setOutputPath(dir.getAbsolutePath());
@@ -37,6 +37,7 @@ public class ImageConvertTest {
         service.process(context);
         
         double lastVal = 0;
+        dir = new File(dir, "export");
         final File[] fa = dir.listFiles();
         for (File file : fa) {
         	file.deleteOnExit();
@@ -72,7 +73,7 @@ public class ImageConvertTest {
 		final IConversionContext context = service.open(path);
 		final File tmp = File.createTempFile("whatever", ".unknown");
 		tmp.deleteOnExit();
-		final File dir = new File(tmp.getParent(), "tiff_export"+System.currentTimeMillis());
+		File dir = new File(tmp.getParent(), "tiff_export"+System.currentTimeMillis());
 		dir.mkdirs();
 		dir.deleteOnExit();
         context.setOutputPath(dir.getAbsolutePath());
@@ -88,6 +89,7 @@ public class ImageConvertTest {
         
         service.process(context);
         
+        dir = new File(dir, "export");
         final File[] fa = dir.listFiles();
         for (File file : fa) file.deleteOnExit();
         
