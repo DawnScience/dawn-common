@@ -13,6 +13,15 @@ import uk.ac.diamond.scisoft.analysis.dataset.Stats;
  */
 public class JexlGeneralFunctions {
 	
+    /**
+     * Makes an arange(...) using the size of the passed in data.
+     * @param copy
+     * @return
+     */
+	public static AbstractDataset arange(final AbstractDataset copy) {
+		return AbstractDataset.arange(copy.getSize(), AbstractDataset.INT32);
+	}
+
 	public static AbstractDataset mean(final AbstractDataset data,final int axis) {
 		return data.mean(axis);
 	}
