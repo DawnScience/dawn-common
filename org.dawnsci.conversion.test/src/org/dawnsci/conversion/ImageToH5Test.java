@@ -42,39 +42,51 @@ public class ImageToH5Test {
 		doTest("/entry1/a/long/path/data", new int[]{10,2048,2048});
 	}
 
+	/**
+	 * Test should be done @ 1000x 2k but this clobbers the test decks.
+	 * We reduce to 100 x 2k for the test decks to run properly.
+	 * @throws Exception
+	 */
 	@Test
 	public void testLargeData() throws Exception {
 		
-		doTest("/entry1/data", new int[]{1000,2048,2048});
+		doTest("/entry1/data", new int[]{100,2048,2048});
 	}
 
     private void doTest(String dPath, int[] shape) throws Exception {
 
 		final File image = new File("testfiles/dir/ref-testscale_1_001.img");
-		// Copy the file a few times.
-		for (int i = 0; i < shape[0]; i++) {
-			final File nf = new File(image.getParentFile(), "copy_"+i+".img");
-			nf.deleteOnExit();
-			FileUtils.copyNio(image, nf);
-		}
 		
-		ConversionServiceImpl service = new ConversionServiceImpl();
-		
-        final IConversionContext context = service.open("testfiles/dir/copy_.*img");
-        final File output = new File("testfiles/imageStackTestOutput.h5");
-        output.deleteOnExit();
-        context.setOutputPath(output.getAbsolutePath());
-        context.setDatasetName(dPath); // With this conversion dataset is the OUTPUT
-        context.setConversionScheme(ConversionScheme.H5_FROM_IMAGEDIR);
-		
-		service.process(context);
-		
-		if (!output.exists()) throw new Exception("Image stack was not written to "+output.getName());
-		
-		
-		final ILazyDataset set = LoaderFactory.getData(output.getAbsolutePath(), null).getLazyDataset(0);
-		if (!Arrays.equals(set.getShape(), shape)) {
-			throw new Exception("Did not write dataset of expected shape!");
+		final File dir   = new File(File.createTempFile("fred", "").getParentFile(), "testDir");
+		try {
+			// Copy the file a few times.
+			for (int i = 0; i < shape[0]; i++) {
+				final File nf = new File(dir, "copy_"+i+".img");
+				nf.deleteOnExit();
+				FileUtils.copyNio(image, nf);
+			}
+			
+			ConversionServiceImpl service = new ConversionServiceImpl();
+			
+	        final IConversionContext context = service.open(dir.getAbsolutePath()+"/copy_.*img");
+	        final File output = new File(dir.getParentFile(), "imageStackTestOutput.h5");
+	        output.deleteOnExit();
+	        context.setOutputPath(output.getAbsolutePath());
+	        context.setDatasetName(dPath); // With this conversion dataset is the OUTPUT
+	        context.setConversionScheme(ConversionScheme.H5_FROM_IMAGEDIR);
+			
+			service.process(context);
+			
+			if (!output.exists()) throw new Exception("Image stack was not written to "+output.getName());
+			
+			
+			final ILazyDataset set = LoaderFactory.getData(output.getAbsolutePath(), null).getLazyDataset(0);
+			if (!Arrays.equals(set.getShape(), shape)) {
+				throw new Exception("Did not write dataset of expected shape!");
+			}
+			
+		} finally {
+			FileUtils.recursiveDelete(dir);
 		}
 		
 	}
