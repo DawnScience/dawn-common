@@ -227,29 +227,35 @@ public class AsciiConvertPage extends ResourceChoosePage implements IConversionW
         final String p = getAbsoluteFilePath();
 		if (p==null || p.length() == 0) {
 			setErrorMessage("Please select a file to export to.");
+			setPageComplete(false);
 			return;
 		}
 		final File path = new File(p);
 		if (path.exists() && !path.canWrite()) {
 			setErrorMessage("Please choose another location to export to; this one is read only.");
+			setPageComplete(false);
 			return;
 		}
 		if (context.getFilePaths().size()<2) {
 			if (path.exists() && !overwrite) {
 				setErrorMessage("Please confirm overwrite of the file.");
+				setPageComplete(false);
 				return;
 			}
 			if (!path.getName().toLowerCase().endsWith("."+getExtension())) {
 				setErrorMessage("Please set the file name to export as a file with the extension '"+getExtension()+"'.");
+				setPageComplete(false);
 				return;
 			}
 		} else {
 			if (!path.exists()) {
 				setErrorMessage("Please choose an existing folder to export to.");
+				setPageComplete(false);
 				return;
 			}
 		}
 		setErrorMessage(null);
+		setPageComplete(true);
 	}
 
 	public boolean isOpen() {
