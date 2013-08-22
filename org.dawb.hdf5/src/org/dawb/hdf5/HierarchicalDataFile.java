@@ -108,14 +108,16 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 	 * Used internally to close all open references.
 	 * @param path
 	 */
-	protected static void closeAll(String path) throws Exception{
+	protected static void closeReaders(String path) throws Exception{
 		if (readCache.containsKey(path)) {
-			readCache.get(path).close();
+			readCache.get(path).close(true);
 		}
 	}
 	
 	public boolean isClosed() {
-		return !readCache.containsKey(this.path) && !writeCache.contains(this.path);
+		if (readCache==null || writeCache==null) return true;
+		if (path==null) return true;
+		return !readCache.containsKey(path) && !writeCache.contains(path);
 	}
 	
 	/**
@@ -420,7 +422,19 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 	 * 
 	 * @throws Exception
 	 */
-	public synchronized void close() throws Exception {
+	public void close() throws Exception {
+		close(false);
+	}
+	/**
+	 * closes a file and removes it from the cache providing there
+	 * are not other users of the file registered.
+	 * 
+	 * Synchronized to avoid more than one file
+	 * being opened for a given path.
+	 * 
+	 * @throws Exception
+	 */
+	protected synchronized void close(boolean force) throws Exception {
 		
 		// Close links
 		if (linkReferences!=null) {
@@ -429,10 +443,10 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 			}
 			linkReferences.clear();
 		}
-		
+
 		if (openType == FileFormat.READ) {
 			count--;
-			if (count<=0) {
+			if (count<=0 || force) {
 				count = 0; // Just to be sure it does not get<0, unlikely
 				file.close();
 				readCache.remove(path);
