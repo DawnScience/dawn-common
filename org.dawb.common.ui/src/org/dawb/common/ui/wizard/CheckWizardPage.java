@@ -155,6 +155,7 @@ public class CheckWizardPage extends WizardPage implements SelectionListener{
 						public void modifyText(ModifyEvent e) {
 							stringValues.put(label, text.getText());
 							validate();
+							text.setFocus();
 						}
 					});
 				    if (textCache==null) textCache = new HashMap<String, Control>(7);
@@ -184,13 +185,13 @@ public class CheckWizardPage extends WizardPage implements SelectionListener{
 					String value = stringValues.get(label);
 					if (value==null || value.equals("")) {
 						setErrorMessage("Please set a value for '"+label+"'.");
-						setPageComplete(false);
+						if (isPageComplete()) setPageComplete(false);
 						return;
 					}
 				}
 			}
 			setErrorMessage(null);
-			setPageComplete(true);
+			if (!isPageComplete()) setPageComplete(true);
 			return;
 		} finally {
 			validationActive = true;
