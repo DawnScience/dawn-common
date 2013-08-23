@@ -96,7 +96,7 @@ public class PersistenceExportWizard extends AbstractPerstenceWizard implements 
 	}
 
     public boolean canFinish() {
-    	if (fcp.isPageComplete()) {
+    	if (fcp.isPageComplete() && getContainer().getCurrentPage()==fcp) {
     		options.setDescription("Please choose the things to save in '"+fcp.getFileName()+"'.");
     		options.setOptionEnabled("Original Data",   false);
     		options.setOptionEnabled("Image History",    false);

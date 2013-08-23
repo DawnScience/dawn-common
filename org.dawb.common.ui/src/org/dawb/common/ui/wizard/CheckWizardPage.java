@@ -153,7 +153,8 @@ public class CheckWizardPage extends WizardPage implements SelectionListener{
 				    text.addModifyListener(new ModifyListener() {					
 						@Override
 						public void modifyText(ModifyEvent e) {
-							stringValues.put(label, text.getText());
+							final String textValue = text.getText();
+							stringValues.put(label, textValue);
 							validate();
 							text.setFocus();
 						}
