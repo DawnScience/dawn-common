@@ -45,7 +45,7 @@ public class PythonUtils {
 			if (path==null) path = System.getenv("Path"); // Windows...
 			
 			if (path!=null){
-				final String pythonPath = searchPath(path, "python");
+				final String pythonPath = searchPath(path, "python", new Version("3.0.0"));
 				if (pythonPath!=null) return pythonPath;
 			}
 		}
@@ -68,16 +68,16 @@ public class PythonUtils {
 	 * @param execName
 	 * @return
 	 */
-	private static String searchPath(final String path, final String execName) {
+	private static String searchPath(final String path, final String execName, Version lessThanVersion) {
 		final StringTokenizer toker = new StringTokenizer(path, File.pathSeparator);
 		while(toker.hasMoreTokens()) {
-			final String execPath = getExecutable(toker.nextToken(), execName);
+			final String execPath = getExecutable(toker.nextToken(), execName, lessThanVersion);
 			if (execPath!=null) return execPath;
 		}
 		return null;
 	}
 	
-	private static String getExecutable(final String dirPath, final String execName) {
+	private static String getExecutable(final String dirPath, final String execName, Version lessThanVersion) {
 		
 		final File dir = new File(dirPath);
 		if (!dir.exists())      return null;
@@ -94,7 +94,7 @@ public class PythonUtils {
 			final Matcher matcher = pattern.matcher(file.getName());
 			if (matcher.matches()) {
 				final Version v = new Version(matcher.group(1));
-				if (v.compareTo(version) > 0) {
+				if (v.compareTo(version) > 0 && (lessThanVersion == null || v.compareTo(lessThanVersion) < 0)) {
 					version = v;
 					found   = file.getAbsolutePath();
 				}
