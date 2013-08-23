@@ -40,17 +40,28 @@ abstract public class AbstractPythonRunScriptServicePluginTest implements
 	}
 
 	@Test
-	public void testEmptyScript() throws AnalysisRpcException, IOException,
+	public void testEmptyResult() throws AnalysisRpcException, IOException,
 			CoreException {
-		Map<String, Object> result = runScript(getTemp(""),
+		Map<String, Object> result = runScript(
+				getTemp("def run(**kwargs): return {}"),
 				Collections.<String, Object> emptyMap());
 		Assert.assertEquals(Collections.emptyMap(), result);
 	}
 
 	@Test
+	public void testNullResult() throws AnalysisRpcException, IOException,
+			CoreException {
+		// Remember, no return in Python is the same as return None
+		Map<String, Object> result = runScript(
+				getTemp("def run(**kwargs): pass"),
+				Collections.<String, Object> emptyMap());
+		Assert.assertEquals(null, result);
+	}
+
+	@Test
 	public void testExceptionFromPython() throws IOException {
 		try {
-			runScript(getTemp("assert False"),
+			runScript(getTemp("def run(**kwargs): assert False"),
 					Collections.<String, Object> emptyMap());
 		} catch (AnalysisRpcException e) {
 			Assert.assertTrue(e.getCause().toString()
@@ -63,7 +74,7 @@ abstract public class AbstractPythonRunScriptServicePluginTest implements
 	public void testBasicOutput() throws AnalysisRpcException, IOException,
 			CoreException {
 		Map<String, Object> result = runScript(
-				getTemp("script_outputs['var1'] = 23"),
+				getTemp("def run(**kwargs): return {'var1': 23}"),
 				Collections.<String, Object> emptyMap());
 		Assert.assertTrue(result.size() == 1);
 		Assert.assertEquals(result.get("var1"), 23);
@@ -73,8 +84,7 @@ abstract public class AbstractPythonRunScriptServicePluginTest implements
 	public void testMultipleOutput() throws AnalysisRpcException, IOException,
 			CoreException {
 		Map<String, Object> result = runScript(
-				getTemp("script_outputs['var1'] = 23\n"
-						+ "script_outputs['var2'] = 'abc'"),
+				getTemp("def run(**kwargs): return {'var1': 23, 'var2': 'abc'}"),
 				Collections.<String, Object> emptyMap());
 		Assert.assertTrue(result.size() == 2);
 		Assert.assertEquals(result.get("var1"), 23);
@@ -86,7 +96,7 @@ abstract public class AbstractPythonRunScriptServicePluginTest implements
 	public void testComplexOutput() throws AnalysisRpcException, IOException,
 			CoreException {
 		Map<String, Object> result = runScript(
-				getTemp("script_outputs['var1'] = {1 : 2, 'b' : 3}"),
+				getTemp("def run(**kwargs): return {'var1': {1 : 2, 'b' : 3}}"),
 				Collections.<String, Object> emptyMap());
 		Assert.assertTrue(result.size() == 1);
 		Map<Object, Object> var1 = (Map<Object, Object>) result.get("var1");
@@ -98,7 +108,7 @@ abstract public class AbstractPythonRunScriptServicePluginTest implements
 	public void testBasicInput() throws AnalysisRpcException, IOException {
 		Map<String, Object> input = new HashMap<String, Object>();
 		input.put("var1", 23);
-		runScript(getTemp("assert script_inputs['var1'] == 23"), input);
+		runScript(getTemp("def run(var1, **kwargs): assert var1 == 23"), input);
 	}
 
 	@Test
@@ -106,8 +116,9 @@ abstract public class AbstractPythonRunScriptServicePluginTest implements
 		Map<String, Object> input = new HashMap<String, Object>();
 		input.put("var1", 23);
 		input.put("var2", "abc");
-		runScript(getTemp("assert script_inputs['var1'] == 23;"
-				+ "assert script_inputs['var2'] == 'abc'"), input);
+		runScript(
+				getTemp("def run(var1, var2, **kwargs): assert var1 == 23; assert var2 == 'abc'"),
+				input);
 	}
 
 	@Test
@@ -117,7 +128,8 @@ abstract public class AbstractPythonRunScriptServicePluginTest implements
 		var1.put(1, 2);
 		var1.put("b", 3);
 		input.put("var1", var1);
-		runScript(getTemp("assert script_inputs['var1'] == {1 : 2, 'b' : 3}"),
+		runScript(
+				getTemp("def run(var1, **kwargs): assert var1 == {1 : 2, 'b' : 3}"),
 				input);
 	}
 
@@ -130,8 +142,36 @@ abstract public class AbstractPythonRunScriptServicePluginTest implements
 
 	@Test
 	public void testImport() throws AnalysisRpcException, IOException {
-		runScript(getTemp("import math"),
+		runScript(getTemp("import math\ndef run(**kwargs): pass"),
 				Collections.<String, Object> emptyMap());
+	}
+
+	@Test
+	public void testAlternativeMethodName() throws AnalysisRpcException,
+			IOException {
+		Map<String, Object> result = runScript(
+				getTemp("def altrun(**kwargs): return {'var1': 23}"),
+				Collections.<String, Object> emptyMap(), "altrun");
+		Assert.assertTrue(result.size() == 1);
+		Assert.assertEquals(result.get("var1"), 23);
+	}
+
+	@Test
+	public void testVariableName() throws AnalysisRpcException, IOException {
+		Map<String, Object> result = runScript(
+				getTemp("run=lambda **kwargs: {'var1': 23}"),
+				Collections.<String, Object> emptyMap());
+		Assert.assertTrue(result.size() == 1);
+		Assert.assertEquals(result.get("var1"), 23);
+	}
+
+	@Test
+	public void testClassCall() throws AnalysisRpcException, IOException {
+		Map<String, Object> result = runScript(
+				getTemp("class x:\n\tdef __call__(self, **kwargs): return {'var1': 23}\nrun=x()"),
+				Collections.<String, Object> emptyMap());
+		Assert.assertTrue(result.size() == 1);
+		Assert.assertEquals(result.get("var1"), 23);
 	}
 
 }
