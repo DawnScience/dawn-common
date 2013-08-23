@@ -427,7 +427,7 @@ class PersistentFileImpl implements IPersistentFile{
 		if(xAxisData != null){
 			String xAxisName = !xAxisData.getName().equals("") ? xAxisData.getName() : "X Axis";
 			final Datatype      xDatatype = H5Utils.getDatatype(xAxisData);
-			long[] shape = H5Utils.getLong(data.getShape());
+			long[] shape = H5Utils.getLong(xAxisData.getShape());
 
 			final Dataset xDataset = file.replaceDataset(xAxisName,  xDatatype, shape, ((AbstractDataset)xAxisData).getBuffer(), parent);
 			file.setNexusAttribute(xDataset, Nexus.SDS);
@@ -436,7 +436,7 @@ class PersistentFileImpl implements IPersistentFile{
 		if(yAxisData != null){
 			String yAxisName = !yAxisData.getName().equals("") ? yAxisData.getName() : "Y Axis";
 			final Datatype      yDatatype = H5Utils.getDatatype(yAxisData);
-			long[] shape = H5Utils.getLong(data.getShape());
+			long[] shape = H5Utils.getLong(yAxisData.getShape());
 
 			final Dataset yDataset = file.replaceDataset(yAxisName,  yDatatype, shape,((AbstractDataset)yAxisData).getBuffer(), parent);
 			file.setNexusAttribute(yDataset, Nexus.SDS);
