@@ -8,23 +8,27 @@ work in the following way
 2. Set abtract datasets as numpy arrays
 3. Run a user defined script
 
-This script is designed to be passed to scisoftpy.rpc's addHandler, see PythonService2.java
+This script is designed to be passed to scisoftpy.rpc's addHandler, see PythonRunScriptService.java
 '''
 
-def runScript(scriptPath, inputs):
+def runScript(scriptPath, inputs, funcName='run'):
     '''
     scriptPath  - is the path to the user script that should be run
     inputs      - is a dictionary of input objects 
     '''
 
-    # Create the dictionary that has the input and where to extract the 
-    # output from
     # We don't use globals() to creating vars because we are not
     # trying to run within the context of this method
-    vars = {'script_inputs': inputs, 'script_outputs': dict(), 
-            '__name__': '<script>', '__file__': scriptPath}
-    
-    # Run the script, inputs and outputs are in vars
+    vars = {'__name__': '<script>',
+            '__file__': scriptPath,
+            'runScriptFuncName': funcName}
+
+    # Run the script, this generates a function to call
     execfile(scriptPath, vars)
-    
-    return vars['script_outputs']
+
+    # Run the function generated, in the Java interface, the runScript method
+    # is declared as returning a Map<String, Object>, but that is not enforced
+    # in the Python and an incorrect usage will result in a cast exception 
+    result = vars[funcName](**inputs)
+
+    return result

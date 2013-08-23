@@ -22,6 +22,13 @@ public class PythonRunScriptServiceIndividualRunPluginTest extends
 		return runScript.runScript(scriptFullPath, data);
 	}
 
+	@Override
+	public Map<String, Object> runScript(String scriptFullPath,
+			Map<String, ?> data, String funcName)
+			throws AnalysisRpcException {
+		return runScript.runScript(scriptFullPath, data, funcName);
+	}
+
 	@Before
 	public void before() throws AnalysisRpcException, IOException,
 			CoreException {

@@ -103,7 +103,7 @@ public class AnalysisRpcPythonServicePluginTest {
 				"def callPlot(): import scisoftpy as dnp; dnp.plot.plot(dnp.arange(10))\n",
 				"callPlot");
 		ItestSetPlotPort proxy = service.getClient().newProxyInstance(
-				ItestSetPlotPort.class, true);
+				ItestSetPlotPort.class, false);
 		proxy.callPlot();
 		Assert.assertTrue(called[0]);
 	}
