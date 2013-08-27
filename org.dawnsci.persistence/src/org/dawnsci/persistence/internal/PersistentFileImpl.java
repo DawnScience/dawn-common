@@ -74,32 +74,20 @@ class PersistentFileImpl implements IPersistentFile{
 	private final String DIFFRACTIONMETADATA_ENTRY = "/entry/diffraction_metadata";
 
 	/**
-	 * Version of the API
-	 */
-	private final String VERSION_FILE = "/resource/persistence-version.txt";
-	/**
-	 * Site where the API is used
-	 */
-	private final String SITE_FILE = "/resource/persistence-site.txt";
-
-	/**
 	 * For save
 	 * @param file
 	 */
 	public PersistentFileImpl(IHierarchicalDataFile file) throws Exception{
 		this.file = file;
 		this.filePath = file.getPath();
-		// set the site and version
-		String sitePath = "", versionPath = "";
-		if(Activator.getContext() == null){
-			sitePath = System.getProperty("user.dir")+SITE_FILE;
-			versionPath = System.getProperty("user.dir")+VERSION_FILE;
-		} else {
-			sitePath = BundleUtils.getBundleLocation(Activator.getContext().getBundle()).getAbsolutePath()+SITE_FILE;
-			versionPath = BundleUtils.getBundleLocation(Activator.getContext().getBundle()).getAbsolutePath()+VERSION_FILE;
+
+		String currentSite = System.getenv("DAWN_SITE");
+		if (currentSite==null || "".equals(currentSite)) {
+			logger.debug("DAWN_SITE is not set, persistence layer defaulting to DLS in file meta information.");
+			currentSite = "Diamond Light Source";
 		}
-		setSite(PersistenceUtils.readFile(sitePath));
-		setVersion(PersistenceUtils.readFile(versionPath));
+		setSite(currentSite);
+		setVersion("1.0");
 	}
 
 	/**
