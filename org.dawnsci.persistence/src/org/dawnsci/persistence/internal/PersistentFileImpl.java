@@ -16,7 +16,6 @@ import ncsa.hdf.object.HObject;
 import ncsa.hdf.object.h5.H5Datatype;
 
 import org.dawb.common.services.IPersistentFile;
-import org.dawb.common.util.eclipse.BundleUtils;
 import org.dawb.hdf5.HierarchicalDataFactory;
 import org.dawb.hdf5.HierarchicalDataFileUtils;
 import org.dawb.hdf5.IHierarchicalDataFile;
@@ -24,12 +23,10 @@ import org.dawb.hdf5.Nexus;
 import org.dawb.hdf5.nexus.NexusUtils;
 import org.dawnsci.io.h5.H5LazyDataset;
 import org.dawnsci.io.h5.H5Utils;
-import org.dawnsci.persistence.Activator;
 import org.dawnsci.persistence.function.FunctionBean;
 import org.dawnsci.persistence.function.FunctionBeanConverter;
 import org.dawnsci.persistence.roi.ROIBean;
 import org.dawnsci.persistence.roi.ROIBeanConverter;
-import org.dawnsci.persistence.util.PersistenceUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,6 +59,7 @@ import com.google.gson.GsonBuilder;
  *
  */
 class PersistentFileImpl implements IPersistentFile{
+	
 	private static final Logger logger = LoggerFactory.getLogger(PersistentFileImpl.class);
 	private IHierarchicalDataFile file;
 	private String filePath;
