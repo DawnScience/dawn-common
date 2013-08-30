@@ -204,7 +204,7 @@ public class NCDConvertPage extends ResourceChoosePage implements
 		
 		IDataset ds = null;
 		try {
-			ds = LoaderFactory.getDataSet(source, "add", null);
+			ds = LoaderFactory.getDataSet(source, datasetName, null);
 		} catch (Exception e) {
 			logger.error("Failed to read dataset {}", datasetName, e);
 		}
