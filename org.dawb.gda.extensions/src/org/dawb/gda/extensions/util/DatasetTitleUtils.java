@@ -115,22 +115,5 @@ public class DatasetTitleUtils {
 		return rootName;
 	}
 
-	/**
-	 * 
-	 * @param names
-	 * @return
-	 */
-	public static Map<String,String> getChoppedNames(final Collection<String> names) {
-		
-		final String rootName = DatasetTitleUtils.getRootName(names);
-		if (rootName==null)      return null;
-		if (rootName.length()<1) return null;
-
-		final Map<String,String> chopped = new HashMap<String,String>(names.size());
-		for (String name : names) {
-			chopped.put(name, name.substring(rootName.length()));
-		}
-		return chopped;
-	}
 
 }
