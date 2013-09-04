@@ -62,26 +62,9 @@
       </serviceFactory>
    </extension>
    <extension
-         point="org.dawnsci.introRegister">
-      <introPageRegister
-            class="org.dawb.gda.extensions.intro.WorkflowIntroLauncher"
-            description="Designing scientific algorithms in a visual way."
-            icon="icons/Workflow128x128.png"
-            id="org.dawb.gda.extensions.introPageRegister"
-            name="(Pre-release) Workflows">
-      </introPageRegister>
-   </extension>
-   <extension
          point="org.dawb.hdf5.editor.double.click.listener">
       <double_click_provider
             class="org.dawb.gda.extensions.h5.HDF5SelectionProvider">
       </double_click_provider>
-   </extension>
-   <extension
-         point="org.eclipse.ui.intro.configExtension">
-      <configExtension
-            configId="org.dawnsci.intro.universalConfig"
-            content="intro/introContribution.xml">
-      </configExtension>
    </extension>
 </plugin>
