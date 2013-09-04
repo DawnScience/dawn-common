@@ -1,6 +1,8 @@
 package org.dawnsci.jexl.internal;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.DatasetUtils;
+import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.Slice;
 import uk.ac.diamond.scisoft.analysis.dataset.Stats;
 
@@ -13,6 +15,23 @@ import uk.ac.diamond.scisoft.analysis.dataset.Stats;
  */
 public class JexlGeneralFunctions {
 	
+	/**
+	 * @see DatasetUtils.transpose(IDataset a, int... axes)
+	 * @param a
+	 * @param axes
+	 * @return
+	 */
+	public static AbstractDataset transpose(final IDataset a, int... axes) {
+		return DatasetUtils.transpose(a, axes);
+	}
+    /**
+     * Makes a tile of the passed in data with the passed in repetition shape.
+     * @param copy
+     * @return
+     */
+	public static AbstractDataset tile(final AbstractDataset copy, int... reps) {
+		return DatasetUtils.tile(copy, reps);
+	}
     /**
      * Makes an arange(...) using the size of the passed in data.
      * @param copy
