@@ -90,11 +90,4 @@
             high_priority="false">
       </loader>
    </extension>
-   <extension
-         point="org.eclipse.ui.intro.configExtension">
-      <configExtension
-            configId="org.dawnsci.intro.universalConfig"
-            content="intro/introContribution.xml">
-      </configExtension>
-   </extension>
 </plugin>
