@@ -77,4 +77,11 @@
             class="org.dawb.gda.extensions.h5.HDF5SelectionProvider">
       </double_click_provider>
    </extension>
+   <extension
+         point="org.eclipse.ui.intro.configExtension">
+      <configExtension
+            configId="org.dawnsci.intro.universalConfig"
+            content="intro/introContribution.xml">
+      </configExtension>
+   </extension>
 </plugin>
