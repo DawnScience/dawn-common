@@ -1,4 +1,4 @@
-package org.dawb.gda.extensions.spec;
+package org.dawnsci.io.spec;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

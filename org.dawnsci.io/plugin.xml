@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="uk.ac.diamond.scisoft.analysis.io.loader">
+      <loader
+            class="org.dawnsci.io.h5.H5Loader"
+            file_extension="h5, nxs, hdf5, hd5, hdf, nexus"
+            high_priority="true">
+      </loader>
+      <loader
+            class="org.dawb.gda.extensions.spec.SpecLoader"
+            file_extension="spec"
+            high_priority="false">
+      </loader>
+   </extension>
+
+</plugin>

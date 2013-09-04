@@ -7,7 +7,7 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */ 
-package org.dawb.gda.extensions.spec;
+package org.dawnsci.io.spec;
 
 import java.util.Collection;
 import java.util.EventObject;
