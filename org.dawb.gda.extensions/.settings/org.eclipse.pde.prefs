@@ -1,4 +1,3 @@
-#Wed Nov 02 09:31:07 GMT 2011
 compilers.f.unresolved-features=1
 compilers.f.unresolved-plugins=1
 compilers.incompatible-environment=1
@@ -23,7 +22,7 @@ compilers.p.not-externalized-att=2
 compilers.p.unknown-attribute=0
 compilers.p.unknown-class=0
 compilers.p.unknown-element=0
-compilers.p.unknown-identifier=0
+compilers.p.unknown-identifier=1
 compilers.p.unknown-resource=0
 compilers.p.unresolved-ex-points=1
 compilers.p.unresolved-import=0
