@@ -9,10 +9,12 @@ import java.util.regex.Pattern;
 import org.dawb.common.services.IExpressionObject;
 import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.ui.Activator;
-import org.dawb.common.ui.slicing.DimsData;
-import org.dawb.common.ui.slicing.DimsDataList;
-import org.dawb.common.ui.slicing.SliceComponent;
 import org.dawb.common.ui.util.GridUtils;
+import org.dawnsci.slicing.api.SlicingFactory;
+import org.dawnsci.slicing.api.system.DimsData;
+import org.dawnsci.slicing.api.system.DimsDataList;
+import org.dawnsci.slicing.api.system.ISliceSystem;
+import org.dawnsci.slicing.api.system.SliceSource;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -45,7 +47,7 @@ public abstract class AbstractSliceConversionPage extends ResourceChoosePage {
 	protected CCombo         nameChoice;
 	protected String         datasetName;
 	protected IConversionContext context;
-	protected SliceComponent sliceComponent;
+	protected ISliceSystem   sliceComponent;
 	protected Label          multiFileMessage;
 
 	public AbstractSliceConversionPage(String pageName, String description, ImageDescriptor icon) {
@@ -90,7 +92,8 @@ public abstract class AbstractSliceConversionPage extends ResourceChoosePage {
 				pathChanged();
 				nameChanged();
 				if (getErrorMessage()==null) {
-				    sliceComponent.setExplanationText("Slices matching '"+datasetName+"', based on '"+sliceComponent.getCurrentSlice().getName()+"'.\nWith the shape "+Arrays.toString(sliceComponent.getLazyDataset().getShape()));
+					int[] shape = sliceComponent.getData().getLazySet().getShape();
+				    sliceComponent.setLabel("Slices matching '"+datasetName+"', based on '"+sliceComponent.getSliceName()+"'.\nWith the shape "+Arrays.toString(shape));
 				}
 			}
 		});
@@ -119,7 +122,12 @@ public abstract class AbstractSliceConversionPage extends ResourceChoosePage {
 		Label sep = new Label(container, SWT.HORIZONTAL|SWT.SEPARATOR);
 		sep.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 4, 1));
 		
-		this.sliceComponent = new SliceComponent("org.dawb.workbench.views.h5GalleryView");
+		try {
+			this.sliceComponent = SlicingFactory.createSliceSystem("org.dawb.workbench.views.h5GalleryView");
+		} catch (Exception e) {
+			logger.error("Cannot create slice system!", e);
+			return;
+		}
 
 		final Control slicer = sliceComponent.createPartControl(container);
 		GridData data = new GridData(SWT.FILL, SWT.FILL, true, true, 4, 1);
@@ -127,7 +135,7 @@ public abstract class AbstractSliceConversionPage extends ResourceChoosePage {
 		slicer.setLayoutData(data);
 		sliceComponent.setVisible(true);
 		sliceComponent.setRangesAllowed(true);
-		sliceComponent.setToolBarEnabled(false);
+		sliceComponent.setSliceActionsEnabled(false);
 		
 		pathChanged();
 
@@ -221,7 +229,8 @@ public abstract class AbstractSliceConversionPage extends ResourceChoosePage {
 				isExpression = false;
 			}
 			if (lz!=null) {
-				sliceComponent.setData(lz, datasetName, context.getFilePaths().get(0), isExpression);
+				final SliceSource source = new SliceSource(lz, datasetName, context.getFilePaths().get(0), isExpression);
+				sliceComponent.setData(source);
 				setErrorMessage(null);
   		    } else {
   				setErrorMessage("Cannot read data set '"+datasetName+"'");
@@ -304,7 +313,8 @@ public abstract class AbstractSliceConversionPage extends ResourceChoosePage {
 			} else if (dd.isRange()) {
 				context.addSliceDimension(dd.getDimension(), dd.getSliceRange()!=null ? dd.getSliceRange() : "all");
 				try {
-				    context.setWorkSize(sliceComponent.getLazyDataset().getShape()[dd.getDimension()]);
+					final ILazyDataset lazy = sliceComponent.getData().getLazySet();
+				    context.setWorkSize(lazy.getShape()[dd.getDimension()]);
 				} catch (Exception ne) {
 					logger.error("Cannot set work size!", ne);
 				}

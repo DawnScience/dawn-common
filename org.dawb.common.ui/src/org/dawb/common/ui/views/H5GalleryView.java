@@ -16,16 +16,16 @@ import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
 
 import org.dawb.common.services.IThumbnailService;
+import org.dawb.common.services.IVariableManager;
 import org.dawb.common.services.ServiceManager;
 import org.dawb.common.ui.Activator;
 import org.dawb.common.ui.menu.CheckableActionGroup;
 import org.dawb.common.ui.menu.MenuAction;
-import org.dawb.common.ui.slicing.ISlicablePlottingPart;
-import org.dawb.common.ui.slicing.ISliceReceiver;
-import org.dawb.common.ui.slicing.SliceComponent;
 import org.dawb.common.ui.util.EclipseUtils;
 import org.dawb.common.util.object.ObjectUtils;
 import org.dawnsci.plotting.api.IPlottingSystem;
+import org.dawnsci.slicing.api.system.ISliceGallery;
+import org.dawnsci.slicing.api.system.ISliceSystem;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -77,7 +77,7 @@ import uk.ac.diamond.scisoft.analysis.io.SliceObject;
  * @author gerring
  *
  */
-public class H5GalleryView extends ViewPart implements MouseListener, SelectionListener, ISliceReceiver {
+public class H5GalleryView extends ViewPart implements MouseListener, SelectionListener, ISliceGallery {
 
 	public static final String ID = "org.dawb.workbench.views.h5GalleryView"; //$NON-NLS-1$
     
@@ -293,20 +293,16 @@ public class H5GalleryView extends ViewPart implements MouseListener, SelectionL
 		if (items==null || items.length<1) return;
 		
 		final IEditorPart part = EclipseUtils.getActiveEditor();
-		if (part instanceof ISlicablePlottingPart) {
+		if (part != null) {
 			
-			ISlicablePlottingPart prov = (ISlicablePlottingPart)part;
-			
-			
-			final SliceComponent sliceComponent = prov.getSliceComponent();
+			final ISliceSystem sliceComponent = (ISliceSystem)part.getAdapter(ISliceSystem.class);
 			if (sliceComponent!=null) {
 				sliceComponent.setSliceIndex(info.getSliceDimension(), items[0].getItemCount(), items.length<=1);
 			}
 			if (items.length<=1) return;
 			
 			List<IDataset> ys = getSlices(items);
-			final IAdaptable      adaptable = (IAdaptable)prov.getDataSetComponent();
-			final IPlottingSystem system    = (IPlottingSystem)adaptable.getAdapter(IPlottingSystem.class);
+			final IPlottingSystem system = (IPlottingSystem)part.getAdapter(IPlottingSystem.class);
 			system.clear();
 
 			if (ys.get(0).getShape().length==1) {
