@@ -9,7 +9,7 @@
             high_priority="true">
       </loader>
       <loader
-            class="org.dawb.gda.extensions.spec.SpecLoader"
+            class="org.dawnsci.io.spec.SpecLoader"
             file_extension="spec"
             high_priority="false">
       </loader>
