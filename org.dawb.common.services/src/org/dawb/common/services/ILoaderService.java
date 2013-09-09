@@ -9,6 +9,8 @@
  */ 
 package org.dawb.common.services;
 
+import java.util.Collection;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
@@ -59,25 +61,32 @@ public interface ILoaderService {
 	  * This method can be used to load meta data. It will use Fabio if
 	  * LoaderFactory does not work.
 	  */
-	 public IMetaData getMetaData(final String filePath, final IProgressMonitor monitor) throws Exception;
-	 
-    
-	 /**
-	  * The locked diffraction data if any. Usually this will be null unless someone
-	  * has specifically decided to override the meta data.
-	  * 
-	  * @return
-	  */
-	 public IDiffractionMetadata getLockedDiffractionMetaData();
-	 
-	 /**
-	  * Call to set the locked data, this will mean that the real diffraction data is
-	  * ignored in some cases.
-	  * 
-	  * @param diffMetaData
-	  * @return the old one if any.
-	  */
-	 public IDiffractionMetadata setLockedDiffractionMetaData(IDiffractionMetadata diffMetaData);
+    public IMetaData getMetaData(final String filePath, final IProgressMonitor monitor) throws Exception;
+
+
+    /**
+     * The locked diffraction data if any. Usually this will be null unless someone
+     * has specifically decided to override the meta data.
+     * 
+     * @return
+     */
+    public IDiffractionMetadata getLockedDiffractionMetaData();
+
+    /**
+     * Call to set the locked data, this will mean that the real diffraction data is
+     * ignored in some cases.
+     * 
+     * @param diffMetaData
+     * @return the old one if any.
+     */
+    public IDiffractionMetadata setLockedDiffractionMetaData(IDiffractionMetadata diffMetaData);
+
+
+    /**
+     * 
+     * @return list of supported file extensions.
+     */
+	public Collection<String> getSupportedExtensions();
 
 
 }

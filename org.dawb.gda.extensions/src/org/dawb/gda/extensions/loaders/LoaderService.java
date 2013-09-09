@@ -10,6 +10,7 @@
 package org.dawb.gda.extensions.loaders;
 
 import java.net.URL;
+import java.util.Collection;
 
 import org.dawb.common.services.ILoaderService;
 import org.dawb.common.ui.monitor.ProgressMonitorWrapper;
@@ -93,5 +94,11 @@ public class LoaderService extends AbstractServiceFactory implements ILoaderServ
 		IDiffractionMetadata old = lockedDiffractionMetaData;
 		lockedDiffractionMetaData= diffMetaData;
 		return old;
+	}
+
+
+	@Override
+	public Collection<String> getSupportedExtensions() {
+		return LoaderFactory.getSupportedExtensions();
 	}
 }
