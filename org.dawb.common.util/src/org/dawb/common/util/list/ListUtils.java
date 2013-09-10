@@ -12,9 +12,32 @@ package org.dawb.common.util.list;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.lang.reflect.Array;
+import java.util.AbstractList;
 
 public class ListUtils {
 
+	/**
+	 * Convert a primitive array to a list.
+	 * @param array - an array of peimitives
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+    public static <T> List<T> asList(final Object array) {
+		
+        if (!array.getClass().isArray()) throw new IllegalArgumentException("Not an array");
+        return new AbstractList<T>() {
+            @Override
+            public T get(int index) {
+                return (T) Array.get(array, index);
+            }
+
+            @Override
+            public int size() {
+                return Array.getLength(array);
+            }
+        };
+    }
 	/**
 	 * 
 	 * @param value
