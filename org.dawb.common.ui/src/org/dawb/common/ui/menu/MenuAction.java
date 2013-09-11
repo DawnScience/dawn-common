@@ -103,6 +103,9 @@ public class MenuAction extends Action implements IMenuCreator {
 		this.iSeparator = 0;
 	}
 
+	protected List<IAction> getActions() {
+		return actions;
+	}
 	public void setSelectedAction(int iAction) {
 		setSelectedAction(actions.get(iAction));
 	}
