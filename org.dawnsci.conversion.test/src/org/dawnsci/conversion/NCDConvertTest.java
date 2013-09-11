@@ -9,6 +9,7 @@ import java.util.Map;
 
 import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.services.conversion.IConversionContext.ConversionScheme;
+import org.dawnsci.conversion.converters.CustomNCDConverter.SAS_FORMAT;
 import org.junit.Test;
 
 import uk.ac.diamond.scisoft.analysis.io.DataHolder;
@@ -36,6 +37,7 @@ public class NCDConvertTest {
         context.setDatasetName("/entry1/Pilatus2M_result/data");
         context.setAxisDatasetName("/entry1/Pilatus2M_result/q");
         context.addSliceDimension(0, "all");
+        context.setUserObject(SAS_FORMAT.ASCII);
         service.process(context);
         
         final File[] fa = dir.listFiles();
@@ -44,7 +46,7 @@ public class NCDConvertTest {
         	final DataHolder   dh    = LoaderFactory.getData(file.getAbsolutePath());
             String[] names = dh.getNames();
             assertEquals(61, names.length);
-            assertEquals("q / nm^-1",names[0]);
+            assertEquals("q(1/nm)",names[0]);
             assertEquals("Column_0",names[1]);
         }
    	}
@@ -68,6 +70,7 @@ public class NCDConvertTest {
         context.setConversionScheme(ConversionScheme.CUSTOM_NCD);
         context.setDatasetName("/entry1/Pilatus2M_result/data");
         context.addSliceDimension(0, "all");
+        context.setUserObject(SAS_FORMAT.ASCII);
         service.process(context);
         
         final File[] fa = dir.listFiles();
@@ -102,6 +105,7 @@ public class NCDConvertTest {
         context.setDatasetName("/entry1/Pilatus2M_result/data");
         context.setAxisDatasetName("/entry1/Pilatus2M_result/q");
         context.addSliceDimension(0, "all");
+        context.setUserObject(SAS_FORMAT.ASCII);
         service.process(context);
         
         final File[] fa = dir.listFiles();
@@ -111,7 +115,7 @@ public class NCDConvertTest {
         	final DataHolder   dh    = LoaderFactory.getData(file.getAbsolutePath());
             String[] names = dh.getNames();
             assertEquals(3, names.length);
-            assertEquals("q / Angstrom^-1",names[0]);
+            assertEquals("q(1/A)",names[0]);
             assertEquals("Column_0",names[1]);
         }
    	}
@@ -136,6 +140,7 @@ public class NCDConvertTest {
         context.setDatasetNames(Arrays.asList(new String[] {"/entry1/Pilatus2M_result/data","/entry1/Pilatus2M_processing/Normalisation/data"}));
         context.setAxisDatasetName("/entry1/Pilatus2M_result/q");
         context.addSliceDimension(0, "all");
+        context.setUserObject(SAS_FORMAT.ASCII);
         service.process(context);
         
         final File[] fa = dir.listFiles();
@@ -145,7 +150,7 @@ public class NCDConvertTest {
         	final DataHolder   dh    = LoaderFactory.getData(file.getAbsolutePath());
             String[] names = dh.getNames();
             assertEquals(2, names.length);
-            assertEquals("q / Angstrom^-1",names[0]);
+            assertEquals("q(1/A)",names[0]);
             assertEquals("Column_0",names[1]);
         }
    	}
@@ -160,9 +165,9 @@ public class NCDConvertTest {
 		final String path1 = getTestFilePath("results_i22-102527_Pilatus2M_280313_112434.nxs");
 		final String path2 = getTestFilePath("results_i22-114346_Pilatus2M_220313_090939.nxs");
 		Map<String, String> unitMap = new HashMap<String, String>();
-		unitMap.put(path , "q / Angstrom^-1");
-		unitMap.put(path1, "q / nm^-1");
-		unitMap.put(path2, "q / Angstrom^-1");
+		unitMap.put(path , "q(1/A)");
+		unitMap.put(path1, "q(1/nm)");
+		unitMap.put(path2, "q(1/A)");
 		
 		final IConversionContext context = service.open(path);
 		///TODO fix in interface
@@ -181,6 +186,7 @@ public class NCDConvertTest {
         context.setDatasetNames(Arrays.asList(new String[] {"/entry1/Pilatus2M_result/data","/entry1/Pilatus2M_processing/Normalisation/data"}));
         context.setAxisDatasetName("/entry1/Pilatus2M_result/q");
         context.addSliceDimension(0, "all");
+        context.setUserObject(SAS_FORMAT.ASCII);
         service.process(context);
         
         final File[] fa = dir.listFiles();

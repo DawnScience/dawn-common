@@ -1,14 +1,37 @@
 package org.dawnsci.conversion.converters;
 
 
+import gda.analysis.io.ScanFileHolderException;
+
 import java.io.File;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.measure.unit.NonSI;
+import javax.measure.unit.SI;
+import javax.measure.unit.UnitFormat;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.Marshaller;
+
 import ncsa.hdf.object.Dataset;
 
 import org.apache.commons.lang.ArrayUtils;
+import org.cansas.cansas1d.FloatUnitType;
+import org.cansas.cansas1d.IdataType;
+import org.cansas.cansas1d.ObjectFactory;
+import org.cansas.cansas1d.SAScollimationType;
+import org.cansas.cansas1d.SASdataType;
+import org.cansas.cansas1d.SASdetectorType;
+import org.cansas.cansas1d.SASentryType;
+import org.cansas.cansas1d.SASsourceType;
+import org.cansas.cansas1d.SAStransmissionSpectrumType;
+import org.cansas.cansas1d.SASentryType.Run;
+import org.cansas.cansas1d.SASinstrumentType;
+import org.cansas.cansas1d.SASrootType;
+import org.cansas.cansas1d.SASsampleType;
 import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.hdf5.HierarchicalDataFactory;
 import org.dawb.hdf5.IHierarchicalDataFile;
@@ -22,22 +45,25 @@ import uk.ac.diamond.scisoft.analysis.dataset.IErrorDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.PositionIterator;
 import uk.ac.diamond.scisoft.analysis.dataset.Slice;
-import uk.ac.diamond.scisoft.analysis.hdf5.HDF5Dataset;
 import uk.ac.diamond.scisoft.analysis.hdf5.HDF5File;
 import uk.ac.diamond.scisoft.analysis.hdf5.HDF5Node;
 import uk.ac.diamond.scisoft.analysis.io.ASCIIDataWithHeadingSaver;
 import uk.ac.diamond.scisoft.analysis.io.DataHolder;
 import uk.ac.diamond.scisoft.analysis.io.HDF5Loader;
+import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
 
 public class CustomNCDConverter extends AbstractConversion  {
 
 	private static final Logger logger = LoggerFactory.getLogger(CustomNCDConverter.class);
 	private static final String DEFAULT_AXIS_NAME = "x";
-	private static final String DEFAULT_COLUMN_NAME = "Column_";
-	private static final String DEFAULT_ERRORS_COLUMN_NAME = "Error_";
+	private static final String DEFAULT_COLUMN_NAME = "Column";
+	private static final String DEFAULT_ERRORS_COLUMN_NAME = "Error";
 	private static final String DEFAULT_TITLE_NODE = "/entry1/title";
 	private static final String DEFAULT_SCAN_COMMAND_NODE = "/entry1/scan_command";
+	private static final String CANSAS_JAXB_CONTEXT = "org.cansas.cansas1d";
+	
+	public static enum SAS_FORMAT { ASCII, ATSAS, CANSAS };
 
 	public CustomNCDConverter(IConversionContext context) {
 		super(context);
@@ -55,13 +81,30 @@ public class CustomNCDConverter extends AbstractConversion  {
             final String               nameFrag,
             final IConversionContext   context) throws Exception {
 		
+		Object obj = context.getUserObject();
+		SAS_FORMAT exportFormat;
+		if (obj instanceof SAS_FORMAT) {
+			exportFormat = (SAS_FORMAT) obj;
+		} else {
+			exportFormat = SAS_FORMAT.ASCII;
+		}
+		
+		if (exportFormat.equals(SAS_FORMAT.CANSAS)) {
+			exportCanSAS(lz, nameFrag, context);
+			return;
+		}
+		
 		String selFilePath = context.getSelectedConversionFile().getAbsolutePath();
 		IHierarchicalDataFile hdf5Reader = HierarchicalDataFactory.getReader(selFilePath);
 		
 		//get the x axis if required
-		IDataset axis = null;
+		IErrorDataset axis = null;
 		if (context.getAxisDatasetName() != null) {
 			axis = getAxis(context.getAxisDatasetName(), context.getSelectedConversionFile());
+			// ATSAS ASCII format doesn't support axis errors
+			if (axis.hasErrors() && exportFormat.equals(SAS_FORMAT.ATSAS)) {
+				axis.clearError();
+			}
 		}
 		
 		//Set up position iterator (final 2 dimensions saved in a single file
@@ -69,7 +112,7 @@ public class CustomNCDConverter extends AbstractConversion  {
 		boolean hasErrors = (lz.getLazyErrors() != null ? true : false);
 		int iterDim;
 		int[] cutAxes;
-		if (stop.length == 1 || hasErrors) {
+		if (stop.length == 1 || exportFormat.equals(SAS_FORMAT.ATSAS)) {
 			iterDim = lz.getRank() - 1;
 			cutAxes = new int[] {lz.getRank() - 1};
 		} else {
@@ -125,28 +168,33 @@ public class CustomNCDConverter extends AbstractConversion  {
 		List<String> headings = new ArrayList<String>();
 		
 		if (axis != null) {
-			String axisName = axis.getName();
+			String axisUnit = getAxisUnit(context.getAxisDatasetName(), context.getSelectedConversionFile());
+			String axisName = String.format("%s(%s)%5s", axis.getName(), axisUnit, "");
 			headings.add(" ".concat(axisName));
+			if (axis.hasErrors()) {
+				headings.add(String.format("%s(%s)", axis.getName().concat("_errors"), axisUnit));
+			}
 		}
 		
-		if (stop.length == 1 || hasErrors) {
-			headings.add(DEFAULT_COLUMN_NAME + "0");
+		String stringFormat = "%-10s";
+		if (stop.length == 1 || exportFormat.equals(SAS_FORMAT.ATSAS)) {
+			headings.add(String.format(stringFormat,DEFAULT_COLUMN_NAME));
 			if (hasErrors) {
-				headings.add(DEFAULT_ERRORS_COLUMN_NAME + "0");
+				headings.add(String.format(stringFormat,DEFAULT_ERRORS_COLUMN_NAME));
 			}
 		} else {
 			for (int i = 0; i< stop[iterDim]; i++) {
-				headings.add(DEFAULT_COLUMN_NAME + i);
+				headings.add(String.format(stringFormat,DEFAULT_COLUMN_NAME + "_" + i));
+			}
+			if (hasErrors) {
+				for (int i = 0; i< stop[iterDim]; i++) {
+					headings.add(String.format(stringFormat,DEFAULT_ERRORS_COLUMN_NAME + "_" + i));
+				}
 			}
 		}
 		
 		//Iterate over lazy dataset and save
-		DataHolder dh = new  DataHolder();
-		for (int i = 0; iterator.hasNext();) {
-			
-			if (i == 0) {
-				dh = new  DataHolder();
-			}
+		while (iterator.hasNext()) {
 			
 			int[] start = iterator.getPos();
 			
@@ -169,6 +217,11 @@ public class CustomNCDConverter extends AbstractConversion  {
 			if (!(Arrays.equals(lz.getShape(), data.getShape()))) {
 				nameSuffix = nameStringFromSliceArray(iterDim, slices);
 			}
+			data.setName(nameFrag + nameStringFromSliceArray(iterDim, slices));
+			String pathToFolder = context.getOutputPath();
+			String fileName = buildFileName(context.getSelectedConversionFile().getAbsolutePath(),nameFrag);
+			String fullName = pathToFolder + File.separator + fileName + nameSuffix +".dat";
+			
 			
 			//Check data suitable then concatenate axis with data
 			if (data.getRank() == 1) {
@@ -178,26 +231,8 @@ public class CustomNCDConverter extends AbstractConversion  {
 				}
 			}
 			
-			IDataset[] columns = new IDataset[] {DatasetUtils.transpose(data, null)};
-			if (axis != null) {
-				columns = (IDataset[]) ArrayUtils.addAll(new IDataset[]{axis}, columns);
-			}
-			if (hasErrors) {
-				columns = (IDataset[]) ArrayUtils.addAll(columns, new IDataset[]{DatasetUtils.transpose(errors, null)});
-			}
-			data = DatasetUtils.concatenate(columns, 1);
-			
-			String pathToFolder = context.getOutputPath();
-			String fileName = buildFileName(context.getSelectedConversionFile().getAbsolutePath(),nameFrag);
-			String fullName = pathToFolder + File.separator + fileName + nameSuffix +".dat";
-			
-			ASCIIDataWithHeadingSaver saver = new ASCIIDataWithHeadingSaver(fullName);
-			data.setName(nameFrag + nameStringFromSliceArray(iterDim, slices));
-			dh.addDataset(data.getName(), data);
-			saver.setHeader(sb.toString());
-			saver.setHeadings(headings);
-			saver.saveFile(dh);
-			
+			exportASCII(axis, data, errors, fullName, sb.toString(), headings);
+				
 			if (context.getMonitor() != null) {
 				IMonitor mon = context.getMonitor();
 				if (mon.isCancelled()) {
@@ -206,6 +241,194 @@ public class CustomNCDConverter extends AbstractConversion  {
 				context.getMonitor().subTask(fileName + nameSuffix);
 			}
 		}
+		
+		if (context.getMonitor() != null) {
+			IMonitor mon = context.getMonitor();
+			mon.worked(1);
+		}
+	}
+	
+	private void exportASCII(IErrorDataset axis, IDataset data, IDataset errors, String fullName, String header, List<String> headings) throws ScanFileHolderException {
+		String dataName = data.getName();
+		IDataset[] columns = new IDataset[] {DatasetUtils.transpose(data, null)};
+		if (axis != null) {
+			if (axis.hasErrors()) {
+				AbstractDataset axisErrors = DatasetUtils.cast((AbstractDataset) axis.getError(), ((AbstractDataset)data).getDtype());
+				columns = (IDataset[]) ArrayUtils.addAll(new IDataset[]{axis, axisErrors}, columns);
+				
+			} else {
+				columns = (IDataset[]) ArrayUtils.addAll(new IDataset[]{axis}, columns);
+			}
+			
+		}
+		if (errors != null) {
+			columns = (IDataset[]) ArrayUtils.addAll(columns, new IDataset[]{DatasetUtils.transpose(errors, null)});
+		}
+		data = DatasetUtils.concatenate(columns, 1);
+		data.setName(dataName);
+		
+		DataHolder dh = new  DataHolder();
+		dh.addDataset(data.getName(), data);
+		
+		ASCIIDataWithHeadingSaver saver = new ASCIIDataWithHeadingSaver(fullName);
+		saver.setHeader(header);
+		saver.setHeadings(headings);
+		saver.saveFile(dh);
+	}
+	
+	private void exportCanSAS(final ILazyDataset         lz, 
+            final String               nameFrag,
+            final IConversionContext   context) throws Exception {
+		
+		String selFilePath = context.getSelectedConversionFile().getAbsolutePath();
+		IHierarchicalDataFile hdf5Reader = HierarchicalDataFactory.getReader(selFilePath);
+		
+		//get the x axis if required
+		AbstractDataset axis = null;
+		AbstractDataset axisErrors = null;
+		String axisUnits = "a.u.";
+		if (context.getAxisDatasetName() != null) {
+			axis = getAxis(context.getAxisDatasetName(), context.getSelectedConversionFile());
+			axis.squeeze();
+			axisUnits = getAxisUnit(context.getAxisDatasetName(), context.getSelectedConversionFile());
+			if (axis.hasErrors()) {
+				axisErrors = DatasetUtils.cast((AbstractDataset) ((IErrorDataset) axis).getError(),
+						axis.getDtype());
+				axisErrors.squeeze();
+			}
+		}
+		
+		//Set up position iterator (final 2 dimensions saved in a single file
+		int[] stop = lz.getShape();
+		boolean hasErrors = (lz.getLazyErrors() != null ? true : false);
+		int iterDim = lz.getRank() - 1;
+		int[] cutAxes = new int[] {lz.getRank() - 1};
+		
+		PositionIterator iterator = new PositionIterator(stop, cutAxes);
+		
+		for (int i = 0 ; i < iterDim ; i++) {
+			stop[i] = 0;
+		}
+		
+		int[] step = new int[stop.length];
+		for (int i = 0 ; i < step.length; i++) {
+			step[i] = 1;
+		}
+		
+		ObjectFactory of       = new ObjectFactory();
+		SASrootType   sasRoot  = of.createSASrootType();
+		SASsampleType sasSample  = of.createSASsampleType();
+		
+		SASsourceType sasSource = of.createSASsourceType();
+		sasSource.setRadiation("x-ray");
+		SASdetectorType sasDetector = of.createSASdetectorType();
+		sasDetector.setName(nameFrag);
+		SAScollimationType sasCollimation = of.createSAScollimationType();
+		
+		SASinstrumentType sasInstrument  = of.createSASinstrumentType();
+		sasInstrument.setName("Diamond Light Source Ltd.");
+		sasInstrument.setSASsource(sasSource);
+		sasInstrument.getSASdetector().add(sasDetector);
+		sasInstrument.getSAScollimation().add(sasCollimation);
+		SAStransmissionSpectrumType sasTransmission  = of.createSAStransmissionSpectrumType();
+		
+		try {
+			Dataset titleData = (Dataset) hdf5Reader.getData(DEFAULT_TITLE_NODE);
+			String[] str = (String[]) titleData.getData();
+			if (str.length > 0) {
+				String title = str[0];
+				sasSample.setID(title);
+			} else {
+				sasSample.setID("N/A");
+			}
+		} catch (Exception e) {
+			logger.info("Default title node {} was not found", DEFAULT_TITLE_NODE);
+			sasSample.setID("N/A");
+		}
+		
+		String pathToFolder = context.getOutputPath();
+		String fileName = buildFileName(context.getSelectedConversionFile().getAbsolutePath(),nameFrag);
+		String fullName = pathToFolder + File.separator + fileName + ".xml";
+		
+		//Iterate over lazy dataset and save
+		while (iterator.hasNext()) {
+			
+			SASentryType  sasEntry = of.createSASentryType();
+			
+			int[] start = iterator.getPos();
+			
+			for (int j = 0 ; j < iterDim ; j++) {
+				stop[j] = start[j]+1;
+			}
+			
+			Slice[] slices = Slice.convertToSlice(start, stop, step);
+			IDataset data = lz.getSlice(slices).squeeze();
+			
+			AbstractDataset errors = null;
+			if (hasErrors) {
+				errors = DatasetUtils.cast((AbstractDataset) ((IErrorDataset) data).getError(),
+						((AbstractDataset)data).getDtype());
+				errors.squeeze();
+			}
+			
+			Run run = new Run();
+			String runName = "Frame"+ nameStringFromSliceArray(iterDim, slices);
+			run.setValue(runName);
+			sasEntry.getRun().add(run);
+			
+			SASdataType sasData  = of.createSASdataType();
+			
+			PositionIterator iter = new PositionIterator(data.getShape(), new int[] {});
+			while (iter.hasNext()) {
+				int[] idx = iter.getPos();
+				float val;
+				
+				IdataType iData = of.createIdataType();
+				FloatUnitType I = of.createFloatUnitType();
+				val = data.getFloat(idx);
+				I.setValue(val);
+				I.setUnit("a.u.");
+				iData.setI(I);
+				if (axis != null) {
+					FloatUnitType Q = of.createFloatUnitType();
+					val = axis.getFloat(idx);
+					Q.setValue(val);
+					Q.setUnit(axisUnits);
+					iData.setQ(Q);
+				}
+				if (errors != null) {
+					FloatUnitType devI = of.createFloatUnitType();
+					val = errors.getFloat(idx);
+					devI.setValue(val);
+					devI.setUnit("a.u.");
+					iData.setIdev(devI);
+				}
+				if (axisErrors != null) {
+					FloatUnitType devQ = of.createFloatUnitType();
+					val = axisErrors.getFloat(idx);
+					devQ.setValue(val);
+					devQ.setUnit(axisUnits);
+					iData.setQdev(devQ);
+				}
+				sasData.getIdata().add(iData);
+			}
+			
+			sasEntry.setTitle(data.getName());
+			sasEntry.getSASdata().add(sasData);
+			sasEntry.setSASsample(sasSample);
+			sasEntry.getSAStransmissionSpectrum().add(sasTransmission);
+			sasEntry.setSASinstrument(sasInstrument);
+			sasEntry.getSASnote().add(selFilePath);
+			
+			sasRoot.getSASentry().add(sasEntry);
+		}
+		JAXBElement<SASrootType> jabxSASroot = of.createSASroot(sasRoot);
+
+		JAXBContext jc = JAXBContext.newInstance(CANSAS_JAXB_CONTEXT);
+		Marshaller m = jc.createMarshaller();
+		m.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, "http://www.cansas.org/formats/1.1/cansas1d.xsd");		
+		m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+		m.marshal(jabxSASroot, new FileOutputStream(fullName));
 		
 		if (context.getMonitor() != null) {
 			IMonitor mon = context.getMonitor();
@@ -236,26 +459,45 @@ public class CustomNCDConverter extends AbstractConversion  {
 		return t.toString();
 	}
 	
-	private IDataset getAxis(String datasetName, File path) {
+	private AbstractDataset getAxis(String datasetName, File path) {
 		
-		IDataset data = null;
+		AbstractDataset data = null;
 		try {
-			HDF5File tree = new HDF5Loader(path.getAbsolutePath()).loadTree();
-			HDF5Node node = tree.findNodeLink(datasetName).getDestination();
-			data = ((HDF5Dataset) node).getDataset().getSlice();
+			data = LoaderFactory.getDataSet(path.getAbsolutePath(), datasetName, null);
 			//expand so the concatenation works later
 			data.setShape(data.getShape()[0],1);
-			
-			if (node.containsAttribute("unit")) {
-				String qaxisUnit = node.getAttribute("unit").getFirstElement();
-				data.setName(getAxisDatasetName(datasetName).concat(" / ").concat(qaxisUnit));
-			} else {
-				data.setName(getAxisDatasetName(datasetName));
-			}
+			data.setName(getAxisDatasetName(datasetName));
 		} catch (Exception e) {
 			logger.warn("Couldn't get dataset: " + datasetName);
 		}
 		return data;
+	}
+	
+	private String getAxisUnit(String datasetName, File path) {
+		try {
+			HDF5File tree = new HDF5Loader(path.getAbsolutePath()).loadTree();
+			HDF5Node node = tree.findNodeLink(datasetName).getDestination();
+			String units = null;
+			if (node.containsAttribute("units")) {
+				units = node.getAttribute("units").getFirstElement();
+			} else if (node.containsAttribute("unit")) {
+				units = node.getAttribute("unit").getFirstElement();
+			}
+			if (units != null) {
+				UnitFormat unitFormat = UnitFormat.getUCUMInstance();
+				String angstrom = unitFormat.format(NonSI.ANGSTROM.inverse());
+				String nanometer = unitFormat.format(SI.NANO(SI.METER)
+						.inverse());
+				if (units.equals(nanometer)) {
+					return "1/nm";
+				} else if (units.equals(angstrom)) {
+					return "1/A";
+				}
+			}
+		} catch (ScanFileHolderException e) {
+			logger.warn("Unit information for axis dataset {} not found", datasetName);
+		}
+		return "a.u.";
 	}
 	
 	private String buildFileName(String pathToOriginal, String datasetName) {

@@ -3,33 +3,37 @@ package org.dawnsci.conversion.ui.pages;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.ui.util.GridUtils;
 import org.dawb.common.ui.wizard.ResourceChoosePage;
+import org.dawnsci.common.widgets.utils.RadioUtils;
+import org.dawnsci.conversion.converters.CustomNCDConverter.SAS_FORMAT;
 import org.dawnsci.conversion.ui.Activator;
 import org.dawnsci.conversion.ui.IConversionWizardPage;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
-
-
 
 public class NCDConvertPage extends ResourceChoosePage implements
 		IConversionWizardPage {
@@ -42,6 +46,7 @@ public class NCDConvertPage extends ResourceChoosePage implements
 	private Label          multiFileMessage;
 	private Label          axisMessage;
 	private Button         axisButton;
+	private SAS_FORMAT     exportFormat;
 	
 	private static final String QAXISNAME = "/q";
 	private static final String DATANAME = "/data";
@@ -96,9 +101,55 @@ public class NCDConvertPage extends ResourceChoosePage implements
 		axisMessage.setText("");
 		axisMessage.setEnabled(false);
 		
+		Group formatGroup = new Group(container, SWT.NONE);
+		formatGroup.setLayout(new GridLayout(1, false));
+		formatGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
+		formatGroup.setText("Export Format");
+		try {
+			RadioUtils.createRadioControls(formatGroup, createExportFormatActions());
+		} catch (Exception e) {
+			logger.error("Failed to create export format selection group");
+		}
+		
 		pathChanged();
 	}
 	
+	private List<Action> createExportFormatActions() {
+		List<Action> radioActions = new ArrayList<Action>();
+
+		Action exportASCII = new Action() {
+			@Override
+			public void run() {
+				exportFormat = SAS_FORMAT.ASCII;
+			}
+		};
+		exportASCII.setText("ASCII");
+		exportASCII.setToolTipText("Export data into multicolumn ASCII format");
+
+		Action exportATSAS = new Action() {
+			@Override
+			public void run() {
+				exportFormat = SAS_FORMAT.ATSAS;
+			}
+		};
+		exportATSAS.setText("ATSAS");
+		exportATSAS.setToolTipText("Export data into ATSAS ASCII format");
+
+		Action exportCanSAS = new Action() {
+			@Override
+			public void run() {
+				exportFormat = SAS_FORMAT.CANSAS;
+			}
+		};
+		exportCanSAS.setText("canSAS XML");
+		exportCanSAS.setToolTipText("Export data into canSAS XML format");
+
+		radioActions.add(exportASCII);
+		radioActions.add(exportATSAS);
+		radioActions.add(exportCanSAS);
+
+		return radioActions;
+	}
 
 	@Override
 	public boolean isOpen() {
@@ -116,7 +167,7 @@ public class NCDConvertPage extends ResourceChoosePage implements
 		if (axisButton.getEnabled() && axisButton.getSelection()) {
 			context.setAxisDatasetName(axisMessage.getText());
 		}
-		
+		context.setUserObject(exportFormat);
 		return context;
 	}
 	
