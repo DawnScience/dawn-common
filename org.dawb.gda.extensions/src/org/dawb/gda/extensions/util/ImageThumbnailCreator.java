@@ -83,20 +83,20 @@ public class ImageThumbnailCreator extends AbstractServiceFactory implements ITh
 	private static int colourMapChoice    = 1;
     private static ImageRegistry imageRegistry;
     
-	public Image createImage(final File f, final int size) {
+	public Image createImage(final File f, final int width, int height) {
 		
 		if (f.isDirectory()) {
 			final Image image = Activator.getImageDescriptor("icons/folder.gif").createImage();
-			final Image blank = new Image(Display.getDefault(), size, size);
+			final Image blank = new Image(Display.getDefault(), width, height);
 			GC gc = new GC(blank);
-	        gc.drawImage(image, (size/2)-image.getImageData().width/2, size/2-image.getImageData().height/2);
+	        gc.drawImage(image, (width/2)-image.getImageData().width/2, height/2-image.getImageData().height/2);
 	        gc.dispose();
 	        
 	        return blank;
 		}
 		
 		try {
-			final AbstractDataset thumb = getThumbnail(f, size);
+			final AbstractDataset thumb = getThumbnail(f, width, height);
 		    return createImageSWT(thumb);
 		    
 		} catch (Throwable ne) {
@@ -117,32 +117,32 @@ public class ImageThumbnailCreator extends AbstractServiceFactory implements ITh
 		}
 		
 		final Image image = PlatformUI.getWorkbench().getEditorRegistry().getImageDescriptor(f.getAbsolutePath()).createImage();
-		final Image blank = new Image(Display.getDefault(), size, size);
+		final Image blank = new Image(Display.getDefault(), width, height);
 		GC gc = new GC(blank);
-        gc.drawImage(image, (size/2)-image.getImageData().width/2, size/2-image.getImageData().height/2);
+        gc.drawImage(image, (width/2)-image.getImageData().width/2, height/2-image.getImageData().height/2);
         gc.dispose();
         
         return blank;
 	}
 	
-	private AbstractDataset getThumbnail(final File f, final int size) throws Throwable {
+	private AbstractDataset getThumbnail(final File f, final int wdith, final int height) throws Throwable {
 		
 	    if (H5Loader.isH5(f.getAbsolutePath())) return null; // Cannot risk loading large datasets!
 		final ILoaderService loader = (ILoaderService)ServiceManager.getService(ILoaderService.class);
 		final AbstractDataset set   = (AbstractDataset)loader.getDataset(f.getAbsolutePath(), null);
-		final AbstractDataset thumb = getThumbnail(set, size);
+		final AbstractDataset thumb = getThumbnail(set, wdith, height);
 		return thumb;
 	}
 
-	public AbstractDataset getThumbnail(final IDataset ds, int size) {
+	public AbstractDataset getThumbnail(final IDataset ds,  final int w, final int h) {
 
 		if (ds!=null && ds.getRank() == 2) { // 2D datasets only!!!
 			int width = ds.getShape()[1];
 			int height = ds.getShape()[0];
 
 			int[] stepping = new int[2];
-			stepping[1] = Math.max(1, width / size);
-			stepping[0] = Math.max(1, height / size);
+			stepping[1] = Math.max(1, width / w);
+			stepping[0] = Math.max(1, height / h);
 			Downsample down = new Downsample(DownsampleMode.POINT, stepping);
 			AbstractDataset ds_downsampled = down.value(ds).get(0);
 			ds_downsampled.setName(ds.getName());
@@ -232,10 +232,10 @@ public class ImageThumbnailCreator extends AbstractServiceFactory implements ITh
 	}
 
 	@Override
-	public Image getThumbnailImage(final IDataset set, final int size) throws Exception {
+	public Image getThumbnailImage(final IDataset set, final int width, final int height) throws Exception {
 		
 		if (set.getShape().length==2) {
-			final AbstractDataset thumb = getThumbnail(set, size);
+			final AbstractDataset thumb = getThumbnail(set, width, height);
 			if (thumb==null) return null;
 			return createImage(thumb);
 			
@@ -258,8 +258,12 @@ public class ImageThumbnailCreator extends AbstractServiceFactory implements ITh
 					
 					system.createPlot1D(null, Arrays.asList(set), new NullProgressMonitor());
 					
-		            final Image unscaled = ((AbstractPlottingSystem)system).getImage(new Rectangle(0, 0, 300, 300));
-		            scaled[0]   = new Image(display, unscaled.getImageData().scaledTo(size, size));
+					if (width>=300) {
+						scaled[0]   = ((AbstractPlottingSystem)system).getImage(new Rectangle(0, 0, width, height));
+					} else {
+			            final Image unscaled = ((AbstractPlottingSystem)system).getImage(new Rectangle(0, 0, 300, 300));
+			            scaled[0]   = new Image(display, unscaled.getImageData().scaledTo(width, height));
+					}
 				}
 			});
             return scaled[0];

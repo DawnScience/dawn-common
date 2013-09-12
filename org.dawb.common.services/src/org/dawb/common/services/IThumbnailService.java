@@ -32,7 +32,7 @@ public interface IThumbnailService extends IFileIconService{
 	 * @param size
 	 * @return
 	 */
-	public Image createImage(final File f, final int size);
+	public Image createImage(final File f, final int width, int height);
 
 	/**
 	 * Get a thumbnail AbstractDataset of square shape.
@@ -40,7 +40,7 @@ public interface IThumbnailService extends IFileIconService{
 	 * @param size
 	 * @return
 	 */
-	public IDataset getThumbnail(IDataset set, int size);
+	public IDataset getThumbnail(IDataset set, final int width, int height);
 
 	/**
 	 * Create an image from an AbstractDataset
@@ -55,6 +55,6 @@ public interface IThumbnailService extends IFileIconService{
 	 * @param size
 	 * @return
 	 */
-	public Image getThumbnailImage(IDataset set, int size) throws Exception;
+	public Image getThumbnailImage(IDataset set, final int width, int height) throws Exception;
 	
 }

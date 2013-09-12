@@ -651,7 +651,7 @@ public class ImageMonitorView extends ViewPart implements MouseListener, Selecti
 
 						final int    size = store.getInt("org.dawb.workbench.views.image.monitor.thumbnail.size");
 
-						final Image     image     = service.createImage(ii.getFile(), size);
+						final Image     image     = service.createImage(ii.getFile(), size, size);
 						// This image must be disposed later!
 						
                         final ImageItem imageItem = ii;

@@ -387,7 +387,7 @@ public class H5GalleryView extends ViewPart implements MouseListener, SelectionL
 	            		if (size<1) size = 96;
 	            		
 	            		final IThumbnailService service = (IThumbnailService)ServiceManager.getService(IThumbnailService.class);	            		
-	            		final Image image = service.getThumbnailImage(set, size);
+	            		final Image image = service.getThumbnailImage(set, size, size);
 
 	            		Display.getDefault().asyncExec(new Runnable() {
 							@Override
