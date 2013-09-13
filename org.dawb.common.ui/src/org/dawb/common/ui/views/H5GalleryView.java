@@ -15,8 +15,8 @@ import java.util.List;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
 
-import org.dawb.common.services.IThumbnailService;
-import org.dawb.common.services.IVariableManager;
+import org.dawb.common.services.IPlotImageService;
+import org.dawb.common.services.PlotImageData;
 import org.dawb.common.services.ServiceManager;
 import org.dawb.common.ui.Activator;
 import org.dawb.common.ui.menu.CheckableActionGroup;
@@ -26,7 +26,6 @@ import org.dawb.common.util.object.ObjectUtils;
 import org.dawnsci.plotting.api.IPlottingSystem;
 import org.dawnsci.slicing.api.system.ISliceGallery;
 import org.dawnsci.slicing.api.system.ISliceSystem;
-import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -386,8 +385,8 @@ public class H5GalleryView extends ViewPart implements MouseListener, SelectionL
 	            		int             size  = store.getInt("org.dawb.workbench.views.image.monitor.thumbnail.size");
 	            		if (size<1) size = 96;
 	            		
-	            		final IThumbnailService service = (IThumbnailService)ServiceManager.getService(IThumbnailService.class);	            		
-	            		final Image image = service.getThumbnailImage(set, size, size);
+	            		final IPlotImageService service = (IPlotImageService)ServiceManager.getService(IPlotImageService.class);	            		
+	            		final Image image = service.getImage(new PlotImageData(set, size, size));
 
 	            		Display.getDefault().asyncExec(new Runnable() {
 							@Override

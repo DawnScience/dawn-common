@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
 
-import org.dawb.common.services.IThumbnailService;
+import org.dawb.common.services.IPlotImageService;
 import org.dawb.common.services.ServiceManager;
 import org.dawb.common.ui.Activator;
 import org.dawb.common.ui.menu.CheckableActionGroup;
@@ -630,7 +630,7 @@ public class ImageMonitorView extends ViewPart implements MouseListener, Selecti
 	private void createImageThread() throws Exception {
 
 		final IPreferenceStore store = new ScopedPreferenceStore(InstanceScope.INSTANCE, "org.dawb.common.ui");
-		final IThumbnailService service = (IThumbnailService)ServiceManager.getService(IThumbnailService.class);
+		final IPlotImageService service = (IPlotImageService)ServiceManager.getService(IPlotImageService.class);
 
 		this.imageThread = new Thread(new Runnable() {
 			@Override

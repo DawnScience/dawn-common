@@ -96,12 +96,19 @@ public abstract class AbstractImageConversion extends AbstractConversion {
 		return slice;
 	}
 	
+	protected Enum getSliceType() {
+		if (context.getUserObject()==null) return null;
+        return ((ConversionInfoBean)context.getUserObject()).getSliceType();
+	}
+	
 	/**
 	 * To be used as the user object to convey data about the conversion.
 	 * @author fcp94556
 	 *
 	 */
 	public static final class ConversionInfoBean {
+		
+		private Enum sliceType;
 		private int frameRate = 20;
 		private ImageServiceBean imageServiceBean;
 		private int downsampleBin=1;
@@ -147,6 +154,8 @@ public abstract class AbstractImageConversion extends AbstractConversion {
 					* result
 					+ ((sliceIndexFormat == null) ? 0 : sliceIndexFormat
 							.hashCode());
+			result = prime * result
+					+ ((sliceType == null) ? 0 : sliceType.hashCode());
 			return result;
 		}
 		@Override
@@ -187,6 +196,11 @@ public abstract class AbstractImageConversion extends AbstractConversion {
 					return false;
 			} else if (!sliceIndexFormat.equals(other.sliceIndexFormat))
 				return false;
+			if (sliceType == null) {
+				if (other.sliceType != null)
+					return false;
+			} else if (!sliceType.equals(other.sliceType))
+				return false;
 			return true;
 		}
 		public String getAlternativeNamePrefix() {
@@ -224,6 +238,12 @@ public abstract class AbstractImageConversion extends AbstractConversion {
 		}
 		public void setSliceIndexFormat(String sliceIndexFormat) {
 			this.sliceIndexFormat = sliceIndexFormat;
+		}
+		public Enum getSliceType() {
+			return sliceType;
+		}
+		public void setSliceType(Enum sliceType) {
+			this.sliceType = sliceType;
 		}
 	}
 

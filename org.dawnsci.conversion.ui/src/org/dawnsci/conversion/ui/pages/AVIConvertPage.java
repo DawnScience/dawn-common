@@ -22,6 +22,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.events.ExpansionAdapter;
 import org.eclipse.ui.forms.events.ExpansionEvent;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
+import org.dawnsci.plotting.api.PlotType;
 
 import uk.ac.diamond.scisoft.analysis.dataset.function.DownsampleMode;
 
@@ -142,6 +143,14 @@ public final class AVIConvertPage extends AbstractSliceConversionPage {
 		
 	}
 	
+	@Override
+	protected void createContentAfterFileChoose(Composite container) {
+		super.createContentAfterFileChoose(container);
+		sliceComponent.setSliceActionEnabled(PlotType.XY,      true);
+		sliceComponent.setSliceActionEnabled(PlotType.IMAGE,   true);
+		sliceComponent.setSliceActionEnabled(PlotType.SURFACE, true);
+	}
+	
 	private static final String getFileNameNoExtension(File file) {
 		final String fileName = file.getName();
 		int posExt = fileName.lastIndexOf(".");
@@ -213,6 +222,7 @@ public final class AVIConvertPage extends AbstractSliceConversionPage {
 		bean.setDownsampleBin(downsampleSize);
 		bean.setFrameRate(frameRate);
 		context.setUserObject(bean);
+		bean.setSliceType(sliceComponent.getSliceType());
 		
 		return context;
 	}

@@ -34,7 +34,7 @@ public class ServiceManager {
 		OFFLINE_SERVICES.add(IHardwareService.class);
 		OFFLINE_SERVICES.add(IPaletteService.class);
 		OFFLINE_SERVICES.add(ILoaderService.class);
-		OFFLINE_SERVICES.add(IThumbnailService.class);
+		OFFLINE_SERVICES.add(IPlotImageService.class);
 		OFFLINE_SERVICES.add(IUserInputService.class);
 		OFFLINE_SERVICES.add(ISystemService.class);
 		OFFLINE_SERVICES.add(ITransferService.class);

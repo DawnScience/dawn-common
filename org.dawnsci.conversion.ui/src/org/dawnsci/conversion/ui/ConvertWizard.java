@@ -31,6 +31,7 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IExportWizard;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
@@ -154,20 +155,30 @@ public class ConvertWizard extends Wizard implements IExportWizard{
 						
 						EclipseUtils.refreshAndOpen(context.getOutputPath(), selectedConversionPage.isOpen(), monitor);
 						
-					} catch (Exception e) {
-						throw new InterruptedException(e.getMessage());
+					} catch (final Exception e) {
+						Display.getDefault().syncExec(new Runnable() {
+							public void run() {
+								final StringBuilder buf = new StringBuilder();
+								if (context.getFilePaths()!=null) {
+									buf.append( "The file(s) ");
+									buf.append(Arrays.toString(context.getFilePaths().toArray()));
+									buf.append( " were not converted!\n");
+								}
+								if (e.getMessage()!=null) buf.append(e.getMessage());
+								ErrorDialog.openError(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
+													"File(s) Not Converted", 
+													null,
+													new Status(IStatus.WARNING, "org.edna.workbench.actions", buf.toString(), e));
+							}
+						});
+					return;
 					} finally {
 						monitor.done();
 					}
 				}
 			});
 		} catch (Throwable ne) {
-			final String message = "The file(s) "+Arrays.toString(context.getFilePaths().toArray())+" were not converted!";
-			ErrorDialog.openError(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-					"File(s) Not Converted", 
-					ne.getMessage(),
-					new Status(IStatus.WARNING, "org.edna.workbench.actions", message, ne));
-
+            logger.warn("Conversion interupted!", ne);
 		}
 
 		return true;

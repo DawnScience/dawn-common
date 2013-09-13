@@ -12,6 +12,7 @@ package org.dawb.common.services;
 import java.io.File;
 
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.ui.services.IDisposable;
 
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 
@@ -24,7 +25,7 @@ import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
  * 
  * @author fcp94556
  */
-public interface IThumbnailService extends IFileIconService{
+public interface IPlotImageService extends IFileIconService{
 
 	/**
 	 * Create a sqaure image from a specified file, f of given side size, size in pixels.
@@ -41,20 +42,31 @@ public interface IThumbnailService extends IFileIconService{
 	 * @return
 	 */
 	public IDataset getThumbnail(IDataset set, final int width, int height);
-
-	/**
-	 * Create an image from an AbstractDataset
-	 * @param thumb - must be 2D set
-	 * @return
-	 */
-	public Image createImage(IDataset thumb) throws Exception;
 	
 	/**
-	 * Main method for thumbnails, deals with 1D and 2D set thumbnails.
+	 * Main method for thumbnails and other images of plots which must have
+	 * a certain size. Deals with 1D and 2D, including surfaces.
+	 * 
+	 * THREAD SAFE
+	 * 
 	 * @param set
 	 * @param size
 	 * @return
 	 */
-	public Image getThumbnailImage(IDataset set, final int width, int height) throws Exception;
+	public Image getImage(PlotImageData data) throws Exception;
+	
+	/**
+	 * Creates an object which may be used to cache the plotting system
+	 * when looping over a stack and getting many images. For instance when
+	 * exporting surface or 1D plots. This  IDisposable is then set in the
+	 * call to PlotImageData to make it more efficient.
+	 * 
+	 * THREAD SAFE
+	 * 
+	 * @param plotName to use to look up plotting system (can be null)
+	 * @return
+	 * @throws Exception
+	 */
+	public IDisposable createPlotDisposable(String plotName) throws Exception;
 	
 }

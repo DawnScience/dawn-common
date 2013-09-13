@@ -13,23 +13,19 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
-import org.dawb.common.services.IPaletteService;
-import org.dawb.common.services.IThumbnailService;
+import org.dawb.common.services.IPlotImageService;
+import org.dawb.common.services.PlotImageData;
+import org.dawb.common.services.PlotImageData.PlotImageType;
 import org.dawb.common.services.ServiceManager;
 import org.dawb.common.services.conversion.IConversionContext;
-import org.dawnsci.plotting.api.histogram.HistogramBound;
+import org.dawnsci.plotting.api.IPlottingSystem;
+import org.dawnsci.plotting.api.PlotType;
+import org.dawnsci.plotting.api.PlottingFactory;
 import org.dawnsci.plotting.api.histogram.IImageService;
-import org.dawnsci.plotting.api.histogram.ImageServiceBean;
-import org.dawnsci.plotting.api.histogram.ImageServiceBean.HistoType;
-import org.dawnsci.plotting.api.histogram.ImageServiceBean.ImageOrigin;
-import org.dawnsci.plotting.api.preferences.BasePlottingConstants;
-import org.eclipse.core.runtime.preferences.InstanceScope;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.ui.preferences.ScopedPreferenceStore;
+import org.eclipse.ui.services.IDisposable;
 import org.monte.media.Format;
 import org.monte.media.FormatKeys.MediaType;
 import org.monte.media.avi.AVIWriter;
@@ -49,7 +45,8 @@ public class AVIImageConverter extends AbstractImageConversion {
 	
 	private static final Logger logger = LoggerFactory.getLogger(AVIImageConverter.class);
 
-	private IImageService    service;
+	private IImageService        imageService;
+	private IPlotImageService    thumbService;
 
 	/**
 	 * dir where we put the temporary images which we will later write to video.
@@ -73,15 +70,21 @@ public class AVIImageConverter extends AbstractImageConversion {
 		if (!avi.isFile() && context.getFilePaths().size()<2) {
 			throw new RuntimeException("The output path must be a single file when converting one file!");
 		}
+		
+		final Enum sliceType = getSliceType();
+		if (sliceType==null) throw new Exception("A slice type must be set for the video!");
+		if (!(sliceType instanceof PlotType)) throw new Exception("The video export currently does not work with slice "+sliceType);
+		
+		
 		avi.getParentFile().mkdirs();
 				
-		this.service = (IImageService)ServiceManager.getService(IImageService.class);
+		this.imageService = (IImageService)ServiceManager.getService(IImageService.class);
+		this.thumbService = (IPlotImageService)ServiceManager.getService(IPlotImageService.class);	            		
 
 	}
 
 	private File       selected=null;
 	private AVIWriter  out;
-	private ImageServiceBean bean;
 	private Point XYD_PLOT_SIZE = new Point(1025,768);
 	
 	/**
@@ -92,12 +95,18 @@ public class AVIImageConverter extends AbstractImageConversion {
 	@Override
 	protected synchronized void convert(AbstractDataset slice) throws Exception {
 		
+		if (getSliceType() == PlotType.SURFACE) {
+			final String plotName = context.getSelectedConversionFile().getName();
+			final IPlottingSystem system = PlottingFactory.getPlottingSystem(plotName);
+			if (system==null) throw new Exception("\nTo export videos to surfaces, please do the following things:\n\n1. Ensure that you are in 'Data Browsing' perspective.\n2. Open the file, and plot an initial surface.\n3. This orientation is then used for the surface orientation during export.\n4. Remember to set the window as desired.\n5. Rerun the conversion, this plot will be used.");
+		}
+
 		try {
 		
 			if (context.getMonitor()!=null && context.getMonitor().isCancelled()) {
 				throw new Exception(getClass().getSimpleName()+" is cancelled");
 			}
-			slice = (slice.getRank()==2) ? getDownsampled(slice) : slice;
+			slice = (slice.getRank()!=1) ? getDownsampled(slice) : slice;
 
 			boolean newAVIFile = selected==null || !selected.equals(context.getSelectedConversionFile());
 			if (context.isExpression() && out!=null) newAVIFile=false;
@@ -112,31 +121,11 @@ public class AVIImageConverter extends AbstractImageConversion {
 					context.getMonitor().subTask("Converting '"+selectedName+"' to '"+outputFile.getName()+"'");
 				}
 			}
+						
+			ImageData       data = getImageData(slice);
+			BufferedImage   img  = imageService.getBufferedImage(data);
 			
-			if (newAVIFile && slice.getRank()==2) {
-				this.bean = createImageServiceBean();
-
-				Format format = new Format(EncodingKey, ENCODING_AVI_MJPG, DepthKey, 24, QualityKey, 1f);
-			    format = format.prepend(MediaTypeKey, MediaType.VIDEO, //
-										FrameRateKey, new Rational(getFrameRate(), 1),// frame rate
-										WidthKey,     slice.getShape()[1], //
-										HeightKey,    slice.getShape()[0]);
-				out.addTrack(format);
-			}
-
-			
-			ImageData data=null;
-			if (slice.getRank()==2) {
-				bean.setImage(slice);
-				bean.setDepth(8);
-				data = service.getImageData(bean);
-			} else {
-				data = getXYImage(slice);
-			}
-			
-			BufferedImage   img  = service.getBufferedImage(data);
-			
-			if (newAVIFile && slice.getRank()==1) {
+			if (newAVIFile) {
 				Format format = new Format(EncodingKey, ENCODING_AVI_MJPG, DepthKey, 24, QualityKey, 1f);
 				format = format.prepend(MediaTypeKey, MediaType.VIDEO, //
 						FrameRateKey, new Rational(getFrameRate(), 1),// frame rate
@@ -144,12 +133,9 @@ public class AVIImageConverter extends AbstractImageConversion {
 						HeightKey,    img.getHeight());
 
 				out.addTrack(format);
+	        	out.setPalette(0, img.getColorModel());	       
 			}
 			
-			
-	        if (newAVIFile) {
-	        	out.setPalette(0, img.getColorModel());	       
-	        }
 	        out.write(0, img, 1);
 	        
 	        if (context.getMonitor()!=null) context.getMonitor().worked(1);
@@ -159,10 +145,42 @@ public class AVIImageConverter extends AbstractImageConversion {
 		}
 	}
 	
-	private ImageData getXYImage(AbstractDataset slice) throws Exception {
-		final IThumbnailService service = (IThumbnailService)ServiceManager.getService(IThumbnailService.class);	            		
-		final Image image = service.getThumbnailImage(slice, XYD_PLOT_SIZE.x, XYD_PLOT_SIZE.y);
-		ImageData data = image.getImageData();
+	private IDisposable plotDisposable;
+	
+	private ImageData getImageData(AbstractDataset slice) throws Exception {
+		
+
+		int width = XYD_PLOT_SIZE.x; int height = XYD_PLOT_SIZE.y;
+		final PlotImageData pdata = new PlotImageData(slice, width, height);
+		
+		if (slice.getRank()==2 && getSliceType()==PlotType.IMAGE) {
+			width = slice.getShape()[1];
+			height= slice.getShape()[0];
+			pdata.setType(PlotImageType.IMAGE_ONLY);
+			
+		} else {
+			// We override the slice name so that update works.
+			final String title = slice.getName(); // Contains information about slice.
+			pdata.setPlotTitle(title);
+			
+			slice.setName("slice");
+			
+			String plotName = getSliceType()==PlotType.SURFACE
+					        ? context.getSelectedConversionFile().getName()
+					        : null;
+			if (plotDisposable==null) plotDisposable = thumbService.createPlotDisposable(plotName);
+			pdata.setDisposible(plotDisposable);
+			
+			if (getSliceType()==PlotType.XY) {
+				pdata.setType(PlotImageType.XY_PLOT);
+			} else if (getSliceType()==PlotType.SURFACE) {
+				pdata.setType(PlotImageType.SURFACE_PLOT);
+			}
+		}
+		
+		
+		final Image     image = thumbService.getImage(pdata);
+		final ImageData data  = image.getImageData();
 		image.dispose();
 		return data;
 	}
@@ -180,42 +198,15 @@ public class AVIImageConverter extends AbstractImageConversion {
 		if (context.getUserObject()==null) return 1;
 		return ((ConversionInfoBean)context.getUserObject()).getFrameRate();
 	}
-	private ImageServiceBean createImageServiceBean() {
-		
-		if (context.getUserObject()!=null && ((ConversionInfoBean)context.getUserObject()).getImageServiceBean()!=null) {
-			return ((ConversionInfoBean)context.getUserObject()).getImageServiceBean();
-		}
-		ImageServiceBean imageServiceBean = new ImageServiceBean();
-		try {
-			final IPaletteService pservice = (IPaletteService)ServiceManager.getService(IPaletteService.class);
-			String scheme = getPreferenceStore().getString(BasePlottingConstants.COLOUR_SCHEME);
-			if (scheme == null || "".equals(scheme)) scheme = "Jet (Blue-Cyan-Green-Yellow-Red)";
-			PaletteData pdata = pservice.getPaletteData(scheme);
-			imageServiceBean.setPalette(pdata);	
-		} catch (Exception e) {
-			logger.error("Cannot create palette!", e);
-		}	
-		imageServiceBean.setOrigin(ImageOrigin.forLabel(getPreferenceStore().getString(BasePlottingConstants.ORIGIN_PREF)));
-		imageServiceBean.setHistogramType(HistoType.forLabel(getPreferenceStore().getString(BasePlottingConstants.HISTO_PREF)));
-		imageServiceBean.setMinimumCutBound(HistogramBound.fromString(getPreferenceStore().getString(BasePlottingConstants.MIN_CUT)));
-		imageServiceBean.setMaximumCutBound(HistogramBound.fromString(getPreferenceStore().getString(BasePlottingConstants.MAX_CUT)));
-		imageServiceBean.setNanBound(HistogramBound.fromString(getPreferenceStore().getString(BasePlottingConstants.NAN_CUT)));
-		imageServiceBean.setLo(getPreferenceStore().getDouble(BasePlottingConstants.HISTO_LO));
-		imageServiceBean.setHi(getPreferenceStore().getDouble(BasePlottingConstants.HISTO_HI));		
-		
-		return imageServiceBean;
-	}
 	
-	private IPreferenceStore store;
-	private IPreferenceStore getPreferenceStore() {
-		if (store!=null) return store;
-		store = new ScopedPreferenceStore(InstanceScope.INSTANCE, "org.dawnsci.plotting");
-		return store;
-	}
 
 	@Override
 	public void close(IConversionContext context) throws IOException {
-        out.close();
+        if (out!=null) out.close();
+        if (plotDisposable!=null && getSliceType()!=PlotType.SURFACE)  {
+        	// Surfaces use the live plotter and are not disposable.
+        	plotDisposable.dispose();
+        }
 	}
 
 }

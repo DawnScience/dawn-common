@@ -44,12 +44,12 @@
                serviceClass="org.dawb.common.services.ILoaderService"></service>
       </serviceFactory>
       <serviceFactory
-            factoryClass="org.dawb.gda.extensions.util.ImageThumbnailCreator">
+            factoryClass="org.dawb.gda.extensions.util.PlotImageService">
          <service
-               serviceClass="org.dawb.common.services.IThumbnailService"></service>
+               serviceClass="org.dawb.common.services.IPlotImageService"></service>
       </serviceFactory>
       <serviceFactory
-            factoryClass="org.dawb.gda.extensions.util.ImageThumbnailCreator">
+            factoryClass="org.dawb.gda.extensions.util.PlotImageService">
          <service
                serviceClass="org.dawb.common.services.IFileIconService">
          </service>

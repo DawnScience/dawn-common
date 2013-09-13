@@ -23,7 +23,9 @@ import javax.swing.filechooser.FileSystemView;
 import org.dawb.common.services.IFileIconService;
 import org.dawb.common.services.ILoaderService;
 import org.dawb.common.services.IPaletteService;
-import org.dawb.common.services.IThumbnailService;
+import org.dawb.common.services.IPlotImageService;
+import org.dawb.common.services.PlotImageData;
+import org.dawb.common.services.PlotImageData.PlotImageType;
 import org.dawb.common.services.ServiceManager;
 import org.dawb.common.util.io.FileUtils;
 import org.dawb.gda.extensions.Activator;
@@ -46,6 +48,9 @@ import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -54,6 +59,7 @@ import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.eclipse.ui.services.AbstractServiceFactory;
+import org.eclipse.ui.services.IDisposable;
 import org.eclipse.ui.services.IServiceLocator;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
@@ -68,9 +74,9 @@ import uk.ac.diamond.scisoft.analysis.rcp.plotting.utils.GlobalColourMaps;
 import uk.ac.diamond.scisoft.analysis.rcp.plotting.utils.SWTImageUtils;
 import uk.ac.gda.util.OSUtils;
 
-public class ImageThumbnailCreator extends AbstractServiceFactory implements IThumbnailService {
+public class PlotImageService extends AbstractServiceFactory implements IPlotImageService {
 	
-	public ImageThumbnailCreator() {
+	public PlotImageService() {
 		
 	}
 	static {
@@ -218,45 +224,80 @@ public class ImageThumbnailCreator extends AbstractServiceFactory implements ITh
 	public Object create(Class serviceInterface, IServiceLocator parentLocator,
 			IServiceLocator locator) {
 		
-		if (serviceInterface==IThumbnailService.class) {
-			return new ImageThumbnailCreator();
+		if (serviceInterface==IPlotImageService.class) {
+			return new PlotImageService();
 		} else if (serviceInterface==IFileIconService.class) {
-			return new ImageThumbnailCreator();
+			return new PlotImageService();
 		}
 		return null;
 	}
 
-	@Override
-	public Image createImage(IDataset thumb) throws Exception {
+	private Image createImage(IDataset thumb) throws Exception {
 		return createImageSWT(thumb);
 	}
 
 	@Override
-	public Image getThumbnailImage(final IDataset set, final int width, final int height) throws Exception {
+	public Image getImage(final PlotImageData data) throws Exception {
 		
-		if (set.getShape().length==2) {
+		final IDataset set  = data.getData();
+		final int     width = data.getWidth();
+		final int    height = data.getHeight();
+		
+		if (set.getShape().length==2 && data.getType()==PlotImageType.IMAGE_ONLY) {
 			final AbstractDataset thumb = getThumbnail(set, width, height);
 			if (thumb==null) return null;
 			return createImage(thumb);
 			
-		} else if (set.getShape().length==1) {
+		} else {
 
-			// We plot to an offscreen plotting system, then take a screen shot of this.
-			final IPlottingSystem system = PlottingFactory.getLightWeightPlottingSystem();
+			PlotDisposable pd  = (PlotDisposable)data.getDisposable();
+			if (pd == null) pd = (PlotDisposable)createPlotDisposable(null);
+			final PlotDisposable plotDisposable = pd;
+			
+			final IPlottingSystem system = pd.getSystem();
+		
 			
 			final Image[] scaled = new Image[1];
 			
-			final Display display = Display.getDefault();
+			final Shell   shell   = plotDisposable.getShell();
+			final Display display = shell!=null ? shell.getDisplay() : Display.getDefault();
+			
 			display.syncExec(new Runnable() {
 				public void run() {
-					final Shell   shell   = new Shell(display);
-					shell.setSize(600, 600);
-					final Composite plotter = new Composite(shell, SWT.NONE);
-					system.createPlotPart(plotter, "Thumbnail", null, PlotType.XY, null);
 					
-					// TODO set no title?
+					if (shell!=null) shell.setSize(width+20, height+20);
 					
-					system.createPlot1D(null, Arrays.asList(set), new NullProgressMonitor());
+					if (set.getShape().length==1) {
+						system.updatePlot1D(null, Arrays.asList(set), new NullProgressMonitor());
+						
+					} else if (data.getType()==PlotImageType.IMAGE_PLOT) {
+						system.setPlotType(PlotType.IMAGE);
+						system.updatePlot2D(set, null, new NullProgressMonitor());
+						
+					} else if (data.getType()==PlotImageType.SURFACE_PLOT) {
+						system.setPlotType(PlotType.SURFACE);
+						system.updatePlot2D(set, null, new NullProgressMonitor());
+					}
+
+					if (data.getPlotTitle()!=null) system.setTitle(data.getPlotTitle());
+					system.repaint(true);
+					
+					// We try to make the axes only grow if they are caching plotting because
+					// it stops the video being shakey.
+					if (data.getDisposable()!=null){
+						double yLow = Math.min(data.getyLower(), system.getSelectedYAxis().getLower());
+						double yUp  = Math.max(data.getyUpper(), system.getSelectedYAxis().getUpper());
+						data.setyLower(yLow);
+						data.setyUpper(yUp);
+
+						double xLow = Math.min(data.getxLower(), system.getSelectedXAxis().getLower());
+						double xUp  = Math.max(data.getxUpper(), system.getSelectedXAxis().getUpper());
+						data.setxLower(xLow);
+						data.setxUpper(xUp);
+						
+						system.getSelectedYAxis().setRange(yLow, yUp);
+						system.getSelectedXAxis().setRange(xLow, xUp);
+					}
 					
 					if (width>=300) {
 						scaled[0]   = ((AbstractPlottingSystem)system).getImage(new Rectangle(0, 0, width, height));
@@ -264,12 +305,81 @@ public class ImageThumbnailCreator extends AbstractServiceFactory implements ITh
 			            final Image unscaled = ((AbstractPlottingSystem)system).getImage(new Rectangle(0, 0, 300, 300));
 			            scaled[0]   = new Image(display, unscaled.getImageData().scaledTo(width, height));
 					}
+					
+					// They are inefficiently make a new plot part each time.
+					if (data.getDisposable()==null) plotDisposable.dispose();
 				}
 			});
             return scaled[0];
 		}
-		return null;
 	}
+	
+	@Override
+	public IDisposable createPlotDisposable(String plotName) throws Exception {
+		
+		// We plot to an offscreen plotting system, then take a screen shot of this.
+		final PlotDisposable ret = new PlotDisposable();
+		IPlottingSystem system = plotName!=null 
+		                       ? PlottingFactory.getPlottingSystem(plotName)
+		                       : PlottingFactory.getLightWeightPlottingSystem();
+		                       
+		if (system==null) system = PlottingFactory.getLightWeightPlottingSystem();
+		ret.setSystem(system);
+				
+		if (system.getPlotComposite()==null) {
+			Display.getDefault().syncExec(new Runnable() {
+				public void run() {
+					final Shell   shell   = new Shell(Display.getDefault(), SWT.RESIZE|SWT.NO_TRIM);
+					ret.setShell(shell);
+					shell.setSize(600, 600);
+					
+					shell.setLayout(new FillLayout());
+					final Composite main = new Composite(shell, SWT.NONE);
+					main.setLayout(new GridLayout(1, false));
+					
+					final Composite plotter = new Composite(main, SWT.NONE);
+					plotter.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+					
+					ret.getSystem().createPlotPart(plotter, "Thumbnail", null, PlotType.XY, null);		
+				}
+			});
+		}
+		
+		return ret;
+	}
+	
+	protected static class PlotDisposable implements IDisposable {
+		
+		private IPlottingSystem system;
+		private Shell           shell;
+
+		@Override
+		public void dispose() {
+			Display.getDefault().syncExec(new Runnable() {
+				public void run() {
+					if (system!=null) system.dispose();
+					if (shell!=null)  shell.dispose();
+				}
+			});
+		}
+
+		public IPlottingSystem getSystem() {
+			return system;
+		}
+
+		public void setSystem(IPlottingSystem system) {
+			this.system = system;
+		}
+
+		public Shell getShell() {
+			return shell;
+		}
+
+		public void setShell(Shell shell) {
+			this.shell = shell;
+		}
+	}
+
 	    
     public Image getIconForFile(File file) {
     	
