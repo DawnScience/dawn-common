@@ -35,11 +35,13 @@ public class ImageToH5Test {
 	@Test
 	public void testImageSimple() throws Exception {
 		
+		System.out.println("starting testImageSimple");
 		doTest("/entry/data", new int[]{10,2048,2048});
 	}
 	@Test
 	public void testImageLongPath() throws Exception {
 		
+		System.out.println("starting testImageLongPath");
 		doTest("/entry1/a/long/path/data", new int[]{10,2048,2048});
 	}
 
@@ -51,6 +53,7 @@ public class ImageToH5Test {
 	@Test
 	public void testLargeData() throws Exception {
 		
+		System.out.println("starting testLargeData");
 		doTest("/entry1/data", new int[]{100,2048,2048});
 	}
 
