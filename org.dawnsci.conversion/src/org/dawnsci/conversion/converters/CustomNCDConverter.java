@@ -166,17 +166,17 @@ public class CustomNCDConverter extends AbstractConversion  {
 		}
 		
 		List<String> headings = new ArrayList<String>();
+		String stringFormat = "%-12s";
 		
 		if (axis != null) {
 			String axisUnit = getAxisUnit(context.getAxisDatasetName(), context.getSelectedConversionFile());
-			String axisName = String.format("%s(%s)%5s", axis.getName(), axisUnit, "");
+			String axisName = String.format(stringFormat, String.format("%s(%s)", axis.getName(), axisUnit));
 			headings.add(" ".concat(axisName));
 			if (axis.hasErrors()) {
-				headings.add(String.format("%s(%s)", axis.getName().concat("_errors"), axisUnit));
+				headings.add(String.format(stringFormat, String.format("%s(%s)", axis.getName().concat("_errors"), axisUnit)));
 			}
 		}
 		
-		String stringFormat = "%-10s";
 		if (stop.length == 1 || exportFormat.equals(SAS_FORMAT.ATSAS)) {
 			headings.add(String.format(stringFormat,DEFAULT_COLUMN_NAME));
 			if (hasErrors) {
@@ -271,6 +271,7 @@ public class CustomNCDConverter extends AbstractConversion  {
 		dh.addDataset(data.getName(), data);
 		
 		ASCIIDataWithHeadingSaver saver = new ASCIIDataWithHeadingSaver(fullName);
+		saver.setCellFormat("%-12.8g");
 		saver.setHeader(header);
 		saver.setHeadings(headings);
 		saver.saveFile(dh);
