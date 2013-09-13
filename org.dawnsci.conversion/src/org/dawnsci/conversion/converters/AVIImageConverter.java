@@ -22,6 +22,7 @@ import org.dawnsci.plotting.api.IPlottingSystem;
 import org.dawnsci.plotting.api.PlotType;
 import org.dawnsci.plotting.api.PlottingFactory;
 import org.dawnsci.plotting.api.histogram.IImageService;
+import org.dawnsci.plotting.api.trace.ISurfaceTrace;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Point;
@@ -106,7 +107,7 @@ public class AVIImageConverter extends AbstractImageConversion {
 			if (context.getMonitor()!=null && context.getMonitor().isCancelled()) {
 				throw new Exception(getClass().getSimpleName()+" is cancelled");
 			}
-			slice = (slice.getRank()!=1) ? getDownsampled(slice) : slice;
+			slice = (slice.getRank()==2 && getSliceType() == PlotType.IMAGE) ? getDownsampled(slice) : slice;
 
 			boolean newAVIFile = selected==null || !selected.equals(context.getSelectedConversionFile());
 			if (context.isExpression() && out!=null) newAVIFile=false;
@@ -162,7 +163,7 @@ public class AVIImageConverter extends AbstractImageConversion {
 			// We override the slice name so that update works.
 			final String title = slice.getName(); // Contains information about slice.
 			pdata.setPlotTitle(title);
-			
+
 			slice.setName("slice");
 			
 			String plotName = getSliceType()==PlotType.SURFACE

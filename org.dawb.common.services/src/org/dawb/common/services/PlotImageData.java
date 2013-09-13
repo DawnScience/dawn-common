@@ -31,6 +31,7 @@ public class PlotImageData {
 	private int      width;
 	private int      height;
 	private PlotImageType type=PlotImageType.IMAGE_ONLY;
+	private boolean constantRange=false;
 	
 	private double yLower, yUpper, xLower, xUpper;
 	
@@ -172,6 +173,14 @@ public class PlotImageData {
 
 	public void setxUpper(double xUpper) {
 		this.xUpper = xUpper;
+	}
+
+	public boolean isConstantRange() {
+		return constantRange;
+	}
+
+	public void setConstantRange(boolean constantRange) {
+		this.constantRange = constantRange;
 	}
 	
 }

@@ -37,6 +37,7 @@ import org.dawnsci.plotting.api.PlottingFactory;
 import org.dawnsci.plotting.api.histogram.IImageService;
 import org.dawnsci.plotting.api.histogram.ImageServiceBean;
 import org.dawnsci.plotting.api.histogram.ImageServiceBean.ImageOrigin;
+import org.dawnsci.plotting.api.trace.ISurfaceTrace;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -275,8 +276,8 @@ public class PlotImageService extends AbstractServiceFactory implements IPlotIma
 						system.updatePlot2D(set, null, new NullProgressMonitor());
 						
 					} else if (data.getType()==PlotImageType.SURFACE_PLOT) {
-						system.setPlotType(PlotType.SURFACE);
-						system.updatePlot2D(set, null, new NullProgressMonitor());
+						final ISurfaceTrace trace = (ISurfaceTrace)system.getTraces(ISurfaceTrace.class).iterator().next();
+						trace.setData(data.getData(), null);
 					}
 
 					if (data.getPlotTitle()!=null) system.setTitle(data.getPlotTitle());
@@ -284,7 +285,7 @@ public class PlotImageService extends AbstractServiceFactory implements IPlotIma
 					
 					// We try to make the axes only grow if they are caching plotting because
 					// it stops the video being shakey.
-					if (data.getDisposable()!=null){
+					if (data.getDisposable()!=null && data.isConstantRange()){
 						double yLow = Math.min(data.getyLower(), system.getSelectedYAxis().getLower());
 						double yUp  = Math.max(data.getyUpper(), system.getSelectedYAxis().getUpper());
 						data.setyLower(yLow);
