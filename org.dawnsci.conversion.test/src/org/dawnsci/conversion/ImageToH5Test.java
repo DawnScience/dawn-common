@@ -25,6 +25,7 @@ import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.services.conversion.IConversionContext.ConversionScheme;
 import org.dawb.common.util.io.FileUtils;
 import org.junit.Test;
+import static org.junit.Assert.fail;
 
 import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
@@ -57,7 +58,7 @@ public class ImageToH5Test {
 
 		final File image = new File("testfiles/dir/ref-testscale_1_001.img");
 		
-		final File dir   = new File(File.createTempFile("fred", "").getParentFile(), "testDir");
+		final File dir   = new File(File.createTempFile("ImageToH5Test", "").getParentFile(), "testDir");
 		try {
 			// Copy the file a few times.
 			for (int i = 0; i < shape[0]; i++) {
@@ -77,14 +78,15 @@ public class ImageToH5Test {
 			
 			service.process(context);
 			
-			if (!output.exists()) throw new Exception("Image stack was not written to "+output.getName());
-			
-			
+			if (!output.exists()) {
+				fail("Image stack was not written to "+output.getName());
+			}
+
 			final ILazyDataset set = LoaderFactory.getData(output.getAbsolutePath(), null).getLazyDataset(0);
 			if (!Arrays.equals(set.getShape(), shape)) {
-				throw new Exception("Did not write dataset of expected shape!");
+				fail("Dataset written with shape "+Arrays.toString(set.getShape())+", but expected shape was "+Arrays.toString(shape));
 			}
-			
+
 		} finally {
 			FileUtils.recursiveDelete(dir);
 		}
