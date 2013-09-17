@@ -92,6 +92,7 @@ public class PlotImageService extends AbstractServiceFactory implements IPlotIma
 	private static int colourMapChoice    = 1;
     private static ImageRegistry imageRegistry;
     
+    @Override
 	public Image createImage(final File f, final int width, int height) {
 		
 		if (f.isDirectory()) {
@@ -106,7 +107,7 @@ public class PlotImageService extends AbstractServiceFactory implements IPlotIma
 		
 		try {
 			final AbstractDataset thumb = getThumbnail(f, width, height);
-		    return createImageSWT(thumb);
+		    return createImageSWT(thumb, null);
 		    
 		} catch (Throwable ne) {
 			
@@ -168,17 +169,19 @@ public class PlotImageService extends AbstractServiceFactory implements IPlotIma
 	 * @return
 	 * @throws Exception 
 	 */
-	public Image createImageSWT(final IDataset thumbnail) throws Exception {
+	public Image createImageSWT(final IDataset thumbnail, ImageServiceBean bean) throws Exception {
         
 		final ScopedPreferenceStore store = new ScopedPreferenceStore(InstanceScope.INSTANCE, "org.dawnsci.plotting");
-		final ImageServiceBean bean = new ImageServiceBean();
-
-		final IPaletteService pservice = (IPaletteService)PlatformUI.getWorkbench().getService(IPaletteService.class);
-		bean.setPalette(pservice.getPaletteData(store.getString("org.dawb.plotting.system.colourSchemeName")));	
-		bean.setOrigin(ImageOrigin.forLabel(store.getString("org.dawb.plotting.system.originChoice")));
+		
+		if (bean==null) {
+			bean = new ImageServiceBean();
+			final IPaletteService pservice = (IPaletteService)ServiceManager.getService(IPaletteService.class);
+			bean.setPalette(pservice.getPaletteData(store.getString("org.dawb.plotting.system.colourSchemeName")));	
+			bean.setOrigin(ImageOrigin.forLabel(store.getString("org.dawb.plotting.system.originChoice")));
+		}
 		bean.setImage(thumbnail);
 		
-		final IImageService service = (IImageService)PlatformUI.getWorkbench().getService(IImageService.class);
+		final IImageService service = (IImageService)ServiceManager.getService(IImageService.class);
 		return  service.getImage(bean);
 	}
 	/**
@@ -235,8 +238,8 @@ public class PlotImageService extends AbstractServiceFactory implements IPlotIma
 		return null;
 	}
 
-	private Image createImage(IDataset thumb) throws Exception {
-		return createImageSWT(thumb);
+	private Image createImage(IDataset thumb, ImageServiceBean bean) throws Exception {
+		return createImageSWT(thumb, bean);
 	}
 
 	@Override
@@ -249,7 +252,7 @@ public class PlotImageService extends AbstractServiceFactory implements IPlotIma
 		if (set.getShape().length==2 && data.getType()==PlotImageType.IMAGE_ONLY) {
 			final AbstractDataset thumb = getThumbnail(set, width, height);
 			if (thumb==null) return null;
-			return createImage(thumb);
+			return createImage(thumb, (ImageServiceBean)data.getImageServiceBean());
 			
 		} else {
 

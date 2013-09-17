@@ -4,11 +4,13 @@ import java.awt.Dimension;
 import java.io.File;
 
 import org.dawb.common.services.IPaletteService;
+import org.dawb.common.services.IPlotImageService;
 import org.dawb.common.services.ServiceManager;
 import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.services.conversion.IConversionContext.ConversionScheme;
 import org.dawb.common.ui.image.PaletteFactory;
 import org.dawb.gda.extensions.util.ImageService;
+import org.dawb.gda.extensions.util.PlotImageService;
 import org.dawnsci.conversion.converters.AbstractImageConversion.ConversionInfoBean;
 import org.dawnsci.plotting.api.histogram.HistogramBound;
 import org.dawnsci.plotting.api.histogram.IImageService;
@@ -31,8 +33,9 @@ public class AVIImageConvertTest {
 		ConversionServiceImpl service = new ConversionServiceImpl();
 		
 		// Not sure of this will work...
-		ServiceManager.setService(IImageService.class,   new ImageService());
-		ServiceManager.setService(IPaletteService.class, new PaletteService());
+		ServiceManager.setService(IImageService.class,       new ImageService());
+		ServiceManager.setService(IPlotImageService.class,   new PlotImageService());
+		ServiceManager.setService(IPaletteService.class,     new PaletteService());
 		
 		// Determine path to test file
 		final String path = getTestFilePath("export.h5");

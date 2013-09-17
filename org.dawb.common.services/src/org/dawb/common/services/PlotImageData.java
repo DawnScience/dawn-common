@@ -35,6 +35,8 @@ public class PlotImageData {
 	
 	private double yLower, yUpper, xLower, xUpper, zUpper, zLower;
 	
+	private Object imageServiceBean;
+	
 	/**
 	 * An object which may be used to cache the plotting
 	 * system when doing images in 1D or surfaces. This 
@@ -231,6 +233,14 @@ public class PlotImageData {
 
 	public void setzLower(double zLower) {
 		this.zLower = zLower;
+	}
+
+	public Object getImageServiceBean() {
+		return imageServiceBean;
+	}
+
+	public void setImageServiceBean(Object imageServiceBean) {
+		this.imageServiceBean = imageServiceBean;
 	}
 	
 }

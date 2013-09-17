@@ -127,6 +127,9 @@ public class AVIImageConverter extends AbstractImageConversion {
 			if (plotImageData==null) {
 				plotImageData = new PlotImageData();
 				plotImageData.setConstantRange(true);
+				if (getImageServiceBean()!=null) {
+					plotImageData.setImageServiceBean(getImageServiceBean());
+				}
 			}
 						
 			ImageData       data = getImageData(slice, plotImageData);

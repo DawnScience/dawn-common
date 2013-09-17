@@ -7,6 +7,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.dawb.common.services.conversion.IConversionContext;
+import org.dawnsci.plotting.api.PlotType;
 import org.dawnsci.plotting.api.histogram.ImageServiceBean;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
@@ -100,6 +101,10 @@ public abstract class AbstractImageConversion extends AbstractConversion {
 		if (context.getUserObject()==null) return null;
         return ((ConversionInfoBean)context.getUserObject()).getSliceType();
 	}
+	protected ImageServiceBean getImageServiceBean() {
+		if (context.getUserObject()==null) return null;
+        return ((ConversionInfoBean)context.getUserObject()).getImageServiceBean();
+	}
 	
 	/**
 	 * To be used as the user object to convey data about the conversion.
@@ -108,7 +113,7 @@ public abstract class AbstractImageConversion extends AbstractConversion {
 	 */
 	public static final class ConversionInfoBean {
 		
-		private Enum sliceType;
+		private Enum sliceType=PlotType.IMAGE;
 		private int frameRate = 20;
 		private ImageServiceBean imageServiceBean;
 		private int downsampleBin=1;
