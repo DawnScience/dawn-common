@@ -33,7 +33,7 @@ public class PlotImageData {
 	private PlotImageType type=PlotImageType.IMAGE_ONLY;
 	private boolean constantRange=false;
 	
-	private double yLower, yUpper, xLower, xUpper;
+	private double yLower, yUpper, xLower, xUpper, zUpper, zLower;
 	
 	/**
 	 * An object which may be used to cache the plotting
@@ -83,6 +83,7 @@ public class PlotImageData {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + (constantRange ? 1231 : 1237);
 		result = prime * result + ((data == null) ? 0 : data.hashCode());
 		result = prime * result
 				+ ((disposable == null) ? 0 : disposable.hashCode());
@@ -91,6 +92,19 @@ public class PlotImageData {
 				+ ((plotTitle == null) ? 0 : plotTitle.hashCode());
 		result = prime * result + ((type == null) ? 0 : type.hashCode());
 		result = prime * result + width;
+		long temp;
+		temp = Double.doubleToLongBits(xLower);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(xUpper);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(yLower);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(yUpper);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(zLower);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(zUpper);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
 		return result;
 	}
 
@@ -103,6 +117,8 @@ public class PlotImageData {
 		if (getClass() != obj.getClass())
 			return false;
 		PlotImageData other = (PlotImageData) obj;
+		if (constantRange != other.constantRange)
+			return false;
 		if (data == null) {
 			if (other.data != null)
 				return false;
@@ -123,6 +139,24 @@ public class PlotImageData {
 		if (type != other.type)
 			return false;
 		if (width != other.width)
+			return false;
+		if (Double.doubleToLongBits(xLower) != Double
+				.doubleToLongBits(other.xLower))
+			return false;
+		if (Double.doubleToLongBits(xUpper) != Double
+				.doubleToLongBits(other.xUpper))
+			return false;
+		if (Double.doubleToLongBits(yLower) != Double
+				.doubleToLongBits(other.yLower))
+			return false;
+		if (Double.doubleToLongBits(yUpper) != Double
+				.doubleToLongBits(other.yUpper))
+			return false;
+		if (Double.doubleToLongBits(zLower) != Double
+				.doubleToLongBits(other.zLower))
+			return false;
+		if (Double.doubleToLongBits(zUpper) != Double
+				.doubleToLongBits(other.zUpper))
 			return false;
 		return true;
 	}
@@ -181,6 +215,22 @@ public class PlotImageData {
 
 	public void setConstantRange(boolean constantRange) {
 		this.constantRange = constantRange;
+	}
+
+	public double getzUpper() {
+		return zUpper;
+	}
+
+	public void setzUpper(double zUpper) {
+		this.zUpper = zUpper;
+	}
+
+	public double getzLower() {
+		return zLower;
+	}
+
+	public void setzLower(double zLower) {
+		this.zLower = zLower;
 	}
 	
 }

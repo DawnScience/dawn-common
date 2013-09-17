@@ -22,7 +22,6 @@ import org.dawnsci.plotting.api.IPlottingSystem;
 import org.dawnsci.plotting.api.PlotType;
 import org.dawnsci.plotting.api.PlottingFactory;
 import org.dawnsci.plotting.api.histogram.IImageService;
-import org.dawnsci.plotting.api.trace.ISurfaceTrace;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Point;
@@ -86,7 +85,9 @@ public class AVIImageConverter extends AbstractImageConversion {
 
 	private File       selected=null;
 	private AVIWriter  out;
-	private Point XYD_PLOT_SIZE = new Point(1025,768);
+	private Point XYD_PLOT_SIZE = new Point(1024,768);
+
+	private PlotImageData plotImageData;
 	
 	/**
 	 * This convert cannot be asynchronous. (Like most actually)
@@ -122,8 +123,13 @@ public class AVIImageConverter extends AbstractImageConversion {
 					context.getMonitor().subTask("Converting '"+selectedName+"' to '"+outputFile.getName()+"'");
 				}
 			}
+			
+			if (plotImageData==null) {
+				plotImageData = new PlotImageData();
+				plotImageData.setConstantRange(true);
+			}
 						
-			ImageData       data = getImageData(slice);
+			ImageData       data = getImageData(slice, plotImageData);
 			BufferedImage   img  = imageService.getBufferedImage(data);
 			
 			if (newAVIFile) {
@@ -148,15 +154,15 @@ public class AVIImageConverter extends AbstractImageConversion {
 	
 	private IDisposable plotDisposable;
 	
-	private ImageData getImageData(AbstractDataset slice) throws Exception {
+	private ImageData getImageData(AbstractDataset slice, PlotImageData pdata) throws Exception {
 		
-
-		int width = XYD_PLOT_SIZE.x; int height = XYD_PLOT_SIZE.y;
-		final PlotImageData pdata = new PlotImageData(slice, width, height);
+		pdata.setData(slice);
+		pdata.setWidth(XYD_PLOT_SIZE.x);
+		pdata.setHeight(XYD_PLOT_SIZE.y);
 		
 		if (slice.getRank()==2 && getSliceType()==PlotType.IMAGE) {
-			width = slice.getShape()[1];
-			height= slice.getShape()[0];
+			pdata.setWidth(slice.getShape()[1]);
+			pdata.setHeight(slice.getShape()[0]);
 			pdata.setType(PlotImageType.IMAGE_ONLY);
 			
 		} else {
@@ -178,7 +184,6 @@ public class AVIImageConverter extends AbstractImageConversion {
 				pdata.setType(PlotImageType.SURFACE_PLOT);
 			}
 		}
-		
 		
 		final Image     image = thumbService.getImage(pdata);
 		final ImageData data  = image.getImageData();
@@ -208,6 +213,7 @@ public class AVIImageConverter extends AbstractImageConversion {
         	// Surfaces use the live plotter and are not disposable.
         	plotDisposable.dispose();
         }
+        plotImageData = null;
 	}
 
 }

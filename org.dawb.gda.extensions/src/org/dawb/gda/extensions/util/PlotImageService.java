@@ -15,7 +15,9 @@ import java.awt.image.DirectColorModel;
 import java.awt.image.IndexColorModel;
 import java.awt.image.WritableRaster;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import javax.swing.ImageIcon;
 import javax.swing.filechooser.FileSystemView;
@@ -277,7 +279,25 @@ public class PlotImageService extends AbstractServiceFactory implements IPlotIma
 						
 					} else if (data.getType()==PlotImageType.SURFACE_PLOT) {
 						final ISurfaceTrace trace = (ISurfaceTrace)system.getTraces(ISurfaceTrace.class).iterator().next();
-						trace.setData(data.getData(), null);
+						
+						// Keep z constant
+						List<IDataset> oaxes = trace.getAxes();
+						List<IDataset> axes  = new ArrayList<IDataset>(3);
+						if (oaxes==null) {
+							axes.add(AbstractDataset.arange(set.getShape()[1], AbstractDataset.INT));
+							axes.add(AbstractDataset.arange(set.getShape()[0], AbstractDataset.INT));
+						} else {
+							axes.add(oaxes.get(0));
+							axes.add(oaxes.get(1));
+						}
+
+						// z only gets larger
+						double zLow = Math.min(data.getzLower(), set.min().doubleValue());
+						double zUp  = Math.max(data.getzUpper(), set.max().doubleValue());
+						IDataset z  = AbstractDataset.arange(zLow, zUp, (zUp-zLow)/1000, AbstractDataset.FLOAT);
+						axes.add(z);
+						
+						trace.setData(data.getData(), axes);
 					}
 
 					if (data.getPlotTitle()!=null) system.setTitle(data.getPlotTitle());
@@ -285,7 +305,7 @@ public class PlotImageService extends AbstractServiceFactory implements IPlotIma
 					
 					// We try to make the axes only grow if they are caching plotting because
 					// it stops the video being shakey.
-					if (data.getDisposable()!=null && data.isConstantRange()){
+					if (data.getDisposable()!=null && data.isConstantRange() && data.getType()!=PlotImageType.SURFACE_PLOT){
 						double yLow = Math.min(data.getyLower(), system.getSelectedYAxis().getLower());
 						double yUp  = Math.max(data.getyUpper(), system.getSelectedYAxis().getUpper());
 						data.setyLower(yLow);
@@ -302,7 +322,8 @@ public class PlotImageService extends AbstractServiceFactory implements IPlotIma
 					
 					if (width>=300) {
 						scaled[0]   = ((AbstractPlottingSystem)system).getImage(new Rectangle(0, 0, width, height));
-					} else {
+					
+					} else { // They wanted an icon
 			            final Image unscaled = ((AbstractPlottingSystem)system).getImage(new Rectangle(0, 0, 300, 300));
 			            scaled[0]   = new Image(display, unscaled.getImageData().scaledTo(width, height));
 					}
