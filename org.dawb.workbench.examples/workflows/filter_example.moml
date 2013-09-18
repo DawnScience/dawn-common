@@ -1,0 +1,141 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE entity PUBLIC "-//UC Berkeley//DTD MoML 1//EN"
+    "http://ptolemy.eecs.berkeley.edu/xml/dtd/MoML_1.dtd">
+<entity name="newModel" class="ptolemy.actor.TypedCompositeActor" source="C:\Work\runtime-uk.ac.diamond.dawn.product\workflows\examples\filter_example.moml">
+    <property name="_createdBy" class="ptolemy.kernel.attributes.VersionAttribute" value="7.0.1">
+    </property>
+    <property name="_workbenchVersion" class="ptolemy.kernel.attributes.VersionAttribute" value="null">
+    </property>
+    <property name="Director" class="com.isencia.passerelle.domain.cap.Director">
+        <property name="Expert Modeler" class="ptolemy.data.expr.Parameter" value="false">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{20, 20}">
+        </property>
+    </property>
+    <entity name="slicedImage" class="org.dawb.passerelle.actors.data.DataImportSource">
+<display name="slicedImage"/>        <property name="Receiver Q Capacity (-1)" class="ptolemy.data.expr.Parameter" value="-1">
+        </property>
+        <property name="Receiver Q warning size (-1)" class="ptolemy.data.expr.Parameter" value="-1">
+        </property>
+        <property name="_break_point" class="ptolemy.data.expr.Parameter" value="false">
+        </property>
+        <property name="Relative Path" class="ptolemy.data.expr.Parameter" value="true">
+        </property>
+        <property name="Folder" class="ptolemy.data.expr.Parameter" value="false">
+        </property>
+        <property name="Include Metadata" class="ptolemy.data.expr.Parameter" value="false">
+        </property>
+        <property name="File Filter" class="com.isencia.passerelle.util.ptolemy.RegularExpressionParameter" value="">
+        </property>
+        <property name="Path" class="com.isencia.passerelle.util.ptolemy.ResourceParameter" value="/${project_name}/data/pow_M99S5_1_0001.cbf">
+        </property>
+        <property name="Data Sets" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="image">
+        </property>
+        <property name="Rename Data Sets" class="com.isencia.passerelle.util.ptolemy.StringMapParameter" value="image=line">
+        </property>
+        <property name="Data Set Slice" class="org.dawb.passerelle.actors.data.config.SliceParameter" value="PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPGphdmEgdmVyc2lvbj0iMS43LjBfMTUiIGNsYXNzPSJqYXZhLmJlYW5zLlhNTERlY29kZXIiPgogPG9iamVjdCBjbGFzcz0ib3JnLmRhd25zY2kuc2xpY2luZy5hcGkuc3lzdGVtLkRpbXNEYXRhTGlzdCI+CiAgPHZvaWQgcHJvcGVydHk9ImRpbXNEYXRhIj4KICAgPG9iamVjdCBjbGFzcz0iamF2YS51dGlsLkFycmF5TGlzdCI+CiAgICA8dm9pZCBtZXRob2Q9ImFkZCI+CiAgICAgPG9iamVjdCBjbGFzcz0ib3JnLmRhd25zY2kuc2xpY2luZy5hcGkuc3lzdGVtLkRpbXNEYXRhIiBpZD0iRGltc0RhdGEwIj4KICAgICAgPHZvaWQgY2xhc3M9Im9yZy5kYXduc2NpLnNsaWNpbmcuYXBpLnN5c3RlbS5EaW1zRGF0YSIgbWV0aG9kPSJnZXRGaWVsZCI+CiAgICAgICA8c3RyaW5nPnNsaWNlPC9zdHJpbmc+CiAgICAgICA8dm9pZCBtZXRob2Q9InNldCI+CiAgICAgICAgPG9iamVjdCBpZHJlZj0iRGltc0RhdGEwIi8+CiAgICAgICAgPGludD43MjM8L2ludD4KICAgICAgIDwvdm9pZD4KICAgICAgPC92b2lkPgogICAgICA8dm9pZCBwcm9wZXJ0eT0iZGltZW5zaW9uIj4KICAgICAgIDxpbnQ+MDwvaW50PgogICAgICA8L3ZvaWQ+CiAgICAgPC9vYmplY3Q+CiAgICA8L3ZvaWQ+CiAgICA8dm9pZCBtZXRob2Q9ImFkZCI+CiAgICAgPG9iamVjdCBjbGFzcz0ib3JnLmRhd25zY2kuc2xpY2luZy5hcGkuc3lzdGVtLkRpbXNEYXRhIj4KICAgICAgPHZvaWQgcHJvcGVydHk9ImRpbWVuc2lvbiI+CiAgICAgICA8aW50PjE8L2ludD4KICAgICAgPC92b2lkPgogICAgICA8dm9pZCBwcm9wZXJ0eT0icGxvdEF4aXMiPgogICAgICAgPGludD4wPC9pbnQ+CiAgICAgIDwvdm9pZD4KICAgICA8L29iamVjdD4KICAgIDwvdm9pZD4KICAgPC9vYmplY3Q+CiAgPC92b2lkPgogPC9vYmplY3Q+CjwvamF2YT4K">
+        </property>
+        <property name="Data Type" class="org.dawb.passerelle.actors.data.DataImportSource$3" value="Complete data as numerical arrays">
+        </property>
+        <property name="Slice Name Type" class="org.dawb.passerelle.actors.data.DataImportSource$4" value="Same name for each slice">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{41.0, 210.0}">
+        </property>
+    </entity>
+    <entity name="Plot Review" class="org.dawb.passerelle.actors.ui.UserPlotTransformer">
+        <property name="Receiver Q Capacity (-1)" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+        <property name="Receiver Q warning size (-1)" class="ptolemy.data.expr.Parameter" value="-1">
+        </property>
+        <property name="Expression Mode" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="Evaluate on every data input">
+        </property>
+        <property name="Memory Mode" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="Create copy of data leaving original data intact.">
+        </property>
+        <property name="Name Mode" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="Attempt to use image name if there is one.">
+        </property>
+        <property name="_break_point" class="ptolemy.data.expr.Parameter" value="false">
+        </property>
+        <property name="User Input Type" class="org.dawb.passerelle.actors.ui.UserPlotTransformer$1" value="Edit with dialog (non-blocking)">
+        </property>
+        <property name="Tool id" class="org.dawb.passerelle.actors.ui.UserPlotTransformer$2" value="org.dawb.workbench.plotting.tools.fittingTool">
+        </property>
+        <property name="Description" class="ptolemy.data.expr.StringParameter" value="">
+        </property>
+        <property name="Axis Names" class="ptolemy.data.expr.StringParameter" value="">
+        </property>
+        <property name="Data Names" class="ptolemy.data.expr.StringParameter" value="line">
+        </property>
+        <property name="Silent" class="ptolemy.data.expr.Parameter" value="false">
+        </property>
+        <property name="Automatic default value" class="ptolemy.data.expr.Parameter" value="true">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{153.0, 211.0}">
+        </property>
+    </entity>
+    <entity name="Data Export" class="org.dawb.passerelle.actors.data.DataExportTransformer">
+        <property name="Receiver Q Capacity (-1)" class="ptolemy.data.expr.Parameter" value="-1">
+        </property>
+        <property name="Receiver Q warning size (-1)" class="ptolemy.data.expr.Parameter" value="-1">
+        </property>
+        <property name="Expression Mode" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="Evaluate on every data input">
+        </property>
+        <property name="Memory Mode" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="Create copy of data leaving original data intact.">
+        </property>
+        <property name="Name Mode" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="Attempt to use image name if there is one.">
+        </property>
+        <property name="_break_point" class="ptolemy.data.expr.Parameter" value="false">
+        </property>
+        <property name="File Format" class="org.dawb.passerelle.actors.data.DataExportTransformer$1" value="hdf5">
+        </property>
+        <property name="Writing Type" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="Create new file using ${file_name} then use that for everything">
+        </property>
+        <property name="Output" class="com.isencia.passerelle.util.ptolemy.ResourceParameter" value="/${project_name}/output/">
+        </property>
+        <property name="Calibration" class="org.dawb.passerelle.actors.data.DataExportTransformer$2" value="None">
+        </property>
+        <property name="Dataset Name" class="ptolemy.data.expr.StringParameter" value="example/peak">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{373.0, 210.0}">
+        </property>
+    </entity>
+    <entity name="Filter" class="org.dawb.passerelle.common.actors.DataMessageFilter">
+        <property name="Receiver Q Capacity (-1)" class="ptolemy.data.expr.Parameter" value="-1">
+        </property>
+        <property name="Receiver Q warning size (-1)" class="ptolemy.data.expr.Parameter" value="-1">
+        </property>
+        <property name="Expression Mode" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="Evaluate on every data input">
+        </property>
+        <property name="Memory Mode" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="Create copy of data leaving original data intact.">
+        </property>
+        <property name="Name Mode" class="com.isencia.passerelle.util.ptolemy.StringChoiceParameter" value="Attempt to use image name if there is one.">
+        </property>
+        <property name="_break_point" class="ptolemy.data.expr.Parameter" value="false">
+        </property>
+        <property name="Data Filter" class="ptolemy.data.expr.StringParameter" value="Peak 1">
+        </property>
+        <property name="Region Filter" class="ptolemy.data.expr.StringParameter" value="">
+        </property>
+        <property name="Function Filter" class="ptolemy.data.expr.StringParameter" value="">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{267.0, 210.0}">
+        </property>
+    </entity>
+    <relation name="_R" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <relation name="_R_2" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <relation name="_R_3" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <link port="slicedImage.output" relation="_R"/>
+    <link port="Plot Review.input" relation="_R"/>
+    <link port="Plot Review.output" relation="_R_2"/>
+    <link port="Data Export.input" relation="_R_3"/>
+    <link port="Filter.input" relation="_R_2"/>
+    <link port="Filter.output" relation="_R_3"/>
+</entity>
