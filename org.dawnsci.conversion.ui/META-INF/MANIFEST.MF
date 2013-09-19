@@ -17,11 +17,11 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.forms;bundle-version="3.5.200",
  org.dawnsci.io;bundle-version="1.2.0",
  org.dawnsci.common.widgets;bundle-version="1.2.0",
- org.dawnsci.slicing.api;bundle-version="1.0.0"
+ org.dawnsci.slicing.api;bundle-version="1.0.0",
+ org.eclipse.emf.common.ui;bundle-version="[2.7.0,2.7.1)"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Import-Package: org.dawb.common.ui.monitor,
  org.dawb.common.ui.util,
  org.dawnsci.plotting.api,
- org.eclipse.emf.common.ui.dialogs,
  org.slf4j
