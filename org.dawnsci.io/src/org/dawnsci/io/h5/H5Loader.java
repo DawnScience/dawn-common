@@ -31,14 +31,13 @@ import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.LazyDataset;
 import uk.ac.diamond.scisoft.analysis.io.AbstractFileLoader;
 import uk.ac.diamond.scisoft.analysis.io.DataHolder;
-import uk.ac.diamond.scisoft.analysis.io.IDataSetLoader;
 import uk.ac.diamond.scisoft.analysis.io.IMetaData;
 import uk.ac.diamond.scisoft.analysis.io.IMetaLoader;
 import uk.ac.diamond.scisoft.analysis.io.MetaDataAdapter;
 import uk.ac.diamond.scisoft.analysis.io.SliceObject;
 import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
 
-public class H5Loader extends AbstractFileLoader implements IMetaLoader, IDataSetLoader {
+public class H5Loader extends AbstractFileLoader implements IMetaLoader {
 
 	public final static List<String> EXT;
 	static {
@@ -155,7 +154,6 @@ public class H5Loader extends AbstractFileLoader implements IMetaLoader, IDataSe
 	}
 
 
-	@Override
 	public AbstractDataset loadSet(String path, String fullPath, IMonitor mon) throws Exception {
 		IHierarchicalDataFile file = null;
 		try {
@@ -186,7 +184,6 @@ public class H5Loader extends AbstractFileLoader implements IMetaLoader, IDataSe
 		}
 	}
 
-	@Override
 	public Map<String, ILazyDataset> loadSets(String path, List<String> fullPaths, IMonitor mon) throws Exception {
 		IHierarchicalDataFile file = null;
 		try {

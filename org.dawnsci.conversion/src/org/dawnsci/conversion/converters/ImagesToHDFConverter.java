@@ -17,6 +17,7 @@ import org.dawb.hdf5.IHierarchicalDataFile;
 import org.dawb.hdf5.Nexus;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.LazyDataset;
 import uk.ac.diamond.scisoft.analysis.io.ImageStackLoader;
@@ -99,12 +100,12 @@ public class ImagesToHDFConverter extends AbstractConversion{
 
     private boolean first = true;
 	@Override
-	protected void convert(AbstractDataset slice) throws Exception {
+	protected void convert(IDataset slice) throws Exception {
 		
         final String datasetPath = context.getDatasetNames().get(0);
 		final Datatype        dt = getDatatype(slice);
 		
-		Dataset d = hFile.appendDataset(name, dt, getLong(slice.getShape()), slice.getBuffer(), group);
+		Dataset d = hFile.appendDataset(name, dt, getLong(slice.getShape()), ((AbstractDataset)slice).getBuffer(), group);
 		if (first) {
 			hFile.setNexusAttribute(d, Nexus.SDS);
 			hFile.setAttribute(d, "original_name", datasetPath);

@@ -33,7 +33,7 @@ import org.monte.media.math.Rational;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 
 /**
  * Class to create a video of slices.
@@ -95,7 +95,7 @@ public class AVIImageConverter extends AbstractImageConversion {
 	 * @throws Exception
 	 */
 	@Override
-	protected synchronized void convert(AbstractDataset slice) throws Exception {
+	protected synchronized void convert(IDataset slice) throws Exception {
 		
 		if (getSliceType() == PlotType.SURFACE) {
 			final String plotName = context.getSelectedConversionFile().getName();
@@ -157,7 +157,7 @@ public class AVIImageConverter extends AbstractImageConversion {
 	
 	private IDisposable plotDisposable;
 	
-	private ImageData getImageData(AbstractDataset slice, PlotImageData pdata) throws Exception {
+	private ImageData getImageData(IDataset slice, PlotImageData pdata) throws Exception {
 		
 		pdata.setData(slice);
 		pdata.setWidth(XYD_PLOT_SIZE.x);

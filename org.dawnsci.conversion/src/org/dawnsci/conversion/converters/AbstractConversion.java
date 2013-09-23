@@ -98,7 +98,7 @@ public abstract class AbstractConversion {
 	 * @param slice
 	 * @param context, used to provide the output location mainly.
 	 */
-	protected abstract void convert(AbstractDataset slice) throws Exception;
+	protected abstract void convert(IDataset slice) throws Exception;
 	
 
 	/**
@@ -119,7 +119,7 @@ public abstract class AbstractConversion {
 		final DataHolder   dh = LoaderFactory.getData(path.getAbsolutePath());
 		context.setSelectedH5Path(dsPath);
 		if (context.getSliceDimensions()==null) {
-			AbstractDataset data = LoaderFactory.getDataSet(path.getAbsolutePath(), dsPath, null);
+			IDataset data = LoaderFactory.getDataSet(path.getAbsolutePath(), dsPath, null);
 			data.setName(dsPath);
 			convert(data);
 			return null;

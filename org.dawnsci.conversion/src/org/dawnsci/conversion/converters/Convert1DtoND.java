@@ -49,7 +49,7 @@ public class Convert1DtoND extends AbstractConversion {
 	}
 
 	@Override
-	protected void convert(AbstractDataset slice) throws Exception {
+	protected void convert(IDataset slice) throws Exception {
 		
 		if (!dataMap.containsKey(slice.getName()))dataMap.put(slice.getName(), new ArrayList<ILazyDataset>());
 		dataMap.get(slice.getName()).add(slice);

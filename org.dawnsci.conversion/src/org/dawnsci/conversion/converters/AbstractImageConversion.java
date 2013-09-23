@@ -10,7 +10,7 @@ import org.dawb.common.services.conversion.IConversionContext;
 import org.dawnsci.plotting.api.PlotType;
 import org.dawnsci.plotting.api.histogram.ImageServiceBean;
 
-import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.function.Downsample;
 import uk.ac.diamond.scisoft.analysis.dataset.function.DownsampleMode;
 
@@ -26,7 +26,7 @@ public abstract class AbstractImageConversion extends AbstractConversion {
 	 * Please override getExtension() if using getFileName(...)
 	 * @return
 	 */
-	protected final String getFilePath(AbstractDataset slice) {
+	protected final String getFilePath(IDataset slice) {
 		final String sliceFileName = getFileName(slice);
 		
 		final File selectedFile = context.getSelectedConversionFile();
@@ -37,7 +37,7 @@ public abstract class AbstractImageConversion extends AbstractConversion {
 
 	private Pattern INDEX_PATTERN = Pattern.compile("(.+index=)(\\d+)\\)");
 	
-	private String getFileName(AbstractDataset slice) {
+	private String getFileName(IDataset slice) {
 		
 		String fileName = slice.getName();
 		if (context.getUserObject()!=null) {
@@ -89,7 +89,7 @@ public abstract class AbstractImageConversion extends AbstractConversion {
         return ((ConversionInfoBean)context.getUserObject()).getDownsampleMode();
 	}
 	
-	protected AbstractDataset getDownsampled(AbstractDataset slice) {
+	protected IDataset getDownsampled(IDataset slice) {
 		final String name = slice.getName();
 		if (getDownsampleBin()>1) {
 			final Downsample down = new Downsample(getDownsampleMode(), getDownsampleBin(), getDownsampleBin());

@@ -36,7 +36,7 @@ public class AsciiConvert1D extends AbstractConversion {
 	private File selected = null;
 	
 	@Override
-	protected void convert(AbstractDataset slice) throws Exception {
+	protected void convert(IDataset slice) throws Exception {
 		if (context.getMonitor()!=null && context.getMonitor().isCancelled()) {
 			throw new Exception(getClass().getSimpleName()+" is cancelled");
 		}

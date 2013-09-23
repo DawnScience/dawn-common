@@ -4,7 +4,7 @@ import java.io.File;
 
 import org.dawb.common.services.conversion.IConversionContext;
 
-import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.io.DataHolder;
 import uk.ac.diamond.scisoft.analysis.io.JavaImageSaver;
 
@@ -28,7 +28,7 @@ public class ImageConverter extends AbstractImageConversion {
 	}
 
 	@Override
-	protected void convert(AbstractDataset slice) throws Exception {
+	protected void convert(IDataset slice) throws Exception {
 		
 		if (context.getMonitor()!=null && context.getMonitor().isCancelled()) {
 			throw new Exception(getClass().getSimpleName()+" is cancelled");

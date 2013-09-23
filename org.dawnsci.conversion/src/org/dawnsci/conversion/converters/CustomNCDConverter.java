@@ -26,12 +26,12 @@ import org.cansas.cansas1d.SAScollimationType;
 import org.cansas.cansas1d.SASdataType;
 import org.cansas.cansas1d.SASdetectorType;
 import org.cansas.cansas1d.SASentryType;
-import org.cansas.cansas1d.SASsourceType;
-import org.cansas.cansas1d.SAStransmissionSpectrumType;
 import org.cansas.cansas1d.SASentryType.Run;
 import org.cansas.cansas1d.SASinstrumentType;
 import org.cansas.cansas1d.SASrootType;
 import org.cansas.cansas1d.SASsampleType;
+import org.cansas.cansas1d.SASsourceType;
+import org.cansas.cansas1d.SAStransmissionSpectrumType;
 import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.hdf5.HierarchicalDataFactory;
 import org.dawb.hdf5.IHierarchicalDataFile;
@@ -72,7 +72,7 @@ public class CustomNCDConverter extends AbstractConversion  {
 	}
 
 	@Override
-	protected void convert(AbstractDataset slice) {
+	protected void convert(IDataset slice) {
 		//we do our convert elsewhere
 	}
 	
@@ -100,7 +100,7 @@ public class CustomNCDConverter extends AbstractConversion  {
 		//get the x axis if required
 		IErrorDataset axis = null;
 		if (context.getAxisDatasetName() != null) {
-			axis = getAxis(context.getAxisDatasetName(), context.getSelectedConversionFile());
+			axis = (IErrorDataset)getAxis(context.getAxisDatasetName(), context.getSelectedConversionFile());
 			// ATSAS ASCII format doesn't support axis errors
 			if (axis.hasErrors() && exportFormat.equals(SAS_FORMAT.ATSAS)) {
 				axis.clearError();
@@ -289,7 +289,7 @@ public class CustomNCDConverter extends AbstractConversion  {
 		AbstractDataset axisErrors = null;
 		String axisUnits = "a.u.";
 		if (context.getAxisDatasetName() != null) {
-			axis = getAxis(context.getAxisDatasetName(), context.getSelectedConversionFile());
+			axis = (AbstractDataset)getAxis(context.getAxisDatasetName(), context.getSelectedConversionFile());
 			axis.squeeze();
 			axisUnits = getAxisUnit(context.getAxisDatasetName(), context.getSelectedConversionFile());
 			if (axis.hasErrors()) {
@@ -460,9 +460,9 @@ public class CustomNCDConverter extends AbstractConversion  {
 		return t.toString();
 	}
 	
-	private AbstractDataset getAxis(String datasetName, File path) {
+	private IDataset getAxis(String datasetName, File path) {
 		
-		AbstractDataset data = null;
+		IDataset data = null;
 		try {
 			data = LoaderFactory.getDataSet(path.getAbsolutePath(), datasetName, null);
 			//expand so the concatenation works later
