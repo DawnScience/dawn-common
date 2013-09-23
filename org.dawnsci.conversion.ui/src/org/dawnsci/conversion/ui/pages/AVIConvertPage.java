@@ -5,6 +5,7 @@ import java.io.File;
 import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.ui.util.GridUtils;
 import org.dawnsci.conversion.converters.ImageConverter;
+import org.dawnsci.plotting.api.PlotType;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
@@ -14,6 +15,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -22,7 +24,6 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.events.ExpansionAdapter;
 import org.eclipse.ui.forms.events.ExpansionEvent;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
-import org.dawnsci.plotting.api.PlotType;
 
 import uk.ac.diamond.scisoft.analysis.dataset.function.DownsampleMode;
 
@@ -48,6 +49,7 @@ public final class AVIConvertPage extends AbstractSliceConversionPage {
 	private String         downsampleName;
 	private int            downsampleSize;
 	private int            frameRate;
+	private boolean        alwaysShowTitle = false;
 
 	public AVIConvertPage() {
 		super("wizardPage", "Page for exporting HDF5 data slices into a video.", null);
@@ -128,6 +130,16 @@ public final class AVIConvertPage extends AbstractSliceConversionPage {
 		label = new Label(advanced, SWT.NULL);
 		label.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
 		label.setText("image/s");
+		
+        final Button showTitle = new Button(advanced, SWT.CHECK);
+        showTitle.setText("Show title and axes when exporting image stacks.");
+        showTitle.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
+        showTitle.setSelection(alwaysShowTitle);
+        showTitle.addSelectionListener(new SelectionAdapter() {
+        	public void widgetSelected(SelectionEvent e) {
+        		alwaysShowTitle = showTitle.getSelection();
+        	}
+		});
 
 		GridUtils.setVisible(advanced, false);
 		ExpansionAdapter expansionListener = new ExpansionAdapter() {
@@ -223,6 +235,7 @@ public final class AVIConvertPage extends AbstractSliceConversionPage {
 		bean.setFrameRate(frameRate);
 		context.setUserObject(bean);
 		bean.setSliceType(sliceComponent.getSliceType());
+		bean.setAlwaysShowTitle(alwaysShowTitle);
 		
 		return context;
 	}

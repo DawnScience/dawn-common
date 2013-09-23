@@ -90,9 +90,11 @@ public abstract class AbstractImageConversion extends AbstractConversion {
 	}
 	
 	protected AbstractDataset getDownsampled(AbstractDataset slice) {
+		final String name = slice.getName();
 		if (getDownsampleBin()>1) {
 			final Downsample down = new Downsample(getDownsampleMode(), getDownsampleBin(), getDownsampleBin());
 			slice = down.value(slice).get(0);
+			slice.setName(name);
 		}
 		return slice;
 	}
@@ -104,6 +106,10 @@ public abstract class AbstractImageConversion extends AbstractConversion {
 	protected ImageServiceBean getImageServiceBean() {
 		if (context.getUserObject()==null) return null;
         return ((ConversionInfoBean)context.getUserObject()).getImageServiceBean();
+	}
+	protected boolean isAlwaysShowTitle() {
+		if (context.getUserObject()==null) return false;
+        return ((ConversionInfoBean)context.getUserObject()).isAlwaysShowTitle();
 	}
 	
 	/**
@@ -122,6 +128,7 @@ public abstract class AbstractImageConversion extends AbstractConversion {
 		private String extension = "tiff";
 		private int    bits      = 33;
 		private String sliceIndexFormat = "#000";
+		private boolean alwaysShowTitle = false;
 		
 		public String getExtension() {
 			return extension;
@@ -143,6 +150,7 @@ public abstract class AbstractImageConversion extends AbstractConversion {
 					* result
 					+ ((alternativeNamePrefix == null) ? 0
 							: alternativeNamePrefix.hashCode());
+			result = prime * result + (alwaysShowTitle ? 1231 : 1237);
 			result = prime * result + bits;
 			result = prime * result + downsampleBin;
 			result = prime
@@ -177,6 +185,8 @@ public abstract class AbstractImageConversion extends AbstractConversion {
 					return false;
 			} else if (!alternativeNamePrefix
 					.equals(other.alternativeNamePrefix))
+				return false;
+			if (alwaysShowTitle != other.alwaysShowTitle)
 				return false;
 			if (bits != other.bits)
 				return false;
@@ -249,6 +259,12 @@ public abstract class AbstractImageConversion extends AbstractConversion {
 		}
 		public void setSliceType(Enum sliceType) {
 			this.sliceType = sliceType;
+		}
+		public boolean isAlwaysShowTitle() {
+			return alwaysShowTitle;
+		}
+		public void setAlwaysShowTitle(boolean alwaysShowTitle) {
+			this.alwaysShowTitle = alwaysShowTitle;
 		}
 	}
 

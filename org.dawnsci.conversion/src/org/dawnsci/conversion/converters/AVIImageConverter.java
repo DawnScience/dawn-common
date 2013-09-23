@@ -163,17 +163,21 @@ public class AVIImageConverter extends AbstractImageConversion {
 		pdata.setWidth(XYD_PLOT_SIZE.x);
 		pdata.setHeight(XYD_PLOT_SIZE.y);
 		
+		// We override the slice name so that update works.
+		final String title = slice.getName(); // Contains information about slice.
+		pdata.setPlotTitle(title);
+		slice.setName("slice");
+
 		if (slice.getRank()==2 && getSliceType()==PlotType.IMAGE) {
 			pdata.setWidth(slice.getShape()[1]);
 			pdata.setHeight(slice.getShape()[0]);
-			pdata.setType(PlotImageType.IMAGE_ONLY);
+			if (isAlwaysShowTitle()) {
+				pdata.setType(PlotImageType.IMAGE_PLOT);
+			} else {
+			    pdata.setType(PlotImageType.IMAGE_ONLY);
+			}
 			
 		} else {
-			// We override the slice name so that update works.
-			final String title = slice.getName(); // Contains information about slice.
-			pdata.setPlotTitle(title);
-
-			slice.setName("slice");
 			
 			String plotName = getSliceType()==PlotType.SURFACE
 					        ? context.getSelectedConversionFile().getName()
