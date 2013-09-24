@@ -119,6 +119,7 @@ public abstract class AbstractConversion {
 		final DataHolder   dh = LoaderFactory.getData(path.getAbsolutePath());
 		context.setSelectedH5Path(dsPath);
 		if (context.getSliceDimensions()==null) {
+			// Because the data might be lazy and unloadable. We want to load all the data now.
 			IDataset data = LoaderFactory.getDataSet(path.getAbsolutePath(), dsPath, null);
 			data.setName(dsPath);
 			convert(data);
