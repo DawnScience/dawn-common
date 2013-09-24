@@ -158,6 +158,7 @@ public final class AVIConvertPage extends AbstractSliceConversionPage {
 	@Override
 	protected void createContentAfterFileChoose(Composite container) {
 		super.createContentAfterFileChoose(container);
+		updateAllowedActions();
 	}
 	
 	private static final String getFileNameNoExtension(File file) {
@@ -172,10 +173,6 @@ public final class AVIConvertPage extends AbstractSliceConversionPage {
 		return false;
 	}
 	
-	protected void nameChanged() {
-        super.nameChanged();
-        updateAllowedActions();
-	}
 	/**
 	 * Checks the path is ok.
 	 */
@@ -197,7 +194,6 @@ public final class AVIConvertPage extends AbstractSliceConversionPage {
 			setErrorMessage(null);
 			return;
 		}
-		updateAllowedActions();
 	}
 	
 	private void updateAllowedActions() {

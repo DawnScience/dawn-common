@@ -16,6 +16,7 @@ import org.dawnsci.slicing.api.system.DimsDataList;
 import org.dawnsci.slicing.api.system.ISliceSystem;
 import org.dawnsci.slicing.api.system.SliceSource;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.wizard.IWizardPage;
@@ -49,6 +50,7 @@ public abstract class AbstractSliceConversionPage extends ResourceChoosePage {
 	protected IConversionContext context;
 	protected ISliceSystem   sliceComponent;
 	protected Label          multiFileMessage;
+
 
 	public AbstractSliceConversionPage(String pageName, String description, ImageDescriptor icon) {
 		super(pageName, description, icon);
