@@ -158,9 +158,6 @@ public final class AVIConvertPage extends AbstractSliceConversionPage {
 	@Override
 	protected void createContentAfterFileChoose(Composite container) {
 		super.createContentAfterFileChoose(container);
-		sliceComponent.setSliceActionEnabled(PlotType.XY,      true);
-		sliceComponent.setSliceActionEnabled(PlotType.IMAGE,   true);
-		sliceComponent.setSliceActionEnabled(PlotType.SURFACE, true);
 	}
 	
 	private static final String getFileNameNoExtension(File file) {
@@ -175,6 +172,10 @@ public final class AVIConvertPage extends AbstractSliceConversionPage {
 		return false;
 	}
 	
+	protected void nameChanged() {
+        super.nameChanged();
+        updateAllowedActions();
+	}
 	/**
 	 * Checks the path is ok.
 	 */
@@ -196,8 +197,16 @@ public final class AVIConvertPage extends AbstractSliceConversionPage {
 			setErrorMessage(null);
 			return;
 		}
+		updateAllowedActions();
 	}
 	
+	private void updateAllowedActions() {
+		sliceComponent.setSliceActionsEnabled(false);
+		sliceComponent.setSliceActionEnabled(PlotType.XY,      true);
+		sliceComponent.setSliceActionEnabled(PlotType.IMAGE,   true);
+		sliceComponent.setSliceActionEnabled(PlotType.SURFACE, true);
+	}
+
 	@Override
 	public void setContext(IConversionContext context) {
 		
