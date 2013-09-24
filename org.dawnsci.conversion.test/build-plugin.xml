@@ -24,14 +24,18 @@
            Invoke the tests
          ==================================================================== -->
 
-    <target name="junit-tests" depends="toolCheck, set-test-base-DAWN">
-        <junit-call description="${ant.project.name} Java JUnit tests">
+    <target name="junit-tests" depends="toolCheck, set-test-base-DAWN, Xvfb_start, _junit-tests, Xvfb_stop" />
+
+    <target name="_junit-tests" depends="toolCheck, set-test-base-DAWN">
+        <junit-call description="${ant.project.name} Java JUnit tests"
+        Xvfb-display-name="${Xvfb-display-name}" Xvfb-display-number="${Xvfb-display-number}">
             <formatter type="xml" />
             <classpath>
                 <pathelement location="${junitjar.loc}" />
                 <pathelement location="${GDA-plugin.basedir}/bin" />
                 <pathelement location="${GDA-plugin.basedir}/testfiles/logging" />  <!-- to pick up logback-test.xml -->
                 <pathelement location="${GDA-plugin.host.basedir}/bin" />
+                <pathelement location="${GDA-plugin.host.basedir}/jars/*" />
                 <pathelement location="${workspace.git.loc}/dawn-common.git/org.dawb.common.services/bin" />
                 <pathelement location="${workspace.git.loc}/dawn-common.git/org.dawb.common.util/bin" />
                 <pathelement location="${workspace.git.loc}/dawn-common.git/org.dawb.hdf5/bin" />
@@ -46,7 +50,15 @@
                 <pathelement location="${workspace.git.loc}/dawn-ui.git/org.dawnsci.rcp.histogram/bin" />
                 <pathelement path="${workspace.loc}/tp/plugins/com.springsource.slf4j.api_1.5.6.jar" />  <!--ensure that required org.slf4j.LoggerFactory appears first in classpath -->
                 <pathelement path="${workspace.loc}/tp/plugins/com.springsource.slf4j.org.apache.commons.logging_1.5.6.jar" />  <!--ensure that matching imp appears first in classpath -->
-                <pathelement location="${workspace.loc}/tp/plugins/*" />
+                <fileset dir="${workspace.loc}/tp/plugins">
+                    <include name="*.jar" />
+                    <exclude name="*.source_*" />
+                    <exclude name="org.eclipse.swt.*" />  <!--AVIImageConvertTest uses SWT, so exclude jars for non-mathching platforms. Xvfb also required. -->
+                </fileset>
+                <fileset dir="${workspace.loc}/tp/plugins">
+                    <include name="org.eclipse.swt.*.${eclipse.os}.${eclipse.arch}_*.jar" />
+                    <exclude name="*.source_*" />
+                </fileset>
             </classpath>
             <batchtest todir="@{report.dir}">
                 <fileset dir="${GDA-plugin.basedir}/src">
