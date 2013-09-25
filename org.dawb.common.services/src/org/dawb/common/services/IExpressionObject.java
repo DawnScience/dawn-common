@@ -16,6 +16,7 @@
 
 package org.dawb.common.services;
 
+import java.util.List;
 import java.util.Map;
 
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
@@ -91,6 +92,13 @@ public interface IExpressionObject {
 	 * @return true if expression contained in the object has legal syntax.
 	 */
 	public boolean isValid(IMonitor monitor);
+	
+	/**
+	 * Used to give a nicer error message when an expression is bad.
+	 * @param monitor
+	 * @return
+	 */
+	public List<String> getInvalidVariables(IMonitor monitor);
 	
 	/**
 	 * Get all functions currently in the expression engine
