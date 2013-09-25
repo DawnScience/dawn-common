@@ -69,4 +69,15 @@ public interface IVariableManager {
 	 */
 	public void addExpression();
 
+	
+	/**
+	 * Saves the current expressions.
+	 */
+	public void saveExpressions();
+	
+	/**
+	 * Call to remove the values of any cached expressions.
+	 */
+	public void clearExpressionCache(String... variableNames);
+
 }

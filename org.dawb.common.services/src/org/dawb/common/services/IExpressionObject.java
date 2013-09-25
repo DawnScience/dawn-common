@@ -99,4 +99,11 @@ public interface IExpressionObject {
 	 */
 	public Map<String,Object> getFunctions();
 
+	/**
+	 * 
+	 * @param variableNames
+	 * @return true if one or more of variableNames is referenced by this expression
+	 */
+	public boolean containsVariable(String... variableNames);
+
 }
