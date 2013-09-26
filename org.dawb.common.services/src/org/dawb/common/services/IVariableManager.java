@@ -16,6 +16,8 @@
 
 package org.dawb.common.services;
 
+import java.util.List;
+
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
@@ -30,14 +32,54 @@ import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
  */
 public interface IVariableManager {
 	
+	public abstract class Stub implements IVariableManager {
 
+		@Override
+		public void deleteExpression() {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void addExpression() {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void saveExpressions() {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void clearExpressionCache(String... variableNames) {
+			// TODO Auto-generated method stub
+
+		}
+
+	}
+
+	/**
+	 * 
+	 * @return names of all known data names
+	 */
+	public List<String> getDataNames();
+
+
+	/**
+	 * 
+	 * @return names of all known variables
+	 */
+	public List<String> getVariableNames();
+	
 	/**
 	 * Test if variable name can be resolved.
 	 * @param name
 	 * @param monitor
 	 * @return
 	 */
-	public boolean isVariableName(String name, IMonitor monitor);
+	public boolean isVariableName(String variableName, IMonitor monitor);
 
 	/**
 	 * The  has been
@@ -47,7 +89,7 @@ public interface IVariableManager {
 	 * @param monitor
 	 * @return
 	 */
-	public IDataset getVariableValue(String name, final IMonitor monitor);
+	public IDataset getVariableValue(String variableName, final IMonitor monitor);
 
 	/**
 	 * Tries to get the lazy dataset for the name
@@ -55,7 +97,15 @@ public interface IVariableManager {
 	 * @param monitor
 	 * @return
 	 */
-	public ILazyDataset getLazyValue(String name, final IMonitor monitor);
+	public ILazyDataset getLazyValue(String variableName, final IMonitor monitor);
+
+	/**
+	 * Tries to get the lazy dataset for the name
+	 * @param dataName
+	 * @param monitor
+	 * @return
+	 */
+	public IDataset getDataValue(String dataName, final IMonitor monitor);
 
 	/**
 	 * Delete selected expression, if any

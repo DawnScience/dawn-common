@@ -114,4 +114,9 @@ public interface IExpressionObject {
 	 */
 	public boolean containsVariable(String... variableNames);
 
+	/**
+	 * The manager of all available expressions.
+	 * @return
+	 */
+	public IVariableManager getVariableManager();
 }
