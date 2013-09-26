@@ -36,13 +36,13 @@ public class ImageToH5Test {
 	public void testImageSimple() throws Exception {
 		
 		System.out.println("starting testImageSimple");
-		doTest("/entry/data", new int[]{10,2048,2048});
+		doTest("testImageSimple", "/entry/data", new int[]{10,2048,2048});
 	}
 	@Test
 	public void testImageLongPath() throws Exception {
 		
 		System.out.println("starting testImageLongPath");
-		doTest("/entry1/a/long/path/data", new int[]{10,2048,2048});
+		doTest("testImageLongPath", "/entry1/a/long/path/data", new int[]{20,2048,2048});
 	}
 
 	/**
@@ -54,14 +54,14 @@ public class ImageToH5Test {
 	public void testLargeData() throws Exception {
 		
 		System.out.println("starting testLargeData");
-		doTest("/entry1/data", new int[]{100,2048,2048});
+		doTest("testLargeData", "/entry1/data", new int[]{100,2048,2048});
 	}
 
-    private void doTest(String dPath, int[] shape) throws Exception {
+    private void doTest(String testname, String dPath, int[] shape) throws Exception {
 
 		final File image = new File("testfiles/dir/ref-testscale_1_001.img");
 		
-		final File dir   = new File(File.createTempFile("ImageToH5Test", "").getParentFile(), "testDir");
+		final File dir   = new File(System.getProperty("java.io.tmpdir"), "ImageToH5Test_"+testname);
 		try {
 			// Copy the file a few times.
 			for (int i = 0; i < shape[0]; i++) {
@@ -73,7 +73,7 @@ public class ImageToH5Test {
 			ConversionServiceImpl service = new ConversionServiceImpl();
 			
 	        final IConversionContext context = service.open(dir.getAbsolutePath()+"/copy_.*img");
-	        final File output = new File(dir.getParentFile(), "imageStackTestOutput.h5");
+	        final File output = new File(dir.getParentFile(), "imageStackTestOutput_"+testname+".h5");
 	        output.deleteOnExit();
 	        context.setOutputPath(output.getAbsolutePath());
 	        context.setDatasetName(dPath); // With this conversion dataset is the OUTPUT
