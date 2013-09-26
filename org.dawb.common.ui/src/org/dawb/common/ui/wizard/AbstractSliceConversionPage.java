@@ -16,7 +16,6 @@ import org.dawnsci.slicing.api.system.DimsDataList;
 import org.dawnsci.slicing.api.system.ISliceSystem;
 import org.dawnsci.slicing.api.system.SliceSource;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.wizard.IWizardPage;
@@ -225,14 +224,18 @@ public abstract class AbstractSliceConversionPage extends ResourceChoosePage {
 		try {
 			isExpression = true;
             ILazyDataset lz = getLazyExpression();				
-			if (lz==null) {
+			if (lz!=null) {
+				final SliceSource source = new SliceSource(getExpression().getVariableManager(), lz, datasetName, context.getFilePaths().get(0), isExpression);
+				sliceComponent.setData(source);
+			} else {
 				DataHolder dh = LoaderFactory.getData(context.getFilePaths().get(0), new IMonitor.Stub());
 				lz = dh.getLazyDataset(datasetName);
 				isExpression = false;
+				
+				final SliceSource source = new SliceSource(dh, lz, datasetName, context.getFilePaths().get(0), isExpression);
+				sliceComponent.setData(source);
 			}
 			if (lz!=null) {
-				final SliceSource source = new SliceSource(lz, datasetName, context.getFilePaths().get(0), isExpression);
-				sliceComponent.setData(source);
 				setErrorMessage(null);
   		    } else {
   				setErrorMessage("Cannot read data set '"+datasetName+"'");
@@ -257,14 +260,21 @@ public abstract class AbstractSliceConversionPage extends ResourceChoosePage {
 
 
 	private ILazyDataset getLazyExpression() {
+		
+        final IExpressionObject object = getExpression();
+        if (object==null) return null;
+        return object.getLazyDataSet(datasetName, new IMonitor.Stub());
+	}
+	
+	private IExpressionObject getExpression() {
 		if (datasetName!=null && datasetName.endsWith("[Expression]")) {
 			
 			final IExpressionObject object = getExpression(datasetName);
-			if (object==null) return null;
-			return object.getLazyDataSet(datasetName, new IMonitor.Stub());
+			return object;
 		}
 		return null;
 	}
+
 
 	public void setContext(IConversionContext context) {
 		
