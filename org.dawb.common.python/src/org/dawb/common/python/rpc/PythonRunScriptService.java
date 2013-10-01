@@ -2,16 +2,10 @@ package org.dawb.common.python.rpc;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
 import org.dawb.common.python.Activator;
 import org.dawb.common.util.eclipse.BundleUtils;
-import org.eclipse.core.resources.IProject;
-import org.python.pydev.core.IInterpreterInfo;
-import org.python.pydev.core.Tuple;
 
 import uk.ac.diamond.scisoft.analysis.rpc.AnalysisRpcClient;
 import uk.ac.diamond.scisoft.analysis.rpc.AnalysisRpcException;
@@ -123,27 +117,6 @@ public class PythonRunScriptService implements IPythonRunScript {
 			Map<String, ?> data, String funcName)
 			throws AnalysisRpcException {
 		return proxy.runScript(scriptFullPath, data, funcName);
-	}
-
-	
-	private static List<Tuple<Tuple<IProject, IInterpreterInfo>, AnalysisRpcPythonPyDevService>> services = Collections.synchronizedList(new ArrayList<Tuple<Tuple<IProject, IInterpreterInfo>, AnalysisRpcPythonPyDevService>>());
-
-	public static PythonRunScriptService getService(boolean isDebug, final IProject project, final IInterpreterInfo info) throws IOException, AnalysisRpcException {
-		
-		synchronized (services) {
-			Tuple<IProject, IInterpreterInfo> tuple = new Tuple<IProject, IInterpreterInfo>(
-					project, info);
-			for (Tuple<Tuple<IProject, IInterpreterInfo>, AnalysisRpcPythonPyDevService> service : services) {
-				if (service.o1.equals(tuple)) {
-					return new PythonRunScriptService(service.o2, isDebug, true);
-				}
-			}
-			AnalysisRpcPythonPyDevService rpcservice = new AnalysisRpcPythonPyDevService(
-					info, project);
-			services.add(new Tuple<Tuple<IProject, IInterpreterInfo>, AnalysisRpcPythonPyDevService>(
-					tuple, rpcservice));
-			return new PythonRunScriptService(rpcservice, isDebug);
-		}
 	}
 
 }
