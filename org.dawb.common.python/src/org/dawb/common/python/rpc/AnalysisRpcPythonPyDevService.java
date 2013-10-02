@@ -49,6 +49,10 @@ import uk.ac.diamond.scisoft.analysis.rpc.AnalysisRpcException;
 /**
  * Subclass of {@link AnalysisRpcPythonService} that uses PyDev's
  * InterpreterInfos to generate PYTHONPATHs and path to Python executable.
+ * 
+ * TODO Instead of having concrete constructors of AnalysisRpcPythonPyDevService
+ * around, this service should be contributed using OSGI and have an
+ * associated interface.
  */
 public class AnalysisRpcPythonPyDevService extends AnalysisRpcPythonService {
 	private static final Logger logger = LoggerFactory
