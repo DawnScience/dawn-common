@@ -80,6 +80,14 @@ public interface IVariableManager {
 	 * @return
 	 */
 	public boolean isVariableName(String variableName, IMonitor monitor);
+	
+	/**
+	 * Test if variable name can be resolved.
+	 * @param name
+	 * @param monitor
+	 * @return
+	 */
+	public boolean isDataName(String variableName, IMonitor monitor);
 
 	/**
 	 * The  has been
