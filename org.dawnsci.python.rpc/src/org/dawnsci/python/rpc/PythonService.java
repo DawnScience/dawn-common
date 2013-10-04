@@ -16,7 +16,7 @@
  * with GDA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.dawb.common.python.rpc;
+package org.dawnsci.python.rpc;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -28,14 +28,13 @@ import java.util.Map;
 
 import org.dawb.common.util.eclipse.BundleUtils;
 import org.dawb.common.util.net.NetUtils;
+import org.dawnsci.python.rpc.commandline.ManagedCommandline;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.ac.diamond.scisoft.analysis.rpc.AnalysisRpcClient;
-
-import com.isencia.util.commandline.ManagedCommandline;
 
 /**
  * This class encapsulates a system command to python used with the RPC service
@@ -100,12 +99,12 @@ public class PythonService {
 		}
 	    final int    port   = NetUtils.getFreePort(getServiceStartPort());
 		final File   path   = BundleUtils.getBundleLocation("org.dawb.common.python");
-		String script = path.getAbsolutePath()+"/org/dawb/common/python/rpc/python_service.py";;
+		String script = path.getAbsolutePath()+"/org/dawnsci/python/rpc/python_service.py";;
 		if (new File(script).exists()) {
 			pyBuf.append(BundleUtils.getBundleLocation("uk.ac.diamond.scisoft.python").getAbsolutePath());
 		} else {
 			// Check if we are running a development version
-			script = path.getAbsolutePath()+"/src/org/dawb/common/python/rpc/python_service.py";
+			script = path.getAbsolutePath()+"/src/org/dawnsci/python/rpc/python_service.py";
 			if (new File(script).exists()) {
 				pyBuf.append(BundleUtils.getBundleLocation("uk.ac.diamond.scisoft.python").getAbsolutePath()+"/src");
 			} else {

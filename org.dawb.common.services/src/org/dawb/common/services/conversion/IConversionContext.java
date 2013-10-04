@@ -41,7 +41,8 @@ public interface IConversionContext {
 		H5_FROM_IMAGEDIR(" nexus stack from directory of images", true, false, 2),
 		H5_FROM_1D(" nexus from 1D data",   true,  1),
 		CUSTOM_NCD(" ascii from NCD data",     true, 2,3,4,5,6),
-		CUSTOM_TOMO(" tiff from tomography nexus file(s) [nxtomo]",    true, 3);
+		CUSTOM_TOMO(" tiff from tomography nexus file(s) [nxtomo]",    true, 3),
+		COMPARE(" compare data",    true,  false, 0,1,2,3,4,5);
 		
 		private final String  uiLabel;
 		private final int[]   preferredRanks;

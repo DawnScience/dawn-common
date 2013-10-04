@@ -1,24 +1,21 @@
-package org.dawb.common.python.rpc;
+package org.dawnsci.python.rpc;
 
 import java.io.IOException;
 import java.util.Map;
 
+import org.dawnsci.python.rpc.PythonRunScriptService;
 import org.eclipse.core.runtime.CoreException;
 import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.Before;
 
 import uk.ac.diamond.scisoft.analysis.rpc.AnalysisRpcException;
 
-/**
- * This concrete test runs all the tests in
- * AbstractPythonRunScriptServicePluginTest with the same service.
- */
-public class PythonRunScriptServiceReuseRunPluginTest extends
+/** This concrete test runs each test with its own service instance. */
+public class PythonRunScriptServiceIndividualRunPluginTest extends
 		AbstractPythonRunScriptServicePluginTest {
 
-	private static AnalysisRpcPythonServiceManual service;
-	private static PythonRunScriptService runScript;
+	private AnalysisRpcPythonServiceManual service;
+	private PythonRunScriptService runScript;
 
 	@Override
 	public Map<String, Object> runScript(String scriptFullPath,
@@ -33,15 +30,15 @@ public class PythonRunScriptServiceReuseRunPluginTest extends
 		return runScript.runScript(scriptFullPath, data, funcName);
 	}
 
-	@BeforeClass
-	public static void before() throws AnalysisRpcException, IOException,
+	@Before
+	public void before() throws AnalysisRpcException, IOException,
 			CoreException {
 		service = new AnalysisRpcPythonServiceManual();
 		runScript = new PythonRunScriptService(service);
 	}
 
-	@AfterClass
-	public static void after() {
+	@After
+	public void after() {
 		service.stop();
 	}
 }

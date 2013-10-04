@@ -1,12 +1,13 @@
-package org.dawb.common.python.rpc;
+package org.dawnsci.python.rpc;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
 
-import org.dawb.common.python.Activator;
 import org.dawb.common.util.net.NetUtils;
+import org.dawnsci.python.rpc.commandline.CommandLineException;
+import org.dawnsci.python.rpc.commandline.ManagedCommandline;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -18,9 +19,6 @@ import org.slf4j.LoggerFactory;
 
 import uk.ac.diamond.scisoft.analysis.rpc.AnalysisRpcClient;
 import uk.ac.diamond.scisoft.analysis.rpc.AnalysisRpcException;
-
-import com.isencia.util.commandline.CommandLineException;
-import com.isencia.util.commandline.ManagedCommandline;
 
 /**
  * Launch a python process running the Python Analysis RPC Server

@@ -16,7 +16,7 @@
  * with GDA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.dawb.common.python.rpc;
+package org.dawnsci.python.rpc;
 
 import java.io.File;
 import java.io.IOException;

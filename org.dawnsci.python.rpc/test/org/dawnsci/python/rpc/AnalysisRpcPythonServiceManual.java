@@ -1,4 +1,4 @@
-package org.dawb.common.python.rpc;
+package org.dawnsci.python.rpc;
 
 import java.io.File;
 import java.io.IOException;
@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.dawb.common.util.eclipse.BundleUtils;
+import org.dawnsci.python.rpc.AnalysisRpcPythonService;
 import org.eclipse.core.runtime.CoreException;
 import org.python.pydev.plugin.PydevPlugin;
 

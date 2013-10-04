@@ -1,10 +1,9 @@
-package org.dawb.common.python.rpc;
+package org.dawnsci.python.rpc;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
-import org.dawb.common.python.Activator;
 import org.dawb.common.util.eclipse.BundleUtils;
 
 import uk.ac.diamond.scisoft.analysis.rpc.AnalysisRpcClient;
@@ -16,7 +15,7 @@ import uk.ac.diamond.scisoft.analysis.rpc.AnalysisRpcException;
  * then can be used as a proxy
  */
 public class PythonRunScriptService implements IPythonRunScript {
-	private static final String SCRIPT_PATH = "/org/dawb/common/python/rpc/";
+	private static final String SCRIPT_PATH = "/org/dawnsci/python/rpc/";
 	private static final String PYTHON_SERVICE_RUNSCRIPT_PY = "python_service_runscript.py";
 	private IPythonRunScript proxy;
 

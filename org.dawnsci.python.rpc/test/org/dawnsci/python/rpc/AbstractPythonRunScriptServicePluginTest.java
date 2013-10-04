@@ -1,4 +1,4 @@
-package org.dawb.common.python.rpc;
+package org.dawnsci.python.rpc;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -10,6 +10,7 @@ import java.util.Map;
 import junit.framework.Assert;
 
 import org.dawb.common.util.eclipse.BundleUtils;
+import org.dawnsci.python.rpc.IPythonRunScript;
 import org.eclipse.core.runtime.CoreException;
 import org.junit.Test;
 

@@ -6,6 +6,7 @@ import org.dawnsci.conversion.converters.AVIImageConverter;
 import org.dawnsci.conversion.converters.AbstractConversion;
 import org.dawnsci.conversion.converters.AsciiConvert1D;
 import org.dawnsci.conversion.converters.AsciiConvert2D;
+import org.dawnsci.conversion.converters.CompareConverter;
 import org.dawnsci.conversion.converters.Convert1DtoND;
 import org.dawnsci.conversion.converters.CustomNCDConverter;
 import org.dawnsci.conversion.converters.CustomTomoConverter;
@@ -54,8 +55,12 @@ class ConversionServiceImpl implements IConversionService {
 					break;
 				case H5_FROM_1D:
 					deligate = new Convert1DtoND(context);
-				default:
 					break;
+				case COMPARE:
+					deligate = new CompareConverter(context);
+					break;
+				default:
+					throw new Exception("No conversion for "+context.getConversionScheme());
 				}
 			}
 			deligate.process(context);

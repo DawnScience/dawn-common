@@ -1,7 +1,8 @@
-package org.dawb.common.python.rpc;
+package org.dawnsci.python.rpc;
 
 import java.io.IOException;
 
+import org.dawnsci.python.rpc.AnalysisRpcPythonService;
 import org.eclipse.core.runtime.CoreException;
 import org.junit.After;
 import org.junit.Assert;

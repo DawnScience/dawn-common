@@ -13,8 +13,8 @@ package org.dawb.common.python.test.rpc;
 import java.util.Arrays;
 import java.util.HashMap;
 
-import org.dawb.common.python.rpc.PythonService;
 import org.dawb.common.util.eclipse.BundleUtils;
+import org.dawnsci.python.rpc.PythonService;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
