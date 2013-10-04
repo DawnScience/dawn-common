@@ -113,7 +113,7 @@ public interface IVariableManager {
 	 * @param monitor
 	 * @return
 	 */
-	public IDataset getDataValue(String dataName, final IMonitor monitor);
+	public ILazyDataset getDataValue(String dataName, final IMonitor monitor);
 
 	/**
 	 * Delete selected expression, if any

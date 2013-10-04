@@ -203,13 +203,13 @@ public class NexusUtils {
 							if (axesDims!=null && Arrays.equals(shapeAxes, shapeData)) {
 								for (int dim : axesDims) {
 									if (dim == dimension) {
-										axis = ((Dataset)hObject).getName()+":"+dimension;
+										axis = ((Dataset)hObject).getFullName()+":"+dimension;
 										break;
 									}
 								}
 							}
 						}
-						if (iaxis == dimension) axis = ((Dataset)hObject).getName();
+						if (iaxis == dimension) axis = ((Dataset)hObject).getFullName();
 						
 					} else if (PRIM.equals(attribute.getName())) {
 						if (pos!=0) pos = getAttributeIntValue(attribute);
@@ -233,7 +233,7 @@ public class NexusUtils {
 			if (axis==null && !isSignal) {
 				final long[] dims = ((Dataset)hObject).getDims();
 				if (dims[0]==size && dims.length==1) {
-					axis = ((Dataset)hObject).getName();
+					axis = ((Dataset)hObject).getFullName();
 				}
 			}
 			
