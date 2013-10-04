@@ -61,7 +61,11 @@ public class CompareConverter extends AbstractConversion{
 					group = hFile.group(path, group);
 					if (i<(paths.length-2)) hFile.setNexusAttribute(group, Nexus.ENTRY);
 				}
-				hFile.setNexusAttribute(group, Nexus.DATA);
+				try {
+					hFile.setNexusAttribute(group, Nexus.DATA);
+				} catch (Exception ignored) {
+					continue;
+				}
 			}
 			groups.put(datasetNameStr, group);
 			written.put(datasetNameStr, false);
@@ -103,6 +107,8 @@ public class CompareConverter extends AbstractConversion{
 	}
  	
 	public static AbstractDataset resize(final AbstractDataset a, final int... shape) {
+		
+		if (a.getDtype()==AbstractDataset.STRING) return a;
 		int size = a.getSize();
 		AbstractDataset rdata = AbstractDataset.zeros(a.getElementsPerItem(), shape, a.getDtype());
 		IndexIterator it = rdata.getIterator();

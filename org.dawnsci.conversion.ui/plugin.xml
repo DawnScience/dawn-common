@@ -129,6 +129,11 @@
             conversion_scheme="H5_FROM_1D"
             id="org.dawnsci.conversion.ui.conversionH5From1D">
       </conversion_page>
+      <conversion_page
+            conversion_page="org.dawnsci.conversion.ui.pages.CompareConvertPage"
+            conversion_scheme="COMPARE"
+            id="org.dawnsci.conversion.ui.compareConversion">
+      </conversion_page>
    </extension>
 
 </plugin>
