@@ -98,7 +98,7 @@ public class PythonService {
 			pyBuf.append(File.pathSeparatorChar);
 		}
 	    final int    port   = NetUtils.getFreePort(getServiceStartPort());
-		final File   path   = BundleUtils.getBundleLocation("org.dawb.common.python");
+		final File   path   = BundleUtils.getBundleLocation(Activator.PLUGIN_ID);
 		String script = path.getAbsolutePath()+"/org/dawnsci/python/rpc/python_service.py";;
 		if (new File(script).exists()) {
 			pyBuf.append(BundleUtils.getBundleLocation("uk.ac.diamond.scisoft.python").getAbsolutePath());
