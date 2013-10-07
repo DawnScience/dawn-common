@@ -8,6 +8,7 @@ import org.dawb.common.util.eclipse.BundleUtils;
 
 import uk.ac.diamond.scisoft.analysis.rpc.AnalysisRpcClient;
 import uk.ac.diamond.scisoft.analysis.rpc.AnalysisRpcException;
+import uk.ac.diamond.scisoft.analysis.rpc.AnalysisRpcRemoteException;
 
 /**
  * Implementation of IPythonRunScript that registers
@@ -117,5 +118,13 @@ public class PythonRunScriptService implements IPythonRunScript {
 			throws AnalysisRpcException {
 		return proxy.runScript(scriptFullPath, data, funcName);
 	}
-
+	
+	/**
+	 * Formats a remote exception to limit the Python code that was not "users" code. 
+	 * @param e Remote Exception to format
+	 * @return a Python style exception format
+	 */
+	public String formatException(AnalysisRpcRemoteException e) {
+		return e.getPythonFormattedStackTrace(PYTHON_SERVICE_RUNSCRIPT_PY);
+	}
 }

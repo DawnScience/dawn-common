@@ -35,6 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.ac.diamond.scisoft.analysis.rpc.AnalysisRpcClient;
+import uk.ac.diamond.scisoft.analysis.rpc.AnalysisRpcRemoteException;
 
 /**
  * This class encapsulates a system command to python used with the RPC service
@@ -392,6 +393,15 @@ public class PythonService {
 			port = Integer.parseInt(System.getProperty("org.dawb.passerelle.actors.scripts.python.free.port"));
 		}
 		return port;
+	}
+
+	/**
+	 * Formats a remote exception to limit the Python code that was not "users" code. 
+	 * @param e Remote Exception to format
+	 * @return a Python style exception format
+	 */
+	public String formatException(AnalysisRpcRemoteException e) {
+		return e.getPythonFormattedStackTrace("python_service.py");
 	}
 
 }
