@@ -14,9 +14,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.dawb.common.python.rpc.PythonService;
 import org.dawb.common.util.eclipse.BundleUtils;
 import org.dawb.common.util.test.TestUtils;
+import org.dawnsci.python.rpc.PythonService;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;

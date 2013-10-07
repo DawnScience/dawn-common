@@ -98,6 +98,8 @@
                   </enumeration>
                   <enumeration value="H5_FROM_1D">
                   </enumeration>
+                  <enumeration value="COMPARE">
+                  </enumeration>
                </restriction>
             </simpleType>
          </attribute>

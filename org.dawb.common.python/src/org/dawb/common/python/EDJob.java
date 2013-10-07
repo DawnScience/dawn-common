@@ -11,7 +11,7 @@ package org.dawb.common.python;
 
 import java.io.Serializable;
 
-import org.dawb.common.python.rpc.PythonService;
+import org.dawnsci.python.rpc.PythonService;
 
 /**
  * Class encapsulating EDNA python plugins.

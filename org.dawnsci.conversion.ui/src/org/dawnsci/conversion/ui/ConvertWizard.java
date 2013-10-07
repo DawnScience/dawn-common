@@ -156,6 +156,7 @@ public class ConvertWizard extends Wizard implements IExportWizard{
 						EclipseUtils.refreshAndOpen(context.getOutputPath(), selectedConversionPage.isOpen(), monitor);
 						
 					} catch (final Exception e) {
+						logger.error("Cannot process", e);
 						Display.getDefault().syncExec(new Runnable() {
 							public void run() {
 								final StringBuilder buf = new StringBuilder();

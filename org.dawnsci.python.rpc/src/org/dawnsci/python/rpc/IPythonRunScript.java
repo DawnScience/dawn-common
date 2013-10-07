@@ -1,4 +1,4 @@
-package org.dawb.common.python.rpc;
+package org.dawnsci.python.rpc;
 
 import java.util.Map;
 

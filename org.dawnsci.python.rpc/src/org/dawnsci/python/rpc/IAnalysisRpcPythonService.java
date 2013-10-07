@@ -1,4 +1,4 @@
-package org.dawb.common.python.rpc;
+package org.dawnsci.python.rpc;
 
 import uk.ac.diamond.scisoft.analysis.rpc.AnalysisRpcClient;
 import uk.ac.diamond.scisoft.analysis.rpc.AnalysisRpcException;
