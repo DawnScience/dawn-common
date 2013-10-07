@@ -31,6 +31,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.python.pydev.core.IInterpreterInfo;
 import org.python.pydev.core.IInterpreterManager;
 import org.python.pydev.core.IPythonNature;
@@ -383,9 +384,25 @@ public class AnalysisRpcPythonPyDevService extends AnalysisRpcPythonService {
 
 	/**
 	 * Get the PyDev Debug Server Listening Port.
+	 * XXX This method is a reimplementation of:
+	 * DebugPluginPrefsInitializer.getRemoteDebuggerPort
+	 * which suffers from two problems:
+	 * 1) com.python.pydev.debug is not an exported package
+	 * 2) The DebugPluginPrefsInitializer is a preference initializer, but it
+	 *    violates this rule for preferences:
+	 *       Note: Clients should only set default preference values for their own bundle.
+	 * Therefore this method attempts to get the current value set for the port,
+	 * but in the case that the default-default value of 0 is returned (meaning
+	 * preference has not been initialised) we return the default value.
 	 */
 	public static int getPyDevDebugServerPort() {
-		return PydevPlugin.getDefault().getPreferenceStore()
-				.getInt("PYDEV_REMOTE_DEBUGGER_PORT");
+		IPreferenceStore store = PydevPlugin.getDefault().getPreferenceStore();
+		// XXX should use DebugPluginPrefsInitializer.PYDEV_REMOTE_DEBUGGER_PORT
+		int port = store.getInt("PYDEV_REMOTE_DEBUGGER_PORT");
+		if (port == 0) {
+			// XXX should use DebugPluginPrefsInitializer.DEFAULT_REMOTE_DEBUGGER_PORT
+			port = 5678;
+		}
+		return port;
 	}
 }
