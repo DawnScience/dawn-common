@@ -67,11 +67,24 @@ public class HierarchicalDataFactory {
 	 * @throws Exception
 	 */
 	public static IHierarchicalDataFile getWriter(final String absolutePath) throws Exception {
+		return getWriter(absolutePath, false);
+	}
+
+	/**
+	 * Call this method to get a reference to a HierarchicalDataFile
+	 * opened for writing use.
+	 * 
+	 * @param absolutePath
+	 * @param waitForAvailability if false and in use, exception thrown, if true will wait for lock in high level API. If a lock of the low level API is active, throws exception regardless.
+	 * @return
+	 * @throws Exception
+	 */
+	public static IHierarchicalDataFile getWriter(final String absolutePath, boolean waitForAvailability) throws Exception {
 		if (!(new File(absolutePath)).exists()) {
 			create(absolutePath);
 		}
 		if (lowLevelLocks.containsKey(absolutePath)) throw new Exception("The low level API is currently reading from "+absolutePath);
-		return HierarchicalDataFile.open(absolutePath, FileFormat.WRITE);
+		return HierarchicalDataFile.open(absolutePath, FileFormat.WRITE, waitForAvailability);
 	}
 	
 	/**
