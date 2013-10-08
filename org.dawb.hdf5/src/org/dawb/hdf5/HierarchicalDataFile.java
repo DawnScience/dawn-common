@@ -13,8 +13,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
@@ -63,6 +65,7 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 	
 	private static Map<String,HierarchicalDataFile> readCache;
 	private static Collection<String>               writeCache;
+	private static Map<String,ReentrantLock>        lockMap;
 
 	/**
 	 * Opens a new HierarchicalDataFile or returns the currently
@@ -76,10 +79,25 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 	 * @return
 	 */
 	static synchronized HierarchicalDataFile open(final String absolutePath, final int openType) throws Exception {
+		return open(absolutePath, openType, false);
+	}
+
+	/**
+	 * Opens a new HierarchicalDataFile or returns the currently
+	 * open one if necessary. Keeps a count of threads which have
+	 * opened the file and only finally closes the file when the count
+	 * is back to zero.
+	 * 
+	 * Used through HierarchicalDataFactory only.
+	 * 
+	 * @param absolutePath
+	 * @return
+	 */
+	static synchronized HierarchicalDataFile open(final String absolutePath, final int openType, boolean waitForLock) throws Exception {
 
 		
 		if (openType == FileFormat.READ) {
-			if (readCache==null) readCache = new HashMap<String,HierarchicalDataFile>(7);
+			if (readCache==null) readCache = new Hashtable<String,HierarchicalDataFile>(7); // Synchronized!
 			HierarchicalDataFile file = readCache.get(absolutePath);
 			if (file!=null) {
 				file.count++; 
@@ -93,10 +111,26 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 		} else if (openType == FileFormat.WRITE || openType == FileFormat.CREATE) {
 			
 			if (writeCache==null) writeCache = new HashSet<String>(11);
+			if (writeCache.contains(absolutePath)) {
+				if (waitForLock) {
+					lockMap.get(absolutePath).lock(); // Will block if another thread is using
+				} else {
+					throw new Exception("Already writing to "+absolutePath+"!");
+				}
+			}
 			if (writeCache.contains(absolutePath)) throw new Exception("Already writing to "+absolutePath+"!");
 			
 			HierarchicalDataFile file = new HierarchicalDataFile(absolutePath, openType);
-			writeCache.add(absolutePath);
+			
+			synchronized(file) {
+				writeCache.add(absolutePath);
+				if (lockMap==null) lockMap = new Hashtable<String,ReentrantLock>(7); // Synchronized!
+				
+				final ReentrantLock lock = new ReentrantLock();
+				lockMap.put(absolutePath, lock);
+				lock.lock();
+			}
+			
 			return file;
 			
 		} else {
@@ -453,7 +487,11 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 			}
 		} else if (openType == FileFormat.WRITE || openType == FileFormat.CREATE) {
 			file.close();
-			writeCache.remove(path);
+			synchronized (file) {
+				writeCache.remove(path);
+				final ReentrantLock lock = lockMap.remove(path);
+				if (lock!=null) lock.unlock();
+			}
 		}
 	}
 	
