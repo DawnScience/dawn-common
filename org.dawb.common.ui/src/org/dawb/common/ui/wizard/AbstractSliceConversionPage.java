@@ -322,7 +322,7 @@ public abstract class AbstractSliceConversionPage extends ResourceChoosePage {
 		for (DimsData dd : dims.getDimsData()) {
 			if (dd.isSlice()) {
 				context.addSliceDimension(dd.getDimension(), String.valueOf(dd.getSlice()));
-			} else if (dd.isRange()) {
+			} else if (dd.isTextRange()) {
 				context.addSliceDimension(dd.getDimension(), dd.getSliceRange()!=null ? dd.getSliceRange() : "all");
 				try {
 					final ILazyDataset lazy = sliceComponent.getData().getLazySet();
