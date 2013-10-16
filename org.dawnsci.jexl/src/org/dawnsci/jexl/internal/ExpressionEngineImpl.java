@@ -129,8 +129,8 @@ public class ExpressionEngineImpl implements IExpressionEngine{
 	 * way in JEXL of getting the variables for a given function it would 
 	 * be better than what we do: which is a regular expression!
 	 * 
-	 * lz:rmean(fred,0)                     ->    fred
-	 * 10*lz:rmean(fred,0)                  ->    fred
+	 * lz:rmean(fred,0)                     -> fred
+	 * 10*lz:rmean(fred,0)                  -> fred
 	 * 10*lz:rmean(fred,0)+dat:mean(bill,0) -> fred
 	 * lz:rmean(fred,0)+lz:rmean(bill,0)    -> fred, bill
 	 * lz:func(fred*10,bill,ted*2)          -> fred, bill, ted
