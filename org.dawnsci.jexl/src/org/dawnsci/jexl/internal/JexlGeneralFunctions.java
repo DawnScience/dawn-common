@@ -84,57 +84,10 @@ public class JexlGeneralFunctions {
 	}
 	
 	public static AbstractDataset slice(AbstractDataset data, String sliceString) {
-		Slice[] slices = getSliceFromString(sliceString);
-		
+		Slice[] slices = Slice.convertFromString(sliceString);
+
 		if (slices.length != data.getRank()) throw new IllegalArgumentException("Invalid string");
-		
+
 		return data.getSlice(slices).squeeze();
 	}
-	
-	private static Slice[] getSliceFromString(String sliceString) {
-		
-		String clean = sliceString.replace("[", "");
-		clean = clean.replace("]", "");
-		
-		String[] sub = clean.split(",");
-		
-		Slice[] slices= new Slice[sub.length];
-		
-		for (int i = 0; i < sub.length; i++) {
-			String s = sub[i];
-			
-			slices[i]= new Slice();
-			
-			int idx0 = s.indexOf(":");
-			
-			if (idx0 == -1) {
-				slices[i].setStart(Integer.parseInt(s));
-				slices[i].setStop(Integer.parseInt(s)+1);
-				continue;
-			} else if (idx0 == 0) {
-				slices[i].setStart(0);
-			} else {
-				slices[i].setStart(Integer.parseInt(s.substring(0,idx0)));
-			}
-			
-			int idx1 = s.indexOf(":", idx0+1);
-			if (idx1 == -1) {
-				
-				if (s.substring(idx0+1).length() == 0) continue;
-				
-				slices[i].setStop(Integer.parseInt(s.substring(idx0+1)));
-				continue;
-			} else if (idx1-idx0 == 1) {
-				slices[i].setStep(Integer.parseInt(s.substring(idx1+1)));
-				continue;
-			} else {
-				slices[i].setStop(Integer.parseInt(s.substring(idx0+1,idx1)));
-				slices[i].setStep(Integer.parseInt(s.substring(idx1+1)));
-			}
-			
-		}
-		
-		return slices;
-	}
-	
 }
