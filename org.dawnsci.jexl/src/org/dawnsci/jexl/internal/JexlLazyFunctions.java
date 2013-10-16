@@ -31,8 +31,8 @@ public class JexlLazyFunctions {
 
 	
 	/**
-	 * Apparently this is not a true rolling mean. However it does the
-	 * mean in a lazy way providing the size does not overrun the size
+	 * Apparently this is not a true rolling sum. However it does the
+	 * job in a lazy way providing the size does not overrun the size
 	 * of a double.
 	 * 
 	 * @param data
