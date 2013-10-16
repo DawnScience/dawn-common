@@ -16,9 +16,8 @@
 
 package org.dawb.common.services.expressions;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 
@@ -111,9 +110,19 @@ public interface IExpressionEngine {
 	public void addLoadedVariable(String name, Object value);
 	
 	/**
-	 * Gets names of variables from the expression
+	 * Gets names of *all* variables from the expression
 	 * 
 	 * @returns names
 	 */
-	public Set<List<String>> getVariableNamesFromExpression();
+	public Collection<String> getVariableNamesFromExpression();
+	
+	/**
+	 * Gets names of variables from the expression which can be
+	 * provided as lazy datasets. The expression will then do the 
+	 * relavent slicing during evaluation.
+	 * 
+	 * @returns names
+	 */
+	public Collection<String> getLazyVariableNamesFromExpression();
+
 }
