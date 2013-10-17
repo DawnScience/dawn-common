@@ -52,6 +52,8 @@
                 <fileset dir="${GDA-plugin.basedir}/src">
                     <include name="**/*Test.java" />
                     <exclude name="**/ImageToH5Test.java" />  <!-- needs some research -->
+                    <exclude name="**/AVIImageConvertTest.java" />  <!-- fixed post-8.34 -->
+                    <exclude name="**/ImageConvertTest.java" />  <!-- fixed post-8.34 -->
                 </fileset>
             </batchtest>
         </junit-call>
