@@ -116,7 +116,7 @@ public class HeaderTableView extends ViewPart implements ISelectionListener, IPa
 		
 		final TableViewerColumn value = new TableViewerColumn(table, SWT.NONE, 1);
 		value.getColumn().setText("Value");
-		value.getColumn().setWidth(200);
+		value.getColumn().setWidth(500);
 		value.setLabelProvider(new HeaderColumnLabelProvider(1));
 
 		table.setColumnProperties(new String[]{"Key","Value"});
@@ -265,6 +265,18 @@ public class HeaderTableView extends ViewPart implements ISelectionListener, IPa
 		
 	}
 	
+	/**
+	 * Called to programmatically send the meta which should be shown.
+	 * @param prov
+	 */
+	public void setMetaProvider(IMetadataProvider prov) {
+		try {
+			meta = prov.getMetadata();
+			if (meta != null) updateTable.schedule();
+		} catch (Exception e) {
+			logger.error("There was a error reading the metadata from the selection", e);
+		}
+	}
 	
 	@Override
 	public void selectionChanged(IWorkbenchPart part, ISelection selection) {

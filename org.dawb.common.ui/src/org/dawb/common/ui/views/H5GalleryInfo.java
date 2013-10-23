@@ -13,13 +13,26 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 import uk.ac.diamond.scisoft.analysis.io.SliceObject;
 
-public class H5GalleryInfo {
+public class H5GalleryInfo implements GalleryDelegateInfo {
+	
+	private static final Logger logger = LoggerFactory.getLogger(H5GalleryInfo.class);
 
+	private final ILazyDataset lazySet;
 	private SliceObject slice;
 	private int[]       shape;
 	private int         sliceDimension;
+	
+	H5GalleryInfo(ILazyDataset lazySet) {
+		this.lazySet = lazySet;
+	}
 	
 	public void createDefaultSliceDimension() {
 		sliceDimension = getDefaultSliceDimension();
@@ -124,6 +137,76 @@ public class H5GalleryInfo {
 		throw new RuntimeException("Can only deal with 1D and 2D slices!");
 	}
 
+	@Override
+	public String getName() {
+		return getSlice().getName();
+	}
 
+	/**
+	 * Always returns full data, ignores boolean
+	 */
+	@Override
+	public IDataset getData(boolean fullData, final ImageItem ii) throws Exception {
+		// Do slice
+		final SliceObject slice = getSlice();
+		
+		IDataset set=null;
+		try {
+			set = lazySet.getSlice(getSliceStart(ii.getIndex()), getSliceStop(ii.getIndex()), getSliceStep(ii.getIndex()));
+			if (set==null) return null;
+			if (set instanceof AbstractDataset) {
+				set = ((AbstractDataset)set).squeeze();
+			}
+		} catch (java.lang.IllegalArgumentException ne) {
+			// We do not want the thread to stop in this case.
+			logger.debug("Encountered invalid shape with "+slice);
+			return null;
+		}
+		set.setShape(set.getShape());
+
+		return set;
+	}
+
+
+	
+	protected int[] getSliceStart(int index) {
+		
+        final int [] start = new int[getShape().length];
+        for (int i = 0; i < start.length; i++) {
+			if (i==getSliceDimension()) {
+				start[i] = index;
+			} else if (isNonAxisDimension(i)) {
+				start[i] = 0; // TODO FIXME
+			} else{
+				start[i] = getStart(i); // 0 for 2D, the current slice index for this dim for 1D
+			}
+		}
+        return start;
+	}
+
+	protected int[] getSliceStop(int index) {
+		
+        final int [] stop = new int[getShape().length];
+        for (int i = 0; i < stop.length; i++) {
+			if (i==getSliceDimension()) {
+				stop[i] = index+1;
+			} else if (isNonAxisDimension(i)) {
+				stop[i] = 1; // TODO FIXME
+			} else{
+				stop[i] = getStop(i);  // size dim for 2D, the current slice index for this dim  +1 for 1D
+			}
+		}
+        return stop;
+	}
+	protected int[] getSliceStep(int index) {
+		
+        final int [] step = new int[getShape().length];
+        for (int i = 0; i < step.length; i++) step[i]=1;
+        return step;
+	}
+
+	public String getPath(int itemCount) {
+        return null;
+	}
 	
 }

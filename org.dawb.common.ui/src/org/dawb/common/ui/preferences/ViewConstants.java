@@ -16,5 +16,5 @@ public class ViewConstants {
 	public static final String IMAGE_SIZE   = "org.dawb.workbench.views.image.monitor.thumbnail.size";
 	public static final String POLL_RATE    = "org.dawb.workbench.views.image.monitor.poll.rate";
 	
-	
+	public static final String PAGE_ID      = "org.edna.workbench.views.preferencePage";
 }

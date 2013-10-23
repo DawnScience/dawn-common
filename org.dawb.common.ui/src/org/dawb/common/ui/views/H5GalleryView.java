@@ -12,54 +12,34 @@ package org.dawb.common.ui.views;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.BlockingDeque;
-import java.util.concurrent.LinkedBlockingDeque;
 
-import org.dawb.common.services.IPlotImageService;
-import org.dawb.common.services.PlotImageData;
-import org.dawb.common.services.ServiceManager;
 import org.dawb.common.ui.Activator;
 import org.dawb.common.ui.menu.CheckableActionGroup;
 import org.dawb.common.ui.menu.MenuAction;
+import org.dawb.common.ui.preferences.ViewConstants;
 import org.dawb.common.ui.util.EclipseUtils;
-import org.dawb.common.util.object.ObjectUtils;
 import org.dawnsci.plotting.api.IPlottingSystem;
 import org.dawnsci.slicing.api.system.ISliceGallery;
 import org.dawnsci.slicing.api.system.ISliceSystem;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.nebula.widgets.gallery.DefaultGalleryGroupRenderer;
-import org.eclipse.nebula.widgets.gallery.DefaultGalleryItemRenderer;
-import org.eclipse.nebula.widgets.gallery.Gallery;
+import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.nebula.widgets.gallery.GalleryItem;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.eclipse.ui.part.ViewPart;
-import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,18 +62,13 @@ public class H5GalleryView extends ViewPart implements MouseListener, SelectionL
     
 	private static Logger  logger = LoggerFactory.getLogger(H5GalleryView.class);
 	
-	private ILazyDataset             lazySet;
-	private Gallery                  gallery;
-	private GalleryItem              galleryGroup;
-	private BlockingDeque<ImageItem> queue;
-	private Thread                   imageThread;
 	private H5GalleryInfo            info;
 	private MenuAction               dimensionList;
+	private GalleryDelegate          galleryDelegate;
 
 	
 	public H5GalleryView() {
-		this.queue = new LinkedBlockingDeque<ImageItem>(Integer.MAX_VALUE);
-		createImageThread();
+		this.galleryDelegate = new GalleryDelegate();
 	}
 
 	/**
@@ -104,60 +79,7 @@ public class H5GalleryView extends ViewPart implements MouseListener, SelectionL
 	public void createPartControl(Composite parent) {
 
 		parent.setLayout(new FillLayout());
-
-		this.gallery = new Gallery(parent, SWT.V_SCROLL | SWT.VIRTUAL | SWT.MULTI);
-		gallery.setToolTipText("This part is used to navigate an image set inside an hdf5/nexus file.");
-		
-		// Renderers
-		final DefaultGalleryGroupRenderer gr = new DefaultGalleryGroupRenderer();
-		gr.setMinMargin(2);
-		
-		// Size image - parameterize this so that the user can change it.
-		final IPreferenceStore store = new ScopedPreferenceStore(InstanceScope.INSTANCE, "org.dawb.common.ui");
-		final int    size      = store.getInt("org.dawb.workbench.views.image.monitor.thumbnail.size");
-		store.addPropertyChangeListener(new IPropertyChangeListener() {
-			@Override
-			public void propertyChange(PropertyChangeEvent event) {
-				if (!event.getProperty().equals("org.dawb.workbench.views.image.monitor.thumbnail.size")) return;
-				if (gr.getGallery().isDisposed()) return;
-				int side = ObjectUtils.getInteger(event.getNewValue());
-				gr.setItemHeight(side);
-				gr.setItemWidth(side);
-				refreshAll();
-			}
-		});
-		gr.setItemHeight(size);
-		gr.setItemWidth(size);
-		gr.setAutoMargin(true);
-		gallery.setGroupRenderer(gr);
-
-		DefaultGalleryItemRenderer ir = new DefaultGalleryItemRenderer();
-		gallery.setItemRenderer(ir);
-		
-		
-		// Virtual
-		gallery.setVirtualGroups(true);
-		gallery.addListener(SWT.SetData, new Listener() {
-			public void handleEvent(Event event) {
-				
-				GalleryItem item = (GalleryItem) event.item;
-				int index = gallery.indexOf(item);
-				item.setItemCount(index);
-				
-				item.setText(index+"");
-				
-				final ImageItem ii = new ImageItem();
-				ii.setIndex(index);
-				ii.setItem(item);
-							 	
-			 	// Add to render queue
-			 	queue.offerFirst(ii);	
-			}
-
-		});
-
-		this.galleryGroup = new GalleryItem(gallery, SWT.VIRTUAL);
-		galleryGroup.setText("Please choose a directory to monitor...");
+		galleryDelegate.createContent("Please choose a directory to monitor...", parent);
 		
 		createActions();
 		initializeToolBar();
@@ -165,53 +87,13 @@ public class H5GalleryView extends ViewPart implements MouseListener, SelectionL
 		
 		//getSite().setSelectionProvider(new GalleryTreeViewer(gallery));
 		
-		gallery.addMouseListener(this);
-		gallery.addSelectionListener(this);
+		galleryDelegate.addMouseListener(this);
+		galleryDelegate.addSelectionListener(this);
 	}
 	
-	public void createImageGallery(H5GalleryInfo info) {
+	private void createImageGallery(H5GalleryInfo info) {
 		this.info = info;
-		refreshAll();
-	}
-	
-	public void refreshAll() {
-		refreshAll(false);
-	}
-	
-	private void refreshAll(final boolean updateSelection) {
-		
-		queue.clear();
-		
-		// We use a job for this as the file list can be large
-		final Job refresh = new Job("Refresh Image Monitor") {
-			@Override
-			protected IStatus run(IProgressMonitor monitor) {
-				
-				
-		
-			    Display.getDefault().asyncExec(new Runnable() {
-					@Override
-					public void run() {
-						galleryGroup.clearAll();
-						galleryGroup.setItemCount(info.getSize());
-						galleryGroup.setExpanded(true);
-						galleryGroup.setText(info.getSlice().getName());
-						
-						gallery.update();
-						gallery.getParent().layout(new Control[]{gallery});
-
-						GalleryItem item = galleryGroup.getItem(galleryGroup.getItemCount()-1);
-						gallery.setSelection(new GalleryItem[]{item});
-					    
-					}
-			    });
-
-				return Status.OK_STATUS;
-			}
-		};
-		refresh.setPriority(Job.BUILD);
-		refresh.schedule();
-		
+		galleryDelegate.setData(info);
 	}
 	
 	@Override
@@ -241,7 +123,7 @@ public class H5GalleryView extends ViewPart implements MouseListener, SelectionL
 	 */
 	private void createActions() {
 		final MenuManager menuManager = new MenuManager();
-		gallery.setMenu(menuManager.createContextMenu(gallery));
+		galleryDelegate.setMenu(menuManager);
 		getSite().registerContextMenu(menuManager, null);
 	}
 
@@ -255,6 +137,18 @@ public class H5GalleryView extends ViewPart implements MouseListener, SelectionL
 		dimensionList = new MenuAction("Slice dimension");
 		dimensionList.setImageDescriptor(Activator.getImageDescriptor("icons/slice_dimension.gif"));
 		toolbarManager.add(dimensionList);
+		
+		Action prefs = new Action("Preferences...", Activator.getImageDescriptor("icons/data.gif")) {
+			@Override
+			public void run() {
+				PreferenceDialog pref = PreferencesUtil.createPreferenceDialogOn(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), ViewConstants.PAGE_ID, null, null);
+				if (pref != null) pref.open();
+			}
+		};
+		toolbarManager.add(prefs);
+		
+		getViewSite().getActionBars().getMenuManager().add(prefs);
+
 	}
 
 	/**
@@ -267,9 +161,7 @@ public class H5GalleryView extends ViewPart implements MouseListener, SelectionL
 
 	@Override
 	public void setFocus() {
-		if (gallery!=null&&!gallery.isDisposed()) {
-			gallery.setFocus();
-		}
+		galleryDelegate.setFocus();
 	}
 
 	@Override
@@ -288,7 +180,7 @@ public class H5GalleryView extends ViewPart implements MouseListener, SelectionL
 	
 	private void updateSelection() {
 		
-		final GalleryItem[] items = gallery.getSelection();
+		final GalleryItem[] items = galleryDelegate.getSelection();
 		if (items==null || items.length<1) return;
 		
 		final IEditorPart part = EclipseUtils.getActiveEditor();
@@ -300,7 +192,7 @@ public class H5GalleryView extends ViewPart implements MouseListener, SelectionL
 			}
 			if (items.length<=1) return;
 			
-			List<IDataset> ys = getSlices(items);
+			List<IDataset> ys = galleryDelegate.getSelectionData(items);
 			final IPlottingSystem system = (IPlottingSystem)part.getAdapter(IPlottingSystem.class);
 			system.clear();
 
@@ -315,160 +207,17 @@ public class H5GalleryView extends ViewPart implements MouseListener, SelectionL
 		}
 	}
 	
-	private List<IDataset> getSlices(GalleryItem[] items) {
-		
-		final List<IDataset> ys = new ArrayList<IDataset>(11);
-		for (GalleryItem item : items) {
-			final ImageItem ii = new ImageItem();
-			ii.setIndex(item.getItemCount());
-			ii.setItem(item);
-            try {
-            	IDataset slice = getSlice(ii);
-            	slice.setName("Slice "+item.getItemCount());
-				ys.add((AbstractDataset)slice);
-			} catch (Exception e) {
-				logger.error("Cannot slice ", e);
-				continue;
-			}
-		}
-        return ys;
-	}
-
 	public void dispose() {
 		
-		queue.clear();
-		queue.add(new ImageItem()); // stops queue.
-		
-		if (gallery!=null&&!gallery.isDisposed()) {
-			// Dispose images, may be a lot!
-			for (int i = 0; i<gallery.getItemCount() ; ++i) {
-				if (gallery.getItem(i).getImage()!=null) {
-					gallery.getItem(i).getImage().dispose();
-				}
-			}
-			gallery.removeSelectionListener(this);
-			gallery.removeMouseListener(this);
-			gallery.dispose();
-		}
-		
-		// Nullify variables
-		gallery=null;
-		galleryGroup=null;
-		queue=null;
-		imageThread=null;
+		galleryDelegate.removeSelectionListener(this);
+		galleryDelegate.removeMouseListener(this);
+		galleryDelegate.dispose();
 		info=null;
 		
 		super.dispose();
 
 	}
 	
-	
-	private void createImageThread() {
-
-		final IPreferenceStore store = new ScopedPreferenceStore(InstanceScope.INSTANCE, "org.dawb.common.ui");
-			
-		this.imageThread = new Thread(new Runnable() {
-			@Override
-			public void run() {
-				try {
-	                while(true) { // This thead is going all the time.
-	                	if (queue==null) return;
-	                	final ImageItem ii = queue.take();
-	                   	if (ii.getItem()==null) return;
-	                   	if (ii.getIndex()<0)    return;
-	                   	if (ii.getItem().isDisposed()) continue;
-	                   	
-	                   	final IDataset set = getSlice(ii);
-	                   	if (set==null) continue;
-	            		
-	            		// Generate thumbnail
-	            		int             size  = store.getInt("org.dawb.workbench.views.image.monitor.thumbnail.size");
-	            		if (size<1) size = 96;
-	            		
-	            		final IPlotImageService service = (IPlotImageService)ServiceManager.getService(IPlotImageService.class);	            		
-	            		final Image image = service.getImage(new PlotImageData(set, size, size));
-
-	            		Display.getDefault().asyncExec(new Runnable() {
-							@Override
-							public void run() {
-								if (ii.getItem().isDisposed()) return;
-								if (ii.getItem().getParent().isDisposed()) return;
-			                   	if (image!=null) {
-									if (image.isDisposed()) return;
-			                   		ii.getItem().setImage(image);
-			                   	}
-							}
-	                   	});
-	                }
-				} catch (Throwable ne) {
-					logger.error("Cannot process images", ne);
-				}
-			}
-
-		}, "Image View Processing Daemon");
-		
-		imageThread.setDaemon(true);
-		imageThread.start();
-	}
-	
-	private IDataset getSlice(final ImageItem ii) throws Exception {
-		// Do slice
-		final SliceObject slice = info.getSlice();
-		
-		IDataset set=null;
-		try {
-			set = lazySet.getSlice(getSliceStart(ii.getIndex()), getSliceStop(ii.getIndex()), getSliceStep(ii.getIndex()));
-			if (set==null) return null;
-			if (set instanceof AbstractDataset) {
-				set = ((AbstractDataset)set).squeeze();
-			}
-		} catch (java.lang.IllegalArgumentException ne) {
-			// We do not want the thread to stop in this case.
-			logger.debug("Encountered invalid shape with "+slice);
-			return null;
-		}
-		set.setShape(set.getShape());
-
-		return set;
-	}
-
-	
-	protected int[] getSliceStart(int index) {
-		
-        final int [] start = new int[info.getShape().length];
-        for (int i = 0; i < start.length; i++) {
-			if (i==info.getSliceDimension()) {
-				start[i] = index;
-			} else if (info.isNonAxisDimension(i)) {
-				start[i] = 0; // TODO FIXME
-			} else{
-				start[i] = info.getStart(i); // 0 for 2D, the current slice index for this dim for 1D
-			}
-		}
-        return start;
-	}
-
-	protected int[] getSliceStop(int index) {
-		
-        final int [] stop = new int[info.getShape().length];
-        for (int i = 0; i < stop.length; i++) {
-			if (i==info.getSliceDimension()) {
-				stop[i] = index+1;
-			} else if (info.isNonAxisDimension(i)) {
-				stop[i] = 1; // TODO FIXME
-			} else{
-				stop[i] = info.getStop(i);  // size dim for 2D, the current slice index for this dim  +1 for 1D
-			}
-		}
-        return stop;
-	}
-	protected int[] getSliceStep(int index) {
-		
-        final int [] step = new int[info.getShape().length];
-        for (int i = 0; i < step.length; i++) step[i]=1;
-        return step;
-	}
-
 	@Override
 	public void mouseUp(MouseEvent e) {
 		//System.out.println(e);
@@ -483,8 +232,7 @@ public class H5GalleryView extends ViewPart implements MouseListener, SelectionL
 	@Override
 	public void updateSlice(final ILazyDataset lazySet, final SliceObject slice) {
 
-		this.lazySet = lazySet;
-		final H5GalleryInfo info = new H5GalleryInfo();
+		final H5GalleryInfo info = new H5GalleryInfo(lazySet);
 		info.setShape(lazySet.getShape());		
 		info.setSlice(slice);
 		info.createDefaultSliceDimension();
@@ -498,7 +246,7 @@ public class H5GalleryView extends ViewPart implements MouseListener, SelectionL
 			final IAction dimAction = new Action(""+(dim+1), IAction.AS_CHECK_BOX) {
 				public void run() {
 					info.setSliceDimension(dim);
-					refreshAll();
+					galleryDelegate.refreshAll();
 				}
 			};
 			if (info.getSliceDimension()==dim) dimAction.setChecked(true);
