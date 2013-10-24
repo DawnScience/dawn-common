@@ -38,4 +38,12 @@ public interface GalleryDelegateInfo {
 	 */
 	String getPath(int itemCount);
 
+	/**
+	 * Maybe implemented to define the path as already being a thumbnail.
+	 * In which case the image will be loaded directly rather than rescaled.
+	 * 
+	 * NOTE getData(...) is called before getDirectThumbnailPath()
+	 * @return
+	 */
+	public String getDirectThumbnailPath();
 }

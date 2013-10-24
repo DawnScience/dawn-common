@@ -208,5 +208,7 @@ public class H5GalleryInfo implements GalleryDelegateInfo {
 	public String getPath(int itemCount) {
         return null;
 	}
-	
+	public String getDirectThumbnailPath() {
+		return null;
+	}
 }

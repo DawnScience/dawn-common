@@ -1,5 +1,8 @@
 package org.dawb.common.ui.views;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingDeque;
@@ -231,14 +234,20 @@ public class GalleryDelegate {
 						if (ii.getItem().isDisposed()) continue;
 
 						final IDataset set = info.getData(false, ii);
-						if (set==null) continue;
+						if (set==null && info.getDirectThumbnailPath()==null) continue;
 
 						// Generate thumbnail
-						int             size  = store.getInt(ViewConstants.IMAGE_SIZE);
+						int size  = store.getInt(ViewConstants.IMAGE_SIZE);
 						if (size<1) size = 96;
 
-						final IPlotImageService service = (IPlotImageService)ServiceManager.getService(IPlotImageService.class);	            		
-						final Image image = service.getImage(new PlotImageData(set, size, size));
+						final Image image;
+						if (info.getDirectThumbnailPath()!=null) {
+							final String path = info.getPath(ii.getIndex());
+							image = new Image(Display.getDefault(), new BufferedInputStream(new FileInputStream(new File(path))));
+						} else {
+							final IPlotImageService service = (IPlotImageService)ServiceManager.getService(IPlotImageService.class);	            		
+							image = service.getImage(new PlotImageData(set, size, size));
+						}
 
 						Display.getDefault().asyncExec(new Runnable() {
 							@Override
