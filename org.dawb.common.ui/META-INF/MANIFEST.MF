@@ -20,7 +20,8 @@ Require-Bundle: org.eclipse.core.runtime,
  org.dawnsci.plotting.api;bundle-version="1.2.0",
  org.eclipse.nebula.jface;bundle-version="1.0.0",
  org.dawnsci.slicing.api;bundle-version="1.0.0",
- org.eclipse.emf.common.ui;bundle-version="[2.7.0,2.7.1)"
+ org.eclipse.emf.common.ui;bundle-version="[2.7.0,2.7.1)",
+ org.eclipse.gmf.runtime.draw2d.ui.render.awt
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Export-Package: org.dawb.common.ui,
@@ -53,5 +54,8 @@ Import-Package: org.dawb.common.services,
  org.dawb.common.services.conversion,
  org.eclipse.draw2d,
  org.eclipse.draw2d.geometry,
+ org.eclipse.gmf.runtime.common.ui.util,
+ org.eclipse.gmf.runtime.draw2d.ui.figures,
+ org.eclipse.gmf.runtime.draw2d.ui.render.awt.internal.svg.export,
  org.slf4j
 Bundle-ClassPath: .

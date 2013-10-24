@@ -83,7 +83,7 @@ public class PlotPrintPreviewDialog extends Dialog {
 	 * PlotPrintPreviewDialog constructor
 	 * 
 	 * @param viewerApp
-	 *            the viewerApp object used to create the image
+	 *            the IPrintImageProvider object used to create the image
 	 * @param device
 	 *            the display device
 	 * @param legendTable
