@@ -31,9 +31,16 @@ import org.osgi.framework.Bundle;
  **/
 public class BundleUtils {
 	
-	
+	/**
+	 * @param bundleName
+	 * @return file this can return null if bundle is not found
+	 * @throws IOException
+	 */
 	public static File getBundleLocation(final String bundleName) throws IOException {
 		final Bundle bundle = Platform.getBundle(bundleName);
+		if (bundle == null) {
+			return null;
+		}
 		return FileLocator.getBundleFile(bundle);
 	}
 	
