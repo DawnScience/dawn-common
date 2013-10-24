@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2012 European Synchrotron Radiation Facility,
+ * Copyright (c) 2013 European Synchrotron Radiation Facility,
  *                    Diamond Light Source Ltd.
  *
  * All rights reserved. This program and the accompanying materials
@@ -38,7 +38,17 @@ import javax.print.StreamPrintService;
 import javax.print.StreamPrintServiceFactory;
 import javax.print.event.PrintJobAdapter;
 import javax.print.event.PrintJobEvent;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerFactoryConfigurationError;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
+import org.eclipse.gmf.runtime.draw2d.ui.render.awt.internal.svg.export.GraphicsSVG;
+import org.eclipse.draw2d.IFigure;
+import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.FileTransfer;
@@ -54,12 +64,14 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Element;
 
 /**
  * Utility class for exporting any active plotting area as an image file
  * 
  * @author Baha El Kassaby
  */
+@SuppressWarnings("restriction")
 public class PlotExportPrintUtil {
 
 	public static final String[] FILE_TYPES = new String[] { "PNG/JPEG File", "Postscript File", "SVG File" };
@@ -115,9 +127,43 @@ public class PlotExportPrintUtil {
 		}
 	}
 
-	private static void saveSVG(File imageFile, Image image)
-			throws FileNotFoundException {
-		// TODO with draw2D to SVG?
+	/**
+	 * Save a Draw2D figure as Scalable Vector Graphics to an output stream.
+	 * @param root the figure to draw
+	 * @param file the file to write the SVG DOM to
+	 * @throws IOException if writing to the output stream fails
+	 * @throws TransformerFactoryConfigurationError if creating the transformer
+	 *   fails
+	 * @throws TransformerException if writing the document fails
+	 */
+	public static void saveSVG(IFigure root, File file)
+			throws IOException, TransformerFactoryConfigurationError,
+			TransformerException {
+		OutputStream out = new FileOutputStream(file);
+		Rectangle viewBox = root.getBounds().getCopy();
+		GraphicsSVG graphics = GraphicsSVG.getInstance(viewBox);
+		try {
+			// paint figure
+			root.paint(graphics);
+			Element svgRoot = graphics.getRoot();
+			// Define the view box
+			svgRoot.setAttributeNS(null, "viewBox",
+					String.valueOf(viewBox.x) + " " + String.valueOf(viewBox.y)
+							+ " " + String.valueOf(viewBox.width) + " "
+							+ String.valueOf(viewBox.height));
+			// Write the document to the stream
+			Transformer transformer = TransformerFactory.newInstance()
+					.newTransformer();
+			transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+			transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+			DOMSource source = new DOMSource(svgRoot);
+			StreamResult result = new StreamResult(out);
+			transformer.transform(source, result);
+		} finally {
+			graphics.dispose();
+			out.close();
+		}
 	}
 
 	private static BufferedImage convertToAWT(ImageData data) {
@@ -183,9 +229,11 @@ public class PlotExportPrintUtil {
 	 * @param fileType
 	 *            type of the file
 	 * @param image
-	 * @throws FileNotFoundException
+	 * @param printableFigure
+	 *          IFigure used to export to svg
+	 * @throws Exception
 	 */
-	public synchronized static void saveGraph(String filename, String fileType, Image image) 
+	public synchronized static void saveGraph(String filename, String fileType, Image image, IFigure printableFigure) 
 			throws Exception {
 		if (!Arrays.asList(FILE_TYPES).contains(fileType))
 			throw new RuntimeException("Cannot deal with file type " + fileType);
@@ -210,7 +258,7 @@ public class PlotExportPrintUtil {
 		} else if (fileType.equals(FILE_TYPES[2])) {
 			if (!lname.endsWith(".svg"))
 				filename = filename + ".svg";
-			saveSVG(new File(filename), image);
+			saveSVG(printableFigure, new File(filename));
 		} else {
 			throw new RuntimeException("Cannot process " + fileType);
 		}
