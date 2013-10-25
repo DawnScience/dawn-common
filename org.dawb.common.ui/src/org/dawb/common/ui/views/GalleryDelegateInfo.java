@@ -36,7 +36,7 @@ public interface GalleryDelegateInfo {
 	 * @param itemCount
 	 * @return
 	 */
-	String getPath(int itemCount);
+	String getPath(int index);
 
 	/**
 	 * Maybe implemented to define the path as already being a thumbnail.
@@ -46,4 +46,11 @@ public interface GalleryDelegateInfo {
 	 * @return
 	 */
 	public String getDirectThumbnailPath();
+
+	/**
+	 * The name of the image as it is read from disk.
+	 * @param index
+	 * @return
+	 */
+	String getName(int index);
 }

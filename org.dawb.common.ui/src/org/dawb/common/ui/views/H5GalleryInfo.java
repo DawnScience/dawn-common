@@ -198,6 +198,11 @@ public class H5GalleryInfo implements GalleryDelegateInfo {
 		}
         return stop;
 	}
+	@Override
+	public String getName(int index) {
+		return String.valueOf(index);
+	}
+
 	protected int[] getSliceStep(int index) {
 		
         final int [] step = new int[getShape().length];

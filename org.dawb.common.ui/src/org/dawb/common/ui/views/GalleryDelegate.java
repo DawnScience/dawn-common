@@ -65,11 +65,11 @@ public class GalleryDelegate {
 		createImageThread();
 	}
 	
-	public void createContent(String groupLabel, Composite parent) {
+	public void createContent(String groupLabel, String toolTip, Composite parent) {
 		
 		this.groupLabel = groupLabel;
 		this.gallery = new Gallery(parent, SWT.V_SCROLL | SWT.VIRTUAL | SWT.MULTI);
-		gallery.setToolTipText("This part is used to navigate an image set inside an hdf5/nexus file.");
+		gallery.setToolTipText(toolTip);
 		
 		// Renderers
 		final DefaultGalleryGroupRenderer gr = new DefaultGalleryGroupRenderer();
@@ -107,7 +107,7 @@ public class GalleryDelegate {
 				int index = gallery.indexOf(item);
 				item.setItemCount(index);
 				
-				item.setText(index+"");
+				item.setText(info.getName(index));
 				
 				final ImageItem ii = new ImageItem();
 				ii.setIndex(index);
@@ -257,6 +257,7 @@ public class GalleryDelegate {
 								if (image!=null) {
 									if (image.isDisposed()) return;
 									ii.getItem().setImage(image);
+									ii.getItem().setText(info.getName(ii.getIndex()));
 								}
 							}
 						});

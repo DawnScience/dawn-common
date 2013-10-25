@@ -79,7 +79,7 @@ public class H5GalleryView extends ViewPart implements MouseListener, SelectionL
 	public void createPartControl(Composite parent) {
 
 		parent.setLayout(new FillLayout());
-		galleryDelegate.createContent("Please choose a directory to monitor...", parent);
+		galleryDelegate.createContent("Please choose a directory to monitor...", "This part is used to navigate an image set inside an hdf5/nexus file.", parent);
 		
 		createActions();
 		initializeToolBar();
