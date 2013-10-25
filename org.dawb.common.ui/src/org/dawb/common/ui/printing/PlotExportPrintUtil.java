@@ -40,13 +40,14 @@ import javax.print.event.PrintJobAdapter;
 import javax.print.event.PrintJobEvent;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.eclipse.gmf.runtime.draw2d.ui.render.awt.internal.svg.export.GraphicsSVG;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.SWT;
@@ -62,6 +63,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.progress.UIJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
@@ -124,45 +126,6 @@ public class PlotExportPrintUtil {
 			logger.error("Could not print to PostScript", e);
 		} catch (IOException e) {
 			logger.error("IO error", e);
-		}
-	}
-
-	/**
-	 * Save a Draw2D figure as Scalable Vector Graphics to an output stream.
-	 * @param root the figure to draw
-	 * @param file the file to write the SVG DOM to
-	 * @throws IOException if writing to the output stream fails
-	 * @throws TransformerFactoryConfigurationError if creating the transformer
-	 *   fails
-	 * @throws TransformerException if writing the document fails
-	 */
-	public static void saveSVG(IFigure root, File file)
-			throws IOException, TransformerFactoryConfigurationError,
-			TransformerException {
-		OutputStream out = new FileOutputStream(file);
-		Rectangle viewBox = root.getBounds().getCopy();
-		GraphicsSVG graphics = GraphicsSVG.getInstance(viewBox);
-		try {
-			// paint figure
-			root.paint(graphics);
-			Element svgRoot = graphics.getRoot();
-			// Define the view box
-			svgRoot.setAttributeNS(null, "viewBox",
-					String.valueOf(viewBox.x) + " " + String.valueOf(viewBox.y)
-							+ " " + String.valueOf(viewBox.width) + " "
-							+ String.valueOf(viewBox.height));
-			// Write the document to the stream
-			Transformer transformer = TransformerFactory.newInstance()
-					.newTransformer();
-			transformer.setOutputProperty(OutputKeys.METHOD, "xml");
-			transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-			DOMSource source = new DOMSource(svgRoot);
-			StreamResult result = new StreamResult(out);
-			transformer.transform(source, result);
-		} finally {
-			graphics.dispose();
-			out.close();
 		}
 	}
 
@@ -258,7 +221,9 @@ public class PlotExportPrintUtil {
 		} else if (fileType.equals(FILE_TYPES[2])) {
 			if (!lname.endsWith(".svg"))
 				filename = filename + ".svg";
-			saveSVG(printableFigure, new File(filename));
+			SaveToSVG svgJob = new SaveToSVG(printableFigure, new File(filename));
+			svgJob.setUser(true);
+			svgJob.schedule();
 		} else {
 			throw new RuntimeException("Cannot process " + fileType);
 		}
@@ -336,6 +301,90 @@ class PrintJobWatcher {
 				wait();
 			}
 		} catch (InterruptedException e) {
+		}
+	}
+}
+
+class SaveToSVG extends UIJob {
+	private Logger logger = LoggerFactory.getLogger(SaveToSVG.class);
+	private File file;
+	private IFigure root;
+
+	/**
+	 * Save a Draw2D figure as Scalable Vector Graphics to an output stream.
+	 * @param root the figure to draw
+	 * @param file the file to write the SVG DOM to
+	 */
+	public SaveToSVG(IFigure printableFigure, File file) {
+		super("Exporting to SVG");
+		this.root = printableFigure;
+		this.file = file;
+	}
+
+	@SuppressWarnings("restriction")
+	@Override
+	public IStatus runInUIThread(final IProgressMonitor monitor) {
+		try {
+			final OutputStream out = new FileOutputStream(file);
+			final Rectangle viewBox = root.getBounds().getCopy();
+
+			GraphicsSVG graphics = null;
+			try {
+				graphics = GraphicsSVG.getInstance(viewBox);
+				// paint figure
+				root.paint(graphics);
+				Element svgRoot = graphics.getRoot();
+
+				if (monitor != null && monitor.isCanceled()) {
+					return Status.CANCEL_STATUS;
+				}
+
+				// Define the view box
+				svgRoot.setAttributeNS(
+						null,
+						"viewBox",
+						String.valueOf(viewBox.x) + " "
+								+ String.valueOf(viewBox.y) + " "
+								+ String.valueOf(viewBox.width) + " "
+								+ String.valueOf(viewBox.height));
+
+				if (monitor != null && monitor.isCanceled()) {
+					return Status.CANCEL_STATUS;
+				}
+
+				// Write the document to the stream
+				Transformer transformer = TransformerFactory.newInstance()
+						.newTransformer();
+				transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+				transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+				transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+
+				if (monitor != null && monitor.isCanceled()) {
+					return Status.CANCEL_STATUS;
+				}
+
+				DOMSource source = new DOMSource(svgRoot);
+				StreamResult result = new StreamResult(out);
+
+				transformer.transform(source, result);
+				return Status.OK_STATUS;
+			} catch (Exception e) {
+				logger.debug(e.getMessage());
+				return Status.CANCEL_STATUS;
+			} finally {
+				if (graphics != null)
+					graphics.dispose();
+				if (out != null) {
+					try {
+						out.close();
+					} catch (IOException e) {
+						logger.debug(e.toString());
+					}
+				}
+			}
+		} catch (FileNotFoundException e) {
+			logger.debug(e.getMessage());
+			return Status.CANCEL_STATUS;
 		}
 	}
 }
