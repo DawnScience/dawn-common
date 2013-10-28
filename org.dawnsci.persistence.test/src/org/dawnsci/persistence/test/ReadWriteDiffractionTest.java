@@ -15,7 +15,7 @@ import uk.ac.diamond.scisoft.analysis.diffraction.DiffractionCrystalEnvironment;
 import uk.ac.diamond.scisoft.analysis.io.DiffractionMetadata;
 import uk.ac.diamond.scisoft.analysis.io.IDiffractionMetadata;
 
-public class ReadWriteDiffractionTest extends AbstractThreadTest {
+public class ReadWriteDiffractionTest extends AbstractThreadTestBase {
 
 	@Test
 	public void testWriteReadMeta() {

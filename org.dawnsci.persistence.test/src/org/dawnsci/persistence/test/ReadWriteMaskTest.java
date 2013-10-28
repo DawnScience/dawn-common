@@ -17,7 +17,7 @@ import org.junit.Test;
 import uk.ac.diamond.scisoft.analysis.dataset.BooleanDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 
-public class ReadWriteMaskTest extends AbstractThreadTest{
+public class ReadWriteMaskTest extends AbstractThreadTestBase{
 	
 	@Test
 	public void testWriteReadMask(){

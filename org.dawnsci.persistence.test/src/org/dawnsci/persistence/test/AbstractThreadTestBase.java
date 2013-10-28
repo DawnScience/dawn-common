@@ -13,7 +13,7 @@ package org.dawnsci.persistence.test;
 /**
  * Class to extend, does not have any tests itself.
  */
-public abstract class AbstractThreadTest {
+public abstract class AbstractThreadTestBase {
 	
 
 	public void testInTestThread() throws Throwable{

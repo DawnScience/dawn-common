@@ -17,7 +17,7 @@ import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
 
-public class ReadWriteHistoryTest extends AbstractThreadTest {
+public class ReadWriteHistoryTest extends AbstractThreadTestBase {
 
 	@Test
 	public void testWriteReadHisto1D() throws Exception {
