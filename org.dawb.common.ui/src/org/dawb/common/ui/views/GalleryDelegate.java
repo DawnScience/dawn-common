@@ -107,7 +107,7 @@ public class GalleryDelegate {
 				int index = gallery.indexOf(item);
 				item.setItemCount(index);
 				
-				item.setText(info.getName(index));
+				item.setText(info.getItemName(index, true));
 				
 				final ImageItem ii = new ImageItem();
 				ii.setIndex(index);
@@ -166,7 +166,7 @@ public class GalleryDelegate {
 			ii.setItem(item);
             try {
             	IDataset slice = info.getData(true, ii);
-            	slice.setName(selectionDataLabel+" "+item.getItemCount());
+            	slice.setName(selectionDataLabel+" "+info.getItemName(item.getItemCount(), false));
 				ys.add((AbstractDataset)slice);
 			} catch (Exception e) {
 				logger.error("Cannot slice ", e);
@@ -257,7 +257,7 @@ public class GalleryDelegate {
 								if (image!=null) {
 									if (image.isDisposed()) return;
 									ii.getItem().setImage(image);
-									ii.getItem().setText(info.getName(ii.getIndex()));
+									ii.getItem().setText(info.getItemName(ii.getIndex(), true));
 								}
 							}
 						});

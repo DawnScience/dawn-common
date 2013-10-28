@@ -199,7 +199,7 @@ public class H5GalleryInfo implements GalleryDelegateInfo {
         return stop;
 	}
 	@Override
-	public String getName(int index) {
+	public String getItemName(int index, boolean attemptToShorten) {
 		return String.valueOf(index);
 	}
 

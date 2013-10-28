@@ -52,5 +52,5 @@ public interface GalleryDelegateInfo {
 	 * @param index
 	 * @return
 	 */
-	String getName(int index);
+	String getItemName(int index, boolean attemptToShorten);
 }

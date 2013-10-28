@@ -208,6 +208,10 @@ public abstract class AbstractSliceConversionPage extends ResourceChoosePage {
 
 	protected void nameChanged() {
 		
+		if (datasetName==null || "".equals(datasetName)) {
+			setErrorMessage("Please choose a dataset name");
+			return;
+		}
 		
 		// Probably should check if regular expression a better way
 		if (datasetName.contains("*") || datasetName.contains("+") || datasetName.contains("?")) {
