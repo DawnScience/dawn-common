@@ -44,10 +44,12 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.dawb.common.ui.util.DisplayUtils;
 import org.eclipse.gmf.runtime.draw2d.ui.render.awt.internal.svg.export.GraphicsSVG;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.SWT;
@@ -63,7 +65,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.progress.UIJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
@@ -126,6 +127,68 @@ public class PlotExportPrintUtil {
 			logger.error("Could not print to PostScript", e);
 		} catch (IOException e) {
 			logger.error("IO error", e);
+		}
+	}
+
+	/**
+	 * Save a Draw2D figure as Scalable Vector Graphics to an output stream.
+	 * Should be run in a UI thread
+	 * @param root the figure to draw
+	 * @param file the file to write the SVG DOM to
+	 * @param monitor
+	 * @throws Exception
+	 */
+	public static IStatus saveSVG(IFigure root, File file, IProgressMonitor monitor)
+			throws IOException {
+		GraphicsSVG graphics = null;
+		OutputStream out = null;
+		try {
+			out = new FileOutputStream(file);
+			final Rectangle viewBox = root.getBounds().getCopy();
+			graphics = GraphicsSVG.getInstance(viewBox);
+			// paint figure
+			root.paint(graphics);
+			Element svgRoot = graphics.getRoot();
+
+			if (monitor != null && monitor.isCanceled()) {
+				return Status.CANCEL_STATUS;
+			}
+
+			// Define the view box
+			svgRoot.setAttributeNS(null, "viewBox",
+					String.valueOf(viewBox.x) + " " + String.valueOf(viewBox.y)
+							+ " " + String.valueOf(viewBox.width) + " "
+							+ String.valueOf(viewBox.height));
+
+			if (monitor != null && monitor.isCanceled()) {
+				return Status.CANCEL_STATUS;
+			}
+
+			// Write the document to the stream
+			Transformer transformer = TransformerFactory.newInstance()
+					.newTransformer();
+			transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+			transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+
+			if (monitor != null && monitor.isCanceled()) {
+				return Status.CANCEL_STATUS;
+			}
+
+			DOMSource source = new DOMSource(svgRoot);
+			StreamResult result = new StreamResult(out);
+
+			transformer.transform(source, result);
+			return Status.OK_STATUS;
+		} catch (Exception e) {
+			logger.debug(e.getMessage());
+			return Status.CANCEL_STATUS;
+		} finally {
+			if (graphics != null)
+				graphics.dispose();
+			if (out != null) {
+				out.close();
+			}
 		}
 	}
 
@@ -196,7 +259,7 @@ public class PlotExportPrintUtil {
 	 *          IFigure used to export to svg
 	 * @throws Exception
 	 */
-	public synchronized static void saveGraph(String filename, String fileType, Image image, IFigure printableFigure) 
+	public synchronized static void saveGraph(String filename, String fileType, Image image, final IFigure printableFigure) 
 			throws Exception {
 		if (!Arrays.asList(FILE_TYPES).contains(fileType))
 			throw new RuntimeException("Cannot deal with file type " + fileType);
@@ -221,7 +284,28 @@ public class PlotExportPrintUtil {
 		} else if (fileType.equals(FILE_TYPES[2])) {
 			if (!lname.endsWith(".svg"))
 				filename = filename + ".svg";
-			SaveToSVG svgJob = new SaveToSVG(printableFigure, new File(filename));
+			final File file = new File(filename);
+			// save to SVG process in a Job
+			Job svgJob = new Job("Exporting to SVG") {
+				IStatus result = null;
+				@Override
+				protected IStatus run(final IProgressMonitor monitor) {
+					DisplayUtils.runInDisplayThread(true, false, null, new Runnable() {
+						@Override
+						public void run() {
+							try {
+								result = saveSVG(printableFigure, file, monitor);
+							} catch (IOException e) {
+								result = Status.CANCEL_STATUS;
+								logger.debug("Error writing to file:"+e.toString());
+							}
+						}
+					});
+					if (result == null)
+						result = Status.CANCEL_STATUS;
+					return result;
+				}
+			};
 			svgJob.setUser(true);
 			svgJob.schedule();
 		} else {
@@ -301,90 +385,6 @@ class PrintJobWatcher {
 				wait();
 			}
 		} catch (InterruptedException e) {
-		}
-	}
-}
-
-class SaveToSVG extends UIJob {
-	private Logger logger = LoggerFactory.getLogger(SaveToSVG.class);
-	private File file;
-	private IFigure root;
-
-	/**
-	 * Save a Draw2D figure as Scalable Vector Graphics to an output stream.
-	 * @param root the figure to draw
-	 * @param file the file to write the SVG DOM to
-	 */
-	public SaveToSVG(IFigure printableFigure, File file) {
-		super("Exporting to SVG");
-		this.root = printableFigure;
-		this.file = file;
-	}
-
-	@SuppressWarnings("restriction")
-	@Override
-	public IStatus runInUIThread(final IProgressMonitor monitor) {
-		try {
-			final OutputStream out = new FileOutputStream(file);
-			final Rectangle viewBox = root.getBounds().getCopy();
-
-			GraphicsSVG graphics = null;
-			try {
-				graphics = GraphicsSVG.getInstance(viewBox);
-				// paint figure
-				root.paint(graphics);
-				Element svgRoot = graphics.getRoot();
-
-				if (monitor != null && monitor.isCanceled()) {
-					return Status.CANCEL_STATUS;
-				}
-
-				// Define the view box
-				svgRoot.setAttributeNS(
-						null,
-						"viewBox",
-						String.valueOf(viewBox.x) + " "
-								+ String.valueOf(viewBox.y) + " "
-								+ String.valueOf(viewBox.width) + " "
-								+ String.valueOf(viewBox.height));
-
-				if (monitor != null && monitor.isCanceled()) {
-					return Status.CANCEL_STATUS;
-				}
-
-				// Write the document to the stream
-				Transformer transformer = TransformerFactory.newInstance()
-						.newTransformer();
-				transformer.setOutputProperty(OutputKeys.METHOD, "xml");
-				transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-				transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-
-				if (monitor != null && monitor.isCanceled()) {
-					return Status.CANCEL_STATUS;
-				}
-
-				DOMSource source = new DOMSource(svgRoot);
-				StreamResult result = new StreamResult(out);
-
-				transformer.transform(source, result);
-				return Status.OK_STATUS;
-			} catch (Exception e) {
-				logger.debug(e.getMessage());
-				return Status.CANCEL_STATUS;
-			} finally {
-				if (graphics != null)
-					graphics.dispose();
-				if (out != null) {
-					try {
-						out.close();
-					} catch (IOException e) {
-						logger.debug(e.toString());
-					}
-				}
-			}
-		} catch (FileNotFoundException e) {
-			logger.debug(e.getMessage());
-			return Status.CANCEL_STATUS;
 		}
 	}
 }

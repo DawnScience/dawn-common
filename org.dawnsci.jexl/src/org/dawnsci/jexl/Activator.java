@@ -15,7 +15,7 @@ public class Activator implements BundleActivator {
 	private static BundleContext context;
 	Logger logger = LoggerFactory.getLogger(Activator.class);
 
-	static BundleContext getContext() {
+	public static BundleContext getContext() {
 		return context;
 	}
 
