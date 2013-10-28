@@ -12,3 +12,5 @@ Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: org.apache.commons.logging,
  org.slf4j
+Bundle-Vendor: Diamond Light Source
+Export-Package: org.dawnsci.jexl

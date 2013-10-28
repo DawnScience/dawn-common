@@ -16,6 +16,14 @@ public class TreeNodeContentProvider implements ITreeContentProvider {
 
 	protected Viewer   viewer;
 	protected TreeNode rootNode;
+	private TreeNode limit;
+	
+	public TreeNodeContentProvider() {
+		this(null);
+	}
+	public TreeNodeContentProvider(TreeNode limit) {
+		this.limit = limit;
+	}
 
 	@Override
 	public void dispose() {
@@ -36,7 +44,10 @@ public class TreeNodeContentProvider implements ITreeContentProvider {
 
 	@Override
 	public Object[] getChildren(Object parentElement) {
+		
 		final TreeNode node = (TreeNode)parentElement;
+		if (limit!=null && node.getParent()==limit) return null;
+		
 		if (node.getChildCount()<1) return null;
 		
 		final Object[] oa   = new Object[node.getChildCount()];
@@ -54,7 +65,9 @@ public class TreeNodeContentProvider implements ITreeContentProvider {
 
 	@Override
 	public boolean hasChildren(Object element) {
-		return ((TreeNode)element).getChildCount()>0;
+		final TreeNode node = (TreeNode)element;
+		if (limit!=null && node.getParent()==limit) return false;
+		return node.getChildCount()>0;
 	}
 
 	public Viewer getViewer() {

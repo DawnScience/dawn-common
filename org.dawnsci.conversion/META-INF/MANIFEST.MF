@@ -26,6 +26,8 @@ Require-Bundle: org.apache.commons.lang,
  org.eclipse.core.runtime;bundle-version="3.8.0"
 Important-Note: This plugin SHOULD NOT be lazy activated because we always want this 
  plugin to be loaded to contribute the service.
-Export-Package: org.dawnsci.conversion.converters
+Export-Package: org.dawnsci.conversion,
+ org.dawnsci.conversion.converters
 Bundle-ClassPath: .,
  jars/cansas1d-1.1.jar
+Bundle-ActivationPolicy: lazy

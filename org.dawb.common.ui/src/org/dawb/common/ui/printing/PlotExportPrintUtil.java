@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2012 European Synchrotron Radiation Facility,
+ * Copyright (c) 2013 European Synchrotron Radiation Facility,
  *                    Diamond Light Source Ltd.
  *
  * All rights reserved. This program and the accompanying materials
@@ -38,7 +38,20 @@ import javax.print.StreamPrintService;
 import javax.print.StreamPrintServiceFactory;
 import javax.print.event.PrintJobAdapter;
 import javax.print.event.PrintJobEvent;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
+import org.dawb.common.ui.util.DisplayUtils;
+import org.eclipse.gmf.runtime.draw2d.ui.render.awt.internal.svg.export.GraphicsSVG;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.draw2d.IFigure;
+import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.FileTransfer;
@@ -54,12 +67,14 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Element;
 
 /**
  * Utility class for exporting any active plotting area as an image file
  * 
  * @author Baha El Kassaby
  */
+@SuppressWarnings("restriction")
 public class PlotExportPrintUtil {
 
 	public static final String[] FILE_TYPES = new String[] { "PNG/JPEG File", "Postscript File", "SVG File" };
@@ -115,9 +130,66 @@ public class PlotExportPrintUtil {
 		}
 	}
 
-	private static void saveSVG(File imageFile, Image image)
-			throws FileNotFoundException {
-		// TODO with draw2D to SVG?
+	/**
+	 * Save a Draw2D figure as Scalable Vector Graphics to an output stream.
+	 * Should be run in a UI thread
+	 * @param root the figure to draw
+	 * @param file the file to write the SVG DOM to
+	 * @param monitor
+	 * @throws Exception
+	 */
+	public static IStatus saveSVG(IFigure root, File file, IProgressMonitor monitor)
+			throws IOException {
+		GraphicsSVG graphics = null;
+		OutputStream out = null;
+		try {
+			out = new FileOutputStream(file);
+			final Rectangle viewBox = root.getBounds().getCopy();
+			graphics = GraphicsSVG.getInstance(viewBox);
+			// paint figure
+			root.paint(graphics);
+			Element svgRoot = graphics.getRoot();
+
+			if (monitor != null && monitor.isCanceled()) {
+				return Status.CANCEL_STATUS;
+			}
+
+			// Define the view box
+			svgRoot.setAttributeNS(null, "viewBox",
+					String.valueOf(viewBox.x) + " " + String.valueOf(viewBox.y)
+							+ " " + String.valueOf(viewBox.width) + " "
+							+ String.valueOf(viewBox.height));
+
+			if (monitor != null && monitor.isCanceled()) {
+				return Status.CANCEL_STATUS;
+			}
+
+			// Write the document to the stream
+			Transformer transformer = TransformerFactory.newInstance()
+					.newTransformer();
+			transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+			transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+
+			if (monitor != null && monitor.isCanceled()) {
+				return Status.CANCEL_STATUS;
+			}
+
+			DOMSource source = new DOMSource(svgRoot);
+			StreamResult result = new StreamResult(out);
+
+			transformer.transform(source, result);
+			return Status.OK_STATUS;
+		} catch (Exception e) {
+			logger.debug(e.getMessage());
+			return Status.CANCEL_STATUS;
+		} finally {
+			if (graphics != null)
+				graphics.dispose();
+			if (out != null) {
+				out.close();
+			}
+		}
 	}
 
 	private static BufferedImage convertToAWT(ImageData data) {
@@ -183,9 +255,11 @@ public class PlotExportPrintUtil {
 	 * @param fileType
 	 *            type of the file
 	 * @param image
-	 * @throws FileNotFoundException
+	 * @param printableFigure
+	 *          IFigure used to export to svg
+	 * @throws Exception
 	 */
-	public synchronized static void saveGraph(String filename, String fileType, Image image) 
+	public synchronized static void saveGraph(String filename, String fileType, Image image, final IFigure printableFigure) 
 			throws Exception {
 		if (!Arrays.asList(FILE_TYPES).contains(fileType))
 			throw new RuntimeException("Cannot deal with file type " + fileType);
@@ -210,7 +284,30 @@ public class PlotExportPrintUtil {
 		} else if (fileType.equals(FILE_TYPES[2])) {
 			if (!lname.endsWith(".svg"))
 				filename = filename + ".svg";
-			saveSVG(new File(filename), image);
+			final File file = new File(filename);
+			// save to SVG process in a Job
+			Job svgJob = new Job("Exporting to SVG") {
+				IStatus result = null;
+				@Override
+				protected IStatus run(final IProgressMonitor monitor) {
+					DisplayUtils.runInDisplayThread(true, false, null, new Runnable() {
+						@Override
+						public void run() {
+							try {
+								result = saveSVG(printableFigure, file, monitor);
+							} catch (IOException e) {
+								result = Status.CANCEL_STATUS;
+								logger.debug("Error writing to file:"+e.toString());
+							}
+						}
+					});
+					if (result == null)
+						result = Status.CANCEL_STATUS;
+					return result;
+				}
+			};
+			svgJob.setUser(true);
+			svgJob.schedule();
 		} else {
 			throw new RuntimeException("Cannot process " + fileType);
 		}

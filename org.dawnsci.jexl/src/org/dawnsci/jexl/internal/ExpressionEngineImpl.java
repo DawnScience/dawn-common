@@ -1,5 +1,7 @@
 package org.dawnsci.jexl.internal;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -9,6 +11,8 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.jexl2.Expression;
 import org.apache.commons.jexl2.JexlEngine;
@@ -44,7 +48,8 @@ public class ExpressionEngineImpl implements IExpressionEngine{
 		Map<String,Object> funcs = new HashMap<String,Object>();
 		funcs.put("dnp", Maths.class);
 		funcs.put("dat", JexlGeneralFunctions.class);
-		funcs.put("im", Image.class);
+		funcs.put("im",  Image.class);
+		funcs.put("lz",  JexlLazyFunctions.class);
 		//TODO determine which function classes should be loaded as default
 //		funcs.put("fft", FFT.class);
 //		funcs.put("plt", SDAPlotter.class);
@@ -100,21 +105,94 @@ public class ExpressionEngineImpl implements IExpressionEngine{
 	}
 
 	@Override
-	public Set<List<String>> getVariableNamesFromExpression() {
+	public Collection<String> getVariableNamesFromExpression() {
 		try {
-		final Script script = jexl.createScript(expression.getExpression());
-		return script.getVariables();
+			final Script script = jexl.createScript(expression.getExpression());
+			Set<List<String>> names = script.getVariables();
+			return unpack(names);
 		} catch (Exception e){
 			return null;
 		}
 	}
 	
+	private Collection<String> unpack(Set<List<String>> names) {
+		Collection<String> ret = new HashSet<String>();
+		for (List<String> entry : names) {
+			ret.add(entry.get(0));
+		}
+		return ret;
+	}
+
+
+	/**
+	 * TODO FIXME Currently does a regular expression. If there was a 
+	 * way in JEXL of getting the variables for a given function it would 
+	 * be better than what we do: which is a regular expression!
+	 * 
+	 * lz:rmean(fred,0)                     -> fred
+	 * 10*lz:rmean(fred,0)                  -> fred
+	 * 10*lz:rmean(fred,0)+dat:mean(bill,0) -> fred
+	 * lz:rmean(fred,0)+lz:rmean(bill,0)    -> fred, bill
+	 * lz:func(fred*10,bill,ted*2)          -> fred, bill, ted
+	 */
+	@Override
+	public Collection<String> getLazyVariableNamesFromExpression() {
+        try {
+            final String expr = expression.getExpression();
+            return getLazyVariables(expr);
+        } catch (Exception e){
+			return null;
+		}
+	}
+	
+	private static final Pattern lazyPattern = Pattern.compile("lz\\:[a-zA-Z0-9_]+\\({1}([a-zA-Z0-9_ \\,\\*\\+\\-\\\\]+)\\){1}");
+
+	private Collection<String> getLazyVariables(String expr) {
+
+		final Collection<String> found = new HashSet<String>(4);
+        final Matcher          matcher = lazyPattern.matcher(expr);
+ 		while (matcher.find()) {
+			final String      exprLine = matcher.group(1);
+			final Script      script   = jexl.createScript(exprLine.replace(',','+'));
+			Set<List<String>> names    = script.getVariables();
+			Collection<String> v = unpack(names);
+			found.addAll(v);
+		}
+        return found;
+	}
+	
+	public static void main(String[] args) throws Exception {
+		
+		 test("");
+		 test("lz:rmean(fred,0)", "fred");
+		 test("10*lz:rmean(fred,0)", "fred");
+		 test("10*lz:rmean(fred,0)+dat:mean(bill,0)", "fred");
+		 test("10*lz:rmean(larry,0)+dat:mean(lz,0)", "larry");
+		 test("10*lz:rmean(larry,0)+lz:mean(lz,0)", "larry", "lz");
+		 test("lz:rmean(fred,0)+lz:rmean(bill,0)", "fred", "bill");
+		 test("lz:func(fred*10,bill,ted*2)", "fred", "bill", "ted");
+		 test("lz:func(fred*10,bill,ted*2)+lz:func(p+10,q+20,r-2)", "fred", "bill", "ted", "p", "q", "r");
+		 
+		 // TODO FIXME This means you cannot use brackets inside lz:xxx( ... )
+		 //test("lz:func(sin(fred)*10,bill,ted*2)", "fred", "bill", "ted");
+	}
+	
+	private static void test(String expr, String... vars) throws Exception {
+		
+		ExpressionEngineImpl     impl  = new ExpressionEngineImpl();
+		final Collection<String> found = impl.getLazyVariables(expr);
+		
+		if (found.size()!=vars.length) throw new Exception("Incorrect number of variables found!");
+		if (!found.containsAll(Arrays.asList(vars))) throw new Exception("Incorrect number of variables found!");
+		System.out.println(found);
+		System.out.println(">>>> Ok <<<<");
+	}
+
 	private void checkAndCreateContext() {
 		if (context == null) {
 			context = new MapContext();
 		}
 	}
-
 
 	@Override
 	public void addExpressionEngineListener(IExpressionEngineListener listener) {

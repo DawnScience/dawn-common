@@ -20,6 +20,7 @@ import org.dawb.common.services.IPlotImageService;
 import org.dawb.common.services.ServiceManager;
 import org.dawb.common.ui.Activator;
 import org.dawb.common.ui.menu.CheckableActionGroup;
+import org.dawb.common.ui.preferences.ViewConstants;
 import org.dawb.common.ui.util.EclipseUtils;
 import org.dawb.common.ui.util.GridUtils;
 import org.dawb.common.util.image.ImageFileUtils;
@@ -40,6 +41,7 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -80,6 +82,7 @@ import org.eclipse.ui.IReusableEditor;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.eclipse.ui.ide.FileStoreEditorInput;
 import org.eclipse.ui.part.ResourceTransfer;
 import org.eclipse.ui.part.ViewPart;
@@ -140,11 +143,11 @@ public class ImageMonitorView extends ViewPart implements MouseListener, Selecti
 		
 		// Size image - parameterize this so that the user can change it.
 		final IPreferenceStore store = new ScopedPreferenceStore(InstanceScope.INSTANCE, "org.dawb.common.ui");
-		final int    size      = store.getInt("org.dawb.workbench.views.image.monitor.thumbnail.size");
+		final int    size      = store.getInt(ViewConstants.IMAGE_SIZE);
 		store.addPropertyChangeListener(new IPropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent event) {
-				if (!event.getProperty().equals("org.dawb.workbench.views.image.monitor.thumbnail.size")) return;
+				if (!event.getProperty().equals(ViewConstants.IMAGE_SIZE)) return;
 				int side = ObjectUtils.getInteger(event.getNewValue());
 				gr.setItemHeight(side);
 				gr.setItemWidth(side);
@@ -442,6 +445,17 @@ public class ImageMonitorView extends ViewPart implements MouseListener, Selecti
 		man.add(byName);
 		
 		man.add(new Separator());
+		
+		Action prefs = new Action("Preferences...", Activator.getImageDescriptor("icons/data.gif")) {
+			@Override
+			public void run() {
+				PreferenceDialog pref = PreferencesUtil.createPreferenceDialogOn(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), ViewConstants.PAGE_ID, null, null);
+				if (pref != null) pref.open();
+			}
+		};
+		man.add(prefs);
+		
+		getViewSite().getActionBars().getMenuManager().add(prefs);
 	}
 
 	/**
@@ -649,7 +663,7 @@ public class ImageMonitorView extends ViewPart implements MouseListener, Selecti
 							continue;
 						}
 
-						final int    size = store.getInt("org.dawb.workbench.views.image.monitor.thumbnail.size");
+						final int    size = store.getInt(ViewConstants.IMAGE_SIZE);
 
 						final Image     image     = service.createImage(ii.getFile(), size, size);
 						// This image must be disposed later!
