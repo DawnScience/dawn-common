@@ -18,7 +18,7 @@ import uk.ac.diamond.scisoft.analysis.dataset.DoubleDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 
-public class ReadWriteDataTest extends AbstractThreadTest {
+public class ReadWriteDataTest extends AbstractThreadTestBase {
 
 	@Test
 	public void testWriteReadData(){

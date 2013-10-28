@@ -12,7 +12,7 @@ import org.dawb.common.services.IPersistentFile;
 import org.dawnsci.persistence.PersistenceServiceCreator;
 import org.junit.Test;
 
-public class ReadWriteTest extends AbstractThreadTest {
+public class ReadWriteTest extends AbstractThreadTestBase {
 
 	@Test
 	public void testReadWriteWithThreads(){
@@ -75,7 +75,7 @@ public class ReadWriteTest extends AbstractThreadTest {
 
 	@Test
 	public void testReadExceptionHDF5File(){
-		String path = Hdf5TestUtils.getAbsolutePath("src/org/dawnsci/persistence/test/MoKedge_1_15.nxs");
+		String path = "testfiles/MoKedge_1_15.nxs";
 
 		// create the PersistentService
 		IPersistenceService persist = PersistenceServiceCreator.createPersistenceService();
