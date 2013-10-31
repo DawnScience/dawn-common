@@ -116,7 +116,11 @@ public abstract class AbstractConversion {
 	protected ILazyDataset getLazyDataset(final File                 path, 
 						                  final String               dsPath,
 						                  final IConversionContext   context) throws Exception {
-				
+		// if there is a lazydataset, we return it
+		ILazyDataset lazy = context.getLazyDataset();
+		if (lazy != null)
+			return context.getLazyDataset();
+
 		final DataHolder   dh = LoaderFactory.getData(path.getAbsolutePath());
 		context.setSelectedH5Path(dsPath);
 		if (context.getSliceDimensions()==null) {
