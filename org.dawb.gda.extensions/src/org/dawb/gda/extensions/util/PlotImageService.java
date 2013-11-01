@@ -23,7 +23,6 @@ import javax.swing.ImageIcon;
 import javax.swing.filechooser.FileSystemView;
 
 import org.dawb.common.services.IFileIconService;
-import org.dawb.common.services.ILoaderService;
 import org.dawb.common.services.IPaletteService;
 import org.dawb.common.services.IPlotImageService;
 import org.dawb.common.services.PlotImageData;
@@ -72,6 +71,7 @@ import uk.ac.diamond.scisoft.analysis.dataset.Stats;
 import uk.ac.diamond.scisoft.analysis.dataset.function.Downsample;
 import uk.ac.diamond.scisoft.analysis.dataset.function.DownsampleMode;
 import uk.ac.diamond.scisoft.analysis.histogram.mapfunctions.AbstractMapFunction;
+import uk.ac.diamond.scisoft.analysis.io.ILoaderService;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 import uk.ac.diamond.scisoft.analysis.rcp.plotting.utils.GlobalColourMaps;
 import uk.ac.diamond.scisoft.analysis.rcp.plotting.utils.SWTImageUtils;

@@ -15,9 +15,9 @@ package org.dawb.common.ui.views;
 import java.io.File;
 import java.util.Collection;
 
-import org.dawb.common.services.ILoaderService;
 import org.dawb.common.ui.util.EclipseUtils;
 import org.dawb.common.ui.util.GridUtils;
+import org.dawnsci.slicing.api.util.ProgressMonitorWrapper;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -52,6 +52,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.ac.diamond.scisoft.analysis.dataset.IMetadataProvider;
+import uk.ac.diamond.scisoft.analysis.io.ILoaderService;
 import uk.ac.diamond.scisoft.analysis.io.IMetaData;
 
 /**
@@ -199,7 +200,7 @@ public class HeaderTableView extends ViewPart implements ISelectionListener, IPa
 				
 				final ILoaderService service = (ILoaderService)PlatformUI.getWorkbench().getService(ILoaderService.class);
 				try {
-					meta = service.getMetaData(filePath, monitor);
+					meta = service.getMetaData(filePath,new ProgressMonitorWrapper( monitor));
 				} catch (Exception e1) {
 					logger.error("Cannot get meta data for "+filePath, e1);
 					return Status.CANCEL_STATUS;

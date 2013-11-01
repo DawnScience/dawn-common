@@ -17,6 +17,8 @@ import java.util.Map;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.ui.PlatformUI;
+
+import uk.ac.diamond.scisoft.analysis.io.ILoaderService;
 /**
  * This class gets a service even if we are running in headless mode.
  * 
