@@ -22,6 +22,7 @@ import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.LazyDataset;
 import uk.ac.diamond.scisoft.analysis.io.ImageStackLoader;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
+import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
 
 /**
  * This converter converts a directory of images to a stack in HDF5
@@ -112,9 +113,14 @@ public class ImagesToHDFConverter extends AbstractConversion{
 			first = false;
 		}
 		
-		if (context.getMonitor()!=null && context.getMonitor().isCancelled()) {
-			hFile.close();
-			throw new Exception("Conversion is cancelled!");
+		IMonitor mon = context.getMonitor();
+		if (mon != null) {
+			if (mon.isCancelled()) {
+				hFile.close();
+				throw new Exception("Conversion is cancelled!");
+			} else {
+				mon.worked(1);
+			}
 		}
 	}
 	

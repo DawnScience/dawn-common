@@ -227,7 +227,7 @@ public abstract class AbstractSliceConversionPage extends ResourceChoosePage {
 
 		try {
 			isExpression = true;
-            ILazyDataset lz = getLazyExpression();				
+			ILazyDataset lz = getLazyExpression();
 			if (lz!=null) {
 				final SliceSource source = new SliceSource(getExpression().getVariableManager(), lz, datasetName, context.getFilePaths().get(0), isExpression);
 				sliceComponent.setData(source);
@@ -305,6 +305,10 @@ public abstract class AbstractSliceConversionPage extends ResourceChoosePage {
       		    nameChoice.select(names.indexOf(datasetName));
         		nameChanged();
         	}
+        }
+        // if lazydataset if provided, get the name from it
+        if (context.getLazyDataset() != null) {
+        	datasetName = context.getLazyDataset().getName();
         }
 		if (defaultDimsList!=null) {
 			try {
