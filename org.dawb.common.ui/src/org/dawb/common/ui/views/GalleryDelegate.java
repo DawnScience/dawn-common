@@ -52,6 +52,7 @@ public class GalleryDelegate {
 	
 	private static final Logger logger = LoggerFactory.getLogger(GalleryDelegate.class);
 
+	private Composite                parent;
 	private Thread                   imageThread;
 	private Gallery                  gallery;
 	private GalleryItem              galleryGroup;
@@ -59,16 +60,22 @@ public class GalleryDelegate {
 	private GalleryDelegateInfo      info;
 
 	private String groupLabel;
+
 	
 	public GalleryDelegate() {
 		this.queue = new LinkedBlockingDeque<ImageItem>(Integer.MAX_VALUE);
 		createImageThread();
 	}
 	
+	public Control getControl() {
+		return parent;
+	}
+	
 	public void createContent(String groupLabel, String toolTip, Composite parent) {
 		
+		this.parent     = parent;
 		this.groupLabel = groupLabel;
-		this.gallery = new Gallery(parent, SWT.V_SCROLL | SWT.VIRTUAL | SWT.MULTI);
+		this.gallery    = new Gallery(parent, SWT.V_SCROLL | SWT.VIRTUAL | SWT.MULTI);
 		gallery.setToolTipText(toolTip);
 		
 		// Renderers

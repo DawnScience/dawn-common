@@ -10,6 +10,8 @@
 package org.dawb.hdf5.editor;
 
 import java.lang.reflect.Array;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.List;
 
@@ -45,7 +47,11 @@ import org.eclipse.ui.part.Page;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 import uk.ac.diamond.scisoft.analysis.hdf5.HDF5Attribute;
+import uk.ac.diamond.scisoft.analysis.hdf5.HDF5Dataset;
+import uk.ac.diamond.scisoft.analysis.hdf5.HDF5Node;
 import uk.ac.diamond.scisoft.analysis.hdf5.HDF5NodeLink;
 
 public class H5ValuePage extends Page  implements ISelectionListener, IPartListener {
@@ -213,12 +219,47 @@ public class H5ValuePage extends Page  implements ISelectionListener, IPartListe
  			else if (nl.isDestinationADataset())
  				label.setText("Dataset name of '" + nl.getName() + "' value:");
 
- 			sourceViewer.getTextWidget().setText(nl.getDestination().toString());
+ 			sourceViewer.getTextWidget().setText(getNodeLinkValue(nl));
 		} else if (sel instanceof HDF5Attribute) { // Might be nexus part.
 			sourceViewer.getTextWidget().setText(sel.toString());
 		}
 	}
 	
+	private NumberFormat format;
+	
+	// Fix for http://jira.diamond.ac.uk/browse/DAWNSCI-747
+	private String getNodeLinkValue(HDF5NodeLink nl) {
+		StringBuilder buf = new StringBuilder();
+		HDF5Node node = nl.getDestination();
+		if (node instanceof HDF5Dataset) {
+			HDF5Dataset  hd = (HDF5Dataset)node;
+			ILazyDataset lz = hd.getDataset();
+			if (lz.getRank()==1 && lz.getShape()[0]<500) {
+								
+				final IDataset data = lz.getSlice();
+				if (Number.class.isAssignableFrom(data.elementClass())) {
+				    buf.append("\n[");
+				    if (format==null) format = new DecimalFormat("#####0.0###");
+				    final int size = Math.min(lz.getShape()[0], 5);
+				    for (int i = 0; i < size; ++i) {
+					    buf.append(format.format(data.getDouble(i)));
+					    if (i<size-1) buf.append(", ");
+				    }
+				    if (lz.getShape()[0]>5) buf.append(" ...");
+				    buf.append("]\n\n");
+				}
+
+			}
+		}
+		buf.append(node.toString());
+		return buf.toString();
+	}
+	
+	private static boolean isNumericalDType(int dtype) {
+		return (dtype <= 8 );
+	}
+
+
 	private void createH5Value(HObject ob) throws Exception {
 		
 		if (ob instanceof Dataset) {

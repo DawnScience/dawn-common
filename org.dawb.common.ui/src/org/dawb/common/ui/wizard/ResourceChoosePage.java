@@ -420,10 +420,12 @@ public class ResourceChoosePage extends WizardPage {
         final List<String>     names  = new ArrayList<String>(7);
         for (String name : meta.getDataShapes().keySet()) {
 			final int[] shape = meta.getDataShapes().get(name);
-			if (scheme!=null && scheme.isRankSupported(shape.length)) {
-				names.add(name);
-			} else if (visitor!=null && visitor.isRankSupported(shape.length)) {
-				names.add(name);
+			if (shape != null) {
+				if (scheme!=null && scheme.isRankSupported(shape.length)) {
+					names.add(name);
+				} else if (visitor!=null && visitor.isRankSupported(shape.length)) {
+					names.add(name);
+				}
 			}
 		}
         
@@ -452,9 +454,7 @@ public class ResourceChoosePage extends WizardPage {
     			}
     		}
     	});
-        
         return names;
-
 	}
 
 	public boolean isNewFile() {

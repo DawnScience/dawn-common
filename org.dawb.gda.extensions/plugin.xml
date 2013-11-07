@@ -41,7 +41,7 @@
       <serviceFactory
             factoryClass="org.dawb.gda.extensions.loaders.LoaderService">
          <service
-               serviceClass="org.dawb.common.services.ILoaderService"></service>
+               serviceClass="uk.ac.diamond.scisoft.analysis.io.ILoaderService"></service>
       </serviceFactory>
       <serviceFactory
             factoryClass="org.dawb.gda.extensions.util.PlotImageService">

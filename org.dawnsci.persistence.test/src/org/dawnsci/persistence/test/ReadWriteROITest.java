@@ -17,7 +17,7 @@ import uk.ac.diamond.scisoft.analysis.roi.CircularROI;
 import uk.ac.diamond.scisoft.analysis.roi.IROI;
 import uk.ac.diamond.scisoft.analysis.roi.RectangularROI;
 
-public class ReadWriteROITest extends AbstractThreadTest {
+public class ReadWriteROITest extends AbstractThreadTestBase {
 
 	@Test
 	public void testWriteReadROI(){
