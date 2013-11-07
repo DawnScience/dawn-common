@@ -42,8 +42,6 @@ import org.slf4j.LoggerFactory;
 
 import uk.ac.diamond.scisoft.analysis.rpc.AnalysisRpcException;
 
-import com.python.pydev.debug.remote.client_api.PydevRemoteDebuggerServer;
-
 /**
  * Subclass of {@link AnalysisRpcPythonService} that uses PyDev's
  * InterpreterInfos to generate PYTHONPATHs and path to Python executable.
@@ -285,20 +283,6 @@ public class AnalysisRpcPythonPyDevService extends AnalysisRpcPythonService {
 					e);
 		}
 		return pyDevPySrc;
-	}
-
-	/**
-	 * Start the PyDev Debug Server.
-	 */
-	public static void startPyDevDebugServer() {
-		PydevRemoteDebuggerServer.startServer();
-	}
-
-	/**
-	 * Stop the PyDev Debug Server.
-	 */
-	public static void stopPyDevDebugServer() {
-		PydevRemoteDebuggerServer.stopServer();
 	}
 
 	/**
