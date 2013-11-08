@@ -20,22 +20,19 @@ package org.dawnsci.python.rpc;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.DirectoryNotEmptyException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.dawb.common.util.eclipse.BundleUtils;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.python.pydev.core.IInterpreterInfo;
 import org.python.pydev.core.IInterpreterManager;
 import org.python.pydev.core.IPythonNature;
 import org.python.pydev.core.MisconfigurationException;
+import org.python.pydev.core.NotConfiguredInterpreterException;
 import org.python.pydev.core.PythonNatureWithoutProjectException;
 import org.python.pydev.plugin.PydevPlugin;
 import org.python.pydev.plugin.nature.PythonNature;
@@ -43,14 +40,14 @@ import org.python.pydev.runners.SimpleRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.python.pydev.debug.remote.client_api.PydevRemoteDebuggerServer;
-
 import uk.ac.diamond.scisoft.analysis.rpc.AnalysisRpcException;
+
+import com.python.pydev.debug.remote.client_api.PydevRemoteDebuggerServer;
 
 /**
  * Subclass of {@link AnalysisRpcPythonService} that uses PyDev's
  * InterpreterInfos to generate PYTHONPATHs and path to Python executable.
- * 
+ *
  * TODO Instead of having concrete constructors of AnalysisRpcPythonPyDevService
  * around, this service should be contributed using OSGI and have an
  * associated interface.
@@ -61,12 +58,11 @@ public class AnalysisRpcPythonPyDevService extends AnalysisRpcPythonService {
 
 	// TODO should we add bundle dependency on uk.ac.diamond.scisoft.python?
 	private static final String UK_AC_DIAMOND_SCISOFT_PYTHON = "uk.ac.diamond.scisoft.python";
-	private File workingDirToDeleteIfEmpty;
 
 	/**
 	 * Create new service using the default (first listed) Python
 	 * InterpreterInfo.
-	 * 
+	 *
 	 * @param autoConfig
 	 *            if true, prompt user to configure a new Python Interpreter
 	 * @throws NotConfiguredInterpreterException
@@ -92,7 +88,7 @@ public class AnalysisRpcPythonPyDevService extends AnalysisRpcPythonService {
 
 	/**
 	 * Create new service using the named Python InterpreterInfo.
-	 * 
+	 *
 	 * @param interpreterName
 	 *            name of the interpreter to use (as listed in Python
 	 *            Interpreters)
@@ -113,7 +109,7 @@ public class AnalysisRpcPythonPyDevService extends AnalysisRpcPythonService {
 	/**
 	 * Create new service using the Python InterpreterInfo as configured for the
 	 * given project.
-	 * 
+	 *
 	 * @param project
 	 *            project to use for InterpreterInfo. This means that the
 	 *            PYTHONPATH used for the launched Python will match that of the
@@ -135,7 +131,7 @@ public class AnalysisRpcPythonPyDevService extends AnalysisRpcPythonService {
 	/**
 	 * Create new service using the Python InterpreterInfo as configured for the
 	 * given project.
-	 * 
+	 *
 	 * @param project
 	 *            project to use for InterpreterInfo. This means that the
 	 *            PYTHONPATH used for the launched Python will match that of the
@@ -151,15 +147,13 @@ public class AnalysisRpcPythonPyDevService extends AnalysisRpcPythonService {
 	 */
 	public AnalysisRpcPythonPyDevService(IInterpreterInfo interpreter,
 			IProject project) throws AnalysisRpcException {
-		this(getJobUserDescription(interpreter), getPythonExe(interpreter),
-				getWorkingDir(project), getEnv(interpreter, project));
+		this(getJobUserDescription(interpreter), getPythonExe(interpreter), getEnv(interpreter, project));
 	}
 
 	private AnalysisRpcPythonPyDevService(String jobUserDescription,
-			File pythonExe, File workingDir, Map<String, String> env)
+			File pythonExe, Map<String, String> env)
 			throws AnalysisRpcException {
-		super(jobUserDescription, pythonExe, workingDir, env);
-		workingDirToDeleteIfEmpty = workingDir;
+		super(jobUserDescription, pythonExe, null, env);
 
 		// Default the port in the launched PyDev to this server
 		getClient().setPyDevSetTracePort(getPyDevDebugServerPort());
@@ -291,81 +285,6 @@ public class AnalysisRpcPythonPyDevService extends AnalysisRpcPythonService {
 					e);
 		}
 		return pyDevPySrc;
-	}
-
-	// TODO
-	// 1) Ideally scripts wouldn't write to cwd at all.
-	// 2) Second ideal would be to handle the directory choice
-	// in the Python side (in particular doing a canTouch() is dodgy)
-	// However, not fully understanding all the uses cases, this stays
-	// as is for now.
-	private static File getWorkingDir(IProject project) {
-		File path = null;
-		if (project != null) {
-			IPath location = project.getLocation();
-			if (location != null) {
-				final File dir = location.toFile();
-				path = getUniqueDir(dir, "python_tmp");
-				if (!path.canWrite() || !path.isDirectory() || !canTouch(path)) {
-					path = null;
-				}
-			}
-		}
-
-		if (path == null) {
-			File home = new File(System.getProperty("user.home") + "/.dawn/");
-			home.mkdirs();
-			path = getUniqueDir(home, "python_tmp");
-		}
-
-		logger.info("Using " + path.toString() + " as working directory");
-		return path;
-
-	}
-
-	private static File getUniqueDir(File dir, String name) {
-
-		int i = 1;
-		File ret = new File(dir, name + i);
-		while (ret.exists()) {
-			if (ret.list() == null || ret.list().length < 1)
-				break; // Use the same empty one.
-			++i;
-			ret = new File(dir, name + i);
-		}
-		ret.mkdirs();
-		return ret;
-	}
-
-	private static boolean canTouch(File path) {
-		try {
-			path.mkdirs();
-			File touch = new File(path, "touch");
-			touch.createNewFile();
-			touch.delete();
-		} catch (Throwable ne) {
-			return false;
-		}
-		return true;
-	}
-
-	@Override
-	public void stop() {
-		super.stop();
-
-		// Remove the temporary working directory if it is empty
-		Path path = workingDirToDeleteIfEmpty.toPath();
-		if (Files.isDirectory(path)) {
-			try {
-				Files.delete(path);
-			} catch (DirectoryNotEmptyException e) {
-				// this is expected if scripts created files
-			} catch (IOException e) {
-				// this is unexpected
-				logger.error("Failed to delete working dir " + path.toString(),
-						e);
-			}
-		}
 	}
 
 	/**
