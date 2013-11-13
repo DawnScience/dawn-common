@@ -271,15 +271,6 @@
                tooltip="Preferences for the image monitor">
          </command>
       </menuContribution>
-      <menuContribution
-            locationURI="menu:org.dawb.workbench.views.imageMonitorView">
-         <command
-               commandId="org.edna.workbench.views.preference.preferenceDialog"
-               label="Preferences..."
-               style="push"
-               tooltip="Preferences for the image monitor">
-         </command>
-      </menuContribution>
    </extension>
    
       <extension
