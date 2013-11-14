@@ -33,7 +33,7 @@ public class PythonUtils {
 	 * edna. The pydev extensions also attempt to use this interpreter for
 	 * the default pydev interpreter when running python written in the workbench.
 	 * 
-	 * 
+	 * @warning DOES NOT WORK on Windows. See comment on {@link #getExecutable(String, String, Version)}
 	 * @return
 	 */
 	public static String getProbablePythonPath() {
@@ -77,6 +77,10 @@ public class PythonUtils {
 		return null;
 	}
 	
+	/**
+	 * @warning does not work on Windows because the pattern does not account for .exe extension or
+	 * finding a python executable with no version in its name.
+	 */
 	private static String getExecutable(final String dirPath, final String execName, Version lessThanVersion) {
 		
 		final File dir = new File(dirPath);
