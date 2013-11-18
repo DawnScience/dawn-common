@@ -309,6 +309,8 @@ public abstract class AbstractSliceConversionPage extends ResourceChoosePage {
         // if lazydataset if provided, get the name from it
         if (context.getLazyDataset() != null) {
         	datasetName = context.getLazyDataset().getName();
+        	nameChoice.setItems(new String[] {datasetName});
+        	nameChoice.select(0);
         }
 		if (defaultDimsList!=null) {
 			try {
@@ -333,7 +335,11 @@ public abstract class AbstractSliceConversionPage extends ResourceChoosePage {
 			} else if (dd.isTextRange()) {
 				context.addSliceDimension(dd.getDimension(), dd.getSliceRange()!=null ? dd.getSliceRange() : "all");
 				try {
-					final ILazyDataset lazy = sliceComponent.getData().getLazySet();
+					ILazyDataset lazy = sliceComponent.getData().getLazySet();
+					if (lazy == null) {
+						//check the lazy dataset in the context
+						lazy = context.getLazyDataset();
+					}
 				    context.setWorkSize(lazy.getShape()[dd.getDimension()]);
 				} catch (Exception ne) {
 					logger.error("Cannot set work size!", ne);
@@ -343,7 +349,7 @@ public abstract class AbstractSliceConversionPage extends ResourceChoosePage {
 		        
         // Set any lazy dataset which can be an expression.
         ILazyDataset set = getLazyExpression();
-        context.setLazyDataset(set);
+        if (set != null) context.setLazyDataset(set);
 
 		return context;
 	}
