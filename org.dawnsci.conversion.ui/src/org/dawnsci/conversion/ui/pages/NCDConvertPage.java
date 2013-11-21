@@ -53,8 +53,8 @@ public class NCDConvertPage extends ResourceChoosePage implements
 	private static final String LAST_SET_KEY = "org.dawnsci.conversion.ui.pages.lastDataSetNCD";
 
 	public NCDConvertPage(){
-		super("wizardPage", "Page for slicing NCD nxs results into ascii.", null);
-		setTitle("Convert Tomography to Images");
+		super("wizardPage", "Page for exporting NCD results", null);
+		setTitle("Export NCD results from NeXus files");
 		setDirectory(true);
 	}
 	

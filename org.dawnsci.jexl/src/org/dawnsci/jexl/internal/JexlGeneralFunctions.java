@@ -90,4 +90,8 @@ public class JexlGeneralFunctions {
 
 		return data.getSlice(slices).squeeze();
 	}
+	
+	public static AbstractDataset squeeze(AbstractDataset data) {
+		return data.squeeze();
+	}
 }
