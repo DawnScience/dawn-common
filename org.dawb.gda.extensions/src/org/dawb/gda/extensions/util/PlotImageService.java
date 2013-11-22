@@ -23,7 +23,6 @@ import javax.swing.ImageIcon;
 import javax.swing.filechooser.FileSystemView;
 
 import org.dawb.common.services.IFileIconService;
-import org.dawb.common.services.IPaletteService;
 import org.dawb.common.services.IPlotImageService;
 import org.dawb.common.services.PlotImageData;
 import org.dawb.common.services.PlotImageData.PlotImageType;
@@ -36,6 +35,7 @@ import org.dawnsci.plotting.api.IPlottingSystem;
 import org.dawnsci.plotting.api.PlotType;
 import org.dawnsci.plotting.api.PlottingFactory;
 import org.dawnsci.plotting.api.histogram.IImageService;
+import org.dawnsci.plotting.api.histogram.IPaletteService;
 import org.dawnsci.plotting.api.histogram.ImageServiceBean;
 import org.dawnsci.plotting.api.histogram.ImageServiceBean.ImageOrigin;
 import org.dawnsci.plotting.api.trace.ISurfaceTrace;
