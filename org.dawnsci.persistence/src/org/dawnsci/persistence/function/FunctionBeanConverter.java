@@ -19,8 +19,7 @@ import uk.ac.diamond.scisoft.analysis.fitting.functions.StraightLine;
 import com.google.gson.Gson;
 
 /**
- * Class used to convert from a ROIBase to a ROIBean and vice-versa
- * @author wqk87977
+ * Class used to convert from an IFunction to a FunctionBean and vice-versa
  *
  */
 public class FunctionBeanConverter {
