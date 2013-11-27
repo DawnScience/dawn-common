@@ -38,7 +38,6 @@ import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ShortDataset;
 import uk.ac.diamond.scisoft.analysis.diffraction.DetectorProperties;
 import uk.ac.diamond.scisoft.analysis.diffraction.DiffractionCrystalEnvironment;
-import uk.ac.diamond.scisoft.analysis.fitting.functions.AFunction;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.IFunction;
 import uk.ac.diamond.scisoft.analysis.io.DataHolder;
 import uk.ac.diamond.scisoft.analysis.io.IDiffractionMetadata;
@@ -694,7 +693,7 @@ class PersistentFileImpl implements IPersistentFile{
 	}
 
 	@Override
-	public AFunction getFunction(String functionName) throws Exception {
+	public IFunction getFunction(String functionName) throws Exception {
 		String json = file.getAttributeValue(FUNCTION_ENTRY+"/"+functionName);
 		if(json == null) throw new Exception("Reading Exception: " +FUNCTION_ENTRY+ " entry does not exist in the file " + filePath);
 		// JSON deserialization
@@ -702,7 +701,7 @@ class PersistentFileImpl implements IPersistentFile{
 		Gson gson = builder.create();
 		FunctionBean fBean = FunctionBeanConverter.getFunctionBeanfromJSON(gson, json);
 		//convert the bean to AFunction
-		AFunction function = FunctionBeanConverter.FunctionBeanToAFunction(fBean);
+		IFunction function = FunctionBeanConverter.FunctionBeanToIFunction(fBean);
 
 		return function;
 	}
@@ -726,7 +725,7 @@ class PersistentFileImpl implements IPersistentFile{
 			FunctionBean fBean = FunctionBeanConverter.getFunctionBeanfromJSON(gson, json);
 
 			//convert the bean to AFunction
-			AFunction function = FunctionBeanConverter.FunctionBeanToAFunction(fBean);
+			IFunction function = FunctionBeanConverter.FunctionBeanToIFunction(fBean);
 			functions.put(name, function);
 		}
 
@@ -757,7 +756,7 @@ class PersistentFileImpl implements IPersistentFile{
 	private HObject writeFunction(IHierarchicalDataFile file, Group parent,
 			String name, IFunction function, Gson gson) throws Exception {
 
-		FunctionBean fBean = FunctionBeanConverter.AFunctionToFunctionBean(name, (AFunction)function);
+		FunctionBean fBean = FunctionBeanConverter.IFunctionToFunctionBean(name, (IFunction)function);
 
 		long[] dims = {1};
 
