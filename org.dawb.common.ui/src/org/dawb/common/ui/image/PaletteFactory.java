@@ -23,7 +23,7 @@ import org.eclipse.ui.preferences.ScopedPreferenceStore;
  * 
  * @author Andy Gotz
  * 
-   @deprecated  use {@link org.dawb.common.services.IPaletteService} instead
+   @deprecated  use {@link org.dawnsci.plotting.api.histogram.IPaletteService} instead
  */
 @Deprecated
 public class PaletteFactory {

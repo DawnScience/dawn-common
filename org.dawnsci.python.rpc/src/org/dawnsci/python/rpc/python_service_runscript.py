@@ -11,11 +11,16 @@ work in the following way
 This script is designed to be passed to scisoftpy.rpc's addHandler, see PythonRunScriptService.java
 '''
 
+import os, sys
+
 def runScript(scriptPath, inputs, funcName='run'):
     '''
     scriptPath  - is the path to the user script that should be run
     inputs      - is a dictionary of input objects 
     '''
+
+    # Add the directory of the python script to PYTHONPATH
+    sys.path.append(os.path.dirname(scriptPath))
 
     # We don't use globals() to creating vars because we are not
     # trying to run within the context of this method

@@ -34,7 +34,6 @@ public class ServiceManager {
 	static {
 		OFFLINE_SERVICES = new HashSet<Class<? extends Object>>(4);
 		OFFLINE_SERVICES.add(IHardwareService.class);
-		OFFLINE_SERVICES.add(IPaletteService.class);
 		OFFLINE_SERVICES.add(ILoaderService.class);
 		OFFLINE_SERVICES.add(IPlotImageService.class);
 		OFFLINE_SERVICES.add(IUserInputService.class);
@@ -112,5 +111,9 @@ public class ServiceManager {
 	public static void setService(final Class<?> serviceClass, Object service) {
 		if (overrides==null) overrides = new HashMap<Class<?>, Object>(7);
 		overrides.put(serviceClass, service);
+	}
+	
+	public static void addOffline(final Class<?> service) {
+		OFFLINE_SERVICES.add(service);
 	}
 }
