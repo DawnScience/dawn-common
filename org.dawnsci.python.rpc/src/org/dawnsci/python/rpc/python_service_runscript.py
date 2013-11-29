@@ -11,7 +11,10 @@ work in the following way
 This script is designed to be passed to scisoftpy.rpc's addHandler, see PythonRunScriptService.java
 '''
 
-import os, sys
+import os, sys, threading
+
+sys_path_0_lock = threading.Lock()
+sys_path_0_set = False
 
 def runScript(scriptPath, inputs, funcName='run'):
     '''
@@ -19,8 +22,31 @@ def runScript(scriptPath, inputs, funcName='run'):
     inputs      - is a dictionary of input objects 
     '''
 
-    # Add the directory of the python script to PYTHONPATH
-    sys.path.append(os.path.dirname(scriptPath))
+    # Add the directory of the Python script to PYTHONPATH
+    # Doing this introduces a potential race condition that
+    # we protect against, if multiple calls
+    # to runScript are done in parallel there is no control
+    # over which one will be set when the execfile below actually
+    # runs. We protect against that race condition by ensuring
+    # that the sys.path[0] isn't changed unexpectedly.
+    # See the Python PyDev Workflow actor (PythonPydevScript#getService)
+    # for an implementation of when to spawn new Python executables
+    # and when they can be reused.
+    global sys_path_0_lock
+    global sys_path_0_set
+    sys_path_0_lock.acquire()
+    try:
+        scriptDir = os.path.dirname(scriptPath)
+        sys_path_0 = sys.path[0]
+        if sys_path_0_set and scriptDir != sys_path_0:
+            raise Exception("runScript attempted to change sys.path[0] in a way that " +
+                            "could cause a race condition. Current sys.path[0] is %r, " +
+                            "trying to set to %r" % (sys_path_0, scriptDir) )
+        else:
+            sys.path[0] = scriptDir
+            sys_path_0_set = True
+    finally:
+        sys_path_0_lock.release()
 
     # We don't use globals() to creating vars because we are not
     # trying to run within the context of this method
