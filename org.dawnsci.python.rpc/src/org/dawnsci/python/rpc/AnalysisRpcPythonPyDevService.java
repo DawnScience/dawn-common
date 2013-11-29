@@ -20,11 +20,16 @@ package org.dawnsci.python.rpc;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.dawb.common.util.eclipse.BundleUtils;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -212,6 +217,7 @@ public class AnalysisRpcPythonPyDevService extends AnalysisRpcPythonService {
 
 		String[] envp = null;
 		try {
+			waitForPythonNaturesToLoad();
 			envp = SimpleRunner.getEnvironment(pythonNature, interpreter,
 					manager);
 		} catch (CoreException e) {
@@ -256,6 +262,54 @@ public class AnalysisRpcPythonPyDevService extends AnalysisRpcPythonService {
 		env.put("PYTHONPATH", pythonpath.toString());
 
 		return env;
+	}
+
+	/**
+	 * PyDev defers the full loading of PythonNature to a background job. The
+	 * result is if you try to access the nature before it is ready you can't
+	 * get all the information. In our case we want to get the information about
+	 * how to construct the PYTHONPATH, therefore we need the natures to be
+	 * loaded. So this function blocks until all projects with a PythonNature
+	 * have that nature loaded.
+	 */
+	private static void waitForPythonNaturesToLoad() {
+		IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		for (int i = 100; i > 0; i--) {
+			List<String> list = new ArrayList<String>();
+			IProject[] projects = workspace.getRoot().getProjects();
+			for (IProject project : projects) {
+				if (project.isAccessible()) {
+					try {
+						if (project
+								.isNatureEnabled(PythonNature.PYTHON_NATURE_ID)) {
+							PythonNature nature = PythonNature
+									.getPythonNature(project);
+							if (!nature.isOkToUse()) {
+								list.add(project.getName());
+							}
+						}
+					} catch (CoreException e) {
+						// No PyDev Nature or otherwise unusable, so no
+						// workaround to fix
+					}
+				}
+			}
+
+			if (list.isEmpty()) {
+				logger.info("Python Natures for all PyDev projects loaded");
+				break;
+			}
+
+			String waiting = "Waiting (up to " + i / 10.0 + " seconds)"
+					+ " for Python Natures to load for these projects: ";
+			String join = StringUtils.join(list.toArray(), ", ");
+			logger.info(waiting + join);
+
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+			}
+		}
 	}
 
 	private static String getScisoftPath() {
