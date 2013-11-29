@@ -1,6 +1,6 @@
 package org.dawb.common.ui.plot.function;
 
-import uk.ac.diamond.scisoft.analysis.fitting.functions.AFunction;
+import uk.ac.diamond.scisoft.analysis.fitting.functions.IFunction;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.FunctionFactory;
 //import uk.ac.diamond.scisoft.analysis.fitting.functions.CubicSpline;
 //import uk.ac.diamond.scisoft.analysis.fitting.functions.GaussianND;
@@ -65,11 +65,11 @@ public enum FunctionType {
 		return ops[index];
 	}
 
-	public AFunction getFunction() throws Exception {
+	public IFunction getFunction() throws Exception {
 		return FunctionFactory.getFunction(functionName);
 	}
 
-	public static int getIndex(Class<? extends AFunction> class1) {
+	public static int getIndex(Class<? extends IFunction> class1) {
 		
 		try {
 			String name = FunctionFactory.getName(class1);
@@ -83,12 +83,12 @@ public enum FunctionType {
 		return -1;
 	}
 
-	public static AFunction createNew(int selectionIndex) throws Exception {
+	public static IFunction createNew(int selectionIndex) throws Exception {
 		final FunctionType function = getType(selectionIndex);
 		return FunctionFactory.getFunction(function.functionName);
 	}
 
-	public static AFunction createNew(FunctionType function) throws Exception {
+	public static IFunction createNew(FunctionType function) throws Exception {
 		return FunctionFactory.getFunction(function.functionName);
 	}
 }
