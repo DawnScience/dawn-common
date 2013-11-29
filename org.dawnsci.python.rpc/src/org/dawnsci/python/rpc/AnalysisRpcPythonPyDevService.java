@@ -239,7 +239,7 @@ public class AnalysisRpcPythonPyDevService extends AnalysisRpcPythonService {
 		if (path == null) {
 			path = "";
 		}
-		StringBuilder pythonpath = new StringBuilder();
+		StringBuilder pythonpath = new StringBuilder(path);
 		if (pythonpath.length() > 0) {
 			pythonpath.append(File.pathSeparator);
 		}

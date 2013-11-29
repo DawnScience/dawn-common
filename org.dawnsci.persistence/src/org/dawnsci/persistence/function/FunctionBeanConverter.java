@@ -1,10 +1,10 @@
 package org.dawnsci.persistence.function;
 
-import uk.ac.diamond.scisoft.analysis.fitting.functions.AFunction;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.Cubic;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.Fermi;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.FermiGauss;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.Gaussian;
+import uk.ac.diamond.scisoft.analysis.fitting.functions.IFunction;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.IParameter;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.Lorentzian;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.Offset;
@@ -19,19 +19,18 @@ import uk.ac.diamond.scisoft.analysis.fitting.functions.StraightLine;
 import com.google.gson.Gson;
 
 /**
- * Class used to convert from a ROIBase to a ROIBean and vice-versa
- * @author wqk87977
+ * Class used to convert from an IFunction to a FunctionBean and vice-versa
  *
  */
 public class FunctionBeanConverter {
 
 	/**
-	 * Method that converts a AFunction to a FunctionBean
+	 * Method that converts an IFunction to a FunctionBean
 	 * @param name
 	 * @param function
 	 * @return FunctionBean
 	 */
-	public static FunctionBean AFunctionToFunctionBean(String name, AFunction function){
+	public static FunctionBean IFunctionToFunctionBean(String name, IFunction function){
 		FunctionBean fBean = new FunctionBean();
 		fBean.setName(name);
 		IParameter[] iParameters = function.getParameters();
@@ -70,11 +69,11 @@ public class FunctionBeanConverter {
 	}
 
 	/**
-	 * Method that converts a function bean to an AFunction
+	 * Method that converts a function bean to an IFunction
 	 * @param function Bean
-	 * @return AFunction
+	 * @return IFunction
 	 */
-	public static AFunction FunctionBeanToAFunction(FunctionBean fBean){
+	public static IFunction FunctionBeanToIFunction(FunctionBean fBean){
 		IParameter[] params = fBean.getParameters();
 		switch (fBean.getType()) {
 		case FunctionBean.TYPE_CUBIC:
@@ -120,7 +119,7 @@ public class FunctionBeanConverter {
 	 * Method that returns true if the type of ROI is supported by the ROIBeanConverter
 	 * @return
 	 */
-	public static boolean isAFunctionSupported(AFunction function){
+	public static boolean isAFunctionSupported(IFunction function){
 		if (function instanceof Cubic) {
 			return true;
 		} else if (function instanceof Fermi) {
