@@ -75,7 +75,6 @@ import uk.ac.diamond.scisoft.analysis.io.ILoaderService;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 import uk.ac.diamond.scisoft.analysis.rcp.plotting.utils.GlobalColourMaps;
 import uk.ac.diamond.scisoft.analysis.rcp.plotting.utils.SWTImageUtils;
-import uk.ac.gda.util.OSUtils;
 
 public class PlotImageService extends AbstractServiceFactory implements IPlotImageService {
 	
@@ -511,12 +510,12 @@ public class PlotImageService extends AbstractServiceFactory implements IPlotIma
 		
 		if (folderImage==null) {
 			
-			if (file==null) file = OSUtils.isWindowsOS() ? new File("C:/Windows/") : new File("/");
+			if (file==null) file = isWindowsOS() ? new File("C:/Windows/") : new File("/");
 			/**
 			 * On windows, use windows icon for folder,
 			 * on unix folder icon can be not very nice looking, use folder.png
 			 */
-	        if (OSUtils.isWindowsOS()) {
+	        if (isWindowsOS()) {
 	        	folderImage = getImageSWT(file);
 	        } else {
 	        	folderImage = Activator.getImageDescriptor("icons/folder.gif").createImage();
@@ -527,5 +526,11 @@ public class PlotImageService extends AbstractServiceFactory implements IPlotIma
 		return folderImage;
 	}
 
+	/**
+	 * @return true if windows
+	 */
+	static public boolean isWindowsOS() {
+		return (System.getProperty("os.name").indexOf("Windows") == 0);
+	}
 
 }
