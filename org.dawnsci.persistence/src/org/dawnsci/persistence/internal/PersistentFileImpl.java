@@ -1,3 +1,18 @@
+/*-
+ * Copyright 2013 Diamond Light Source Ltd.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.dawnsci.persistence.internal;
 
 import java.util.ArrayList;
@@ -23,10 +38,7 @@ import org.dawb.hdf5.Nexus;
 import org.dawb.hdf5.nexus.NexusUtils;
 import org.dawnsci.io.h5.H5LazyDataset;
 import org.dawnsci.io.h5.H5Utils;
-import org.dawnsci.persistence.function.FunctionBean;
-import org.dawnsci.persistence.function.FunctionBeanConverter;
-import org.dawnsci.persistence.roi.ROIBean;
-import org.dawnsci.persistence.roi.ROIBeanConverter;
+import org.dawnsci.persistence.json.JSonMarshaller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,10 +56,11 @@ import uk.ac.diamond.scisoft.analysis.io.IDiffractionMetadata;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 import uk.ac.diamond.scisoft.analysis.io.NexusDiffractionMetaReader;
 import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
+import uk.ac.diamond.scisoft.analysis.persistence.bean.function.FunctionBean;
+import uk.ac.diamond.scisoft.analysis.persistence.bean.function.FunctionBeanConverter;
+import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.ROIBean;
+import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.ROIBeanConverter;
 import uk.ac.diamond.scisoft.analysis.roi.IROI;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 /**
  * Implementation of IPersistentFile<br>
@@ -57,7 +70,7 @@ import com.google.gson.GsonBuilder;
  * @author wqk87977
  *
  */
-class PersistentFileImpl implements IPersistentFile{
+class PersistentFileImpl implements IPersistentFile {
 	
 	private static final Logger logger = LoggerFactory.getLogger(PersistentFileImpl.class);
 	private IHierarchicalDataFile file;
@@ -177,17 +190,11 @@ class PersistentFileImpl implements IPersistentFile{
 
 		Group parent = createParentEntry(ROI_ENTRY);
 		if (rois != null) {
-			// JSON serialisation
-			GsonBuilder builder = new GsonBuilder();
-			//TODO: serialiser to be worked on...
-			//builder.registerTypeAdapter(ROIBean.class, new ROISerializer());
-			Gson gson = builder.create();
-
 			Iterator<String> it = rois.keySet().iterator();
 			while(it.hasNext()){
 				String name = it.next();
 				IROI roi = rois.get(name);
-				writeRoi(file, parent, name, roi, gson);
+				writeRoi(file, parent, name, roi);
 			}
 		}
 	}
@@ -199,13 +206,7 @@ class PersistentFileImpl implements IPersistentFile{
 
 		Group parent = createParentEntry(ROI_ENTRY);
 
-		// JSON serialisation
-		GsonBuilder builder = new GsonBuilder();
-		//TODO: serialiser to be worked on...
-		//builder.registerTypeAdapter(ROIBean.class, new ROISerializer());
-		Gson gson = builder.create();
-
-		writeRoi(file, parent, name, roiBase, gson);
+		writeRoi(file, parent, name, roiBase);
 	}
 
 	@Override
@@ -313,19 +314,16 @@ class PersistentFileImpl implements IPersistentFile{
 
 	@Override
 	public IROI getROI(String roiName) throws Exception {
-		GsonBuilder builder = new GsonBuilder();
-		//TODO: deserialiser to be worked on...
-		//builder.registerTypeAdapter(ROIBean.class, new ROIDeserializer());
-		Gson gson = builder.create();
+		JSonMarshaller converter = new JSonMarshaller();
 
 		String json = file.getAttributeValue(ROI_ENTRY+"/"+roiName+"@JSON");
 		if(json == null) throw new Exception("Reading Exception: " +ROI_ENTRY+ " entry does not exist in the file " + filePath);
 		// JSON deserialization
 		json = json.substring(1, json.length()-1); // this is needed as somehow, the getAttribute adds [ ] around the json string...
-		ROIBean roibean = ROIBeanConverter.getROIBeanfromJSON(gson, json);
+		ROIBean roibean = converter.unmarshallToROIBean(json);
 
 		//convert the bean to roibase
-		IROI roi = ROIBeanConverter.ROIBeanToROIBase(roibean);
+		IROI roi = ROIBeanConverter.roiBeanToIROI(roibean);
 
 		return roi;
 	}
@@ -336,11 +334,7 @@ class PersistentFileImpl implements IPersistentFile{
 		if(file == null)
 			file = HierarchicalDataFactory.getReader(filePath);
 
-		// JSON deserialization
-		GsonBuilder builder = new GsonBuilder();
-		//TODO: deserialiser to be worked on...
-		//builder.registerTypeAdapter(ROIBean.class, new ROIDeserializer());
-		Gson gson = builder.create();
+		JSonMarshaller converter = new JSonMarshaller();
 
 		List<String> names = getROINames(mon);
 
@@ -351,10 +345,10 @@ class PersistentFileImpl implements IPersistentFile{
 			String name = (String) it.next();
 			String json = file.getAttributeValue(ROI_ENTRY+"/"+name+"@JSON");
 			json = json.substring(1, json.length()-1); // this is needed as somehow, the getAttribute adds [ ] around the json string...
-			ROIBean roibean = ROIBeanConverter.getROIBeanfromJSON(gson, json);
+			ROIBean roibean = converter.unmarshallToROIBean(json);
 
 			//convert the bean to roibase
-			IROI roi = ROIBeanConverter.ROIBeanToROIBase(roibean);
+			IROI roi = ROIBeanConverter.roiBeanToIROI(roibean);
 			rois.put(name, roi);
 		}
 
@@ -567,14 +561,15 @@ class PersistentFileImpl implements IPersistentFile{
 	private HObject writeRoi(IHierarchicalDataFile file, 
 			Group   parent,
 			String  name,
-			IROI    roi,
-			Gson    gson) throws Exception {
+			IROI    roi) throws Exception {
 
-		ROIBean roibean = ROIBeanConverter.IROIToROIBean(name, roi);
+		ROIBean roibean = ROIBeanConverter.iroiToROIBean(name, roi);
 
 		long[] dims = {1};
 
-		String json = gson.toJson(roibean);
+		JSonMarshaller converter = new JSonMarshaller();
+
+		String json = converter.marshallFromROIBean(roibean);
 
 		// we create the dataset
 		Dataset dat = file.replaceDataset(name, new H5Datatype(Datatype.CLASS_INTEGER, 4, Datatype.NATIVE, Datatype.NATIVE), dims, new int[]{0}, parent);
@@ -605,6 +600,7 @@ class PersistentFileImpl implements IPersistentFile{
 	 * @return BooleanDataset
 	 * @throws Exception 
 	 */
+	@SuppressWarnings("unused")
 	private BooleanDataset readH5Mask(DataHolder dh, String maskName) throws Exception{
 		ILazyDataset ld = dh.getLazyDataset(MASK_ENTRY+"/"+maskName);
 		if (ld instanceof H5LazyDataset) {
@@ -665,15 +661,13 @@ class PersistentFileImpl implements IPersistentFile{
 		Group parent = createParentEntry(FUNCTION_ENTRY);
 
 		if (functions != null) {
-			// JSON serialisation
-			GsonBuilder builder = new GsonBuilder();
-			Gson gson = builder.create();
+			JSonMarshaller converter = new JSonMarshaller();
 
 			Iterator<String> it = functions.keySet().iterator();
 			while(it.hasNext()){
 				String name = it.next();
 				IFunction roi = functions.get(name);
-				writeFunction(file, parent, name, roi, gson);
+				writeFunction(file, parent, name, roi, converter);
 			}
 		}
 	}
@@ -684,11 +678,9 @@ class PersistentFileImpl implements IPersistentFile{
 
 		Group parent = createParentEntry(FUNCTION_ENTRY);
 
-		// JSON serialisation
-		GsonBuilder builder = new GsonBuilder();
-		Gson gson = builder.create();
+		JSonMarshaller converter = new JSonMarshaller();
 
-		writeFunction(file, parent, name, function, gson);
+		writeFunction(file, parent, name, function, converter);
 
 	}
 
@@ -696,12 +688,12 @@ class PersistentFileImpl implements IPersistentFile{
 	public IFunction getFunction(String functionName) throws Exception {
 		String json = file.getAttributeValue(FUNCTION_ENTRY+"/"+functionName);
 		if(json == null) throw new Exception("Reading Exception: " +FUNCTION_ENTRY+ " entry does not exist in the file " + filePath);
-		// JSON deserialization
-		GsonBuilder builder = new GsonBuilder();
-		Gson gson = builder.create();
-		FunctionBean fBean = FunctionBeanConverter.getFunctionBeanfromJSON(gson, json);
+
+		JSonMarshaller converter = new JSonMarshaller();
+		FunctionBean fBean = converter.unmarshallToFunctionBean(json);
+
 		//convert the bean to AFunction
-		IFunction function = FunctionBeanConverter.FunctionBeanToIFunction(fBean);
+		IFunction function = FunctionBeanConverter.functionBeanToIFunction(fBean);
 
 		return function;
 	}
@@ -711,9 +703,8 @@ class PersistentFileImpl implements IPersistentFile{
 		Map<String, IFunction> functions = new HashMap<String, IFunction>();
 		if(file == null)
 			file = HierarchicalDataFactory.getReader(filePath);
-		// JSON deserialization
-		GsonBuilder builder = new GsonBuilder();
-		Gson gson = builder.create();
+
+		JSonMarshaller converter = new JSonMarshaller();
 
 		List<String> names = getFunctionNames(mon);
 
@@ -722,10 +713,10 @@ class PersistentFileImpl implements IPersistentFile{
 			String name = (String) it.next();
 			String json = file.getAttributeValue(FUNCTION_ENTRY+"/"+name+"@JSON");
 			json = json.substring(1, json.length()-1); // this is needed as somehow, the getAttribute adds [ ] around the json string...
-			FunctionBean fBean = FunctionBeanConverter.getFunctionBeanfromJSON(gson, json);
+			FunctionBean fBean = converter.unmarshallToFunctionBean(json);
 
 			//convert the bean to AFunction
-			IFunction function = FunctionBeanConverter.FunctionBeanToIFunction(fBean);
+			IFunction function = FunctionBeanConverter.functionBeanToIFunction(fBean);
 			functions.put(name, function);
 		}
 
@@ -754,13 +745,13 @@ class PersistentFileImpl implements IPersistentFile{
 	}
 
 	private HObject writeFunction(IHierarchicalDataFile file, Group parent,
-			String name, IFunction function, Gson gson) throws Exception {
+			String name, IFunction function, JSonMarshaller converter) throws Exception {
 
-		FunctionBean fBean = FunctionBeanConverter.IFunctionToFunctionBean(name, (IFunction)function);
+		FunctionBean fBean = FunctionBeanConverter.iFunctionToFunctionBean(name, (IFunction)function);
 
 		long[] dims = {1};
 
-		String json = gson.toJson(fBean);
+		String json = converter.marshallFromFunctionBean(fBean);
 
 		// we create the dataset
 		Dataset dat = file.replaceDataset(name, new H5Datatype(Datatype.CLASS_INTEGER, 4, Datatype.NATIVE, Datatype.NATIVE), dims, new int[]{0}, parent);

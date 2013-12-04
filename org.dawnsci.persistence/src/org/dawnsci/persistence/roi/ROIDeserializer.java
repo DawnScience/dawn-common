@@ -2,6 +2,8 @@ package org.dawnsci.persistence.roi;
 
 import java.lang.reflect.Type;
 
+import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.ROIBean;
+
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
