@@ -35,22 +35,28 @@ public class ROIBeanConverterTest {
 	}
 
 	@Test
-	public void testROIBaseToROIBean() {
-		//RectangularROI
+	public void testRectangularROIConversionToRectangularROIBean() {
+		// RectangularROI
 		IROI roi = new RectangularROI(startPoint[0], startPoint[1], lengths[0], lengths[1], 0);
-		RectangularROIBean rbean = (RectangularROIBean)ROIBeanConverter.iroiToROIBean("rectangle1", roi);
+		RectangularROIBean rbean = (RectangularROIBean) ROIBeanConverter.iroiToROIBean("rectangle1", roi);
 		assertArrayEquals(startPoint, rbean.getStartPoint(), 0);
 		assertArrayEquals(lengths, rbean.getLengths(), 0);
-		
+	}
+
+	@Test
+	public void testCircularROIConversionToCircularROIBean() {
 		//CircularROI
 		double radius = 100;
-		roi = new CircularROI(radius, startPoint[0], startPoint[1]);
+		IROI roi = new CircularROI(radius, startPoint[0], startPoint[1]);
 		CircularROIBean cbean = (CircularROIBean)ROIBeanConverter.iroiToROIBean("circle1", roi);
 		assertArrayEquals(startPoint, cbean.getStartPoint(), 0);
 		assertEquals(radius, cbean.getRadius(), 0);
+	}
 
+	@Test
+	public void testPolylineROIConversionToPolylineROIBean(){
 		//PolylineROI
-		roi = new PolylineROI(startPoint);
+		IROI roi = new PolylineROI(startPoint);
 		double[] point0 = {102, 102}, point1 = {105, 105};
 		((PolylineROI)roi).insertPoint(point0);
 		((PolylineROI)roi).insertPoint(point1);
@@ -59,28 +65,29 @@ public class ROIBeanConverterTest {
 		assertArrayEquals(startPoint, pbean.getPoints().get(0), 0);
 		assertArrayEquals(point0, pbean.getPoints().get(1), 0);
 		assertArrayEquals(point1, pbean.getPoints().get(2), 0);
+	}
 
+	@Test
+	public void testSectorROIConversionToSectorROIBean(){
 		//SectorROI
 		double[] radii = {30, 50}, angles = {6, 9};
 		double dpp = 20; int symmetry = 5;
-		roi = new SectorROI();
+		IROI roi = new SectorROI();
 		((SectorROI)roi).setAngles(angles);
 		((SectorROI)roi).setPoint(startPoint);
 		((SectorROI)roi).setRadii(radii[0], radii[1]);
 		((SectorROI)roi).setDpp(dpp);
 		((SectorROI)roi).setSymmetry(symmetry);
-
 		SectorROIBean sbean = (SectorROIBean)ROIBeanConverter.iroiToROIBean("Sector", roi);
 		assertArrayEquals(startPoint, sbean.getStartPoint(), 0);
 		assertArrayEquals(radii, sbean.getRadii(), 0);
 		assertArrayEquals(angles, sbean.getAngles(), 0);
 		assertEquals(dpp, sbean.getDpp(), 0);
 		assertEquals(symmetry, sbean.getSymmetry());
-		
 	}
 
 	@Test
-	public void testROIBeanToROIBase() {
+	public void testRectangularROIBeanConversionToRectangularROI(){
 		//RectangularROI
 		ROIBean rbean = new RectangularROIBean();
 		((RectangularROIBean)rbean).setName("rectangle");
@@ -91,10 +98,13 @@ public class ROIBeanConverterTest {
 		RectangularROI rroi = (RectangularROI)ROIBeanConverter.roiBeanToIROI(rbean);
 		assertArrayEquals(startPoint, rroi.getPoint(), 0);
 		assertArrayEquals(lengths, rroi.getLengths(), 0);
+	}
 
+	@Test
+	public void testCircularROIBeanConversionToCircularROI(){
 		//CircularROI
 		double radius = 100;
-		rbean = new CircularROIBean();
+		ROIBean rbean = new CircularROIBean();
 		((CircularROIBean)rbean).setName("circle");
 		((CircularROIBean)rbean).setStartPoint(startPoint);
 		((CircularROIBean)rbean).setType("CircularROI");
@@ -102,9 +112,12 @@ public class ROIBeanConverterTest {
 		CircularROI croi = (CircularROI)ROIBeanConverter.roiBeanToIROI(rbean);
 		assertArrayEquals(startPoint, croi.getPoint(), 0);
 		assertEquals(radius, croi.getRadius(), 0);
+	}
 
+	@Test
+	public void testPolylineROIBeanConversionToPolylineROI(){
 		//PolylineROI
-		rbean = new PolylineROIBean();
+		ROIBean rbean = new PolylineROIBean();
 		double[] point0 = {102, 102}, point1 = {105, 105};
 		List<double[]> points = new ArrayList<double[]>();
 		//points.add(startPoint);
@@ -118,11 +131,14 @@ public class ROIBeanConverterTest {
 		assertArrayEquals(startPoint, proi.getPoint(), 0);
 		assertArrayEquals(point0, proi.getPoint(1).getPoint(), 0);
 		assertArrayEquals(point1, proi.getPoint(2).getPoint(), 0);
+	}
 
+	@Test
+	public void testSectorROIBeanConversionToSectorROI(){
 		//SectorROI
 		double[] radii = {30, 50}, angles = {6, 9};
 		double dpp = 20; int symmetry = 5;
-		rbean = new SectorROIBean();
+		ROIBean rbean = new SectorROIBean();
 		((SectorROIBean)rbean).setAngles(angles);
 		((SectorROIBean)rbean).setStartPoint(startPoint);
 		((SectorROIBean)rbean).setRadii(radii);
@@ -136,5 +152,4 @@ public class ROIBeanConverterTest {
 		assertEquals(dpp, sroi.getDpp(), 0);
 		assertEquals(symmetry, sroi.getSymmetry());
 	}
-
 }
