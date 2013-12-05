@@ -6,6 +6,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.CircularROIBean;
@@ -22,11 +23,20 @@ import uk.ac.diamond.scisoft.analysis.roi.SectorROI;
 
 public class ROIBeanConverterTest {
 
+	double[] startPoint = new double[2];
+	double[] lengths = new double[2];
+
+	@Before
+	public void setup() {
+		startPoint[0] = 100;
+		startPoint[1] = 100;
+		lengths[0] = 400;
+		lengths[1] = 200;
+	}
+
 	@Test
 	public void testROIBaseToROIBean() {
 		//RectangularROI
-		double[] startPoint = {100,100};
-		double[] lengths = {400, 200};
 		IROI roi = new RectangularROI(startPoint[0], startPoint[1], lengths[0], lengths[1], 0);
 		RectangularROIBean rbean = (RectangularROIBean)ROIBeanConverter.iroiToROIBean("rectangle1", roi);
 		assertArrayEquals(startPoint, rbean.getStartPoint(), 0);
@@ -72,8 +82,6 @@ public class ROIBeanConverterTest {
 	@Test
 	public void testROIBeanToROIBase() {
 		//RectangularROI
-		double[] startPoint = {100,100};
-		double[] lengths = {400, 200};
 		ROIBean rbean = new RectangularROIBean();
 		((RectangularROIBean)rbean).setName("rectangle");
 		((RectangularROIBean)rbean).setStartPoint(startPoint);
