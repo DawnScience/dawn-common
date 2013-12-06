@@ -321,7 +321,7 @@ class PersistentFileImpl implements IPersistentFile {
 		if(json == null) throw new Exception("Reading Exception: " +ROI_ENTRY+ " entry does not exist in the file " + filePath);
 		// JSON deserialization
 		json = json.substring(1, json.length()-1); // this is needed as somehow, the getAttribute adds [ ] around the json string...
-		ROIBean roibean = converter.unmarshallToROIBean(json);
+		ROIBean roibean = (ROIBean)converter.unmarshal(json);
 
 		//convert the bean to roibase
 		IROI roi = ROIBeanConverter.roiBeanToIROI(roibean);
@@ -346,7 +346,7 @@ class PersistentFileImpl implements IPersistentFile {
 			String name = (String) it.next();
 			String json = file.getAttributeValue(ROI_ENTRY+"/"+name+"@JSON");
 			json = json.substring(1, json.length()-1); // this is needed as somehow, the getAttribute adds [ ] around the json string...
-			ROIBean roibean = converter.unmarshallToROIBean(json);
+			ROIBean roibean = (ROIBean) converter.unmarshal(json);
 
 			//convert the bean to roibase
 			IROI roi = ROIBeanConverter.roiBeanToIROI(roibean);
@@ -570,7 +570,7 @@ class PersistentFileImpl implements IPersistentFile {
 
 		IJSonMarshaller converter = new JacksonMarshaller();
 
-		String json = converter.marshallFromROIBean(roibean);
+		String json = converter.marshal(roibean);
 
 		// we create the dataset
 		Dataset dat = file.replaceDataset(name, new H5Datatype(Datatype.CLASS_INTEGER, 4, Datatype.NATIVE, Datatype.NATIVE), dims, new int[]{0}, parent);
@@ -691,7 +691,7 @@ class PersistentFileImpl implements IPersistentFile {
 		if(json == null) throw new Exception("Reading Exception: " +FUNCTION_ENTRY+ " entry does not exist in the file " + filePath);
 
 		IJSonMarshaller converter = new JacksonMarshaller();
-		FunctionBean fBean = converter.unmarshallToFunctionBean(json);
+		FunctionBean fBean = (FunctionBean) converter.unmarshal(json);
 
 		//convert the bean to AFunction
 		IFunction function = FunctionBeanConverter.functionBeanToIFunction(fBean);
@@ -714,7 +714,7 @@ class PersistentFileImpl implements IPersistentFile {
 			String name = (String) it.next();
 			String json = file.getAttributeValue(FUNCTION_ENTRY+"/"+name+"@JSON");
 			json = json.substring(1, json.length()-1); // this is needed as somehow, the getAttribute adds [ ] around the json string...
-			FunctionBean fBean = converter.unmarshallToFunctionBean(json);
+			FunctionBean fBean = (FunctionBean) converter.unmarshal(json);
 
 			//convert the bean to AFunction
 			IFunction function = FunctionBeanConverter.functionBeanToIFunction(fBean);
@@ -752,7 +752,7 @@ class PersistentFileImpl implements IPersistentFile {
 
 		long[] dims = {1};
 
-		String json = converter.marshallFromFunctionBean(fBean);
+		String json = converter.marshal(fBean);
 
 		// we create the dataset
 		Dataset dat = file.replaceDataset(name, new H5Datatype(Datatype.CLASS_INTEGER, 4, Datatype.NATIVE, Datatype.NATIVE), dims, new int[]{0}, parent);
