@@ -49,7 +49,7 @@ public class PersistenceServiceImpl implements IPersistenceService{
 	}
 
 	@Override
-	public Object unmarshal(String json) {
+	public Object unmarshal(String json) throws Exception {
 		return new JacksonMarshaller().unmarshal(json);
 	}
 
