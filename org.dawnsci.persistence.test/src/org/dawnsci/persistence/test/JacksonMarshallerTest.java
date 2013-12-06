@@ -15,7 +15,7 @@ import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.RectangularROIBean;
  * @author wqk87977
  *
  */
-public class JSonMarshallerTest {
+public class JacksonMarshallerTest {
 
 	private double[] startPoint = new double[2];
 	private double[] lengths = new double[2];
@@ -69,13 +69,13 @@ public class JSonMarshallerTest {
 
 	@Test
 	public void testMarshallFromROIBeanToJsonString(){
-		String resultJSON = jackMarshall.marshallFromROIBean(roibean);
+		String resultJSON = jackMarshall.marshal(roibean);
 		assertEquals(jsonroi, resultJSON);
 	}
 
 	@Test
 	public void testUnMarshallFromJSonStringToROIBean(){
-		RectangularROIBean resultbean = (RectangularROIBean) jackMarshall.unmarshallToROIBean(jsonroi);
+		RectangularROIBean resultbean = (RectangularROIBean) jackMarshall.unmarshal(jsonroi);
 		assertEquals(roibean.getName(), resultbean.getName());
 		assertEquals(roibean.getType(), resultbean.getType());
 		assertArrayEquals(roibean.getLengths(), resultbean.getLengths(), 0);
@@ -84,13 +84,13 @@ public class JSonMarshallerTest {
 
 	@Test
 	public void testMarshallFromFunctionBeanToJSonString(){
-		String resultJSON = jackMarshall.marshallFromFunctionBean(functionbean);
+		String resultJSON = jackMarshall.marshal(functionbean);
 		assertEquals(jsonfunction, resultJSON);
 	}
 
 	@Test
 	public void testUnMarshallFromJSonStringToFunctionBean(){
-		FunctionBean resultbean = jackMarshall.unmarshallToFunctionBean(jsonfunction);
+		FunctionBean resultbean = (FunctionBean) jackMarshall.unmarshal(jsonfunction);
 		assertEquals(functionbean.getType(), resultbean.getType());
 		for (int i = 0; i < functionbean.getParameters().length; i++) {
 			assertEquals(functionbean.getParameters()[i].getLowerLimit(), resultbean.getParameters()[i].getLowerLimit(), 0);

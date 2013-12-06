@@ -19,11 +19,7 @@ import org.dawb.common.services.IPersistenceService;
 import org.dawb.common.services.IPersistentFile;
 import org.dawb.hdf5.HierarchicalDataFactory;
 import org.dawb.hdf5.IHierarchicalDataFile;
-import org.dawnsci.persistence.json.IJSonMarshaller;
 import org.dawnsci.persistence.json.JacksonMarshaller;
-
-import uk.ac.diamond.scisoft.analysis.persistence.bean.function.FunctionBean;
-import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.ROIBean;
 
 /**
  * Implementation of IPersistenceService<br>
@@ -53,26 +49,12 @@ public class PersistenceServiceImpl implements IPersistenceService{
 	}
 
 	@Override
-	public ROIBean unmarshallToROIBean(String json) {
-		IJSonMarshaller marshall = new JacksonMarshaller();
-		return marshall.unmarshallToROIBean(json);
+	public Object unmarshal(String json) {
+		return new JacksonMarshaller().unmarshal(json);
 	}
 
 	@Override
-	public String marshallFromROIBean(ROIBean roi) {
-		IJSonMarshaller marshall = new JacksonMarshaller();
-		return marshall.marshallFromROIBean(roi);
-	}
-
-	@Override
-	public FunctionBean unmarshallToFunctionBean(String json) {
-		IJSonMarshaller marshall = new JacksonMarshaller();
-		return marshall.unmarshallToFunctionBean(json);
-	}
-
-	@Override
-	public String marshallFromFunctionBean(FunctionBean function) {
-		IJSonMarshaller marshall = new JacksonMarshaller();
-		return marshall.marshallFromFunctionBean(function);
+	public String marshal(Object obj) {
+		return new JacksonMarshaller().marshal(obj);
 	}
 }

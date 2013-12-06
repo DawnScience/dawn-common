@@ -23,13 +23,15 @@ import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.PerimeterBoxROIBean;
 import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.PointROIBean;
 import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.PolygonalROIBean;
 import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.PolylineROIBean;
-import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.ROIBean;
 import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.RectangularROIBean;
 import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.RingROIBean;
 import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.SectorROIBean;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 /**
  * Class used to implement java bean to JSon and JSon to java bean conversion using Google GSon
@@ -50,65 +52,46 @@ public class GSonMarshaller implements IJSonMarshaller {
 		// builder.registerTypeAdapter(ROIBean.class, new ROISerializer());
 	}
 
-	/**
-	 * Returns a JSON string given a ROIBean
-	 * @param roi
-	 * @return String
-	 */
-	public String marshallFromROIBean(ROIBean roi) {
-		return gson.toJson(roi);
+	@Override
+	public String marshal(Object obj) {
+		return gson.toJson(obj);
 	}
 
-	/**
-	 * Returns a JSon string given a FunctionBean
-	 * @param function
-	 * @return JSon
-	 */
-	public String marshallFromFunctionBean(FunctionBean function) {
-		return gson.toJson(function);
-	}
+	@Override
+	public Object unmarshal(String json) {
+		JsonElement jelement = new JsonParser().parse(json);
+		JsonObject  jobject = jelement.getAsJsonObject();
+		JsonObject typeJobject = jobject.getAsJsonObject("type");
+		if (typeJobject == null) // if no type we return an Object
+			return gson.fromJson(json, Object.class);
+		if (typeJobject.toString() == null)
+			return gson.fromJson(json, Object.class);
 
-	/**
-	 * Returns a Roi bean given a JSon String
-	 * @param json
-	 * @return ROIBean
-	 */
-	public ROIBean unmarshallToROIBean(String json) {
-		ROIBean roibean = gson.fromJson(json, ROIBean.class);
-		if(roibean == null) return null;
-		if(roibean!=null && roibean.getType() == null) return null;
-
-		if(roibean.getType().equals("PointROI")){
+		String type = typeJobject.toString();
+		if(type.equals("PointROI")){
 			return gson.fromJson(json, PointROIBean.class);
-		} else if(roibean.getType().equals("PerimeterBoxROI")){
+		} else if(type.equals("PerimeterBoxROI")){
 			return gson.fromJson(json, PerimeterBoxROIBean.class);
-		} else if(roibean.getType().equals("RectangularROI")){
+		} else if(type.equals("RectangularROI")){
 			return gson.fromJson(json, RectangularROIBean.class);
-		} else if(roibean.getType().equals("CircularROI")){
+		} else if(type.equals("CircularROI")){
 			return gson.fromJson(json, CircularROIBean.class);
-		} else if(roibean.getType().equals("LinearROI")){
+		} else if(type.equals("LinearROI")){
 			return gson.fromJson(json, LinearROIBean.class);
-		} else if(roibean.getType().equals("PolylineROI")){
+		} else if(type.equals("PolylineROI")){
 			return gson.fromJson(json, PolylineROIBean.class);
-		} else if(roibean.getType().equals("PolygonalROI")){
+		} else if(type.equals("PolygonalROI")){
 			return gson.fromJson(json, PolygonalROIBean.class);
-		} else if(roibean.getType().equals("FreedrawROI")){
+		} else if(type.equals("FreedrawROI")){
 			return gson.fromJson(json, FreedrawROIBean.class);
-		} else if(roibean.getType().equals("RingROI")){
+		} else if(type.equals("RingROI")){
 			return gson.fromJson(json, RingROIBean.class);
-		} else if(roibean.getType().equals("SectorROI")){
+		} else if(type.equals("SectorROI")){
 			return gson.fromJson(json, SectorROIBean.class);
+		} else if(Integer.valueOf(type) != null && Integer.valueOf(type) >= 0) {
+			// TODO write custom deserializer and/or instance creator so that IParameter can be deserialized
+			return gson.fromJson(json, FunctionBean.class);
 		}
 		return null;
-	}
-
-	/**
-	 * Returns a FunctionBean given a json String
-	 * @param json
-	 * @return FunctionBean
-	 */
-	public FunctionBean unmarshallToFunctionBean(String json) {
-		// TODO write custom deserializer and/or instance creator so that IParameter can be deserialized
-		return gson.fromJson(json, FunctionBean.class);
 	}
 }

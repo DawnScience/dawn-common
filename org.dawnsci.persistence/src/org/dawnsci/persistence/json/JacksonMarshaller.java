@@ -30,7 +30,6 @@ import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.PerimeterBoxROIBean;
 import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.PointROIBean;
 import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.PolygonalROIBean;
 import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.PolylineROIBean;
-import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.ROIBean;
 import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.RectangularROIBean;
 import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.RingROIBean;
 import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.SectorROIBean;
@@ -56,54 +55,33 @@ public class JacksonMarshaller implements IJSonMarshaller{
 
 	public JacksonMarshaller() {
 		mapper = new ObjectMapper();
+		// mapping for deserializing FunctionBean
 		SimpleModule module = new SimpleModule("ParameterMapping", Version.unknownVersion());
 		module.addAbstractTypeMapping(IParameter.class, Parameter.class);
-//		module.addAbstractTypeMapping(ROIBean.class, );
 		mapper.registerModule(module);
 	}
 
-	/**
-	 * Returns a JSON string given a ROIBean
-	 * @param roi
-	 * @return String
-	 */
-	public String marshallFromROIBean(ROIBean roi) {
+	@Override
+	public String marshal(Object obj) {
 		try {
-			return mapper.writeValueAsString(roi);
+			return mapper.writeValueAsString(obj);
 		} catch (JsonProcessingException e) {
-			logger.error("Error marshalling from ROIBean:" + e);
+			logger.error("Error marshalling from "+ obj.getClass() + ":" + e);
 			return "";
 		}
 	}
 
-	/**
-	 * Returns a JSon string given a FunctionBean
-	 * @param function
-	 * @return JSon
-	 */
-	public String marshallFromFunctionBean(FunctionBean function) {
-		try {
-			return mapper.writeValueAsString(function);
-		} catch (JsonProcessingException e) {
-			logger.error("Error marshalling from FunctionBean:" + e);
-			return "";
-		}
-	}
-
-	/**
-	 * Returns a Roi bean given a JSon String
-	 * @param json
-	 * @return ROIBean
-	 */
-	public ROIBean unmarshallToROIBean(String json) {
+	@Override
+	public Object unmarshal(String json) {
 		try {
 			//read JSON like DOM Parser
 			JsonNode rootNode = mapper.readTree(json);
 			JsonNode typeNode = rootNode.path("type");
-			if (typeNode == null)
-				return null;
+			if (typeNode == null) // if no type we return an Object
+				return mapper.readValue(json, Object.class);
 			if (typeNode.asText() == null)
-				return null;
+				return mapper.readValue(json, Object.class);
+
 			String type = typeNode.asText();
 			if (type.equals("PointROI")) {
 				return mapper.readValue(json, PointROIBean.class);
@@ -125,37 +103,19 @@ public class JacksonMarshaller implements IJSonMarshaller{
 				return mapper.readValue(json, RingROIBean.class);
 			} else if (type.equals("SectorROI")) {
 				return mapper.readValue(json, SectorROIBean.class);
+			} else if (Integer.valueOf(type) != null && Integer.valueOf(type) >= 0) { // if type is an integer we unmarshall to FunctionBean
+				return mapper.readValue(json, FunctionBean.class);
 			}
 		} catch (JsonParseException e) {
-			logger.error("Error unmarshalling to ROIBean:" + e);
+			logger.error("Error unmarshalling :" + e);
 			return null;
 		} catch (JsonMappingException e) {
-			logger.error("Error unmarshalling to ROIBean:" + e);
+			logger.error("Error unmarshalling :" + e);
 			return null;
 		} catch (IOException e) {
-			logger.error("Error unmarshalling to ROIBean:" + e);
+			logger.error("Error unmarshalling :" + e);
 			return null;
 		}
 		return null;
-	}
-
-	/**
-	 * Returns a FunctionBean given a json String
-	 * @param json
-	 * @return FunctionBean
-	 */
-	public FunctionBean unmarshallToFunctionBean(String json) {
-		try {
-			return mapper.readValue(json, FunctionBean.class);
-		} catch (JsonParseException e) {
-			logger.error("Error unmarshalling to FunctionBean:" + e);
-			return null;
-		} catch (JsonMappingException e) {
-			logger.error("Error unmarshalling to FunctionBean:" + e);
-			return null;
-		} catch (IOException e) {
-			logger.error("Error unmarshalling to FunctionBean:" + e);
-			return null;
-		}
 	}
 }

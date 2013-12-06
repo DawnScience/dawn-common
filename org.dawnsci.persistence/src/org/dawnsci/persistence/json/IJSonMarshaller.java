@@ -15,11 +15,8 @@
  */
 package org.dawnsci.persistence.json;
 
-import uk.ac.diamond.scisoft.analysis.persistence.bean.function.FunctionBean;
-import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.ROIBean;
-
 /**
- * Interface used to used to marshall from ROIBean/FunctionBean to JSON
+ * Interface used to marshall from ROIBean/FunctionBean to JSON
  * and unmarshall from JSON to ROIBean/FunctionBean
  * 
  * @author wqk87977
@@ -28,30 +25,17 @@ import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.ROIBean;
 public interface IJSonMarshaller {
 
 	/**
-	 * Returns a JSON string given a ROIBean
-	 * @param roi
-	 * @return String
+	 * Returns a JSON String given an object
+	 * @param obj
+	 * @return
 	 */
-	public String marshallFromROIBean(ROIBean roi);
+	public String marshal(Object obj);
 
 	/**
-	 * Returns a JSon string given a FunctionBean
-	 * @param function
-	 * @return JSon
-	 */
-	public String marshallFromFunctionBean(FunctionBean function) ;
-
-	/**
-	 * Returns a Roi bean given a JSon String
+	 * Returns an object given a JSON String
 	 * @param json
-	 * @return ROIBean
+	 * @return
 	 */
-	public ROIBean unmarshallToROIBean(String json);
+	public Object unmarshal(String json);
 
-	/**
-	 * Returns a FunctionBean given a json String
-	 * @param json
-	 * @return FunctionBean
-	 */
-	public FunctionBean unmarshallToFunctionBean(String json);
 }

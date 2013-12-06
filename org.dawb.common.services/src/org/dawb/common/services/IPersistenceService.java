@@ -1,8 +1,5 @@
 package org.dawb.common.services;
 
-import uk.ac.diamond.scisoft.analysis.persistence.bean.function.FunctionBean;
-import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.ROIBean;
-
 /**
  * This service can be called to save and/or load data from an hdf5 file.
  * 
@@ -28,30 +25,17 @@ public interface IPersistenceService {
 	public IPersistentFile createPersistentFile(String filePath) throws Exception;
 
 	/**
-	 * Returns a Roi bean given a JSon String
+	 * Returns an object bean given a JSon String
 	 * @param json
-	 * @return ROIBean
+	 * @return obj
 	 */
-	public ROIBean unmarshallToROIBean(String json);
+	public Object unmarshal(String json);
 
 	/**
-	 * Returns a JSON string given a ROIBean
-	 * @param roi
+	 * Returns a JSON string given an Object bean
+	 * @param obj
 	 * @return string
 	 */
-	public String marshallFromROIBean(ROIBean roi);
+	public String marshal(Object obj);
 
-	/**
-	 * Returns a FunctionBean given a JSON String
-	 * @param json
-	 * @return FunctionBean
-	 */
-	public FunctionBean unmarshallToFunctionBean(String json);
-
-	/**
-	 * Returns a JSON String given a Function bean
-	 * @param function
-	 * @return
-	 */
-	public String marshallFromFunctionBean(FunctionBean funtion);
 }
