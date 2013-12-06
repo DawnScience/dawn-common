@@ -38,7 +38,8 @@ import org.dawb.hdf5.Nexus;
 import org.dawb.hdf5.nexus.NexusUtils;
 import org.dawnsci.io.h5.H5LazyDataset;
 import org.dawnsci.io.h5.H5Utils;
-import org.dawnsci.persistence.json.JSonMarshaller;
+import org.dawnsci.persistence.json.IJSonMarshaller;
+import org.dawnsci.persistence.json.JacksonMarshaller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -314,7 +315,7 @@ class PersistentFileImpl implements IPersistentFile {
 
 	@Override
 	public IROI getROI(String roiName) throws Exception {
-		JSonMarshaller converter = new JSonMarshaller();
+		IJSonMarshaller converter = new JacksonMarshaller();
 
 		String json = file.getAttributeValue(ROI_ENTRY+"/"+roiName+"@JSON");
 		if(json == null) throw new Exception("Reading Exception: " +ROI_ENTRY+ " entry does not exist in the file " + filePath);
@@ -334,7 +335,7 @@ class PersistentFileImpl implements IPersistentFile {
 		if(file == null)
 			file = HierarchicalDataFactory.getReader(filePath);
 
-		JSonMarshaller converter = new JSonMarshaller();
+		IJSonMarshaller converter = new JacksonMarshaller();
 
 		List<String> names = getROINames(mon);
 
@@ -567,7 +568,7 @@ class PersistentFileImpl implements IPersistentFile {
 
 		long[] dims = {1};
 
-		JSonMarshaller converter = new JSonMarshaller();
+		IJSonMarshaller converter = new JacksonMarshaller();
 
 		String json = converter.marshallFromROIBean(roibean);
 
@@ -661,7 +662,7 @@ class PersistentFileImpl implements IPersistentFile {
 		Group parent = createParentEntry(FUNCTION_ENTRY);
 
 		if (functions != null) {
-			JSonMarshaller converter = new JSonMarshaller();
+			IJSonMarshaller converter = new JacksonMarshaller();
 
 			Iterator<String> it = functions.keySet().iterator();
 			while(it.hasNext()){
@@ -678,7 +679,7 @@ class PersistentFileImpl implements IPersistentFile {
 
 		Group parent = createParentEntry(FUNCTION_ENTRY);
 
-		JSonMarshaller converter = new JSonMarshaller();
+		IJSonMarshaller converter = new JacksonMarshaller();
 
 		writeFunction(file, parent, name, function, converter);
 
@@ -689,7 +690,7 @@ class PersistentFileImpl implements IPersistentFile {
 		String json = file.getAttributeValue(FUNCTION_ENTRY+"/"+functionName);
 		if(json == null) throw new Exception("Reading Exception: " +FUNCTION_ENTRY+ " entry does not exist in the file " + filePath);
 
-		JSonMarshaller converter = new JSonMarshaller();
+		IJSonMarshaller converter = new JacksonMarshaller();
 		FunctionBean fBean = converter.unmarshallToFunctionBean(json);
 
 		//convert the bean to AFunction
@@ -704,7 +705,7 @@ class PersistentFileImpl implements IPersistentFile {
 		if(file == null)
 			file = HierarchicalDataFactory.getReader(filePath);
 
-		JSonMarshaller converter = new JSonMarshaller();
+		IJSonMarshaller converter = new JacksonMarshaller();
 
 		List<String> names = getFunctionNames(mon);
 
@@ -745,7 +746,7 @@ class PersistentFileImpl implements IPersistentFile {
 	}
 
 	private HObject writeFunction(IHierarchicalDataFile file, Group parent,
-			String name, IFunction function, JSonMarshaller converter) throws Exception {
+			String name, IFunction function, IJSonMarshaller converter) throws Exception {
 
 		FunctionBean fBean = FunctionBeanConverter.iFunctionToFunctionBean(name, (IFunction)function);
 

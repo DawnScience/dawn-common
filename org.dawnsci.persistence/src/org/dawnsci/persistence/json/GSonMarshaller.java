@@ -33,19 +33,21 @@ import com.google.gson.GsonBuilder;
 
 /**
  * Class used to implement java bean to JSon and JSon to java bean conversion using Google GSon
+ * TODO this marshaller won't work with abstract classes unless a specific deserializer is written for it
  * @author wqk87977
  *
  */
-public class JSonMarshaller {
+public class GSonMarshaller implements IJSonMarshaller {
 
 	private Gson gson;
 
-	public JSonMarshaller() {
+	public GSonMarshaller() {
+		gson = new GsonBuilder().create();
+		// .registerTypeAdapter(ROIBean.class, new Marshaller())
+		// .registerTypeAdapter(FunctionBean.class, new Marshaller()).create();
 		// JSON serialisation
-		GsonBuilder builder = new GsonBuilder();
 		// TODO: serialiser to be worked on...
 		// builder.registerTypeAdapter(ROIBean.class, new ROISerializer());
-		gson = builder.create();
 	}
 
 	/**
@@ -106,6 +108,7 @@ public class JSonMarshaller {
 	 * @return FunctionBean
 	 */
 	public FunctionBean unmarshallToFunctionBean(String json) {
+		// TODO write custom deserializer and/or instance creator so that IParameter can be deserialized
 		return gson.fromJson(json, FunctionBean.class);
 	}
 }
