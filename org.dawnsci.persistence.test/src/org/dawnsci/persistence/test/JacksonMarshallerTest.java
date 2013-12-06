@@ -75,11 +75,17 @@ public class JacksonMarshallerTest {
 
 	@Test
 	public void testUnMarshallFromJSonStringToROIBean(){
-		RectangularROIBean resultbean = (RectangularROIBean) jackMarshall.unmarshal(jsonroi);
-		assertEquals(roibean.getName(), resultbean.getName());
-		assertEquals(roibean.getType(), resultbean.getType());
-		assertArrayEquals(roibean.getLengths(), resultbean.getLengths(), 0);
-		assertEquals(roibean.getAngle(), resultbean.getAngle(), 0);
+		RectangularROIBean resultbean;
+		try {
+			resultbean = (RectangularROIBean) jackMarshall.unmarshal(jsonroi);
+
+			assertEquals(roibean.getName(), resultbean.getName());
+			assertEquals(roibean.getType(), resultbean.getType());
+			assertArrayEquals(roibean.getLengths(), resultbean.getLengths(), 0);
+			assertEquals(roibean.getAngle(), resultbean.getAngle(), 0);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Test
@@ -90,13 +96,17 @@ public class JacksonMarshallerTest {
 
 	@Test
 	public void testUnMarshallFromJSonStringToFunctionBean(){
-		FunctionBean resultbean = (FunctionBean) jackMarshall.unmarshal(jsonfunction);
-		assertEquals(functionbean.getType(), resultbean.getType());
-		for (int i = 0; i < functionbean.getParameters().length; i++) {
-			assertEquals(functionbean.getParameters()[i].getLowerLimit(), resultbean.getParameters()[i].getLowerLimit(), 0);
-			assertEquals(functionbean.getParameters()[i].getUpperLimit(), resultbean.getParameters()[i].getUpperLimit(), 0);
-			assertEquals(functionbean.getParameters()[i].getValue(), resultbean.getParameters()[i].getValue(), 0);
+		FunctionBean resultbean;
+		try {
+			resultbean = (FunctionBean) jackMarshall.unmarshal(jsonfunction);
+			assertEquals(functionbean.getType(), resultbean.getType());
+			for (int i = 0; i < functionbean.getParameters().length; i++) {
+				assertEquals(functionbean.getParameters()[i].getLowerLimit(), resultbean.getParameters()[i].getLowerLimit(), 0);
+				assertEquals(functionbean.getParameters()[i].getUpperLimit(), resultbean.getParameters()[i].getUpperLimit(), 0);
+				assertEquals(functionbean.getParameters()[i].getValue(), resultbean.getParameters()[i].getValue(), 0);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-
 	}
 }
