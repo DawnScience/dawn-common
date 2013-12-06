@@ -35,7 +35,7 @@ public interface IJSonMarshaller {
 	 * Returns an object given a JSON String
 	 * @param json
 	 * @return
+	 * @throws Exception
 	 */
-	public Object unmarshal(String json);
-
+	public Object unmarshal(String json) throws Exception;
 }

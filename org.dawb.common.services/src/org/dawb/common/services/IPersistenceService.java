@@ -29,7 +29,7 @@ public interface IPersistenceService {
 	 * @param json
 	 * @return obj
 	 */
-	public Object unmarshal(String json);
+	public Object unmarshal(String json) throws Exception;
 
 	/**
 	 * Returns a JSON string given an Object bean
