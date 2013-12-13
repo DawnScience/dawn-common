@@ -7,7 +7,10 @@ Bundle-Activator: org.dawb.common.util.Activator
 Bundle-Vendor: ESRF
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
-Export-Package: org.dawb.common.util,
+Export-Package: org.apache.commons.collections4.list,
+ org.apache.commons.collections4.map,
+ org.apache.commons.collections4.set,
+ org.dawb.common.util,
  org.dawb.common.util.eclipse,
  org.dawb.common.util.image,
  org.dawb.common.util.io,
