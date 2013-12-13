@@ -9,8 +9,8 @@
  */ 
 package org.dawb.common.ui.views;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import org.dawb.common.ui.Activator;
@@ -19,12 +19,16 @@ import org.dawb.common.ui.menu.MenuAction;
 import org.dawb.common.ui.preferences.ViewConstants;
 import org.dawb.common.ui.util.EclipseUtils;
 import org.dawnsci.plotting.api.IPlottingSystem;
+import org.dawnsci.plotting.api.trace.IImageTrace;
+import org.dawnsci.plotting.api.trace.ITrace;
 import org.dawnsci.slicing.api.system.ISliceGallery;
 import org.dawnsci.slicing.api.system.ISliceSystem;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.nebula.widgets.gallery.GalleryItem;
 import org.eclipse.swt.events.MouseEvent;
@@ -33,6 +37,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IViewSite;
@@ -133,6 +138,40 @@ public class H5GalleryView extends ViewPart implements MouseListener, SelectionL
 	private void initializeToolBar() {
 		IToolBarManager toolbarManager = getViewSite().getActionBars()
 				.getToolBarManager();
+		
+		final Action lockHistogram = new Action("Lock colour map, also known as histogram, to current plot", IAction.AS_CHECK_BOX) {
+			public void run() {
+				if (isChecked()) {
+					IPlottingSystem sys = (IPlottingSystem)EclipseUtils.getPage().getActivePart().getAdapter(IPlottingSystem.class);
+					if (sys == null && EclipseUtils.getPage().getActiveEditor()!=null) {
+						sys = (IPlottingSystem)EclipseUtils.getPage().getActiveEditor().getAdapter(IPlottingSystem.class);
+					}
+					if (sys == null) {
+						MessageDialog.openInformation(Display.getDefault().getActiveShell(), "Cannot find plot", "In order to lock colour map in the gallery, there must be a plot somewhere in DAWN visible.\n\nPlease make sure that an image is plotted with the colours you would like.");
+						return;
+					}
+					final Collection<ITrace> images = sys.getTraces(IImageTrace.class);
+					if (images==null || images.isEmpty()) {
+						MessageDialog.openInformation(Display.getDefault().getActiveShell(), "Cannot find image", "In order to lock colour map in the gallery, there must be an image plotted to copy.\n\nPlease make sure that an image is plotted with the colours you would like.");
+						return;
+					}
+					final IImageTrace image = (IImageTrace)images.iterator().next();
+					galleryDelegate.setLockedHistogram(image.getImageServiceBean());
+				} else {
+					galleryDelegate.setLockedHistogram(null);
+				}
+			}
+		};
+		lockHistogram.setImageDescriptor(Activator.getImageDescriptor("icons/lock.png"));
+		toolbarManager.add(lockHistogram);
+		
+		final Action refresh = new Action("Refresh gallery", Activator.getImageDescriptor("icons/refresh.png")) {
+			public void run() {
+				galleryDelegate.refreshAll();
+			}
+		};
+		toolbarManager.add(refresh);
+		toolbarManager.add(new Separator());
 		
 		dimensionList = new MenuAction("Slice dimension");
 		dimensionList.setImageDescriptor(Activator.getImageDescriptor("icons/slice_dimension.gif"));

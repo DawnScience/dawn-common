@@ -13,6 +13,7 @@ import org.dawb.common.services.PlotImageData;
 import org.dawb.common.services.ServiceManager;
 import org.dawb.common.ui.preferences.ViewConstants;
 import org.dawb.common.util.object.ObjectUtils;
+import org.dawnsci.plotting.api.histogram.ImageServiceBean;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -58,6 +59,17 @@ public class GalleryDelegate {
 	private GalleryItem              galleryGroup;
 	private BlockingDeque<ImageItem> queue;
 	private GalleryDelegateInfo      info;
+	
+	private ImageServiceBean lockedHistogram = null;
+
+	public ImageServiceBean getLockedHistogram() {
+		return lockedHistogram;
+	}
+
+	public void setLockedHistogram(ImageServiceBean lockedHistogram) {
+		this.lockedHistogram = lockedHistogram;
+		if (lockedHistogram!=null) refreshAll();
+	}
 
 	private String groupLabel;
 
@@ -253,7 +265,9 @@ public class GalleryDelegate {
 							image = new Image(Display.getDefault(), new BufferedInputStream(new FileInputStream(new File(path))));
 						} else {
 							final IPlotImageService service = (IPlotImageService)ServiceManager.getService(IPlotImageService.class);	            		
-							image = service.getImage(new PlotImageData(set, size, size));
+							final PlotImageData id = new PlotImageData(set, size, size);
+							if (getLockedHistogram()!=null) id.setImageServiceBean(lockedHistogram);
+							image = service.getImage(id);
 						}
 
 						Display.getDefault().asyncExec(new Runnable() {
