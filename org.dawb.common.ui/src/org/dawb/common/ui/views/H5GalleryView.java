@@ -40,7 +40,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IMemento;
+import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IViewSite;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.PreferencesUtil;
@@ -147,12 +149,18 @@ public class H5GalleryView extends ViewPart implements MouseListener, SelectionL
 						sys = (IPlottingSystem)EclipseUtils.getPage().getActiveEditor().getAdapter(IPlottingSystem.class);
 					}
 					if (sys == null) {
-						MessageDialog.openInformation(Display.getDefault().getActiveShell(), "Cannot find plot", "In order to lock colour map in the gallery, there must be a plot somewhere in DAWN visible.\n\nPlease make sure that an image is plotted with the colours you would like.");
+						for (IViewReference vr : EclipseUtils.getPage().getViewReferences()) {
+							final IWorkbenchPart view = vr.getPart(false);
+							if (view!=null) sys = (IPlottingSystem)view.getAdapter(IPlottingSystem.class);
+						}
+					}
+					if (sys == null) {
+						MessageDialog.openInformation(Display.getDefault().getActiveShell(), "Cannot find plot", "In order to lock colour map in the gallery, please plot an image and make it visible.\n\nPlease make sure that an image is plotted with the colours you would like.");
 						return;
 					}
 					final Collection<ITrace> images = sys.getTraces(IImageTrace.class);
 					if (images==null || images.isEmpty()) {
-						MessageDialog.openInformation(Display.getDefault().getActiveShell(), "Cannot find image", "In order to lock colour map in the gallery, there must be an image plotted to copy.\n\nPlease make sure that an image is plotted with the colours you would like.");
+						MessageDialog.openInformation(Display.getDefault().getActiveShell(), "Cannot find image", "In order to lock colour map in the gallery, there must be an image plotted and visible.\n\nPlease make sure that an image is plotted with the colours you would like.");
 						return;
 					}
 					final IImageTrace image = (IImageTrace)images.iterator().next();

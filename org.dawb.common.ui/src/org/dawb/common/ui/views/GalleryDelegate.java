@@ -335,16 +335,16 @@ public class GalleryDelegate {
 	}
 
 	public void addMouseListener(MouseListener listener) {
-		gallery.addMouseListener(listener);
+		if (!gallery.isDisposed()) gallery.addMouseListener(listener);
 	}
 	public void addSelectionListener(SelectionListener listener) {
-		gallery.addSelectionListener(listener);
+		if (!gallery.isDisposed()) gallery.addSelectionListener(listener);
 	}
 	public void removeMouseListener(MouseListener listener) {
-		gallery.removeMouseListener(listener);
+		if (!gallery.isDisposed()) gallery.removeMouseListener(listener);
 	}
 	public void removeSelectionListener(SelectionListener listener) {
-		gallery.removeSelectionListener(listener);
+		if (!gallery.isDisposed()) gallery.removeSelectionListener(listener);
 	}
 
 	public String getPath(int itemCount) {
