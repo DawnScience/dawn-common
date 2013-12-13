@@ -256,7 +256,7 @@ IConversionWizardPage {
 					}
 
 					DataHolder holder = LoaderFactory.getData(source, new ProgressMonitorWrapper(monitor));
-					final List<String> names = new ArrayList<String>(holder.getMap().keySet());
+					final List<String> names = new ArrayList<String>(holder.toLazyMap().keySet());
 					Collections.sort(names);
 					setDataNames(names.toArray(new String[names.size()]), null, holder);
 					return;
