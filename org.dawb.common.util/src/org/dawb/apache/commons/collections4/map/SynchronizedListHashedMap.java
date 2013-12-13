@@ -6,7 +6,7 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */ 
-package org.apache.commons.collections4.map;
+package org.dawb.apache.commons.collections4.map;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -16,8 +16,8 @@ import java.util.Map;
 
 import org.apache.commons.collections4.MapIterator;
 import org.apache.commons.collections4.collection.SynchronizedCollection;
-import org.apache.commons.collections4.list.SynchronizedList;
-import org.apache.commons.collections4.map.AbstractHashedMap_Dawn.HashEntry;
+import org.dawb.apache.commons.collections4.list.SynchronizedList;
+import org.dawb.apache.commons.collections4.map.AbstractHashedMap_Dawn.HashEntry;
 
 /**
  * Decorates another {@link ListHashedMap} to synchronize its behaviour for a

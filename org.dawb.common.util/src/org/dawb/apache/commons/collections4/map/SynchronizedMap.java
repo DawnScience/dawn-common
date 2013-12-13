@@ -6,7 +6,7 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */ 
-package org.apache.commons.collections4.map;
+package org.dawb.apache.commons.collections4.map;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.collections4.collection.SynchronizedCollection;
-import org.apache.commons.collections4.set.SynchronizedSet;
+import org.dawb.apache.commons.collections4.set.SynchronizedSet;
 
 /**
  * Decorates another {@link Map} to synchronize its behaviour for a

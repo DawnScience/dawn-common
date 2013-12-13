@@ -6,7 +6,7 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */ 
-package org.apache.commons.collections4.map;
+package org.dawb.apache.commons.collections4.map;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
