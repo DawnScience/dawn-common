@@ -11,8 +11,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
-import org.apache.commons.collections4.map.ListHashedMap;
-import org.apache.commons.collections4.map.SynchronizedListHashedMap;
+import org.dawb.apache.commons.collections4.map.ListHashedMap;
+import org.dawb.apache.commons.collections4.map.SynchronizedListHashedMap;
 import org.junit.Test;
 
 public class ListHashedMapTest {
