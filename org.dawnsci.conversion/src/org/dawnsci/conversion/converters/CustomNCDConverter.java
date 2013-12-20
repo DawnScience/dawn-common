@@ -288,156 +288,160 @@ public class CustomNCDConverter extends AbstractConversion  {
 		String selFilePath = context.getSelectedConversionFile().getAbsolutePath();
 		IHierarchicalDataFile hdf5Reader = HierarchicalDataFactory.getReader(selFilePath);
 		
-		//get the x axis if required
-		AbstractDataset axis = null;
-		AbstractDataset axisErrors = null;
-		String axisUnits = "a.u.";
-		if (context.getAxisDatasetName() != null) {
-			axis = (AbstractDataset)getAxis(context.getAxisDatasetName(), context.getSelectedConversionFile());
-			axis.squeeze();
-			axisUnits = getAxisUnit(context.getAxisDatasetName(), context.getSelectedConversionFile());
-			if (axis.hasErrors()) {
-				axisErrors = DatasetUtils.cast((AbstractDataset) ((IErrorDataset) axis).getError(),
-						axis.getDtype());
-				axisErrors.squeeze();
-			}
-		}
-		
-		//Set up position iterator (final 2 dimensions saved in a single file
-		int[] stop = lz.getShape();
-		boolean hasErrors = (lz.getLazyErrors() != null ? true : false);
-		int iterDim = lz.getRank() - 1;
-		int[] cutAxes = new int[] {lz.getRank() - 1};
-		
-		PositionIterator iterator = new PositionIterator(stop, cutAxes);
-		
-		for (int i = 0 ; i < iterDim ; i++) {
-			stop[i] = 0;
-		}
-		
-		int[] step = new int[stop.length];
-		for (int i = 0 ; i < step.length; i++) {
-			step[i] = 1;
-		}
-		
-		ObjectFactory of       = new ObjectFactory();
-		SASrootType   sasRoot  = of.createSASrootType();
-		SASsampleType sasSample  = of.createSASsampleType();
-		
-		SASsourceType sasSource = of.createSASsourceType();
-		sasSource.setRadiation("x-ray");
-		SASdetectorType sasDetector = of.createSASdetectorType();
-		sasDetector.setName(nameFrag);
-		SAScollimationType sasCollimation = of.createSAScollimationType();
-		
-		SASinstrumentType sasInstrument  = of.createSASinstrumentType();
-		sasInstrument.setName("Diamond Light Source Ltd.");
-		sasInstrument.setSASsource(sasSource);
-		sasInstrument.getSASdetector().add(sasDetector);
-		sasInstrument.getSAScollimation().add(sasCollimation);
-		SAStransmissionSpectrumType sasTransmission  = of.createSAStransmissionSpectrumType();
-		
 		try {
-			Dataset titleData = (Dataset) hdf5Reader.getData(DEFAULT_TITLE_NODE);
-			String[] str = (String[]) titleData.getData();
-			if (str.length > 0) {
-				String title = str[0];
-				sasSample.setID(title);
-			} else {
+			//get the x axis if required
+			AbstractDataset axis = null;
+			AbstractDataset axisErrors = null;
+			String axisUnits = "a.u.";
+			if (context.getAxisDatasetName() != null) {
+				axis = (AbstractDataset)getAxis(context.getAxisDatasetName(), context.getSelectedConversionFile());
+				axis.squeeze();
+				axisUnits = getAxisUnit(context.getAxisDatasetName(), context.getSelectedConversionFile());
+				if (axis.hasErrors()) {
+					axisErrors = DatasetUtils.cast((AbstractDataset) ((IErrorDataset) axis).getError(),
+							axis.getDtype());
+					axisErrors.squeeze();
+				}
+			}
+			
+			//Set up position iterator (final 2 dimensions saved in a single file
+			int[] stop = lz.getShape();
+			boolean hasErrors = (lz.getLazyErrors() != null ? true : false);
+			int iterDim = lz.getRank() - 1;
+			int[] cutAxes = new int[] {lz.getRank() - 1};
+			
+			PositionIterator iterator = new PositionIterator(stop, cutAxes);
+			
+			for (int i = 0 ; i < iterDim ; i++) {
+				stop[i] = 0;
+			}
+			
+			int[] step = new int[stop.length];
+			for (int i = 0 ; i < step.length; i++) {
+				step[i] = 1;
+			}
+			
+			ObjectFactory of       = new ObjectFactory();
+			SASrootType   sasRoot  = of.createSASrootType();
+			SASsampleType sasSample  = of.createSASsampleType();
+			
+			SASsourceType sasSource = of.createSASsourceType();
+			sasSource.setRadiation("x-ray");
+			SASdetectorType sasDetector = of.createSASdetectorType();
+			sasDetector.setName(nameFrag);
+			SAScollimationType sasCollimation = of.createSAScollimationType();
+			
+			SASinstrumentType sasInstrument  = of.createSASinstrumentType();
+			sasInstrument.setName("Diamond Light Source Ltd.");
+			sasInstrument.setSASsource(sasSource);
+			sasInstrument.getSASdetector().add(sasDetector);
+			sasInstrument.getSAScollimation().add(sasCollimation);
+			SAStransmissionSpectrumType sasTransmission  = of.createSAStransmissionSpectrumType();
+			
+			try {
+				Dataset titleData = (Dataset) hdf5Reader.getData(DEFAULT_TITLE_NODE);
+				String[] str = (String[]) titleData.getData();
+				if (str.length > 0) {
+					String title = str[0];
+					sasSample.setID(title);
+				} else {
+					sasSample.setID("N/A");
+				}
+			} catch (Exception e) {
+				logger.info("Default title node {} was not found", DEFAULT_TITLE_NODE);
 				sasSample.setID("N/A");
 			}
-		} catch (Exception e) {
-			logger.info("Default title node {} was not found", DEFAULT_TITLE_NODE);
-			sasSample.setID("N/A");
-		}
-		
-		String pathToFolder = context.getOutputPath();
-		String fileName = buildFileName(context.getSelectedConversionFile().getAbsolutePath(),nameFrag);
-		String fullName = pathToFolder + File.separator + fileName + ".xml";
-		
-		//Iterate over lazy dataset and save
-		while (iterator.hasNext()) {
 			
-			SASentryType  sasEntry = of.createSASentryType();
+			String pathToFolder = context.getOutputPath();
+			String fileName = buildFileName(context.getSelectedConversionFile().getAbsolutePath(),nameFrag);
+			String fullName = pathToFolder + File.separator + fileName + ".xml";
 			
-			int[] start = iterator.getPos();
-			
-			for (int j = 0 ; j < iterDim ; j++) {
-				stop[j] = start[j]+1;
-			}
-			
-			Slice[] slices = Slice.convertToSlice(start, stop, step);
-			IDataset data = lz.getSlice(slices).squeeze();
-			
-			AbstractDataset errors = null;
-			if (hasErrors) {
-				errors = DatasetUtils.cast((AbstractDataset) ((IErrorDataset) data).getError(),
-						((AbstractDataset)data).getDtype());
-				errors.squeeze();
-			}
-			
-			Run run = new Run();
-			String runName = "Frame"+ nameStringFromSliceArray(iterDim, slices);
-			run.setValue(runName);
-			sasEntry.getRun().add(run);
-			
-			SASdataType sasData  = of.createSASdataType();
-			
-			PositionIterator iter = new PositionIterator(data.getShape(), new int[] {});
-			while (iter.hasNext()) {
-				int[] idx = iter.getPos();
-				float val;
+			//Iterate over lazy dataset and save
+			while (iterator.hasNext()) {
 				
-				IdataType iData = of.createIdataType();
-				FloatUnitType I = of.createFloatUnitType();
-				val = data.getFloat(idx);
-				I.setValue(val);
-				I.setUnit("a.u.");
-				iData.setI(I);
-				if (axis != null) {
-					FloatUnitType Q = of.createFloatUnitType();
-					val = axis.getFloat(idx);
-					Q.setValue(val);
-					Q.setUnit(axisUnits);
-					iData.setQ(Q);
+				SASentryType  sasEntry = of.createSASentryType();
+				
+				int[] start = iterator.getPos();
+				
+				for (int j = 0 ; j < iterDim ; j++) {
+					stop[j] = start[j]+1;
 				}
-				if (errors != null) {
-					FloatUnitType devI = of.createFloatUnitType();
-					val = errors.getFloat(idx);
-					devI.setValue(val);
-					devI.setUnit("a.u.");
-					iData.setIdev(devI);
+				
+				Slice[] slices = Slice.convertToSlice(start, stop, step);
+				IDataset data = lz.getSlice(slices).squeeze();
+				
+				AbstractDataset errors = null;
+				if (hasErrors) {
+					errors = DatasetUtils.cast((AbstractDataset) ((IErrorDataset) data).getError(),
+							((AbstractDataset)data).getDtype());
+					errors.squeeze();
 				}
-				if (axisErrors != null) {
-					FloatUnitType devQ = of.createFloatUnitType();
-					val = axisErrors.getFloat(idx);
-					devQ.setValue(val);
-					devQ.setUnit(axisUnits);
-					iData.setQdev(devQ);
+				
+				Run run = new Run();
+				String runName = "Frame"+ nameStringFromSliceArray(iterDim, slices);
+				run.setValue(runName);
+				sasEntry.getRun().add(run);
+				
+				SASdataType sasData  = of.createSASdataType();
+				
+				PositionIterator iter = new PositionIterator(data.getShape(), new int[] {});
+				while (iter.hasNext()) {
+					int[] idx = iter.getPos();
+					float val;
+					
+					IdataType iData = of.createIdataType();
+					FloatUnitType I = of.createFloatUnitType();
+					val = data.getFloat(idx);
+					I.setValue(val);
+					I.setUnit("a.u.");
+					iData.setI(I);
+					if (axis != null) {
+						FloatUnitType Q = of.createFloatUnitType();
+						val = axis.getFloat(idx);
+						Q.setValue(val);
+						Q.setUnit(axisUnits);
+						iData.setQ(Q);
+					}
+					if (errors != null) {
+						FloatUnitType devI = of.createFloatUnitType();
+						val = errors.getFloat(idx);
+						devI.setValue(val);
+						devI.setUnit("a.u.");
+						iData.setIdev(devI);
+					}
+					if (axisErrors != null) {
+						FloatUnitType devQ = of.createFloatUnitType();
+						val = axisErrors.getFloat(idx);
+						devQ.setValue(val);
+						devQ.setUnit(axisUnits);
+						iData.setQdev(devQ);
+					}
+					sasData.getIdata().add(iData);
 				}
-				sasData.getIdata().add(iData);
+				
+				sasEntry.setTitle(data.getName());
+				sasEntry.getSASdata().add(sasData);
+				sasEntry.setSASsample(sasSample);
+				sasEntry.getSAStransmissionSpectrum().add(sasTransmission);
+				sasEntry.setSASinstrument(sasInstrument);
+				sasEntry.getSASnote().add(selFilePath);
+				
+				sasRoot.getSASentry().add(sasEntry);
 			}
+			JAXBElement<SASrootType> jabxSASroot = of.createSASroot(sasRoot);
+	
+			JAXBContext jc = JAXBContext.newInstance(CANSAS_JAXB_CONTEXT);
+			Marshaller m = jc.createMarshaller();
+			m.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, "http://www.cansas.org/formats/1.1/cansas1d.xsd");		
+			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+			m.marshal(jabxSASroot, new FileOutputStream(fullName));
 			
-			sasEntry.setTitle(data.getName());
-			sasEntry.getSASdata().add(sasData);
-			sasEntry.setSASsample(sasSample);
-			sasEntry.getSAStransmissionSpectrum().add(sasTransmission);
-			sasEntry.setSASinstrument(sasInstrument);
-			sasEntry.getSASnote().add(selFilePath);
-			
-			sasRoot.getSASentry().add(sasEntry);
-		}
-		JAXBElement<SASrootType> jabxSASroot = of.createSASroot(sasRoot);
-
-		JAXBContext jc = JAXBContext.newInstance(CANSAS_JAXB_CONTEXT);
-		Marshaller m = jc.createMarshaller();
-		m.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, "http://www.cansas.org/formats/1.1/cansas1d.xsd");		
-		m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-		m.marshal(jabxSASroot, new FileOutputStream(fullName));
-		
-		if (context.getMonitor() != null) {
-			IMonitor mon = context.getMonitor();
-			mon.worked(1);
+			if (context.getMonitor() != null) {
+				IMonitor mon = context.getMonitor();
+				mon.worked(1);
+			}
+		} finally {
+			hdf5Reader.close();
 		}
 	}
 	
