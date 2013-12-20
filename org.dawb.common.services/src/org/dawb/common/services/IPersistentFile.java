@@ -49,6 +49,14 @@ import uk.ac.diamond.scisoft.analysis.roi.IROI;
  * required to build a IDiffractionMetadata object. <br>
  * <br>
  * After using an IPersistentFile, the method {@link close()} needs to be called.
+ * <code>
+ * //Get file ref
+ * try {
+ *    // save some things
+ * } finally {
+ *    fileref.close();
+ * }
+ * </code>
  * <br>
  * 
  * @author wqk87977
