@@ -2,10 +2,17 @@ package org.dawnsci.persistence.workflow.xml;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.StringWriter;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerFactoryConfigurationError;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +34,7 @@ import org.xml.sax.SAXException;
  */
 public class MomlUpdater {
 
-	private static final Logger Logger = LoggerFactory.getLogger(MomlUpdater.class);
+	private static final Logger logger = LoggerFactory.getLogger(MomlUpdater.class);
 	private static final String EXPRESSION_MODE = "Expression Mode";
 
 	/**
@@ -69,30 +76,53 @@ public class MomlUpdater {
 				}
 			}
 			// return the resulting XML tree as a String
-			return printXMLTree(baseNode);
-
+//			return docToStringUsingLSSerializer(baseNode.getOwnerDocument());
+			return docToStringUsingTransformer(baseNode.getOwnerDocument());
 		} catch (ParserConfigurationException e) {
-			Logger.error("ParserConfigurationException:"+e);
+			logger.error("ParserConfigurationException:"+e);
 			return null;
 		} catch (SAXException e) {
-			Logger.error("SAXException:"+e);
+			logger.error("SAXException:"+e);
 			return null;
 		} catch (IOException e) {
 			e.printStackTrace();
-			Logger.error("IOException:"+e);
+			logger.error("IOException:"+e);
+			return null;
+		} catch (TransformerFactoryConfigurationError e) {
+			logger.error("TransformerFactoryConfigurationError:"+e);
+			e.printStackTrace();
+			return null;
+		} catch (TransformerException e) {
+			e.printStackTrace();
+			logger.error("TransformerException:"+e);
 			return null;
 		}
 	}
 
 	/**
-	 * Method that returns a DOM node as a String
+	 * Method that returns a DOM document as a String using LSSerializer
 	 * @param node
 	 * @return a string
 	 */
-	public static String printXMLTree(Node node) {
-		DOMImplementationLS lsImpl = (DOMImplementationLS)node.getOwnerDocument().getImplementation().getFeature("LS", "3.0");
+	public static String docToStringUsingLSSerializer(Document doc) {
+		Node node = doc.getFirstChild();
+
+		DOMImplementationLS lsImpl = (DOMImplementationLS)doc.getImplementation().getFeature("LS", "3.0");
 		LSSerializer serializer = lsImpl.createLSSerializer();
 		serializer.getDomConfig().setParameter("xml-declaration", true); //by default its true, so set it to false to get String without xml-declaration
 		return serializer.writeToString(node);
+	}
+
+	/**
+	 * Method that returns a DOM document as a String using Transformer
+	 * This method is preferred as it adds the XML declaration attribute "standalone"
+	 * @param node
+	 * @return a string
+	 */
+	public static String docToStringUsingTransformer(Document doc) throws TransformerFactoryConfigurationError, TransformerException {
+		Transformer transformer = TransformerFactory.newInstance().newTransformer();
+		StringWriter stw = new StringWriter();  
+		transformer.transform(new DOMSource(doc), new StreamResult(stw));  
+		return stw.toString();
 	}
 }
