@@ -46,4 +46,12 @@ public interface IPersistenceService {
 	 */
 	public String marshal(Object obj);
 
+	/**
+	 * Returns a MOML file (serialised as a string) without the expression mode nodes
+	 * @param filePath
+	 *           The full file path of the MOML file
+	 * @return string
+	 *           updated XML tree as a string
+	 */
+	public String deleteExpressionModeFromMoml(String filePath);
 }

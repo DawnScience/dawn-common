@@ -20,6 +20,7 @@ import org.dawb.common.services.IPersistentFile;
 import org.dawb.hdf5.HierarchicalDataFactory;
 import org.dawb.hdf5.IHierarchicalDataFile;
 import org.dawnsci.persistence.json.JacksonMarshaller;
+import org.dawnsci.persistence.workflow.xml.MomlUpdater;
 
 /**
  * Implementation of IPersistenceService<br>
@@ -56,5 +57,10 @@ public class PersistenceServiceImpl implements IPersistenceService{
 	@Override
 	public String marshal(Object obj) {
 		return new JacksonMarshaller().marshal(obj);
+	}
+
+	@Override
+	public String deleteExpressionModeFromMoml(String filePath) {
+		return MomlUpdater.updateMoml(filePath);
 	}
 }
