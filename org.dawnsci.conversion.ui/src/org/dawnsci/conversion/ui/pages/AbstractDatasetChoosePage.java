@@ -105,7 +105,7 @@ public abstract class AbstractDatasetChoosePage extends ResourceChoosePage imple
 		final Label chooseData = new Label(main, SWT.LEFT);
 		chooseData.setText("Please tick data to export:");
 		
-		final ToolBarManager toolMan = new ToolBarManager(SWT.RIGHT|SWT.FLAT);
+		final ToolBarManager toolMan = new ToolBarManager(SWT.RIGHT|SWT.FLAT|SWT.WRAP);
         createActions(toolMan);
         toolMan.createControl(main);
         toolMan.getControl().setLayoutData(new GridData(SWT.RIGHT, SWT.FILL, true, false));
