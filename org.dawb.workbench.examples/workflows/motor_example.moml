@@ -1,13 +1,39 @@
 <?xml version="1.0" standalone="no"?>
 <!DOCTYPE entity PUBLIC "-//UC Berkeley//DTD MoML 1//EN"
     "http://ptolemy.eecs.berkeley.edu/xml/dtd/MoML_1.dtd">
-<entity name="newModel" class="ptolemy.actor.TypedCompositeActor" source="/mntdirect/_scisoft/users/svensson/workspaces/dawn_runtime/test_forkjoin/workflows/workflow_examples/motor_example.moml">
+<entity name="newModel" class="ptolemy.actor.TypedCompositeActor" source="C:\Work\runtime-uk.ac.diamond.dawn.product_1\workflows\examples\motor_example.moml">
     <property name="_createdBy" class="ptolemy.kernel.attributes.VersionAttribute" value="7.0.1">
     </property>
     <property name="_workbenchVersion" class="ptolemy.kernel.attributes.VersionAttribute" value="0.8.2">
     </property>
-    <property name="Director" class="com.isencia.passerelle.domain.cap.Director">
-        <property name="_location" class="ptolemy.kernel.util.Location" value="{20, 20}">
+    <property name="Thread Director" class="com.isencia.passerelle.domain.cap.Director">
+        <property name="timeResolution" class="ptolemy.moml.SharedParameter" value="1E-10">
+        </property>
+        <property name="Properties File" class="ptolemy.data.expr.FileParameter" value="">
+        </property>
+        <property name="__directorAdapter" class="com.isencia.passerelle.ext.impl.DefaultDirectorAdapter">
+        </property>
+        <property name="Stop for unhandled Error" class="ptolemy.data.expr.Parameter" value="false">
+            <property name="style" class="ptolemy.actor.gui.style.CheckBoxStyle">
+            </property>
+        </property>
+        <property name="Mock Mode" class="ptolemy.data.expr.Parameter" value="false">
+            <property name="style" class="ptolemy.actor.gui.style.CheckBoxStyle">
+            </property>
+        </property>
+        <property name="Expert Modeler" class="ptolemy.data.expr.Parameter" value="false">
+            <property name="style" class="ptolemy.actor.gui.style.CheckBoxStyle">
+            </property>
+        </property>
+        <property name="Validate Initialization" class="ptolemy.data.expr.Parameter" value="true">
+            <property name="style" class="ptolemy.actor.gui.style.CheckBoxStyle">
+            </property>
+        </property>
+        <property name="Validate Iteration" class="ptolemy.data.expr.Parameter" value="false">
+            <property name="style" class="ptolemy.actor.gui.style.CheckBoxStyle">
+            </property>
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{28.0, 23.0}">
         </property>
     </property>
     <entity name="Read Values" class="org.dawb.passerelle.actors.hardware.TangoMotorTransformer">
@@ -21,7 +47,7 @@
         </property>
         <property name="Motors" class="org.dawb.passerelle.actors.hardware.motor.MotorParameter" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt; &lt;java version=&quot;1.6.0_23&quot; class=&quot;java.beans.XMLDecoder&quot;&gt;  &lt;object class=&quot;org.dawb.passerelle.actors.hardware.motor.MotorContainer&quot;&gt;   &lt;void property=&quot;expressions&quot;&gt;    &lt;void method=&quot;add&quot;&gt;     &lt;object class=&quot;org.dawb.passerelle.actors.hardware.motor.MotorBean&quot;&gt;      &lt;void property=&quot;motorName&quot;&gt;       &lt;string&gt;motors/phi&lt;/string&gt;      &lt;/void&gt;      &lt;void property=&quot;readOnly&quot;&gt;       &lt;boolean&gt;true&lt;/boolean&gt;      &lt;/void&gt;     &lt;/object&gt;    &lt;/void&gt;    &lt;void method=&quot;add&quot;&gt;     &lt;object class=&quot;org.dawb.passerelle.actors.hardware.motor.MotorBean&quot;&gt;      &lt;void property=&quot;motorName&quot;&gt;       &lt;string&gt;motors/kap1&lt;/string&gt;      &lt;/void&gt;      &lt;void property=&quot;readOnly&quot;&gt;       &lt;boolean&gt;true&lt;/boolean&gt;      &lt;/void&gt;     &lt;/object&gt;    &lt;/void&gt;   &lt;/void&gt;  &lt;/object&gt; &lt;/java&gt; ">
         </property>
-        <property name="_location" class="ptolemy.kernel.util.Location" value="{20.0, 146.0}">
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{121.0, 145.0}">
         </property>
     </entity>
     <entity name="Review" class="org.dawb.passerelle.actors.ui.UserModifyTransformer">
@@ -37,7 +63,9 @@
         </property>
         <property name="User Input Type" class="org.dawb.passerelle.actors.ui.UserModifyTransformer$1" value="Edit with dialog (non-blocking)">
         </property>
-        <property name="_location" class="ptolemy.kernel.util.Location" value="{131.0, 146.0}">
+        <property name="Automatic Mode Variable" class="ptolemy.data.expr.StringParameter" value="automatic_mode">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{232.0, 145.0}">
         </property>
     </entity>
     <entity name="Data Export" class="org.dawb.passerelle.actors.data.DataExportTransformer">
@@ -55,7 +83,7 @@
         </property>
         <property name="Output" class="com.isencia.passerelle.util.ptolemy.ResourceParameter" value="/${project_name}/output/">
         </property>
-        <property name="_location" class="ptolemy.kernel.util.Location" value="{333.0, 146.0}">
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{434.0, 145.0}">
         </property>
     </entity>
     <entity name="Open File" class="org.dawb.passerelle.actors.file.OpenFileSink">
@@ -69,7 +97,7 @@
         </property>
         <property name="File Path" class="ptolemy.data.expr.StringParameter" value="${file_path}">
         </property>
-        <property name="_location" class="ptolemy.kernel.util.Location" value="{440.0, 146.0}">
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{541.0, 145.0}">
         </property>
     </entity>
     <entity name="Write Values" class="org.dawb.passerelle.actors.hardware.TangoMotorTransformer">
@@ -83,8 +111,60 @@
         </property>
         <property name="Motors" class="org.dawb.passerelle.actors.hardware.motor.MotorParameter" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt; &lt;java version=&quot;1.6.0_23&quot; class=&quot;java.beans.XMLDecoder&quot;&gt;  &lt;object class=&quot;org.dawb.passerelle.actors.hardware.motor.MotorContainer&quot;&gt;   &lt;void property=&quot;expressions&quot;&gt;    &lt;void method=&quot;add&quot;&gt;     &lt;object class=&quot;org.dawb.passerelle.actors.hardware.motor.MotorBean&quot;&gt;      &lt;void property=&quot;expression&quot;&gt;       &lt;string&gt;phi&lt;/string&gt;      &lt;/void&gt;      &lt;void property=&quot;motorName&quot;&gt;       &lt;string&gt;motors/phi&lt;/string&gt;      &lt;/void&gt;     &lt;/object&gt;    &lt;/void&gt;    &lt;void method=&quot;add&quot;&gt;     &lt;object class=&quot;org.dawb.passerelle.actors.hardware.motor.MotorBean&quot;&gt;      &lt;void property=&quot;expression&quot;&gt;       &lt;string&gt;kap1&lt;/string&gt;      &lt;/void&gt;      &lt;void property=&quot;motorName&quot;&gt;       &lt;string&gt;motors/kap1&lt;/string&gt;      &lt;/void&gt;     &lt;/object&gt;    &lt;/void&gt;   &lt;/void&gt;  &lt;/object&gt; &lt;/java&gt; ">
         </property>
-        <property name="_location" class="ptolemy.kernel.util.Location" value="{232.0, 146.0}">
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{333.0, 145.0}">
         </property>
+    </entity>
+    <entity name="Scalar" class="org.dawb.passerelle.actors.data.Scalar">
+        <property name="Receiver Q Capacity (-1)" class="ptolemy.data.expr.Parameter" value="-1">
+        </property>
+        <property name="Receiver Q warning size (-1)" class="ptolemy.data.expr.Parameter" value="-1">
+        </property>
+        <property name="_icon" class="com.isencia.passerelle.actor.gui.EditorIcon">
+        </property>
+        <property name="Buffer time (ms)" class="ptolemy.data.expr.Parameter" value="0">
+        </property>
+        <property name="_break_point" class="ptolemy.data.expr.Parameter" value="false">
+        </property>
+        <property name="Name" class="ptolemy.data.expr.StringParameter" value="x">
+        </property>
+        <property name="Value" class="org.dawb.passerelle.actors.data.Scalar$RangeParameter" value="1">
+        </property>
+        <property name="Decimal Format" class="ptolemy.data.expr.StringParameter" value="">
+        </property>
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{13.0, 152.0}">
+        </property>
+        <port name="requestFinish" class="com.isencia.passerelle.core.ControlPort">
+            <property name="input"/>
+            <property name="multiport"/>
+            <property name="control" class="ptolemy.kernel.util.StringAttribute">
+            </property>
+        </port>
+        <port name="error" class="com.isencia.passerelle.core.ErrorPort">
+            <property name="output"/>
+            <property name="multiport"/>
+            <property name="error" class="ptolemy.kernel.util.StringAttribute">
+            </property>
+        </port>
+        <port name="hasFired" class="com.isencia.passerelle.core.ControlPort">
+            <property name="output"/>
+            <property name="multiport"/>
+            <property name="control" class="ptolemy.kernel.util.StringAttribute">
+            </property>
+        </port>
+        <port name="hasFinished" class="com.isencia.passerelle.core.ControlPort">
+            <property name="output"/>
+            <property name="multiport"/>
+            <property name="control" class="ptolemy.kernel.util.StringAttribute">
+            </property>
+        </port>
+        <port name="output" class="com.isencia.passerelle.core.Port">
+            <property name="output"/>
+            <property name="multiport"/>
+        </port>
+        <port name="trigger" class="com.isencia.passerelle.core.Port">
+            <property name="input"/>
+            <property name="multiport"/>
+        </port>
     </entity>
     <relation name="_R" class="ptolemy.actor.TypedIORelation">
         <property name="width" class="ptolemy.data.expr.Parameter" value="1">
@@ -102,6 +182,11 @@
         <property name="width" class="ptolemy.data.expr.Parameter" value="1">
         </property>
     </relation>
+    <relation name="_R_2" class="ptolemy.actor.TypedIORelation">
+        <property name="width" class="ptolemy.data.expr.Parameter" value="1">
+        </property>
+    </relation>
+    <link port="Read Values.input" relation="_R_2"/>
     <link port="Read Values.output" relation="_R"/>
     <link port="Review.input" relation="_R"/>
     <link port="Review.output" relation="_R2"/>
@@ -110,4 +195,5 @@
     <link port="Open File.input" relation="_R3"/>
     <link port="Write Values.input" relation="_R2"/>
     <link port="Write Values.output" relation="_R4"/>
+    <link port="Scalar.output" relation="_R_2"/>
 </entity>
