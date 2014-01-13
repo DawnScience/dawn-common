@@ -9,10 +9,6 @@
  */ 
 package org.dawb.gda.extensions;
 
-import java.util.Hashtable;
-
-import org.dawb.gda.extensions.util.ImageService;
-import org.dawnsci.plotting.api.histogram.IImageService;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
@@ -40,9 +36,6 @@ public class Activator extends AbstractUIPlugin {
 	 */
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
-		Hashtable<String, String> props = new Hashtable<String, String>(1);
-		props.put("description", "A service used to get colouring information for drawing images of synchrotron data.");
-		context.registerService(IImageService.class, new ImageService(), props);
 		plugin = this;
 	}
 
