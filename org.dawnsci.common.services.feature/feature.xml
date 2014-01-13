@@ -56,17 +56,16 @@
          unpack="false"/>
 
    <plugin
-         id="org.dawnsci.plotting.service"
+         id="org.dawnsci.jexl"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.dawnsci.jexl"
+         id="org.dawnsci.plotting.services"
          download-size="0"
          install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
 </feature>
