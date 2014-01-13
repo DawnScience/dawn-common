@@ -43,7 +43,7 @@
          unpack="false"/>
 
    <plugin
-         id="org.dawnsci.rcp.histogram"
+         id="org.dawnsci.plotting.histogram"
          download-size="0"
          install-size="0"
          version="0.0.0"/>
@@ -56,7 +56,7 @@
          unpack="false"/>
 
    <plugin
-         id="org.dawb.gda.extensions"
+         id="org.dawnsci.plotting.service"
          download-size="0"
          install-size="0"
          version="0.0.0"
