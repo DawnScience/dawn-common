@@ -15,17 +15,23 @@ import java.awt.image.DirectColorModel;
 import java.awt.image.IndexColorModel;
 import java.awt.image.WritableRaster;
 
+import org.dawb.common.services.ServiceManager;
+import org.dawnsci.plotting.api.histogram.HistogramBound;
 import org.dawnsci.plotting.api.histogram.IImageService;
 import org.dawnsci.plotting.api.histogram.IPaletteService;
 import org.dawnsci.plotting.api.histogram.ImageServiceBean;
 import org.dawnsci.plotting.api.histogram.ImageServiceBean.HistoType;
 import org.dawnsci.plotting.api.histogram.ImageServiceBean.ImageOrigin;
+import org.dawnsci.plotting.api.preferences.BasePlottingConstants;
+import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.eclipse.ui.services.AbstractServiceFactory;
 import org.eclipse.ui.services.IServiceLocator;
 
@@ -581,6 +587,32 @@ public class ImageService extends AbstractServiceFactory implements IImageServic
 			}
 			return bufferedImage;
 		}
+	}
+
+	@Override
+	public ImageServiceBean createBeanFromPreferences() {
+		
+		IPreferenceStore store            = new ScopedPreferenceStore(InstanceScope.INSTANCE, "org.dawnsci.plotting");
+		ImageServiceBean imageServiceBean = new ImageServiceBean();
+		imageServiceBean.setOrigin(ImageOrigin.forLabel(store.getString(BasePlottingConstants.ORIGIN_PREF)));
+		imageServiceBean.setHistogramType(HistoType.forLabel(store.getString(BasePlottingConstants.HISTO_PREF)));
+		imageServiceBean.setMinimumCutBound(HistogramBound.fromString(store.getString(BasePlottingConstants.MIN_CUT)));
+		imageServiceBean.setMaximumCutBound(HistogramBound.fromString(store.getString(BasePlottingConstants.MAX_CUT)));
+		imageServiceBean.setNanBound(HistogramBound.fromString(store.getString(BasePlottingConstants.NAN_CUT)));
+		imageServiceBean.setLo(store.getDouble(BasePlottingConstants.HISTO_LO));
+		imageServiceBean.setHi(store.getDouble(BasePlottingConstants.HISTO_HI));		
+		
+		try {
+			IPaletteService pservice = (IPaletteService)ServiceManager.getService(IPaletteService.class);
+			if (pservice !=null) {
+				final String scheme = store.getString(BasePlottingConstants.COLOUR_SCHEME);
+				imageServiceBean.setPalette(pservice.getPaletteData(scheme));
+			}
+		} catch (Exception e) {
+			// Ignored
+		}
+	
+		return imageServiceBean;
 	}
 
 }

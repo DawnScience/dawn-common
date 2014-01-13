@@ -129,6 +129,9 @@ public class AVIImageConverter extends AbstractImageConversion {
 				plotImageData.setConstantRange(true);
 				if (getImageServiceBean()!=null) {
 					plotImageData.setImageServiceBean(getImageServiceBean());
+				} else {
+					// We will generate an image service bean 
+					plotImageData.setImageServiceBean(imageService.createBeanFromPreferences());
 				}
 			}
 						
