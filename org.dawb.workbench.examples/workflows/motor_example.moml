@@ -1,7 +1,7 @@
 <?xml version="1.0" standalone="no"?>
 <!DOCTYPE entity PUBLIC "-//UC Berkeley//DTD MoML 1//EN"
     "http://ptolemy.eecs.berkeley.edu/xml/dtd/MoML_1.dtd">
-<entity name="newModel" class="ptolemy.actor.TypedCompositeActor" source="C:\Work\runtime-uk.ac.diamond.dawn.product_1\workflows\examples\motor_example.moml">
+<entity name="newModel" class="ptolemy.actor.TypedCompositeActor" source="/mntdirect/_scisoft/users/svensson/workspaces/dawn/runtime-org.dawnsci.base.product/workflows/dawn_examples/motor_example.moml">
     <property name="_createdBy" class="ptolemy.kernel.attributes.VersionAttribute" value="7.0.1">
     </property>
     <property name="_workbenchVersion" class="ptolemy.kernel.attributes.VersionAttribute" value="0.8.2">
@@ -11,27 +11,15 @@
         </property>
         <property name="Properties File" class="ptolemy.data.expr.FileParameter" value="">
         </property>
-        <property name="__directorAdapter" class="com.isencia.passerelle.ext.impl.DefaultDirectorAdapter">
-        </property>
         <property name="Stop for unhandled Error" class="ptolemy.data.expr.Parameter" value="false">
-            <property name="style" class="ptolemy.actor.gui.style.CheckBoxStyle">
-            </property>
         </property>
         <property name="Mock Mode" class="ptolemy.data.expr.Parameter" value="false">
-            <property name="style" class="ptolemy.actor.gui.style.CheckBoxStyle">
-            </property>
         </property>
         <property name="Expert Modeler" class="ptolemy.data.expr.Parameter" value="false">
-            <property name="style" class="ptolemy.actor.gui.style.CheckBoxStyle">
-            </property>
         </property>
         <property name="Validate Initialization" class="ptolemy.data.expr.Parameter" value="true">
-            <property name="style" class="ptolemy.actor.gui.style.CheckBoxStyle">
-            </property>
         </property>
         <property name="Validate Iteration" class="ptolemy.data.expr.Parameter" value="false">
-            <property name="style" class="ptolemy.actor.gui.style.CheckBoxStyle">
-            </property>
         </property>
         <property name="_location" class="ptolemy.kernel.util.Location" value="{28.0, 23.0}">
         </property>
@@ -114,7 +102,7 @@
         <property name="_location" class="ptolemy.kernel.util.Location" value="{333.0, 145.0}">
         </property>
     </entity>
-    <entity name="Scalar" class="org.dawb.passerelle.actors.data.Scalar">
+    <entity name="Start" class="org.dawb.passerelle.actors.Start">
         <property name="Receiver Q Capacity (-1)" class="ptolemy.data.expr.Parameter" value="-1">
         </property>
         <property name="Receiver Q warning size (-1)" class="ptolemy.data.expr.Parameter" value="-1">
@@ -123,15 +111,7 @@
         </property>
         <property name="Buffer time (ms)" class="ptolemy.data.expr.Parameter" value="0">
         </property>
-        <property name="_break_point" class="ptolemy.data.expr.Parameter" value="false">
-        </property>
-        <property name="Name" class="ptolemy.data.expr.StringParameter" value="x">
-        </property>
-        <property name="Value" class="org.dawb.passerelle.actors.data.Scalar$RangeParameter" value="1">
-        </property>
-        <property name="Decimal Format" class="ptolemy.data.expr.StringParameter" value="">
-        </property>
-        <property name="_location" class="ptolemy.kernel.util.Location" value="{13.0, 152.0}">
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{17.0, 145.0}">
         </property>
         <port name="requestFinish" class="com.isencia.passerelle.core.ControlPort">
             <property name="input"/>
@@ -159,10 +139,6 @@
         </port>
         <port name="output" class="com.isencia.passerelle.core.Port">
             <property name="output"/>
-            <property name="multiport"/>
-        </port>
-        <port name="trigger" class="com.isencia.passerelle.core.Port">
-            <property name="input"/>
             <property name="multiport"/>
         </port>
     </entity>
@@ -195,5 +171,5 @@
     <link port="Open File.input" relation="_R3"/>
     <link port="Write Values.input" relation="_R2"/>
     <link port="Write Values.output" relation="_R4"/>
-    <link port="Scalar.output" relation="_R_2"/>
+    <link port="Start.output" relation="_R_2"/>
 </entity>
