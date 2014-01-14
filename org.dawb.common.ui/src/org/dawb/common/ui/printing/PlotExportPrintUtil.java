@@ -78,6 +78,8 @@ import org.w3c.dom.Element;
 public class PlotExportPrintUtil {
 
 	public static final String[] FILE_TYPES = new String[] { "PNG/JPEG File", "Postscript File", "SVG File" };
+	public static final String[] FILE_FORMATS = new String[] { "png", "jpg", "jpeg", "ps", "eps", "svg" };
+
 	private static final Logger logger = LoggerFactory.getLogger(PlotExportPrintUtil.class);
 	private static final String tempDirectory = System.getProperty("java.io.tmpdir");
 
@@ -261,7 +263,9 @@ public class PlotExportPrintUtil {
 	 */
 	public synchronized static void saveGraph(String filename, String fileType, Image image, final IFigure printableFigure) 
 			throws Exception {
-		if (!Arrays.asList(FILE_TYPES).contains(fileType))
+		// test for all possible file types
+		if (!Arrays.asList(FILE_FORMATS).contains(fileType.toLowerCase())
+				&& !Arrays.asList(FILE_TYPES).contains(fileType))
 			throw new RuntimeException("Cannot deal with file type " + fileType);
 		// If they have specified the file type in the file name, use that.
 		String lname = filename.toLowerCase();
