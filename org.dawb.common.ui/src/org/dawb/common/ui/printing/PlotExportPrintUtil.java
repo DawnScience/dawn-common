@@ -261,7 +261,13 @@ public class PlotExportPrintUtil {
 	 */
 	public synchronized static void saveGraph(String filename, String fileType, Image image, final IFigure printableFigure) 
 			throws Exception {
-		if (!Arrays.asList(FILE_TYPES).contains(fileType))
+		if (!fileType.toLowerCase().contains("ps")
+				&& !fileType.toLowerCase().contains("eps")
+				&& !fileType.toLowerCase().contains("jpg")
+				&& !fileType.toLowerCase().contains("jpeg")
+				&& !fileType.toLowerCase().contains("png")
+				&& !fileType.toLowerCase().contains("svg")
+				&& !Arrays.asList(FILE_TYPES).contains(fileType))
 			throw new RuntimeException("Cannot deal with file type " + fileType);
 		// If they have specified the file type in the file name, use that.
 		String lname = filename.toLowerCase();
