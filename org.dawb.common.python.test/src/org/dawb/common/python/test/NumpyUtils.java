@@ -1,3 +1,4 @@
+package org.dawb.common.python.test;
 /*
  * Copyright (c) 2012 European Synchrotron Radiation Facility,
  *                    Diamond Light Source Ltd.
@@ -7,7 +8,7 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */ 
-package org.dawb.common.python;
+
 
 import java.util.LinkedHashMap;
 

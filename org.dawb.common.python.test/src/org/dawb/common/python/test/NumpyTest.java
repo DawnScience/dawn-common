@@ -13,7 +13,6 @@ import java.util.Arrays;
 
 import jep.Jep;
 
-import org.dawb.common.python.NumpyUtils;
 import org.dawb.common.util.test.TestUtils;
 import org.junit.Test;
 

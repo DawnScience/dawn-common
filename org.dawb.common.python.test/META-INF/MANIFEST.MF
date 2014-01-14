@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Test for python plugin
+Bundle-SymbolicName: org.dawb.common.python.test
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: Diamond Light Source
+Fragment-Host: org.dawb.common.python
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Require-Bundle: uk.ac.diamond.scisoft.analysis;bundle-version="1.3.0"
