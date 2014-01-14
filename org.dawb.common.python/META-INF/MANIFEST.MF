@@ -27,5 +27,4 @@ Import-Package: com.isencia.util.commandline;version="7.0.0",
  org.python.pydev.runners;bundle-version="[3.0.0,3.1.0)",
  org.python.pydev.ui.interpreters;bundle-version="[3.0.0,3.1.0)",
  org.slf4j
-Export-Package: org.dawb.common.python,
- org.dawb.common.python.test
+Export-Package: org.dawb.common.python
