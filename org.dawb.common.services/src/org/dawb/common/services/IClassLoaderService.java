@@ -16,7 +16,7 @@ package org.dawb.common.services;
  * communicating.
  * 
  * The class loader will include things like AbstractDataset and beans used
- * to commicate tool data.
+ * to communicate tool data.
  * 
  * Usage:
  * <code>
@@ -36,7 +36,7 @@ package org.dawb.common.services;
 public interface IClassLoaderService {
 
 	/**
-	 * Call to activate a classloader with data analysis classes available.
+	 * Call to activate a class loader with data analysis classes available
 	 *  
 	 * @param active
 	 */
