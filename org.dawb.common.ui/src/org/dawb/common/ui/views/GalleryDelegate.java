@@ -351,4 +351,8 @@ public class GalleryDelegate {
 		return info.getPath(itemCount);
 	}
 
+	public boolean isVisible() {
+		return gallery.isVisible();
+	}
+
 }
