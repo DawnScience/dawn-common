@@ -4,6 +4,8 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -23,12 +25,18 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.ISelectionProvider;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.nebula.widgets.gallery.DefaultGalleryGroupRenderer;
 import org.eclipse.nebula.widgets.gallery.DefaultGalleryItemRenderer;
 import org.eclipse.nebula.widgets.gallery.Gallery;
 import org.eclipse.nebula.widgets.gallery.GalleryItem;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseListener;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
@@ -49,7 +57,7 @@ import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
  * @author fcp94556
  *
  */
-public class GalleryDelegate {
+public class GalleryDelegate implements SelectionListener {
 	
 	private static final Logger logger = LoggerFactory.getLogger(GalleryDelegate.class);
 
@@ -193,6 +201,27 @@ public class GalleryDelegate {
 			}
 		}
         return ys;
+	}
+	
+	protected List<GallerySelection> getSelectionPaths(GalleryItem[] items) {
+		
+		final List<GallerySelection> sels = new ArrayList<GallerySelection>(11);
+		for (GalleryItem item : items) {
+			final ImageItem ii = new ImageItem();
+			ii.setIndex(item.getItemCount());
+			ii.setItem(item);
+            try {
+            	GallerySelection sel = new GallerySelection();
+            	sel.setPath(info.getPath(ii.getIndex()));
+            	sel.setName(selectionDataLabel+" "+info.getItemName(item.getItemCount(), false));
+            	sel.setIndex(ii.getIndex());
+            	sels.add(sel);
+			} catch (Exception e) {
+				logger.error("Cannot slice ", e);
+				continue;
+			}
+		}
+        return sels;
 	}
 
 	
@@ -353,6 +382,65 @@ public class GalleryDelegate {
 
 	public boolean isVisible() {
 		return gallery.isVisible();
+	}
+
+	private ISelectionProvider selectionProvider;
+	/**
+	 * Creates and returns a new selection provider that will notify 
+	 * when any item the gallery changes.
+	 * 
+	 * The array of selections sent by the provider will be the string paths to the data sets.
+	 */
+	public ISelectionProvider createSelectionProvider() {
+		selectionProvider = new ISelectionProvider() {
+			
+			Collection<ISelectionChangedListener>  listeners = new LinkedHashSet<ISelectionChangedListener>();
+			@Override
+			public void setSelection(ISelection selection) {
+				// TODO Set the UI?
+				
+				for (ISelectionChangedListener l : listeners) {
+					l.selectionChanged(new SelectionChangedEvent(this, selection));
+				}
+			}
+			
+			@Override
+			public void removeSelectionChangedListener(ISelectionChangedListener listener) {
+				listeners.remove(listener);
+			}
+			@Override
+			public void addSelectionChangedListener(ISelectionChangedListener listener) {
+				listeners.add(listener);
+			}
+			
+			@Override
+			public ISelection getSelection() {
+				final GalleryItem[] items = GalleryDelegate.this.getSelection();
+				if (items==null || items.length<1) return null;
+				return new StructuredSelection(getSelectionPaths(items));
+			}
+			
+		};
+		
+		gallery.addSelectionListener(this);
+		
+		return selectionProvider;
+	}
+	
+	public ISelectionProvider getSelectionProvider() {
+		return selectionProvider;
+	}
+	
+	@Override
+	public void widgetSelected(SelectionEvent e) {
+	
+		ISelection selection  = selectionProvider.getSelection();
+		selectionProvider.setSelection(selection);
+	}
+	
+	@Override
+	public void widgetDefaultSelected(SelectionEvent e) {
+		
 	}
 
 }
