@@ -1,7 +1,7 @@
 <?xml version="1.0" standalone="no"?>
 <!DOCTYPE entity PUBLIC "-//UC Berkeley//DTD MoML 1//EN"
     "http://ptolemy.eecs.berkeley.edu/xml/dtd/MoML_1.dtd">
-<entity name="newModel" class="ptolemy.actor.TypedCompositeActor" source="/mntdirect/_scisoft/users/svensson/workspaces/dawn_runtime/test_forkjoin/workflows/workflow_examples/python_numpy_example1.moml">
+<entity name="newModel" class="ptolemy.actor.TypedCompositeActor" source="/mntdirect/_scisoft/users/svensson/workspaces/dawn/runtime-org.dawnsci.base.product/workflows/unit_tests/python_numpy_example1.moml">
     <property name="_createdBy" class="ptolemy.kernel.attributes.VersionAttribute" value="7.0.1">
     </property>
     <property name="_workbenchVersion" class="ptolemy.kernel.attributes.VersionAttribute" value="0.8.2">
@@ -52,8 +52,6 @@
         <property name="Interpreter Type" class="org.dawb.passerelle.actors.scripts.PythonScript$1" value="Python">
         </property>
         <property name="Dataset Outputs" class="ptolemy.data.expr.StringParameter" value="lnI0It">
-        </property>
-        <property name="Python Debug" class="org.dawb.passerelle.actors.scripts.PythonScript$3" value="Start new python rcp server">
         </property>
         <property name="_location" class="ptolemy.kernel.util.Location" value="{179.0, 156.0}">
         </property>
