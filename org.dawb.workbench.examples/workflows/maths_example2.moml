@@ -1,7 +1,7 @@
 <?xml version="1.0" standalone="no"?>
 <!DOCTYPE entity PUBLIC "-//UC Berkeley//DTD MoML 1//EN"
     "http://ptolemy.eecs.berkeley.edu/xml/dtd/MoML_1.dtd">
-<entity name="newModel" class="ptolemy.actor.TypedCompositeActor" source="/mntdirect/_scisoft/dawn/mx/workflow/workflows/examples/maths_example2.moml">
+<entity name="newModel" class="ptolemy.actor.TypedCompositeActor" source="/mntdirect/_scisoft/users/svensson/workspaces/dawn/runtime-org.dawnsci.base.product/workflows/unit_tests/maths_example2.moml">
     <property name="_createdBy" class="ptolemy.kernel.attributes.VersionAttribute" value="7.0.1">
     </property>
     <property name="_workbenchVersion" class="ptolemy.kernel.attributes.VersionAttribute" value="0.8.2">
@@ -77,10 +77,6 @@
         </property>
         <property name="Python Interpreter Command" class="ptolemy.data.expr.StringParameter" value="python">
         </property>
-        <property name="Python Link" class="org.dawb.passerelle.actors.scripts.PythonScript$2" value="RPC">
-        </property>
-        <property name="Python Debug" class="org.dawb.passerelle.actors.scripts.PythonScript$3" value="Start new python rcp server">
-        </property>
         <property name="_location" class="ptolemy.kernel.util.Location" value="{173.0, 288.0}">
         </property>
     </entity>
@@ -104,10 +100,6 @@
         <property name="Dataset Outputs" class="ptolemy.data.expr.StringParameter" value="image1, image2, image3">
         </property>
         <property name="Python Interpreter Command" class="ptolemy.data.expr.StringParameter" value="python">
-        </property>
-        <property name="Python Link" class="org.dawb.passerelle.actors.scripts.PythonScript$2" value="RPC">
-        </property>
-        <property name="Python Debug" class="org.dawb.passerelle.actors.scripts.PythonScript$3" value="Start new python rcp server">
         </property>
         <property name="_location" class="ptolemy.kernel.util.Location" value="{173.0, 150.0}">
         </property>
