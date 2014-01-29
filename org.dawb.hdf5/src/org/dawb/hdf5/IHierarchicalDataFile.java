@@ -27,14 +27,17 @@ import ncsa.hdf.object.HObject;
  * @author gerring
  *
  */
-public interface IHierarchicalDataFile {
+public interface IHierarchicalDataFile extends AutoCloseable {
 
 	public static final int NUMBER_ARRAY              = 17061;
 	public static final int SCALAR                    = 17063;
 	public static final int TEXT                      = 17062;
 	/**
 	 * Must be called to close the file.
-	 * @throws Exception
+	 * 
+     * For historical reasons (close was written before AutoCloseable was
+     * added) this method does not follow strongly encouragement not to throw
+     * Exception. 
 	 */
 	public void close() throws Exception;
 	
@@ -95,9 +98,22 @@ public interface IHierarchicalDataFile {
 	 * e.g. /entry1/data@napimount
 	 * @param fullAttributeKey
 	 * @return
+	 * @throws NullPointerException if path (part before @) does not exist 
+	 * in file
+	 * @throws ArrayIndexOutOfBoundsException if there is no @ in fullAttributeKey
 	 */
 	public String getAttributeValue(String fullAttributeKey) throws Exception;
 
+	/**
+	 * Reads all the attributes for the given object and returns a Map of attribute
+	 * name to attribute values. NOTE unlike {@link #getAttributeValues()} which is
+	 * recursive, this method only gets the attribute for the given path.
+	 * 
+	 * @return map of attribute names (part after the @) to attribute values or 
+	 * <code>null</code> if path does not exist.
+	 */
+	Map<String, Object> getAttributeValues(String fullPath);
+	
 	/**
 	 * Reads all the attribute Lists from the object and puts it in a map of the full paths
 	 * to the attributes using paths of the form: <node full path>@<attribute name>

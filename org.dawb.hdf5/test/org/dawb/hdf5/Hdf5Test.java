@@ -8,7 +8,10 @@
  */ 
 package org.dawb.hdf5;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.File;
+import java.util.Map;
 
 import ncsa.hdf.hdf5lib.H5;
 import ncsa.hdf.hdf5lib.HDF5Constants;
@@ -213,6 +216,60 @@ public class Hdf5Test {
 		catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	@Test
+	public void testAutoCloseable() throws Exception {
+		// this is really a compile test to make sure that IHierarchicalDataFile
+		// can be used with a try-with-resources statement (i.e. is
+		// AutoCloseable)
+		String absolutePath = Hdf5TestUtils
+				.getAbsolutePath("test/org/dawb/hdf5/FeKedge_1_15.nxs");
+		try (IHierarchicalDataFile reader = HierarchicalDataFactory
+				.getReader(absolutePath)) {
+		}
+	}
+
+	@Test
+	public void testGetAttributeValues_String() throws Exception {
+		String absolutePath = Hdf5TestUtils
+				.getAbsolutePath("test/org/dawb/hdf5/FeKedge_1_15.nxs");
+		try (IHierarchicalDataFile reader = HierarchicalDataFactory
+				.getReader(absolutePath)) {
+			Map<String, Object> attrs;
+
+			attrs = reader.getAttributeValues("/");
+			assertEquals(4, attrs.size());
+			assertEquals("1.6.10", HierarchicalDataUtils.extractScalar(attrs
+					.get("HDF5_Version")));
+			assertEquals("4.2.0", HierarchicalDataUtils.extractScalar(attrs
+					.get("NeXus_version")));
+			assertEquals(
+					"/scratch/users/data/2010/cm1903-4/Experiment_1/nexus/FeKedge_1_15.nxs",
+					HierarchicalDataUtils.extractScalar(attrs.get("file_name")));
+			assertEquals("2010-07-19T13:54:15+00:00",
+					HierarchicalDataUtils.extractScalar(attrs.get("file_time")));
+
+			attrs = reader.getAttributeValues("/entry1/xspress2system/Time");
+			assertEquals(2, attrs.size());
+			assertEquals(1,
+					HierarchicalDataUtils.extractScalar(attrs.get("axis")));
+			assertEquals("/entry1/instrument/xas_scannable/Time",
+					HierarchicalDataUtils.extractScalar(attrs.get("target")));
+
+			attrs = reader
+					.getAttributeValues("/entry1/instrument/xspress2system/data");
+			assertEquals(3, attrs.size());
+			assertEquals(1,
+					HierarchicalDataUtils.extractScalar(attrs.get("signal")));
+			assertEquals("/entry1/instrument/xspress2system/data",
+					HierarchicalDataUtils.extractScalar(attrs.get("target")));
+			assertEquals("counts",
+					HierarchicalDataUtils.extractScalar(attrs.get("units")));
+
+			assertEquals(null, reader.getAttributeValues("/nonexistent"));
+		}
+
 	}
 
 }

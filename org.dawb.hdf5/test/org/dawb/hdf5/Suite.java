@@ -16,8 +16,8 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses( { 
 	
 	org.dawb.hdf5.Hdf5Test.class, 
-	org.dawb.hdf5.Hdf5ThreadTest.class 
-	
+	org.dawb.hdf5.Hdf5ThreadTest.class, 
+	org.dawb.hdf5.HierarchicalDataUtilsTest.class
 } )
 public class Suite {
 }
