@@ -267,4 +267,99 @@ public class HierarchicalDataUtils {
         return value.toString();
 	}
 
+	/**
+	 * Convert the size == 1 array to a scalar (extract value[0]). Works on
+	 * primitive type arrays, String[] and Number[]
+	 * 
+	 * @param value
+	 *            a {@link Dataset} value (i.e. an array, the result of calling
+	 *            {@link Dataset#read()})
+	 * @return the scalar value, or <code>null</code> if no scalar can be
+	 *         extracted
+	 */
+	public static Object extractScalar(Object value) {
+
+		if (value == null)
+			return null;
+
+		if (value instanceof short[]) {
+			short[] valueArray = (short[]) value;
+			if (valueArray.length == 1)
+				return valueArray[0];
+			return null;
+
+		} else if (value instanceof int[]) {
+			int[] valueArray = (int[]) value;
+			if (valueArray.length == 1)
+				return valueArray[0];
+			return null;
+
+		} else if (value instanceof long[]) {
+			long[] valueArray = (long[]) value;
+			if (valueArray.length == 1)
+				return valueArray[0];
+			return null;
+
+		} else if (value instanceof char[]) {
+			char[] valueArray = (char[]) value;
+			if (valueArray.length == 1)
+				return valueArray[0];
+			return null;
+
+		} else if (value instanceof float[]) {
+			float[] valueArray = (float[]) value;
+			if (valueArray.length == 1)
+				return valueArray[0];
+			return null;
+
+		} else if (value instanceof double[]) {
+			double[] valueArray = (double[]) value;
+			if (valueArray.length == 1)
+				return valueArray[0];
+			return null;
+
+		} else if (value instanceof boolean[]) {
+			boolean[] valueArray = (boolean[]) value;
+			if (valueArray.length == 1)
+				return valueArray[0];
+			return null;
+
+		} else if (value instanceof byte[]) {
+			byte[] valueArray = (byte[]) value;
+			if (valueArray.length == 1)
+				return valueArray[0];
+			return null;
+
+		} else if (value instanceof String[]) {
+			String[] valueArray = (String[]) value;
+			if (valueArray.length == 1)
+				return valueArray[0];
+			return null;
+
+		} else if (value instanceof Number[]) {
+			Number[] valueArray = (Number[]) value;
+			if (valueArray.length == 1)
+				return valueArray[0];
+			return null;
+		}
+
+		return null;
+	}
+
+	/**
+	 * Compares the two scalar objects if they are the same type and Comparable
+	 * using their compareTo method, else compares the toString value.
+	 * 
+	 * @see Comparable#compareTo(Object)
+	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public static int compareScalars(Object a, Object b) {
+		if (a instanceof Comparable && b instanceof Comparable) {
+			Comparable ca = (Comparable) a;
+			Comparable cb = (Comparable) b;
+			if (a.getClass() == b.getClass())
+				return ca.compareTo(cb);
+		}
+		return a.toString().compareTo(b.toString());
+	}
 }

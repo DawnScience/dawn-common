@@ -270,6 +270,39 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 	}
 	
 	@Override
+	public Map<String, Object> getAttributeValues(String path) {
+		HObject object;
+		try {
+			object = getData(path);
+		} catch (Exception e) {
+			// Path does not exist
+			object = null;
+		}
+		if (object == null) {
+			return null;
+		}
+
+		Map<String, Object> map = new HashMap<>();
+		List<?> attributes;
+		try {
+			attributes = object.getMetadata();
+		} catch (Exception e) {
+			// can't get metadata, to be consistent with #getAttributeValues() we
+			// return empty map for this node
+			return map;
+		}
+
+		for (Object attribute : attributes) {
+			if (attribute instanceof Attribute) {
+				Attribute a = (Attribute) attribute;
+				map.put(a.getName(), a.getValue());
+			}
+		}
+    	return map;
+	}
+	
+	
+	@Override
 	public Map<String, Object> getAttributeValues() {
 		return getAttributeValues(getRoot(), new HashMap<String, Object>(89));
 	}
