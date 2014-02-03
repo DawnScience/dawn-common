@@ -28,7 +28,7 @@ import uk.ac.diamond.scisoft.analysis.roi.XAxisLineBoxROI;
 import uk.ac.diamond.scisoft.analysis.roi.YAxisBoxROI;
 import uk.ac.diamond.scisoft.analysis.roi.YAxisLineBoxROI;
 
-public class RegionService {
+public class RegionServiceImpl {
 
 	private static Map<Object,Object> roiMap;
 	

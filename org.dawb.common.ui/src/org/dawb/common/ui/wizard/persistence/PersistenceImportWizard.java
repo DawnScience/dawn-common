@@ -10,7 +10,7 @@ import org.dawb.common.services.IPersistenceService;
 import org.dawb.common.services.IPersistentFile;
 import org.dawb.common.services.ServiceManager;
 import org.dawb.common.ui.monitor.ProgressMonitorWrapper;
-import org.dawb.common.ui.plot.region.RegionService;
+import org.dawb.common.ui.plot.region.RegionServiceImpl;
 import org.dawb.common.ui.util.EclipseUtils;
 import org.dawb.common.ui.wizard.CheckWizardPage;
 import org.dawb.common.ui.wizard.ResourceChoosePage;
@@ -276,7 +276,7 @@ public class PersistenceImportWizard extends AbstractPerstenceWizard implements 
 										region = system.getRegion(roiName);
 										region.setROI(roi);
 									} else {
-										region = system.createRegion(roiName, RegionService.forROI(roi));
+										region = system.createRegion(roiName, RegionServiceImpl.forROI(roi));
 										system.addRegion(region);
 										region.setROI(roi);
 									}

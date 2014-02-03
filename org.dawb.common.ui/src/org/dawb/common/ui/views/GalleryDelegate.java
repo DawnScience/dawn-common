@@ -35,6 +35,8 @@ import org.eclipse.nebula.widgets.gallery.DefaultGalleryItemRenderer;
 import org.eclipse.nebula.widgets.gallery.Gallery;
 import org.eclipse.nebula.widgets.gallery.GalleryItem;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -124,12 +126,38 @@ public class GalleryDelegate implements SelectionListener {
 		DefaultGalleryItemRenderer ir = new DefaultGalleryItemRenderer();
 		gallery.setItemRenderer(ir);
 		
+		gallery.addKeyListener(new KeyListener() {
+			
+			@Override
+			public void keyReleased(KeyEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void keyPressed(KeyEvent e) {
+				
+				// Control-A is bad
+				e.doit = false;
+			    switch (e.keyCode) {
+				case SWT.HOME:
+				case SWT.END:
+				case SWT.PAGE_UP:
+				case SWT.PAGE_DOWN:
+				case SWT.ARROW_UP:
+				case SWT.ARROW_DOWN:
+					e.doit = true;
+					return;
+				}
+			}
+		});
 		
 		// Virtual
 		gallery.setVirtualGroups(true);
 		gallery.addListener(SWT.SetData, new Listener() {
 			public void handleEvent(Event event) {
 				
+                if (!event.doit) return;
 				GalleryItem item = (GalleryItem) event.item;
 				int index = gallery.indexOf(item);
 				item.setItemCount(index);
@@ -435,7 +463,7 @@ public class GalleryDelegate implements SelectionListener {
 	public void widgetSelected(SelectionEvent e) {
 	
 		ISelection selection  = selectionProvider.getSelection();
-		selectionProvider.setSelection(selection);
+		if (selection!=null) selectionProvider.setSelection(selection);
 	}
 	
 	@Override
