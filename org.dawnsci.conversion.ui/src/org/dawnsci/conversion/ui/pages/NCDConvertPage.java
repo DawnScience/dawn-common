@@ -10,7 +10,7 @@ import java.util.List;
 import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.ui.util.GridUtils;
 import org.dawb.common.ui.wizard.ResourceChoosePage;
-import org.dawnsci.common.widgets.utils.RadioUtils;
+import org.dawnsci.common.widgets.radio.RadioGroupWidget;
 import org.dawnsci.conversion.converters.CustomNCDConverter.SAS_FORMAT;
 import org.dawnsci.conversion.ui.Activator;
 import org.dawnsci.conversion.ui.IConversionWizardPage;
@@ -105,11 +105,8 @@ public class NCDConvertPage extends ResourceChoosePage implements
 		formatGroup.setLayout(new GridLayout(1, false));
 		formatGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
 		formatGroup.setText("Export Format");
-		try {
-			RadioUtils.createRadioControls(formatGroup, createExportFormatActions());
-		} catch (Exception e) {
-			logger.error("Failed to create export format selection group");
-		}
+		RadioGroupWidget exportFormatRadios = new RadioGroupWidget(formatGroup);
+		exportFormatRadios.setActions(createExportFormatActions());
 		
 		pathChanged();
 	}
