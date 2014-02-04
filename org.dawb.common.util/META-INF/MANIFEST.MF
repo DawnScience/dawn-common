@@ -22,7 +22,7 @@ Export-Package: org.dawb.apache.commons.collections4.list,
  org.dawb.common.util.text,
  org.dawb.common.util.xml
 Import-Package: org.apache.commons.jexl2;version="2.1.1",
- org.slf4j
+ org.slf4j;version="[1.7.5,1.7.6)"
 Require-Bundle: org.eclipse.core.resources;bundle-version="3.7.101",
  org.eclipse.core.runtime;bundle-version="3.7.0",
  com.springsource.org.apache.commons.digester;bundle-version="1.8.1",
