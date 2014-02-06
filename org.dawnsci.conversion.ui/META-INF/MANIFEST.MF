@@ -25,4 +25,4 @@ Bundle-ActivationPolicy: lazy
 Import-Package: org.dawb.common.ui.monitor,
  org.dawb.common.ui.util,
  org.dawnsci.plotting.api,
- org.slf4j
+ org.slf4j;version="[1.7.5,1.7.6)"
