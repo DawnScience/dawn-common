@@ -1,5 +1,5 @@
 /*-
- * Copyright 2013 Diamond Light Source Ltd.
+ * Copyright 2014 Diamond Light Source Ltd.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -324,7 +324,7 @@ class PersistentFileImpl implements IPersistentFile {
 		ROIBean roibean = (ROIBean)converter.unmarshal(json);
 
 		//convert the bean to roibase
-		IROI roi = ROIBeanConverter.roiBeanToIROI(roibean);
+		IROI roi = ROIBeanConverter.getROI(roibean);
 
 		return roi;
 	}
@@ -349,7 +349,7 @@ class PersistentFileImpl implements IPersistentFile {
 			ROIBean roibean = (ROIBean) converter.unmarshal(json);
 
 			//convert the bean to roibase
-			IROI roi = ROIBeanConverter.roiBeanToIROI(roibean);
+			IROI roi = ROIBeanConverter.getROI(roibean);
 			rois.put(name, roi);
 		}
 
@@ -564,7 +564,7 @@ class PersistentFileImpl implements IPersistentFile {
 			String  name,
 			IROI    roi) throws Exception {
 
-		ROIBean roibean = ROIBeanConverter.iroiToROIBean(name, roi);
+		ROIBean roibean = ROIBeanConverter.getROIBean(name, roi);
 
 		long[] dims = {1};
 
