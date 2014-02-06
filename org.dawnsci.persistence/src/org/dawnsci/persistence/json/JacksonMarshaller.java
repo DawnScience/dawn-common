@@ -23,6 +23,7 @@ import uk.ac.diamond.scisoft.analysis.fitting.functions.Parameter;
 import uk.ac.diamond.scisoft.analysis.persistence.bean.function.FunctionBean;
 import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.CircularROIBean;
 import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.FreedrawROIBean;
+import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.GridROIBean;
 import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.LinearROIBean;
 import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.PerimeterBoxROIBean;
 import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.PointROIBean;
@@ -82,6 +83,8 @@ public class JacksonMarshaller implements IJSonMarshaller{
 			return mapper.readValue(json, PointROIBean.class);
 		} else if (type.equals("PerimeterBoxROI")) {
 			return mapper.readValue(json, PerimeterBoxROIBean.class);
+		} else if (type.equals("GridROI")) {
+			return mapper.readValue(json, GridROIBean.class);
 		} else if (type.equals("RectangularROI")) {
 			return mapper.readValue(json, RectangularROIBean.class);
 		} else if (type.equals("CircularROI")) {
