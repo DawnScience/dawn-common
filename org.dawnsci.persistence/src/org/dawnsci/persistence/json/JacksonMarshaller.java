@@ -79,27 +79,27 @@ public class JacksonMarshaller implements IJSonMarshaller{
 			return mapper.readValue(json, Object.class);
 
 		String type = typeNode.asText();
-		if (type.equals("PointROI")) {
+		if (type.equals(PointROIBean.TYPE)) {
 			return mapper.readValue(json, PointROIBean.class);
-		} else if (type.equals("PerimeterBoxROI")) {
+		} else if (type.equals(PerimeterBoxROIBean.TYPE)) {
 			return mapper.readValue(json, PerimeterBoxROIBean.class);
-		} else if (type.equals("GridROI")) {
+		} else if (type.equals(GridROIBean.TYPE)) {
 			return mapper.readValue(json, GridROIBean.class);
-		} else if (type.equals("RectangularROI")) {
+		} else if (type.equals(RectangularROIBean.TYPE)) {
 			return mapper.readValue(json, RectangularROIBean.class);
-		} else if (type.equals("CircularROI")) {
+		} else if (type.equals(CircularROIBean.TYPE)) {
 			return mapper.readValue(json, CircularROIBean.class);
-		} else if (type.equals("LinearROI")) {
+		} else if (type.equals(LinearROIBean.TYPE)) {
 			return mapper.readValue(json, LinearROIBean.class);
-		} else if (type.equals("PolylineROI")) {
+		} else if (type.equals(PolylineROIBean.TYPE)) {
 			return mapper.readValue(json, PolylineROIBean.class);
-		} else if (type.equals("PolygonalROI")) {
+		} else if (type.equals(PolygonalROIBean.TYPE)) {
 			return mapper.readValue(json, PolygonalROIBean.class);
-		} else if (type.equals("FreedrawROI")) {
+		} else if (type.equals(FreedrawROIBean.TYPE)) {
 			return mapper.readValue(json, FreedrawROIBean.class);
-		} else if (type.equals("RingROI")) {
+		} else if (type.equals(RingROIBean.TYPE)) {
 			return mapper.readValue(json, RingROIBean.class);
-		} else if (type.equals("SectorROI")) {
+		} else if (type.equals(SectorROIBean.TYPE)) {
 			return mapper.readValue(json, SectorROIBean.class);
 		} else if (Integer.valueOf(type) != null && Integer.valueOf(type) >= 0) { // if type is an integer we unmarshall to FunctionBean
 			return mapper.readValue(json, FunctionBean.class);
