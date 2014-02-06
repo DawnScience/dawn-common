@@ -119,14 +119,50 @@
         </property>
         <property name="Receiver Q warning size (-1)" class="ptolemy.data.expr.Parameter" value="-1">
         </property>
+        <property name="_icon" class="com.isencia.passerelle.actor.gui.EditorIcon">
+        </property>
+        <property name="Buffer time (ms)" class="ptolemy.data.expr.Parameter" value="0">
+        </property>
         <property name="_break_point" class="ptolemy.data.expr.Parameter" value="false">
         </property>
         <property name="Name" class="ptolemy.data.expr.StringParameter" value="roi">
         </property>
         <property name="Region" class="org.dawb.passerelle.common.parameter.roi.ROIParameter" value="{&quot;type&quot;:&quot;RectangularROI&quot;,&quot;name&quot;:null,&quot;startPoint&quot;:[0.0,0.0],&quot;lengths&quot;:[300.0,300.0],&quot;angle&quot;:0.0,&quot;endPoint&quot;:[300.0,300.0]}">
         </property>
-        <property name="_location" class="ptolemy.kernel.util.Location" value="{42.0, 101.0}">
+        <property name="_location" class="ptolemy.kernel.util.Location" value="{31.0, 91.0}">
         </property>
+        <port name="requestFinish" class="com.isencia.passerelle.core.ControlPort">
+            <property name="input"/>
+            <property name="multiport"/>
+            <property name="control" class="ptolemy.kernel.util.StringAttribute">
+            </property>
+        </port>
+        <port name="error" class="com.isencia.passerelle.core.ErrorPort">
+            <property name="output"/>
+            <property name="multiport"/>
+            <property name="error" class="ptolemy.kernel.util.StringAttribute">
+            </property>
+        </port>
+        <port name="hasFired" class="com.isencia.passerelle.core.ControlPort">
+            <property name="output"/>
+            <property name="multiport"/>
+            <property name="control" class="ptolemy.kernel.util.StringAttribute">
+            </property>
+        </port>
+        <port name="hasFinished" class="com.isencia.passerelle.core.ControlPort">
+            <property name="output"/>
+            <property name="multiport"/>
+            <property name="control" class="ptolemy.kernel.util.StringAttribute">
+            </property>
+        </port>
+        <port name="output" class="com.isencia.passerelle.core.Port">
+            <property name="output"/>
+            <property name="multiport"/>
+        </port>
+        <port name="trigger" class="com.isencia.passerelle.core.Port">
+            <property name="input"/>
+            <property name="multiport"/>
+        </port>
     </entity>
     <relation name="_R" class="ptolemy.actor.TypedIORelation">
         <property name="width" class="ptolemy.data.expr.Parameter" value="1">
