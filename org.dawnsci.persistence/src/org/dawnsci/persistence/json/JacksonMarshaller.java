@@ -21,7 +21,10 @@ import org.slf4j.LoggerFactory;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.IParameter;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.Parameter;
 import uk.ac.diamond.scisoft.analysis.persistence.bean.function.FunctionBean;
+import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.CircularFitROIBean;
 import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.CircularROIBean;
+import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.EllipticalFitROIBean;
+import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.EllipticalROIBean;
 import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.FreedrawROIBean;
 import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.GridROIBean;
 import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.LinearROIBean;
@@ -101,6 +104,12 @@ public class JacksonMarshaller implements IJSonMarshaller{
 			return mapper.readValue(json, RingROIBean.class);
 		} else if (type.equals(SectorROIBean.TYPE)) {
 			return mapper.readValue(json, SectorROIBean.class);
+		} else if (type.equals(EllipticalROIBean.TYPE)) {
+			return mapper.readValue(json, EllipticalROIBean.class);
+		} else if (type.equals(CircularFitROIBean.TYPE)) {
+			return mapper.readValue(json, CircularFitROIBean.class);
+		} else if (type.equals(EllipticalFitROIBean.TYPE)) {
+			return mapper.readValue(json, EllipticalFitROIBean.class);
 		} else if (Integer.valueOf(type) != null && Integer.valueOf(type) >= 0) { // if type is an integer we unmarshall to FunctionBean
 			return mapper.readValue(json, FunctionBean.class);
 		}
