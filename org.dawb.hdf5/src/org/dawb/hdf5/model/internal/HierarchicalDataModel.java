@@ -41,6 +41,7 @@ public class HierarchicalDataModel implements IHierarchicalDataModel {
 	 *            to expunge cache for
 	 */
 	public void clearFileCache(IFile file) {
+		if (file==null) return;
 		synchronized (cache) {
 			cache.remove(file.getRawLocation().toOSString());
 		}
