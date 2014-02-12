@@ -17,7 +17,7 @@ Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
 Export-Package: org.dawb.hdf5,
  org.dawb.hdf5.model,
- org.dawb.hdf5.model.internal,
+ org.dawb.hdf5.model.internal;x-internal:=true,
  org.dawb.hdf5.nexus
 Import-Package: org.junit,
  org.junit.runner,
