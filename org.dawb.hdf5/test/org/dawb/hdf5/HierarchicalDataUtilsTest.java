@@ -49,5 +49,12 @@ public class HierarchicalDataUtilsTest {
 		assertTrue(compareScalars(Arrays.asList(1), "[1]") == 0);
 		assertTrue(compareScalars("[1]", Arrays.asList(1)) == 0);
 		assertTrue(compareScalars(Arrays.asList(1), Arrays.asList(1)) == 0);
+
+		// Special cases dealing with NaN
+		// Because we are doing compare, NaN has a sort order (See Float/Double.compareTo)
+		assertEquals(0, compareScalars(Float.NaN, Float.NaN));
+		assertEquals(false, Float.NaN == Float.NaN);
+		assertEquals(0, compareScalars(Double.NaN, Double.NaN));
+		assertEquals(false, Double.NaN == Double.NaN);
 	}
 }
