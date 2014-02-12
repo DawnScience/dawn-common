@@ -105,12 +105,12 @@ public class HierarchicalDataFileModelTest {
 	}
 
 	private void checkGetPathOnAllCases(IHierarchicalDataFileModel model) {
-		// root attrib
+		// global attributes
 		assertEquals("1.8.7", model.getPath("/@HDF5_Version"));
 		// path with scalar dataset
 		assertEquals(1754416.0,
 				model.getPath("/entry1/instrument/analyser/cps"));
-		// attrib scalar dataset
+		// scalar dataset attribute
 		assertEquals("Hz",
 				model.getPath("/entry1/instrument/analyser/cps@units"));
 		// group

@@ -5,7 +5,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- */ 
+ */
 package org.dawb.hdf5;
 
 import java.io.BufferedInputStream;
@@ -28,10 +28,10 @@ import ncsa.hdf.object.HObject;
 
 public class HierarchicalDataUtils {
 
-	
+
 	/**
 	 * Overwrites destination_file if it exists, creates new if not.
-	 * 
+	 *
 	 * @param source_file
 	 * @param destination_file
 	 * @throws IOException
@@ -42,7 +42,7 @@ public class HierarchicalDataUtils {
 
 	/**
 	 * Overwrites destination_file if it exists, creates new if not.
-	 * 
+	 *
 	 * @param source_file
 	 * @param destination_file
 	 * @param buffer
@@ -83,16 +83,16 @@ public class HierarchicalDataUtils {
 		}
 	}
 
-	
+
 	/**
-	 * @throws Exception 
-	 * @throws OutOfMemoryError 
-	 * 
+	 * @throws Exception
+	 * @throws OutOfMemoryError
+	 *
 	 */
 	public static boolean isDataType(Dataset set, int requiredType) throws OutOfMemoryError, Exception {
-		
-		if (requiredType<0) return true; // Numbers less than 0 are any dataset 
-		
+
+		if (requiredType<0) return true; // Numbers less than 0 are any dataset
+
         final int   type  = set.getDatatype().getDatatypeClass();
         if (type==Datatype.CLASS_FLOAT || type==Datatype.CLASS_INTEGER || type==Datatype.CLASS_CHAR) {
         	if (IHierarchicalDataFile.NUMBER_ARRAY==requiredType) {
@@ -105,7 +105,7 @@ public class HierarchicalDataUtils {
         		return shape.length==1 && shape[0]==1;
         	}
         }
-        
+
         if (type==Datatype.CLASS_STRING) {
         	if (IHierarchicalDataFile.TEXT==requiredType) {
         		return true;
@@ -118,7 +118,7 @@ public class HierarchicalDataUtils {
 
         return requiredType==type;
 	}
-	
+
 
 	/**
 	 * Returns the link in another file if this is a linked file.
@@ -130,10 +130,10 @@ public class HierarchicalDataUtils {
 	 */
 	public static HObject getDataLink(HObject set, HierarchicalDataFile original) {
 
-		try {  	
+		try {
 			// To make things faster, we only check for Datasets
 			if (!(set instanceof Dataset)) return null;
-			
+
 			List<?> attributes = set.getMetadata(); // Appears in stack traces of VM exists
 			if (attributes==null || attributes.isEmpty()) return null;
 
@@ -141,37 +141,37 @@ public class HierarchicalDataUtils {
 				if (attribute instanceof Attribute) {
 					Attribute a = (Attribute)attribute;
 					if (a.getName().equals(HierarchicalInfo.NAPIMOUNT)) {
-						return  getDataLink(set, a, original);			
+						return  getDataLink(set, a, original);
 					}
 				}
 			}
 		} catch (Throwable ne) {
 			return null;
 		}
-		
+
 		return null;
 	}
 
 	private static final Pattern LINK_ATTR = Pattern.compile("nxfile\\:\\/\\/(.+)\\#(entry.+)");
 
 	private static final HObject getDataLink(HObject set, Attribute a, HierarchicalDataFile original) throws Exception {
-		
+
 		final String[] vals = (String[])a.getValue();
 		final Matcher matcher = LINK_ATTR.matcher(vals[0]);
 		if (matcher.matches()) {
-			
+
 			final String path     = matcher.group(1);
 			final String fullPath = matcher.group(2);
-			
+
 			File file = new File(path);
 			if (!file.exists()) {
 				// Look in same directory.
 				final File parent = set.getFileFormat().getAbsoluteFile().getParentFile();
 				file = new File(parent, file.getName());
 			}
-			
+
 			if (!file.exists()) return null;
-			
+
 			IHierarchicalDataFile hFile = original!=null
 					                    ? original.getLinkedFile(file.getAbsolutePath())
 					                    // Causes a memory leak I think:
@@ -179,13 +179,13 @@ public class HierarchicalDataUtils {
 			HObject link = hFile.getData(fullPath);
 			link.getMetadata(); // Ensure that meta data is read.
 			return link;
-		} 
-		
+		}
+
 		return null;
 	}
 
 	public static long[] getDims(final Dataset set) throws Exception {
-		
+
         if (set.getDims()==null) {
         	set.getMetadata();
         }
@@ -193,7 +193,7 @@ public class HierarchicalDataUtils {
 	}
 
 	public static long getSize(final Dataset set) throws Exception {
-		
+
 		long[] shape;
 		try {
 			shape = HierarchicalDataUtils.getDims((Dataset)set);
@@ -201,14 +201,14 @@ public class HierarchicalDataUtils {
 			return -1;
 		}
 		if (shape==null) return -1;
-		
+
 		long size = shape[0];
 		for (int i = 1; i < shape.length; i++) size*=shape[i];
 
 		final int bpi  = set.getDatatype().getDatatypeSize();
         return  bpi*size;
-         
-         
+
+
 	}
 
 	/**
@@ -219,7 +219,7 @@ public class HierarchicalDataUtils {
 	public static String extractValue(Object value) {
 		if (value == null) {
 			return "";
-			
+
 		} else if (value.getClass().isArray()) {
 			return toString(value);
 
@@ -233,44 +233,44 @@ public class HierarchicalDataUtils {
 	 * @param value
 	 */
 	private static String toString(Object value) {
-		
+
 		if (value==null) return null;
-		
+
         if (value instanceof short[]) {
         	return Arrays.toString((short[])value);
-        	
+
         } else if  (value instanceof int[]) {
         	return Arrays.toString((int[])value);
-        	
+
         } else if  (value instanceof long[]) {
         	return Arrays.toString((long[])value);
-        	
+
         } else if  (value instanceof char[]) {
         	return Arrays.toString((char[])value);
-        	
+
         } else if  (value instanceof float[]) {
         	return Arrays.toString((float[])value);
-        	
+
         } else if  (value instanceof double[]) {
         	return Arrays.toString((double[])value);
-        	
+
         } else if  (value instanceof boolean[]) {
         	return Arrays.toString((boolean[])value);
-        	
+
         } else if  (value instanceof byte[]) {
         	return Arrays.toString((byte[])value);
-        	
+
         } else if  (value instanceof Object[]) {
         	return Arrays.toString((Object[])value);
         }
-        
+
         return value.toString();
 	}
 
 	/**
 	 * Convert the size == 1 array to a scalar (extract value[0]). Works on
 	 * primitive type arrays, String[] and Number[]
-	 * 
+	 *
 	 * @param value
 	 *            a {@link Dataset} value (i.e. an array, the result of calling
 	 *            {@link Dataset#read()})
@@ -349,7 +349,7 @@ public class HierarchicalDataUtils {
 	/**
 	 * Compares the two scalar objects if they are the same type and Comparable
 	 * using their compareTo method, else compares the toString value.
-	 * 
+	 *
 	 * @see Comparable#compareTo(Object)
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -361,5 +361,52 @@ public class HierarchicalDataUtils {
 				return ca.compareTo(cb);
 		}
 		return a.toString().compareTo(b.toString());
+	}
+
+	/**
+	 * Compare object a as a scalar to String b by first converting b to a type
+	 * that matches a.
+	 *
+	 * @see Comparable#compareTo(Object)
+	 * @throws NumberFormatException
+	 *             if b can not be converted to the same type as a
+	 */
+	public static int compareScalarToString(Object a, String b)
+			throws NumberFormatException {
+		if (a instanceof Short) {
+			return ((Short) a).compareTo(Short.parseShort(b));
+		}
+		if (a instanceof Integer) {
+			return ((Integer) a).compareTo(Integer.parseInt(b));
+		}
+		if (a instanceof Long) {
+			return ((Long) a).compareTo(Long.parseLong(b));
+		}
+		if (a instanceof Character) {
+			return ((Character) a).toString().compareTo(b);
+		}
+		if (a instanceof Float) {
+			return ((Float) a).compareTo(Float.parseFloat(b));
+		}
+		if (a instanceof Double) {
+			return ((Double) a).compareTo(Double.parseDouble(b));
+		}
+		if (a instanceof Boolean) {
+			return ((Boolean) a).compareTo(Boolean.parseBoolean(b));
+		}
+		if (a instanceof Byte) {
+			return ((Byte) a).compareTo(Byte.valueOf(b));
+		}
+		if (a instanceof String) {
+			return ((String) a).compareTo(b);
+		}
+		String name;
+		if (a == null) {
+			name = "null";
+		} else {
+			name = "a.getClass().getName()";
+		}
+		throw new NumberFormatException("a has unknown type for conversion: "
+				+ name);
 	}
 }

@@ -31,10 +31,12 @@ public class HierarchicalDataWorkspaceModelFactory {
 			@Override
 			public void resourceChanged(IResourceChangeEvent event) {
 				IResourceDelta delta = event.getDelta();
-				try {
-					delta.accept(new DeltaVisitor(model));
-				} catch (CoreException e) {
-					// our visitor does not throw CoreException
+				if (delta != null) {
+					try {
+						delta.accept(new DeltaVisitor(model));
+					} catch (CoreException e) {
+						// our visitor does not throw CoreException
+					}
 				}
 			}
 		};
