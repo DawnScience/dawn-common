@@ -383,7 +383,7 @@ public class HierarchicalDataUtils {
 			return ((Long) a).compareTo(Long.parseLong(b));
 		}
 		if (a instanceof Character) {
-			return ((Character)a).toString().compareTo(b);
+			return ((Character) a).toString().compareTo(b);
 		}
 		if (a instanceof Float) {
 			return ((Float) a).compareTo(Float.parseFloat(b));
