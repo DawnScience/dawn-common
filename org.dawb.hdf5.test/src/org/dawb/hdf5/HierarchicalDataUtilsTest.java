@@ -83,6 +83,9 @@ public class HierarchicalDataUtilsTest {
 		assertTrue(compareScalarToString(new Float(2), "1.0") > 0);
 		assertTrue(compareScalarToString(new Float(2), "2.0") == 0);
 		assertTrue(compareScalarToString(new Float(2), "3.0") < 0);
+		assertTrue(compareScalarToString(new Float(2), "1") > 0);
+		assertTrue(compareScalarToString(new Float(2), "2") == 0);
+		assertTrue(compareScalarToString(new Float(2), "3") < 0);
 		assertTrue(compareScalarToString(new Float(Float.NaN), "NaN") == 0);
 		assertTrue(compareScalarToString(new Float(2), "NaN") < 0);
 		assertTrue(compareScalarToString(new Float(2), "Infinity") < 0);
@@ -92,6 +95,9 @@ public class HierarchicalDataUtilsTest {
 		assertTrue(compareScalarToString(new Double(2), "1.0") > 0);
 		assertTrue(compareScalarToString(new Double(2), "2.0") == 0);
 		assertTrue(compareScalarToString(new Double(2), "3.0") < 0);
+		assertTrue(compareScalarToString(new Double(2), "1") > 0);
+		assertTrue(compareScalarToString(new Double(2), "2") == 0);
+		assertTrue(compareScalarToString(new Double(2), "3") < 0);
 		assertTrue(compareScalarToString(new Double(Double.NaN), "NaN") == 0);
 		assertTrue(compareScalarToString(new Double(2), "NaN") < 0);
 		assertTrue(compareScalarToString(new Double(2), "Infinity") < 0);
