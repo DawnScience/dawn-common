@@ -118,4 +118,25 @@ public final class PropUtils {
 		
 		return out.toString("8859_1");
 	}
+	
+	/**
+	 * String to be parsed to properties. In the form of key=value pairs
+	 * separated by semi colons. You may not use the string = or ; in the 
+	 * keys or values. Keys and values are trimmed so extra spaces will be
+	 * ignored.
+	 * 
+	 * @param secondId
+	 * @return map of values extracted from the 
+	 */
+	public static Properties parseString(String properties) {
+		
+		if (properties==null) return new Properties();
+		Properties props = new Properties();
+		final String[] split = properties.split(";");
+		for (String line : split) {
+			final String[] kv = line.split("=");
+			props.setProperty(kv[0].trim(), kv[1].trim());
+		}
+		return props;
+	}
 }

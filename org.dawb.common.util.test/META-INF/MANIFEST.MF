@@ -5,4 +5,4 @@ Bundle-SymbolicName: org.dawb.common.util.test
 Bundle-Version: 1.0.0.qualifier
 Fragment-Host: org.dawb.common.util
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Require-Bundle: org.junit4
+Require-Bundle: org.junit;bundle-version="[4.10.0,5.0.0)"

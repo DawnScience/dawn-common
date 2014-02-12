@@ -47,4 +47,5 @@ public class Activator implements BundleActivator {
 		ServiceReference<?> ref = context.getServiceReference(clazz);
 		if (ref==null) return null;
 		return context.getService(ref);
-	}}
+	}
+}

@@ -9,14 +9,15 @@ import java.util.Map;
 import org.dawb.common.services.IPersistenceService;
 import org.dawb.common.services.IPersistentFile;
 import org.dawb.common.services.ServiceManager;
+import org.dawb.common.ui.Activator;
 import org.dawb.common.ui.monitor.ProgressMonitorWrapper;
-import org.dawb.common.ui.plot.region.RegionService;
 import org.dawb.common.ui.util.EclipseUtils;
 import org.dawb.common.ui.wizard.CheckWizardPage;
 import org.dawb.common.ui.wizard.ResourceChoosePage;
 import org.dawb.common.util.io.FileUtils;
 import org.dawnsci.plotting.api.IPlottingSystem;
 import org.dawnsci.plotting.api.region.IRegion;
+import org.dawnsci.plotting.api.region.IRegionService;
 import org.dawnsci.plotting.api.trace.IImageTrace;
 import org.dawnsci.plotting.api.trace.ITrace;
 import org.eclipse.core.resources.IFile;
@@ -266,6 +267,8 @@ public class PersistenceImportWizard extends AbstractPerstenceWizard implements 
 			if (options.is("Regions")) {
 				final Map<String, IROI> rois = file.getROIs(mon);
 				if (rois!=null && !rois.isEmpty()) {
+					
+					final IRegionService rservice = (IRegionService)Activator.getService(IRegionService.class);
 					for (final String roiName : rois.keySet()) {
 						final IROI roi = rois.get(roiName);
 						Display.getDefault().syncExec(new Runnable() {
@@ -276,7 +279,7 @@ public class PersistenceImportWizard extends AbstractPerstenceWizard implements 
 										region = system.getRegion(roiName);
 										region.setROI(roi);
 									} else {
-										region = system.createRegion(roiName, RegionService.forROI(roi));
+										region = system.createRegion(roiName, rservice.forROI(roi));
 										system.addRegion(region);
 										region.setROI(roi);
 									}

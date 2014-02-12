@@ -35,7 +35,6 @@ Export-Package: org.dawb.common.ui,
  org.dawb.common.ui.parts,
  org.dawb.common.ui.plot,
  org.dawb.common.ui.plot.function,
- org.dawb.common.ui.plot.region,
  org.dawb.common.ui.plot.roi,
  org.dawb.common.ui.plot.roi.data,
  org.dawb.common.ui.plot.tools,
@@ -57,5 +56,5 @@ Import-Package: org.dawb.common.services,
  org.eclipse.gmf.runtime.common.ui.util,
  org.eclipse.gmf.runtime.draw2d.ui.figures,
  org.eclipse.gmf.runtime.draw2d.ui.render.awt.internal.svg.export,
- org.slf4j
+ org.slf4j;version="[1.7.6,1.7.7)"
 Bundle-ClassPath: .

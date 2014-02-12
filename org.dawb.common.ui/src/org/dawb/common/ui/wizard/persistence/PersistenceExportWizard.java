@@ -235,7 +235,11 @@ public class PersistenceExportWizard extends AbstractPerstenceWizard implements 
 						 final Collection<IRegion> regions = system.getRegions();
 						 if (options.is("Regions") && regions!=null && !regions.isEmpty()) {
 							 for (IRegion iRegion : regions) {
-								 if (!file.isRegionSupported(iRegion.getROI())) continue;
+								 if (!file.isRegionSupported(iRegion.getROI())) {
+									logger.debug("Region "+ iRegion.getName() + " of type "
+											+ iRegion.getClass().getName() + " is not supported");
+									continue;
+								 }
 								 file.addROI(iRegion.getName(), iRegion.getROI());
 								 file.setRegionAttribute(iRegion.getName(), "Region Type", iRegion.getRegionType().getName());
 								 if (iRegion.getUserObject()!=null) {
