@@ -362,4 +362,51 @@ public class HierarchicalDataUtils {
 		}
 		return a.toString().compareTo(b.toString());
 	}
+
+	/**
+	 * Compare object a as a scalar to String b by first converting b to a type
+	 * that matches a.
+	 *
+	 * @see Comparable#compareTo(Object)
+	 * @throws NumberFormatException
+	 *             if b can not be converted to the same type as a
+	 */
+	public static int compareScalarToString(Object a, String b)
+			throws NumberFormatException {
+		if (a instanceof Short) {
+			return ((Short) a).compareTo(Short.parseShort(b));
+		}
+		if (a instanceof Integer) {
+			return ((Integer) a).compareTo(Integer.parseInt(b));
+		}
+		if (a instanceof Long) {
+			return ((Long) a).compareTo(Long.parseLong(b));
+		}
+		if (a instanceof Character) {
+			return ((Character)a).toString().compareTo(b);
+		}
+		if (a instanceof Float) {
+			return ((Float) a).compareTo(Float.parseFloat(b));
+		}
+		if (a instanceof Double) {
+			return ((Double) a).compareTo(Double.parseDouble(b));
+		}
+		if (a instanceof Boolean) {
+			return ((Boolean) a).compareTo(Boolean.parseBoolean(b));
+		}
+		if (a instanceof Byte) {
+			return ((Byte) a).compareTo(Byte.valueOf(b));
+		}
+		if (a instanceof String) {
+			return ((String) a).compareTo(b);
+		}
+		String name;
+		if (a == null) {
+			name = "null";
+		} else {
+			name = "a.getClass().getName()";
+		}
+		throw new NumberFormatException("a has unknown type for conversion: "
+				+ name);
+	}
 }
