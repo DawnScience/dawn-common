@@ -14,4 +14,5 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: org.apache.commons.logging,
  org.slf4j;version="[1.7.6,1.7.7)"
 Bundle-Vendor: Diamond Light Source
-Export-Package: org.dawnsci.jexl
+Export-Package: org.dawnsci.jexl,
+ org.dawnsci.jexl.internal;x-internal:=true
