@@ -81,6 +81,8 @@ public class IconUtils {
         
         final GC gc = new GC(image);
        
+        if (Display.getDefault()==null) return ImageDescriptor.createFromImage(image);
+        if (Display.getDefault().getActiveShell()==null) return ImageDescriptor.createFromImage(image);
         gc.setBackground(Display.getDefault().getActiveShell().getBackground());
         gc.fillRectangle(new Rectangle(0,0,16,16));
         gc.setForeground(ColorConstants.gray);
