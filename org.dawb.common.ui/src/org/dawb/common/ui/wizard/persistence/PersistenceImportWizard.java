@@ -65,6 +65,7 @@ public class PersistenceImportWizard extends AbstractPerstenceWizard implements 
 		
 		this.fcp = new ResourceChoosePage("Import File", null, null);
 		fcp.setDescription("Choose the file (*.nxs or *.msk) to import.");
+		fcp.setOverwriteVisible(false);
 		addPage(fcp);
 		
 		this.options = new CheckWizardPage("Import Options", createDefaultOptions());
@@ -246,7 +247,7 @@ public class PersistenceImportWizard extends AbstractPerstenceWizard implements 
 			// Save things.
 			ITrace trace  = system.getTraces().iterator().next();
 			if (options.is("Original Data")) {
-				// TODO
+				// Not needed can open file directly
 			}
 
 			if (options.is("Mask") && trace instanceof IImageTrace) {
