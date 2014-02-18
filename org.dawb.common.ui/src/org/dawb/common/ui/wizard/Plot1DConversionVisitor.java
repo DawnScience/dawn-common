@@ -116,7 +116,7 @@ public class Plot1DConversionVisitor extends AbstractPlotConversionVisitor {
 			if (dtype != AbstractDataset.getDType(data)) {
 				data = DatasetUtils.cast((AbstractDataset)data, dtype);
 			}
-
+			data.squeeze();
 			data.setShape(data.getShape()[0],1);
 			datasets.add(data);
 			headings.add("dataset_" + i);

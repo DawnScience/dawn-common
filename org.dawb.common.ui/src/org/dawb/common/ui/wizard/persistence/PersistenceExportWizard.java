@@ -312,6 +312,10 @@ public class PersistenceExportWizard extends AbstractPerstenceWizard implements 
 		
 		final IWorkbenchPart  part   = EclipseUtils.getPage().getActivePart();
 		if (part!=null) {
+			Object object = part.getAdapter(IToolPageSystem.class);
+			if (object != null && object instanceof IPlottingSystem) {
+				return (IPlottingSystem) object;
+			}
 			return (IPlottingSystem)part.getAdapter(IPlottingSystem.class);
 		}
 		
