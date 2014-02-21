@@ -65,7 +65,7 @@ public class GalleryDelegate implements SelectionListener {
 
 	private Composite                parent;
 	private Thread                   imageThread;
-	private Gallery                  gallery;
+	protected Gallery                gallery;
 	private GalleryItem              galleryGroup;
 	private BlockingDeque<ImageItem> queue;
 	private GalleryDelegateInfo      info;
@@ -178,7 +178,7 @@ public class GalleryDelegate implements SelectionListener {
 		galleryGroup.setText(groupLabel);
 	}
 	
-	public void setLayoutData(Object layoutData) {
+	protected void setLayoutData(Object layoutData) {
 		gallery.setLayoutData(layoutData);
 	}
 	
