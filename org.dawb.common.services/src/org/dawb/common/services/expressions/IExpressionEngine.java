@@ -103,8 +103,11 @@ public interface IExpressionEngine {
 	public void addLoadedVariable(String name, Object value);
 	
 	/**
-	 * Gets names of *all* variables from the expression
-	 * 
+	 * Gets names of *all* variables from the expression.
+	 * <p>
+	 * The returned collection attempts to maintain the order of the
+	 * variable names as they were first encountered in the expression.
+	 *
 	 * @returns names
 	 */
 	public Collection<String> getVariableNamesFromExpression();
