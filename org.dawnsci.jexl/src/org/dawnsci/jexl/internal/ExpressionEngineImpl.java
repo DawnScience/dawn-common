@@ -115,11 +115,23 @@ public class ExpressionEngineImpl implements IExpressionEngine{
 			return null;
 		}
 	}
-	
-	private Collection<String> unpack(Set<List<String>> names) {
-		for (List<String> entry : names) {
-			ret.add(entry.get(0));
+
+	private Collection<String> unpack(Set<List<String>> dottednames) {
 		Collection<String> ret = new LinkedHashSet<String>();
+		for (List<String> dottedname : dottednames) {
+			if (dottedname.size() == 0) {
+				continue;
+			} else if (dottedname.size() == 1) {
+				ret.add(dottedname.get(0));
+			} else {
+				StringBuilder name = new StringBuilder();
+				for (String namePart : dottedname) {
+					name.append(namePart);
+					name.append(".");
+				}
+				String assembledName = name.substring(0, name.length() - 1);
+				ret.add(assembledName);
+			}
 		}
 		return ret;
 	}
