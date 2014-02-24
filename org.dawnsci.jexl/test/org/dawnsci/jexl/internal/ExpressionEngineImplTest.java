@@ -27,4 +27,12 @@ public class ExpressionEngineImplTest {
 		assertVariablesEquals("(c+b)+a", "c", "b", "a");
 	}
 
+	@Test
+	public void testDottedNames() throws Exception {
+		assertVariablesEquals("a.b.c+d.e.f", "a.b.c", "d.e.f");
+		assertVariablesEquals("my.'new'", "my.new");
+		assertVariablesEquals("my['new']", "my.new");
+	}
+	}
+
 }
