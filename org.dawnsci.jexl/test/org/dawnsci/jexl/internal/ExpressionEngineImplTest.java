@@ -33,6 +33,12 @@ public class ExpressionEngineImplTest {
 		assertVariablesEquals("my.'new'", "my.new");
 		assertVariablesEquals("my['new']", "my.new");
 	}
+
+	@Test
+	public void testDottedNamesWithKeyWords() throws Exception {
+		// These tests fail to "compile"
+		assertVariablesEquals("my.'new'.dotted.var", "my.new.dotted.var");
+		assertVariablesEquals("my['new'].dotted.var", "my.new.dotted.var");
 	}
 
 }
