@@ -49,6 +49,7 @@ import org.eclipse.ui.PlatformUI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.ac.diamond.scisoft.analysis.io.IDataHolder;
 import uk.ac.diamond.scisoft.analysis.io.IMetaData;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 
@@ -418,7 +419,7 @@ public class ResourceChoosePage extends WizardPage {
 		IConversionVisitor     visitor= context.getConversionVisitor();
 		final IMetaData        meta   = LoaderFactory.getMetaData(source, new ProgressMonitorWrapper(monitor));
         final List<String>     names  = new ArrayList<String>(7);
-        for (String name : meta.getDataShapes().keySet()) {
+        if (meta!=null) for (String name : meta.getDataShapes().keySet()) {
 			final int[] shape = meta.getDataShapes().get(name);
 			if (shape != null) {
 				if (scheme!=null && scheme.isRankSupported(shape.length)) {
@@ -428,9 +429,14 @@ public class ResourceChoosePage extends WizardPage {
 				}
 			}
 		}
+       
+        // Add names from image stacks.
+		final IDataHolder  dataHolder = LoaderFactory.getData(source, true, true, new ProgressMonitorWrapper(monitor));
+        if (dataHolder!=null) for (String name : dataHolder.getNames()) {
+			if (!names.contains(name)) names.add(name);
+		}
         
         // Process any expressions
-        
     	final String sourcePath = getSourcePath(context);
     	final IExpressionObjectService service = (IExpressionObjectService)PlatformUI.getWorkbench().getService(IExpressionObjectService.class);
        
@@ -454,6 +460,7 @@ public class ResourceChoosePage extends WizardPage {
     			}
     		}
     	});
+    	
         return names;
 	}
 
