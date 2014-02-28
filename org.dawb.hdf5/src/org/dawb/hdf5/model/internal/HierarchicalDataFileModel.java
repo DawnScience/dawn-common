@@ -158,7 +158,17 @@ public class HierarchicalDataFileModel implements IHierarchicalDataFileModel {
 					Dataset dataset = ((Dataset) data);
 
 					long[] dims = dataset.getDims();
-					if (dims.length == 1 && dims[0] == 1) {
+					boolean allSizeOneDim = true;
+					for (long dim : dims) {
+						if (dim != 1) {
+							allSizeOneDim = false;
+						}
+					}
+					// Only read datasets which have one element
+					// as datasets with > 1 element cannot be converted
+					// with extractScalar, loading them in the first place
+					// uses unnecessary procession time.
+					if (allSizeOneDim) {
 						Object value = dataset.read();
 						node.scalar = HierarchicalDataUtils
 								.extractScalar(value);

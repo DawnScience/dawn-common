@@ -4,13 +4,16 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import ncsa.hdf.object.Dataset;
+import ncsa.hdf.object.Datatype;
 import ncsa.hdf.object.Group;
 import ncsa.hdf.object.HObject;
+import ncsa.hdf.object.h5.H5Datatype;
 
 import org.dawb.hdf5.Hdf5TestUtils;
 import org.dawb.hdf5.HierarchicalDataFactory;
@@ -25,8 +28,9 @@ public class HierarchicalDataFileModelTest {
 
 		@Override
 		public IHierarchicalDataFile getReader() throws Exception {
-			String absolutePath = Hdf5TestUtils
-					.getBundleFile("org/dawb/hdf5/model/internal/i05-4859.nxs").getAbsolutePath();
+			String absolutePath = Hdf5TestUtils.getBundleFile(
+					"org/dawb/hdf5/model/internal/i05-4859.nxs")
+					.getAbsolutePath();
 			return HierarchicalDataFactory.getReader(absolutePath);
 		}
 	};
@@ -37,18 +41,23 @@ public class HierarchicalDataFileModelTest {
 	@Test
 	public void printDataContents() throws Exception {
 		try (IHierarchicalDataFile reader = get_i05_4859_Reader.getReader()) {
-			Map<String, Object> attributeValues = reader.getAttributeValues();
-			for (Entry<String, Object> entry : attributeValues.entrySet()) {
-				String ln = entry.getKey() + "=" + entry.getValue() + "=="
-						+ HierarchicalDataUtils.extractScalar(entry.getValue());
-				System.out.println(ln);
-
-			}
-
-			Group g = reader.getRoot();
-			printGroup("", g);
+			printDataContents(reader);
 		}
 
+	}
+
+	private void printDataContents(IHierarchicalDataFile reader)
+			throws Exception {
+		Map<String, Object> attributeValues = reader.getAttributeValues();
+		for (Entry<String, Object> entry : attributeValues.entrySet()) {
+			String ln = entry.getKey() + "=" + entry.getValue() + "=="
+					+ HierarchicalDataUtils.extractScalar(entry.getValue());
+			System.out.println(ln);
+
+		}
+
+		Group g = reader.getRoot();
+		printGroup("", g);
 	}
 
 	private void printGroup(String path, Group g) throws Exception {
@@ -63,7 +72,10 @@ public class HierarchicalDataFileModelTest {
 			if (obj instanceof Dataset) {
 				Dataset dataset = (Dataset) obj;
 				Object value = dataset.read();
-				System.out.print("=" + value);
+				System.out.print("=DIMS(");
+				System.out.print(Arrays.toString(dataset.getDims()));
+				System.out.print(")");
+				System.out.print(value);
 				System.out.print("=="
 						+ HierarchicalDataUtils.extractScalar(value));
 			}
@@ -292,4 +304,93 @@ public class HierarchicalDataFileModelTest {
 		assertEquals("Hz",
 				model.getPath("/entry1/instrument/analyser/cps@units"));
 	}
+
+	private Object createNexusFile(final Datatype dtype, final long[] shape,
+			final Object buffer) throws Exception {
+		String PATH = "kichwa1";
+		final File file = File.createTempFile("HierarchicalDataFileModelTest",
+				".nxs");
+		file.delete();
+		try {
+
+			// Create a file and verify it
+			IHierarchicalDataFile writer = HierarchicalDataFactory
+					.getWriter(file.getAbsolutePath());
+			writer.createDataset(PATH, dtype, shape, buffer, writer.getRoot());
+			writer.close();
+			try (IHierarchicalDataFile reader = HierarchicalDataFactory
+					.getReader(file.getAbsolutePath());) {
+				printDataContents(reader);
+			}
+
+			IHierarchicalDataFileModel model = new HierarchicalDataFileModel(
+					new IHierarchicalDataFileGetReader() {
+
+						@Override
+						public IHierarchicalDataFile getReader()
+								throws Exception {
+							String absolutePath = file.getAbsolutePath();
+							return HierarchicalDataFactory
+									.getReader(absolutePath);
+						}
+					});
+			return model.getPath(PATH);
+		} finally {
+			file.delete();
+		}
+	}
+
+	/**
+	 * This test was created to test support Datasets that have > 1 dimension,
+	 * but the sizes of all the dimensions are 1. e.g. /entry1/sample/name is
+	 * stored as [ZrTe3_X60] with dims [1,1] and previously was not supported
+	 *
+	 * @throws Exception
+	 */
+	@Test
+	public void testMultiDimArrayString() throws Exception {
+		final String GOLD = "Gold";
+		H5Datatype dtype = new H5Datatype(Datatype.CLASS_STRING,
+				GOLD.length() + 1, Datatype.NATIVE, Datatype.NATIVE);
+		assertEquals(GOLD,
+				createNexusFile(dtype, new long[] { 1 }, new String[] { GOLD }));
+		assertEquals(
+				GOLD,
+				createNexusFile(dtype, new long[] { 1, 1 },
+						new String[] { GOLD }));
+		assertEquals(
+				GOLD,
+				createNexusFile(dtype, new long[] { 1, 1, 1 },
+						new String[] { GOLD }));
+		assertEquals(
+				GOLD,
+				createNexusFile(dtype, new long[] { 1, 1, 1, 1 },
+						new String[] { GOLD }));
+	}
+
+	@Test
+	public void testMultiDimArrayFloat() throws Exception {
+		H5Datatype dtype = new H5Datatype(Datatype.CLASS_FLOAT, 64 / 8,
+				Datatype.NATIVE, Datatype.NATIVE);
+		assertEquals(1.0,
+				createNexusFile(dtype, new long[] { 1 }, new double[] { 1.0 }));
+		assertEquals(
+				1.0,
+				createNexusFile(dtype, new long[] { 1, 1 },
+						new double[][] { { 1.0 } }));
+		assertEquals(
+				1.0,
+				createNexusFile(dtype, new long[] { 1, 1, 1 },
+						new double[][][] { { { 1.0 } } }));
+		assertEquals(
+				1.0,
+				createNexusFile(dtype, new long[] { 1, 1 },
+						new double[] { 1.0 }));
+		assertEquals(
+				1.0,
+				createNexusFile(dtype, new long[] { 1, 1, 1 },
+						new double[] { 1.0 }));
+
+	}
+
 }
