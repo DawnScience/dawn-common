@@ -85,8 +85,8 @@ public class Hdf5Test {
 
 		int id = -1;
 		try {
-			final String path = Hdf5TestUtils.getAbsolutePath("test/org/dawb/hdf5/FeKedge_1_15.nxs");
-			id = H5.H5Fopen(path, 
+			final String path = Hdf5TestUtils.getBundleFile("src/org/dawb/hdf5/FeKedge_1_15.nxs").getAbsolutePath();
+			id = H5.H5Fopen(path,
 				            HDF5Constants.H5F_ACC_RDWR,
 					        HDF5Constants.H5P_DEFAULT);
 			
@@ -101,7 +101,7 @@ public class Hdf5Test {
 	
 	@Test
 	public void testData() throws Exception {
-		getData(Hdf5TestUtils.getAbsolutePath("test/org/dawb/hdf5/FeKedge_1_15.nxs"));
+		getData(Hdf5TestUtils.getBundleFile("org/dawb/hdf5/FeKedge_1_15.nxs").getAbsolutePath());
 	}
 	
 	private void getData(String path) throws Exception {
@@ -123,7 +123,7 @@ public class Hdf5Test {
 
 	@Test
 	public void testShowStructure() throws Exception {
-		printStructure(Hdf5TestUtils.getAbsolutePath("test/org/dawb/hdf5/FeKedge_1_15.nxs"));
+		printStructure(Hdf5TestUtils.getBundleFile("org/dawb/hdf5/FeKedge_1_15.nxs").getAbsolutePath());
 		//printStructure(/buffer/linpickard1/results/examples/DCT_201006-good.h5");
 		//printStructure("/buffer/linpickard1/results/large test files/rhodo_f2_datanorm_.h5");
 	}
@@ -224,7 +224,7 @@ public class Hdf5Test {
 		// can be used with a try-with-resources statement (i.e. is
 		// AutoCloseable)
 		String absolutePath = Hdf5TestUtils
-				.getAbsolutePath("test/org/dawb/hdf5/FeKedge_1_15.nxs");
+				.getBundleFile("org/dawb/hdf5/FeKedge_1_15.nxs").getAbsolutePath();
 		try (IHierarchicalDataFile reader = HierarchicalDataFactory
 				.getReader(absolutePath)) {
 		}
@@ -233,7 +233,7 @@ public class Hdf5Test {
 	@Test
 	public void testGetAttributeValues_String() throws Exception {
 		String absolutePath = Hdf5TestUtils
-				.getAbsolutePath("test/org/dawb/hdf5/FeKedge_1_15.nxs");
+				.getBundleFile("org/dawb/hdf5/FeKedge_1_15.nxs").getAbsolutePath();
 		try (IHierarchicalDataFile reader = HierarchicalDataFactory
 				.getReader(absolutePath)) {
 			Map<String, Object> attrs;

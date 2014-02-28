@@ -3,6 +3,7 @@ package org.dawb.hdf5.model.internal;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -25,7 +26,7 @@ public class HierarchicalDataFileModelTest {
 		@Override
 		public IHierarchicalDataFile getReader() throws Exception {
 			String absolutePath = Hdf5TestUtils
-					.getAbsolutePath("test/org/dawb/hdf5/model/internal/i05-4859.nxs");
+					.getBundleFile("org/dawb/hdf5/model/internal/i05-4859.nxs").getAbsolutePath();
 			return HierarchicalDataFactory.getReader(absolutePath);
 		}
 	};
@@ -80,8 +81,7 @@ public class HierarchicalDataFileModelTest {
 
 			@Override
 			public IHierarchicalDataFile getReader() throws Exception {
-				String absolutePath = Hdf5TestUtils
-						.getAbsolutePath("test/org/dawb/hdf5/model/internal/non-existent-file.nxs");
+				String absolutePath = "/tmp/non-existent-file.nxs";
 				return HierarchicalDataFactory.getReader(absolutePath);
 			}
 		};

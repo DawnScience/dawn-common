@@ -67,9 +67,9 @@ public class Hdf5ThreadTest extends AbstractThreadTest {
 			if (useFileCopy) {
 				test = File.createTempFile("test", ".h5");
 				test.deleteOnExit();
-				HierarchicalDataUtils.copy(new File(Hdf5TestUtils.getAbsolutePath("test/org/dawb/hdf5/FeKedge_1_15.nxs")), test);
+				HierarchicalDataUtils.copy(Hdf5TestUtils.getBundleFile("org/dawb/hdf5/FeKedge_1_15.nxs"), test);
 			} else {
-				test = new File(Hdf5TestUtils.getAbsolutePath("test/org/dawb/hdf5/FeKedge_1_15.nxs"));
+				test = Hdf5TestUtils.getBundleFile("org/dawb/hdf5/FeKedge_1_15.nxs");
 			}
 			
 			
