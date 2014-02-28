@@ -5,7 +5,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- */ 
+ */
 package org.dawb.hdf5;
 
 import static org.junit.Assert.assertEquals;
@@ -24,56 +24,56 @@ import org.junit.Test;
 
 
 public class Hdf5Test {
-	
+
 	private static String FILENAME = "dset.h5";
 	private static String DATASETNAME = "dset";
 	private static final int DIM_X = 4;
 	private static final int DIM_Y = 6;
-	
+
 	@Test
 	public void writeH5Example() throws Exception {
-		
+
 		IHierarchicalDataFile file = null;
 		try {
-			
+
 			final File tmp = File.createTempFile("Test", "h5");
 			tmp.deleteOnExit();
 			tmp.createNewFile();
-			
+
 			// Throws exception if already writing to this file
-			// on another thread. 
+			// on another thread.
 			// writeH5Example is synchronized to here to avoid this write
 			// (but not others!) interfering.
 			file = HierarchicalDataFactory.getWriter(tmp.getAbsolutePath());
-					
+
 			final Group myDataGroup = file.group("myData");
-			
+
 			final double[] random = new double[2048*2048];
 			for (int i = 0; i < 2048*2048; i++) {
 				random[i] = Math.random();
 			}
-			Dataset s = file.createDataset("data", 
-					new H5Datatype(Datatype.CLASS_FLOAT, 64/8, Datatype.NATIVE, Datatype.NATIVE), 
+			Dataset s = file.createDataset("data",
+					new H5Datatype(Datatype.CLASS_FLOAT, 64/8, Datatype.NATIVE, Datatype.NATIVE),
 					new long[]{2048,2048},
-					random, 
+					random,
 					myDataGroup);
 			file.setNexusAttribute(s, Nexus.SDS);
 			file.close();
-			
+
 			file = HierarchicalDataFactory.getReader(tmp.getAbsolutePath());
 			final Dataset set = (Dataset)file.getData("myData/data");
-			
+
 			set.getMetadata();
-			
+
 			final long[] size = set.getDims();
 			if (size[0]!=2048 || size[1]!=2048) throw new Exception("Unexpected read data set size!");
-			
+
 			final double[] data = (double[])set.getData();
-			
+
 			for (int i = 0; i < data.length; i++) {
 				if (data[i]!=random[i]) throw new Exception("Unexpected data value!");
 			}
-			
+
 		} finally {
 			if (file!=null) file.close();
 		}
@@ -81,7 +81,7 @@ public class Hdf5Test {
 
 	@Test
 	public void testOpenFile() throws Exception {
-		
+
 
 		int id = -1;
 		try {
@@ -89,23 +89,23 @@ public class Hdf5Test {
 			id = H5.H5Fopen(path,
 				            HDF5Constants.H5F_ACC_RDWR,
 					        HDF5Constants.H5P_DEFAULT);
-			
-			
+
+
 			if (id<0) throw new Exception("Cannot open hdf5 file!");
 		} finally {
 			if (id>-1) H5.H5Fclose(id);
 		}
-		
-		
+
+
 	}
-	
+
 	@Test
 	public void testData() throws Exception {
 		getData(Hdf5TestUtils.getBundleFile("org/dawb/hdf5/FeKedge_1_15.nxs").getAbsolutePath());
 	}
-	
+
 	private void getData(String path) throws Exception {
-		
+
 		IHierarchicalDataFile testFile = null;
 
 		try {
@@ -127,7 +127,7 @@ public class Hdf5Test {
 		//printStructure(/buffer/linpickard1/results/examples/DCT_201006-good.h5");
 		//printStructure("/buffer/linpickard1/results/large test files/rhodo_f2_datanorm_.h5");
 	}
-	
+
 	public void printStructure(final String path) throws Exception {
 
 		IHierarchicalDataFile testFile = null;
@@ -135,11 +135,11 @@ public class Hdf5Test {
 		try {
 			// open the file and retrieve the file structure
 			testFile = HierarchicalDataFactory.getReader(path);
-			final Group root = testFile.getRoot();			
+			final Group root = testFile.getRoot();
 			if (root == null) throw new Exception("Did not get root!");
-			
+
 			testFile.print();
-			
+
 		} finally {
 			// close file resource
 			if (testFile!=null) testFile.close();
@@ -147,10 +147,10 @@ public class Hdf5Test {
 
 	}
 
-	
+
 	//@Test
 	public void testReadWriteDataset() {
-		
+
 		int file_id = -1;
 		int dataset_id = -1;
 		int[][] dset_data = new int[DIM_X][DIM_Y];
