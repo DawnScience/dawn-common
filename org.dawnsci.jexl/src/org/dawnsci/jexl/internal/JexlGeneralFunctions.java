@@ -94,4 +94,9 @@ public class JexlGeneralFunctions {
 	public static AbstractDataset squeeze(AbstractDataset data) {
 		return data.squeeze();
 	}
+	
+	public static AbstractDataset reshape(AbstractDataset data, int[] shape) {
+		AbstractDataset out = data.clone();
+		return out.reshape(shape);
+	}
 }
