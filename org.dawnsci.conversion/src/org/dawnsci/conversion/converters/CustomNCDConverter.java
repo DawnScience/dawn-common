@@ -103,7 +103,7 @@ public class CustomNCDConverter extends AbstractConversion  {
 			if (context.getAxisDatasetName() != null) {
 				axis = (IErrorDataset)getAxis(context.getAxisDatasetName(), context.getSelectedConversionFile());
 				// ATSAS ASCII format doesn't support axis errors
-				if (axis.hasErrors() && exportFormat.equals(SAS_FORMAT.ATSAS)) {
+				if (axis != null && axis.hasErrors() && exportFormat.equals(SAS_FORMAT.ATSAS)) {
 					axis.clearError();
 				}
 			}

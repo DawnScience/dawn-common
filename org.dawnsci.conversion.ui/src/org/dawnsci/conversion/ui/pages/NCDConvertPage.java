@@ -169,7 +169,7 @@ public class NCDConvertPage extends ResourceChoosePage implements
 	}
 	
 	private void nameChanged() {
-		String qAxisName = datasetName.replaceAll(DATANAME, QAXISNAME);
+		String qAxisName = datasetName.replaceAll(DATANAME+"$", QAXISNAME);
 		
 		if (hasDataset(qAxisName)) {
 			axisButton.setEnabled(true);
