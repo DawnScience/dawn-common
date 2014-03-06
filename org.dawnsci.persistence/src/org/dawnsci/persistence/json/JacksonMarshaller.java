@@ -110,7 +110,7 @@ public class JacksonMarshaller implements IJSonMarshaller{
 			return mapper.readValue(json, CircularFitROIBean.class);
 		} else if (type.equals(EllipticalFitROIBean.TYPE)) {
 			return mapper.readValue(json, EllipticalFitROIBean.class);
-		} else if (Integer.valueOf(type) != null && Integer.valueOf(type) >= 0) { // if type is an integer we unmarshall to FunctionBean
+		} else if (type.contains("functions")) {
 			return mapper.readValue(json, FunctionBean.class);
 		}
 		return null;
