@@ -49,6 +49,7 @@ public class NCDConvertPage extends ResourceChoosePage implements
 	private SAS_FORMAT     exportFormat;
 	
 	private static final String QAXISNAME = "/q";
+	private static final String THETAAXISNAME = "/2theta";
 	private static final String DATANAME = "/data";
 	private static final String LAST_SET_KEY = "org.dawnsci.conversion.ui.pages.lastDataSetNCD";
 
@@ -169,9 +170,18 @@ public class NCDConvertPage extends ResourceChoosePage implements
 	}
 	
 	private void nameChanged() {
-		String qAxisName = datasetName.replaceAll(DATANAME+"$", QAXISNAME);
 		
-		if (hasDataset(qAxisName)) {
+		boolean hasAxis = false;
+		
+		String qAxisName = datasetName.replaceAll(DATANAME+"$", QAXISNAME);
+		hasAxis = hasDataset(qAxisName);
+		
+		if (!hasAxis) {
+			qAxisName = datasetName.replaceAll(DATANAME+"$", THETAAXISNAME);
+			hasAxis = hasDataset(qAxisName);
+		}
+		
+		if (hasAxis) {
 			axisButton.setEnabled(true);
 			axisButton.setSelection(true);
 			axisMessage.setText(qAxisName);
