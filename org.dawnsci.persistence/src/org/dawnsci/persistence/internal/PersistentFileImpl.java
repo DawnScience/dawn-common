@@ -57,8 +57,6 @@ import uk.ac.diamond.scisoft.analysis.io.IDiffractionMetadata;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 import uk.ac.diamond.scisoft.analysis.io.NexusDiffractionMetaReader;
 import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
-import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.ROIBean;
-import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.ROIBeanConverter;
 import uk.ac.diamond.scisoft.analysis.roi.IROI;
 
 /**
@@ -319,10 +317,7 @@ class PersistentFileImpl implements IPersistentFile {
 		if(json == null) throw new Exception("Reading Exception: " +ROI_ENTRY+ " entry does not exist in the file " + filePath);
 		// JSON deserialization
 		json = json.substring(1, json.length()-1); // this is needed as somehow, the getAttribute adds [ ] around the json string...
-		ROIBean roibean = (ROIBean)converter.unmarshal(json);
-
-		//convert the bean to roibase
-		IROI roi = ROIBeanConverter.getROI(roibean);
+		IROI roi = (IROI)converter.unmarshal(json);
 
 		return roi;
 	}
@@ -344,10 +339,8 @@ class PersistentFileImpl implements IPersistentFile {
 			String name = (String) it.next();
 			String json = file.getAttributeValue(ROI_ENTRY+"/"+name+"@JSON");
 			json = json.substring(1, json.length()-1); // this is needed as somehow, the getAttribute adds [ ] around the json string...
-			ROIBean roibean = (ROIBean) converter.unmarshal(json);
+			IROI roi = (IROI) converter.unmarshal(json);
 
-			//convert the bean to roibase
-			IROI roi = ROIBeanConverter.getROI(roibean);
 			rois.put(name, roi);
 		}
 
@@ -562,13 +555,11 @@ class PersistentFileImpl implements IPersistentFile {
 			String  name,
 			IROI    roi) throws Exception {
 
-		ROIBean roibean = ROIBeanConverter.getROIBean(name, roi);
-
 		long[] dims = {1};
 
 		IJSonMarshaller converter = new JacksonMarshaller();
 
-		String json = converter.marshal(roibean);
+		String json = converter.marshal(roi);
 
 		// we create the dataset
 		Dataset dat = file.replaceDataset(name, new H5Datatype(Datatype.CLASS_INTEGER, 4, Datatype.NATIVE, Datatype.NATIVE), dims, new int[]{0}, parent);
@@ -650,7 +641,7 @@ class PersistentFileImpl implements IPersistentFile {
 
 	@Override
 	public boolean isRegionSupported(IROI roi) {
-		return ROIBeanConverter.isROISupported(roi);
+		return JacksonMarshaller.isROISupported(roi);
 	}
 
 	@Override

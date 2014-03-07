@@ -6,17 +6,15 @@ import static org.junit.Assert.assertEquals;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.dawnsci.persistence.json.roi.CircularROIBean;
+import org.dawnsci.persistence.json.roi.PolylineROIBean;
+import org.dawnsci.persistence.json.roi.ROIBean;
+import org.dawnsci.persistence.json.roi.RectangularROIBean;
+import org.dawnsci.persistence.json.roi.SectorROIBean;
 import org.junit.Before;
 import org.junit.Test;
 
-import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.CircularROIBean;
-import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.PolylineROIBean;
-import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.ROIBean;
-import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.ROIBeanConverter;
-import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.RectangularROIBean;
-import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.SectorROIBean;
 import uk.ac.diamond.scisoft.analysis.roi.CircularROI;
-import uk.ac.diamond.scisoft.analysis.roi.IROI;
 import uk.ac.diamond.scisoft.analysis.roi.PolylineROI;
 import uk.ac.diamond.scisoft.analysis.roi.RectangularROI;
 import uk.ac.diamond.scisoft.analysis.roi.SectorROI;
@@ -35,58 +33,6 @@ public class ROIBeanConverterTest {
 	}
 
 	@Test
-	public void testRectangularROIConversionToRectangularROIBean() {
-		// RectangularROI
-		IROI roi = new RectangularROI(startPoint[0], startPoint[1], lengths[0], lengths[1], 0);
-		RectangularROIBean rbean = (RectangularROIBean) ROIBeanConverter.getROIBean("rectangle1", roi);
-		assertArrayEquals(startPoint, rbean.getStartPoint(), 0);
-		assertArrayEquals(lengths, rbean.getLengths(), 0);
-	}
-
-	@Test
-	public void testCircularROIConversionToCircularROIBean() {
-		//CircularROI
-		double radius = 100;
-		IROI roi = new CircularROI(radius, startPoint[0], startPoint[1]);
-		CircularROIBean cbean = (CircularROIBean)ROIBeanConverter.getROIBean("circle1", roi);
-		assertArrayEquals(startPoint, cbean.getStartPoint(), 0);
-		assertEquals(radius, cbean.getRadius(), 0);
-	}
-
-	@Test
-	public void testPolylineROIConversionToPolylineROIBean(){
-		//PolylineROI
-		IROI roi = new PolylineROI(startPoint);
-		double[] point0 = {102, 102}, point1 = {105, 105};
-		((PolylineROI)roi).insertPoint(point0);
-		((PolylineROI)roi).insertPoint(point1);
-		PolylineROIBean pbean = (PolylineROIBean)ROIBeanConverter.getROIBean("Polyline", roi);
-		assertArrayEquals(startPoint, pbean.getStartPoint(), 0);
-		assertArrayEquals(startPoint, pbean.getPoints().get(0), 0);
-		assertArrayEquals(point0, pbean.getPoints().get(1), 0);
-		assertArrayEquals(point1, pbean.getPoints().get(2), 0);
-	}
-
-	@Test
-	public void testSectorROIConversionToSectorROIBean(){
-		//SectorROI
-		double[] radii = {30, 50}, angles = {6, 9};
-		double dpp = 20; int symmetry = 5;
-		IROI roi = new SectorROI();
-		((SectorROI)roi).setAngles(angles);
-		((SectorROI)roi).setPoint(startPoint);
-		((SectorROI)roi).setRadii(radii[0], radii[1]);
-		((SectorROI)roi).setDpp(dpp);
-		((SectorROI)roi).setSymmetry(symmetry);
-		SectorROIBean sbean = (SectorROIBean)ROIBeanConverter.getROIBean("Sector", roi);
-		assertArrayEquals(startPoint, sbean.getStartPoint(), 0);
-		assertArrayEquals(radii, sbean.getRadii(), 0);
-		assertArrayEquals(angles, sbean.getAngles(), 0);
-		assertEquals(dpp, sbean.getDpp(), 0);
-		assertEquals(symmetry, sbean.getSymmetry());
-	}
-
-	@Test
 	public void testRectangularROIBeanConversionToRectangularROI(){
 		//RectangularROI
 		ROIBean rbean = new RectangularROIBean();
@@ -95,7 +41,7 @@ public class ROIBeanConverterTest {
 		((RectangularROIBean)rbean).setType("RectangularROI");
 		((RectangularROIBean)rbean).setLengths(lengths);
 		((RectangularROIBean)rbean).setAngle(0);
-		RectangularROI rroi = (RectangularROI)ROIBeanConverter.getROI(rbean);
+		RectangularROI rroi = (RectangularROI)rbean.getROI();
 		assertArrayEquals(startPoint, rroi.getPoint(), 0);
 		assertArrayEquals(lengths, rroi.getLengths(), 0);
 	}
@@ -109,7 +55,7 @@ public class ROIBeanConverterTest {
 		((CircularROIBean)rbean).setStartPoint(startPoint);
 		((CircularROIBean)rbean).setType("CircularROI");
 		((CircularROIBean)rbean).setRadius(radius);
-		CircularROI croi = (CircularROI)ROIBeanConverter.getROI(rbean);
+		CircularROI croi = (CircularROI)rbean.getROI();
 		assertArrayEquals(startPoint, croi.getPoint(), 0);
 		assertEquals(radius, croi.getRadius(), 0);
 	}
@@ -127,7 +73,7 @@ public class ROIBeanConverterTest {
 		((PolylineROIBean)rbean).setPoints(points);
 		((PolylineROIBean)rbean).setStartPoint(startPoint);
 		((PolylineROIBean)rbean).setType("PolylineROI");
-		PolylineROI proi = (PolylineROI)ROIBeanConverter.getROI(rbean);
+		PolylineROI proi = (PolylineROI)rbean.getROI();
 		assertArrayEquals(startPoint, proi.getPoint(), 0);
 		assertArrayEquals(point0, proi.getPoint(1).getPoint(), 0);
 		assertArrayEquals(point1, proi.getPoint(2).getPoint(), 0);
@@ -145,7 +91,7 @@ public class ROIBeanConverterTest {
 		((SectorROIBean)rbean).setDpp(dpp);
 		((SectorROIBean)rbean).setSymmetry(symmetry);
 
-		SectorROI sroi = (SectorROI)ROIBeanConverter.getROI(rbean);
+		SectorROI sroi = (SectorROI)rbean.getROI();
 		assertArrayEquals(startPoint, sroi.getPoint(), 0);
 		assertArrayEquals(radii, sroi.getRadii(), 0);
 		assertArrayEquals(angles, sroi.getAngles(), 0);
