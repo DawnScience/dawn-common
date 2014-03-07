@@ -19,8 +19,9 @@ import uk.ac.diamond.scisoft.analysis.fitting.functions.IParameter;
 
 /**
  * Function bean used to marshall/unmarshall to / from JSON strings <br>
- * A converter can be used to convert this bean to IFunction<br> 
- * (See uk.ac.diamond.scisoft.analysis.persistence.bean.function.FunctionBeanConverter) 
+ * A converter can be used to convert this bean to IFunction<br>
+ * (See uk.ac.diamond.scisoft.analysis.persistence.bean.function.
+ * FunctionBeanConverter)
  */
 public class FunctionBean {
 
@@ -29,15 +30,17 @@ public class FunctionBean {
 	protected IParameter[] parameters;
 
 	public FunctionBean() {
-		
+
 	}
 
 	public String getName() {
 		return name;
 	}
+
 	public void setName(String name) {
 		this.name = name;
 	}
+
 	public String getType() {
 		return type;
 	}
@@ -56,17 +59,21 @@ public class FunctionBean {
 
 	/**
 	 * Method that converts a function bean to an IFunction using reflection
+	 * 
 	 * @return IFunction
-	 * @throws ClassNotFoundException 
-	 * @throws SecurityException 
-	 * @throws NoSuchMethodException 
-	 * @throws InvocationTargetException 
-	 * @throws IllegalArgumentException 
-	 * @throws IllegalAccessException 
-	 * @throws InstantiationException 
+	 * @throws ClassNotFoundException
+	 * @throws SecurityException
+	 * @throws NoSuchMethodException
+	 * @throws InvocationTargetException
+	 * @throws IllegalArgumentException
+	 * @throws IllegalAccessException
+	 * @throws InstantiationException
 	 */
 	@JsonIgnore
-	public IFunction getIFunction() throws ClassNotFoundException, NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+	public IFunction getIFunction() throws ClassNotFoundException,
+			NoSuchMethodException, SecurityException, InstantiationException,
+			IllegalAccessException, IllegalArgumentException,
+			InvocationTargetException {
 		IParameter[] params = this.getParameters();
 		Class<?> clazz = Class.forName(this.getType());
 		Constructor<?> constructor = clazz.getConstructor(IParameter[].class);
