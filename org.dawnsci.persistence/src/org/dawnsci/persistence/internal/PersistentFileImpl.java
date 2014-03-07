@@ -667,8 +667,8 @@ class PersistentFileImpl implements IPersistentFile {
 			Iterator<String> it = functions.keySet().iterator();
 			while(it.hasNext()){
 				String name = it.next();
-				IFunction roi = functions.get(name);
-				writeFunction(file, parent, name, roi, converter);
+				IFunction function = functions.get(name);
+				writeFunction(file, parent, name, function, converter);
 			}
 		}
 	}
