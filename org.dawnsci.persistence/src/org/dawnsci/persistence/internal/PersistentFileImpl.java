@@ -57,8 +57,6 @@ import uk.ac.diamond.scisoft.analysis.io.IDiffractionMetadata;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 import uk.ac.diamond.scisoft.analysis.io.NexusDiffractionMetaReader;
 import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
-import uk.ac.diamond.scisoft.analysis.persistence.bean.function.FunctionBean;
-import uk.ac.diamond.scisoft.analysis.persistence.bean.function.FunctionBeanConverter;
 import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.ROIBean;
 import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.ROIBeanConverter;
 import uk.ac.diamond.scisoft.analysis.roi.IROI;
@@ -691,10 +689,8 @@ class PersistentFileImpl implements IPersistentFile {
 		if(json == null) throw new Exception("Reading Exception: " +FUNCTION_ENTRY+ " entry does not exist in the file " + filePath);
 
 		IJSonMarshaller converter = new JacksonMarshaller();
-		FunctionBean fBean = (FunctionBean) converter.unmarshal(json);
-
-		//convert the bean to AFunction
-		IFunction function = FunctionBeanConverter.functionBeanToIFunction(fBean);
+		//Deserialize the json back to a function
+		IFunction function = (IFunction) converter.unmarshal(json);
 
 		return function;
 	}
@@ -714,10 +710,9 @@ class PersistentFileImpl implements IPersistentFile {
 			String name = (String) it.next();
 			String json = file.getAttributeValue(FUNCTION_ENTRY+"/"+name+"@JSON");
 			json = json.substring(1, json.length()-1); // this is needed as somehow, the getAttribute adds [ ] around the json string...
-			FunctionBean fBean = (FunctionBean) converter.unmarshal(json);
+			//Deserialize the json back to a function
+			IFunction function = (IFunction) converter.unmarshal(json);
 
-			//convert the bean to AFunction
-			IFunction function = FunctionBeanConverter.functionBeanToIFunction(fBean);
 			functions.put(name, function);
 		}
 
@@ -748,11 +743,11 @@ class PersistentFileImpl implements IPersistentFile {
 	private HObject writeFunction(IHierarchicalDataFile file, Group parent,
 			String name, IFunction function, IJSonMarshaller converter) throws Exception {
 
-		FunctionBean fBean = FunctionBeanConverter.iFunctionToFunctionBean(name, (IFunction)function);
+//		FunctionBean fBean = FunctionBeanConverter.iFunctionToFunctionBean(name, (IFunction)function);
 
 		long[] dims = {1};
 
-		String json = converter.marshal(fBean);
+		String json = converter.marshal(function);
 
 		// we create the dataset
 		Dataset dat = file.replaceDataset(name, new H5Datatype(Datatype.CLASS_INTEGER, 4, Datatype.NATIVE, Datatype.NATIVE), dims, new int[]{0}, parent);

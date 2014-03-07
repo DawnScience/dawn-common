@@ -15,7 +15,6 @@
  */
 package org.dawnsci.persistence.json;
 
-import uk.ac.diamond.scisoft.analysis.persistence.bean.function.FunctionBean;
 import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.CircularROIBean;
 import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.FreedrawROIBean;
 import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.LinearROIBean;

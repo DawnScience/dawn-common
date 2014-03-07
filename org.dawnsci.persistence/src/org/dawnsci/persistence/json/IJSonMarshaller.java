@@ -15,6 +15,8 @@
  */
 package org.dawnsci.persistence.json;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 /**
  * Interface used to marshall from ROIBean/FunctionBean to JSON
  * and unmarshall from JSON to ROIBean/FunctionBean
@@ -28,8 +30,9 @@ public interface IJSonMarshaller {
 	 * Returns a JSON String given an object
 	 * @param obj
 	 * @return
+	 * @throws JsonProcessingException 
 	 */
-	public String marshal(Object obj);
+	public String marshal(Object obj) throws JsonProcessingException;
 
 	/**
 	 * Returns an object given a JSON String

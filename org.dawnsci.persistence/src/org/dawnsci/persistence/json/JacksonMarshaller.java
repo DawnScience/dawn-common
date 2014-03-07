@@ -15,12 +15,9 @@
  */
 package org.dawnsci.persistence.json;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import uk.ac.diamond.scisoft.analysis.fitting.functions.IFunction;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.IParameter;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.Parameter;
-import uk.ac.diamond.scisoft.analysis.persistence.bean.function.FunctionBean;
 import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.CircularFitROIBean;
 import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.CircularROIBean;
 import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.EllipticalFitROIBean;
@@ -35,6 +32,7 @@ import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.PolylineROIBean;
 import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.RectangularROIBean;
 import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.RingROIBean;
 import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.SectorROIBean;
+import uk.ac.diamond.scisoft.analysis.roi.ROIBase;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.Version;
@@ -49,8 +47,6 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
  */
 public class JacksonMarshaller implements IJSonMarshaller{
 
-	private final Logger logger = LoggerFactory.getLogger(JacksonMarshaller.class);
-
 	private ObjectMapper mapper;
 
 	public JacksonMarshaller() {
@@ -62,12 +58,24 @@ public class JacksonMarshaller implements IJSonMarshaller{
 	}
 
 	@Override
-	public String marshal(Object obj) {
-		try {
+	public String marshal(Object obj) throws JsonProcessingException {
+		if (obj instanceof IFunction) {
+			IFunction function = (IFunction)obj;
+			FunctionBean fBean = new FunctionBean();
+			fBean.setName(function.getName());
+			IParameter[] iParameters = function.getParameters();
+			Parameter[] parameters = new Parameter[iParameters.length];
+			for (int i = 0; i < parameters.length; i++) {
+				parameters[i] = new Parameter(iParameters[i]);
+			}
+			fBean.setParameters(parameters);
+			fBean.setType(function.getClass().getName());
+
+			return mapper.writeValueAsString(fBean);
+		} else if (obj instanceof ROIBase) {
 			return mapper.writeValueAsString(obj);
-		} catch (JsonProcessingException e) {
-			logger.error("Error marshalling from "+ obj.getClass() + ":" + e);
-			return "";
+		} else {
+			return mapper.writeValueAsString(obj);
 		}
 	}
 
@@ -111,7 +119,8 @@ public class JacksonMarshaller implements IJSonMarshaller{
 		} else if (type.equals(EllipticalFitROIBean.TYPE)) {
 			return mapper.readValue(json, EllipticalFitROIBean.class);
 		} else if (type.contains("functions")) {
-			return mapper.readValue(json, FunctionBean.class);
+			FunctionBean fbean = mapper.readValue(json, FunctionBean.class);
+			return fbean.getIFunction();
 		}
 		return null;
 	}

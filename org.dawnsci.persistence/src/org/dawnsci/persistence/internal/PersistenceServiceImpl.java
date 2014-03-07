@@ -21,6 +21,10 @@ import org.dawb.hdf5.HierarchicalDataFactory;
 import org.dawb.hdf5.IHierarchicalDataFile;
 import org.dawnsci.persistence.json.JacksonMarshaller;
 import org.dawnsci.persistence.workflow.xml.MomlUpdater;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 /**
  * Implementation of IPersistenceService<br>
@@ -31,6 +35,8 @@ import org.dawnsci.persistence.workflow.xml.MomlUpdater;
  *
  */
 public class PersistenceServiceImpl implements IPersistenceService{
+
+	private final Logger logger = LoggerFactory.getLogger(PersistenceServiceImpl.class);
 
 	/**
 	 * Default Constructor
@@ -56,7 +62,13 @@ public class PersistenceServiceImpl implements IPersistenceService{
 
 	@Override
 	public String marshal(Object obj) {
-		return new JacksonMarshaller().marshal(obj);
+		try {
+			return new JacksonMarshaller().marshal(obj);
+		} catch (JsonProcessingException e) {
+			logger.error("Error while marshalling object " + obj + " : " + e);
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 	@Override
