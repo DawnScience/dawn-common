@@ -124,6 +124,9 @@ class PersistentFileImpl implements IPersistentFile {
 			while(it.hasNext()){
 				String name = it.next();
 				BooleanDataset bd = (BooleanDataset)masks.get(name);
+				// Inverse the dataset: see http://jira.diamond.ac.uk/browse/SCI-1757
+				bd.invert();
+
 				AbstractDataset id = DatasetUtils.cast(bd, AbstractDataset.INT8);
 				final Datatype datatype = H5Utils.getDatatype(id);
 				final long[] shape = new long[id.getShape().length];
@@ -138,6 +141,9 @@ class PersistentFileImpl implements IPersistentFile {
 
 	@Override
 	public void addMask(String name, IDataset mask, IMonitor mon) throws Exception{
+		// Inverse the dataset: see http://jira.diamond.ac.uk/browse/SCI-1757
+		((BooleanDataset)mask).invert();
+
 		AbstractDataset id = DatasetUtils.cast((BooleanDataset)mask, AbstractDataset.INT8);
 		//check if parent group exists
 		Group parent = (Group)file.getData(MASK_ENTRY);
@@ -290,6 +296,8 @@ class PersistentFileImpl implements IPersistentFile {
 	public BooleanDataset getMask(String maskName, IMonitor mon) throws Exception {
 		ShortDataset sdata = (ShortDataset)LoaderFactory.getDataSet(filePath, MASK_ENTRY+"/"+maskName, mon);
 		BooleanDataset bd = (BooleanDataset) DatasetUtils.cast(sdata, AbstractDataset.BOOL);
+		// Inverse the dataset: see http://jira.diamond.ac.uk/browse/SCI-1757
+		bd.invert();
 		return bd;
 	}
 
@@ -304,6 +312,8 @@ class PersistentFileImpl implements IPersistentFile {
 
 			ShortDataset sdata = (ShortDataset)LoaderFactory.getDataSet(filePath, MASK_ENTRY+"/"+name, mon);
 			BooleanDataset bd = (BooleanDataset) DatasetUtils.cast(sdata, AbstractDataset.BOOL);
+			// Inverse the dataset: see http://jira.diamond.ac.uk/browse/SCI-1757
+			bd.invert();
 			masks.put(name, bd);
 		}
 		return masks;
