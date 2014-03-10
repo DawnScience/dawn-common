@@ -68,7 +68,7 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
 		
 		this.options = new CheckWizardPage("Export Options", createDefaultOptions());
 		Map<String,String> stringOptions = new HashMap<String, String>(1);
-		stringOptions.put("Mask", "");
+		stringOptions.put(PersistWizardConstants.MASK, "");
 		options.setStringValues(stringOptions);
 		options.setDescription("Please choose things to export.");
 		
@@ -98,12 +98,12 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
     public boolean canFinish() {
     	if (fcp.isPageComplete() && getContainer().getCurrentPage()==fcp) {
     		options.setDescription("Please choose the things to save in '"+fcp.getFileName()+"'.");
-    		options.setOptionEnabled("Original Data",   false);
-    		options.setOptionEnabled("Image History",    false);
-    		options.setOptionEnabled("Mask",            false);
-    		options.setOptionEnabled("Regions",         false);
-    		options.setOptionEnabled("Diffraction Metadata", false);
-    		options.setOptionEnabled("Functions",       false);
+    		options.setOptionEnabled(PersistWizardConstants.ORIGINAL_DATA,   false);
+    		options.setOptionEnabled(PersistWizardConstants.IMAGE_HIST,      false);
+    		options.setOptionEnabled(PersistWizardConstants.MASK,            false);
+    		options.setOptionEnabled(PersistWizardConstants.REGIONS,         false);
+    		options.setOptionEnabled(PersistWizardConstants.DIFF_META,       false);
+    		options.setOptionEnabled(PersistWizardConstants.FUNCTIONS,       false);
 
     		File                file=null;
     		IPersistentFile     pf=null;
@@ -115,7 +115,7 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
     		    pf    = service.getPersistentFile(file.getAbsolutePath());
     		    final List<String>  names = pf.getMaskNames(null);
     		    if (names!=null && !names.isEmpty()) {
-    		    	options.setStringValue("Mask", names.get(0));
+    		    	options.setStringValue(PersistWizardConstants.MASK, names.get(0));
     		    }
     		        		    
     		} catch (Throwable ne) {
@@ -130,10 +130,10 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
     				ITrace trace  = system.getTraces().iterator().next();
     				if (trace!=null) {
     					
-    					options.setOptionEnabled("Original Data", true);
+    					options.setOptionEnabled(PersistWizardConstants.ORIGINAL_DATA, true);
     					
     					if (trace instanceof IImageTrace && ((IImageTrace)trace).getMask()!=null) {
-    						options.setOptionEnabled("Mask", true);
+    						options.setOptionEnabled(PersistWizardConstants.MASK, true);
     					}
     				}
     				
@@ -144,17 +144,17 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
     					final Map<String, IDataset> data = (Map<String, IDataset>)tool.getToolData();
     					if (data!=null && !data.isEmpty()) requireHistory = true;
     				}
-      				options.setOptionEnabled("Image History", requireHistory);
+      				options.setOptionEnabled(PersistWizardConstants.IMAGE_HIST, requireHistory);
     				
     				final Collection<IRegion> regions = system.getRegions();
     				if (regions != null && !regions.isEmpty()) {
-    					options.setOptionEnabled("Regions", true);
+    					options.setOptionEnabled(PersistWizardConstants.REGIONS, true);
     				}
     				
     				if (trace!=null && trace instanceof IImageTrace && trace.getData() != null) {
     					IMetaData meta = ((AbstractDataset)trace.getData()).getMetadata();
     					if (meta != null && (meta instanceof IDiffractionMetadata)) {
-    						options.setOptionEnabled("Diffraction Metadata", true);
+    						options.setOptionEnabled(PersistWizardConstants.DIFF_META, true);
     					}
     				}
     				
@@ -162,7 +162,7 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
     				if (part!=null) {
     					final IFunctionService funcService = (IFunctionService)part.getAdapter(IFunctionService.class);
     					if (funcService != null) {
-    						options.setOptionEnabled("Functions", true);
+    						options.setOptionEnabled(PersistWizardConstants.FUNCTIONS, true);
     					}
     				}
 
@@ -202,7 +202,7 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
 						 final IMonitor mon = new ProgressMonitorWrapper(monitor);
 
 						 // Save things.
-						 if (options.is("Original Data")) {
+						 if (options.is(PersistWizardConstants.ORIGINAL_DATA)) {
 							 Collection<ITrace> traces  = system.getTraces();
 							 for (ITrace trace : traces) {
 								 file.setData((AbstractDataset)trace.getData());
@@ -212,7 +212,7 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
 								 }
 							 }
 						 }
-						 if (options.is("Image History")) {
+						 if (options.is(PersistWizardConstants.IMAGE_HIST)) {
 			    				final IToolPageSystem tsystem = (IToolPageSystem)system.getAdapter(IToolPageSystem.class);
 			    				final IToolPage       tool    = tsystem.getActiveTool();
 			    				if (tool != null && tool.getToolId().equals("org.dawb.workbench.plotting.tools.imageCompareTool")) {
@@ -224,16 +224,16 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
 						 }
 						 
 						 final ITrace trace = system.getTraces().iterator().next();
-						 if (options.is("Mask") && trace instanceof IImageTrace) {
+						 if (options.is(PersistWizardConstants.MASK) && trace instanceof IImageTrace) {
 							 IImageTrace image = (IImageTrace)trace;
-							 final String name = options.getString("Mask");
+							 final String name = options.getString(PersistWizardConstants.MASK);
 							 if (image.getMask()!=null) {
 								 file.addMask(name, (BooleanDataset)image.getMask(), mon);
 							 }
 						 }
 						 
 						 final Collection<IRegion> regions = system.getRegions();
-						 if (options.is("Regions") && regions!=null && !regions.isEmpty()) {
+						 if (options.is(PersistWizardConstants.REGIONS) && regions!=null && !regions.isEmpty()) {
 							 for (IRegion iRegion : regions) {
 								 if (!file.isRegionSupported(iRegion.getROI())) {
 									logger.debug("Region "+ iRegion.getName() + " of type "
@@ -248,7 +248,7 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
 							 }
 						 }
 						 
-						 if (options.is("Diffraction Metadata")) {
+						 if (options.is(PersistWizardConstants.DIFF_META)) {
 							 if (trace!=null && trace instanceof IImageTrace && trace.getData() != null) {
 								 IMetaData meta = trace.getData().getMetadata();
 								 if (meta == null || meta instanceof IDiffractionMetadata) {
@@ -257,7 +257,7 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
 							 }
 						 }
 						 
-						 if (options.is("Functions")) {
+						 if (options.is(PersistWizardConstants.FUNCTIONS)) {
 							 if (funcService != null) {
 								 Map<String, IFunction> functions = funcService.getFunctions();
 								 if (functions != null) {

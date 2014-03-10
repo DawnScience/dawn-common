@@ -15,15 +15,14 @@ public abstract class AbstractPersistenceWizard extends Wizard {
 		
 	}
 
-
 	protected Map<String, Boolean> createDefaultOptions() {
 		final Map<String, Boolean> options = new LinkedHashMap<String, Boolean>(3);
-		options.put("Original Data",        true);
-		options.put("Image History",        true);
-		options.put("Mask",                 true);
-		options.put("Regions",              true);
-		options.put("Functions",            true);
-		options.put("Diffraction Metadata", true);
+		options.put(PersistWizardConstants.ORIGINAL_DATA, true);
+		options.put(PersistWizardConstants.IMAGE_HIST,    true);
+		options.put(PersistWizardConstants.MASK,          true);
+		options.put(PersistWizardConstants.REGIONS,       true);
+		options.put(PersistWizardConstants.FUNCTIONS,     true);
+		options.put(PersistWizardConstants.DIFF_META,     true);
 		return options;
 	}
 

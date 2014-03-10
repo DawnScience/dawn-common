@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.dawb.common.ui.util.GridUtils;
+import org.dawb.common.ui.wizard.persistence.PersistWizardConstants;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
@@ -185,7 +186,10 @@ public class CheckWizardPage extends WizardPage implements SelectionListener{
 				if (stringValues!=null&&stringValues.containsKey(label) && values.get(label)) {
 					String value = stringValues.get(label);
 					if (value==null || value.equals("")) {
-						setErrorMessage("Please set a value for '"+label+"'.");
+						if (label != null && label.equals(PersistWizardConstants.MASK))
+							setErrorMessage("Please set a name for 'Mask'.");
+						else
+							setErrorMessage("Please set a value for '"+label+"'.");
 						if (isPageComplete()) setPageComplete(false);
 						return;
 					}

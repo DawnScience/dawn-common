@@ -246,11 +246,11 @@ public class PersistenceImportWizard extends AbstractPersistenceWizard implement
 
 			// Save things.
 			ITrace trace  = system.getTraces().iterator().next();
-			if (options.is("Original Data")) {
+			if (options.is(PersistWizardConstants.ORIGINAL_DATA)) {
 				// Not needed can open file directly
 			}
 
-			if (options.is("Mask") && trace instanceof IImageTrace) {
+			if (options.is(PersistWizardConstants.MASK) && trace instanceof IImageTrace) {
 				final IImageTrace image = (IImageTrace)trace;
 				String name = options.getString("Mask"); //TODO drop down of available masks.
 				if (name == null) name = file.getMaskNames(null).get(0);
@@ -265,7 +265,7 @@ public class PersistenceImportWizard extends AbstractPersistenceWizard implement
 			}
 
 			final IPersistentFile finalFile = file;
-			if (options.is("Regions")) {
+			if (options.is(PersistWizardConstants.REGIONS)) {
 				final Map<String, IROI> rois = file.getROIs(mon);
 				if (rois!=null && !rois.isEmpty()) {
 					
@@ -298,7 +298,7 @@ public class PersistenceImportWizard extends AbstractPersistenceWizard implement
 				}
 			}
 			
-			if (options.is("Diffraction Metadata") && trace instanceof IImageTrace) {
+			if (options.is(PersistWizardConstants.DIFF_META) && trace instanceof IImageTrace) {
 				//check loader service and overwrite if not null
 				//check image and overwrite if none in service
 				ILoaderService loaderService = (ILoaderService)PlatformUI.getWorkbench().getService(ILoaderService.class);
@@ -322,7 +322,7 @@ public class PersistenceImportWizard extends AbstractPersistenceWizard implement
 				});
 			}
 			
-			if (options.is("Functions")) {
+			if (options.is(PersistWizardConstants.FUNCTIONS)) {
 				if (funcService != null) {
 					final Map<String, IFunction> functions = file.getFunctions(mon);
 					if (functions != null) {
