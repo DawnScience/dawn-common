@@ -15,6 +15,7 @@
  */
 package org.dawnsci.persistence.json;
 
+import org.dawnsci.persistence.json.function.FunctionBean;
 import org.dawnsci.persistence.json.roi.CircularROIBean;
 import org.dawnsci.persistence.json.roi.FreedrawROIBean;
 import org.dawnsci.persistence.json.roi.LinearROIBean;

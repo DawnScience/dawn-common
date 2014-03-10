@@ -18,6 +18,8 @@ package org.dawnsci.persistence.json;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.dawnsci.persistence.json.function.FunctionBean;
+import org.dawnsci.persistence.json.function.FunctionListBean;
 import org.dawnsci.persistence.json.roi.CircularFitROIBean;
 import org.dawnsci.persistence.json.roi.CircularROIBean;
 import org.dawnsci.persistence.json.roi.EllipticalFitROIBean;
@@ -37,6 +39,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.ac.diamond.scisoft.analysis.fitting.functions.IFunction;
+import uk.ac.diamond.scisoft.analysis.fitting.functions.IOperator;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.IParameter;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.Parameter;
 import uk.ac.diamond.scisoft.analysis.roi.CircularFitROI;
@@ -85,8 +88,13 @@ public class JacksonMarshaller implements IJSonMarshaller{
 	public String marshal(Object obj) throws JsonProcessingException {
 		if (obj instanceof IFunction) {
 			IFunction function = (IFunction)obj;
-			FunctionBean fBean = getFunctionBean(function);
-			return mapper.writeValueAsString(fBean);
+			if (function instanceof IOperator) {
+				FunctionListBean bean = getFunctionListBean(function);
+				return mapper.writeValueAsString(bean);
+			} else {
+				FunctionBean bean = getFunctionBean(function);
+				return mapper.writeValueAsString(bean);
+			}
 		} else if (obj instanceof IROI) {
 			IROI roi = (IROI)obj;
 			ROIBean rbean = getROIBean(roi);
@@ -150,14 +158,19 @@ public class JacksonMarshaller implements IJSonMarshaller{
 			EllipticalFitROIBean bean = mapper.readValue(json, EllipticalFitROIBean.class);
 			return bean.getROI();
 		} else if (type.contains("functions")) {
-			FunctionBean fbean = mapper.readValue(json, FunctionBean.class);
-			return fbean.getIFunction();
+			if (FunctionListBean.getInstance(type) instanceof IOperator) {
+				FunctionListBean fbean = mapper.readValue(json, FunctionListBean.class);
+				return fbean.getIFunction();
+			} else {
+				FunctionBean fbean = mapper.readValue(json, FunctionBean.class);
+				return fbean.getIFunction();
+			}
 		}
 		return null;
 	}
 
 	/**
-	 * Method that converts an IFunctionI to a FunctionBean
+	 * Method that converts an IFunction to a FunctionBean
 	 * @param function
 	 * @return FunctionBean
 	 */
@@ -170,6 +183,24 @@ public class JacksonMarshaller implements IJSonMarshaller{
 			parameters[i] = new Parameter(iParameters[i]);
 		}
 		fBean.setParameters(parameters);
+		fBean.setType(function.getClass().getName());
+		return fBean;
+	}
+
+	/**
+	 * Method that converts an IOperator to a FunctionListBean
+	 * @param function
+	 * @return FunctionListBean
+	 */
+	private FunctionListBean getFunctionListBean(IFunction function) {
+		FunctionListBean fBean = new FunctionListBean();
+		fBean.setName(function.getName());
+		IFunction[] functions = ((IOperator)function).getFunctions();
+		FunctionBean[] funcBeans = new FunctionBean[functions.length];
+		for (int i = 0; i < functions.length; i++) {
+			funcBeans[i] = getFunctionBean(functions[i]);
+		}
+		fBean.setFunctions(funcBeans);
 		fBean.setType(function.getClass().getName());
 		return fBean;
 	}

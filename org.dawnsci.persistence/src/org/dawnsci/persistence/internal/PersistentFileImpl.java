@@ -733,9 +733,6 @@ class PersistentFileImpl implements IPersistentFile {
 
 	private HObject writeFunction(IHierarchicalDataFile file, Group parent,
 			String name, IFunction function, IJSonMarshaller converter) throws Exception {
-
-//		FunctionBean fBean = FunctionBeanConverter.iFunctionToFunctionBean(name, (IFunction)function);
-
 		long[] dims = {1};
 
 		String json = converter.marshal(function);

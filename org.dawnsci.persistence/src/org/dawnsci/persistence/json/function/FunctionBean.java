@@ -6,7 +6,7 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package org.dawnsci.persistence.json;
+package org.dawnsci.persistence.json.function;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;

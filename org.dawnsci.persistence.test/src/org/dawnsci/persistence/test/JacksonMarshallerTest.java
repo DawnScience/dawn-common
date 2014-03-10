@@ -2,8 +2,8 @@ package org.dawnsci.persistence.test;
 
 import static org.junit.Assert.*;
 
-import org.dawnsci.persistence.json.FunctionBean;
 import org.dawnsci.persistence.json.JacksonMarshaller;
+import org.dawnsci.persistence.json.function.FunctionBean;
 import org.dawnsci.persistence.json.roi.RectangularROIBean;
 import org.junit.Before;
 import org.junit.Test;
