@@ -10,8 +10,6 @@ import java.util.Map;
 import org.dawb.common.services.IPersistenceService;
 import org.dawb.common.services.IPersistentFile;
 import org.dawnsci.persistence.PersistenceServiceCreator;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import uk.ac.diamond.scisoft.analysis.roi.CircularROI;
@@ -20,22 +18,21 @@ import uk.ac.diamond.scisoft.analysis.roi.RectangularROI;
 
 public class ReadWriteROITest extends AbstractThreadTestBase {
 
-	private File tmp;
-	private IPersistenceService persist;
-	private IPersistentFile file;
+	//Do not put the annotation as the files needs to be created and closed after each test
+	//so it can run with the thread tests
+	//Passes value by array
+	public IPersistentFile before(File[] tmp) throws Exception {
 
-	@Before
-	public void before() throws Exception {
-		tmp = File.createTempFile("TestRoi", ".txt");
-		tmp.createNewFile();
+		tmp[0] = File.createTempFile("TestRoi", ".txt");
+		tmp[0].createNewFile();
 
 		// create the PersistentService
-		persist = PersistenceServiceCreator.createPersistenceService();
-		file = persist.createPersistentFile(tmp.getAbsolutePath());
+		IPersistenceService persist = PersistenceServiceCreator.createPersistenceService();
+		IPersistentFile file = persist.createPersistentFile(tmp[0].getAbsolutePath());
+		return file;
 	}
 
-	@After
-	public void after(){
+	public void after(File tmp, IPersistentFile file){
 		if (tmp != null)
 			tmp.deleteOnExit();
 
@@ -45,6 +42,10 @@ public class ReadWriteROITest extends AbstractThreadTestBase {
 
 	@Test
 	public void testWriteReadRectangularROI() throws Exception {
+		//create and init files
+		File[] tmp = new File[1];
+		IPersistentFile file = before(tmp);
+
 		IROI rroi = new RectangularROI();
 		Map<String, IROI> rois = new HashMap<String, IROI>();
 		rois.put("MyROI", rroi);
@@ -61,11 +62,16 @@ public class ReadWriteROITest extends AbstractThreadTestBase {
 		IROI resultROI = roisRead.get("MyROI");
 		
 		assertEquals(rroi, resultROI);
+
+		//close files
+		after(tmp[0], file);
 	}
 
 	@Test
 	public void testWriteReadROI() throws Exception{
-
+		//create and init files
+		File[] tmp = new File[1];
+		IPersistentFile file = before(tmp);
 		// regions
 		RectangularROI rroi = new RectangularROI(0, 0, 100, 200, 0);
 		CircularROI croi = new CircularROI(50, 100, 100);
@@ -91,6 +97,8 @@ public class ReadWriteROITest extends AbstractThreadTestBase {
 			fail("ROIs read are Null.");
 		}
 
+		//close files
+		after(tmp[0], file);
 	}
 
 	@Test
