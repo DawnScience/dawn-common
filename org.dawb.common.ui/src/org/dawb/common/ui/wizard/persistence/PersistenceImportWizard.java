@@ -53,7 +53,7 @@ import uk.ac.diamond.scisoft.analysis.roi.IROI;
  * @author fcp94556
  *
  */
-public class PersistenceImportWizard extends AbstractPerstenceWizard implements IImportWizard {
+public class PersistenceImportWizard extends AbstractPersistenceWizard implements IImportWizard {
 
 	public static final String ID = "org.dawnsci.plotting.importMask";
 	private ResourceChoosePage fcp;

@@ -49,7 +49,7 @@ import uk.ac.diamond.scisoft.analysis.io.IDiffractionMetadata;
 import uk.ac.diamond.scisoft.analysis.io.IMetaData;
 import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
 
-public class PersistenceExportWizard extends AbstractPerstenceWizard implements IExportWizard {
+public class PersistenceExportWizard extends AbstractPersistenceWizard implements IExportWizard {
 	
 	public static final String ID = "org.dawnsci.plotting.exportMask";
 	
