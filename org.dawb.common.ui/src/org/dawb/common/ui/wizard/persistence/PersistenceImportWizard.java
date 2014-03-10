@@ -322,15 +322,18 @@ public class PersistenceImportWizard extends AbstractPerstenceWizard implements 
 				});
 			}
 			
-			 if (options.is("Functions")) {
-				 if (funcService != null) {
-					 Map<String, IFunction> functions = file.getFunctions(mon);
-					 if (functions != null) {
-						 funcService.setFunctions(functions);
+			if (options.is("Functions")) {
+				if (funcService != null) {
+					final Map<String, IFunction> functions = file.getFunctions(mon);
+					if (functions != null) {
+						Display.getDefault().syncExec(new Runnable() {
+							public void run() {
+								funcService.setFunctions(functions);
+							}
+						});
 					}
-				 }
-			 }
-			
+				}
+			}
 
 		} finally {
 			if (file!=null) file.close();

@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,61 +18,87 @@ import uk.ac.diamond.scisoft.analysis.roi.RectangularROI;
 
 public class ReadWriteROITest extends AbstractThreadTestBase {
 
-	@Test
-	public void testWriteReadROI(){
-		
-		try {
-			final File tmp = File.createTempFile("TestRoi", ".nxs");
+	//Do not put the annotation as the files needs to be created and closed after each test
+	//so it can run with the thread tests
+	//Passes value by array
+	public IPersistentFile before(File[] tmp) throws Exception {
+
+		tmp[0] = File.createTempFile("TestRoi", ".txt");
+		tmp[0].createNewFile();
+
+		// create the PersistentService
+		IPersistenceService persist = PersistenceServiceCreator.createPersistenceService();
+		IPersistentFile file = persist.createPersistentFile(tmp[0].getAbsolutePath());
+		return file;
+	}
+
+	public void after(File tmp, IPersistentFile file){
+		if (tmp != null)
 			tmp.deleteOnExit();
-			tmp.createNewFile();
-			
-			//regions
-			RectangularROI rroi = new RectangularROI(0, 0, 100, 200, 0);
-			CircularROI croi = new CircularROI(50, 100, 100);
-			Map<String, IROI> rois = new HashMap<String, IROI>();
-			rois.put("rectangle0", rroi);
-			rois.put("circle0", croi);
-			
-			// create the PersistentService
-			IPersistenceService persist = PersistenceServiceCreator.createPersistenceService();
-			
-			//create the persistent file and set rois
-			IPersistentFile file = null;
-			try {
-				file = persist.createPersistentFile(tmp.getAbsolutePath());
-				file.setROIs(rois);
-			} catch (Exception e){
-				e.printStackTrace();
-				fail("Exception occured while writing ROis");
-			} finally {
-				if(file != null)
-					file.close();
-			}
 
-			Map<String, IROI> roisRead = null;
-			//read the persistent file and retrieve the regions
-			try {
-				file = persist.getPersistentFile(tmp.getAbsolutePath());
-				roisRead = file.getROIs(null);
-			} catch (Exception e) {
-				e.printStackTrace();
-				fail("Exception occured while reading ROis");
-			} finally {
-				file.close();
-			}
+		if(file != null)
+			file.close();
+	}
 
-			//test that the rois are the same
-			if(roisRead != null){
-				assertEquals(rois.containsKey("rectangle0"), roisRead.containsKey("rectangle0"));
-				assertEquals(rois.containsKey("circle0"), roisRead.containsKey("circle0"));
-			} else {
-				fail("ROIs read are Null.");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			fail("IOException occured while creating the test file");
+	@Test
+	public void testWriteReadRectangularROI() throws Exception {
+		//create and init files
+		File[] tmp = new File[1];
+		IPersistentFile file = before(tmp);
+
+		IROI rroi = new RectangularROI();
+		Map<String, IROI> rois = new HashMap<String, IROI>();
+		rois.put("MyROI", rroi);
+		file.setROIs(rois);
+
+		Map<String, IROI> roisRead = null;
+		//read the persistent file and retrieve the functions
+		roisRead = file.getROIs(null);
+	
+		//test that the rois are the same
+		assertEquals(rois.containsKey("MyROI"), roisRead.containsKey("MyROI"));
+
+		//test the unmarshalling of the JSON String
+		IROI resultROI = roisRead.get("MyROI");
+		
+		assertEquals(rroi, resultROI);
+
+		//close files
+		after(tmp[0], file);
+	}
+
+	@Test
+	public void testWriteReadROI() throws Exception{
+		//create and init files
+		File[] tmp = new File[1];
+		IPersistentFile file = before(tmp);
+		// regions
+		RectangularROI rroi = new RectangularROI(0, 0, 100, 200, 0);
+		CircularROI croi = new CircularROI(50, 100, 100);
+		Map<String, IROI> rois = new HashMap<String, IROI>();
+		rois.put("rectangle0", rroi);
+		rois.put("circle0", croi);
+
+		// create the persistent file and set rois
+		file.setROIs(rois);
+
+
+		Map<String, IROI> roisRead = null;
+		// read the persistent file and retrieve the regions
+		roisRead = file.getROIs(null);
+
+		// test that the rois are the same
+		if (roisRead != null) {
+			assertEquals(rois.containsKey("rectangle0"),
+					roisRead.containsKey("rectangle0"));
+			assertEquals(rois.containsKey("circle0"),
+					roisRead.containsKey("circle0"));
+		} else {
+			fail("ROIs read are Null.");
 		}
 
+		//close files
+		after(tmp[0], file);
 	}
 
 	@Test

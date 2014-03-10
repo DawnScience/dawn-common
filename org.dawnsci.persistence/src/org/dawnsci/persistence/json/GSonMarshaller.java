@@ -15,17 +15,17 @@
  */
 package org.dawnsci.persistence.json;
 
-import uk.ac.diamond.scisoft.analysis.persistence.bean.function.FunctionBean;
-import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.CircularROIBean;
-import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.FreedrawROIBean;
-import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.LinearROIBean;
-import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.PerimeterBoxROIBean;
-import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.PointROIBean;
-import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.PolygonalROIBean;
-import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.PolylineROIBean;
-import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.RectangularROIBean;
-import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.RingROIBean;
-import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.SectorROIBean;
+import org.dawnsci.persistence.json.function.FunctionBean;
+import org.dawnsci.persistence.json.roi.CircularROIBean;
+import org.dawnsci.persistence.json.roi.FreedrawROIBean;
+import org.dawnsci.persistence.json.roi.LinearROIBean;
+import org.dawnsci.persistence.json.roi.PerimeterBoxROIBean;
+import org.dawnsci.persistence.json.roi.PointROIBean;
+import org.dawnsci.persistence.json.roi.PolygonalROIBean;
+import org.dawnsci.persistence.json.roi.PolylineROIBean;
+import org.dawnsci.persistence.json.roi.RectangularROIBean;
+import org.dawnsci.persistence.json.roi.RingROIBean;
+import org.dawnsci.persistence.json.roi.SectorROIBean;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

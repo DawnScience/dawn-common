@@ -3,13 +3,15 @@ package org.dawnsci.persistence.test;
 import static org.junit.Assert.*;
 
 import org.dawnsci.persistence.json.JacksonMarshaller;
+import org.dawnsci.persistence.json.function.FunctionBean;
+import org.dawnsci.persistence.json.roi.RectangularROIBean;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 import uk.ac.diamond.scisoft.analysis.fitting.functions.Fermi;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.Parameter;
-import uk.ac.diamond.scisoft.analysis.persistence.bean.function.FunctionBean;
-import uk.ac.diamond.scisoft.analysis.persistence.bean.roi.RectangularROIBean;
 
 /**
  * Test the marshallizer with Jackson
@@ -70,7 +72,7 @@ public class JacksonMarshallerTest {
 	}
 
 	@Test
-	public void testMarshallFromROIBeanToJsonString(){
+	public void testMarshallFromROIBeanToJsonString() throws JsonProcessingException{
 		String resultJSON = jackMarshall.marshal(roibean);
 		assertEquals(jsonroi, resultJSON);
 	}
@@ -91,7 +93,7 @@ public class JacksonMarshallerTest {
 	}
 
 	@Test
-	public void testMarshallFromFunctionBeanToJSonString(){
+	public void testMarshallFromFunctionBeanToJSonString() throws JsonProcessingException{
 		String resultJSON = jackMarshall.marshal(functionbean);
 		assertEquals(jsonfunction, resultJSON);
 	}

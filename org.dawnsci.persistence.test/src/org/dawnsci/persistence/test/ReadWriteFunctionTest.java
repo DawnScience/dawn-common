@@ -94,14 +94,14 @@ public class ReadWriteFunctionTest {
 		compoundFunction.addFunction(gaussian);
 		compoundFunction.addFunction(fermi);
 		//TODO
-//		Map<String, IFunction> functions = new HashMap<String, IFunction>();
-//		functions.put("MyFunction", compoundFunction);
-//		//write function to JSON
-//		file.setFunctions(functions);
-//		//read function from JSON
-//		Map<String, IFunction> functionsRead = file.getFunctions(null);
-//
-//		assertEquals(compoundFunction, functionsRead.get("MyFunction"));
+		Map<String, IFunction> functions = new HashMap<String, IFunction>();
+		functions.put("MyFunction", compoundFunction);
+		//write function to JSON
+		file.setFunctions(functions);
+		//read function from JSON
+		Map<String, IFunction> functionsRead = file.getFunctions(null);
+
+		assertEquals(compoundFunction, functionsRead.get("MyFunction"));
 	}
 
 }
