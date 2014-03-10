@@ -48,6 +48,12 @@ public class PersistenceServiceImpl implements IPersistenceService{
 		IHierarchicalDataFile file = HierarchicalDataFactory.getWriter(filePath);
 		return new PersistentFileImpl(file);
 	}
+	
+	@Override
+	public IPersistentFile createPersistentFile(Object file) throws Exception {
+		return new PersistentFileImpl((IHierarchicalDataFile)file);
+	}
+
 
 	@Override
 	public Object unmarshal(String json) throws Exception {

@@ -8,6 +8,7 @@
  */
 package org.dawb.common.services;
 
+
 /**
  * This service can be called to save and/or load data from an hdf5 file.
  * 
@@ -32,6 +33,14 @@ public interface IPersistenceService {
 	 */
 	public IPersistentFile createPersistentFile(String filePath) throws Exception;
 
+	/**
+	 * 
+	 * @param file - currently must be the IHierarchicalDataFile or a class cast exception is thrown 
+	 * @return
+	 * @throws Exception
+	 */
+	public IPersistentFile createPersistentFile(Object file) throws Exception;
+	
 	/**
 	 * Returns an object bean given a JSon String
 	 * @param json
