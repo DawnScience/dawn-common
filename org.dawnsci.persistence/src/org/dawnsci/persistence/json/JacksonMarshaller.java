@@ -118,12 +118,15 @@ public class JacksonMarshaller implements IJSonMarshaller{
 			return mapper.readValue(json, Object.class);
 
 		String type = typeNode.asText();
-		if (type.contains("ROI")) { // if the ROI keyword is present we assume the data is a roi
+		// if the ROI keyword is present we assume the data is a roi
+		if (type.contains("ROI")) {
 			// Return the corresponding ROIBean class name
 			Class<?> clazz = Class.forName("org.dawnsci.persistence.json.roi." + type + "Bean");
 			ROIBean bean = (ROIBean) mapper.readValue(json, clazz);
 			return bean.getROI();
-		} else if (type.contains("function")) { // if the function keyword is present we assume the data is a function
+		}
+		// if the function keyword is present we assume the data is a function
+		if (type.contains("function")) {
 			if (PersistenceUtils.getInstance(type) instanceof IOperator) {
 				FunctionListBean fbean = mapper.readValue(json, FunctionListBean.class);
 				return fbean.getIFunction();
