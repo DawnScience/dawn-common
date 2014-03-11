@@ -39,9 +39,9 @@ def runScript(scriptPath, inputs, funcName='run'):
         scriptDir = os.path.dirname(scriptPath)
         sys_path_0 = sys.path[0]
         if sys_path_0_set and scriptDir != sys_path_0:
-            raise Exception("runScript attempted to change sys.path[0] in a way that " +
-                            "could cause a race condition. Current sys.path[0] is %r, " +
-                            "trying to set to %r" % (sys_path_0, scriptDir) )
+            raise Exception("runScript attempted to change sys.path[0] in a way that "
+                            "could cause a race condition. Current sys.path[0] is {!r}, "
+                            "trying to set to {!r}".format(sys_path_0, scriptDir))
         else:
             sys.path[0] = scriptDir
             sys_path_0_set = True
