@@ -87,9 +87,9 @@ public class EllipticalFitROIBean extends ROIBean {
 			poly.insertPoint(point);
 		}
 		EllipticalFitROI eroi = new EllipticalFitROI(poly);
-		eroi.setName(this.getName());
-		eroi.setSemiaxes(this.getSemiAxes());
-		eroi.setAngle(this.getAngle());
+		eroi.setName(getName());
+		eroi.setSemiaxes(getSemiAxes());
+		eroi.setAngle(getAngle());
 		return eroi;
 	}
 

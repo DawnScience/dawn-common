@@ -51,8 +51,8 @@ public class PolylineROIBean extends ROIBean{
 	@Override
 	@JsonIgnore
 	public IROI getROI() {
-		PolylineROI plroi = new PolylineROI(this.getStartPoint());
-		Iterator<double[]> it = this.getPoints().iterator();
+		PolylineROI plroi = new PolylineROI(getStartPoint());
+		Iterator<double[]> it = getPoints().iterator();
 		while (it.hasNext()) {
 			double[] point = it.next();
 			plroi.insertPoint(point);

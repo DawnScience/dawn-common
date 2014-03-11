@@ -74,11 +74,11 @@ public class FunctionListBean {
 			NoSuchMethodException, SecurityException, InstantiationException,
 			IllegalAccessException, IllegalArgumentException,
 			InvocationTargetException {
-		FunctionBean[] funcBeans = this.getFunctions();
+		FunctionBean[] funcBeans = getFunctions();
 		IFunction[] functions = new IFunction[funcBeans.length];
 
-		IFunction operator = (IFunction) PersistenceUtils.getInstance(this.type);
-		operator.setName(this.name);
+		IFunction operator = (IFunction) PersistenceUtils.getInstance(type);
+		operator.setName(name);
 
 		for (int i = 0; i < funcBeans.length; i++) {
 			functions[i] = funcBeans[i].getIFunction();

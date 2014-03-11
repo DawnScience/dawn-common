@@ -88,10 +88,10 @@ public class PerimeterBoxROIBean extends ROIBean {
 	@JsonIgnore
 	public IROI getROI() {
 		PerimeterBoxROI proi = new PerimeterBoxROI();
-		proi.setName(this.getName());
-		proi.setPoint(this.getStartPoint());
-		proi.setLengths(this.getLengths());
-		proi.setAngle(this.getAngle());
+		proi.setName(getName());
+		proi.setPoint(getStartPoint());
+		proi.setLengths(getLengths());
+		proi.setAngle(getAngle());
 		return proi;
 	}
 }

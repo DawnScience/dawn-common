@@ -26,7 +26,9 @@ import org.dawnsci.persistence.json.roi.EllipticalFitROIBean;
 import org.dawnsci.persistence.json.roi.EllipticalROIBean;
 import org.dawnsci.persistence.json.roi.FreedrawROIBean;
 import org.dawnsci.persistence.json.roi.GridROIBean;
+import org.dawnsci.persistence.json.roi.HyperbolicROIBean;
 import org.dawnsci.persistence.json.roi.LinearROIBean;
+import org.dawnsci.persistence.json.roi.ParabolicROIBean;
 import org.dawnsci.persistence.json.roi.PerimeterBoxROIBean;
 import org.dawnsci.persistence.json.roi.PointROIBean;
 import org.dawnsci.persistence.json.roi.PolygonalROIBean;
@@ -49,8 +51,10 @@ import uk.ac.diamond.scisoft.analysis.roi.EllipticalFitROI;
 import uk.ac.diamond.scisoft.analysis.roi.EllipticalROI;
 import uk.ac.diamond.scisoft.analysis.roi.FreeDrawROI;
 import uk.ac.diamond.scisoft.analysis.roi.GridROI;
+import uk.ac.diamond.scisoft.analysis.roi.HyperbolicROI;
 import uk.ac.diamond.scisoft.analysis.roi.IROI;
 import uk.ac.diamond.scisoft.analysis.roi.LinearROI;
+import uk.ac.diamond.scisoft.analysis.roi.ParabolicROI;
 import uk.ac.diamond.scisoft.analysis.roi.PerimeterBoxROI;
 import uk.ac.diamond.scisoft.analysis.roi.PointROI;
 import uk.ac.diamond.scisoft.analysis.roi.PolygonalROI;
@@ -343,6 +347,25 @@ public class JacksonMarshaller implements IJSonMarshaller{
 			eroibean.setPoints(points);
 			return eroibean;
 
+		} else if(roiClass == ParabolicROI.class){
+			ParabolicROI proi = (ParabolicROI) roi;
+			ParabolicROIBean proibean = new ParabolicROIBean();
+			proibean.setName(proi.getName());
+			proibean.setAngle(proi.getAngle());
+			proibean.setFocalParameter(proi.getFocalParameter());
+			proibean.setStartPoint(proi.getPoint());getClass();
+			return proibean;
+
+		} else if(roiClass == HyperbolicROI.class){
+			HyperbolicROI hroi = (HyperbolicROI) roi;
+			HyperbolicROIBean hroibean = new HyperbolicROIBean();
+			hroibean.setName(hroi.getName());
+			hroibean.setAngle(hroi.getAngle());
+			hroibean.setEccentricity(hroi.getEccentricity());
+			hroibean.setSemi(hroi.getSemilatusRectum());
+			hroibean.setStartPoint(hroi.getPoint());getClass();
+			return hroibean;
+
 		} else {
 			logger.debug("This type is not supported");
 		}
@@ -369,7 +392,9 @@ public class JacksonMarshaller implements IJSonMarshaller{
 				|| roi instanceof YAxisBoxROI
 				|| roi instanceof EllipticalROI
 				|| roi instanceof CircularFitROI
-				|| roi instanceof EllipticalFitROI)
+				|| roi instanceof EllipticalFitROI
+				|| roi instanceof ParabolicROI
+				|| roi instanceof HyperbolicROI)
 			return true;
 		return false;
 	}

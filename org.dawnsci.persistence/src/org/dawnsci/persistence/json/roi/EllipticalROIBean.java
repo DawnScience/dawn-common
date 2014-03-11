@@ -81,10 +81,10 @@ public class EllipticalROIBean extends ROIBean {
 	@JsonIgnore
 	public IROI getROI() {
 		EllipticalROI croi = new EllipticalROI();
-		croi.setName(this.getName());
-		croi.setPoint(this.getStartPoint());
-		croi.setAngle(this.getAngle());
-		croi.setSemiaxes(this.getSemiAxes());
+		croi.setName(getName());
+		croi.setPoint(getStartPoint());
+		croi.setAngle(getAngle());
+		croi.setSemiaxes(getSemiAxes());
 		return croi;
 	}
 }

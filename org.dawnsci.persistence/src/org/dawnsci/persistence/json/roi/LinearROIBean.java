@@ -50,9 +50,9 @@ public class LinearROIBean extends ROIBean {
 	@JsonIgnore
 	public IROI getROI() {
 		LinearROI lroi = new LinearROI();
-		lroi.setPoint(this.getStartPoint());
-		lroi.setEndPoint(this.getEndPoint());
-		lroi.setName(this.getName());
+		lroi.setPoint(getStartPoint());
+		lroi.setEndPoint(getEndPoint());
+		lroi.setName(getName());
 		return lroi;
 	}
 

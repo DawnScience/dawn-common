@@ -74,7 +74,7 @@ public class CircularFitROIBean extends ROIBean {
 			poly.insertPoint(point);
 		}
 		CircularFitROI croi = new CircularFitROI(poly);
-		croi.setName(this.getName());
+		croi.setName(getName());
 		return croi;
 	}
 

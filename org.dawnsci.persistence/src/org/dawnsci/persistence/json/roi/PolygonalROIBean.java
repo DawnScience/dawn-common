@@ -51,13 +51,13 @@ public class PolygonalROIBean extends ROIBean{
 	@Override
 	@JsonIgnore
 	public IROI getROI() {
-		PolygonalROI pgroi = new PolygonalROI(this.getStartPoint());
-		Iterator<double[]> it = this.getPoints().iterator();
+		PolygonalROI pgroi = new PolygonalROI(getStartPoint());
+		Iterator<double[]> it = getPoints().iterator();
 		while (it.hasNext()) {
 			double[] point = it.next();
 			pgroi.insertPoint(point);
 		}
-		pgroi.setName(this.getName());
+		pgroi.setName(getName());
 		return pgroi;
 	}
 }

@@ -77,12 +77,12 @@ public class FunctionBean {
 			IllegalAccessException, IllegalArgumentException,
 			InvocationTargetException {
 		IFunction function = null;
-		IParameter[] params = this.getParameters();
-		Class<?> clazz = Class.forName(this.getType());
+		IParameter[] params = getParameters();
+		Class<?> clazz = Class.forName(getType());
 		// If a Jexl expression
 		if (clazz.equals(JexlExpressionFunction.class)) {
 			Constructor<?> constructor = clazz.getConstructor(String.class);
-			function = (IFunction) constructor.newInstance((String) this.getName());
+			function = (IFunction) constructor.newInstance((String) getName());
 			for (int i = 0; i < params.length; i++) {
 				((JexlExpressionFunction)function).setParameter(i, params[i]);
 			}

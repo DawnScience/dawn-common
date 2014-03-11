@@ -54,9 +54,9 @@ public class CircularROIBean extends ROIBean {
 	@Override
 	@JsonIgnore
 	public IROI getROI() {
-		CircularROI croi = new CircularROI(this.getRadius(), 
-				this.getStartPoint()[0], this.getStartPoint()[1]);
-		croi.setName(this.getName());
+		CircularROI croi = new CircularROI(getRadius(), 
+				getStartPoint()[0], getStartPoint()[1]);
+		croi.setName(getName());
 		return croi;
 	}
 }

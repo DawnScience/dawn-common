@@ -26,8 +26,8 @@ public class PointROIBean extends ROIBean {
 	@Override
 	public IROI getROI() {
 		PointROI proi = new PointROI();
-		proi.setName(this.getName());
-		proi.setPoint(this.getStartPoint());
+		proi.setName(getName());
+		proi.setPoint(getStartPoint());
 		return proi;
 	}
 }

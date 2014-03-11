@@ -143,15 +143,15 @@ public class SectorROIBean extends ROIBean{
 	@JsonIgnore
 	public IROI getROI() {
 		SectorROI sroi = new SectorROI();
-		sroi.setName(this.getName());
-		sroi.setPoint(this.getStartPoint());
-		sroi.setRadii(this.getRadii());
-		sroi.setAngles(this.getAngles());
-		sroi.setDpp(this.getDpp());
-		sroi.setSymmetry(this.getSymmetry());
-		sroi.setClippingCompensation(this.isClippingCompensation());
-		sroi.setCombineSymmetry(this.isCombineSymmetry());
-		sroi.setAverageArea(this.isAverageArea());
+		sroi.setName(getName());
+		sroi.setPoint(getStartPoint());
+		sroi.setRadii(getRadii());
+		sroi.setAngles(getAngles());
+		sroi.setDpp(getDpp());
+		sroi.setSymmetry(getSymmetry());
+		sroi.setClippingCompensation(isClippingCompensation());
+		sroi.setCombineSymmetry(isCombineSymmetry());
+		sroi.setAverageArea(isAverageArea());
 		return sroi;
 	}
 }

@@ -96,12 +96,12 @@ public class GridROIBean extends ROIBean{
 	@Override
 	@JsonIgnore
 	public IROI getROI() {
-		GridROI groi = new GridROI(this.getStartPoint()[0], 
-				this.getStartPoint()[1], this.getLengths()[0], 
-				this.getLengths()[1], this.getAngle(),
-				this.getxSpacing(), this.getySpacing(),
-				this.isGridLinesOn(), this.isMidPointOn());
-		groi.setName(this.getName());
+		GridROI groi = new GridROI(getStartPoint()[0], 
+				getStartPoint()[1], getLengths()[0], 
+				getLengths()[1], getAngle(),
+				getxSpacing(), getySpacing(),
+				isGridLinesOn(), isMidPointOn());
+		groi.setName(getName());
 		return groi;
 	}
 }

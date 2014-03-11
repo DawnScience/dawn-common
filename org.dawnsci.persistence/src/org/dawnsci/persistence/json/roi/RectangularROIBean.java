@@ -86,10 +86,10 @@ public class RectangularROIBean extends ROIBean{
 	@Override
 	@JsonIgnore
 	public IROI getROI() {
-		RectangularROI rroi = new RectangularROI(this.getStartPoint()[0], 
-				this.getStartPoint()[1], this.getLengths()[0], 
-				this.getLengths()[1], this.getAngle());
-		rroi.setName(this.getName());
+		RectangularROI rroi = new RectangularROI(getStartPoint()[0], 
+				getStartPoint()[1], getLengths()[0], 
+				getLengths()[1], getAngle());
+		rroi.setName(getName());
 		return rroi;
 	}
 }

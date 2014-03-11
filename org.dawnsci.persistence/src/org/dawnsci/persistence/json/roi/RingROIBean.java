@@ -109,12 +109,12 @@ public class RingROIBean extends ROIBean{
 	@JsonIgnore
 	public IROI getROI() {
 		RingROI sroi = new RingROI();
-		sroi.setName(this.getName());
-		sroi.setPoint(this.getStartPoint());
-		sroi.setRadii(this.getRadii());
-		sroi.setAngles(this.getAngles());
-		sroi.setDpp(this.getDpp());
-		sroi.setSymmetry(this.getSymmetry());
+		sroi.setName(getName());
+		sroi.setPoint(getStartPoint());
+		sroi.setRadii(getRadii());
+		sroi.setAngles(getAngles());
+		sroi.setDpp(getDpp());
+		sroi.setSymmetry(getSymmetry());
 		return sroi;
 	}
 }

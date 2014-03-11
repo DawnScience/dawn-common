@@ -51,13 +51,13 @@ public class FreedrawROIBean extends ROIBean{
 	@Override
 	@JsonIgnore
 	public IROI getROI() {
-		FreeDrawROI fdroi = new FreeDrawROI(this.getStartPoint());
-		Iterator<double[]> it = this.getPoints().iterator();
+		FreeDrawROI fdroi = new FreeDrawROI(getStartPoint());
+		Iterator<double[]> it = getPoints().iterator();
 		while (it.hasNext()){
 			double[] point = it.next();
 			fdroi.insertPoint(point);
 		}
-		fdroi.setName(this.getName());
+		fdroi.setName(getName());
 		return fdroi;
 	}
 }
