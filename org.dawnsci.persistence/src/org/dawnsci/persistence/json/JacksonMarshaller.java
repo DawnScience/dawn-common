@@ -60,6 +60,8 @@ import uk.ac.diamond.scisoft.analysis.roi.SectorROI;
 import uk.ac.diamond.scisoft.analysis.roi.XAxisBoxROI;
 import uk.ac.diamond.scisoft.analysis.roi.YAxisBoxROI;
 
+import org.dawnsci.common.widgets.gda.function.jexl.JexlExpressionFunction;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -157,7 +159,7 @@ public class JacksonMarshaller implements IJSonMarshaller{
 		} else if (type.equals(EllipticalFitROIBean.TYPE)) {
 			EllipticalFitROIBean bean = mapper.readValue(json, EllipticalFitROIBean.class);
 			return bean.getROI();
-		} else if (type.contains("functions")) {
+		} else if (type.contains("function")) { // if the function keyword is present we assume the data is a function
 			if (FunctionListBean.getInstance(type) instanceof IOperator) {
 				FunctionListBean fbean = mapper.readValue(json, FunctionListBean.class);
 				return fbean.getIFunction();
@@ -176,7 +178,12 @@ public class JacksonMarshaller implements IJSonMarshaller{
 	 */
 	private FunctionBean getFunctionBean(IFunction function) {
 		FunctionBean fBean = new FunctionBean();
-		fBean.setName(function.getName());
+		if (function instanceof JexlExpressionFunction) {
+			JexlExpressionFunction jexl = (JexlExpressionFunction)function;
+			fBean.setName(jexl.getExpression());
+		} else {
+			fBean.setName(function.getName());
+		}
 		IParameter[] iParameters = function.getParameters();
 		Parameter[] parameters = new Parameter[iParameters.length];
 		for (int i = 0; i < parameters.length; i++) {

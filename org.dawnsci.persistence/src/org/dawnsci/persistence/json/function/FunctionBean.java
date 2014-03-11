@@ -12,6 +12,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 
+import org.dawnsci.common.widgets.gda.function.jexl.JexlExpressionFunction;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import uk.ac.diamond.scisoft.analysis.fitting.functions.IFunction;
@@ -74,10 +76,21 @@ public class FunctionBean {
 			NoSuchMethodException, SecurityException, InstantiationException,
 			IllegalAccessException, IllegalArgumentException,
 			InvocationTargetException {
+		IFunction function = null;
 		IParameter[] params = this.getParameters();
 		Class<?> clazz = Class.forName(this.getType());
-		Constructor<?> constructor = clazz.getConstructor(IParameter[].class);
-		return (IFunction) constructor.newInstance((Object) params);
+		// If a Jexl expression
+		if (clazz.equals(JexlExpressionFunction.class)) {
+			Constructor<?> constructor = clazz.getConstructor(String.class);
+			function = (IFunction) constructor.newInstance((String) this.getName());
+			for (int i = 0; i < params.length; i++) {
+				((JexlExpressionFunction)function).setParameter(i, params[i]);
+			}
+		} else { // For all other cases try to return an instance of IFunction with parameters
+			Constructor<?> constructor = clazz.getConstructor(IParameter[].class);
+			function = (IFunction) constructor.newInstance((Object) params);
+		}
+		return function;
 	}
 
 	@Override
