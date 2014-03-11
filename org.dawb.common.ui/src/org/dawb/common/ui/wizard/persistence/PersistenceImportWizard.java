@@ -18,6 +18,8 @@ import org.dawb.common.util.io.FileUtils;
 import org.dawnsci.plotting.api.IPlottingSystem;
 import org.dawnsci.plotting.api.region.IRegion;
 import org.dawnsci.plotting.api.region.IRegionService;
+import org.dawnsci.plotting.api.tool.IToolPage;
+import org.dawnsci.plotting.api.tool.IToolPageSystem;
 import org.dawnsci.plotting.api.trace.IImageTrace;
 import org.dawnsci.plotting.api.trace.ITrace;
 import org.eclipse.core.resources.IFile;
@@ -258,6 +260,13 @@ public class PersistenceImportWizard extends AbstractPersistenceWizard implement
 				if (mask!=null)  {
 					Display.getDefault().syncExec(new Runnable() {
 						public void run() {
+							// we set the maskDataset on the masking tool
+							final IToolPageSystem tsystem = (IToolPageSystem)system.getAdapter(IToolPageSystem.class);
+							final IToolPage       tool    = tsystem.getActiveTool();
+							if (tool != null && tool.getToolId().equals("org.dawb.workbench.plotting.tools.maskingTool")) {
+								tool.setToolData(mask);
+							}
+							// we set the mask on the image trace
 							image.setMask(mask);
 						}
 					});
