@@ -3,6 +3,10 @@ package org.dawnsci.persistence.util;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+
+import uk.ac.diamond.scisoft.analysis.fitting.functions.IFunction;
 
 public class PersistenceUtils {
 
@@ -36,5 +40,26 @@ public class PersistenceUtils {
 		}
 
 		return contents.toString();
+	}
+
+	/**
+	 * Returns a class instance
+	 * @param sClazz
+	 * @return
+	 * @throws ClassNotFoundException
+	 * @throws NoSuchMethodException
+	 * @throws SecurityException
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 * @throws IllegalArgumentException
+	 * @throws InvocationTargetException
+	 */
+	public static Object getInstance(String sClazz)
+			throws ClassNotFoundException, NoSuchMethodException,
+			SecurityException, InstantiationException, IllegalAccessException,
+			IllegalArgumentException, InvocationTargetException {
+		Class<?> clazz = Class.forName(sClazz);
+		Constructor<?> constructor = clazz.getConstructor();
+		return (IFunction) constructor.newInstance();
 	}
 }

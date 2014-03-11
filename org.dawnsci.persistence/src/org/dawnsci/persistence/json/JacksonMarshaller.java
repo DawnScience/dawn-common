@@ -35,6 +35,7 @@ import org.dawnsci.persistence.json.roi.ROIBean;
 import org.dawnsci.persistence.json.roi.RectangularROIBean;
 import org.dawnsci.persistence.json.roi.RingROIBean;
 import org.dawnsci.persistence.json.roi.SectorROIBean;
+import org.dawnsci.persistence.util.PersistenceUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -160,7 +161,7 @@ public class JacksonMarshaller implements IJSonMarshaller{
 			EllipticalFitROIBean bean = mapper.readValue(json, EllipticalFitROIBean.class);
 			return bean.getROI();
 		} else if (type.contains("function")) { // if the function keyword is present we assume the data is a function
-			if (FunctionListBean.getInstance(type) instanceof IOperator) {
+			if (PersistenceUtils.getInstance(type) instanceof IOperator) {
 				FunctionListBean fbean = mapper.readValue(json, FunctionListBean.class);
 				return fbean.getIFunction();
 			} else {

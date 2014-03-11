@@ -8,9 +8,10 @@
  */
 package org.dawnsci.persistence.json.function;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
+
+import org.dawnsci.persistence.util.PersistenceUtils;
 
 
 import uk.ac.diamond.scisoft.analysis.fitting.functions.IFunction;
@@ -76,7 +77,7 @@ public class FunctionListBean {
 		FunctionBean[] funcBeans = this.getFunctions();
 		IFunction[] functions = new IFunction[funcBeans.length];
 
-		IFunction operator = (IFunction) getInstance(this.type);
+		IFunction operator = (IFunction) PersistenceUtils.getInstance(this.type);
 		operator.setName(this.name);
 
 		for (int i = 0; i < funcBeans.length; i++) {
@@ -84,28 +85,6 @@ public class FunctionListBean {
 			((IOperator)operator).addFunction(functions[i]);
 		}
 		return operator;
-	}
-
-	/**
-	 * Returns a class instance
-	 * @param sClazz
-	 * @return
-	 * @throws ClassNotFoundException
-	 * @throws NoSuchMethodException
-	 * @throws SecurityException
-	 * @throws InstantiationException
-	 * @throws IllegalAccessException
-	 * @throws IllegalArgumentException
-	 * @throws InvocationTargetException
-	 */
-	@JsonIgnore
-	public static Object getInstance(String sClazz)
-			throws ClassNotFoundException, NoSuchMethodException,
-			SecurityException, InstantiationException, IllegalAccessException,
-			IllegalArgumentException, InvocationTargetException {
-		Class<?> clazz = Class.forName(sClazz);
-		Constructor<?> constructor = clazz.getConstructor();
-		return (IFunction) constructor.newInstance();
 	}
 
 	@Override
