@@ -118,47 +118,10 @@ public class JacksonMarshaller implements IJSonMarshaller{
 			return mapper.readValue(json, Object.class);
 
 		String type = typeNode.asText();
-		if (type.equals(PointROIBean.TYPE)) {
-			PointROIBean bean = mapper.readValue(json, PointROIBean.class);
-			return bean.getROI();
-		} else if (type.equals(PerimeterBoxROIBean.TYPE)) {
-			PerimeterBoxROIBean bean = mapper.readValue(json, PerimeterBoxROIBean.class);
-			return bean.getROI();
-		} else if (type.equals(GridROIBean.TYPE)) {
-			GridROIBean bean = mapper.readValue(json, GridROIBean.class);
-			return bean.getROI();
-		} else if (type.equals(RectangularROIBean.TYPE)) {
-			RectangularROIBean bean = mapper.readValue(json, RectangularROIBean.class);
-			return bean.getROI();
-		} else if (type.equals(CircularROIBean.TYPE)) {
-			CircularROIBean bean = mapper.readValue(json, CircularROIBean.class);
-			return bean.getROI();
-		} else if (type.equals(LinearROIBean.TYPE)) {
-			LinearROIBean bean = mapper.readValue(json, LinearROIBean.class);
-			return bean.getROI();
-		} else if (type.equals(PolylineROIBean.TYPE)) {
-			PolylineROIBean bean = mapper.readValue(json, PolylineROIBean.class);
-			return bean.getROI();
-		} else if (type.equals(PolygonalROIBean.TYPE)) {
-			PolygonalROIBean bean = mapper.readValue(json, PolygonalROIBean.class);
-			return bean.getROI();
-		} else if (type.equals(FreedrawROIBean.TYPE)) {
-			FreedrawROIBean bean = mapper.readValue(json, FreedrawROIBean.class);
-			return bean.getROI();
-		} else if (type.equals(RingROIBean.TYPE)) {
-			RingROIBean bean = mapper.readValue(json, RingROIBean.class);
-			return bean.getROI();
-		} else if (type.equals(SectorROIBean.TYPE)) {
-			SectorROIBean bean = mapper.readValue(json, SectorROIBean.class);
-			return bean.getROI();
-		} else if (type.equals(EllipticalROIBean.TYPE)) {
-			EllipticalROIBean bean = mapper.readValue(json, EllipticalROIBean.class);
-			return bean.getROI();
-		} else if (type.equals(CircularFitROIBean.TYPE)) {
-			CircularFitROIBean bean =  mapper.readValue(json, CircularFitROIBean.class);
-			return bean.getROI();
-		} else if (type.equals(EllipticalFitROIBean.TYPE)) {
-			EllipticalFitROIBean bean = mapper.readValue(json, EllipticalFitROIBean.class);
+		if (type.contains("ROI")) { // if the ROI keyword is present we assume the data is a roi
+			// Return the corresponding ROIBean class name
+			Class<?> clazz = Class.forName("org.dawnsci.persistence.json.roi." + type + "Bean");
+			ROIBean bean = (ROIBean) mapper.readValue(json, clazz);
 			return bean.getROI();
 		} else if (type.contains("function")) { // if the function keyword is present we assume the data is a function
 			if (PersistenceUtils.getInstance(type) instanceof IOperator) {
