@@ -45,6 +45,7 @@ import org.slf4j.LoggerFactory;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.BooleanDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.Comparisons;
 import uk.ac.diamond.scisoft.analysis.dataset.DatasetUtils;
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
@@ -125,7 +126,7 @@ class PersistentFileImpl implements IPersistentFile {
 				String name = it.next();
 				BooleanDataset bd = (BooleanDataset)masks.get(name);
 				// Inverse the dataset: see http://jira.diamond.ac.uk/browse/SCI-1757
-				bd.invert();
+				bd = Comparisons.logicalNot(bd);
 
 				AbstractDataset id = DatasetUtils.cast(bd, AbstractDataset.INT8);
 				final Datatype datatype = H5Utils.getDatatype(id);
@@ -142,7 +143,7 @@ class PersistentFileImpl implements IPersistentFile {
 	@Override
 	public void addMask(String name, IDataset mask, IMonitor mon) throws Exception{
 		// Inverse the dataset: see http://jira.diamond.ac.uk/browse/SCI-1757
-		((BooleanDataset)mask).invert();
+		mask = Comparisons.logicalNot((BooleanDataset)mask);
 
 		AbstractDataset id = DatasetUtils.cast((BooleanDataset)mask, AbstractDataset.INT8);
 		//check if parent group exists
@@ -297,7 +298,7 @@ class PersistentFileImpl implements IPersistentFile {
 		ShortDataset sdata = (ShortDataset)LoaderFactory.getDataSet(filePath, MASK_ENTRY+"/"+maskName, mon);
 		BooleanDataset bd = (BooleanDataset) DatasetUtils.cast(sdata, AbstractDataset.BOOL);
 		// Inverse the dataset: see http://jira.diamond.ac.uk/browse/SCI-1757
-		bd.invert();
+		bd = Comparisons.logicalNot(bd);
 		return bd;
 	}
 
@@ -313,7 +314,7 @@ class PersistentFileImpl implements IPersistentFile {
 			ShortDataset sdata = (ShortDataset)LoaderFactory.getDataSet(filePath, MASK_ENTRY+"/"+name, mon);
 			BooleanDataset bd = (BooleanDataset) DatasetUtils.cast(sdata, AbstractDataset.BOOL);
 			// Inverse the dataset: see http://jira.diamond.ac.uk/browse/SCI-1757
-			bd.invert();
+			bd = Comparisons.logicalNot(bd);
 			masks.put(name, bd);
 		}
 		return masks;
