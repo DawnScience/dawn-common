@@ -12,7 +12,7 @@ package org.dawb.common.services.expressions;
 import java.util.Collection;
 import java.util.Map;
 
-import org.eclipse.core.runtime.IProgressMonitor;
+import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
 
 /**
  * This service can be called to save and/or load data from an hdf5 file.
@@ -56,7 +56,7 @@ public interface IExpressionEngine {
 	 * 
 	 * @param monitor
 	 */
-	public void evaluateWithEvent(IProgressMonitor monitor);
+	public void evaluateWithEvent(IMonitor monitor);
 	
 	/**
 	 * Get all functions currently in the expression engine

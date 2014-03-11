@@ -22,14 +22,10 @@ import org.apache.commons.jexl2.Script;
 import org.dawb.common.services.expressions.ExpressionEngineEvent;
 import org.dawb.common.services.expressions.IExpressionEngine;
 import org.dawb.common.services.expressions.IExpressionEngineListener;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 
 import uk.ac.diamond.scisoft.analysis.dataset.Image;
 import uk.ac.diamond.scisoft.analysis.dataset.Maths;
+import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
 
 public class ExpressionEngineImpl implements IExpressionEngine{
 	
@@ -37,7 +33,7 @@ public class ExpressionEngineImpl implements IExpressionEngine{
 	private Expression expression;
 	private MapContext context;
 	private HashSet<IExpressionEngineListener> expressionListeners;
-	private Job job;
+	private Thread job;
 	private Callable<Object> callable;
 	
 	public ExpressionEngineImpl() {
@@ -221,7 +217,7 @@ public class ExpressionEngineImpl implements IExpressionEngine{
 
 
 	@Override
-	public void evaluateWithEvent(final IProgressMonitor monitor) {
+	public void evaluateWithEvent(IMonitor mon) {
 		if (expression == null) return;
 
 		final Script script = jexl.createScript(expression.getExpression());
@@ -231,22 +227,20 @@ public class ExpressionEngineImpl implements IExpressionEngine{
 		callable = script.callable(context);
 
 		final ExecutorService service = Executors.newCachedThreadPool();
+		final IMonitor monitor = mon == null ? new IMonitor.Stub() : mon;
+
 
 		if (job == null) {
-			job = new Job("Expression Calculation") {
+			job = new Thread("Expression Calculation") {
 
 				@Override
-				protected IStatus run(IProgressMonitor monitor) {
+				public void run() {
 					String exp = expression.getExpression();
 					try {
 						
-						if (monitor == null) {
-							monitor = new NullProgressMonitor();
-						}
-						
 						Future<Object> future = service.submit(callable);
 
-						while (!future.isDone() && !monitor.isCanceled()) {
+						while (!future.isDone() && !monitor.isCancelled()) {
 							Thread.sleep(100);
 						}
 
@@ -254,7 +248,7 @@ public class ExpressionEngineImpl implements IExpressionEngine{
 							Object result = future.get();
 							ExpressionEngineEvent event = new ExpressionEngineEvent(ExpressionEngineImpl.this, result, exp);
 							fireExpressionListeners(event);
-							return Status.OK_STATUS;
+							return;
 						}
 
 					} catch (InterruptedException e) {
@@ -268,13 +262,13 @@ public class ExpressionEngineImpl implements IExpressionEngine{
 					ExpressionEngineEvent event = new ExpressionEngineEvent(ExpressionEngineImpl.this, null, exp);
 					fireExpressionListeners(event);
 
-					return Status.CANCEL_STATUS;
+					return;
 				}
 				
 			};
 
 		}
-		job.schedule();
+		job.start();
 	}
 
 	private void fireExpressionListeners(ExpressionEngineEvent event) {

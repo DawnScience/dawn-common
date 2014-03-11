@@ -49,7 +49,10 @@ public class CheckableActionGroup implements IPropertyChangeListener {
 		}
 	}
 	
-	public void dipose() {
+	public void clear() {
+		for (IAction action : actions) {
+			action.removePropertyChangeListener(this);
+		}
 		actions.clear();
 	}
 }

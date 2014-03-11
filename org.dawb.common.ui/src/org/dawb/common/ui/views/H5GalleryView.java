@@ -73,6 +73,8 @@ public class H5GalleryView extends ViewPart implements MouseListener, SelectionL
 	private MenuAction               dimensionList;
 	private GalleryDelegate          galleryDelegate;
 
+	private CheckableActionGroup dimensionGroup;
+
 	
 	public H5GalleryView() {
 		this.galleryDelegate = new GalleryDelegate();
@@ -184,6 +186,7 @@ public class H5GalleryView extends ViewPart implements MouseListener, SelectionL
 		dimensionList = new MenuAction("Slice dimension");
 		dimensionList.setImageDescriptor(Activator.getImageDescriptor("icons/slice_dimension.gif"));
 		toolbarManager.add(dimensionList);
+		dimensionGroup = new CheckableActionGroup();
 		
 		Action prefs = new Action("Preferences...", Activator.getImageDescriptor("icons/data.gif")) {
 			@Override
@@ -286,8 +289,8 @@ public class H5GalleryView extends ViewPart implements MouseListener, SelectionL
 		createImageGallery(info);
 
 		dimensionList.clear();
+		dimensionGroup.clear();
 		
-		final CheckableActionGroup grp = new CheckableActionGroup();
 		final List<Integer> dims = info.getSliceableDimensions();
 		for (final int dim : dims) {
 			final IAction dimAction = new Action(""+(dim+1), IAction.AS_CHECK_BOX) {
@@ -299,7 +302,7 @@ public class H5GalleryView extends ViewPart implements MouseListener, SelectionL
 			if (info.getSliceDimension()==dim) dimAction.setChecked(true);
 			dimAction.setToolTipText("Slice using the dimension "+dim+" of the data.");
 			dimensionList.add(dimAction);
-			grp.add(dimAction);
+			dimensionGroup.add(dimAction);
 		}
 		
 		getViewSite().getActionBars().getToolBarManager().update(true);
