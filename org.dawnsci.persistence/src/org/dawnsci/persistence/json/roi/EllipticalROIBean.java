@@ -58,6 +58,7 @@ public class EllipticalROIBean extends ROIBean {
 	/**
 	 * @return true if ellipse is circular (i.e. its axes have the same length)
 	 */
+	@JsonIgnore
 	public boolean isCircular() {
 		return semiAxes[0] == semiAxes[1];
 	}
