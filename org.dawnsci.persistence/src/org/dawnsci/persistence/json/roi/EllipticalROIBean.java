@@ -62,19 +62,12 @@ public class EllipticalROIBean extends ROIBean {
 		return semiAxes[0] == semiAxes[1];
 	}
 
-	/**
-	 * @return Returns the angle in degrees
-	 */
-	public double getAngleDegrees() {
-		return Math.toDegrees(angle);
-	}
-
 	@Override
 	public String toString() {
 		if (isCircular()) {
-			return super.toString() + String.format("point=%s, radius=%g, angle=%g", Arrays.toString(getStartPoint()), semiAxes[0], getAngleDegrees());
+			return super.toString() + String.format("point=%s, radius=%g, angle=%g", Arrays.toString(getStartPoint()), semiAxes[0], getAngle());
 		}
-		return super.toString() + String.format("point=%s, semiaxes=%s, angle=%g", Arrays.toString(getStartPoint()), Arrays.toString(semiAxes), getAngleDegrees());
+		return super.toString() + String.format("point=%s, semiaxes=%s, angle=%g", Arrays.toString(getStartPoint()), Arrays.toString(semiAxes), getAngle());
 	}
 
 	@Override
