@@ -73,13 +73,6 @@ class PersistentFileImpl implements IPersistentFile {
 	private static final Logger logger = LoggerFactory.getLogger(PersistentFileImpl.class);
 	private IHierarchicalDataFile file;
 	private String filePath;
-	private final String ENTRY          = "/entry";
-	private final String DATA_ENTRY     = "/entry/data";
-	private final String HISTORY_ENTRY  = "/entry/history";
-	private final String MASK_ENTRY     = "/entry/mask";
-	private final String ROI_ENTRY      = "/entry/region";
-	private final String FUNCTION_ENTRY = "/entry/function";
-	private final String DIFFRACTIONMETADATA_ENTRY = "/entry/diffraction_metadata";
 	private String version;
 
 	/**
@@ -96,7 +89,7 @@ class PersistentFileImpl implements IPersistentFile {
 			currentSite = "Diamond Light Source";
 		}
 		setSite(currentSite);
-		setVersion("1.1");
+		setVersion(PersistenceConstants.CURRENT_VERSION);
 	}
 
 	/**
@@ -108,7 +101,7 @@ class PersistentFileImpl implements IPersistentFile {
 		try {
 			this.file = HierarchicalDataFactory.getReader(filePath);
 			//Retrieve version number
-			this.version = file.getAttributeValue(ENTRY+"@Version");
+			this.version = file.getAttributeValue(PersistenceConstants.ENTRY+"@Version");
 		} catch (Exception e) {
 			logger.error("Error getting H5 Reader:" + e);
 		}
@@ -119,7 +112,7 @@ class PersistentFileImpl implements IPersistentFile {
 		if(file == null)
 			file = HierarchicalDataFactory.getWriter(filePath);
 
-		Group parent = createParentEntry(MASK_ENTRY);
+		Group parent = createParentEntry(PersistenceConstants.MASK_ENTRY);
 
 		if (masks != null) {
 			Set<String> names = masks.keySet();
@@ -150,9 +143,9 @@ class PersistentFileImpl implements IPersistentFile {
 
 		AbstractDataset id = DatasetUtils.cast((BooleanDataset)mask, AbstractDataset.INT8);
 		//check if parent group exists
-		Group parent = (Group)file.getData(MASK_ENTRY);
+		Group parent = (Group)file.getData(PersistenceConstants.MASK_ENTRY);
 		if(parent == null)
-			parent = createParentEntry(MASK_ENTRY);
+			parent = createParentEntry(PersistenceConstants.MASK_ENTRY);
 		final Datatype datatype = H5Utils.getDatatype(id);
 		long[] shape = H5Utils.getLong(id.getShape());
 		final Dataset dataset = file.replaceDataset(name, datatype, shape, id.getBuffer(), parent);
@@ -169,7 +162,7 @@ class PersistentFileImpl implements IPersistentFile {
 		if(file == null)
 			file = HierarchicalDataFactory.getWriter(filePath);
 
-		Group parent = createParentEntry(HISTORY_ENTRY);
+		Group parent = createParentEntry(PersistenceConstants.HISTORY_ENTRY);
 
 		int index = 0;
 		for (IDataset data : sets) {
@@ -195,7 +188,7 @@ class PersistentFileImpl implements IPersistentFile {
 	public void setROIs(Map<String, IROI> rois) throws Exception {
 		if (file == null) file = HierarchicalDataFactory.getWriter(filePath);
 
-		Group parent = createParentEntry(ROI_ENTRY);
+		Group parent = createParentEntry(PersistenceConstants.ROI_ENTRY);
 		if (rois != null) {
 			Iterator<String> it = rois.keySet().iterator();
 			while(it.hasNext()){
@@ -211,7 +204,7 @@ class PersistentFileImpl implements IPersistentFile {
 		if (file == null)
 			file = HierarchicalDataFactory.getWriter(filePath);
 
-		Group parent = createParentEntry(ROI_ENTRY);
+		Group parent = createParentEntry(PersistenceConstants.ROI_ENTRY);
 
 		writeRoi(file, parent, name, roiBase);
 	}
@@ -219,13 +212,13 @@ class PersistentFileImpl implements IPersistentFile {
 	@Override
 	public void setRegionAttribute(String regionName, String attributeName, String attributeValue) throws Exception {
 		if ("JSON".equals(attributeName)) throw new Exception("Cannot override the JSON attribute!");
-		final HObject node = file.getData(ROI_ENTRY+"/"+regionName);
+		final HObject node = file.getData(PersistenceConstants.ROI_ENTRY+"/"+regionName);
 		file.setAttribute(node, attributeName, attributeValue);
 	}
 
 	@Override
 	public String getRegionAttribute(String regionName, String attributeName) throws Exception{
-		return file.getAttributeValue(ROI_ENTRY+"/"+regionName+"@"+attributeName);
+		return file.getAttributeValue(PersistenceConstants.ROI_ENTRY+"/"+regionName+"@"+attributeName);
 	}
 
 	/**
@@ -236,8 +229,8 @@ class PersistentFileImpl implements IPersistentFile {
 	private void setVersion(String version) throws Exception {
 		if (file == null) file = HierarchicalDataFactory.getWriter(filePath);
 		//check if parent group exists
-		Group parent = (Group)file.getData(ENTRY);
-		if(parent == null) parent = createParentEntry(ENTRY);
+		Group parent = (Group)file.getData(PersistenceConstants.ENTRY);
+		if(parent == null) parent = createParentEntry(PersistenceConstants.ENTRY);
 		file.setAttribute(parent, "Version", version);
 	}
 
@@ -245,8 +238,8 @@ class PersistentFileImpl implements IPersistentFile {
 	public void setSite(String site) throws Exception {
 		if (file == null) file = HierarchicalDataFactory.getWriter(filePath);
 		//check if parent group exists
-		Group parent = (Group)file.getData(ENTRY);
-		if(parent == null) parent = createParentEntry(ENTRY);
+		Group parent = (Group)file.getData(PersistenceConstants.ENTRY);
+		if(parent == null) parent = createParentEntry(PersistenceConstants.ENTRY);
 		file.setAttribute(parent, "Site", site);
 	}
 
@@ -255,7 +248,7 @@ class PersistentFileImpl implements IPersistentFile {
 		ILazyDataset data = null;
 		DataHolder dh = LoaderFactory.getData(filePath, true, mon);
 		dataName = !dataName.equals("") ? dataName : "data";
-		data = readH5Data(dh, dataName, DATA_ENTRY);
+		data = readH5Data(dh, dataName, PersistenceConstants.DATA_ENTRY);
 
 		return data;
 	}
@@ -271,7 +264,7 @@ class PersistentFileImpl implements IPersistentFile {
 		DataHolder dh = LoaderFactory.getData(filePath, true, mon);
 		Map<String, ILazyDataset> sets = new HashMap<String, ILazyDataset>(dh.size());
 		for (String name : dh.getNames()) {
-			if (name.startsWith(HISTORY_ENTRY)) {
+			if (name.startsWith(PersistenceConstants.HISTORY_ENTRY)) {
 				sets.put(name, dh.getLazyDataset(name));
 			}
 		}
@@ -285,11 +278,11 @@ class PersistentFileImpl implements IPersistentFile {
 
 		DataHolder dh = LoaderFactory.getData(filePath, true, mon);
 		xAxisName = !xAxisName.equals("") ? xAxisName : "X Axis";
-		xaxis = readH5Data(dh, xAxisName, DATA_ENTRY);
+		xaxis = readH5Data(dh, xAxisName, PersistenceConstants.DATA_ENTRY);
 		if(xaxis != null)
 			axes.add(xaxis);
 		yAxisName = !yAxisName.equals("") ? yAxisName : "Y Axis";
-		yaxis = readH5Data(dh, yAxisName, DATA_ENTRY);
+		yaxis = readH5Data(dh, yAxisName, PersistenceConstants.DATA_ENTRY);
 		if(yaxis != null)
 			axes.add(yaxis);
 
@@ -298,7 +291,7 @@ class PersistentFileImpl implements IPersistentFile {
 
 	@Override
 	public BooleanDataset getMask(String maskName, IMonitor mon) throws Exception {
-		ShortDataset sdata = (ShortDataset)LoaderFactory.getDataSet(filePath, MASK_ENTRY+"/"+maskName, mon);
+		ShortDataset sdata = (ShortDataset)LoaderFactory.getDataSet(filePath, PersistenceConstants.MASK_ENTRY+"/"+maskName, mon);
 		BooleanDataset bd = (BooleanDataset) DatasetUtils.cast(sdata, AbstractDataset.BOOL);
 		if (getVersionNumber() > 1) {
 			// Inverse the dataset: see http://jira.diamond.ac.uk/browse/SCI-1757
@@ -316,7 +309,7 @@ class PersistentFileImpl implements IPersistentFile {
 		while (it.hasNext()) {
 			String name = (String) it.next();
 
-			ShortDataset sdata = (ShortDataset)LoaderFactory.getDataSet(filePath, MASK_ENTRY+"/"+name, mon);
+			ShortDataset sdata = (ShortDataset)LoaderFactory.getDataSet(filePath, PersistenceConstants.MASK_ENTRY+"/"+name, mon);
 			BooleanDataset bd = (BooleanDataset) DatasetUtils.cast(sdata, AbstractDataset.BOOL);
 			if (getVersionNumber() > 1) {
 				// Inverse the dataset: see http://jira.diamond.ac.uk/browse/SCI-1757
@@ -337,8 +330,8 @@ class PersistentFileImpl implements IPersistentFile {
 	public IROI getROI(String roiName) throws Exception {
 		IJSonMarshaller converter = new JacksonMarshaller();
 
-		String json = file.getAttributeValue(ROI_ENTRY+"/"+roiName+"@JSON");
-		if(json == null) throw new Exception("Reading Exception: " +ROI_ENTRY+ " entry does not exist in the file " + filePath);
+		String json = file.getAttributeValue(PersistenceConstants.ROI_ENTRY+"/"+roiName+"@JSON");
+		if(json == null) throw new Exception("Reading Exception: " +PersistenceConstants.ROI_ENTRY+ " entry does not exist in the file " + filePath);
 		// JSON deserialization
 		json = json.substring(1, json.length()-1); // this is needed as somehow, the getAttribute adds [ ] around the json string...
 		IROI roi = (IROI)converter.unmarshal(json);
@@ -361,7 +354,7 @@ class PersistentFileImpl implements IPersistentFile {
 		Iterator<String> it = names.iterator();
 		while (it.hasNext()) {
 			String name = (String) it.next();
-			String json = file.getAttributeValue(ROI_ENTRY+"/"+name+"@JSON");
+			String json = file.getAttributeValue(PersistenceConstants.ROI_ENTRY+"/"+name+"@JSON");
 			json = json.substring(1, json.length()-1); // this is needed as somehow, the getAttribute adds [ ] around the json string...
 			IROI roi = (IROI) converter.unmarshal(json);
 
@@ -375,7 +368,7 @@ class PersistentFileImpl implements IPersistentFile {
 	public List<String> getDataNames(IMonitor mon) throws Exception{
 		List<String> names = null;
 		DataHolder dh = LoaderFactory.getData(filePath, true, mon);
-		names = getNames(dh, DATA_ENTRY);
+		names = getNames(dh, PersistenceConstants.DATA_ENTRY);
 
 		return names;
 	}
@@ -384,7 +377,7 @@ class PersistentFileImpl implements IPersistentFile {
 	public List<String> getMaskNames(IMonitor mon) throws Exception{
 		List<String> names = null;
 		DataHolder dh = LoaderFactory.getData(filePath, true, mon);
-		names = getNames(dh, MASK_ENTRY);
+		names = getNames(dh, PersistenceConstants.MASK_ENTRY);
 		return names;
 	}
 
@@ -395,8 +388,8 @@ class PersistentFileImpl implements IPersistentFile {
 		IHierarchicalDataFile f = null;
 		try {
 			f      = HierarchicalDataFactory.getReader(getFilePath());
-			Group grp = (Group)f.getData(ROI_ENTRY);
-			if (grp==null) throw new Exception("Reading Exception: " +ROI_ENTRY+ " entry does not exist in the file " + filePath);
+			Group grp = (Group)f.getData(PersistenceConstants.ROI_ENTRY);
+			if (grp==null) throw new Exception("Reading Exception: " +PersistenceConstants.ROI_ENTRY+ " entry does not exist in the file " + filePath);
 
 			List<HObject> children =  grp.getMemberList();
 			if (names==null) names = new ArrayList<String>(children.size());
@@ -413,7 +406,7 @@ class PersistentFileImpl implements IPersistentFile {
 	public void setDiffractionMetadata(IDiffractionMetadata metadata) throws Exception {
 		if (file == null) file = HierarchicalDataFactory.getWriter(filePath);
 
-		Group parent = HierarchicalDataFileUtils.createParentEntry(file, DIFFRACTIONMETADATA_ENTRY,Nexus.DETECT);
+		Group parent = HierarchicalDataFileUtils.createParentEntry(file, PersistenceConstants.DIFFRACTIONMETADATA_ENTRY,Nexus.DETECT);
 
 		DetectorProperties detprop = metadata.getDetector2DProperties();
 
@@ -477,37 +470,37 @@ class PersistentFileImpl implements IPersistentFile {
 
 	@Override
 	public String getVersion() throws Exception {
-		return file.getAttributeValue(ENTRY+"@Version");
+		return file.getAttributeValue(PersistenceConstants.ENTRY+"@Version");
 	}
 
 	@Override
 	public String getSite() throws Exception {
-		return file.getAttributeValue(ENTRY+"@Site");
+		return file.getAttributeValue(PersistenceConstants.ENTRY+"@Site");
 	}
 	
 	@Override
 	public boolean containsData() {
-		return isEntry(DATA_ENTRY,null);
+		return isEntry(PersistenceConstants.DATA_ENTRY,null);
 	}
 
 	@Override
 	public boolean containsMask() {
-		return isEntry(MASK_ENTRY,null);
+		return isEntry(PersistenceConstants.MASK_ENTRY,null);
 	}
 
 	@Override
 	public boolean containsRegion() {
-		return isEntry(ROI_ENTRY,null);
+		return isEntry(PersistenceConstants.ROI_ENTRY,null);
 	}
 
 	@Override
 	public boolean containsDiffractionMetadata() {
-		return isEntry(DIFFRACTIONMETADATA_ENTRY,null);
+		return isEntry(PersistenceConstants.DIFFRACTIONMETADATA_ENTRY,null);
 	}
 
 	@Override
 	public boolean containsFunction() {
-		return isEntry(FUNCTION_ENTRY,null);
+		return isEntry(PersistenceConstants.FUNCTION_ENTRY,null);
 	}
 
 	private boolean isEntry(String entryPath, IMonitor mon)  {
@@ -537,7 +530,7 @@ class PersistentFileImpl implements IPersistentFile {
 		if(file == null)
 			file = HierarchicalDataFactory.getWriter(filePath);
 
-		Group parent = createParentEntry(DATA_ENTRY);
+		Group parent = createParentEntry(PersistenceConstants.DATA_ENTRY);
 
 		if(data != null){
 
@@ -616,11 +609,11 @@ class PersistentFileImpl implements IPersistentFile {
 	 */
 	@SuppressWarnings("unused")
 	private BooleanDataset readH5Mask(DataHolder dh, String maskName) throws Exception{
-		ILazyDataset ld = dh.getLazyDataset(MASK_ENTRY+"/"+maskName);
+		ILazyDataset ld = dh.getLazyDataset(PersistenceConstants.MASK_ENTRY+"/"+maskName);
 		if (ld instanceof H5LazyDataset) {
 			return (BooleanDataset)DatasetUtils.cast(((H5LazyDataset)ld).getCompleteData(null), AbstractDataset.BOOL);
 		} else {
-			return (BooleanDataset)DatasetUtils.cast(dh.getDataset(MASK_ENTRY+"/"+maskName), AbstractDataset.BOOL);
+			return (BooleanDataset)DatasetUtils.cast(dh.getDataset(PersistenceConstants.MASK_ENTRY+"/"+maskName), AbstractDataset.BOOL);
 		}
 	}
 
@@ -672,7 +665,7 @@ class PersistentFileImpl implements IPersistentFile {
 	public void setFunctions(Map<String, IFunction> functions) throws Exception {
 		if (file == null) file = HierarchicalDataFactory.getWriter(filePath);
 
-		Group parent = createParentEntry(FUNCTION_ENTRY);
+		Group parent = createParentEntry(PersistenceConstants.FUNCTION_ENTRY);
 
 		if (functions != null) {
 			IJSonMarshaller converter = new JacksonMarshaller();
@@ -690,7 +683,7 @@ class PersistentFileImpl implements IPersistentFile {
 	public void addFunction(String name, IFunction function) throws Exception {
 		if (file == null) file = HierarchicalDataFactory.getWriter(filePath);
 
-		Group parent = createParentEntry(FUNCTION_ENTRY);
+		Group parent = createParentEntry(PersistenceConstants.FUNCTION_ENTRY);
 
 		IJSonMarshaller converter = new JacksonMarshaller();
 
@@ -700,8 +693,8 @@ class PersistentFileImpl implements IPersistentFile {
 
 	@Override
 	public IFunction getFunction(String functionName) throws Exception {
-		String json = file.getAttributeValue(FUNCTION_ENTRY+"/"+functionName);
-		if(json == null) throw new Exception("Reading Exception: " +FUNCTION_ENTRY+ " entry does not exist in the file " + filePath);
+		String json = file.getAttributeValue(PersistenceConstants.FUNCTION_ENTRY+"/"+functionName);
+		if(json == null) throw new Exception("Reading Exception: " +PersistenceConstants.FUNCTION_ENTRY+ " entry does not exist in the file " + filePath);
 
 		IJSonMarshaller converter = new JacksonMarshaller();
 		//Deserialize the json back to a function
@@ -723,7 +716,7 @@ class PersistentFileImpl implements IPersistentFile {
 		Iterator<String> it = names.iterator();
 		while (it.hasNext()) {
 			String name = (String) it.next();
-			String json = file.getAttributeValue(FUNCTION_ENTRY+"/"+name+"@JSON");
+			String json = file.getAttributeValue(PersistenceConstants.FUNCTION_ENTRY+"/"+name+"@JSON");
 			json = json.substring(1, json.length()-1); // this is needed as somehow, the getAttribute adds [ ] around the json string...
 			//Deserialize the json back to a function
 			IFunction function = (IFunction) converter.unmarshal(json);
@@ -741,8 +734,8 @@ class PersistentFileImpl implements IPersistentFile {
 		IHierarchicalDataFile file = null;
 		try {
 			file      = HierarchicalDataFactory.getReader(getFilePath());
-			Group grp = (Group)file.getData(FUNCTION_ENTRY);
-			if (grp==null) throw new Exception("Reading Exception: " +FUNCTION_ENTRY+ " entry does not exist in the file " + filePath);
+			Group grp = (Group)file.getData(PersistenceConstants.FUNCTION_ENTRY);
+			if (grp==null) throw new Exception("Reading Exception: " +PersistenceConstants.FUNCTION_ENTRY+ " entry does not exist in the file " + filePath);
 
 			List<HObject> children =  grp.getMemberList();
 			if (names==null) names = new ArrayList<String>(children.size());

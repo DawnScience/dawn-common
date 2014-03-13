@@ -10,6 +10,7 @@ import java.io.IOException;
 import org.dawb.common.services.IPersistenceService;
 import org.dawb.common.services.IPersistentFile;
 import org.dawnsci.persistence.PersistenceServiceCreator;
+import org.dawnsci.persistence.internal.PersistenceConstants;
 import org.junit.Test;
 
 public class ReadWriteTest extends AbstractThreadTestBase {
@@ -31,7 +32,7 @@ public class ReadWriteTest extends AbstractThreadTestBase {
 			File tmp = File.createTempFile("TestVersionSite", ".nxs");
 			tmp.deleteOnExit();
 			tmp.createNewFile();
-			String version = "1.0";
+			String version = PersistenceConstants.CURRENT_VERSION;
 			String site = "Diamond Light Source";
 			// create the PersistentService
 			IPersistenceService persist = PersistenceServiceCreator.createPersistenceService();
