@@ -95,7 +95,7 @@ class PersistentFileImpl implements IPersistentFile {
 			currentSite = "Diamond Light Source";
 		}
 		setSite(currentSite);
-		setVersion("1.0");
+		setVersion("1.1");
 	}
 
 	/**
@@ -297,8 +297,10 @@ class PersistentFileImpl implements IPersistentFile {
 	public BooleanDataset getMask(String maskName, IMonitor mon) throws Exception {
 		ShortDataset sdata = (ShortDataset)LoaderFactory.getDataSet(filePath, MASK_ENTRY+"/"+maskName, mon);
 		BooleanDataset bd = (BooleanDataset) DatasetUtils.cast(sdata, AbstractDataset.BOOL);
-		// Inverse the dataset: see http://jira.diamond.ac.uk/browse/SCI-1757
-		bd = Comparisons.logicalNot(bd);
+		if (Double.valueOf(getVersion()) > 1) {
+			// Inverse the dataset: see http://jira.diamond.ac.uk/browse/SCI-1757
+			bd = Comparisons.logicalNot(bd);
+		}
 		return bd;
 	}
 
@@ -313,8 +315,10 @@ class PersistentFileImpl implements IPersistentFile {
 
 			ShortDataset sdata = (ShortDataset)LoaderFactory.getDataSet(filePath, MASK_ENTRY+"/"+name, mon);
 			BooleanDataset bd = (BooleanDataset) DatasetUtils.cast(sdata, AbstractDataset.BOOL);
-			// Inverse the dataset: see http://jira.diamond.ac.uk/browse/SCI-1757
-			bd = Comparisons.logicalNot(bd);
+			if (Double.valueOf(getVersion()) > 1) {
+				// Inverse the dataset: see http://jira.diamond.ac.uk/browse/SCI-1757
+				bd = Comparisons.logicalNot(bd);
+			}
 			masks.put(name, bd);
 		}
 		return masks;
