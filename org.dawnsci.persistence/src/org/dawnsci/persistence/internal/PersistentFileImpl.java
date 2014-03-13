@@ -80,6 +80,7 @@ class PersistentFileImpl implements IPersistentFile {
 	private final String ROI_ENTRY      = "/entry/region";
 	private final String FUNCTION_ENTRY = "/entry/function";
 	private final String DIFFRACTIONMETADATA_ENTRY = "/entry/diffraction_metadata";
+	private String version;
 
 	/**
 	 * For save
@@ -106,6 +107,8 @@ class PersistentFileImpl implements IPersistentFile {
 		this.filePath = filePath;
 		try {
 			this.file = HierarchicalDataFactory.getReader(filePath);
+			//Retrieve version number
+			this.version = file.getAttributeValue(ENTRY+"@Version");
 		} catch (Exception e) {
 			logger.error("Error getting H5 Reader:" + e);
 		}
@@ -297,7 +300,7 @@ class PersistentFileImpl implements IPersistentFile {
 	public BooleanDataset getMask(String maskName, IMonitor mon) throws Exception {
 		ShortDataset sdata = (ShortDataset)LoaderFactory.getDataSet(filePath, MASK_ENTRY+"/"+maskName, mon);
 		BooleanDataset bd = (BooleanDataset) DatasetUtils.cast(sdata, AbstractDataset.BOOL);
-		if (Double.valueOf(getVersion()) > 1) {
+		if (getVersionNumber() > 1) {
 			// Inverse the dataset: see http://jira.diamond.ac.uk/browse/SCI-1757
 			bd = Comparisons.logicalNot(bd);
 		}
@@ -315,13 +318,19 @@ class PersistentFileImpl implements IPersistentFile {
 
 			ShortDataset sdata = (ShortDataset)LoaderFactory.getDataSet(filePath, MASK_ENTRY+"/"+name, mon);
 			BooleanDataset bd = (BooleanDataset) DatasetUtils.cast(sdata, AbstractDataset.BOOL);
-			if (Double.valueOf(getVersion()) > 1) {
+			if (getVersionNumber() > 1) {
 				// Inverse the dataset: see http://jira.diamond.ac.uk/browse/SCI-1757
 				bd = Comparisons.logicalNot(bd);
 			}
 			masks.put(name, bd);
 		}
 		return masks;
+	}
+
+	private Double getVersionNumber() throws Exception {
+		if (version == null) throw new Exception("No version number could be found in the file");
+		String str = version.replace("[", "").replace("]", "");
+		return Double.parseDouble(str);
 	}
 
 	@Override
@@ -383,10 +392,10 @@ class PersistentFileImpl implements IPersistentFile {
 	public List<String> getROINames(IMonitor mon) throws Exception{
 		List<String> names = null;
 
-		IHierarchicalDataFile file = null;
+		IHierarchicalDataFile f = null;
 		try {
-			file      = HierarchicalDataFactory.getReader(getFilePath());
-			Group grp = (Group)file.getData(ROI_ENTRY);
+			f      = HierarchicalDataFactory.getReader(getFilePath());
+			Group grp = (Group)f.getData(ROI_ENTRY);
 			if (grp==null) throw new Exception("Reading Exception: " +ROI_ENTRY+ " entry does not exist in the file " + filePath);
 
 			List<HObject> children =  grp.getMemberList();
@@ -395,7 +404,7 @@ class PersistentFileImpl implements IPersistentFile {
 				names.add(hObject.getName());
 			}
 		} finally {
-			if (file!=null) file.close();
+			if (f!=null) f.close();
 		}
 		return names;
 	}
