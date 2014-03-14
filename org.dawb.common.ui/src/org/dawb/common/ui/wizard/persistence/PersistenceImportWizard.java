@@ -102,18 +102,18 @@ public class PersistenceImportWizard extends AbstractPersistenceWizard implement
 		COMPLETE_TEST: if (fcp.isPageComplete()) {
 			final String absolutePath = fcp.getAbsoluteFilePath();
 			if (absolutePath==null) break COMPLETE_TEST;
-			options.setOptionEnabled("Original Data", false);
-			options.setOptionEnabled("Mask",          false);
-			options.setOptionEnabled("Regions",       false);
-			options.setOptionEnabled("Functions",       false);
-			options.setOptionEnabled("Diffraction Metadata",       false);
+			options.setOptionEnabled(PersistWizardConstants.ORIGINAL_DATA, false);
+			options.setOptionEnabled(PersistWizardConstants.MASK,          false);
+			options.setOptionEnabled(PersistWizardConstants.REGIONS,       false);
+			options.setOptionEnabled(PersistWizardConstants.FUNCTIONS,       false);
+			options.setOptionEnabled(PersistWizardConstants.DIFF_META,       false);
 			final File   file         = new File(absolutePath);
 			if (file.exists())  {
 				final String ext = FileUtils.getFileExtension(file);
 				if (ext!=null) {
 					if ("msk".equals(ext.toLowerCase())){
-						options.setStringValue("Mask", null);
-						options.setOptionEnabled("Mask",true);
+						options.setStringValue(PersistWizardConstants.MASK, null);
+						options.setOptionEnabled(PersistWizardConstants.MASK,true);
 
 					} else if ("nxs".equals(ext.toLowerCase())) {
 
@@ -126,29 +126,29 @@ public class PersistenceImportWizard extends AbstractPersistenceWizard implement
 							if (pf.containsMask()) {
 								final List<String>  names = pf.getMaskNames(null);
 								if (names!=null && !names.isEmpty()) {
-									options.setOptionEnabled("Mask", true);
-									options.setStringValues("Mask", names);
+									options.setOptionEnabled(PersistWizardConstants.MASK, true);
+									options.setStringValues(PersistWizardConstants.MASK, names);
 								}
 							} else {
-								options.setStringValue("Mask", null);
+								options.setStringValue(PersistWizardConstants.MASK, null);
 							}
 
 							if (pf.containsRegion()) {
 								final List<String>  regions = pf.getROINames(null);
 								if (regions!=null && !regions.isEmpty()) {
-									options.setOptionEnabled("Regions", true);
+									options.setOptionEnabled(PersistWizardConstants.REGIONS, true);
 								}
 							}
 
 							if (pf.containsFunction()) {
 								final List<String>  functions = pf.getFunctionNames(null);
 								if (functions!=null && !functions.isEmpty()) {
-									options.setOptionEnabled("Functions", true);
+									options.setOptionEnabled(PersistWizardConstants.FUNCTIONS, true);
 								}
 							}
 
 							if (pf.containsDiffractionMetadata()) {
-								options.setOptionEnabled("Diffraction Metadata", true);
+								options.setOptionEnabled(PersistWizardConstants.DIFF_META, true);
 							}
 
 						} catch (Throwable ne) {
