@@ -234,11 +234,12 @@ class PersistentFileImpl implements IPersistentFile {
 
 	@Override
 	public ILazyDataset getData(String dataName, IMonitor mon) throws Exception{
-		ILazyDataset data = null;
-		DataHolder dh = LoaderFactory.getData(filePath, true, mon);
+		if (file == null)
+			file = HierarchicalDataFactory.getReader(filePath);
 		dataName = !dataName.equals("") ? dataName : "data";
-		data = readH5Data(dh, dataName, PersistenceConstants.DATA_ENTRY);
-		return data;
+		Dataset set = (Dataset)file.getData(PersistenceConstants.DATA_ENTRY+"/"+dataName);
+		set.getMetadata();
+		return new H5LazyDataset(set);
 	}
 
 	/**
@@ -352,10 +353,7 @@ class PersistentFileImpl implements IPersistentFile {
 
 	@Override
 	public List<String> getDataNames(IMonitor mon) throws Exception{
-		List<String> names = null;
-		DataHolder dh = LoaderFactory.getData(filePath, true, mon);
-		names = getNames(dh, PersistenceConstants.DATA_ENTRY);
-		return names;
+		return getNames(PersistenceConstants.DATA_ENTRY, mon);
 	}
 
 	@Override
@@ -593,25 +591,6 @@ class PersistentFileImpl implements IPersistentFile {
 		} else {
 			return (BooleanDataset)DatasetUtils.cast(dh.getDataset(PersistenceConstants.MASK_ENTRY+"/"+maskName), AbstractDataset.BOOL);
 		}
-	}
-
-	/**
-	 * Method to retrieve all names in dataEntry
-	 * @param dataEntry
-	 * @param mon
-	 * @return List<String>
-	 * @throws Exception
-	 */
-	private List<String> getNames(DataHolder dh, String dataEntry) throws Exception{
-		List<String> nameslist = new ArrayList<String>();
-		String[] names = dh.getNames();
-		for (int i = 0; i < names.length; i++) {
-			if(names[i].startsWith(dataEntry)){
-				nameslist.add(names[i].substring(dataEntry.length()+1));
-			}
-		}
-		if (nameslist.isEmpty()) throw new Exception("Reading Exception: " +dataEntry+ " entry does not exist in the file " + filePath);
-		return nameslist;
 	}
 
 	@Override

@@ -65,7 +65,8 @@ public class ReadWriteDataTest extends AbstractThreadTestBase {
 			}
 
 			// test that the data/axes are the same
-			assertEquals(da.getName(), dataRead.getName());
+			assertEquals(da.getShape()[0], dataRead.getShape()[0]);
+			assertEquals(da.getShape()[1], dataRead.getShape()[1]);
 			assertEquals(axes.get(0).getName(), axesRead.get(0).getName());
 			assertEquals(axes.get(1).getName(), axesRead.get(1).getName());
 		} catch (IOException e1) {
@@ -134,7 +135,8 @@ public class ReadWriteDataTest extends AbstractThreadTestBase {
 			file.close();
 
 			// test that the data/axes are the same
-			assertEquals(da.getName(), dataRead.getName());
+			assertEquals(da.getShape()[0], dataRead.getShape()[0]);
+			assertEquals(da.getShape()[1], dataRead.getShape()[1]);
 			assertEquals(axes.get(0).getName(), axesRead.get(0).getName());
 			assertEquals(axes.get(1).getName(), axesRead.get(1).getName());
 		} catch (IOException e1) {
