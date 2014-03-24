@@ -51,14 +51,9 @@ public class ReadWriteTest extends AbstractThreadTestBase {
 		try {
 			file = persist.getPersistentFile(tmp.getAbsolutePath());
 			String str = file.getVersion();
-			versionRead = str.substring(1, str.length() - 1); // we get rid of
-																// the first and
-																// last
-																// character
+			versionRead = str.substring(1, str.length() - 1);
 			str = file.getSite();
-			siteRead = str.substring(1, str.length() - 1); // we get rid of the
-															// first and last
-															// character
+			siteRead = str.substring(1, str.length() - 1);
 		} finally {
 			if (file != null)
 				file.close();
