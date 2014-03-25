@@ -87,6 +87,12 @@ public interface IExpressionObject {
 	public boolean isValid(IMonitor monitor);
 	
 	/**
+	 * A string which maye be null to provide feedback as to the problem with the expression.
+	 * @return
+	 */
+	public String getInvalidReason();
+
+	/**
 	 * Used to give a nicer error message when an expression is bad.
 	 * @param monitor
 	 * @return
