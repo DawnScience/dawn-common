@@ -64,6 +64,11 @@ public class ExpressionEngineImpl implements IExpressionEngine{
 		checkFunctions(expr);
 	}
 
+	/**
+	 * TODO FIXME Must be better way than this...
+	 * @param expr
+	 * @throws Exception
+	 */
 	private void checkFunctions(String expr)  throws Exception {
         // We now evaluate the expression to try and trap invalid functions.
 		try {
