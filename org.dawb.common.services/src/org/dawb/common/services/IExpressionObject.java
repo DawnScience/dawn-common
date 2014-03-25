@@ -80,6 +80,14 @@ public interface IExpressionObject {
 	public ILazyDataset getLazyDataSet(String suggestedName, IMonitor monitor);
 
 	/**
+	 * If the expression has been evaluated once, this will give the cached result. Otherwise
+	 * it will return null.
+	 * 
+	 * @return
+	 */
+	public ILazyDataset getCachedLazyDataSet();
+
+	/**
 	 * 
 	 * @param monitor
 	 * @return true if expression contained in the object has legal syntax.
@@ -118,4 +126,5 @@ public interface IExpressionObject {
 	 * @return
 	 */
 	public IVariableManager getVariableManager();
+
 }
