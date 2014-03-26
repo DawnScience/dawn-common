@@ -15,6 +15,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.junit.Test;
 
 import uk.ac.diamond.scisoft.analysis.rpc.AnalysisRpcException;
+import uk.ac.diamond.scisoft.analysis.rpc.AnalysisRpcRemoteException;
 
 abstract public class AbstractPythonRunScriptServicePluginTest implements
 		IPythonRunScript {
@@ -61,13 +62,16 @@ abstract public class AbstractPythonRunScriptServicePluginTest implements
 
 	@Test
 	public void testExceptionFromPython() throws IOException {
+		String pycode = "def run(**kwargs): assert False, 'assertion failed'";
 		try {
-			runScript(getTemp("def run(**kwargs): assert False"),
+			runScript(getTemp(pycode),
 					Collections.<String, Object> emptyMap());
 		} catch (AnalysisRpcException e) {
-			Assert.assertTrue(e.getCause().toString()
+			AnalysisRpcRemoteException cause = (AnalysisRpcRemoteException)e.getCause();
+			Assert.assertTrue(cause.toString()
 					.contains("AssertionError"));
-			Assert.assertTrue(e.getCause().toString().contains("assert False"));
+			Assert.assertTrue(cause.toString().contains("assertion failed"));
+			Assert.assertTrue(cause.getPythonFormattedStackTrace(null).contains(pycode));
 		}
 	}
 
