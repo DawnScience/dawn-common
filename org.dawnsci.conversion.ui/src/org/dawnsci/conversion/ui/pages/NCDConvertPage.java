@@ -50,6 +50,7 @@ public class NCDConvertPage extends ResourceChoosePage implements
 	
 	private static final String QAXISNAME = "/q";
 	private static final String THETAAXISNAME = "/2theta";
+	private static final String DAXISNAME = "/d-spacing";
 	private static final String DATANAME = "/data";
 	private static final String LAST_SET_KEY = "org.dawnsci.conversion.ui.pages.lastDataSetNCD";
 
@@ -178,6 +179,11 @@ public class NCDConvertPage extends ResourceChoosePage implements
 		
 		if (!hasAxis) {
 			qAxisName = datasetName.replaceAll(DATANAME+"$", THETAAXISNAME);
+			hasAxis = hasDataset(qAxisName);
+		}
+		
+		if (!hasAxis) {
+			qAxisName = datasetName.replaceAll(DATANAME+"$", DAXISNAME);
 			hasAxis = hasDataset(qAxisName);
 		}
 		
