@@ -329,7 +329,7 @@ public abstract class AbstractSliceConversionPage extends ResourceChoosePage {
 		context.setOutputPath(getAbsoluteFilePath());
 		context.setExpression(isExpression);
 		final DimsDataList dims = sliceComponent.getDimsDataList();
-		for (DimsData dd : dims.getDimsData()) {
+		for (DimsData dd : dims.iterable()) {
 			if (dd.isSlice()) {
 				context.addSliceDimension(dd.getDimension(), String.valueOf(dd.getSlice()));
 			} else if (dd.isTextRange()) {
