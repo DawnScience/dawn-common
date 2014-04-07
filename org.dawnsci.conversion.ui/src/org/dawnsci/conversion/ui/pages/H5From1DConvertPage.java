@@ -47,6 +47,7 @@ import org.mihalis.opal.checkBoxGroup.CheckBoxGroup;
 
 import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 import uk.ac.diamond.scisoft.analysis.io.DataHolder;
+import uk.ac.diamond.scisoft.analysis.io.IDataHolder;
 import uk.ac.diamond.scisoft.analysis.io.IMetaData;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 
@@ -57,7 +58,7 @@ IConversionWizardPage {
 	private CheckboxTableViewer checkboxTableViewer;
 	private String[]            dataSetNames;
 	private IMetaData          imeta;
-	private DataHolder         holder;
+	private IDataHolder        holder;
 	private IConversionContext context;
 	private Spinner fastSpinner;
 	private Spinner slowSpinner;
@@ -255,7 +256,7 @@ IConversionWizardPage {
 						}
 					}
 
-					DataHolder holder = LoaderFactory.getData(source, new ProgressMonitorWrapper(monitor));
+					IDataHolder holder = LoaderFactory.getData(source, new ProgressMonitorWrapper(monitor));
 					final List<String> names = new ArrayList<String>(holder.toLazyMap().keySet());
 					Collections.sort(names);
 					setDataNames(names.toArray(new String[names.size()]), null, holder);
@@ -269,7 +270,7 @@ IConversionWizardPage {
 
 		});
 	}
-	protected void setDataNames(String[] array, final IMetaData imeta, final DataHolder holder) {
+	protected void setDataNames(String[] array, final IMetaData imeta, final IDataHolder holder) {
 		dataSetNames = array;
 		this.imeta   = imeta;
 		this.holder  = holder;

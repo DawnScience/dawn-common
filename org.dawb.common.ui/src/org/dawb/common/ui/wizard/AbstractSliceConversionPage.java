@@ -34,7 +34,7 @@ import org.eclipse.swt.widgets.Label;
 import org.slf4j.LoggerFactory;
 
 import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
-import uk.ac.diamond.scisoft.analysis.io.DataHolder;
+import uk.ac.diamond.scisoft.analysis.io.IDataHolder;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
 
@@ -232,7 +232,7 @@ public abstract class AbstractSliceConversionPage extends ResourceChoosePage {
 				final SliceSource source = new SliceSource(getExpression().getVariableManager(), lz, datasetName, context.getFilePaths().get(0), isExpression);
 				sliceComponent.setData(source);
 			} else {
-				DataHolder dh = LoaderFactory.getData(context.getFilePaths().get(0), true, true, new IMonitor.Stub());
+				IDataHolder dh = LoaderFactory.getData(context.getFilePaths().get(0), true, true, new IMonitor.Stub());
 				lz = dh.getLazyDataset(datasetName);
 				isExpression = false;
 				

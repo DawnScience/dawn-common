@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.services.conversion.IConversionContext.ConversionScheme;
@@ -26,8 +25,7 @@ import org.eclipse.swt.widgets.Label;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.ac.diamond.scisoft.analysis.io.DataHolder;
-import uk.ac.diamond.scisoft.analysis.io.IMetaData;
+import uk.ac.diamond.scisoft.analysis.io.IDataHolder;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
 
@@ -203,7 +201,7 @@ public class ConversionChoicePage extends ResourceChoosePage implements IConvers
 			
 			final int ranks[] = chosenConversion.getPreferredRanks();
 			if (ranks!=null) {
-				DataHolder holder = null;
+				IDataHolder holder = null;
 				if (getSelectedFiles()!=null && getSelectedFiles().size()>1) {		
 					for (String path : getSelectedFiles()) {
 						try {

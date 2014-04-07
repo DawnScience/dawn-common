@@ -20,11 +20,12 @@ import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.DatasetUtils;
 import uk.ac.diamond.scisoft.analysis.dataset.DoubleDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.FloatDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.IntegerDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.LongDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.Maths;
 import uk.ac.diamond.scisoft.analysis.dataset.ShortDataset;
-import uk.ac.diamond.scisoft.analysis.io.DataHolder;
+import uk.ac.diamond.scisoft.analysis.io.IDataHolder;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 
 public class NumpyTest {
@@ -146,8 +147,8 @@ public class NumpyTest {
 		String path = TestUtils.getAbsolutePath(org.dawb.common.python.Activator.getDefault().getBundle(), 
                                                 "test/org/dawb/common/python/test/billeA_4201_EF_XRD_5998.edf");				
 
-		final DataHolder dh = LoaderFactory.getData(path, null);
-		final AbstractDataset set = dh.getDataset(0);
+		final IDataHolder dh = LoaderFactory.getData(path, null);
+		final IDataset set = dh.getDataset(0);
 		
 		Jep jep=null;
 		
@@ -173,7 +174,7 @@ public class NumpyTest {
 		
 		String path = TestUtils.getAbsolutePath(org.dawb.common.python.Activator.getDefault().getBundle(), 
 				                                "test/org/dawb/common/python/test/billeA_4201_EF_XRD_5998.edf");				
-		final AbstractDataset i = LoaderFactory.getData(path, null).getDataset(0);
+		final IDataset i = LoaderFactory.getData(path, null).getDataset(0);
 		i.setName("i");
 		
 		System.gc();
@@ -182,12 +183,12 @@ public class NumpyTest {
 		
 		path = TestUtils.getAbsolutePath(org.dawb.common.python.Activator.getDefault().getBundle(), 
                                                 "test/org/dawb/common/python/test/dark_0001.edf");				
-		final AbstractDataset d = LoaderFactory.getData(path, null).getDataset(0);
+		final IDataset d = LoaderFactory.getData(path, null).getDataset(0);
 		d.setName("d");
 	
 		path = TestUtils.getAbsolutePath(org.dawb.common.python.Activator.getDefault().getBundle(), 
                                                 "test/org/dawb/common/python/test/flat_0001.edf");				
-		AbstractDataset f = LoaderFactory.getData(path, null).getDataset(0);
+		IDataset f = LoaderFactory.getData(path, null).getDataset(0);
 		f = DatasetUtils.cast(f, AbstractDataset.FLOAT32);
 		f.setName("f");
 
@@ -295,7 +296,7 @@ public class NumpyTest {
 				final String path = TestUtils.getAbsolutePath(org.dawb.common.python.Activator.getDefault().getBundle(), 
 						"test/org/dawb/common/python/test/billeA_4201_EF_XRD_5998.edf");				
 				
-				AbstractDataset set = LoaderFactory.getData(path, null).getDataset(0);
+				IDataset set = LoaderFactory.getData(path, null).getDataset(0);
 				set.setName("i");
 				NumpyUtils.setNumpy(jep, set);
 				NumpyUtils.getNumpy(jep, set.getName());

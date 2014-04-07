@@ -1,6 +1,6 @@
 package org.dawnsci.conversion;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 import java.util.Arrays;
@@ -13,6 +13,7 @@ import org.dawnsci.conversion.converters.CustomNCDConverter.SAS_FORMAT;
 import org.junit.Test;
 
 import uk.ac.diamond.scisoft.analysis.io.DataHolder;
+import uk.ac.diamond.scisoft.analysis.io.IDataHolder;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 
 public class NCDConvertTest {
@@ -43,7 +44,7 @@ public class NCDConvertTest {
         final File[] fa = dir.listFiles();
         for (File file : fa) {
         	file.deleteOnExit();
-        	final DataHolder   dh    = LoaderFactory.getData(file.getAbsolutePath());
+        	final IDataHolder   dh    = LoaderFactory.getData(file.getAbsolutePath());
             String[] names = dh.getNames();
             assertEquals(61, names.length);
             assertEquals("q(1/nm)",names[0]);
@@ -76,7 +77,7 @@ public class NCDConvertTest {
         final File[] fa = dir.listFiles();
         for (File file : fa) {
         	file.deleteOnExit();
-        	final DataHolder   dh    = LoaderFactory.getData(file.getAbsolutePath());
+        	final IDataHolder   dh    = LoaderFactory.getData(file.getAbsolutePath());
             String[] names = dh.getNames();
             assertEquals(60, names.length);
             assertEquals("Column_0",names[0]);
@@ -112,7 +113,7 @@ public class NCDConvertTest {
         assertEquals(12, fa.length);
         for (File file : fa) {
         	file.deleteOnExit();
-        	final DataHolder   dh    = LoaderFactory.getData(file.getAbsolutePath());
+        	final IDataHolder   dh    = LoaderFactory.getData(file.getAbsolutePath());
             String[] names = dh.getNames();
             assertEquals(3, names.length);
             assertEquals("q(1/A)",names[0]);
@@ -147,7 +148,7 @@ public class NCDConvertTest {
         assertEquals(2, fa.length);
         for (File file : fa) {
         	file.deleteOnExit();
-        	final DataHolder   dh    = LoaderFactory.getData(file.getAbsolutePath());
+        	final IDataHolder   dh    = LoaderFactory.getData(file.getAbsolutePath());
             String[] names = dh.getNames();
             assertEquals(2, names.length);
             assertEquals("q(1/A)",names[0]);
@@ -195,7 +196,7 @@ public class NCDConvertTest {
 			for (String pathName : unitMap.keySet()) {
 				if (file.getName().contains(pathName)) {
 					file.deleteOnExit();
-					final DataHolder dh = LoaderFactory.getData(file.getAbsolutePath());
+					final IDataHolder dh = LoaderFactory.getData(file.getAbsolutePath());
 					String[] names = dh.getNames();
 					String unitName = unitMap.get(pathName);
 					assertEquals(unitName, names[0]);

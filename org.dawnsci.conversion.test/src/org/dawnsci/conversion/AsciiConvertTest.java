@@ -15,7 +15,7 @@ import org.dawb.common.services.conversion.IConversionContext.ConversionScheme;
 import org.dawnsci.conversion.converters.AsciiConvert1D;
 import org.junit.Test;
 
-import uk.ac.diamond.scisoft.analysis.io.DataHolder;
+import uk.ac.diamond.scisoft.analysis.io.IDataHolder;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 
 
@@ -40,7 +40,7 @@ public class AsciiConvertTest {
         
         service.process(context);
         
-        final DataHolder   dh    = LoaderFactory.getData(tmp.getAbsolutePath());
+        final IDataHolder   dh    = LoaderFactory.getData(tmp.getAbsolutePath());
         final List<String> names = Arrays.asList("/entry1/counterTimer01/Energy","/entry1/counterTimer01/I0","/entry1/counterTimer01/lnI0It","/entry1/counterTimer01/It");
         for (String name : names) {
             if (dh.getDataset(name)==null) throw new Exception("Missing dataset "+name);
@@ -76,7 +76,7 @@ public class AsciiConvertTest {
         service.process(context);
         
         // Check rename worked
-        final DataHolder   dh    = LoaderFactory.getData(tmp.getAbsolutePath());
+        final IDataHolder   dh    = LoaderFactory.getData(tmp.getAbsolutePath());
         final List<String> names = Arrays.asList("Energy","I0","lnI0It","It");
         for (String name : names) {
             if (dh.getDataset(name)==null) throw new Exception("Missing dataset "+name);

@@ -42,7 +42,7 @@ import uk.ac.diamond.scisoft.analysis.dataset.DatasetUtils;
 import uk.ac.diamond.scisoft.analysis.diffraction.DiffractionMetadataUtils;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.IFunction;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.IFunctionService;
-import uk.ac.diamond.scisoft.analysis.io.DataHolder;
+import uk.ac.diamond.scisoft.analysis.io.IDataHolder;
 import uk.ac.diamond.scisoft.analysis.io.IDiffractionMetadata;
 import uk.ac.diamond.scisoft.analysis.io.ILoaderService;
 import uk.ac.diamond.scisoft.analysis.io.IMetaData;
@@ -223,7 +223,7 @@ public class PersistenceImportWizard extends AbstractPersistenceWizard implement
 
 	protected void createFit2DMask(String filePath, IPlottingSystem system, IProgressMonitor monitor) throws Exception {
 		
-		final DataHolder      holder = LoaderFactory.getData(filePath, new ProgressMonitorWrapper(monitor));
+		final IDataHolder     holder = LoaderFactory.getData(filePath, new ProgressMonitorWrapper(monitor));
 		final AbstractDataset mask   = DatasetUtils.cast(holder.getDataset(0), AbstractDataset.BOOL);
 		final ITrace          trace  = system.getTraces().iterator().next();
 		

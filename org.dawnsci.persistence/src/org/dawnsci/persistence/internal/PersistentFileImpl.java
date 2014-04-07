@@ -52,7 +52,7 @@ import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 import uk.ac.diamond.scisoft.analysis.diffraction.DetectorProperties;
 import uk.ac.diamond.scisoft.analysis.diffraction.DiffractionCrystalEnvironment;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.IFunction;
-import uk.ac.diamond.scisoft.analysis.io.DataHolder;
+import uk.ac.diamond.scisoft.analysis.io.IDataHolder;
 import uk.ac.diamond.scisoft.analysis.io.IDiffractionMetadata;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 import uk.ac.diamond.scisoft.analysis.io.NexusDiffractionMetaReader;
@@ -250,7 +250,7 @@ class PersistentFileImpl implements IPersistentFile {
 	 */
 	@Override
 	public Map<String, ILazyDataset> getHistory(IMonitor mon) throws Exception {
-		DataHolder dh = LoaderFactory.getData(filePath, true, mon);
+		IDataHolder dh = LoaderFactory.getData(filePath, true, mon);
 		Map<String, ILazyDataset> sets = new HashMap<String, ILazyDataset>(dh.size());
 		for (String name : dh.getNames()) {
 			if (name.startsWith(PersistenceConstants.HISTORY_ENTRY)) {
@@ -265,7 +265,7 @@ class PersistentFileImpl implements IPersistentFile {
 		List<ILazyDataset> axes = new ArrayList<ILazyDataset>();
 		ILazyDataset xaxis = null, yaxis = null;
 
-		DataHolder dh = LoaderFactory.getData(filePath, true, mon);
+		IDataHolder dh = LoaderFactory.getData(filePath, true, mon);
 		xAxisName = !xAxisName.equals("") ? xAxisName : "X Axis";
 		xaxis = readH5Data(dh, xAxisName, PersistenceConstants.DATA_ENTRY);
 		if(xaxis != null)
@@ -572,7 +572,7 @@ class PersistentFileImpl implements IPersistentFile {
 	 * @return ILazyDataset
 	 * @throws Exception 
 	 */
-	private ILazyDataset readH5Data(DataHolder dh, String dataName, String dataEntry) throws Exception{
+	private ILazyDataset readH5Data(IDataHolder dh, String dataName, String dataEntry) throws Exception{
 		ILazyDataset ld = dh.getLazyDataset(dataEntry+"/"+dataName);
 		if(ld == null) throw new Exception("Reading Exception: " +dataEntry+ " entry does not exist in the file " + filePath);
 		return ld;
@@ -584,7 +584,7 @@ class PersistentFileImpl implements IPersistentFile {
 	 * @throws Exception 
 	 */
 	@SuppressWarnings("unused")
-	private BooleanDataset readH5Mask(DataHolder dh, String maskName) throws Exception{
+	private BooleanDataset readH5Mask(IDataHolder dh, String maskName) throws Exception{
 		ILazyDataset ld = dh.getLazyDataset(PersistenceConstants.MASK_ENTRY+"/"+maskName);
 		if (ld instanceof H5LazyDataset) {
 			return (BooleanDataset)DatasetUtils.cast(((H5LazyDataset)ld).getCompleteData(null), AbstractDataset.BOOL);

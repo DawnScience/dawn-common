@@ -9,8 +9,6 @@
  */ 
 package org.dawnsci.io.h5;
 
-import gda.analysis.io.ScanFileHolderException;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -34,6 +32,7 @@ import uk.ac.diamond.scisoft.analysis.io.DataHolder;
 import uk.ac.diamond.scisoft.analysis.io.IMetaData;
 import uk.ac.diamond.scisoft.analysis.io.IMetaLoader;
 import uk.ac.diamond.scisoft.analysis.io.MetaDataAdapter;
+import uk.ac.diamond.scisoft.analysis.io.ScanFileHolderException;
 import uk.ac.diamond.scisoft.analysis.io.SliceObject;
 import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
 

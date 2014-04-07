@@ -14,8 +14,10 @@ import java.util.LinkedHashMap;
 
 import jep.Jep;
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.DatasetUtils;
 import uk.ac.diamond.scisoft.analysis.dataset.DoubleDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.FloatDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.IntegerDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.LongDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ShortDataset;
@@ -31,8 +33,9 @@ public class NumpyUtils {
 	 * @param jep
 	 * @throws Throwable
 	 */
-	public static void setNumpy(final Jep jep, final AbstractDataset set) throws Throwable {
+	public static void setNumpy(final Jep jep, final IDataset iset) throws Throwable {
 		
+		final AbstractDataset set = DatasetUtils.convertToAbstractDataset(iset);
 		// numpy!
 		jep.eval("from numpy import *");
 		

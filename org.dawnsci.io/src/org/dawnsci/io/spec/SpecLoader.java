@@ -9,8 +9,6 @@
  */ 
 package org.dawnsci.io.spec;
 
-import gda.analysis.io.ScanFileHolderException;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
@@ -28,6 +26,7 @@ import uk.ac.diamond.scisoft.analysis.io.DataHolder;
 import uk.ac.diamond.scisoft.analysis.io.ExtendedMetadataAdapter;
 import uk.ac.diamond.scisoft.analysis.io.IMetaData;
 import uk.ac.diamond.scisoft.analysis.io.IMetaLoader;
+import uk.ac.diamond.scisoft.analysis.io.ScanFileHolderException;
 import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
 
 public class SpecLoader extends AbstractFileLoader implements IMetaLoader {

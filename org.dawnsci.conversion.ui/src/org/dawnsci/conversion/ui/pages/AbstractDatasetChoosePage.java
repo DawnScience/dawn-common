@@ -1,9 +1,6 @@
 package org.dawnsci.conversion.ui.pages;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import org.dawb.common.services.conversion.IConversionContext;
@@ -41,6 +38,7 @@ import org.slf4j.LoggerFactory;
 
 import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 import uk.ac.diamond.scisoft.analysis.io.DataHolder;
+import uk.ac.diamond.scisoft.analysis.io.IDataHolder;
 import uk.ac.diamond.scisoft.analysis.io.IMetaData;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 
@@ -58,7 +56,7 @@ public abstract class AbstractDatasetChoosePage extends ResourceChoosePage imple
 	protected boolean overwrite = false;
 
 	protected IMetaData          imeta;
-	protected DataHolder         holder;
+	protected IDataHolder        holder;
 	
 
 	protected AbstractDatasetChoosePage(String pageName, String description, ImageDescriptor icon) {
@@ -198,7 +196,7 @@ public abstract class AbstractDatasetChoosePage extends ResourceChoosePage imple
 					final String source = getSourcePath(context);
 					if (source==null || "".equals(source)) return;
 					// Attempt to use meta data, save memory
-					DataHolder holder = LoaderFactory.getData(source, new ProgressMonitorWrapper(monitor));
+					IDataHolder holder = LoaderFactory.getData(source, new ProgressMonitorWrapper(monitor));
 					final List<String> names = SliceUtils.getSlicableNames(holder, getMinimumDataSize());
 					setDataNames(names.toArray(new String[names.size()]), null, holder);
 					return;
@@ -214,7 +212,7 @@ public abstract class AbstractDatasetChoosePage extends ResourceChoosePage imple
 
 	protected abstract int getMinimumDataSize();
 
-	protected void setDataNames(String[] array, final IMetaData imeta, final DataHolder holder) {
+	protected void setDataNames(String[] array, final IMetaData imeta, final IDataHolder holder) {
 		dataSetNames = array;
 		this.imeta   = imeta;
 		this.holder  = holder;

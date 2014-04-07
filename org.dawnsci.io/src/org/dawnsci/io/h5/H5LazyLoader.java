@@ -1,7 +1,5 @@
 package org.dawnsci.io.h5;
 
-import gda.analysis.io.ScanFileHolderException;
-
 import java.io.File;
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
@@ -15,6 +13,7 @@ import org.dawb.hdf5.IHierarchicalDataFile;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.io.ILazyLoader;
+import uk.ac.diamond.scisoft.analysis.io.ScanFileHolderException;
 import uk.ac.diamond.scisoft.analysis.io.SliceObject;
 import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
 

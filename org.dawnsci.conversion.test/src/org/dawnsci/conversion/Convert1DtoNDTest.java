@@ -18,7 +18,7 @@
 
 package org.dawnsci.conversion;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
 
 import java.io.File;
 import java.util.Arrays;
@@ -30,7 +30,7 @@ import org.dawnsci.conversion.converters.Convert1DtoND.Convert1DInfoBean;
 import org.junit.Test;
 
 import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
-import uk.ac.diamond.scisoft.analysis.io.DataHolder;
+import uk.ac.diamond.scisoft.analysis.io.IDataHolder;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 
 public class Convert1DtoNDTest {
@@ -59,7 +59,7 @@ public class Convert1DtoNDTest {
         
         service.process(context);
         
-        final DataHolder   dh    = LoaderFactory.getData(tmp.getAbsolutePath());
+        final IDataHolder   dh    = LoaderFactory.getData(tmp.getAbsolutePath());
         final List<String> names = Arrays.asList("/entry1/counterTimer01/I0","/entry1/counterTimer01/lnI0It","/entry1/counterTimer01/It");
         for (String name : names) {
             ILazyDataset ds = dh.getLazyDataset(name);
@@ -97,7 +97,7 @@ public class Convert1DtoNDTest {
         
         service.process(context);
         
-        final DataHolder   dh    = LoaderFactory.getData(tmp.getAbsolutePath());
+        final IDataHolder   dh    = LoaderFactory.getData(tmp.getAbsolutePath());
         final List<String> names = Arrays.asList("/entry1/counterTimer01/I0","/entry1/counterTimer01/lnI0It","/entry1/counterTimer01/It");
         for (String name : names) {
             ILazyDataset ds = dh.getLazyDataset(name);
@@ -128,7 +128,7 @@ public class Convert1DtoNDTest {
         
         service.process(context);
         
-        final DataHolder   dh    = LoaderFactory.getData(tmp.getAbsolutePath());
+        final IDataHolder   dh    = LoaderFactory.getData(tmp.getAbsolutePath());
         final List<String> names = Arrays.asList("/entry1/dataset_0","/entry1/dataset_1");
         for (String name : names) {
             ILazyDataset ds = dh.getLazyDataset(name);

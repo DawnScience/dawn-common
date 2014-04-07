@@ -22,6 +22,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 
 
@@ -106,8 +107,8 @@ public class NumpyRpcTest {
 		
 		String path = TestUtils.getAbsolutePath(org.dawb.common.python.Activator.getDefault().getBundle(), 
                             "test/org/dawb/common/python/test/billeA_4201_EF_XRD_5998.edf");				
-		final AbstractDataset             set  = LoaderFactory.getData(path).getDataset(0);
-		final Map<String,AbstractDataset> data = new HashMap<String, AbstractDataset>();
+		final IDataset             set  = LoaderFactory.getData(path).getDataset(0);
+		final Map<String,IDataset> data = new HashMap<String, IDataset>();
 		data.put("x", set);
 		
 		final String scriptPath = BundleUtils.getBundleLocation("org.dawb.common.python").getAbsolutePath()+"/test/org/dawb/common/python/test/rpc/2x.py";	

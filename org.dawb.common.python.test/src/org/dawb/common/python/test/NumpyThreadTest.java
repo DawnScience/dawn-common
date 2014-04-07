@@ -14,7 +14,7 @@ import jep.Jep;
 import org.dawb.common.util.test.TestUtils;
 import org.junit.Test;
 
-import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 
 public class NumpyThreadTest extends AbstractThreadTest {
@@ -40,7 +40,7 @@ public class NumpyThreadTest extends AbstractThreadTest {
 			System.out.println("Processing loop of medium sized files into numpy, count "+index);
 			String path = TestUtils.getAbsolutePath(org.dawb.common.python.Activator.getDefault().getBundle(), 
                                                     "test/org/dawb/common/python/test/billeA_4201_EF_XRD_5998.edf");				
-			final AbstractDataset set = LoaderFactory.getData(path, null).getDataset(0);
+			final IDataset set = LoaderFactory.getData(path, null).getDataset(0);
 			set.setName("i");
 			NumpyUtils.setNumpy(jep, set);
 			NumpyUtils.getNumpy(jep, set.getName());

@@ -25,7 +25,7 @@ import uk.ac.diamond.scisoft.analysis.dataset.IntegerDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.LongDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ShortDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.StringDataset;
-import uk.ac.diamond.scisoft.analysis.io.DataHolder;
+import uk.ac.diamond.scisoft.analysis.io.IDataHolder;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
 
@@ -121,7 +121,7 @@ public abstract class AbstractConversion {
 		if (lazy != null)
 			return context.getLazyDataset();
 
-		final DataHolder   dh = LoaderFactory.getData(path.getAbsolutePath());
+		final IDataHolder   dh = LoaderFactory.getData(path.getAbsolutePath());
 		context.setSelectedH5Path(dsPath);
 		if (context.getSliceDimensions()==null) {
 			// Because the data might be lazy and unloadable. We want to load all the data now.
@@ -306,7 +306,7 @@ public abstract class AbstractConversion {
 	public List<String> getDataNames(File ioFile) throws Exception {
 
 		if (ioFile.isDirectory()) return Collections.emptyList();
-		final DataHolder   dh    = LoaderFactory.getData(ioFile.getAbsolutePath());
+		final IDataHolder   dh    = LoaderFactory.getData(ioFile.getAbsolutePath());
 		
 		if (dh == null || dh.getNames() == null) return Collections.emptyList();
 		return Arrays.asList(dh.getNames());

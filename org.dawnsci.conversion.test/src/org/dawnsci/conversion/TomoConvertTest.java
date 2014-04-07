@@ -8,7 +8,7 @@ import org.dawnsci.conversion.converters.CustomTomoConverter;
 import org.junit.Test;
 
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
-import uk.ac.diamond.scisoft.analysis.io.DataHolder;
+import uk.ac.diamond.scisoft.analysis.io.IDataHolder;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 
 public class TomoConvertTest {
@@ -53,7 +53,7 @@ public class TomoConvertTest {
         fa.toString();
         for (File file : fa) {
         	file.deleteOnExit();
-        	final DataHolder holder = LoaderFactory.getData(file.getAbsolutePath());
+        	final IDataHolder holder = LoaderFactory.getData(file.getAbsolutePath());
         	final IDataset   set    = holder.getDataset(0);
         	if (set.getShape()[0]!=100 || set.getShape()[1]!=100) {
         		throw new Exception("Incorrect shape of exported dataset!");
@@ -117,7 +117,7 @@ public class TomoConvertTest {
         	folder.deleteOnExit();
         	for (File file : fa1) {
         		file.deleteOnExit();
-        		final DataHolder holder = LoaderFactory.getData(file.getAbsolutePath());
+        		final IDataHolder holder = LoaderFactory.getData(file.getAbsolutePath());
         		final IDataset   set    = holder.getDataset(0);
         		if (set.getShape()[0]!=100 || set.getShape()[1]!=100) {
         			throw new Exception("Incorrect shape of exported dataset!");
@@ -168,7 +168,7 @@ public class TomoConvertTest {
         
         for (File file : fa) {
         	file.deleteOnExit();
-        	final DataHolder holder = LoaderFactory.getData(file.getAbsolutePath());
+        	final IDataHolder holder = LoaderFactory.getData(file.getAbsolutePath());
         	final IDataset   set    = holder.getDataset(0);
         	if (set.getShape()[0]!=100 || set.getShape()[1]!=100) {
         		throw new Exception("Incorrect shape of exported dataset!");

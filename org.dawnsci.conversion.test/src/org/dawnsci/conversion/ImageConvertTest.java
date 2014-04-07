@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.io.DataHolder;
+import uk.ac.diamond.scisoft.analysis.io.IDataHolder;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 
 
@@ -41,7 +42,7 @@ public class ImageConvertTest {
         final File[] fa = dir.listFiles();
         for (File file : fa) {
         	file.deleteOnExit();
-        	final DataHolder holder = LoaderFactory.getData(file.getAbsolutePath());
+        	final IDataHolder holder = LoaderFactory.getData(file.getAbsolutePath());
         	final IDataset   set    = holder.getDataset(0);
         	if (set.getShape()[0]!=2048 || set.getShape()[1]!=2048) {
         		throw new Exception("Incorrect shape of exported dataset!");
@@ -99,7 +100,7 @@ public class ImageConvertTest {
         	
         	if (!file.getName().startsWith("Export")) throw new Exception("Alternative name did not work!");
         	
-        	final DataHolder holder = LoaderFactory.getData(file.getAbsolutePath());
+        	final IDataHolder holder = LoaderFactory.getData(file.getAbsolutePath());
         	final IDataset   set    = holder.getDataset(0);
         	if (set.getShape()[0]!=2048 || set.getShape()[1]!=2048) {
         		throw new Exception("Incorrect shape of exported dataset!");
