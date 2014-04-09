@@ -185,7 +185,7 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 		// open the file with read-only access
 		this.file = fileFormat.createInstance(path, openType);
 		if (file == null) throw new Exception("Failed to open file: "+path);
-		
+
 		try {
 		    file.open();
 		} catch (ncsa.hdf.hdf5lib.exceptions.HDF5LibraryException ne) {
@@ -673,7 +673,7 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 	        String[] arrayValue = {value};
 	        Datatype dtype = new H5Datatype(Datatype.CLASS_STRING, arrayValue[0].length()+1, -1, -1);
 			Dataset dataset = file.createScalarDS(name, parent, dtype, new long[]{1}, null, null, 0, arrayValue);
-			
+
 			return dataset;
 			
 		} finally {
@@ -715,6 +715,14 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 		
 	}
 
+	@Override
+	public HObject createLink(Group targetGroup, String linkName, String sourceFullPath)
+			throws Exception {
+		final HObject object = getData(sourceFullPath);
+		if (object==null) 
+			return null;
+		return file.createLink(targetGroup, linkName, object);
+	}
 	
 	public void delete(String fullPath) throws Exception {
 		final HObject object = getData(fullPath);
@@ -827,7 +835,5 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 			return -1;
 		}
 	}
-
-
 
 }
