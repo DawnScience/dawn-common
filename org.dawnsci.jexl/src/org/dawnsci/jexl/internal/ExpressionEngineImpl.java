@@ -17,6 +17,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.jexl2.Expression;
 import org.apache.commons.jexl2.JexlEngine;
+import org.apache.commons.jexl2.JexlException;
 import org.apache.commons.jexl2.MapContext;
 import org.apache.commons.jexl2.Script;
 import org.dawb.common.services.expressions.ExpressionEngineEvent;
@@ -57,9 +58,42 @@ public class ExpressionEngineImpl implements IExpressionEngine{
 	
 
 	@Override
-	public void createExpression(String expression) throws Exception {
-		this.expression = jexl.createExpression(expression);
+	public void createExpression(String expr) throws Exception {
+		this.expression = jexl.createExpression(expr);
+		
+		checkFunctions(expr);
 	}
+
+	/**
+	 * TODO FIXME Must be better way than this...
+	 * @param expr
+	 * @throws Exception
+	 */
+	private void checkFunctions(String expr)  throws Exception {
+        // We now evaluate the expression to try and trap invalid functions.
+		try {
+			final Script script = jexl.createScript(expr);
+			Set<List<String>> names = script.getVariables();
+			Collection<String> vars = unpack(names);
+			
+			final Map<String,Object> dummy = new HashMap<String,Object>(vars.size());
+			for (String name : vars) dummy.put(name, 1);
+			MapContext dCnxt = new MapContext(dummy);
+			
+			expression.evaluate(dCnxt);
+			
+		} catch (JexlException ne) {
+			if (ne.getMessage().toLowerCase().contains("no such function namespace")) {
+				final String  msg = ne.toString();
+				final String[] segs = msg.split(":");
+				throw new Exception(segs[3], ne);
+			}
+
+		} catch (Exception ignored) {
+			// We allow the expression but it might fail later
+		}		
+	}
+
 
 	@Override
 	public Object evaluate() throws Exception {

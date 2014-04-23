@@ -9,21 +9,27 @@ import java.util.Map;
 
 import junit.framework.Assert;
 
+import org.apache.commons.io.FileUtils;
 import org.dawb.common.util.eclipse.BundleUtils;
-import org.dawnsci.python.rpc.IPythonRunScript;
 import org.eclipse.core.runtime.CoreException;
 import org.junit.Test;
 
 import uk.ac.diamond.scisoft.analysis.rpc.AnalysisRpcException;
+import uk.ac.diamond.scisoft.analysis.rpc.AnalysisRpcRemoteException;
 
 abstract public class AbstractPythonRunScriptServicePluginTest implements
 		IPythonRunScript {
 
 	private String getScript(String script) throws IOException {
 		final String scriptPath = BundleUtils.getBundleLocation(
-				"org.dawb.common.python").getAbsolutePath()
-				+ "/test/org/dawb/common/python/rpc/" + script;
-		return scriptPath;
+				"org.dawnsci.python.rpc").getAbsolutePath()
+				+ "/test/org/dawnsci/python/rpc/" + script;
+		// We need to keep all the files in the same directory so we can reuse the same
+		// launched service. So load the file and put it in the temp directory.
+		// See the exception raised in python_service_runscript.py if sys.path[0] is
+		// changed
+		String scriptContents = FileUtils.readFileToString(new File(scriptPath));
+		return getTemp(scriptContents);
 	}
 
 	/** Make a temporary file out of a script */
@@ -61,13 +67,16 @@ abstract public class AbstractPythonRunScriptServicePluginTest implements
 
 	@Test
 	public void testExceptionFromPython() throws IOException {
+		String pycode = "def run(**kwargs): assert False, 'assertion failed'";
 		try {
-			runScript(getTemp("def run(**kwargs): assert False"),
+			runScript(getTemp(pycode),
 					Collections.<String, Object> emptyMap());
 		} catch (AnalysisRpcException e) {
-			Assert.assertTrue(e.getCause().toString()
+			AnalysisRpcRemoteException cause = (AnalysisRpcRemoteException)e.getCause();
+			Assert.assertTrue(cause.toString()
 					.contains("AssertionError"));
-			Assert.assertTrue(e.getCause().toString().contains("assert False"));
+			Assert.assertTrue(cause.toString().contains("assertion failed"));
+			Assert.assertTrue(cause.getPythonFormattedStackTrace(null).contains(pycode));
 		}
 	}
 

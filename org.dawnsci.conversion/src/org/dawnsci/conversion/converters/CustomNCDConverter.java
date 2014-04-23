@@ -498,12 +498,15 @@ public class CustomNCDConverter extends AbstractConversion  {
 				String nanometer = unitFormat.format(SI.NANO(SI.METER)
 						.inverse());
 				String angle = unitFormat.format(NonSI.DEGREE_ANGLE);
+				String dspace = unitFormat.format(NonSI.ANGSTROM);
 				if (units.equals(nanometer)) {
 					return "1/nm";
 				} else if (units.equals(angstrom)) {
 					return "1/A";
 				} else if (units.equals(angle)) {
 					return "degrees";
+				} else if (units.equals(dspace)) {
+					return "Angstrom";
 				}
 			}
 		} catch (ScanFileHolderException e) {

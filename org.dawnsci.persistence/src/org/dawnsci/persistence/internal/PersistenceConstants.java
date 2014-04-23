@@ -17,6 +17,7 @@ package org.dawnsci.persistence.internal;
 
 public class PersistenceConstants {
 
+	// NOTE You cannot have a version above .9 because double are used.
 	public static final String CURRENT_VERSION = "1.1";
 	public static final String ENTRY          = "/entry";
 	public static final String DATA_ENTRY     = "/entry/data";

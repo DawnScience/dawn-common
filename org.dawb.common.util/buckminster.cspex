@@ -3,9 +3,6 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:bc="http://www.eclipse.org/buckminster/Common-1.0"
 	xmlns="http://www.eclipse.org/buckminster/CSpec-1.0">
-	<dependencies>
-		<dependency name="org.dawb.common.util.test" componentType="osgi.bundle"/>
-	</dependencies>
 	<generators>
 		<!-- Place your Generators here -->
 	</generators>
