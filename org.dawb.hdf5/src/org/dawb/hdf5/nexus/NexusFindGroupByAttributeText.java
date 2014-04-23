@@ -24,8 +24,12 @@ public class NexusFindGroupByAttributeText implements IFindInNexus{
 	@Override
 	public boolean inNexus(HObject nexusObject) {
 		if (nexusObject instanceof Group) {
-			if (NexusUtils.getNexusGroupAttributeValue((Group)nexusObject, attributeName).toLowerCase().equals(attributeValue.toLowerCase())) {
-				return true;
+			if (attributeName != null) {
+				String attrNexusObject = NexusUtils.getNexusGroupAttributeValue((Group) nexusObject, attributeName);
+				if (attrNexusObject != null && attributeValue != null
+						&& attrNexusObject.toLowerCase().equals(attributeValue.toLowerCase())) {
+					return true;
+				}
 			}
 		}
 		return false;
