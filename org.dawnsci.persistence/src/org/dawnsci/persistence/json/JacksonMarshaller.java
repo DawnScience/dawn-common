@@ -246,8 +246,8 @@ public class JacksonMarshaller implements IJSonMarshaller{
 			plroibean.setName(name);
 			plroibean.setStartPoint(plroi.getPoint());
 			List<double[]> points = new ArrayList<double[]>();
-			for (int i = 0; i < plroi.getNumberOfPoints(); i++) {
-				points.add(plroi.getPoint(i).getPoint());
+			for (IROI p: plroi) {
+				points.add(p.getPoint());
 			}
 			plroibean.setPoints(points);
 			return plroibean;
@@ -258,8 +258,8 @@ public class JacksonMarshaller implements IJSonMarshaller{
 			pgroibean.setName(name);
 			pgroibean.setStartPoint(pgroi.getPoint());
 			List<double[]> points = new ArrayList<double[]>();
-			for (int i = 0; i < pgroi.getNumberOfPoints(); i++) {
-				points.add(pgroi.getPoint(i).getPoint());
+			for (IROI p: pgroi) {
+				points.add(p.getPoint());
 			}
 			pgroibean.setPoints(points);
 			return pgroibean;
@@ -270,8 +270,8 @@ public class JacksonMarshaller implements IJSonMarshaller{
 			fdroibean.setName(name);
 			fdroibean.setStartPoint(fdroi.getPoint());
 			List<double[]> points = new ArrayList<double[]>();
-			for(int i = 0; i<fdroi.getNumberOfPoints(); i++){
-				points.add(fdroi.getPoint(i).getPoint());
+			for (IROI p: fdroi) {
+				points.add(p.getPoint());
 			}
 			fdroibean.setPoints(points);
 			return fdroibean;
@@ -325,9 +325,8 @@ public class JacksonMarshaller implements IJSonMarshaller{
 			croibean.setRadius(croi.getRadius());
 			croibean.setStartPoint(croi.getPoint());
 			List<double[]> points = new ArrayList<double[]>();
-			PolylineROI poly = croi.getPoints();
-			for (int i = 0; i < poly.getNumberOfPoints(); i++) {
-				points.add(poly.getPoint(i).getPoint());
+			for (IROI p: croi.getPoints()) {
+				points.add(p.getPoint());
 			}
 			croibean.setPoints(points);
 			return croibean;
@@ -340,9 +339,8 @@ public class JacksonMarshaller implements IJSonMarshaller{
 			eroibean.setSemiAxes(eroi.getSemiAxes());
 			eroibean.setAngle(eroi.getAngle());
 			List<double[]> points = new ArrayList<double[]>();
-			PolylineROI poly = eroi.getPoints();
-			for (int i = 0; i < poly.getNumberOfPoints(); i++) {
-				points.add(poly.getPoint(i).getPoint());
+			for (IROI p: eroi.getPoints()) {
+				points.add(p.getPoint());
 			}
 			eroibean.setPoints(points);
 			return eroibean;
