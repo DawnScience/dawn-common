@@ -275,19 +275,7 @@ public class JacksonMarshaller implements IJSonMarshaller{
 			}
 			fdroibean.setPoints(points);
 			return fdroibean;
-
-		} else if(roiClass == RingROI.class){
-			RingROI rroi = (RingROI) roi;
-			RingROIBean rroibean = new RingROIBean();
-			rroibean.setName(name);
-			rroibean.setStartPoint(rroi.getPoint());
-			rroibean.setAngles(rroi.getAngles());
-			rroibean.setRadii(rroi.getRadii());
-			rroibean.setSymmetry(rroi.getSymmetry());
-			rroibean.setDpp(rroi.getDpp());
-			return rroibean;
-
-		} else if(roiClass == SectorROI.class){
+		} else if (roiClass == SectorROI.class) {
 			SectorROI sroi = (SectorROI)roi;
 			SectorROIBean sroibean = new SectorROIBean();
 			sroibean.setName(name);
@@ -300,7 +288,16 @@ public class JacksonMarshaller implements IJSonMarshaller{
 			sroibean.setCombineSymmetry(sroi.isCombineSymmetry());
 			sroibean.setAverageArea(sroi.isAverageArea());
 			return sroibean;
-
+		} else if (roiClass == RingROI.class) {
+			RingROI rroi = (RingROI) roi;
+			RingROIBean rroibean = new RingROIBean();
+			rroibean.setName(name);
+			rroibean.setStartPoint(rroi.getPoint());
+			rroibean.setRadii(rroi.getRadii());
+			rroibean.setDpp(rroi.getDpp());
+			rroibean.setAverageArea(rroi.isAverageArea());
+			rroibean.setClippingCompensation(rroi.isClippingCompensation());
+			return rroibean;
 		} else if(roiClass == CircularROI.class){
 			CircularROI croi = (CircularROI) roi;
 			CircularROIBean croibean = new CircularROIBean();

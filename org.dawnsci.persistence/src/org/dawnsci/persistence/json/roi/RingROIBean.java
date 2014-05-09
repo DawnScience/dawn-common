@@ -15,36 +15,19 @@ import uk.ac.diamond.scisoft.analysis.roi.RingROI;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-public class RingROIBean extends ROIBean{
+public class RingROIBean extends ROIBean {
 
 	public static final String TYPE = "RingROI";
 
-	private double[] angles;   // angles in radians
+	protected double[] radii; // radii
 
-	private int symmetry; // symmetry
+	protected double dpp; // Sampling rate used for profile calculations in dots per pixel
 
-	private double[] radii; // radii
-
-	private double dpp; // Sampling rate used for profile calculations in dots per pixel
+	private boolean clippingCompensation; // compensate for clipping
+	private boolean averageArea;
 
 	public RingROIBean(){
 		type = TYPE;
-	}
-
-	/**
-	 * Set the angles
-	 * @param angles
-	 */
-	public void setAngles(double[] angles){
-		this.angles = angles;
-	}
-
-	/**
-	 * Set the symmetry
-	 * @param symmetry
-	 */
-	public void setSymmetry(int symmetry){
-		this.symmetry = symmetry;
 	}
 
 	/**
@@ -66,22 +49,6 @@ public class RingROIBean extends ROIBean{
 	}
 
 	/**
-	 * Returns the angle
-	 * @return angles
-	 */
-	public double[] getAngles(){
-		return angles;
-	}
-
-	/**
-	 * Returns the symmetry
-	 * @return symmetry
-	 */
-	public int getSymmetry(){
-		return symmetry;
-	}
-
-	/**
 	 * Returns the radii
 	 * @return radii
 	 */
@@ -99,10 +66,26 @@ public class RingROIBean extends ROIBean{
 		return dpp;
 	}
 
+	public boolean isClippingCompensation() {
+		return clippingCompensation;
+	}
+
+	public void setClippingCompensation(boolean clippingCompensation) {
+		this.clippingCompensation = clippingCompensation;
+	}
+
+	public boolean isAverageArea() {
+		return averageArea;
+	}
+
+	public void setAverageArea(boolean averageArea) {
+		this.averageArea = averageArea;
+	}
+
 	@Override
 	public String toString(){
-		return String.format("{\"type\": \"%s\", \"name\": \"%s\", \"startPoint\": \"%s\", \"angles\": \"%s\", \"symmetry\": \"%s\", \"radii\": \"%s\", \"dpp\": \"%s\"}", 
-				type, name, Arrays.toString(startPoint), Arrays.toString(angles), symmetry, Arrays.toString(radii), dpp);
+		return String.format("{\"type\": \"%s\", \"name\": \"%s\", \"startPoint\": \"%s\", \"radii\": \"%s\", \"dpp\": \"%s\"}", 
+				type, name, Arrays.toString(startPoint), Arrays.toString(radii), dpp);
 	}
 
 	@Override
@@ -112,9 +95,9 @@ public class RingROIBean extends ROIBean{
 		sroi.setName(getName());
 		sroi.setPoint(getStartPoint());
 		sroi.setRadii(getRadii());
-		sroi.setAngles(getAngles());
 		sroi.setDpp(getDpp());
-		sroi.setSymmetry(getSymmetry());
+		sroi.setAverageArea(isAverageArea());
+		sroi.setClippingCompensation(isClippingCompensation());
 		return sroi;
 	}
 }

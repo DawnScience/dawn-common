@@ -21,7 +21,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * @author wqk87977
  *
  */
-public class SectorROIBean extends ROIBean{
+public class SectorROIBean extends RingROIBean {
 
 	public static final String TYPE = "SectorROI";
 
@@ -29,12 +29,6 @@ public class SectorROIBean extends ROIBean{
 
 	private int symmetry; // symmetry
 
-	private double[] radii; // radii
-
-	private double dpp; // Sampling rate used for profile calculations in dots per pixel
-
-	private boolean clippingCompensation; // compensate for clipping
-	private boolean averageArea;
 	private boolean combineSymmetry; // combine symmetry option for profile (where appropriate)
 
 	public SectorROIBean(){
@@ -58,24 +52,6 @@ public class SectorROIBean extends ROIBean{
 	}
 
 	/**
-	 * Set the radii
-	 * @param radii
-	 */
-	public void setRadii(double[] radii){
-		this.radii = radii;
-	}
-
-	/**
-	 * Set sampling rate used in profile calculations  
-	 * 
-	 * @param dpp
-	 *			sampling rate in dots per pixel; 
-	 */
-	public void setDpp(double dpp) {
-		this.dpp = dpp;
-	}
-
-	/**
 	 * Returns the angle
 	 * @return angles
 	 */
@@ -91,40 +67,6 @@ public class SectorROIBean extends ROIBean{
 		return symmetry;
 	}
 
-	/**
-	 * Returns the radii
-	 * @return radii
-	 */
-	public double[] getRadii(){
-		return radii;
-	}
-
-	/**
-	 * Return sampling rate used in profile calculations
-	 * 
-	 * @return
-	 * 			sampling rate in dots per pixel
-	 */
-	public double getDpp() {
-		return dpp;
-	}
-
-	public boolean isClippingCompensation() {
-		return clippingCompensation;
-	}
-
-	public void setClippingCompensation(boolean clippingCompensation) {
-		this.clippingCompensation = clippingCompensation;
-	}
-
-	public boolean isAverageArea() {
-		return averageArea;
-	}
-
-	public void setAverageArea(boolean averageArea) {
-		this.averageArea = averageArea;
-	}
-
 	public boolean isCombineSymmetry() {
 		return combineSymmetry;
 	}
@@ -134,7 +76,7 @@ public class SectorROIBean extends ROIBean{
 	}
 
 	@Override
-	public String toString(){
+	public String toString() {
 		return String.format("{\"type\": \"%s\", \"name\": \"%s\", \"startPoint\": \"%s\", \"angles\": \"%s\", \"symmetry\": \"%s\", \"radii\": \"%s\", \"dpp\": \"%s\"}", 
 				type, name, Arrays.toString(startPoint), Arrays.toString(angles), symmetry, Arrays.toString(radii), dpp);
 	}
