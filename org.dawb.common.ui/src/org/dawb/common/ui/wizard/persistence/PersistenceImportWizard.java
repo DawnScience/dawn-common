@@ -290,8 +290,8 @@ public class PersistenceImportWizard extends AbstractPersistenceWizard implement
 										region.setROI(roi);
 									} else {
 										region = system.createRegion(roiName, rservice.forROI(roi));
-										system.addRegion(region);
 										region.setROI(roi);
+										system.addRegion(region);
 									}
 									if (region!=null) {
 										String uObject = finalFile.getRegionAttribute(roiName, "User Object");
