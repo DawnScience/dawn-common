@@ -2,6 +2,7 @@ package org.dawb.common.ui.views;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -28,8 +29,8 @@ public class CompositeSelectionProvider implements ISelectionProvider, ISelectio
 	 * @param type either notify when any or when a particular provider changes.
 	 */
 	public CompositeSelectionProvider() {
-		providers = new ArrayList<ISelectionProvider>();
-		listeners = new ArrayList<ISelectionChangedListener>();
+		providers = new Vector<ISelectionProvider>();
+		listeners = new Vector<ISelectionChangedListener>();
 	}
 
 	@Override

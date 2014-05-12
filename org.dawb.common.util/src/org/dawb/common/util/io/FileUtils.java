@@ -121,7 +121,7 @@ public final class FileUtils {
 	 * @return a unique file.
 	 */
 	public static File getUnique(final File dir, final String template, final String ext) {
-		final String extension = ext != null ? (ext.startsWith(".")) ? ext : "." + ext : null;
+		final String extension = ext != null ? (ext.startsWith(".")) ? ext : "." + ext : "";
 		final File file = new File(dir, template + extension);
 		if (!file.exists()) {
 			return file;
