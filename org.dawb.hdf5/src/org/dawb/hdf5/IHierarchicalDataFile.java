@@ -275,6 +275,15 @@ public interface IHierarchicalDataFile extends AutoCloseable {
 	 */
 	public Dataset appendDataset(String datasetName, Datatype d, long[] bufferShape, Object buffer, Group group)  throws Exception;
 
+	/**
+	 * Creates a link to an existing object
+	 * 
+	 * @param targetGroup
+	 * @param linkName
+	 * @param sourceFullPath
+	 * @return The link object, or null if sourcePath doesn't exist
+	 */
+	public HObject createLink(Group targetGroup, String linkName, String sourceFullPath) throws Exception;
 
 	/**
 	 * Gets the size of a dimension of the dataset.
