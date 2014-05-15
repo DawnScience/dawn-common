@@ -9,7 +9,7 @@ import org.dawnsci.plotting.api.PlotType;
 import org.dawnsci.plotting.api.trace.IImageTrace;
 import org.dawnsci.plotting.api.trace.ITrace;
 
-import uk.ac.diamond.scisoft.analysis.dataset.ADataset;
+import uk.ac.diamond.scisoft.analysis.dataset.Dataset;
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.io.DataHolder;
@@ -49,13 +49,13 @@ public class Plot2DConversionVisitor extends AbstractPlotConversionVisitor {
 				int dbits = AbstractDataset.getDType(data);
 				
 				switch (dbits) {
-				case ADataset.INT8:
+				case Dataset.INT8:
 					bits = 8;
 					break;
-				case ADataset.INT16:
+				case Dataset.INT16:
 					bits = 16;
 					break;
-				case ADataset.INT32:
+				case Dataset.INT32:
 					bits = 32;
 					break;
 				}
