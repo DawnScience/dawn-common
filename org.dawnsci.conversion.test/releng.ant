@@ -15,50 +15,50 @@
 
 	<import file="${workspace.git.loc}/diamond-releng.git/diamond.releng.tools/ant-headless/test-common.ant" />
 
-    <target name="junit-tests" depends="set-test-base-DAWN, Xvfb_start, _junit-tests, Xvfb_stop" />
+	<target name="junit-tests" depends="set-test-base-DAWN, Xvfb_start, _junit-tests, Xvfb_stop" />
 
-    <target name="_junit-tests" depends="set-test-base-DAWN">
-        <junit-call description="${ant.project.name} Java JUnit tests"
-        Xvfb-display-name="${Xvfb-display-name}" Xvfb-display-number="${Xvfb-display-number}">
-            <formatter type="xml" />
-            <classpath>
-                <pathelement location="${junitjar.loc}" />
-                <pathelement location="${plugin.basedir}/bin" />
-                <pathelement location="${workspace.git.loc}/gda-common.git/uk.ac.diamond.test.runners/logging" />  <!-- to pick up logback-test.xml -->
-                <pathelement location="${plugin.host.basedir}/bin" />
-                <pathelement location="${plugin.host.basedir}/jars/*" />
-                <pathelement location="${workspace.git.loc}/dawn-common.git/org.dawb.common.services/bin" />
-                <pathelement location="${workspace.git.loc}/dawn-common.git/org.dawb.common.util/bin" />
-                <pathelement location="${workspace.git.loc}/dawn-common.git/org.dawb.hdf5/bin" />
-                <pathelement location="${workspace.git.loc}/dawn-third.git/ncsa.hdf/bin" />
-                <pathelement location="${workspace.git.loc}/scisoft-core.git/uk.ac.diamond.scisoft.analysis/bin" />
-                <pathelement location="${workspace.git.loc}/scisoft-core.git/uk.ac.diamond.scisoft.analysis/jars/*" />
-                <pathelement location="${workspace.git.loc}/scisoft-core.git/uk.ac.diamond.scisoft.analysis.api/bin" />
-                <pathelement location="${workspace.git.loc}/scisoft-core.git/uk.ac.diamond.scisoft.analysis.dataset/bin" />
-                <pathelement location="${workspace.git.loc}/dawn-third.git/org.monte.media/bin" />
-                <pathelement location="${workspace.git.loc}/dawn-ui.git/org.dawnsci.plotting.api/bin" />
-                <pathelement location="${workspace.git.loc}/dawn-common.git/org.dawb.common.ui/bin" />
-                <pathelement location="${workspace.git.loc}/dawn-ui.git/org.dawnsci.plotting.services/bin" />
-                <pathelement location="${workspace.git.loc}/dawn-ui.git/org.dawnsci.plotting.histogram/bin" />
-                <path refid="tp.slf4j.path" />  <!--ensure that required org.slf4j.LoggerFactory appears first in classpath -->
-                <path refid="tp.jcl-over-slf4j.path" />  <!--ensure that matching imp appears first in classpath -->
-                <fileset dir="${workspace.loc}/tp/plugins">
-                    <include name="*.jar" />
-                    <exclude name="*.source_*" />
-                    <exclude name="org.eclipse.swt.*" />  <!--AVIImageConvertTest uses SWT, so exclude jars for non-mathching platforms. Xvfb also required. -->
-                </fileset>
-                <fileset dir="${workspace.loc}/tp/plugins">
-                    <include name="org.eclipse.swt.*.${eclipse.os}.${eclipse.arch}_*.jar" />
-                    <exclude name="*.source_*" />
-                </fileset>
-            </classpath>
-            <batchtest todir="@{report.dir}">
-                <fileset dir="${plugin.basedir}/src">
-                    <include name="**/*Test.java" />
-                </fileset>
-            </batchtest>
-        </junit-call>
-    </target>
+	<target name="_junit-tests" depends="set-test-base-DAWN">
+		<junit-call description="${ant.project.name} Java JUnit tests"
+		Xvfb-display-name="${Xvfb-display-name}" Xvfb-display-number="${Xvfb-display-number}">
+			<formatter type="xml" />
+			<classpath>
+				<pathelement location="${junitjar.loc}" />
+				<pathelement location="${plugin.basedir}/bin" />
+				<pathelement location="${workspace.git.loc}/diamond-releng.git/diamond.releng.tools/logging" />  <!-- to pick up logback-test.xml -->
+				<pathelement location="${plugin.host.basedir}/bin" />
+				<pathelement location="${plugin.host.basedir}/jars/*" />
+				<pathelement location="${workspace.git.loc}/dawn-common.git/org.dawb.common.services/bin" />
+				<pathelement location="${workspace.git.loc}/dawn-common.git/org.dawb.common.util/bin" />
+				<pathelement location="${workspace.git.loc}/dawn-common.git/org.dawb.hdf5/bin" />
+				<pathelement location="${workspace.git.loc}/dawn-third.git/ncsa.hdf/bin" />
+				<pathelement location="${workspace.git.loc}/scisoft-core.git/uk.ac.diamond.scisoft.analysis/bin" />
+				<pathelement location="${workspace.git.loc}/scisoft-core.git/uk.ac.diamond.scisoft.analysis/jars/*" />
+				<pathelement location="${workspace.git.loc}/scisoft-core.git/uk.ac.diamond.scisoft.analysis.api/bin" />
+				<pathelement location="${workspace.git.loc}/scisoft-core.git/uk.ac.diamond.scisoft.analysis.dataset/bin" />
+				<pathelement location="${workspace.git.loc}/dawn-third.git/org.monte.media/bin" />
+				<pathelement location="${workspace.git.loc}/dawn-ui.git/org.dawnsci.plotting.api/bin" />
+				<pathelement location="${workspace.git.loc}/dawn-common.git/org.dawb.common.ui/bin" />
+				<pathelement location="${workspace.git.loc}/dawn-ui.git/org.dawnsci.plotting.services/bin" />
+				<pathelement location="${workspace.git.loc}/dawn-ui.git/org.dawnsci.plotting.histogram/bin" />
+				<path refid="tp.slf4j.path" />  <!--ensure that required org.slf4j.LoggerFactory appears first in classpath -->
+				<path refid="tp.jcl-over-slf4j.path" />  <!--ensure that matching imp appears first in classpath -->
+				<fileset dir="${workspace.loc}/tp/plugins">
+					<include name="*.jar" />
+					<exclude name="*.source_*" />
+					<exclude name="org.eclipse.swt.*" />  <!--AVIImageConvertTest uses SWT, so exclude jars for non-mathching platforms. Xvfb also required. -->
+				</fileset>
+				<fileset dir="${workspace.loc}/tp/plugins">
+					<include name="org.eclipse.swt.*.${eclipse.os}.${eclipse.arch}_*.jar" />
+					<exclude name="*.source_*" />
+				</fileset>
+			</classpath>
+			<batchtest todir="@{report.dir}">
+				<fileset dir="${plugin.basedir}/src">
+					<include name="**/*Test.java" />
+				</fileset>
+			</batchtest>
+		</junit-call>
+	</target>
 	
 
 </project>
