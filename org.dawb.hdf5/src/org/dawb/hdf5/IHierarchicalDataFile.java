@@ -293,5 +293,27 @@ public interface IHierarchicalDataFile extends AutoCloseable {
 	 * @throws Exception
 	 */
 	public long getDimensionSize(String datasetName, int dimension) throws Exception;
+	
+	/**
+	 * Method finds the given data set in the group and set a slice of data into it.
+	 * 
+	 * If the data set does not exist, it is created with dimensions [totalShape], and
+	 * the data [buffer] is inserted in the positions designated in startStopStep
+	 * 
+	 * 
+	 * @param name
+	 * @param dtype
+	 * @param buffer
+	 * @param parent
+	 * @param startStopStep
+	 * @param totalShape
+	 * @return
+	 */
+	public Dataset insertSlice(String name,  
+            final Datatype dtype,
+            final Object   buffer,
+            final Group    parent,
+            final long[][] startStopStep,
+            final long[] totalShape) throws Exception;
 
 }

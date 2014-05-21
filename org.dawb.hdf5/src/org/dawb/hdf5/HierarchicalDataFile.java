@@ -835,5 +835,53 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 			return -1;
 		}
 	}
+	
+	public Dataset insertSlice(String name,  
+            final Datatype dtype,
+            final Object   buffer,
+            final Group    parent,
+            final long[][] startStopStep,
+            final long[] totalShape) throws Exception {
+		
+		final int id = parent.open();
+		try {
+			
+			final HObject o = checkExists(name, parent, Dataset.class);
+			Dataset dataset;
+			if (o==null) {
+				dataset = file.createScalarDS(name, parent, dtype, totalShape, totalShape, null, 0, null);
+			} else {
+				dataset = (Dataset)o;
+				
+			}
+			
+			
+			dataset.getMetadata();
+			long[] start     = dataset.getStartDims();
+	        long[] stride    = dataset.getStride();
+	        long[] selected  = dataset.getSelectedDims();
+	        
+	        //start
+	        for (int i = 0; i < start.length; i++) {
+	        	start[i] = startStopStep[0][i];
+	        }
+	        //stride
+	        for (int i = 0; i < stride.length; i++) {
+	        	stride[i] = startStopStep[2][i];
+	        }
+	        //selected
+	        for (int i = 0; i < selected.length; i++) {
+	        	selected[i] = (startStopStep[1][i]-startStopStep[0][i])/startStopStep[2][i];
+	        }
+	        
+	        dataset.write(buffer);
+			
+			return dataset;
+			
+		} finally {
+			parent.close(id);
+		}
+		
+	}
 
 }

@@ -4,8 +4,11 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import ncsa.hdf.object.Dataset;
 import ncsa.hdf.object.Datatype;
@@ -23,7 +26,9 @@ import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.IntegerDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.LongDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.PositionIterator;
 import uk.ac.diamond.scisoft.analysis.dataset.ShortDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.Slice;
 import uk.ac.diamond.scisoft.analysis.dataset.StringDataset;
 import uk.ac.diamond.scisoft.analysis.io.IDataHolder;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
@@ -140,6 +145,14 @@ public abstract class AbstractConversion {
 			               final String               nameFrag,
 		                   final IConversionContext   context) throws Exception {
 		
+		oldOneRangeIterate(lz,nameFrag,context);
+		//multiRangeIterate(lz,nameFrag,context);
+	}
+	
+	private void oldOneRangeIterate(final ILazyDataset         lz, 
+            final String               nameFrag,
+            final IConversionContext   context) throws Exception {
+		
 		final Map<Integer, String> sliceDimensions = context.getSliceDimensions();
 
 		final int[] fullDims = lz.getShape();
@@ -206,6 +219,97 @@ public abstract class AbstractConversion {
 			AbstractDataset data = (AbstractDataset)lz.getSlice(start, stop, step);
 			data = data.squeeze();
 			data.setName(nameFrag+" (Dim "+sliceIndex+"; index="+start[sliceIndex] +")");
+			convert(data);
+			if (context.getMonitor() != null) {
+				IMonitor mon = context.getMonitor();
+				if (mon.isCancelled()) return;
+			}
+		}
+		
+	}
+	
+	private void multiRangeIterate(final ILazyDataset         lz, 
+			               final String               nameFrag,
+		                   final IConversionContext   context) throws Exception {
+		
+		final Map<Integer, String> sliceDimensions = context.getSliceDimensions();
+
+		final int[] fullDims = lz.getShape();
+		
+		//Construct Slice String
+		
+		StringBuilder sb = new StringBuilder();
+		
+		for (int i = 0; i < fullDims.length; i++) {
+			if (sliceDimensions.containsKey(i)) {
+				String s = sliceDimensions.get(i);
+				if (s.contains("all")) s = ":";
+				sb.append(s);
+				sb.append(",");
+			} else {
+				sb.append(":");
+				sb.append(',');
+			}
+		}
+		
+		sb.deleteCharAt(sb.length()-1);
+		Slice[] slices = Slice.convertFromString(sb.toString());
+		
+		//TODO all this horrible-ness could probably be reduced by taking an initial slice
+		//view from the original lazy dataset
+		
+		//create array of ignored axes values
+		Set<Integer> axesSet = new HashSet<Integer>();
+		for (int i = 0; i < fullDims.length; i++) axesSet.add(i);
+		axesSet.removeAll(sliceDimensions.keySet());
+		int[] axes = new int[axesSet.size()];
+		int count = 0;
+		Iterator<Integer> iter = axesSet.iterator();
+		while (iter.hasNext()) axes[count++] = iter.next(); 
+
+		//determine shape of sliced dataset
+		int[] slicedShape = lz.getShape().clone();
+		for (int i = 0; i < slices.length; i++) {
+			if (slices[i].getStop() == null && slices[i].getLength() ==-1) continue;
+			slicedShape[i] = slices[i].getNumSteps();
+		}
+
+		PositionIterator pi = new PositionIterator(lz.getShape(), slices, axes);
+		int[] pos = pi.getPos();
+
+		while (pi.hasNext()) {
+
+			int[] end = pos.clone();
+			for (int i = 0; i<pos.length;i++) {
+				end[i]++;
+			}
+
+			for (int i = 0; i < axes.length; i++){
+				end[axes[i]] = fullDims[axes[i]];
+			}
+
+			int[] st = pos.clone();
+			for (int i = 0; i < st.length;i++) st[i] = 1;
+
+			Slice[] slice = Slice.convertToSlice(pos, end, st);
+			String sliceName = Slice.createString(slice);
+
+			Slice[] outSlice = new Slice[slices.length];
+			for (int i = 0; i < slices.length; i++) {
+				if (slice[i].getStop() == null && slice[i].getLength() ==-1) {
+					outSlice[i] = new Slice();
+				} else {
+					int nSteps = slice[i].getNumSteps();
+					int offset = (slice[i].getStart()-slices[i].getStart())/slices[i].getStep();
+					outSlice[i] = new Slice(offset,offset+nSteps);
+				}
+			}
+
+			AbstractDataset data = (AbstractDataset)lz.getSlice(slice);
+			data = data.squeeze();
+			data.setName(nameFrag + sliceName);
+			context.setSelectedSlice(outSlice);
+			context.setSelectedShape(slicedShape);
 			convert(data);
 			if (context.getMonitor() != null) {
 				IMonitor mon = context.getMonitor();

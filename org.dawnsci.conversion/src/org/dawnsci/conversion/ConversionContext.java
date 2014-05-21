@@ -11,6 +11,7 @@ import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.services.conversion.IConversionVisitor;
 
 import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.Slice;
 import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
 
 class ConversionContext implements IConversionContext {
@@ -29,6 +30,8 @@ class ConversionContext implements IConversionContext {
 	private String              axisDatasetName;
 	private int                 workSize=100;
 	private boolean             expression=false;
+	private Slice[]             selectedSlice;
+	private int[]               selectedShape;
 	
 	public ConversionScheme getConversionScheme() {
 		return conversionScheme;
@@ -231,6 +234,22 @@ class ConversionContext implements IConversionContext {
 	}
 	public void setSelectedH5Path(String selectedH5Path) {
 		this.selectedH5Path = selectedH5Path;
+	}
+	@Override
+	public Slice[] getSelectedSlice() {
+		return selectedSlice;
+	}
+	@Override
+	public void setSelectedSlice(Slice[] slice) {
+		selectedSlice = slice;
+	}
+	@Override
+	public int[] getSelectedShape() {
+		return selectedShape;
+	}
+	@Override
+	public void setSelectedShape(int[] shape) {
+		this.selectedShape = shape;
 	}
 
 }

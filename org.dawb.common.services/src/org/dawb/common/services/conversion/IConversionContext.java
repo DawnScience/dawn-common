@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.Slice;
 import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
 
 /**
@@ -302,5 +303,27 @@ public interface IConversionContext {
 	 * Sets whether the converted ILazyDataset is based on the result of an expression.
 	 */
 	public void setExpression(boolean expression) ;
+	
+	/**
+	 * Gets an array of slices describing where the current slice sits in the view of the dataset 
+	 * @return
+	 */
+	public Slice[] getSelectedSlice();
+	
+	/**
+	 * Set the current array of slices describing where the slice sits in the view of the dataset 
+	 * @return
+	 */
+	public void setSelectedSlice(Slice[] slice);
 
+	/**
+	 * Gets the shape of the subset of the original dataset being analysed
+	 * @return
+	 */
+	public int[] getSelectedShape();
+	
+	/**
+	 * Set the shape of the current subset of the original dataset being analysed
+	 */
+	public void setSelectedShape(int[] shape);
 }

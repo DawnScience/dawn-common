@@ -27,6 +27,7 @@ import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.IntegerDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.LongDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ShortDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.Slice;
 
 public class H5Utils {
 
@@ -183,6 +184,26 @@ public class H5Utils {
 		long[] shape = H5Utils.getLong(a.getShape());
 		Dataset s = file.appendDataset(a.getName(),  H5Utils.getDatatype(a), shape, ((AbstractDataset)a).getBuffer(), parent);
 		file.setNexusAttribute(s, Nexus.SDS);			
+	}
+	
+	public static void insertDataset(IHierarchicalDataFile file, Group parent, IDataset a, Slice[] slice, long[] finalShape) throws Exception {
+
+		long[][] startStopStep = new long[3][slice.length];
+		
+		for (int i = 0; i < slice.length; i++) {
+			startStopStep[0][i] = (long)slice[i].getStart();
+			startStopStep[1][i] = (long)slice[i].getStop();
+			startStopStep[2][i] = (long)slice[i].getStep();
+		}
+		
+		long[] totalShape = new long[finalShape.length];
+		
+		for (int i = 0; i < totalShape.length; i++) {
+			totalShape[i] = (long)finalShape[i];
+        }
+		
+		file.insertSlice(a.getName(), H5Utils.getDatatype(a), ((AbstractDataset)a).getBuffer(), parent, startStopStep, totalShape);
+		
 	}
 
 }

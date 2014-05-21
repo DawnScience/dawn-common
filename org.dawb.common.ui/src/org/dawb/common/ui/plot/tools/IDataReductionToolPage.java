@@ -1,5 +1,6 @@
 package org.dawb.common.ui.plot.tools;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import ncsa.hdf.object.Group;
@@ -10,6 +11,7 @@ import org.dawnsci.plotting.api.tool.IToolPage;
 import org.eclipse.core.runtime.IStatus;
 
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.Slice;
 import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
 
 /**
@@ -65,16 +67,23 @@ public interface IDataReductionToolPage extends IToolPage {
 		private Object                userData;
 		private IMonitor              monitor;
 		
+		private Slice[]               slice;
+		private int[]                 shape;
+		
 		public DataReductionSlice(IHierarchicalDataFile hf,
 				                  Group group,
 				                  IDataset set, 
-				                  Object ud, 
+				                  Object ud,
+				                  Slice[] slice,
+				                  int[] shape,
 				                  IMonitor mon) {
 			this.file    = hf;
 			this.parent  = group;
 			this.data    = set;
 			this.userData= ud;
 			this.monitor = mon;
+			this.slice = slice;
+			this.shape = shape;
 		}
 		public IHierarchicalDataFile getFile() {
 			return file;
@@ -96,7 +105,63 @@ public interface IDataReductionToolPage extends IToolPage {
 		}
 
 		public void appendData(IDataset more) throws Exception {
-			H5Utils.appendDataset(file, parent, more);
+			appendData(more, parent);
+		}
+		
+		public void appendData(IDataset more, Group group) throws Exception {
+			if (slice == null) {
+				H5Utils.appendDataset(file, group, more);
+				return;
+			}
+			
+			//determine if dataset different rank to slice
+			List<Integer> dimList = new ArrayList<Integer>();
+			for (int i = 0; i < slice.length; i++) {
+				if (slice[i].getStop() == null && slice[i].getLength() ==-1) {
+					dimList.add(i);
+				} else {
+					int nSteps = slice[i].getNumSteps();
+					if (nSteps > 1) dimList.add(i);
+				}
+				
+			}
+			int dataRank = more.squeeze().getRank();
+			
+			//Make new slice array to deal with new dimensions
+			List<Slice> sliceList = new ArrayList<Slice>();
+			List<Integer> totalDimList = new ArrayList<Integer>();
+			int padCounter = 0;
+			int counter = 0;
+			for (Slice s: slice) {
+				
+				if (dimList.contains(counter)) {
+					
+					if (padCounter < dataRank) {
+						sliceList.add(new Slice(0,more.getShape()[padCounter],1));
+						totalDimList.add(more.getShape()[padCounter]);
+						padCounter++;
+					} else {
+						continue;
+					}
+					
+					
+				}else {
+					sliceList.add(s);
+					totalDimList.add(shape[counter]);
+				}
+				
+				counter++;
+			}
+			
+			Slice[] sliceOut = new Slice[sliceList.size()];
+			sliceList.toArray(sliceOut);
+			
+			long[] newShape = new long[totalDimList.size()];
+			for (int i = 0; i < newShape.length; i++) newShape[i] = totalDimList.get(i);
+			
+			H5Utils.insertDataset(file, group, more, sliceOut, newShape);
+			
+			return;
 		}
 
 		public Object getUserData() {
