@@ -145,8 +145,8 @@ public abstract class AbstractConversion {
 			               final String               nameFrag,
 		                   final IConversionContext   context) throws Exception {
 		
-		oldOneRangeIterate(lz,nameFrag,context);
-		//multiRangeIterate(lz,nameFrag,context);
+		//oldOneRangeIterate(lz,nameFrag,context);
+		multiRangeIterate(lz,nameFrag,context);
 	}
 	
 	private void oldOneRangeIterate(final ILazyDataset         lz, 
