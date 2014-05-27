@@ -46,6 +46,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.dawb.common.ui.util.DisplayUtils;
 import org.eclipse.gmf.runtime.draw2d.ui.render.awt.internal.svg.export.GraphicsSVG;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -126,6 +127,7 @@ public class PlotExportPrintUtil {
 			is.close();
 			fos.close();
 		} catch (PrintException e) {
+			MessageDialog.openWarning(Display.getDefault().getActiveShell(), "Warning", "The Postscript conversion failed: "+e.getMessage());
 			logger.error("Could not print to PostScript", e);
 		} catch (IOException e) {
 			logger.error("IO error", e);
@@ -184,6 +186,7 @@ public class PlotExportPrintUtil {
 			return Status.OK_STATUS;
 		} catch (Exception e) {
 			logger.debug(e.getMessage());
+			MessageDialog.openWarning(Display.getDefault().getActiveShell(), "Warning", "The SVG conversion failed: "+e.getMessage());
 			return Status.CANCEL_STATUS;
 		} finally {
 			if (graphics != null)
