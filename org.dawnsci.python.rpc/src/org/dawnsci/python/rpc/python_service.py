@@ -5,7 +5,7 @@ during workflow execution.
 The idea is that this service replaces the jep connection for workflows, to give the ability to
 work in the following way
 1. Set primitives from java, strings, doubles, int etc to be variables here
-2. Set abtract datasets as numpy arrays
+2. Set abstract datasets as numpy arrays
 3. Run a user defined script
 
 the script requires one argument which is the port to start the service on.
@@ -62,14 +62,21 @@ def runScript(scriptPath, sets, outputs, additionalPaths=None):
     '''
     Run the script
     '''
-    result = {}
+    enc = sys.stdout.encoding
+    if enc is None or "UTF-8" not in enc: # cope with locale that is not UTF-8
+        import codecs
+        writer = codecs.getwriter("utf-8")
+        sys.stdout = writer(sys.stdout)
+        sys.stderr = writer(sys.stderr)
+
     execfile(scriptPath, globals(), locals()) # need to place locals from script in globals
-    
+
     '''
     Read required results back from globals and locals,
     this enables people to name things how they like in
     the script and then it gets pulled back.
     '''
+    result = {}
     if (outputs!=None and len(outputs)>0): 
         for name in outputs:
             if (name in globals()):
