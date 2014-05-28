@@ -3,8 +3,6 @@ package org.dawnsci.conversion.converters;
 import java.io.File;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.dawb.common.services.conversion.IConversionContext;
 import org.dawnsci.plotting.api.PlotType;
@@ -16,7 +14,7 @@ import uk.ac.diamond.scisoft.analysis.dataset.function.DownsampleMode;
 
 public abstract class AbstractImageConversion extends AbstractConversion {
 
-	
+	int imageCounter = 0;
 	
 	public AbstractImageConversion(IConversionContext context) {
 		super(context);
@@ -35,7 +33,7 @@ public abstract class AbstractImageConversion extends AbstractConversion {
 		return context.getOutputPath()+"/"+fileNameFrag+sliceFileName;
 	}
 
-	private Pattern INDEX_PATTERN = Pattern.compile("(.+index=)(\\d+)\\)");
+	//private Pattern INDEX_PATTERN = Pattern.compile("(.+index=)(\\d+)\\)");
 	
 	private String getFileName(IDataset slice) {
 		
@@ -48,14 +46,19 @@ public abstract class AbstractImageConversion extends AbstractConversion {
 				namePrefix = bean.getAlternativeNamePrefix();
 			}
 			
-			// fileName example " data(Dim 0; index=0) "
+			// Used to be: fileName example " data(Dim 0; index=0) "
+			// now contains full slice information ie data (0,:2048,:2048)
+			// so the old method of parsing the data name no longer works
 			if (bean.getSliceIndexFormat()!=null) {
-				final Matcher matcher = INDEX_PATTERN.matcher(fileName);
-				if (matcher.matches()) {
-					final NumberFormat format = new DecimalFormat(bean.getSliceIndexFormat());
-					namePrefix = namePrefix!=null ? namePrefix :  matcher.group(1);
-					fileName   = namePrefix+format.format(Integer.parseInt(matcher.group(2)))+")";
-				}
+//				final Matcher matcher = INDEX_PATTERN.matcher(fileName);
+//				if (matcher.matches()) {
+//					final NumberFormat format = new DecimalFormat(bean.getSliceIndexFormat());
+//					namePrefix = namePrefix!=null ? namePrefix :  matcher.group(1);
+//					fileName   = namePrefix+format.format(Integer.parseInt(matcher.group(2)))+")";
+//				}
+				final NumberFormat format = new DecimalFormat(bean.getSliceIndexFormat());
+				fileName   = namePrefix+format.format(imageCounter++);
+				
 			}
 		}
 		fileName = fileName.replace('\\', '_');

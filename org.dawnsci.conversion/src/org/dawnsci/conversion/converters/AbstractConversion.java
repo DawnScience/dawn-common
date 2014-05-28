@@ -307,7 +307,7 @@ public abstract class AbstractConversion {
 
 			AbstractDataset data = (AbstractDataset)lz.getSlice(slice);
 			data = data.squeeze();
-			data.setName(nameFrag + sliceName);
+			data.setName(nameFrag + " ("+ sliceName+")");
 			context.setSelectedSlice(outSlice);
 			context.setSelectedShape(slicedShape);
 			convert(data);
