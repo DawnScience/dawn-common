@@ -1185,9 +1185,6 @@ public final class FileUtils {
 		String path=null;
 		if (fileOrResource instanceof IResource) {
 			path = ((IResource)fileOrResource).getLocation().toOSString();
-//		} else if (fileOrResource instanceof File) {
-//			File file = (File)fileOrResource;
-//			path = file.getAbsolutePath();
 		} else {
 			File file = null;
 			if (fileOrResource instanceof File)
