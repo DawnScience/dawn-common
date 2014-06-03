@@ -1151,53 +1151,97 @@ public final class FileUtils {
 		return path.substring(0, index)+"."+ext;
 	}
 
-	public static String getDirectory(final String filePath) {
-		File dir = new File(filePath);
-		if (!dir.isDirectory()) dir = dir.getParentFile();
-		return dir.getAbsolutePath();
-	}
-	
-	public static String getDirectoryPath(final Object fileOrResource) {
-		String path=null;
-		if (fileOrResource instanceof IFolder) {
-			path = ((IFolder)fileOrResource).getLocation().toOSString();
-		} else if(fileOrResource instanceof IFile) {
-			path = ((IFile)fileOrResource).getParent().getLocation().toOSString();
-		} else if (fileOrResource instanceof File) {
-			File file = (File)fileOrResource;
-			path = file.isDirectory() ? file.getAbsolutePath() : file.getParent();
-		} else {
-			File file = null;
-			if (fileOrResource instanceof File)
-				file = (File)fileOrResource;
-			else if (fileOrResource instanceof IAdaptable) {
-				final Object object = ((IAdaptable)fileOrResource).getAdapter(File.class);
-				if (object instanceof File)
-					file = (File)object;
-			}
-			if (file != null)
-				path = file.isDirectory() ? file.getAbsolutePath() : file.getParent();
-		}
-		return path;
+	/**
+	 * Returns the absolute path of directory specified by dir,
+	 * or its parent directory if dir specifies a file.
+	 * @param dir The directory or its child file.
+	 * @return The absolute path of directory specified by dir,
+	 * or its parent directory if dir specifies a file.
+	 */
+	public static String getDirectoryAbsolutePath(final File dir) {
+		return dir.isDirectory() ? dir.getAbsolutePath() : dir.getParentFile().getAbsolutePath();
 	}
 
-	public static String getPath(final Object fileOrResource) {
-		String path=null;
-		if (fileOrResource instanceof IResource) {
-			path = ((IResource)fileOrResource).getLocation().toOSString();
+	/**
+	 * Returns the absolute path of directory specified by filePath,
+	 * or its parent directory if filePath specifies a file.
+	 * @param filePath The path of directory or its child file.
+	 * @return The absolute path of directory specified by filePath,
+	 * or its parent directory if filePath specifies a file.
+	 */
+	public static String getDirectoryAbsolutePath(final String filePath) {
+		return getDirectoryAbsolutePath(new File(filePath));
+	}
+
+	/**
+	 * Returns the file specified by fileOrResource, or <code>null</code> if
+	 * fileOrResource can not be converted to file. Various attempts are done
+	 * in order to convert fileOrResource to file.
+	 * @param fileOrResource The object specifying a file.
+	 * @return the file specified by fileOrResource, or <code>null</code> if
+	 * fileOrResource can not be converted to file.
+	 */
+	public static File getFile(final Object fileOrResource) {
+		File result = null;
+		if (fileOrResource instanceof IFolder) {
+			result = new File(((IFolder)fileOrResource).getLocation().toOSString());
+		} else if(fileOrResource instanceof IFile) {
+			result = new File(((IFile)fileOrResource).getLocation().toOSString());
+		} else if (fileOrResource instanceof IResource) {
+			result = new File(((IResource)fileOrResource).getLocation().toOSString());
 		} else {
-			File file = null;
 			if (fileOrResource instanceof File)
-				file = (File)fileOrResource;
+				result = (File)fileOrResource;
 			else if (fileOrResource instanceof IAdaptable) {
 				final Object object = ((IAdaptable)fileOrResource).getAdapter(File.class);
 				if (object instanceof File)
-					file = (File)object;
+					result = (File)object;
 			}
-			if (file != null)
-				path = file.getAbsolutePath();
 		}
-		return path;
+		return result;
+	}
+
+	/**
+	 * Returns the directory specified by fileOrResource, or its parent
+	 * directory if fileOrResource specifies a file, or <code>null</code> if
+	 * fileOrResource can not be converted to file. Various attempts are done
+	 * in order to convert fileOrResource to file.
+	 * @param fileOrResource The object specifying a directory or file.
+	 * @return The directory specified by fileOrResource, or its parent
+	 * directory if fileOrResource specifies a file, or <code>null</code> if
+	 * fileOrResource can not be converted to file.
+	 */
+	public static File getDirectory(final Object fileOrResource) {
+		File result = getFile(fileOrResource);
+		return result != null && !result.isDirectory() ? result.getParentFile() : result;
+	}
+
+	/**
+	 * Returns the absolute path of directory specified by fileOrResource,
+	 * or its parent directory if fileOrResource specifies a file, or <code>null</code> if
+	 * fileOrResource can not be converted to file. Various attempts are done
+	 * in order to convert fileOrResource to file.
+	 * @param fileOrResource The object specifying a directory or file.
+	 * @return The absolute path of directory specified by fileOrResource,
+	 * or its parent directory if fileOrResource specifies a file, or <code>null</code> if
+	 * fileOrResource can not be converted to file.
+	 */
+	public static String getDirectoryAbsolutePath(final Object fileOrResource) {
+		final File file = getDirectory(fileOrResource);
+		return file == null ? null : file.getAbsolutePath();
+	}
+
+	/**
+	 * Returns the absolute path of file specified by fileOrResource,
+	 * or <code>null</code> if fileOrResource can not be converted to file.
+	 * Various attempts are done in order to convert fileOrResource to file.
+	 * @param fileOrResource The object specifying a directory or file.
+	 * @return The absolute path of file specified by fileOrResource,
+	 * or <code>null</code> if fileOrResource can not be converted to file.
+	 */
+	public static String getAbsolutePath(final Object fileOrResource) {
+		File file = getFile(fileOrResource);
+		return file == null ? null : file.getAbsolutePath();
 	}
 
 	/**

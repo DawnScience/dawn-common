@@ -15,6 +15,7 @@ import org.dawb.common.ui.Activator;
 import org.dawb.common.ui.monitor.ProgressMonitorWrapper;
 import org.dawb.common.ui.util.EclipseUtils;
 import org.dawb.common.ui.util.GridUtils;
+import org.dawb.common.util.io.FileUtils;
 import org.dawnsci.common.widgets.content.FileContentProposalProvider;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -390,10 +391,13 @@ public class ResourceChoosePage extends WizardPage {
 		if (firstElement instanceof IContainer) {
 			IContainer cont = (IContainer)firstElement;
 			return cont.members();
-		} else if (firstElement instanceof File && ((File)firstElement).isDirectory()){
-			return ((File)firstElement).listFiles();
 		} else {
-			return new Object[]{firstElement};
+			final File file = FileUtils.getFile(firstElement);
+			if (file == null)
+				return new Object[]{firstElement};
+			if (file.isDirectory())
+				return file.listFiles();
+			return new Object[]{file};
 		}
 	}
 

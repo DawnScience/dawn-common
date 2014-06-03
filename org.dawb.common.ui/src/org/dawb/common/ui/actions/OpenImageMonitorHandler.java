@@ -78,7 +78,7 @@ public class OpenImageMonitorHandler extends AbstractHandler implements IObjectA
 				public void run() {
 					
 					final Object object = sel.getFirstElement();
-					final String path = FileUtils.getDirectoryPath(object);
+					final String path = FileUtils.getDirectoryAbsolutePath(object);
 					if (path!=null) finalView.setDirectoryPath(path);
 
 				}
