@@ -35,6 +35,7 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.IAdaptable;
 
 /**
  * A class with a collection of file management static utility classes. Several method contents copied from code
@@ -121,7 +122,7 @@ public final class FileUtils {
 	 * @return a unique file.
 	 */
 	public static File getUnique(final File dir, final String template, final String ext) {
-		final String extension = ext != null ? (ext.startsWith(".")) ? ext : "." + ext : "";
+		final String extension = ext != null ? (ext.startsWith(".")) ? ext : "." + ext : null;
 		final File file = new File(dir, template + extension);
 		if (!file.exists()) {
 			return file;
@@ -1101,7 +1102,7 @@ public final class FileUtils {
 	public static String getFileNameNoExtension(File file) {
 		return getFileNameNoExtension(file.getName());
 	}
-	
+
 	/**
 	 * Get Filename minus it's extension if present
 	 * 
@@ -1149,8 +1150,7 @@ public final class FileUtils {
 		final int index = path.lastIndexOf(".");
 		return path.substring(0, index)+"."+ext;
 	}
-	
-	
+
 	public static String getDirectory(final String filePath) {
 		File dir = new File(filePath);
 		if (!dir.isDirectory()) dir = dir.getParentFile();
@@ -1161,27 +1161,46 @@ public final class FileUtils {
 		String path=null;
 		if (fileOrResource instanceof IFolder) {
 			path = ((IFolder)fileOrResource).getLocation().toOSString();
-				
 		} else if(fileOrResource instanceof IFile) {
 			path = ((IFile)fileOrResource).getParent().getLocation().toOSString();
-				  
 		} else if (fileOrResource instanceof File) {
 			File file = (File)fileOrResource;
 			path = file.isDirectory() ? file.getAbsolutePath() : file.getParent();
+		} else {
+			File file = null;
+			if (fileOrResource instanceof File)
+				file = (File)fileOrResource;
+			else if (fileOrResource instanceof IAdaptable) {
+				final Object object = ((IAdaptable)fileOrResource).getAdapter(File.class);
+				if (object instanceof File)
+					file = (File)object;
+			}
+			if (file != null)
+				path = file.isDirectory() ? file.getAbsolutePath() : file.getParent();
 		}
-        return path;
+		return path;
 	}
 
 	public static String getPath(final Object fileOrResource) {
 		String path=null;
 		if (fileOrResource instanceof IResource) {
 			path = ((IResource)fileOrResource).getLocation().toOSString();
-							  
-		} else if (fileOrResource instanceof File) {
-			File file = (File)fileOrResource;
-			path = file.getAbsolutePath();
+//		} else if (fileOrResource instanceof File) {
+//			File file = (File)fileOrResource;
+//			path = file.getAbsolutePath();
+		} else {
+			File file = null;
+			if (fileOrResource instanceof File)
+				file = (File)fileOrResource;
+			else if (fileOrResource instanceof IAdaptable) {
+				final Object object = ((IAdaptable)fileOrResource).getAdapter(File.class);
+				if (object instanceof File)
+					file = (File)object;
+			}
+			if (file != null)
+				path = file.getAbsolutePath();
 		}
-        return path;
+		return path;
 	}
 
 	/**
@@ -1193,7 +1212,7 @@ public final class FileUtils {
 	public static final String getLegalFileName(String name) {
 		name = name.replace(" ", "_");
 		name = name.replaceAll("[^a-zA-Z0-9_]", "");
-        return name;
+		return name;
 	}
 
 	/**
