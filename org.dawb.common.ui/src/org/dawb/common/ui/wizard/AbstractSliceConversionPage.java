@@ -14,6 +14,7 @@ import org.dawnsci.slicing.api.SlicingFactory;
 import org.dawnsci.slicing.api.system.DimsData;
 import org.dawnsci.slicing.api.system.DimsDataList;
 import org.dawnsci.slicing.api.system.ISliceSystem;
+import org.dawnsci.slicing.api.system.RangeMode;
 import org.dawnsci.slicing.api.system.SliceSource;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -135,7 +136,7 @@ public abstract class AbstractSliceConversionPage extends ResourceChoosePage {
 		data.minimumHeight=560;
 		slicer.setLayoutData(data);
 		sliceComponent.setVisible(true);
-		sliceComponent.setRangesAllowed(true);
+	    sliceComponent.setRangeMode(RangeMode.MULTI_RANGE);
 		sliceComponent.setSliceActionsEnabled(false);
 		
 		pathChanged();
