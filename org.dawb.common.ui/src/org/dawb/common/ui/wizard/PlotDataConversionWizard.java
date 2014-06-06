@@ -71,7 +71,7 @@ public class PlotDataConversionWizard extends Wizard implements IExportWizard {
 		
 		//HACK - put in a dataset so the conversion class goes straight to iterate
 		context.setLazyDataset(AbstractDataset.zeros(new int[]{10},AbstractDataset.INT32));
-		context.addSliceDimension(0, null);
+		context.addSliceDimension(0, "all");
 		
 		conversionPage = new PlotDataConversionPage();
 		conversionPage.setPath(System.getProperty("user.home") +File.separator+ "plotdata."+ visitor.getExtension());
