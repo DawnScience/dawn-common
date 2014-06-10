@@ -145,88 +145,9 @@ public abstract class AbstractConversion {
 			               final String               nameFrag,
 		                   final IConversionContext   context) throws Exception {
 		
-		//oldOneRangeIterate(lz,nameFrag,context);
 		multiRangeIterate(lz,nameFrag,context);
 	}
 	
-	private void oldOneRangeIterate(final ILazyDataset         lz, 
-            final String               nameFrag,
-            final IConversionContext   context) throws Exception {
-		
-		final Map<Integer, String> sliceDimensions = context.getSliceDimensions();
-
-		final int[] fullDims = lz.getShape();
-
-		int[] start  = new int[fullDims.length];
-		for (int i = 0; i < start.length; i++) start[i] = 0;
-		
-		int[] stop  = new int[fullDims.length];
-		for (int i = 0; i < stop.length; i++) stop[i] = fullDims[i];
-		
-		int[] step  = new int[fullDims.length];
-
-		List<Integer> dims = new ArrayList<Integer>(fullDims.length);
-		String sliceRange=null;
-		int    sliceIndex=-1;
-		for (int i = 0; i < fullDims.length; i++) {
-			step[i] = 1;
-
-			// Any that parse statically to a single int are not ranges.
-			if (sliceDimensions.containsKey(i)) {
-				try {
-					start[i]    = Integer.parseInt(sliceDimensions.get(i));
-					stop[i]     = start[i]+1;
-					sliceIndex  = sliceIndex<0 ? i : sliceIndex;
-				} catch (Throwable ne) {
-					sliceRange = sliceDimensions.get(i);
-					sliceIndex = i;
-					continue;
-				}
-			} else {
-				dims.add(fullDims[i]);
-			}
-		}
-
-		long[] dim = new long[dims.size()];
-		for (int i = 0; i < dim.length; i++) dim[i] = dims.get(i);
-
-		if (sliceRange!=null) { // We compute the range to slice.
-			int s = 0;
-			int e = fullDims[sliceIndex];
-			if (sliceRange.indexOf(":")>0) {
-				final String[] sa = sliceRange.split(":");
-				s = Integer.parseInt(sa[0]);
-				e = Integer.parseInt(sa[1]);
-			}
-
-			for (int index = s; index < e; index++) {
-				start[sliceIndex]   = index;
-				stop[sliceIndex]    = index+1;
-
-				AbstractDataset data = (AbstractDataset)lz.getSlice(start, stop, step);
-				data = data.squeeze();
-				data.setName(nameFrag+" (Dim "+sliceIndex+"; index="+index+")");
-				convert(data);
-				
-				if (context.getMonitor() != null) {
-					IMonitor mon = context.getMonitor();
-					if (mon.isCancelled()) return;
-				}
-				
-			}
-
-		} else {
-			AbstractDataset data = (AbstractDataset)lz.getSlice(start, stop, step);
-			data = data.squeeze();
-			data.setName(nameFrag+" (Dim "+sliceIndex+"; index="+start[sliceIndex] +")");
-			convert(data);
-			if (context.getMonitor() != null) {
-				IMonitor mon = context.getMonitor();
-				if (mon.isCancelled()) return;
-			}
-		}
-		
-	}
 	
 	private void multiRangeIterate(final ILazyDataset         lz, 
 			               final String               nameFrag,
@@ -237,7 +158,6 @@ public abstract class AbstractConversion {
 		final int[] fullDims = lz.getShape();
 		
 		//Construct Slice String
-		
 		StringBuilder sb = new StringBuilder();
 		
 		for (int i = 0; i < fullDims.length; i++) {

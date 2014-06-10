@@ -1,6 +1,7 @@
 package org.dawb.common.ui.plot.tools;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import ncsa.hdf.object.Group;
@@ -36,6 +37,12 @@ public interface IDataReductionToolPage extends IToolPage {
 	 * @param bean
 	 */
 	public DataReductionInfo export(DataReductionSlice bean) throws Exception;
+	
+	/**
+	 * Called at the end of the data reduction in case clean up or final writes are required.
+	 * @param context
+	 */
+	public void exportFinished() throws Exception ;
 
 	/**
 	 * Bean to contain data for slice of tool.
@@ -43,7 +50,7 @@ public interface IDataReductionToolPage extends IToolPage {
 	 *
 	 */
 	public final class DataReductionSlice {
-		
+				
 		/**
 		 * The file we are writing to.
 		 */
@@ -61,6 +68,11 @@ public interface IDataReductionToolPage extends IToolPage {
 		 * May be null, 0 = x, 1 = y. Y may be omitted, in which case use indexes
 		 */
 		private List<IDataset> axes;
+		
+		/**
+		 * The dataset names or regular expressions as typed by the user into the tool.
+		 */
+		private List<String> datasetRegEx;
 		/**
 		 * May be null, data which the tool may need for persistence.
 		 */
@@ -182,11 +194,15 @@ public interface IDataReductionToolPage extends IToolPage {
 			int result = 1;
 			result = prime * result + ((axes == null) ? 0 : axes.hashCode());
 			result = prime * result + ((data == null) ? 0 : data.hashCode());
+			result = prime * result
+					+ ((datasetRegEx == null) ? 0 : datasetRegEx.hashCode());
 			result = prime * result + ((file == null) ? 0 : file.hashCode());
 			result = prime * result
 					+ ((monitor == null) ? 0 : monitor.hashCode());
 			result = prime * result
 					+ ((parent == null) ? 0 : parent.hashCode());
+			result = prime * result + Arrays.hashCode(shape);
+			result = prime * result + Arrays.hashCode(slice);
 			result = prime * result
 					+ ((userData == null) ? 0 : userData.hashCode());
 			return result;
@@ -210,6 +226,11 @@ public interface IDataReductionToolPage extends IToolPage {
 					return false;
 			} else if (!data.equals(other.data))
 				return false;
+			if (datasetRegEx == null) {
+				if (other.datasetRegEx != null)
+					return false;
+			} else if (!datasetRegEx.equals(other.datasetRegEx))
+				return false;
 			if (file == null) {
 				if (other.file != null)
 					return false;
@@ -225,6 +246,10 @@ public interface IDataReductionToolPage extends IToolPage {
 					return false;
 			} else if (!parent.equals(other.parent))
 				return false;
+			if (!Arrays.equals(shape, other.shape))
+				return false;
+			if (!Arrays.equals(slice, other.slice))
+				return false;
 			if (userData == null) {
 				if (other.userData != null)
 					return false;
@@ -238,7 +263,12 @@ public interface IDataReductionToolPage extends IToolPage {
 		public void setAxes(List<IDataset> axes) {
 			this.axes = axes;
 		}
-
+		public List<String> getDatasetRegEx() {
+			return datasetRegEx;
+		}
+		public void setDatasetRegEx(List<String> datasetRegEx) {
+			this.datasetRegEx = datasetRegEx;
+		}
 		
 	}
 	/**
