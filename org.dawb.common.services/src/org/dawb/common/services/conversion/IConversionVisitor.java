@@ -9,6 +9,8 @@
 
 package org.dawb.common.services.conversion;
 
+import java.util.List;
+
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 
 /**
@@ -51,5 +53,13 @@ public interface IConversionVisitor {
 	 * @return
 	 */
 	boolean isRankSupported(int length);
+
+	/**
+	 * Notifies the visitor of all the datasets in all the files (may be repeats)
+	 * which we will visit.
+	 * 
+	 * @param expandedDatasets
+	 */
+	void setExpandedDatasets(List<String> expandedDatasets);
 
 }

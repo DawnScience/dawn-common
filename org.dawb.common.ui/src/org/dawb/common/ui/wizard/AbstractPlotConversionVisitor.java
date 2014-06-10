@@ -1,5 +1,7 @@
 package org.dawb.common.ui.wizard;
 
+import java.util.List;
+
 import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.services.conversion.IConversionVisitor;
 import org.dawnsci.plotting.api.IPlottingSystem;
@@ -39,5 +41,12 @@ public abstract class AbstractPlotConversionVisitor implements IConversionVisito
 	}
 	
 	public abstract String getExtension();
+
+	
+
+	@Override
+	public void setExpandedDatasets(List<String> expandedDatasets) {
+		// We don't care about them
+	}
 
 }

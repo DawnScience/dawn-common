@@ -14,6 +14,7 @@ public class VisitorConversion extends AbstractConversion {
 
 	@Override
 	protected void convert(IDataset slice) throws Exception{
+		context.getConversionVisitor().setExpandedDatasets(getExpandedDatasets());
 		context.getConversionVisitor().visit(context, slice);
 	}
 

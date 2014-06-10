@@ -148,7 +148,34 @@ public abstract class AbstractConversion {
 		multiRangeIterate(lz,nameFrag,context);
 	}
 	
-	
+	/**
+	 * Method tries to get the input datasets with the regular expressions, if any, expanded.
+	 * @return
+	 */
+	protected List<String> getExpandedDatasets() throws Exception {
+		
+		final List<String> names = new ArrayList<String>(31);
+		
+		final List<String> filePaths = context.getFilePaths();
+		for (String filePathRegEx : filePaths) {
+			final List<File> paths = expand(filePathRegEx);
+			for (File path : paths) {
+				
+				context.setSelectedConversionFile(path);
+				if (path.isFile()) {
+					final List<String> sets   = getDataNames(path);
+					final List<String> dNames = context.getDatasetNames();
+					for (String nameRegExp : dNames) {
+						final List<String> data = getData(sets, nameRegExp);
+					    names.addAll(data);
+					}
+				}
+			}
+		}
+		if (names.isEmpty()) return null;
+		return names;
+	}
+
 	private void multiRangeIterate(final ILazyDataset         lz, 
 			               final String               nameFrag,
 		                   final IConversionContext   context) throws Exception {

@@ -72,7 +72,7 @@ public interface IDataReductionToolPage extends IToolPage {
 		/**
 		 * The dataset names or regular expressions as typed by the user into the tool.
 		 */
-		private List<String> datasetRegEx;
+		private List<String> expandedDatasetNames;
 		/**
 		 * May be null, data which the tool may need for persistence.
 		 */
@@ -195,7 +195,7 @@ public interface IDataReductionToolPage extends IToolPage {
 			result = prime * result + ((axes == null) ? 0 : axes.hashCode());
 			result = prime * result + ((data == null) ? 0 : data.hashCode());
 			result = prime * result
-					+ ((datasetRegEx == null) ? 0 : datasetRegEx.hashCode());
+					+ ((expandedDatasetNames == null) ? 0 : expandedDatasetNames.hashCode());
 			result = prime * result + ((file == null) ? 0 : file.hashCode());
 			result = prime * result
 					+ ((monitor == null) ? 0 : monitor.hashCode());
@@ -226,10 +226,10 @@ public interface IDataReductionToolPage extends IToolPage {
 					return false;
 			} else if (!data.equals(other.data))
 				return false;
-			if (datasetRegEx == null) {
-				if (other.datasetRegEx != null)
+			if (expandedDatasetNames == null) {
+				if (other.expandedDatasetNames != null)
 					return false;
-			} else if (!datasetRegEx.equals(other.datasetRegEx))
+			} else if (!expandedDatasetNames.equals(other.expandedDatasetNames))
 				return false;
 			if (file == null) {
 				if (other.file != null)
@@ -263,11 +263,11 @@ public interface IDataReductionToolPage extends IToolPage {
 		public void setAxes(List<IDataset> axes) {
 			this.axes = axes;
 		}
-		public List<String> getDatasetRegEx() {
-			return datasetRegEx;
+		public List<String> getExpandedDatasetNames() {
+			return expandedDatasetNames;
 		}
-		public void setDatasetRegEx(List<String> datasetRegEx) {
-			this.datasetRegEx = datasetRegEx;
+		public void setExpandedDatasetNames(List<String> datasets) {
+			this.expandedDatasetNames = datasets;
 		}
 		
 	}
