@@ -423,7 +423,7 @@ public class ImageMonitorView extends ViewPart implements MouseListener, Selecti
 		// Add toggle buttons which are hard to do in xml config
 		final IToolBarManager      man = getViewSite().getActionBars().getToolBarManager();
 		final CheckableActionGroup grp = new CheckableActionGroup();
-		final Action byDate = new Action("Sort by date, newest at the bottom", IAction.AS_CHECK_BOX) {
+		final Action byDate = new Action("Sort by date, newest at the top", IAction.AS_CHECK_BOX) {
 			public void run() {
 				currentComparitor = SortingUtils.DATE_SORT_BACKWARDS;
 				refreshAll();
