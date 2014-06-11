@@ -97,9 +97,7 @@ public class ExpressionEngineImpl implements IExpressionEngine{
 
 	@Override
 	public Object evaluate() throws Exception {
-		
 		checkAndCreateContext();
-		
 		return expression.evaluate(context);
 	}
 	
