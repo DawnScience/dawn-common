@@ -33,12 +33,12 @@ public class SortingUtils {
 	 * 
 	 */
 	public static final Comparator<File> NATURAL_SORT = new SortNatural<File>(true);
-	
+
 	/**
 	 * 
 	 */
 	public static final Comparator<File> NATURAL_SORT_CASE_INSENSITIVE = new SortNatural<File>(false);
-	
+
 	/**
 	 * 
 	 */
@@ -49,11 +49,10 @@ public class SortingUtils {
 			if (diff==0) {
 				return NATURAL_SORT.compare(one, two);
 			}
-			if (diff>0) return (int)two.lastModified();
-			return -1;
+			return diff > 0 ? 1 : -1;
 		}
 	};
-	
+
 	/**
 	 * 
 	 */
@@ -64,8 +63,7 @@ public class SortingUtils {
 			if (diff==0) {
 				return NATURAL_SORT.compare(one, two);
 			}
-			if (diff>0) return (int)one.lastModified();
-			return -1;
+			return diff > 0 ? 1 : -1;
 		}
 	};
 
