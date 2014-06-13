@@ -22,8 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.vecmath.Matrix3d;
-
 import ncsa.hdf.object.Dataset;
 import ncsa.hdf.object.Datatype;
 import ncsa.hdf.object.Group;
@@ -35,7 +33,6 @@ import org.dawb.hdf5.HierarchicalDataFactory;
 import org.dawb.hdf5.HierarchicalDataFileUtils;
 import org.dawb.hdf5.IHierarchicalDataFile;
 import org.dawb.hdf5.Nexus;
-import org.dawb.hdf5.nexus.NexusUtils;
 import org.dawnsci.io.h5.H5LazyDataset;
 import org.dawnsci.io.h5.H5Utils;
 import org.dawnsci.persistence.json.IJSonMarshaller;
@@ -51,6 +48,7 @@ import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 import uk.ac.diamond.scisoft.analysis.diffraction.DetectorProperties;
 import uk.ac.diamond.scisoft.analysis.diffraction.DiffractionCrystalEnvironment;
+import uk.ac.diamond.scisoft.analysis.diffraction.IPowderCalibrationInfo;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.IFunction;
 import uk.ac.diamond.scisoft.analysis.io.IDataHolder;
 import uk.ac.diamond.scisoft.analysis.io.IDiffractionMetadata;
@@ -388,56 +386,15 @@ class PersistentFileImpl implements IPersistentFile {
 	public void setDiffractionMetadata(IDiffractionMetadata metadata) throws Exception {
 		if (file == null) file = HierarchicalDataFactory.getWriter(filePath);
 
-		Group parent = HierarchicalDataFileUtils.createParentEntry(file, PersistenceConstants.DIFFRACTIONMETADATA_ENTRY,Nexus.DETECT);
+		Group parent = HierarchicalDataFileUtils.createParentEntry(file, PersistenceConstants.DIFFRACTIONMETADATA_ENTRY,Nexus.INST);
+		parent = file.group("detector", parent);
+		file.setNexusAttribute(parent, Nexus.DETECT);
 
 		DetectorProperties detprop = metadata.getDetector2DProperties();
-
-		H5Datatype intType = new H5Datatype(Datatype.CLASS_INTEGER, 32/8, Datatype.NATIVE, Datatype.NATIVE);
-		H5Datatype doubleType = new H5Datatype(Datatype.CLASS_FLOAT, 64/8, Datatype.NATIVE, Datatype.NATIVE);
-
-		final Dataset nXPix = file.replaceDataset("x_pixel_number", intType, new long[] {1}, new int[]{detprop.getPx()}, parent);
-		file.setAttribute(nXPix,NexusUtils.UNIT, "pixels");
-		final Dataset nYPix = file.replaceDataset("y_pixel_number", intType, new long[] {1}, new int[]{detprop.getPy()}, parent);
-		file.setAttribute(nYPix,NexusUtils.UNIT , "pixels");
-
-		final Dataset sXPix = file.replaceDataset("x_pixel_size", doubleType, new long[] {1}, new double[]{detprop.getHPxSize()}, parent);
-		file.setAttribute(sXPix, NexusUtils.UNIT, "mm");
-		final Dataset sYPix = file.replaceDataset("y_pixel_size", doubleType, new long[] {1}, new double[]{detprop.getVPxSize()}, parent);
-		file.setAttribute(sYPix, NexusUtils.UNIT, "mm");
-
-		double[] beamVector = new double[3];
-		detprop.getBeamVector().get(beamVector);
-		file.replaceDataset("beam_vector", doubleType, new long[] {3}, beamVector, parent);
-
-		double[] beamCentre = detprop.getBeamCentreCoords();
-
-		double dist = detprop.getBeamCentreDistance();
-
-		final Dataset centre = file.replaceDataset("beam_centre", doubleType, new long[] {2}, beamCentre, parent);
-		file.setAttribute(centre,NexusUtils.UNIT, "pixels");
-		final Dataset distance = file.replaceDataset("distance", doubleType, new long[] {1}, new double[] {dist}, parent);
-		file.setAttribute(distance, NexusUtils.UNIT, "mm");
-
-		Matrix3d or = detprop.getOrientation();
-		double[] orientation = new double[] {or.m00 ,or.m01, or.m02,
-				or.m10, or.m11, or.m12,
-				or.m20, or.m21, or.m22};
-
-		file.replaceDataset("detector_orientation", doubleType, new long[] {9}, orientation, parent);
-
+		PersistDiffractionMetadataUtils.writeDetectorProperties(file, parent, detprop);
 		DiffractionCrystalEnvironment crysenv = metadata.getDiffractionCrystalEnvironment();
+		PersistDiffractionMetadataUtils.writeWavelengthMono(file, parent.getParent(), crysenv.getWavelength());
 
-		final Dataset energy = file.replaceDataset("energy", doubleType, new long[] {1}, new double[]{crysenv.getWavelength()}, parent);
-		file.setAttribute(energy, NexusUtils.UNIT, "Angstrom");
-
-		final Dataset count = file.replaceDataset("count_time", doubleType, new long[] {1}, new double[]{crysenv.getExposureTime()}, parent);
-		file.setAttribute(count, NexusUtils.UNIT, "s");
-
-		final Dataset phi_start = file.createDataset("phi_start", doubleType, new long[] {1}, new double[]{crysenv.getPhiStart()}, parent);
-		file.setAttribute(phi_start, NexusUtils.UNIT, "degrees");
-
-		final Dataset phi_range = file.replaceDataset("phi_range", doubleType, new long[] {1}, new double[]{crysenv.getPhiRange()}, parent);
-		file.setAttribute(phi_range, NexusUtils.UNIT, "degrees");
 	}
 
 	@Override
@@ -697,5 +654,13 @@ class PersistentFileImpl implements IPersistentFile {
 		// we set the JSON attribute
 		file.setAttribute(dat, "JSON", json);
 		return dat;
+	}
+	
+	public void setPowderCalibrationInformation(IDataset calibrationImage,
+			IDiffractionMetadata metadata, IPowderCalibrationInfo info) throws Exception {
+		if (file == null) file = HierarchicalDataFactory.getWriter(filePath);
+		
+		PersistSinglePowderCalibration.writeCalibrationToFile(file, calibrationImage, metadata, info);
+		
 	}
 }

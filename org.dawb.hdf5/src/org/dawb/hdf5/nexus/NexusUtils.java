@@ -84,8 +84,14 @@ public class NexusUtils {
 		if (attrList!=null) for (Object object : attrList) {
 			if (object instanceof Attribute) {
 				final Attribute a      = (Attribute)object;
-				final String[]  aValue = (String[])a.getValue();
-				if (name.equals(a.getName()) && entryKey.equals(aValue[0])) return;
+				
+				try {
+					final String[]  aValue = (String[])a.getValue();
+					if (name.equals(a.getName()) && entryKey.equals(aValue[0])) return;
+				} catch (Exception e) {
+					//not a string array...
+				}
+				
 			}
 		}
 		
@@ -155,6 +161,50 @@ public class NexusUtils {
 			entry.close(id);
 		}
 	}
+	
+	/**
+	 * Does not replace the attribute if it exists
+	 * @param file
+	 * @param entry
+	 * @param name
+	 * @param value
+	 * @throws Exception
+	 */
+	public static void setDatasetAttribute(final FileFormat file, 
+							           final HObject   entry,
+							           final String    name,
+							           final Datatype dtype, final long[] shape, final Object buffer) throws Exception {
+		
+		@SuppressWarnings("unchecked")
+		final List<Object> attrList = entry.getMetadata();
+		if (attrList!=null) for (Object object : attrList) {
+			if (object instanceof Attribute) {
+				final Attribute a      = (Attribute)object;
+				if (name.equals(a.getName())) return;
+			}
+		}
+		
+		final int id = entry.open();
+		try {
+	        Attribute attr = new Attribute(name, dtype, shape);
+	        attr.setValue(buffer);
+			
+	        file.writeAttribute(entry, attr, false);
+
+	        if (entry instanceof Group) {
+	        	attrList.add(attr);
+				((Group)entry).writeMetadata(attrList);
+	        } else if (entry instanceof Dataset) {
+	        	attrList.add(attr);
+				((Dataset)entry).writeMetadata(attrList);
+	        }
+		        
+		    
+		} finally {
+			entry.close(id);
+		}
+	}
+	
 	
 	/**
 	 * Gets the nexus axes from the data node, if there are any there
