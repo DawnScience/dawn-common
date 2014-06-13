@@ -436,9 +436,27 @@ public class DOEUtils {
 		return ret;
 	}
 	
+	public static int getSize(String range, String unit) {
+		if (range==null)  return -1;
+		final double[] arange = getRange(range, unit);
+		if (arange==null) return -1;
+		return (int)Math.round((arange[1]-arange[0])/arange[2]);
+	}
 
 	public static double[] getRange(String range, String unit) {
+		
+		if (range==null) return null;
 		if (!DOEUtils.isRange(range, unit)) return null;
+		
+		final Pattern colPattern = getColonRangePattern(8, null);
+		Matcher matcher = colPattern.matcher(range);
+		if (matcher.matches()) {
+			final double   start = Double.parseDouble(matcher.group(1));
+			final double   end   = Double.parseDouble(matcher.group(2));
+			      double   inc   = 1;
+			return new double[]{start,end,inc};
+		}
+		
 		final String value   = DOEUtils.removeUnit(range, unit);
 		final String[] item  = value.split(";");
 		final double   start = Double.parseDouble(item[0].trim());
@@ -503,17 +521,40 @@ public class DOEUtils {
 	 * @return true of the value is a list of values
 	 */
 	public static boolean isRange(String value, int decimalPlaces, String unit) {
-		final Pattern rangePattern = getRangePattern(decimalPlaces, unit);
+		final Pattern colPattern = getColonRangePattern(decimalPlaces, unit);
+		if (colPattern.matcher(value.trim()).matches()) return true;
+		
+		final Pattern rangePattern = getScanRangePattern(decimalPlaces, unit);
 		return rangePattern.matcher(value.trim()).matches();
 	}
-
+	
 	/** 
      * A regular expression to match a range.
      * @param decimalPlaces for numbers matched
      * @param unit - may be null if no unit in the list.
      * @return Pattern
      */
-	public static Pattern getRangePattern(final int decimalPlaces, final String unit) {
+	private static Pattern getColonRangePattern(final int decimalPlaces, final String unit) {
+
+		final String ndec      = decimalPlaces>0 
+				               ? "\\.?\\d{0,"+decimalPlaces+"})"
+						       : ")";
+		
+		final String digitExpr = "(\\-?\\d+"+ndec;
+		final String rangeExpr = digitExpr+" ?: ?"+digitExpr;
+		if (unit==null) {
+			return Pattern.compile(rangeExpr);
+		}
+	    return Pattern.compile(rangeExpr+"\\ {1}\\Q"+unit+"\\E");
+	}
+	
+	/** 
+     * A regular expression to match a range.
+     * @param decimalPlaces for numbers matched
+     * @param unit - may be null if no unit in the list.
+     * @return Pattern
+     */
+	private static Pattern getScanRangePattern(final int decimalPlaces, final String unit) {
 		
 		final String ndec = decimalPlaces>0 
 		                  ? "\\.?\\d{0,"+decimalPlaces+"})"
