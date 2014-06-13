@@ -884,4 +884,12 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 		
 	}
 
+	@Override
+	public void setDatasetAttribute(HObject entry,
+			String name, Datatype dtype, long[] shape, Object buffer)
+			throws Exception {
+		NexusUtils.setDatasetAttribute(file, entry, name, dtype, shape, buffer);
+		
+	}
+
 }

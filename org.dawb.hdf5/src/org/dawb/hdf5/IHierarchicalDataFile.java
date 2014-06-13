@@ -193,6 +193,22 @@ public interface IHierarchicalDataFile extends AutoCloseable {
 	public void setIntAttribute(final HObject   entry, final String    name, final int       value) throws Exception;
 	
 	/**
+	 * Set a dataset attribute on an HObject, useful for setting vectors on NXtransformation.
+	 * Does not overwrite the value if it is already set.
+	 * 
+	 * @param file
+	 * @param entry
+	 * @param name
+	 * @param dtype
+	 * @param shape
+	 * @param buffer
+	 * @throws Exception
+	 */
+	public void setDatasetAttribute(final HObject   entry,
+	           final String    name,
+	           final Datatype dtype, final long[] shape, final Object buffer) throws Exception;
+	
+	/**
 	 * This method returns the dataset axes for a given signal node. The nexus path must be the path
 	 * to the signal
 	 * 

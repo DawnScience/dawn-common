@@ -13,6 +13,7 @@ import java.util.Map;
 
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
+import uk.ac.diamond.scisoft.analysis.diffraction.IPowderCalibrationInfo;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.IFunction;
 import uk.ac.diamond.scisoft.analysis.io.IDiffractionMetadata;
 import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
@@ -41,11 +42,11 @@ import uk.ac.diamond.scisoft.analysis.roi.IROI;
  * entry/region/JSON           |   Attribute    |  String                 
  * entry/function              |   Dataset      |  64-bit floating-point  
  * entry/function/JSON         |   Attribute    |  String                 
- * /entry/diffraction_metadata |   Group        |                         
+ * entry/instrument/detector  |   Group        |                         
  * </pre>
  * The image can contain more than one Dataset with its corresponding axes.<br>
  * The region is an JSON serialized dataset. It can therefore contain more than one region.<br>
- * The diffraction metadata is an NX_detector group containing many datasets
+ * The entry/instrument/detector is an NX_detector group containing many datasets
  * required to build a IDiffractionMetadata object. <br>
  * <br>
  * After using an IPersistentFile, the method {@link close()} needs to be called.
@@ -393,4 +394,13 @@ public interface IPersistentFile {
 	 * @return a boolean
 	 */
 	public boolean containsFunction();
+	
+	/**
+	 * Method to store a powder calibration run in a NeXus file
+	 * @param calibrationImage
+	 * @param metadata
+	 * @param info
+	 * @throws Exception
+	 */
+	public void setPowderCalibrationInformation(IDataset calibrationImage, IDiffractionMetadata metadata, IPowderCalibrationInfo info) throws Exception;
 }
