@@ -65,7 +65,7 @@ public class PlotDataConversionWizard extends Wizard implements IExportWizard {
 		}
 		
 		String[] junk = new String[1];
-		junk[0] = "junk";
+		junk[0] = "";
 		context = service.open(junk);
 		context.setConversionVisitor(visitor);
 		
