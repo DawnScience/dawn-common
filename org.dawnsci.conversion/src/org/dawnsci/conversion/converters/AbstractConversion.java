@@ -157,6 +157,7 @@ public abstract class AbstractConversion {
 		final List<String> names = new ArrayList<String>(31);
 		
 		final List<String> filePaths = context.getFilePaths();
+		if (filePaths.isEmpty() || filePaths.get(0).isEmpty()) return null;
 		for (String filePathRegEx : filePaths) {
 			final List<File> paths = expand(filePathRegEx);
 			for (File path : paths) {
@@ -369,6 +370,8 @@ public abstract class AbstractConversion {
 	 * @return
 	 */
 	public List<File> expand(String path) {
+		
+		if (path.isEmpty()) return null;
 		
 		final List<File> files = new ArrayList<File>(7);
 		path = path.replace('\\', '/');
