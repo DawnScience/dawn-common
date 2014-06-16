@@ -40,6 +40,7 @@ public class ImageConverter extends AbstractImageConversion {
 		final JavaImageSaver saver = new JavaImageSaver(sliceFile.getAbsolutePath(), getExtension(), getBits(), true);
 		final DataHolder     dh    = new DataHolder();
 		dh.addDataset(slice.getName(), slice);
+		dh.setFilePath(context.getSelectedConversionFile().getAbsolutePath());
 		saver.saveFile(dh);
         if (context.getMonitor()!=null) context.getMonitor().worked(1);
 	}
