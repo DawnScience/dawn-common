@@ -42,8 +42,6 @@ public abstract class AbstractPlotConversionVisitor implements IConversionVisito
 	
 	public abstract String getExtension();
 
-	
-
 	@Override
 	public void setExpandedDatasets(List<String> expandedDatasets) {
 		// We don't care about them
