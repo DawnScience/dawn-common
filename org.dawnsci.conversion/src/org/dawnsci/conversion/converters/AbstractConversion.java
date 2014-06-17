@@ -384,7 +384,9 @@ public abstract class AbstractConversion {
 				files.add(file);
 				continue;
 			}
-			if (file.getName().matches(regexp)) files.add(file);
+			if (file.getName().matches(regexp) || file.getName().equals(regexp)) {
+				files.add(file);
+			}
 		}
 		
 		return files.isEmpty() ? null : files;
