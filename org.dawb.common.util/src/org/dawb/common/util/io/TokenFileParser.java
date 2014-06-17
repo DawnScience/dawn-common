@@ -114,17 +114,6 @@ public class TokenFileParser {
 	}
 	
 	/**
-	 * Testing only
-	 * @param args
-	 * @throws Exception
-	 */
-	public static void main(final String [] args) throws Exception {
-		final File file = new File("/home/fcp94556/workspace/uk.ac.gda.core/src/gda/gui/exafs/Element-CoreHole.txt");
-		final TokenFileParser p = new TokenFileParser(file);
-		System.out.println(p);
-	}
-
-	/**
 	 * Exceptions can be thrown if the column cannot parse as double
 	 * @param i
 	 * @return Double[]
