@@ -180,16 +180,7 @@ public abstract class AbstractSliceConversionPage extends ResourceChoosePage {
 				return false;			
 			}
 		}
-		
-		// Check that two ranges have not been set.
-		if (sliceComponent!=null) {
-			final DimsDataList dl = sliceComponent.getDimsDataList();
-			if (dl!=null && dl.getRangeCount()>1) {
-				setErrorMessage("There is a limitation that only one range may be set, curently."); // Not very friendly...
-				return false;			
-			}
-		}
-	
+			
 		setErrorMessage(null);
 		return true;
 	}
