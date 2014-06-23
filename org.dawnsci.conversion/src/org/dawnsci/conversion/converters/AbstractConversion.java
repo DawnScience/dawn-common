@@ -168,7 +168,7 @@ public abstract class AbstractConversion {
 					final List<String> dNames = context.getDatasetNames();
 					for (String nameRegExp : dNames) {
 						final List<String> data = getData(sets, nameRegExp);
-					    names.addAll(data);
+					    if (data != null) names.addAll(data);
 					}
 				}
 			}
