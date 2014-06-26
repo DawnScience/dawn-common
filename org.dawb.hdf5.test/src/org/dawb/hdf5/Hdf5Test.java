@@ -17,7 +17,6 @@ import ncsa.hdf.hdf5lib.H5;
 import ncsa.hdf.hdf5lib.HDF5Constants;
 import ncsa.hdf.object.Dataset;
 import ncsa.hdf.object.Datatype;
-import ncsa.hdf.object.Group;
 import ncsa.hdf.object.h5.H5Datatype;
 
 import org.junit.Test;
@@ -46,7 +45,7 @@ public class Hdf5Test {
 			// (but not others!) interfering.
 			file = HierarchicalDataFactory.getWriter(tmp.getAbsolutePath());
 
-			final Group myDataGroup = file.group("myData");
+			final String myDataGroup = file.group("myData");
 
 			final double[] random = new double[2048*2048];
 			for (int i = 0; i < 2048*2048; i++) {
@@ -57,7 +56,7 @@ public class Hdf5Test {
 					new long[]{2048,2048},
 					random,
 					myDataGroup);
-			file.setNexusAttribute(s, Nexus.SDS);
+			file.setNexusAttribute(s.getFullName(), Nexus.SDS);
 			file.close();
 
 			file = HierarchicalDataFactory.getReader(tmp.getAbsolutePath());
@@ -135,7 +134,7 @@ public class Hdf5Test {
 		try {
 			// open the file and retrieve the file structure
 			testFile = HierarchicalDataFactory.getReader(path);
-			final Group root = testFile.getRoot();
+			final String root = testFile.getRoot();
 			if (root == null) throw new Exception("Did not get root!");
 
 			testFile.print();

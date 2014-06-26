@@ -8,29 +8,34 @@
  */
 package org.dawb.hdf5.nexus;
 
-import ncsa.hdf.object.Group;
-import ncsa.hdf.object.HObject;
+import org.dawb.hdf5.IHierarchicalDataFile;
 
 public class NexusFindGroupByAttributeText implements IFindInNexus{
 	
 	public String attributeValue;
 	public String attributeName;
+	private IHierarchicalDataFile file;
 	
-	public NexusFindGroupByAttributeText(String attributeValue, String attributeName) {
+	public NexusFindGroupByAttributeText(IHierarchicalDataFile file, String attributeValue, String attributeName) {
+		this.file           = file;
 		this.attributeValue = attributeValue;
-		this.attributeName = attributeName;
+		this.attributeName  = attributeName;
 	}
 	
 	@Override
-	public boolean inNexus(HObject nexusObject) {
-		if (nexusObject instanceof Group) {
-			if (attributeName != null) {
-				String attrNexusObject = NexusUtils.getNexusGroupAttributeValue((Group) nexusObject, attributeName);
-				if (attrNexusObject != null && attributeValue != null
-						&& attrNexusObject.toLowerCase().equals(attributeValue.toLowerCase())) {
-					return true;
+	public boolean inNexus(String nexusObject) {
+		try {
+			if (file.isGroup(nexusObject)) {
+				if (attributeName != null) {
+					String attrNexusObject = NexusUtils.getNexusGroupAttributeValue(file, nexusObject, attributeName);
+					if (attrNexusObject != null && attributeValue != null
+							&& attrNexusObject.toLowerCase().equals(attributeValue.toLowerCase())) {
+						return true;
+					}
 				}
 			}
+		} catch (Exception ne) {
+			return false;
 		}
 		return false;
 	}

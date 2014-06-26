@@ -29,7 +29,7 @@ public class CompareConverter extends AbstractConversion{
 	
 
 	private IHierarchicalDataFile hFile;
-	private Map<String,Group>     groups;
+	private Map<String,String>    groups;
 	private Map<String,Boolean>   written;
 
 	public CompareConverter(IConversionContext context) throws Exception {
@@ -43,15 +43,15 @@ public class CompareConverter extends AbstractConversion{
 		// to store the data.
 		final List<String> names = context.getDatasetNames();
 		
-		groups  = new HashMap<String, Group>(names.size());
+		groups  = new HashMap<String, String>(names.size());
 		written = new HashMap<String, Boolean>(names.size());
-		Group group = null;
+		String group = null;
 		for (String datasetNameStr : names) {
 			
 			String[]  paths = datasetNameStr.split("/");
 			if ("".equals(paths[0])) paths = Arrays.copyOfRange(paths, 1, paths.length);
 			
-	 		final Group entry = hFile.group(paths[0]);
+	 		final String entry = hFile.group(paths[0]);
 	 		hFile.setNexusAttribute(entry, Nexus.ENTRY);
 
 			group = entry;
@@ -81,8 +81,8 @@ public class CompareConverter extends AbstractConversion{
  		final String datasetPath = slice.getName(); // Slice must be named the same as the path it will write to
  		final Datatype        dt = getDatatype(slice);
 		
- 		final String name = datasetPath.substring(datasetPath.lastIndexOf('/')+1);
- 		final Group group = groups.get(datasetPath);
+ 		final String name  = datasetPath.substring(datasetPath.lastIndexOf('/')+1);
+ 		final String group = groups.get(datasetPath);
  		
  		
  		AbstractDataset abs = DatasetUtils.convertToAbstractDataset(slice).squeeze();
@@ -95,8 +95,8 @@ public class CompareConverter extends AbstractConversion{
 
 		Dataset d = hFile.appendDataset(name, dt, getLong(slice.getShape()), abs.getBuffer(), group);
 		if (!written.get(datasetPath)) {
-			hFile.setNexusAttribute(d, Nexus.SDS);
-			hFile.setAttribute(d, "original_name", datasetPath);
+			hFile.setNexusAttribute(d.getFullName(), Nexus.SDS);
+			hFile.setAttribute(d.getFullName(), "original_name", datasetPath);
 			written.put(datasetPath, true);
 		}
 		

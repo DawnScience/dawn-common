@@ -9,7 +9,6 @@ import java.util.Map;
 
 import ncsa.hdf.object.Dataset;
 import ncsa.hdf.object.Datatype;
-import ncsa.hdf.object.Group;
 
 import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.hdf5.HierarchicalDataFactory;
@@ -77,7 +76,7 @@ public class Convert1DtoND extends AbstractConversion {
 				List<ILazyDataset> out = dataMap.get(key);
 				String[] paths = getNexusPathAndNameFromKey(key);
 
-				Group entry = file.group(paths[0]);
+				String entry = file.group(paths[0]);
 				file.setNexusAttribute(entry, Nexus.ENTRY);
 
 				if (paths.length>2) {
@@ -106,7 +105,7 @@ public class Convert1DtoND extends AbstractConversion {
 			}
 			if (axis != null) {
 				String[] paths = getNexusPathAndNameFromKey(axisName);
-				Group entry = file.group(paths[0]);
+				String entry = file.group(paths[0]);
 				file.setNexusAttribute(entry, Nexus.ENTRY);
 				
 				if (paths.length>2) {
@@ -131,7 +130,7 @@ public class Convert1DtoND extends AbstractConversion {
 		}
 	}
 	
-	private void saveAxis(IHierarchicalDataFile file,Group entry, AbstractDataset out, String[] paths) throws Exception {
+	private void saveAxis(IHierarchicalDataFile file,String entry, AbstractDataset out, String[] paths) throws Exception {
 		
 		String name = paths[paths.length-1];
 		Datatype dt = getDatatype(out);
@@ -139,11 +138,11 @@ public class Convert1DtoND extends AbstractConversion {
 		
 		Dataset d = file.createDataset(name, dt, shape, out.getBuffer(), entry);
 		
-		file.setNexusAttribute(d, Nexus.SDS);
-		file.setAttribute(d,"axis","1");
+		file.setNexusAttribute(d.getFullName(), Nexus.SDS);
+		file.setAttribute(d.getFullName(),"axis","1");
 	}
 	
-	private void saveTo2DStack(IHierarchicalDataFile file,Group entry, List<ILazyDataset> out,String[] paths,String key, int axisLength) throws Exception{
+	private void saveTo2DStack(IHierarchicalDataFile file,String entry, List<ILazyDataset> out,String[] paths,String key, int axisLength) throws Exception{
 		
 		String name = paths[paths.length-1];
 		Datatype dt = getDatatype(out.get(0).getSlice());
@@ -153,17 +152,17 @@ public class Convert1DtoND extends AbstractConversion {
 		
 		Dataset d = file.appendDataset(name, dt, shape, first.getBuffer(), entry);
 		
-		if (first.getShape()[0] == axisLength) file.setAttribute(d,"signal","1");
+		if (first.getShape()[0] == axisLength) file.setAttribute(d.getFullName(),"signal","1");
 		
-		file.setNexusAttribute(d, Nexus.SDS);
-		file.setAttribute(d, "original_name", key);				
+		file.setNexusAttribute(d.getFullName(), Nexus.SDS);
+		file.setAttribute(d.getFullName(), "original_name", key);				
 		
 		for (int i = 1; i < out.size(); i++) {
 			d = file.appendDataset(name, dt, shape, ((AbstractDataset)out.get(i).getSlice()).getBuffer(), entry);
 		}
 	}
 	
-	private void saveTo3DStack(IHierarchicalDataFile file,Group entry, List<ILazyDataset> out,String[] paths,String key, Convert1DInfoBean bean,int axisLength) throws Exception{
+	private void saveTo3DStack(IHierarchicalDataFile file,String entry, List<ILazyDataset> out,String[] paths,String key, Convert1DInfoBean bean,int axisLength) throws Exception{
 		
 		ILazyDataset[] lz = new ILazyDataset[bean.fastAxis];
 		String name = paths[paths.length-1];
@@ -185,9 +184,9 @@ public class Convert1DtoND extends AbstractConversion {
 			
 		}
 		
-		file.setNexusAttribute(d, Nexus.SDS);
-		file.setAttribute(d, "original_name", key);
-		if (first.getShape()[0] == axisLength) file.setAttribute(d,"signal","1");
+		file.setNexusAttribute(d.getFullName(), Nexus.SDS);
+		file.setAttribute(d.getFullName(), "original_name", key);
+		if (first.getShape()[0] == axisLength) file.setAttribute(d.getFullName(),"signal","1");
 		
 	}
 	

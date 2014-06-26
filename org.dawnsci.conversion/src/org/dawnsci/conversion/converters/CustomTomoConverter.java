@@ -16,6 +16,8 @@ import org.dawb.hdf5.HierarchicalDataFactory;
 import org.dawb.hdf5.IHierarchicalDataFile;
 import org.dawb.hdf5.nexus.IFindInNexus;
 import org.dawb.hdf5.nexus.NexusUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
@@ -30,6 +32,8 @@ import uk.ac.diamond.scisoft.analysis.io.JavaImageSaver;
  *
  */
 public class CustomTomoConverter extends AbstractConversion {
+	
+	private static final Logger logger = LoggerFactory.getLogger(CustomTomoConverter.class);
 
 	private final static String DEF = "definition";
 	private final static String NXTOMO = "nxtomo";
@@ -86,7 +90,8 @@ public class CustomTomoConverter extends AbstractConversion {
 		
 	}
 
-	private void processTomoInfoBeanContext(File path, IConversionContext context) {
+	private void processTomoInfoBeanContext(File path, IConversionContext context) throws Exception {
+		
 		if (findGroupContainingDefinition(path.getAbsolutePath()) == null) {
 			throw new IllegalArgumentException("Not a recognised tomography file");
 		}
@@ -124,38 +129,49 @@ public class CustomTomoConverter extends AbstractConversion {
 
 	}
 	
-	private static HObject findGroupContainingDefinition(String path) {
-		IHierarchicalDataFile file = null;
+	private static String findGroupContainingDefinition(String path) throws Exception {
+		
+		final IHierarchicalDataFile file = HierarchicalDataFactory.getReader(path);
 		try {
-			file = HierarchicalDataFactory.getReader(path);
-			Group object = file.getRoot();
+			
+			String object = file.getRoot();
 			
 			IFindInNexus finder = new IFindInNexus() {
 				
 				@Override
-				public boolean inNexus(HObject nexusObject) {
-					if(nexusObject instanceof H5ScalarDS) {
-						if (((H5ScalarDS)nexusObject).getName().toLowerCase().equals(DEF)) {
-							if (((H5ScalarDS)nexusObject).getDatatype().getDatatypeClass() ==Datatype.CLASS_STRING) {
-								String name = null;
-								try {
-									((H5ScalarDS)nexusObject).setConvertByteToString(true);
-									name = ((String[])((H5ScalarDS)nexusObject).getData())[0];
-								} catch (Exception e) {
-									e.printStackTrace();
-								}
-								if (name != null) {
-									if (name != null && name.toLowerCase().contains(NXTOMO)) return true;
+				public boolean inNexus(String nexusObjectPath) {
+					
+					try {
+						if (file.isDataset(nexusObjectPath)) {
+							
+							final String objectName = nexusObjectPath.substring(nexusObjectPath.lastIndexOf('/')+1);
+							if (objectName.toLowerCase().equals(DEF)) {
+								
+								HObject object = file.getData(nexusObjectPath);
+								if (((Dataset)object).getDatatype().getDatatypeClass() == Datatype.CLASS_STRING) {
+									String name = null;
+									try {
+										((H5ScalarDS)object).setConvertByteToString(true);
+										name = ((String[])((H5ScalarDS)object).getData())[0];
+									} catch (Exception e) {
+										e.printStackTrace();
+									}
+									if (name != null) {
+										if (name != null && name.toLowerCase().contains(NXTOMO)) return true;
+									}
 								}
 							}
 						}
+					} catch (Exception ne) {
+						logger.debug("Cannot test object @ '"+nexusObjectPath+"'");
+						return false;
 					}
 					
 					return false;
 				}
 			};
 			
-			List<HObject> out = NexusUtils.nexusBreadthFirstSearch(finder, object, true);
+			List<String> out = NexusUtils.nexusBreadthFirstSearch(file, finder, object, true);
 			
 			if (out != null && !out.isEmpty()){
 				return out.get(0);
@@ -202,15 +218,16 @@ public class CustomTomoConverter extends AbstractConversion {
 		/**
 		 * Method to check is a valid tomograpy file (returns true)
 		 * and populate some internal data
+		 * @throws Exception 
 		 *
 		 */
-		public boolean setTomographyDefinition(String path) {
+		public boolean setTomographyDefinition(String path) throws Exception {
 			
-			HObject ob = findGroupContainingDefinition(path);
+			String ob = findGroupContainingDefinition(path);
 			
 			if (ob == null) return false;
 			filePath = path;
-			tomoPath = ob.getPath();
+			tomoPath = ob;
 			return true;
 			
 		}

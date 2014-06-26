@@ -56,21 +56,20 @@ public class HierarchicalDataFileModelTest {
 
 		}
 
-		Group g = reader.getRoot();
-		printGroup("", g);
+		String g = reader.getRoot();
+		printGroup(reader, g);
 	}
 
-	private void printGroup(String path, Group g) throws Exception {
-		List<?> members = g.getMemberList();
+	private void printGroup(IHierarchicalDataFile reader, String g) throws Exception {
+		
+		List<String> members = reader.memberList(g);
 
 		int n = members.size();
-		HObject obj = null;
 		for (int i = 0; i < n; i++) {
-			obj = (HObject) members.get(i);
-			String childPath = path + "/" + obj.toString();
+			String childPath = members.get(i);
 			System.out.print(childPath);
-			if (obj instanceof Dataset) {
-				Dataset dataset = (Dataset) obj;
+			if (reader.isDataset(childPath)) {
+				Dataset dataset = (Dataset) reader.getData(childPath);
 				Object value = dataset.read();
 				System.out.print("=DIMS(");
 				System.out.print(Arrays.toString(dataset.getDims()));
@@ -78,12 +77,12 @@ public class HierarchicalDataFileModelTest {
 				System.out.print(value);
 				System.out.print("=="
 						+ HierarchicalDataUtils.extractScalar(value));
+				
+			} else if (reader.isGroup(childPath)) {
+				printGroup(reader, childPath);
 			}
 			System.out.println();
 
-			if (obj instanceof Group) {
-				printGroup(childPath, (Group) obj);
-			}
 		}
 	}
 

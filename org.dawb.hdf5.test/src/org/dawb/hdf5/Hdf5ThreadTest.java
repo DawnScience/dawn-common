@@ -75,7 +75,7 @@ public class Hdf5ThreadTest extends AbstractThreadTest {
 
 			// open the file and retrieve the file structure
 			testFile = HierarchicalDataFactory.getReader(test.getAbsolutePath());
-			final Group root = testFile.getRoot();
+			final String root = testFile.getRoot();
 
 			if (root == null) throw new Exception("Did not get root!");
 			System.out.println("Testing with thread "+index);

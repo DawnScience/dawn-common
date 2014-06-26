@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import ncsa.hdf.object.Group;
-
 import org.dawb.hdf5.IHierarchicalDataFile;
 import org.dawnsci.io.h5.H5Utils;
 import org.dawnsci.plotting.api.tool.IToolPage;
@@ -58,7 +56,7 @@ public interface IDataReductionToolPage extends IToolPage {
 		/**
 		 * The Group which the user chose.
 		 */
-		private Group                 parent;
+		private String                 parent;
 		/**
 		 * The actual sliced data to operate on.
 		 */
@@ -83,7 +81,7 @@ public interface IDataReductionToolPage extends IToolPage {
 		private int[]                 shape;
 		
 		public DataReductionSlice(IHierarchicalDataFile hf,
-				                  Group group,
+				                  String group,
 				                  IDataset set, 
 				                  Object ud,
 				                  Slice[] slice,
@@ -103,10 +101,10 @@ public interface IDataReductionToolPage extends IToolPage {
 		public void setFile(IHierarchicalDataFile hf) {
 			this.file = hf;
 		}
-		public Group getParent() {
+		public String getParent() {
 			return parent;
 		}
-		public void setParent(Group parent) {
+		public void setParent(String parent) {
 			this.parent = parent;
 		}
 		public IDataset getData() {
@@ -120,7 +118,7 @@ public interface IDataReductionToolPage extends IToolPage {
 			appendData(more, parent);
 		}
 		
-		public void appendData(IDataset more, Group group) throws Exception {
+		public void appendData(IDataset more, String group) throws Exception {
 			if (slice == null) {
 				H5Utils.appendDataset(file, group, more);
 				return;

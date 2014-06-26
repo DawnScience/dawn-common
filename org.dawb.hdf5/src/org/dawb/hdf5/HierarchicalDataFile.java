@@ -216,12 +216,18 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 	}
 
 	/**
+	 * Path of the root group
+	 */
+	public String getRoot() {
+		return _getRoot().getFullName();
+	}
+	/**
 	 * Returns the root Group. Note that the close method should not
 	 * have been called yet.
 	 * 
 	 * @return
 	 */
-	public Group getRoot() {
+	protected Group _getRoot() {
 		return (Group)((DefaultMutableTreeNode)getNode()).getUserObject();
 	}
 	
@@ -241,9 +247,30 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 		return link!=null ? link : object;
 	}
 	
-	public Group getParent(final String path) throws Exception {
+	@Override
+	public boolean isDataset(String fullPath) throws Exception {
+		HObject object = getData(fullPath);
+		return object instanceof Dataset;
+	}
+	
+	@Override
+	public boolean isGroup(String fullPath) throws Exception{
+		HObject object = getData(fullPath);
+		return object instanceof Group;
+	}
+
+	@Override
+	public String rename(String path, String newName) throws Exception {
+		HObject object = getData(path);
+		object.setName(newName);
+		return object.getFullName();
+	}
+
+	
+	public String getParent(final String path) throws Exception {
     	final String parentPath = path.substring(0, path.lastIndexOf("/"));
-        return (Group)getData(parentPath);
+        Group group = (Group)getData(parentPath);
+		return group!=null ? parentPath : null;
 	}
 	
 	/**
@@ -304,7 +331,7 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 	
 	@Override
 	public Map<String, Object> getAttributeValues() {
-		return getAttributeValues(getRoot(), new HashMap<String, Object>(89));
+		return getAttributeValues(_getRoot(), new HashMap<String, Object>(89));
 	}
 
     private Map<String, Object> getAttributeValues(HObject object, Map<String, Object> allAttributes) {
@@ -344,7 +371,7 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 	@Override
 	public HierarchicalInfo getDatasetInformation(int dataType)  throws Exception {
 		final HierarchicalInfo info = new HierarchicalInfo();
-		getDatasetInformation(getRoot(), info, dataType);
+		getDatasetInformation(_getRoot(), info, dataType);
 		return info;
 	}
 	
@@ -388,7 +415,7 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 	 * @throws Exception
 	 */
 	public List<String> getDatasetNames(final int dataType)  throws Exception {
-		return getDatasetNames(getRoot(), dataType, new ArrayList<String>(7));
+		return getDatasetNames(_getRoot(), dataType, new ArrayList<String>(7));
 	}
 
 	private List<String> getDatasetNames(Group g, final int dataType, final List<String> names)  throws Exception {
@@ -417,7 +444,7 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 	 * @return a list of the full paths of the data sets.
 	 */
 	public Map<String, Integer> getDatasetSizes(int dataType)  throws Exception{
-		return getDatasetSizes(getRoot(), new HashMap<String, Integer>(31), dataType);
+		return getDatasetSizes(_getRoot(), new HashMap<String, Integer>(31), dataType);
 	}
 	
 	private Map<String, Integer> getDatasetSizes(Group g, Map<String, Integer> sizes, int dataType) throws Exception {
@@ -452,7 +479,7 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 	 */
 	@Override
 	public Map<String, int[]> getDatasetShapes(int dataType)  throws Exception {
-		return getDatasetShapes(getRoot(), new HashMap<String, int[]>(31), dataType);
+		return getDatasetShapes(_getRoot(), new HashMap<String, int[]>(31), dataType);
 	}
 	
 	private Map<String, int[]> getDatasetShapes(Group g, Map<String, int[]> shapes, int dataType)  throws Exception {
@@ -549,8 +576,9 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 	 * @param name
 	 * @throws Exception 
 	 */
-	public Group group(final String name) throws Exception {
-		return group(name, getRoot());
+	public String group(final String name) throws Exception {
+		Group group = _group(name, _getRoot());
+		return group!=null ? group.getFullName() : null;
 	}
 
 	/**
@@ -558,10 +586,25 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 	 * @param name
 	 * @throws Exception 
 	 */
-	public Group group(final String name, final Group group) throws Exception {
-		
+	public String group(final String name, final String groupPath) throws Exception {
+		Group _group = _group(groupPath, _getRoot());
+		Group group  = _group(name, _group);
+		return group!=null ? group.getFullName() : null;
+	}
+	
+	
+	protected Group _group(final String name) throws Exception {
+		return _group(name, _getRoot());
+	}
+
+	protected Group _group(final String name, final Group group) throws Exception {
+		if ("/".equals(name)) return _getRoot();
 		final HObject o = checkExists(name, group, Group.class);
 		if (o!=null) return (Group)o;
+		
+		HObject object = (Group)getData(name);
+		if (object!=null && object instanceof Group) return (Group)object;
+		 
 		return file.createGroup(name, group);
 	}
 	
@@ -583,7 +626,7 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 	}
 
 	public void print() throws Exception {
-		printGroup(getRoot(), "");
+		printGroup(_getRoot(), "");
 	}
 	
 	/**
@@ -613,14 +656,16 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 	}
 
 	@Override
-	public void setIntAttribute(final HObject   entry,
+	public void setIntAttribute(final String   entryPath,
 					           final String    name,
 					           final int       value) throws Exception {
+		HObject entry = getData(entryPath);
 		NexusUtils.setIntAttribute(file, entry, name, value);
 	}
 	
 	@Override
-	public void setNexusAttribute(HObject object, String attribute) throws Exception {
+	public void setNexusAttribute(String objectPath, String attribute) throws Exception {
+		HObject object = getData(objectPath);
 		NexusUtils.setNexusAttribute(file, object, attribute);
 	}
 	
@@ -632,31 +677,32 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 	 * @param value
 	 */
 	@Override
-	public Dataset replaceDataset(final String name, final String value, final Group parent) throws Exception {
+	public Dataset replaceDataset(final String name, final String value, final String parent) throws Exception {
 		return createDataset(name, value, parent, true);
 	}
 
 	@Override
-	public Dataset replaceDataset(final String name, final Datatype dtype, final long[] shape, final Object buffer, final Group parent) throws Exception {
+	public Dataset replaceDataset(final String name, final Datatype dtype, final long[] shape, final Object buffer, final String parent) throws Exception {
 		return createDataset(name, dtype, shape, buffer, parent, true);
 	}
 
 	
 	@Override
-	public Dataset createDataset(final String name, final String value, final Group parent) throws Exception {
+	public Dataset createDataset(final String name, final String value, final String parent) throws Exception {
 		return createDataset(name, value, parent, false);
 	}
 
 	@Override
-	public Dataset createDataset(final String name, final Datatype dtype, final long[] shape, final Object buffer, final Group parent) throws Exception {
+	public Dataset createDataset(final String name, final Datatype dtype, final long[] shape, final Object buffer, final String parent) throws Exception {
 		return createDataset(name, dtype, shape, buffer, parent, false);
 	}
 
 	private Dataset createDataset(String name, 
 			                     final String value, 
-			                           Group  parent,
+			                     String  parentPath,
 			                     final boolean overwrite) throws Exception {
 		
+		Group parent = _group(parentPath);
 		final int id = parent.open();
 		try {
 			if (!overwrite) {
@@ -686,12 +732,14 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 			                     final Datatype dtype,
 			                     final long[]   shape,
 			                     final Object   buffer,
-			                           Group    parent,
+			                     final String   parentPath,
 			                     final boolean  overwrite) throws Exception {
 		
     	if (name.indexOf('/')>-1) {
     		name = name.substring(name.lastIndexOf('/')+1);
     	}
+    	
+		Group parent = _group(parentPath);
 		final int id = parent.open();
 		try {
 			if (!overwrite) {
@@ -716,11 +764,11 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 	}
 
 	@Override
-	public HObject createLink(Group targetGroup, String linkName, String sourceFullPath)
-			throws Exception {
+	public HObject createLink(String targetGroupPath, String linkName, String sourceFullPath) throws Exception {
 		final HObject object = getData(sourceFullPath);
-		if (object==null) 
-			return null;
+		if (object==null)  return null;
+		
+		final Group targetGroup = _group(targetGroupPath);
 		return file.createLink(targetGroup, linkName, object);
 	}
 	
@@ -744,8 +792,9 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 						                     final Datatype dtype,
 						                     final long[]   shape,
 						                     final Object   buffer,
-						                     final Group    parent) throws Exception {
+						                     final String   parentGroupPath) throws Exception {
 		
+		Group parent = _group(parentGroupPath);
 		final int id = parent.open();
 		try {
 			final HObject o = checkExists(name, parent, Dataset.class);
@@ -820,7 +869,8 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 	}
 
 	@Override
-	public void setAttribute(HObject object, String name, String value) throws Exception {
+	public void setAttribute(String objectPath, String name, String value) throws Exception {
+        HObject object = getData(objectPath);
 		NexusUtils.setAttribute(file, object, name, value);
 	}
 
@@ -839,10 +889,11 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 	public Dataset insertSlice(String name,  
             final Datatype dtype,
             final Object   buffer,
-            final Group    parent,
+            final String   parentPath,
             final long[][] startStopStep,
             final long[] totalShape) throws Exception {
 		
+		final Group parent = _group(parentPath);
 		final int id = parent.open();
 		try {
 			
@@ -890,6 +941,18 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 			throws Exception {
 		NexusUtils.setDatasetAttribute(file, entry, name, dtype, shape, buffer);
 		
+	}
+
+	@Override
+	public List<String> memberList(String groupPath) throws Exception {
+		
+		Group group = _group(groupPath);
+		List<HObject> members = group.getMemberList();
+		List<String>  ret     = new ArrayList<String>(members.size());
+		for (HObject member : members) {
+			ret.add(member.getFullName());
+		}
+		return ret;
 	}
 
 }

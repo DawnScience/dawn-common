@@ -15,7 +15,6 @@ import javax.swing.tree.TreeNode;
 
 import ncsa.hdf.object.Dataset;
 import ncsa.hdf.object.Datatype;
-import ncsa.hdf.object.Group;
 import ncsa.hdf.object.HObject;
 
 /**
@@ -62,7 +61,7 @@ public interface IHierarchicalDataFile extends AutoCloseable {
 	 * Return the root Group
 	 * @return
 	 */
-	public Group getRoot();
+	public String getRoot();
 
 	/**
 	 * Print the full file tree
@@ -79,6 +78,22 @@ public interface IHierarchicalDataFile extends AutoCloseable {
 	public HObject getData(String fullPath) throws Exception;
 	
 	/**
+	 * Return true if this path references a Dataset object. Other objects are Groups
+	 * involved in structure, Datasets hold data.
+	 * @param path
+	 * @return
+	 */
+	public boolean isDataset(String path) throws Exception;
+
+	/**
+	 * Return true if this path references a Group object. Objects are Groups
+	 * which hold in structure and Datasets which hold data.
+	 * @param path
+	 * @return
+	 */
+	public boolean isGroup(String path) throws Exception;
+
+	/**
 	 * Attempt to delete the HObject at this path and unlink any children.
 	 * 
 	 * @param fullPath
@@ -86,12 +101,21 @@ public interface IHierarchicalDataFile extends AutoCloseable {
 	//public void delete(String fullPath) throws Exception;
 	
 	/**
+	 * Rename the path to have the newName and return the new full path
+	 * @param path
+	 * @param newName
+	 * @return
+	 * @throws Exception
+	 */
+	public String rename(String path, String newName) throws Exception;
+	
+	/**
 	 * 
 	 * @param path
 	 * @return the parent of the node at this path
 	 * @throws Exception
 	 */
-	public Group getParent(final String path) throws Exception;
+	public String getParent(final String path) throws Exception;
 	
 	/**
 	 * The full attribute key is: <node full path>@<attribute name>
@@ -154,14 +178,14 @@ public interface IHierarchicalDataFile extends AutoCloseable {
 	 * @param string
 	 * @return
 	 */
-	public Group group(String name) throws Exception;
+	public String group(String name) throws Exception;
 
 	/**
 	 * A group in this parent, creating one if it does not exist.
 	 * @param string
 	 * @return
 	 */
-	public Group group(String name, final Group parent) throws Exception;
+	public String group(String name, final String parent) throws Exception;
 	
 	/**
 	 * Does not set the attribute again if it is already set.
@@ -169,7 +193,7 @@ public interface IHierarchicalDataFile extends AutoCloseable {
 	 * @param attribute one of the values defined in {@link Nexus}
 	 * @throws Exception
 	 */
-	public void setNexusAttribute(final HObject object, final String attribute) throws Exception;
+	public void setNexusAttribute(final String objectPath, final String attribute) throws Exception;
 	
 	/**
 	 * 
@@ -178,7 +202,7 @@ public interface IHierarchicalDataFile extends AutoCloseable {
 	 * @param value
 	 * @throws Exception
 	 */
-	public void setAttribute(final HObject object, final String name, final String value) throws Exception;
+	public void setAttribute(final String objectPath, final String name, final String value) throws Exception;
 
 
 	/**
@@ -190,7 +214,7 @@ public interface IHierarchicalDataFile extends AutoCloseable {
 	 * @param value
 	 * @throws Exception
 	 */
-	public void setIntAttribute(final HObject   entry, final String    name, final int       value) throws Exception;
+	public void setIntAttribute(final String   entryPath, final String    name, final int       value) throws Exception;
 	
 	/**
 	 * Set a dataset attribute on an HObject, useful for setting vectors on NXtransformation.
@@ -225,7 +249,7 @@ public interface IHierarchicalDataFile extends AutoCloseable {
 	 * @param name
 	 * @param value
 	 */
-	public Dataset createDataset(final String name, final String value, final Group parent) throws Exception;
+	public Dataset createDataset(final String name, final String value, final String parent) throws Exception;
 
 	/**
 	 * Creates and returns a new dataset with the given name and parent
@@ -234,9 +258,9 @@ public interface IHierarchicalDataFile extends AutoCloseable {
 	 * @param name
 	 * @param shape
 	 * @param buffer
-	 * @param data
+	 * @param dataGroupPath
 	 */
-	public Dataset createDataset(final String name, final Datatype dtype, final long[] shape, final Object buffer, final Group data) throws Exception;
+	public Dataset createDataset(final String name, final Datatype dtype, final long[] shape, final Object buffer, final String dataGroupPath) throws Exception;
 
 	
 	/**
@@ -249,7 +273,7 @@ public interface IHierarchicalDataFile extends AutoCloseable {
 	 * @param data
 	 * @param overwrite
 	 */
-	public Dataset createDataset(final String name, final Datatype dtype, final long[] shape, final Object buffer, final Group data, final boolean overwrite) throws Exception;
+	public Dataset createDataset(final String name, final Datatype dtype, final long[] shape, final Object buffer, final String dataGroupPath, final boolean overwrite) throws Exception;
 
 	/**
 	 * Creates and returns a new dataset with the given name and parent
@@ -258,7 +282,7 @@ public interface IHierarchicalDataFile extends AutoCloseable {
 	 * @param name
 	 * @param value
 	 */
-	public Dataset replaceDataset(final String name, final String value, final Group parent) throws Exception;
+	public Dataset replaceDataset(final String name, final String value, final String parent) throws Exception;
 
 	/**
 	 * Creates and returns a new dataset with the given name and parent
@@ -267,9 +291,9 @@ public interface IHierarchicalDataFile extends AutoCloseable {
 	 * @param name
 	 * @param shape
 	 * @param buffer
-	 * @param data
+	 * @param dataGroupPath
 	 */
-	public Dataset replaceDataset(final String name, final Datatype dtype, final long[] shape, final Object buffer, final Group data) throws Exception;
+	public Dataset replaceDataset(final String name, final Datatype dtype, final long[] shape, final Object buffer, final String dataGroupPath) throws Exception;
 
 	/**
 	 * Method finds the given data set in the group and adds buffer to the end of the stack.
@@ -286,10 +310,10 @@ public interface IHierarchicalDataFile extends AutoCloseable {
 	 * @param d
 	 * @param shape
 	 * @param buffer
-	 * @param group
+	 * @param dataGroupPath
 	 * @return
 	 */
-	public Dataset appendDataset(String datasetName, Datatype d, long[] bufferShape, Object buffer, Group group)  throws Exception;
+	public Dataset appendDataset(String datasetName, Datatype d, long[] bufferShape, Object buffer, String dataGroupPath)  throws Exception;
 
 	/**
 	 * Creates a link to an existing object
@@ -299,7 +323,7 @@ public interface IHierarchicalDataFile extends AutoCloseable {
 	 * @param sourceFullPath
 	 * @return The link object, or null if sourcePath doesn't exist
 	 */
-	public HObject createLink(Group targetGroup, String linkName, String sourceFullPath) throws Exception;
+	public HObject createLink(String targetGroup, String linkName, String sourceFullPath) throws Exception;
 
 	/**
 	 * Gets the size of a dimension of the dataset.
@@ -326,10 +350,19 @@ public interface IHierarchicalDataFile extends AutoCloseable {
 	 * @return
 	 */
 	public Dataset insertSlice(String name,  
-            final Datatype dtype,
-            final Object   buffer,
-            final Group    parent,
-            final long[][] startStopStep,
-            final long[] totalShape) throws Exception;
+					            final Datatype dtype,
+					            final Object   buffer,
+					            final String   parent,
+					            final long[][] startStopStep,
+					            final long[] totalShape) throws Exception;
+
+
+	/**
+	 * List of members from a group.
+	 * @param group
+	 * @return
+	 * @throws Exception
+	 */
+	public List<String> memberList(String group) throws Exception;
 
 }

@@ -184,6 +184,17 @@ public class HierarchicalDataUtils {
 		return null;
 	}
 
+	public static long[] getDims(final IHierarchicalDataFile file, String setPath) throws Exception {
+
+		HObject obj = file.getData(setPath);
+		if (!(obj instanceof Dataset)) return null;
+		Dataset set = (Dataset)obj;
+        if (set.getDims()==null) {
+        	set.getMetadata();
+        }
+        return set.getDims();
+	}
+
 	public static long[] getDims(final Dataset set) throws Exception {
 
         if (set.getDims()==null) {

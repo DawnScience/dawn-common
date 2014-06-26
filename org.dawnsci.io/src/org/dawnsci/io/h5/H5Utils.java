@@ -11,7 +11,6 @@ package org.dawnsci.io.h5;
 
 import ncsa.hdf.object.Dataset;
 import ncsa.hdf.object.Datatype;
-import ncsa.hdf.object.Group;
 import ncsa.hdf.object.h5.H5Datatype;
 
 import org.dawb.hdf5.IHierarchicalDataFile;
@@ -179,14 +178,14 @@ public class H5Utils {
 	 * @param a
 	 * @throws Exception
 	 */
-	public static void appendDataset(IHierarchicalDataFile file, Group parent, IDataset a) throws Exception {
+	public static void appendDataset(IHierarchicalDataFile file, String parent, IDataset a) throws Exception {
 
 		long[] shape = H5Utils.getLong(a.getShape());
 		Dataset s = file.appendDataset(a.getName(),  H5Utils.getDatatype(a), shape, ((AbstractDataset)a).getBuffer(), parent);
-		file.setNexusAttribute(s, Nexus.SDS);			
+		file.setNexusAttribute(s.getFullName(), Nexus.SDS);			
 	}
 	
-	public static void insertDataset(IHierarchicalDataFile file, Group parent, IDataset a, Slice[] slice, long[] finalShape) throws Exception {
+	public static void insertDataset(IHierarchicalDataFile file, String parent, IDataset a, Slice[] slice, long[] finalShape) throws Exception {
 
 		long[][] startStopStep = new long[3][slice.length];
 		

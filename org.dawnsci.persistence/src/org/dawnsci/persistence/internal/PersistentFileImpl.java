@@ -106,7 +106,7 @@ class PersistentFileImpl implements IPersistentFile {
 		if(file == null)
 			file = HierarchicalDataFactory.getWriter(filePath);
 
-		Group parent = createParentEntry(PersistenceConstants.MASK_ENTRY);
+		createParentEntry(PersistenceConstants.MASK_ENTRY);
 
 		if (masks != null) {
 			Set<String> names = masks.keySet();
@@ -124,8 +124,8 @@ class PersistentFileImpl implements IPersistentFile {
 				for (int i = 0; i < shape.length; i++)
 					shape[i] = id.getShape()[i];
 
-				final Dataset dataset = file.replaceDataset(name, datatype, shape, id.getBuffer(), parent);
-				file.setNexusAttribute(dataset, Nexus.SDS);
+				final Dataset dataset = file.replaceDataset(name, datatype, shape, id.getBuffer(), PersistenceConstants.MASK_ENTRY);
+				file.setNexusAttribute(dataset.getFullName(), Nexus.SDS);
 			}
 		}
 	}
@@ -136,13 +136,14 @@ class PersistentFileImpl implements IPersistentFile {
 		mask = Comparisons.logicalNot((BooleanDataset)mask);
 		AbstractDataset id = DatasetUtils.cast((BooleanDataset)mask, AbstractDataset.INT8);
 		//check if parent group exists
-		Group parent = (Group)file.getData(PersistenceConstants.MASK_ENTRY);
-		if(parent == null)
-			parent = createParentEntry(PersistenceConstants.MASK_ENTRY);
+		Object parentObj = file.getData(PersistenceConstants.MASK_ENTRY);
+		if(parentObj == null) {
+			createParentEntry(PersistenceConstants.MASK_ENTRY);
+		} 
 		final Datatype datatype = H5Utils.getDatatype(id);
 		long[] shape = H5Utils.getLong(id.getShape());
-		final Dataset dataset = file.replaceDataset(name, datatype, shape, id.getBuffer(), parent);
-		file.setNexusAttribute(dataset, Nexus.SDS);
+		final Dataset dataset = file.replaceDataset(name, datatype, shape, id.getBuffer(), PersistenceConstants.MASK_ENTRY);
+		file.setNexusAttribute(dataset.getFullName(), Nexus.SDS);
 	}
 
 	@Override
@@ -154,7 +155,8 @@ class PersistentFileImpl implements IPersistentFile {
 	public void setHistory(IDataset... sets) throws Exception {
 		if(file == null)
 			file = HierarchicalDataFactory.getWriter(filePath);
-		Group parent = createParentEntry(PersistenceConstants.HISTORY_ENTRY);
+		
+		createParentEntry(PersistenceConstants.HISTORY_ENTRY);
 		int index = 0;
 		for (IDataset data : sets) {
 			index++;
@@ -162,8 +164,8 @@ class PersistentFileImpl implements IPersistentFile {
 				String dataName = !data.getName().equals("") ? data.getName() : "history"+index;
 				final Datatype      datatype = H5Utils.getDatatype(data);
 				long[] shape = H5Utils.getLong(data.getShape());
-				final Dataset dataset = file.replaceDataset(dataName,  datatype, shape, ((AbstractDataset)data).getBuffer(), parent);
-				file.setNexusAttribute(dataset, Nexus.SDS);
+				final Dataset dataset = file.replaceDataset(dataName,  datatype, shape, ((AbstractDataset)data).getBuffer(), PersistenceConstants.HISTORY_ENTRY);
+				file.setNexusAttribute(dataset.getFullName(), Nexus.SDS);
 			}
 		}
 	}
@@ -177,13 +179,13 @@ class PersistentFileImpl implements IPersistentFile {
 	public void setROIs(Map<String, IROI> rois) throws Exception {
 		if (file == null) file = HierarchicalDataFactory.getWriter(filePath);
 
-		Group parent = createParentEntry(PersistenceConstants.ROI_ENTRY);
+		createParentEntry(PersistenceConstants.ROI_ENTRY);
 		if (rois != null) {
 			Iterator<String> it = rois.keySet().iterator();
 			while(it.hasNext()){
 				String name = it.next();
 				IROI roi = rois.get(name);
-				writeRoi(file, parent, name, roi);
+				writeRoi(file, PersistenceConstants.ROI_ENTRY, name, roi);
 			}
 		}
 	}
@@ -192,15 +194,15 @@ class PersistentFileImpl implements IPersistentFile {
 	public void addROI(String name, IROI roiBase) throws Exception {
 		if (file == null)
 			file = HierarchicalDataFactory.getWriter(filePath);
-		Group parent = createParentEntry(PersistenceConstants.ROI_ENTRY);
-		writeRoi(file, parent, name, roiBase);
+		createParentEntry(PersistenceConstants.ROI_ENTRY);
+		writeRoi(file, PersistenceConstants.ROI_ENTRY, name, roiBase);
 	}
 
 	@Override
 	public void setRegionAttribute(String regionName, String attributeName, String attributeValue) throws Exception {
 		if ("JSON".equals(attributeName)) throw new Exception("Cannot override the JSON attribute!");
 		final HObject node = file.getData(PersistenceConstants.ROI_ENTRY+"/"+regionName);
-		file.setAttribute(node, attributeName, attributeValue);
+		file.setAttribute(node.getFullName(), attributeName, attributeValue);
 	}
 
 	@Override
@@ -216,18 +218,18 @@ class PersistentFileImpl implements IPersistentFile {
 	private void setVersion(String version) throws Exception {
 		if (file == null) file = HierarchicalDataFactory.getWriter(filePath);
 		//check if parent group exists
-		Group parent = (Group)file.getData(PersistenceConstants.ENTRY);
-		if(parent == null) parent = createParentEntry(PersistenceConstants.ENTRY);
-		file.setAttribute(parent, "Version", version);
+		Object parent = file.getData(PersistenceConstants.ENTRY);
+		if (parent == null) createParentEntry(PersistenceConstants.ENTRY);
+		file.setAttribute(PersistenceConstants.ENTRY, "Version", version);
 	}
 
 	@Override
 	public void setSite(String site) throws Exception {
 		if (file == null) file = HierarchicalDataFactory.getWriter(filePath);
 		//check if parent group exists
-		Group parent = (Group)file.getData(PersistenceConstants.ENTRY);
-		if(parent == null) parent = createParentEntry(PersistenceConstants.ENTRY);
-		file.setAttribute(parent, "Site", site);
+		Object parent = file.getData(PersistenceConstants.ENTRY);
+		if(parent == null) createParentEntry(PersistenceConstants.ENTRY);
+		file.setAttribute(PersistenceConstants.ENTRY, "Site", site);
 	}
 
 	@Override
@@ -386,14 +388,14 @@ class PersistentFileImpl implements IPersistentFile {
 	public void setDiffractionMetadata(IDiffractionMetadata metadata) throws Exception {
 		if (file == null) file = HierarchicalDataFactory.getWriter(filePath);
 
-		Group parent = HierarchicalDataFileUtils.createParentEntry(file, PersistenceConstants.DIFFRACTIONMETADATA_ENTRY,Nexus.INST);
+		String parent = HierarchicalDataFileUtils.createParentEntry(file, PersistenceConstants.DIFFRACTIONMETADATA_ENTRY,Nexus.INST);
 		parent = file.group("detector", parent);
 		file.setNexusAttribute(parent, Nexus.DETECT);
 
 		DetectorProperties detprop = metadata.getDetector2DProperties();
 		PersistDiffractionMetadataUtils.writeDetectorProperties(file, parent, detprop);
 		DiffractionCrystalEnvironment crysenv = metadata.getDiffractionCrystalEnvironment();
-		PersistDiffractionMetadataUtils.writeWavelengthMono(file, parent.getParent(), crysenv.getWavelength());
+		PersistDiffractionMetadataUtils.writeWavelengthMono(file, file.getParent(parent), crysenv.getWavelength());
 
 	}
 
@@ -468,7 +470,7 @@ class PersistentFileImpl implements IPersistentFile {
 		if(file == null)
 			file = HierarchicalDataFactory.getWriter(filePath);
 
-		Group parent = createParentEntry(PersistenceConstants.DATA_ENTRY);
+		createParentEntry(PersistenceConstants.DATA_ENTRY);
 
 		if(data != null){
 
@@ -476,16 +478,16 @@ class PersistentFileImpl implements IPersistentFile {
 			final Datatype      datatype = H5Utils.getDatatype(data);
 			long[] shape = H5Utils.getLong(data.getShape());
 
-			final Dataset dataset = file.replaceDataset(dataName,  datatype, shape, ((AbstractDataset)data).getBuffer(), parent);
-			file.setNexusAttribute(dataset, Nexus.SDS);
+			final Dataset dataset = file.replaceDataset(dataName,  datatype, shape, ((AbstractDataset)data).getBuffer(), PersistenceConstants.DATA_ENTRY);
+			file.setNexusAttribute(dataset.getFullName(), Nexus.SDS);
 		}
 		if(xAxisData != null){
 			String xAxisName = !xAxisData.getName().equals("") ? xAxisData.getName() : "X Axis";
 			final Datatype      xDatatype = H5Utils.getDatatype(xAxisData);
 			long[] shape = H5Utils.getLong(xAxisData.getShape());
 
-			final Dataset xDataset = file.replaceDataset(xAxisName,  xDatatype, shape, ((AbstractDataset)xAxisData).getBuffer(), parent);
-			file.setNexusAttribute(xDataset, Nexus.SDS);
+			final Dataset xDataset = file.replaceDataset(xAxisName,  xDatatype, shape, ((AbstractDataset)xAxisData).getBuffer(), PersistenceConstants.DATA_ENTRY);
+			file.setNexusAttribute(xDataset.getFullName(), Nexus.SDS);
 		}
 
 		if(yAxisData != null){
@@ -493,8 +495,8 @@ class PersistentFileImpl implements IPersistentFile {
 			final Datatype      yDatatype = H5Utils.getDatatype(yAxisData);
 			long[] shape = H5Utils.getLong(yAxisData.getShape());
 
-			final Dataset yDataset = file.replaceDataset(yAxisName,  yDatatype, shape,((AbstractDataset)yAxisData).getBuffer(), parent);
-			file.setNexusAttribute(yDataset, Nexus.SDS);
+			final Dataset yDataset = file.replaceDataset(yAxisName,  yDatatype, shape,((AbstractDataset)yAxisData).getBuffer(), PersistenceConstants.DATA_ENTRY);
+			file.setNexusAttribute(yDataset.getFullName(), Nexus.SDS);
 		}
 	}
 
@@ -506,7 +508,7 @@ class PersistentFileImpl implements IPersistentFile {
 	 * @throws Exception
 	 */
 	private HObject writeRoi(IHierarchicalDataFile file, 
-			Group   parent,
+			String  parent,
 			String  name,
 			IROI    roi) throws Exception {
 		long[] dims = {1};
@@ -515,12 +517,12 @@ class PersistentFileImpl implements IPersistentFile {
 		// we create the dataset
 		Dataset dat = file.replaceDataset(name, new H5Datatype(Datatype.CLASS_INTEGER, 4, Datatype.NATIVE, Datatype.NATIVE), dims, new int[]{0}, parent);
 		// we set the JSON attribute
-		file.setAttribute(dat, "JSON", json);
+		file.setAttribute(dat.getFullName(), "JSON", json);
 		return dat;
 	}
 
-	private Group createParentEntry(String fullEntry) throws Exception {
-		return HierarchicalDataFileUtils.createParentEntry(file, fullEntry, Nexus.DATA);
+	private void createParentEntry(String fullEntry) throws Exception {
+		HierarchicalDataFileUtils.createParentEntry(file, fullEntry, Nexus.DATA);
 	}
 
 	/**
@@ -577,14 +579,14 @@ class PersistentFileImpl implements IPersistentFile {
 	@Override
 	public void setFunctions(Map<String, IFunction> functions) throws Exception {
 		if (file == null) file = HierarchicalDataFactory.getWriter(filePath);
-		Group parent = createParentEntry(PersistenceConstants.FUNCTION_ENTRY);
+		createParentEntry(PersistenceConstants.FUNCTION_ENTRY);
 		if (functions != null) {
 			IJSonMarshaller converter = new JacksonMarshaller();
 			Iterator<String> it = functions.keySet().iterator();
 			while(it.hasNext()){
 				String name = it.next();
 				IFunction function = functions.get(name);
-				writeFunction(file, parent, name, function, converter);
+				writeFunction(file, PersistenceConstants.FUNCTION_ENTRY, name, function, converter);
 			}
 		}
 	}
@@ -592,9 +594,9 @@ class PersistentFileImpl implements IPersistentFile {
 	@Override
 	public void addFunction(String name, IFunction function) throws Exception {
 		if (file == null) file = HierarchicalDataFactory.getWriter(filePath);
-		Group parent = createParentEntry(PersistenceConstants.FUNCTION_ENTRY);
+		createParentEntry(PersistenceConstants.FUNCTION_ENTRY);
 		IJSonMarshaller converter = new JacksonMarshaller();
-		writeFunction(file, parent, name, function, converter);
+		writeFunction(file, PersistenceConstants.FUNCTION_ENTRY, name, function, converter);
 	}
 
 	@Override
@@ -645,14 +647,14 @@ class PersistentFileImpl implements IPersistentFile {
 		return names;
 	}
 
-	private HObject writeFunction(IHierarchicalDataFile file, Group parent,
+	private HObject writeFunction(IHierarchicalDataFile file, String parent,
 			String name, IFunction function, IJSonMarshaller converter) throws Exception {
 		long[] dims = {1};
 		String json = converter.marshal(function);
 		// we create the dataset
 		Dataset dat = file.replaceDataset(name, new H5Datatype(Datatype.CLASS_INTEGER, 4, Datatype.NATIVE, Datatype.NATIVE), dims, new int[]{0}, parent);
 		// we set the JSON attribute
-		file.setAttribute(dat, "JSON", json);
+		file.setAttribute(dat.getFullName(), "JSON", json);
 		return dat;
 	}
 	

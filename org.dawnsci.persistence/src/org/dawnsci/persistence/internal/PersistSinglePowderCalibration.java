@@ -4,7 +4,6 @@ import javax.vecmath.Vector3d;
 
 import ncsa.hdf.object.Dataset;
 import ncsa.hdf.object.Datatype;
-import ncsa.hdf.object.Group;
 import ncsa.hdf.object.h5.H5Datatype;
 
 import org.dawb.hdf5.HierarchicalDataFileUtils;
@@ -32,7 +31,7 @@ public class PersistSinglePowderCalibration {
 	public static void writeCalibrationToFile(IHierarchicalDataFile file, IDataset calibrationImage,
 			IDiffractionMetadata metadata, IPowderCalibrationInfo info) throws Exception {
 		
-		Group parent = HierarchicalDataFileUtils.createParentEntry(file, DEFAULTINSTRUMENTNAME,Nexus.INST);
+		String parent = HierarchicalDataFileUtils.createParentEntry(file, DEFAULTINSTRUMENTNAME,Nexus.INST);
 		
 		parent = file.group("detector", parent);
 		file.setNexusAttribute(parent, Nexus.DETECT);
@@ -41,10 +40,10 @@ public class PersistSinglePowderCalibration {
 		final Datatype      datatype = H5Utils.getDatatype(calibrationImage);
 		long[] shape = H5Utils.getLong(calibrationImage.getShape());
 		final Dataset dataset = file.createDataset(DATANAME,  datatype, shape, ((AbstractDataset)calibrationImage).getBuffer(), parent);
-		file.setNexusAttribute(dataset, Nexus.SDS);
+		file.setNexusAttribute(dataset.getFullName(), Nexus.SDS);
 		
 		//make NXData in root as link to this data, make sure data has a link attribute back to the detector
-		Group group = file.group(DEFAULTDATANAME);
+		String group = file.group(DEFAULTDATANAME);
 		file.setNexusAttribute(group, Nexus.DATA);
 		file.createLink(group, dataset.getName(), dataset.getFullName());
 		
@@ -61,8 +60,8 @@ public class PersistSinglePowderCalibration {
 		
 	}
 	
-	private static void createDependsOnTransformations(IHierarchicalDataFile file, DetectorProperties det, Group parent) throws Exception {
-		Group transform = file.group("transformations",parent);
+	private static void createDependsOnTransformations(IHierarchicalDataFile file, DetectorProperties det, String parent) throws Exception {
+		String transform = file.group("transformations",parent);
 		file.setNexusAttribute(transform, "NXtransformations");
 		
 		DoubleDataset offset = new DoubleDataset(new double[3], new int[]{3});
@@ -103,21 +102,21 @@ public class PersistSinglePowderCalibration {
 		
 	}
 	
-	private static void createCalibrationMethod(IHierarchicalDataFile file, IPowderCalibrationInfo info, Group parent) throws Exception {
-		Group note = file.group("calibration_method",parent);
+	private static void createCalibrationMethod(IHierarchicalDataFile file, IPowderCalibrationInfo info, String parent) throws Exception {
+		String note = file.group("calibration_method",parent);
 		file.setNexusAttribute(note, "NXnote");
 		file.createDataset("author", DAWNCALIBRATIONID, note);
 		file.createDataset("description", info.getMethodDescription(), note);
 		final Datatype      datatyped = H5Utils.getDatatype(info.getUsedDSpaceIndexValues());
 		long[] shaped = H5Utils.getLong(info.getUsedDSpaceIndexValues().getShape());
 		final Dataset datasetd = file.createDataset("d_space_index",  datatyped, shaped, ((AbstractDataset)info.getUsedDSpaceIndexValues()).getBuffer(), note);
-		file.setNexusAttribute(datasetd, Nexus.SDS);
+		file.setNexusAttribute(datasetd.getFullName(), Nexus.SDS);
 		
 		createDoubleDataset("residual", info.getResidual(), file, note);
 		
 		if (info.getCitationInformation() == null || info.getCitationInformation().length == 0) return;
 		
-		Group cite = file.group("reference", note);
+		String cite = file.group("reference", note);
 		file.setNexusAttribute(cite, "NXcite");
 		file.createDataset("description", info.getCitationInformation()[0], cite);
 		file.createDataset("doi", info.getCitationInformation()[1], cite);
@@ -126,14 +125,14 @@ public class PersistSinglePowderCalibration {
 		
 	}
 	
-	private static Dataset createNXtransformation(String name, String type, AbstractDataset vector, AbstractDataset offset, String units, String depends_on, double value, IHierarchicalDataFile file, Group group) throws Exception {
+	private static Dataset createNXtransformation(String name, String type, AbstractDataset vector, AbstractDataset offset, String units, String depends_on, double value, IHierarchicalDataFile file, String group) throws Exception {
 		
 		Dataset ds = createDoubleDataset(name, value,file, group);
 		setDatasetAttribute(vector, ds, file);
 		setDatasetAttribute(offset, ds, file);
-		file.setAttribute(ds, "units", units);
-		file.setAttribute(ds, "transformation_type", type);
-		file.setAttribute(ds, "depends_on", depends_on);
+		file.setAttribute(ds.getFullName(), "units", units);
+		file.setAttribute(ds.getFullName(), "transformation_type", type);
+		file.setAttribute(ds.getFullName(), "depends_on", depends_on);
 		return ds;
 	}
 	
@@ -141,7 +140,7 @@ public class PersistSinglePowderCalibration {
 		file.setDatasetAttribute(ds, dataset.getName(), H5Utils.getDatatype(dataset), H5Utils.getLong(dataset.getShape()), dataset.getBuffer());	
 	}
 	
-	private static Dataset createDoubleDataset(String name, double val, IHierarchicalDataFile file, Group group) throws Exception {
+	private static Dataset createDoubleDataset(String name, double val, IHierarchicalDataFile file, String group) throws Exception {
 		
 		return file.createDataset(name, new H5Datatype(Datatype.CLASS_FLOAT, 64/8, Datatype.NATIVE, Datatype.NATIVE),
 				new long[]{1}, new double[]{val}, group);

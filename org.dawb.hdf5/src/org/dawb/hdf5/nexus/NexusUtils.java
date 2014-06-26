@@ -378,20 +378,20 @@ public class NexusUtils {
 	 * If the group has more than one attribute only the first is returned
 	 * 
 	 * @param group
+	 * @throws Exception 
 	 */
-	public static String getNexusGroupAttributeValue(HObject group, String name) {
-		try {
-			for (Object ob: group.getMetadata()) {
-				if (ob instanceof Attribute) {
-					Attribute ab = (Attribute)ob;
-					if (ab.getName().toLowerCase().equals(name.toLowerCase())) {
-						Object test = ab.getValue();
-						if (test instanceof String[])
-							return ((String[])test)[0];
-					}
+	public static String getNexusGroupAttributeValue(IHierarchicalDataFile file, String group, String name) throws Exception {
+		
+		final HObject object = file.getData(group);
+		for (Object ob: object.getMetadata()) {
+			if (ob instanceof Attribute) {
+				Attribute ab = (Attribute)ob;
+				if (ab.getName().toLowerCase().equals(name.toLowerCase())) {
+					Object test = ab.getValue();
+					if (test instanceof String[])
+						return ((String[])test)[0];
 				}
 			}
-		} catch (Exception e) {
 		}
 		return null;
 	}
@@ -403,43 +403,46 @@ public class NexusUtils {
 	 * @param rootGroup - the group to be searched
 	 * @param findFirst - whether the search returns when the first object is found (quicker for single objects)
 	 */
-	public static List<HObject> nexusBreadthFirstSearch(IFindInNexus finder, Group rootGroup, boolean findFirst) {
+	public static List<String> nexusBreadthFirstSearch(IHierarchicalDataFile file, IFindInNexus finder, String rootGroup, boolean findFirst) throws Exception {
 		
-		List<HObject> out = new ArrayList<HObject>();
+		List<String> out = new ArrayList<String>();
 		
-		Queue<Group> queue = new LinkedList<Group>();
-		for (HObject nxObject: rootGroup.getMemberList()) {
+		Queue<String> queue = new LinkedList<String>();
+		for (String nxObject : file.memberList(rootGroup)) {
 			if (finder.inNexus(nxObject)) {
 				
 				if (findFirst) return Arrays.asList(nxObject);
 				else out.add(nxObject);
 			}
 			
-			if(nxObject instanceof Group) {
-				queue.add((Group)nxObject);
+			if(file.isGroup(nxObject)) {
+				queue.add(nxObject);
 			}
 		}
 		
 		Integer i = 0;
 		
 		while (queue.size() != 0) {
-			Group group = queue.poll();
-			for (HObject nxObject: group.getMemberList()) {
+			String group = queue.poll();
+			for (String nxObject: file.memberList(group)) {
 				
 				if (finder.inNexus(nxObject)) {
 					if (findFirst) return Arrays.asList(nxObject);
 					else out.add(nxObject);
 				}
 				
-				if (nxObject instanceof Group) {
-					queue.add((Group)nxObject);
+				if (file.isGroup(nxObject)) {
+					queue.add(nxObject);
 				}
 				
 				i++;
 			}
 		}
 		
-		if (i > 50) logger.debug("This many times through loop (For node "+ rootGroup.getName() +"): " + i.toString());
+		if (i > 50) {
+			final String name = rootGroup.substring(rootGroup.lastIndexOf('/')+1);
+			logger.debug("This many times through loop (For node "+ name +"): " + i.toString());
+		}
 		
 		return out;
 	}

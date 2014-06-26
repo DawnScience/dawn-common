@@ -8,7 +8,6 @@
  */
 package org.dawb.hdf5.nexus;
 
-import ncsa.hdf.object.HObject;
 
 /**
  * This interface describes a single method that returns a boolean when given a
@@ -19,6 +18,6 @@ import ncsa.hdf.object.HObject;
  */
 public interface IFindInNexus
 {
-    boolean inNexus(HObject nexusObject);
+    boolean inNexus(String nexusObjectPath);
     
 }

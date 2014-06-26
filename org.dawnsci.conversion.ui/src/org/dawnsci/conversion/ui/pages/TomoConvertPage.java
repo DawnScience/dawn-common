@@ -230,7 +230,11 @@ public final class TomoConvertPage extends ResourceChoosePage implements IConver
 		context.setOutputPath(getAbsoluteFilePath());
 		context.addSliceDimension(0, "all");
 		final CustomTomoConverter.TomoInfoBean bean = new CustomTomoConverter.TomoInfoBean();
-		bean.setTomographyDefinition(getSourcePath(context));
+		try {
+			bean.setTomographyDefinition(getSourcePath(context));
+		} catch (Exception e) {
+			logger.error("Cannot set tomo definition, please contact your support representative.", e);
+		}
 		bean.setExtension(imageFormat);
 		bean.setBits(bitDepth);
 		bean.setDarkFieldPath(darkPrefixBox.getText());

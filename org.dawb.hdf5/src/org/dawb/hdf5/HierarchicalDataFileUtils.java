@@ -36,13 +36,13 @@ public class HierarchicalDataFileUtils {
 	 * @return
 	 * @throws Exception
 	 */
-	public static Group createParentEntry(IHierarchicalDataFile file,
-			String fullEntry, String nexusEntry) throws Exception {
+	public static String createParentEntry(IHierarchicalDataFile file, String fullEntry, String nexusEntry) throws Exception {
+		
 		String[] entries = fullEntry.split("/");
 		entries = cleanArray(entries);
-		Group parent = null;
+		String parent = null;
 		for (int i = 0; i < entries.length; i++) {
-			ncsa.hdf.object.Group entry = null;
+			String entry = null;
 			if (i == 0) {
 				entry = file.group(entries[i]);
 				file.setNexusAttribute(entry, Nexus.ENTRY);

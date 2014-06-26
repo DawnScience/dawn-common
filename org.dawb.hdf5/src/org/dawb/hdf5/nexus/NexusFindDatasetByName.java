@@ -9,23 +9,29 @@
 package org.dawb.hdf5.nexus;
 
 
-import ncsa.hdf.object.HObject;
-import ncsa.hdf.object.h5.H5ScalarDS;
+import org.dawb.hdf5.IHierarchicalDataFile;
 
 public class NexusFindDatasetByName implements IFindInNexus {
 
 	public String text;
+	private IHierarchicalDataFile file;
 	
-	public NexusFindDatasetByName(String attributeText) {
+	public NexusFindDatasetByName(IHierarchicalDataFile file, String attributeText) {
+		this.file = file;
 		text = attributeText;
 	}
 	
 	@Override
-	public boolean inNexus(HObject nexusObject) {
-		if(nexusObject instanceof H5ScalarDS) {
-			if (((H5ScalarDS)nexusObject).getName().toLowerCase().equals(text.toLowerCase())) {
-				return true;
+	public boolean inNexus(String nexusObjectPath) {
+		try {
+			if (file.isDataset(nexusObjectPath)) {
+				final String name = nexusObjectPath.substring(nexusObjectPath.lastIndexOf('/')+1);
+				if (name.toLowerCase().equals(text.toLowerCase())) {
+					return true;
+				}
 			}
+		} catch (Exception e) {
+			return false;
 		}
 		
 		return false;

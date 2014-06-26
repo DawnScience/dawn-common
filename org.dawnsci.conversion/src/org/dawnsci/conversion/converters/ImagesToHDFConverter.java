@@ -35,7 +35,7 @@ public class ImagesToHDFConverter extends AbstractConversion{
 	
 
 	private IHierarchicalDataFile hFile;
-	private Group                 group;
+	private String                group;
 	private String                name;
 
 	public ImagesToHDFConverter(IConversionContext context) throws Exception {
@@ -49,7 +49,7 @@ public class ImagesToHDFConverter extends AbstractConversion{
 		final String datasetNameStr = context.getDatasetNames().get(0);
 		String[]  paths = datasetNameStr.split("/");
 		if ("".equals(paths[0])) paths = Arrays.copyOfRange(paths, 1, paths.length);
- 		final Group entry = hFile.group(paths[0]);
+ 		final String entry = hFile.group(paths[0]);
  		hFile.setNexusAttribute(entry, Nexus.ENTRY);
 
 		group = entry;
@@ -108,8 +108,8 @@ public class ImagesToHDFConverter extends AbstractConversion{
 		
 		Dataset d = hFile.appendDataset(name, dt, getLong(slice.getShape()), ((AbstractDataset)slice).getBuffer(), group);
 		if (first) {
-			hFile.setNexusAttribute(d, Nexus.SDS);
-			hFile.setAttribute(d, "original_name", datasetPath);
+			hFile.setNexusAttribute(d.getFullName(), Nexus.SDS);
+			hFile.setAttribute(d.getFullName(), "original_name", datasetPath);
 			first = false;
 		}
 		
