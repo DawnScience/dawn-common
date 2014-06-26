@@ -268,7 +268,11 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 
 	
 	public String getParent(final String path) throws Exception {
-    	final String parentPath = path.substring(0, path.lastIndexOf("/"));
+		
+		final int index = path.lastIndexOf("/");
+		if (index<0) return null;
+		
+    	final String parentPath = path.substring(0, index);
         Group group = (Group)getData(parentPath);
 		return group!=null ? parentPath : null;
 	}
@@ -576,8 +580,17 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 	 * @param name
 	 * @throws Exception 
 	 */
-	public String group(final String name) throws Exception {
-		Group group = _group(name, _getRoot());
+	public String group(final String path) throws Exception {
+		
+		HObject object = getData(path);
+		if (object !=null && object instanceof Group) return object.getFullName();
+		
+		final String parent = getParent(path);
+		final String name   = path.substring(path.lastIndexOf('/')+1);
+		
+		Group par   = parent!=null ? (Group)getData(parent) : _getRoot();
+		Group group = _group(name, par);
+		
 		return group!=null ? group.getFullName() : null;
 	}
 
@@ -587,8 +600,8 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 	 * @throws Exception 
 	 */
 	public String group(final String name, final String groupPath) throws Exception {
-		Group _group = _group(groupPath, _getRoot());
-		Group group  = _group(name, _group);
+		Group parent = (Group)getData(groupPath);
+		Group group  = _group(name, parent);
 		return group!=null ? group.getFullName() : null;
 	}
 	

@@ -174,14 +174,14 @@ public interface IHierarchicalDataFile extends AutoCloseable {
 	public Map<String, int[]> getDatasetShapes(int dataType)  throws Exception;
 
 	/**
-	 * A group at the top level, creating one if it does not exist.
+	 * Get a group, creating one if it does not exist.
 	 * @param string
-	 * @return
+	 * @return full path to group.
 	 */
-	public String group(String name) throws Exception;
+	public String group(String path) throws Exception;
 
 	/**
-	 * A group in this parent, creating one if it does not exist.
+	 * Get a group in this parent, creating one if it does not exist.
 	 * @param string
 	 * @return
 	 */

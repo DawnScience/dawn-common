@@ -84,7 +84,7 @@ public class Hdf5Test {
 
 		int id = -1;
 		try {
-			final String path = Hdf5TestUtils.getBundleFile("src/org/dawb/hdf5/FeKedge_1_15.nxs").getAbsolutePath();
+			final String path = Hdf5TestUtils.getBundleFile("org/dawb/hdf5/FeKedge_1_15.nxs").getAbsolutePath();
 			id = H5.H5Fopen(path,
 				            HDF5Constants.H5F_ACC_RDWR,
 					        HDF5Constants.H5P_DEFAULT);

@@ -28,8 +28,12 @@ public class Hdf5TestUtils {
 	 * @throws IOException
 	 */
 	public static File getBundleFile(final String relPath) throws URISyntaxException, IOException {
+		
+		File relative = new File("src/"+relPath);
+		if (relative.exists()) return relative;
+		
 		if (Activator.getContext()==null) { // Tests not running in eclipse
-			return new File("org.dawb.hdf5.test/src/"+relPath);
+			return  new File("org.dawb.hdf5.test/src/"+relPath);
 		}
 		URL[] findEntries = FileLocator.findEntries(Activator.getContext().getBundle(), new Path("src"));
 		URL found = FileLocator.find(Activator.getContext().getBundle(), new Path(relPath), null);
