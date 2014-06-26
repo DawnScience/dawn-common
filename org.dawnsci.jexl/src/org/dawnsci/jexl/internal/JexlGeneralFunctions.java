@@ -1,13 +1,14 @@
 package org.dawnsci.jexl.internal;
 
-import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.Dataset;
+import uk.ac.diamond.scisoft.analysis.dataset.DatasetFactory;
 import uk.ac.diamond.scisoft.analysis.dataset.DatasetUtils;
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.Slice;
 import uk.ac.diamond.scisoft.analysis.dataset.Stats;
 
 /**
- * Class to wrap the methods on the AbstractDataset object (and a few select others)
+ * Class to wrap the methods on the Dataset object (and a few select others)
  * allowing them to be called in a manner consistent with the other Jexl functions
  * i.e. namespace:methodName()
  * <p>
@@ -21,69 +22,71 @@ public class JexlGeneralFunctions {
 	 * @param axes
 	 * @return
 	 */
-	public static AbstractDataset transpose(final IDataset a, int... axes) {
+	public static Dataset transpose(final IDataset a, int... axes) {
 		return DatasetUtils.transpose(a, axes);
 	}
-    /**
+
+	/**
      * Makes a tile of the passed in data with the passed in repetition shape.
      * @param copy
      * @return
      */
-	public static AbstractDataset tile(final AbstractDataset copy, int... reps) {
+	public static Dataset tile(final IDataset copy, int... reps) {
 		return DatasetUtils.tile(copy, reps);
 	}
-    /**
+
+	/**
      * Makes an arange(...) using the size of the passed in data.
      * @param copy
      * @return
      */
-	public static AbstractDataset arange(final AbstractDataset copy) {
-		return AbstractDataset.arange(copy.getSize(), AbstractDataset.INT32);
+	public static Dataset arange(final IDataset copy) {
+		return DatasetFactory.createRange(copy.getSize(), Dataset.INT32);
 	}
 
-	public static AbstractDataset mean(final AbstractDataset data,final int axis) {
+	public static Dataset mean(final Dataset data,final int axis) {
 		return data.mean(axis);
 	}
 	
-	public static AbstractDataset sum(final AbstractDataset data,final int axis) {
+	public static Dataset sum(final Dataset data,final int axis) {
 		return data.sum(axis);
 	}
 	
-	public static AbstractDataset slice(final AbstractDataset data,final int[] start,
+	public static IDataset slice(final IDataset data,final int[] start,
 																   final int[] stop,
 																   final int[] step) {
 		return data.getSlice(start, stop, step);
 	}
 	
-	public static AbstractDataset stdDev(final AbstractDataset data, final int axis) {
+	public static Dataset stdDev(final Dataset data, final int axis) {
 		return data.stdDeviation(axis);
 	}
 	
-	public static AbstractDataset max (final AbstractDataset data, final int axis) {
+	public static Dataset max (final Dataset data, final int axis) {
 		return data.max(axis);
 	}
 	
-	public static AbstractDataset min (final AbstractDataset data, final int axis) {
+	public static Dataset min(final Dataset data, final int axis) {
 		return data.min(axis);
 	}
 	
-	public static AbstractDataset peakToPeak(final AbstractDataset data, final int axis) {
+	public static Dataset peakToPeak(final Dataset data, final int axis) {
 		return data.peakToPeak(axis);
 	}
 	
-	public static AbstractDataset product(final AbstractDataset data, final int axis) {
+	public static Dataset product(final Dataset data, final int axis) {
 		return data.product(axis);
 	}
 	
-	public static AbstractDataset rootMeanSquare(AbstractDataset data, int axis) {
+	public static Dataset rootMeanSquare(Dataset data, int axis) {
 		return data.rootMeanSquare(axis);
 	}
 	
-	public static AbstractDataset median(AbstractDataset data, int axis) {
+	public static Dataset median(Dataset data, int axis) {
 		return Stats.median(data,axis);
 	}
 	
-	public static AbstractDataset slice(AbstractDataset data, String sliceString) {
+	public static Dataset slice(Dataset data, String sliceString) {
 		Slice[] slices = Slice.convertFromString(sliceString);
 
 		if (slices.length != data.getRank()) throw new IllegalArgumentException("Invalid string");
@@ -91,12 +94,12 @@ public class JexlGeneralFunctions {
 		return data.getSlice(slices).squeeze();
 	}
 	
-	public static AbstractDataset squeeze(AbstractDataset data) {
+	public static IDataset squeeze(IDataset data) {
 		return data.squeeze();
 	}
-	
-	public static AbstractDataset reshape(AbstractDataset data, int[] shape) {
-		AbstractDataset out = data.clone();
+
+	public static Dataset reshape(Dataset data, int[] shape) {
+		Dataset out = data.clone();
 		return out.reshape(shape);
 	}
 }
