@@ -382,7 +382,7 @@ public class NexusUtils {
 	 */
 	public static String getNexusGroupAttributeValue(IHierarchicalDataFile file, String group, String name) throws Exception {
 		
-		final HObject object = file.getData(group);
+		final HObject object = (HObject)file.getData(group);
 		for (Object ob: object.getMetadata()) {
 			if (ob instanceof Attribute) {
 				Attribute ab = (Attribute)ob;

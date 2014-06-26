@@ -201,7 +201,7 @@ class PersistentFileImpl implements IPersistentFile {
 	@Override
 	public void setRegionAttribute(String regionName, String attributeName, String attributeValue) throws Exception {
 		if ("JSON".equals(attributeName)) throw new Exception("Cannot override the JSON attribute!");
-		final HObject node = file.getData(PersistenceConstants.ROI_ENTRY+"/"+regionName);
+		final HObject node = (HObject)file.getData(PersistenceConstants.ROI_ENTRY+"/"+regionName);
 		file.setAttribute(node.getFullName(), attributeName, attributeValue);
 	}
 
@@ -446,7 +446,7 @@ class PersistentFileImpl implements IPersistentFile {
 	private boolean isEntry(String entryPath, IMonitor mon)  {
 		HObject hOb = null;
 		try {
-			hOb = file.getData(entryPath);
+			hOb = (HObject)file.getData(entryPath);
 			return hOb != null;
 		} catch (Exception e) {
 			logger.debug("Error while reading file: "+ e);

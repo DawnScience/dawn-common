@@ -147,7 +147,7 @@ public class CustomTomoConverter extends AbstractConversion {
 							final String objectName = nexusObjectPath.substring(nexusObjectPath.lastIndexOf('/')+1);
 							if (objectName.toLowerCase().equals(DEF)) {
 								
-								HObject object = file.getData(nexusObjectPath);
+								HObject object = (HObject)file.getData(nexusObjectPath);
 								if (((Dataset)object).getDatatype().getDatatypeClass() == Datatype.CLASS_STRING) {
 									String name = null;
 									try {

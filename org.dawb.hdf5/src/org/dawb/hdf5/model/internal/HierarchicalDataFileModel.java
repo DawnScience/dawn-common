@@ -140,7 +140,7 @@ public class HierarchicalDataFileModel implements IHierarchicalDataFileModel {
 
 			// scalar has not been loaded
 			try (IHierarchicalDataFile reader = getReader.getReader()) {
-				HObject data = reader.getData(path);
+				HObject data = (HObject)reader.getData(path);
 				if (data == null) {
 					// path does not exist in file
 					cache.put(path, null);

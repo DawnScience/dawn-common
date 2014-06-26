@@ -72,10 +72,11 @@ public interface IHierarchicalDataFile extends AutoCloseable {
 	/**
 	 * This call can also be used to get links out of the data by the path in the link file.
 	 * @param fullPath
-	 * @return
+	 * @return an HObject e.g. Dataset or Group located at that path
 	 * @throws Exception
+	 * @Deprecated This method allows the API user to get ncsa objects directly.
 	 */
-	public HObject getData(String fullPath) throws Exception;
+	public Object getData(String fullPath) throws Exception;
 	
 	/**
 	 * Return true if this path references a Dataset object. Other objects are Groups

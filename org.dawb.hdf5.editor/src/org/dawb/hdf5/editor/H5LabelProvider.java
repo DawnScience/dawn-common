@@ -67,7 +67,7 @@ public class H5LabelProvider extends ColumnLabelProvider implements ITableLabelP
 		}
 		
 		try {
-			object = file.getData(object.getFullName());
+			object = (HObject)file.getData(object.getFullName());
 		} catch (Exception e) {
 			logger.error("Cannot re-create link to recorde "+object.getFullName());
 		}

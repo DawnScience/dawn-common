@@ -172,11 +172,12 @@ public class HierarchicalDataUtils {
 
 			if (!file.exists()) return null;
 
+			@SuppressWarnings("resource")
 			IHierarchicalDataFile hFile = original!=null
 					                    ? original.getLinkedFile(file.getAbsolutePath())
 					                    // Causes a memory leak I think:
 					                    : HierarchicalDataFactory.getReader(file.getAbsolutePath());
-			HObject link = hFile.getData(fullPath);
+			HObject link = (HObject)hFile.getData(fullPath);
 			link.getMetadata(); // Ensure that meta data is read.
 			return link;
 		}
@@ -186,7 +187,7 @@ public class HierarchicalDataUtils {
 
 	public static long[] getDims(final IHierarchicalDataFile file, String setPath) throws Exception {
 
-		HObject obj = file.getData(setPath);
+		HObject obj = (HObject)file.getData(setPath);
 		if (!(obj instanceof Dataset)) return null;
 		Dataset set = (Dataset)obj;
         if (set.getDims()==null) {

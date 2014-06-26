@@ -203,7 +203,7 @@ public class H5ValuePage extends Page  implements ISelectionListener, IPartListe
 					IHierarchicalDataFile file = null;
 					try {
 						file = HierarchicalDataFactory.getReader(filePath);
-						final HObject ob = file.getData(path);
+						final HObject ob = (HObject)file.getData(path);
 						createH5Value(ob);
 					} finally {
 						if (file!=null) file.close();
