@@ -1,6 +1,7 @@
 package org.dawnsci.io.h5;
 
 import org.dawb.hdf5.H5Utils;
+import org.dawb.hdf5.IHierarchicalDataFile;
 
 import ncsa.hdf.object.Dataset;
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
@@ -14,6 +15,10 @@ public class H5LazyDataset extends LazyDataset {
 	 */
 	private static final long serialVersionUID = -4375441355891182709L;
 
+	public H5LazyDataset(final IHierarchicalDataFile file, String path) throws Exception {
+		this((Dataset)file.getData(path));
+	}
+	
 	/**
 	 * You must ensure the meta data is loaded for this data set before using this
 	 * constructor, 		set.getMetadata();

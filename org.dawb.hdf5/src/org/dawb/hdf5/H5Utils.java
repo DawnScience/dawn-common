@@ -53,6 +53,13 @@ public class H5Utils {
 		return AbstractDataset.FLOAT;
 	}
 	
+	public static AbstractDataset getSet(final IHierarchicalDataFile file, String fullPath) throws Exception {
+		@SuppressWarnings("deprecation") // We are allowed to use this method internally.
+		Dataset dataset = (Dataset) file.getData(fullPath);
+		return H5Utils.getSet(dataset.getData(), dataset);
+	}
+
+
 	/**
 	 * Gets a dataset from the complete dims.
 	 * @param val

@@ -75,6 +75,7 @@ public interface IHierarchicalDataFile extends AutoCloseable {
 	 * @throws Exception
 	 * @Deprecated This method allows the API user to get ncsa objects directly.
 	 */
+	@Deprecated
 	public Object getData(String fullPath) throws Exception;
 	
 	/**
