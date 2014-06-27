@@ -16,10 +16,10 @@ import java.util.Map;
 import ncsa.hdf.hdf5lib.H5;
 import ncsa.hdf.hdf5lib.HDF5Constants;
 import ncsa.hdf.object.Dataset;
-import ncsa.hdf.object.Datatype;
-import ncsa.hdf.object.h5.H5Datatype;
 
 import org.junit.Test;
+
+import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 
 
 public class Hdf5Test {
@@ -51,12 +51,12 @@ public class Hdf5Test {
 			for (int i = 0; i < 2048*2048; i++) {
 				random[i] = Math.random();
 			}
-			Dataset s = file.createDataset("data",
-					new H5Datatype(Datatype.CLASS_FLOAT, 64/8, Datatype.NATIVE, Datatype.NATIVE),
-					new long[]{2048,2048},
-					random,
-					myDataGroup);
-			file.setNexusAttribute(s.getFullName(), Nexus.SDS);
+			String s = file.createDataset("data",
+											AbstractDataset.FLOAT64,
+											new long[]{2048,2048},
+											random,
+											myDataGroup);
+			file.setNexusAttribute(s, Nexus.SDS);
 			file.close();
 
 			file = HierarchicalDataFactory.getReader(tmp.getAbsolutePath());

@@ -8,6 +8,7 @@
  */ 
 package org.dawb.hdf5;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -32,6 +33,9 @@ import ncsa.hdf.object.h5.H5ScalarDS;
 import org.dawb.hdf5.nexus.NexusUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 
 /**
  * 
@@ -58,7 +62,7 @@ import org.slf4j.LoggerFactory;
  * @author gerring
  *
  */
-class HierarchicalDataFile implements IHierarchicalDataFile {
+class HierarchicalDataFile implements IHierarchicalDataFile, IFileFormatDataFile {
 	
 	private static final Logger logger = LoggerFactory.getLogger(HierarchicalDataFile.class);
 	
@@ -557,7 +561,7 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 			}
 		}
 	}
-	
+
 	private Map<String,IHierarchicalDataFile> linkReferences;
 	
     /**
@@ -690,27 +694,17 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 	 * @param value
 	 */
 	@Override
-	public Dataset replaceDataset(final String name, final String value, final String parent) throws Exception {
-		return createDataset(name, value, parent, true);
-	}
-
-	@Override
-	public Dataset replaceDataset(final String name, final Datatype dtype, final long[] shape, final Object buffer, final String parent) throws Exception {
-		return createDataset(name, dtype, shape, buffer, parent, true);
+	public String replaceStringDataset(final String name, final String value, final String parent) throws Exception {
+		return createStringDataset(name, value, parent, true);
 	}
 
 	
 	@Override
-	public Dataset createDataset(final String name, final String value, final String parent) throws Exception {
-		return createDataset(name, value, parent, false);
+	public String createStringDataset(final String name, final String value, final String parent) throws Exception {
+		return createStringDataset(name, value, parent, false);
 	}
 
-	@Override
-	public Dataset createDataset(final String name, final Datatype dtype, final long[] shape, final Object buffer, final String parent) throws Exception {
-		return createDataset(name, dtype, shape, buffer, parent, false);
-	}
-
-	private Dataset createDataset(String name, 
+	private String createStringDataset(String name, 
 			                     final String value, 
 			                     String  parentPath,
 			                     final boolean overwrite) throws Exception {
@@ -733,30 +727,92 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 	        Datatype dtype = new H5Datatype(Datatype.CLASS_STRING, arrayValue[0].length()+1, -1, -1);
 			Dataset dataset = file.createScalarDS(name, parent, dtype, new long[]{1}, null, null, 0, arrayValue);
 
-			return dataset;
+			return dataset.getFullName();
 			
 		} finally {
 			parent.close(id);
 		}
 	}
 	
+	@Override
+	public String createStringDataset(final String name, final int size, final String parentPath) throws Exception {
+		
+		Group parent = _group(parentPath);
+		final int id = parent.open();
+		try {
+
+			final String  fullPath = parent.getFullName();
+			final HObject existing = checkExists(name, parent, Dataset.class);
+			if (existing!=null) {
+				file.delete(existing);
+				parent = (Group)getData(fullPath);
+			}
+			
+	        String[] arrayValue = {};
+	        Datatype dtype  = H5Utils.getDatatype(AbstractDataset.STRING, size);
+			Dataset dataset = file.createScalarDS(name, parent, dtype, new long[]{1}, null, null, 0, arrayValue);
+
+			return dataset.getFullName();
+			
+		} finally {
+			parent.close(id);
+		}
+	}
+
+	
+	@Override
+	public String replaceDataset(final String name, IDataset data, final String parent) throws Exception {
+		return createDataset(name, data, parent, true);
+	}
+
+	@Override
+	public String createDataset(final String name, final IDataset data, final String parent) throws Exception {
+		return createDataset(name, data, parent, false);
+	}
+
+
     @Override
-	public Dataset createDataset(String         name,  
-			                     final Datatype dtype,
-			                     final long[]   shape,
-			                     final Object   buffer,
+	public String createDataset(String     name,  
+			                     final IDataset data,
 			                     final String   parentPath,
 			                     final boolean  overwrite) throws Exception {
 		
-    	if (name.indexOf('/')>-1) {
-    		name = name.substring(name.lastIndexOf('/')+1);
-    	}
-    	
+    	int    dType   = ((AbstractDataset)data).getDtype();
+		long[] shape   = H5Utils.getLong(data.getShape());
+		Object buffer  = ((AbstractDataset)data).getBuffer();
+		
+		return createDataset(name, dType, shape, buffer, parentPath, overwrite);
+   	
+   	}
+    
+	@Override
+	public String createDataset(final String name, final int dType, final long[] dims, final Object buffer, final String parent) throws Exception {
+		return createDataset(name, dType, dims, buffer, parent, false);
+	}
+
+	@Override
+	public String replaceDataset(final String name, final int dType, final long[] dims, final Object buffer, final String parent) throws Exception {
+		return createDataset(name, dType, dims, buffer, parent, true);
+	}
+
+	private String createDataset(String         name,  
+			                    final int      dType, 
+			                    final long[]   shape, 
+			                    final Object   buffer,
+			                    final String   parentPath,
+								final boolean  overwrite) throws Exception {
+
+		Datatype dtype = H5Utils.getDatatype(dType);
+
+		if (name.indexOf('/')>-1) {
+			name = name.substring(name.lastIndexOf('/')+1);
+		}
+
 		Group parent = _group(parentPath);
 		final int id = parent.open();
 		try {
 			if (!overwrite) {
-			    name = getUnique(name, parent, Dataset.class);
+				name = getUnique(name, parent, Dataset.class);
 			} else {
 				final String  fullPath = parent.getFullName();
 				final HObject existing = checkExists(name, parent, Dataset.class);
@@ -765,24 +821,25 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 					parent = (Group)getData(fullPath);
 				}
 			}
-			
+
 			Dataset dataset = file.createScalarDS(name, parent, dtype, shape, null, null, 0, buffer);
 
-			return dataset;
-			
+			return dataset.getFullName();
+
 		} finally {
 			parent.close(id);
 		}
-		
+
 	}
 
 	@Override
-	public HObject createLink(String targetGroupPath, String linkName, String sourceFullPath) throws Exception {
+	public String createLink(String targetGroupPath, String linkName, String sourceFullPath) throws Exception {
 		final HObject object = getData(sourceFullPath);
 		if (object==null)  return null;
 		
 		final Group targetGroup = _group(targetGroupPath);
-		return file.createLink(targetGroup, linkName, object);
+		HObject link = file.createLink(targetGroup, linkName, object);
+		return link.getFullName();
 	}
 	
 	public void delete(String fullPath) throws Exception {
@@ -795,20 +852,41 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 			object.close(id);
 		}
 	}
+	
+	public FileFormat getFileFormat() {
+		return file;
+	}
 
 	/**
 	 * Method currently synchronized, you cannot have more than one thread
 	 * setting the shape size and writing the data at a time.
 	 */
 	@Override
-	public synchronized Dataset appendDataset(String         name,  
-						                     final Datatype dtype,
-						                     final long[]   shape,
-						                     final Object   buffer,
+	public synchronized String appendDataset(String         name,  
+						                     final IDataset data,
 						                     final String   parentGroupPath) throws Exception {
+		
+    	int    dType   = ((AbstractDataset)data).getDtype();
+		long[] shape   = H5Utils.getLong(data.getShape());
+		Object buffer  = ((AbstractDataset)data).getBuffer();
+		
+		return appendDataset(name, dType, shape, buffer, parentGroupPath);
+	}
+	
+	@Override
+	public synchronized String appendDataset(String         name,  
+								             final int      dType,
+								             final long[]   shape,
+								             final Object buffer,
+								             final String   parentGroupPath) throws Exception {
+
+		
+		final Datatype dtype = H5Utils.getDatatype(dType);
+	
 		
 		Group parent = _group(parentGroupPath);
 		final int id = parent.open();
+		
 		try {
 			final HObject o = checkExists(name, parent, Dataset.class);
 			if (o==null) {
@@ -821,7 +899,8 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 					maxShape[i+1] = shape[i];
 				}
 				Dataset dataset = file.createScalarDS(name, parent, dtype, appendShape, maxShape, null, 0, buffer);
-				return dataset;
+				return dataset.getFullName();
+				
 			} else {
 				H5ScalarDS dataset = (H5ScalarDS)o;
 				dataset.getMetadata();
@@ -845,7 +924,7 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 
 		        dataset.write(buffer); // Hopefully at selected location
 		        		        
-				return dataset;
+				return dataset.getFullName();
 			}
 			
 		} finally {
@@ -899,15 +978,18 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 		}
 	}
 	
-	public Dataset insertSlice(String name,  
-            final Datatype dtype,
-            final Object   buffer,
-            final String   parentPath,
-            final long[][] startStopStep,
-            final long[] totalShape) throws Exception {
+	@Override
+	public String insertSlice(String name,  
+					            final IDataset data,
+					            final String   parentPath,
+					            final long[][] startStopStep,
+					            final long[] totalShape) throws Exception {
 		
+		Datatype dtype = H5Utils.getDatatype(data);
 		final Group parent = _group(parentPath);
 		final int id = parent.open();
+		
+		Serializable buffer = ((AbstractDataset)data).getBuffer();
 		try {
 			
 			final HObject o = checkExists(name, parent, Dataset.class);
@@ -940,19 +1022,11 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 	        
 	        dataset.write(buffer);
 			
-			return dataset;
+			return dataset.getFullName();
 			
 		} finally {
 			parent.close(id);
 		}
-		
-	}
-
-	@Override
-	public void setDatasetAttribute(HObject entry,
-			String name, Datatype dtype, long[] shape, Object buffer)
-			throws Exception {
-		NexusUtils.setDatasetAttribute(file, entry, name, dtype, shape, buffer);
 		
 	}
 

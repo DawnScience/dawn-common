@@ -400,44 +400,4 @@ public abstract class AbstractConversion {
 		return posExt == -1 ? fileName : fileName.substring(0, posExt);
 	}
 
-	
-	/**
-	 * Determines the HDF5 Datatype for an abstract dataset.
-	 * @param a
-	 * @return data type
-	 */
-	public static Datatype getDatatype(IDataset a) throws Exception {
-		
-		// There is a smarter way of doing this, but am in a hurry...
-		if (a instanceof ByteDataset || a instanceof BooleanDataset) {
-         	return new H5Datatype(Datatype.CLASS_INTEGER, 8/8, Datatype.NATIVE, Datatype.SIGN_NONE);
-         	
-        } else if (a instanceof ShortDataset) {
-        	return new H5Datatype(Datatype.CLASS_INTEGER, 16/8, Datatype.NATIVE, Datatype.NATIVE); 
-        	
-        } else if (a instanceof IntegerDataset) {
-        	return new H5Datatype(Datatype.CLASS_INTEGER, 32/8, Datatype.NATIVE, Datatype.NATIVE); 
-       	
-        } else if (a instanceof LongDataset) {
-        	return new H5Datatype(Datatype.CLASS_INTEGER, 64/8, Datatype.NATIVE, Datatype.NATIVE); 
-        	
-        } else if (a instanceof FloatDataset) {
-        	return new H5Datatype(Datatype.CLASS_FLOAT, 32/8, Datatype.NATIVE, Datatype.NATIVE); 
-        	
-        } else if (a instanceof DoubleDataset) {
-        	return new H5Datatype(Datatype.CLASS_FLOAT, 64/8, Datatype.NATIVE, Datatype.NATIVE); 
-      	    
-        } else if (a instanceof StringDataset) {
-        	return new H5Datatype(Datatype.CLASS_CHAR, 1, Datatype.NATIVE, Datatype.SIGN_NONE);
-        }
-        
-        throw new Exception("Cannot deal with data type "+a.getClass().getName());
-	}
-	
-	public static long[] getLong(int[] intShape) {
-		final long[] longShape  = new long[intShape.length];
-		for (int i = 0; i < intShape.length; i++) longShape[i] = intShape[i];
-		return longShape;
-	}
-
 }

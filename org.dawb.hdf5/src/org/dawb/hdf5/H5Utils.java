@@ -7,15 +7,11 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */ 
-package org.dawnsci.io.h5;
+package org.dawb.hdf5;
 
 import ncsa.hdf.object.Dataset;
 import ncsa.hdf.object.Datatype;
 import ncsa.hdf.object.h5.H5Datatype;
-
-import org.dawb.hdf5.IHierarchicalDataFile;
-import org.dawb.hdf5.Nexus;
-
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.BooleanDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ByteDataset;
@@ -147,27 +143,51 @@ public class H5Utils {
 	public static Datatype getDatatype(IDataset a) throws Exception {
 		
 		// There is a smarter way of doing this, but am in a hurry...
-		if (a instanceof ByteDataset || a instanceof BooleanDataset) {
+		try {
+		    return getDatatype(((uk.ac.diamond.scisoft.analysis.dataset.Dataset)a).getDtype());
+		} catch (Exception ne) {
+			throw new Exception("Cannot deal with data in form "+a.getClass().getName());
+		}
+	}
+	
+	public static Datatype getDatatype(int dType) throws Exception {
+		
+		return getDatatype(dType, -1);
+	}
+
+    /**
+     * 
+     * @param dType
+     * @param size - used if the dType is a String only
+     * @return
+     */
+	public static Datatype getDatatype(int dType, int size)  throws Exception {
+		
+		// There is a smarter way of doing this, but am in a hurry...
+		if (dType==AbstractDataset.INT8 || dType==AbstractDataset.BOOL) {
          	return new H5Datatype(Datatype.CLASS_INTEGER, 8/8, Datatype.NATIVE, Datatype.SIGN_NONE);
          	
-        } else if (a instanceof ShortDataset) {
+        } else if (dType==AbstractDataset.INT16) {
         	return new H5Datatype(Datatype.CLASS_INTEGER, 16/8, Datatype.NATIVE, Datatype.NATIVE); 
         	
-        } else if (a instanceof IntegerDataset) {
+        } else if (dType==AbstractDataset.INT32) {
         	return new H5Datatype(Datatype.CLASS_INTEGER, 32/8, Datatype.NATIVE, Datatype.NATIVE); 
        	
-        } else if (a instanceof LongDataset) {
+        } else if (dType==AbstractDataset.INT64) {
         	return new H5Datatype(Datatype.CLASS_INTEGER, 64/8, Datatype.NATIVE, Datatype.NATIVE); 
         	
-        } else if (a instanceof FloatDataset) {
+        } else if (dType==AbstractDataset.FLOAT32) {
         	return new H5Datatype(Datatype.CLASS_FLOAT, 32/8, Datatype.NATIVE, Datatype.NATIVE); 
         	
-        } else if (a instanceof DoubleDataset) {
+        } else if (dType==AbstractDataset.FLOAT64) {
         	return new H5Datatype(Datatype.CLASS_FLOAT, 64/8, Datatype.NATIVE, Datatype.NATIVE); 
       	    
+        } else if (dType == AbstractDataset.STRING) {
+        	if (size<0) size = 64;
+        	return new H5Datatype(Datatype.CLASS_STRING, size, Datatype.NATIVE, Datatype.NATIVE);
         }
-        
-        throw new Exception("Cannot deal with data type "+a.getClass().getName());
+          
+        throw new Exception("Cannot deal with data type "+dType);
 	}
 
 	/**
@@ -179,10 +199,13 @@ public class H5Utils {
 	 * @throws Exception
 	 */
 	public static void appendDataset(IHierarchicalDataFile file, String parent, IDataset a) throws Exception {
-
-		long[] shape = H5Utils.getLong(a.getShape());
-		Dataset s = file.appendDataset(a.getName(),  H5Utils.getDatatype(a), shape, ((AbstractDataset)a).getBuffer(), parent);
-		file.setNexusAttribute(s.getFullName(), Nexus.SDS);			
+		
+		String s = file.appendDataset(a.getName(),  
+				                     a, 
+				                     parent);
+		
+		file.setNexusAttribute(s, Nexus.SDS);	
+		
 	}
 	
 	public static void insertDataset(IHierarchicalDataFile file, String parent, IDataset a, Slice[] slice, long[] finalShape) throws Exception {
@@ -201,7 +224,7 @@ public class H5Utils {
 			totalShape[i] = (long)finalShape[i];
         }
 		
-		file.insertSlice(a.getName(), H5Utils.getDatatype(a), ((AbstractDataset)a).getBuffer(), parent, startStopStep, totalShape);
+		file.insertSlice(a.getName(), a, parent, startStopStep, totalShape);
 		
 	}
 

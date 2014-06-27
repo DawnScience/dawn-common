@@ -79,7 +79,6 @@ public class CompareConverter extends AbstractConversion{
 	protected void convert(IDataset slice) throws Exception {
 		
  		final String datasetPath = slice.getName(); // Slice must be named the same as the path it will write to
- 		final Datatype        dt = getDatatype(slice);
 		
  		final String name  = datasetPath.substring(datasetPath.lastIndexOf('/')+1);
  		final String group = groups.get(datasetPath);
@@ -93,10 +92,10 @@ public class CompareConverter extends AbstractConversion{
  		int[] requiredShape = getRequiredShape(datasetPath, abs.getShape());
  		abs = resize(abs, requiredShape);
 
-		Dataset d = hFile.appendDataset(name, dt, getLong(slice.getShape()), abs.getBuffer(), group);
+		String d = hFile.appendDataset(name, abs, group);
 		if (!written.get(datasetPath)) {
-			hFile.setNexusAttribute(d.getFullName(), Nexus.SDS);
-			hFile.setAttribute(d.getFullName(), "original_name", datasetPath);
+			hFile.setNexusAttribute(d, Nexus.SDS);
+			hFile.setAttribute(d, "original_name", datasetPath);
 			written.put(datasetPath, true);
 		}
 		

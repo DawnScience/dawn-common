@@ -24,10 +24,14 @@ import ncsa.hdf.object.Group;
 import ncsa.hdf.object.HObject;
 import ncsa.hdf.object.h5.H5Datatype;
 
+import org.dawb.hdf5.H5Utils;
 import org.dawb.hdf5.HierarchicalDataFactory;
+import org.dawb.hdf5.IFileFormatDataFile;
 import org.dawb.hdf5.IHierarchicalDataFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 
 /**
  * Class used to mark groups in the hdf5 tree with nexus attributes.
@@ -162,6 +166,20 @@ public class NexusUtils {
 		}
 	}
 	
+	public static void setDatasetAttribute(IDataset dataset, String dsPath, IHierarchicalDataFile file) throws Exception {
+		setDatasetAttribute(dataset, (Dataset)file.getData(dsPath), file);
+	}
+
+	public static void setDatasetAttribute(IDataset dataset, Dataset ds, IHierarchicalDataFile file) throws Exception {
+		
+		NexusUtils.setDatasetAttribute(((IFileFormatDataFile)file).getFileFormat(), 
+				                      ds, 
+				                      dataset.getName(), 
+				                      H5Utils.getDatatype(dataset), 
+				                      H5Utils.getLong(dataset.getShape()), 
+				                      ((uk.ac.diamond.scisoft.analysis.dataset.Dataset)dataset).getBuffer());
+	}
+
 	/**
 	 * Does not replace the attribute if it exists
 	 * @param file

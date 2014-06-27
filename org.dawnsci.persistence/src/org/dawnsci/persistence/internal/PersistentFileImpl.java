@@ -29,12 +29,12 @@ import ncsa.hdf.object.HObject;
 import ncsa.hdf.object.h5.H5Datatype;
 
 import org.dawb.common.services.IPersistentFile;
+import org.dawb.hdf5.H5Utils;
 import org.dawb.hdf5.HierarchicalDataFactory;
 import org.dawb.hdf5.HierarchicalDataFileUtils;
 import org.dawb.hdf5.IHierarchicalDataFile;
 import org.dawb.hdf5.Nexus;
 import org.dawnsci.io.h5.H5LazyDataset;
-import org.dawnsci.io.h5.H5Utils;
 import org.dawnsci.persistence.json.IJSonMarshaller;
 import org.dawnsci.persistence.json.JacksonMarshaller;
 import org.slf4j.Logger;
@@ -119,13 +119,9 @@ class PersistentFileImpl implements IPersistentFile {
 				bd = Comparisons.logicalNot(bd);
 
 				AbstractDataset id = DatasetUtils.cast(bd, AbstractDataset.INT8);
-				final Datatype datatype = H5Utils.getDatatype(id);
-				final long[] shape = new long[id.getShape().length];
-				for (int i = 0; i < shape.length; i++)
-					shape[i] = id.getShape()[i];
 
-				final Dataset dataset = file.replaceDataset(name, datatype, shape, id.getBuffer(), PersistenceConstants.MASK_ENTRY);
-				file.setNexusAttribute(dataset.getFullName(), Nexus.SDS);
+				final String dataset = file.replaceDataset(name, id, PersistenceConstants.MASK_ENTRY);
+				file.setNexusAttribute(dataset, Nexus.SDS);
 			}
 		}
 	}
@@ -140,10 +136,9 @@ class PersistentFileImpl implements IPersistentFile {
 		if(parentObj == null) {
 			createParentEntry(PersistenceConstants.MASK_ENTRY);
 		} 
-		final Datatype datatype = H5Utils.getDatatype(id);
-		long[] shape = H5Utils.getLong(id.getShape());
-		final Dataset dataset = file.replaceDataset(name, datatype, shape, id.getBuffer(), PersistenceConstants.MASK_ENTRY);
-		file.setNexusAttribute(dataset.getFullName(), Nexus.SDS);
+
+		final String dataset = file.replaceDataset(name, id, PersistenceConstants.MASK_ENTRY);
+		file.setNexusAttribute(dataset, Nexus.SDS);
 	}
 
 	@Override
@@ -162,10 +157,8 @@ class PersistentFileImpl implements IPersistentFile {
 			index++;
 			if(data != null) {
 				String dataName = !data.getName().equals("") ? data.getName() : "history"+index;
-				final Datatype      datatype = H5Utils.getDatatype(data);
-				long[] shape = H5Utils.getLong(data.getShape());
-				final Dataset dataset = file.replaceDataset(dataName,  datatype, shape, ((AbstractDataset)data).getBuffer(), PersistenceConstants.HISTORY_ENTRY);
-				file.setNexusAttribute(dataset.getFullName(), Nexus.SDS);
+				final String dataset = file.replaceDataset(dataName,  data, PersistenceConstants.HISTORY_ENTRY);
+				file.setNexusAttribute(dataset, Nexus.SDS);
 			}
 		}
 	}
@@ -475,28 +468,22 @@ class PersistentFileImpl implements IPersistentFile {
 		if(data != null){
 
 			String dataName = !data.getName().equals("") ? data.getName() : "data";
-			final Datatype      datatype = H5Utils.getDatatype(data);
-			long[] shape = H5Utils.getLong(data.getShape());
 
-			final Dataset dataset = file.replaceDataset(dataName,  datatype, shape, ((AbstractDataset)data).getBuffer(), PersistenceConstants.DATA_ENTRY);
-			file.setNexusAttribute(dataset.getFullName(), Nexus.SDS);
+			final String dataset = file.replaceDataset(dataName,  data, PersistenceConstants.DATA_ENTRY);
+			file.setNexusAttribute(dataset, Nexus.SDS);
 		}
 		if(xAxisData != null){
 			String xAxisName = !xAxisData.getName().equals("") ? xAxisData.getName() : "X Axis";
-			final Datatype      xDatatype = H5Utils.getDatatype(xAxisData);
-			long[] shape = H5Utils.getLong(xAxisData.getShape());
-
-			final Dataset xDataset = file.replaceDataset(xAxisName,  xDatatype, shape, ((AbstractDataset)xAxisData).getBuffer(), PersistenceConstants.DATA_ENTRY);
-			file.setNexusAttribute(xDataset.getFullName(), Nexus.SDS);
+	
+			final String xDataset = file.replaceDataset(xAxisName,  xAxisData, PersistenceConstants.DATA_ENTRY);
+			file.setNexusAttribute(xDataset, Nexus.SDS);
 		}
 
 		if(yAxisData != null){
 			String yAxisName = !yAxisData.getName().equals("") ? yAxisData.getName() : "Y Axis";
-			final Datatype      yDatatype = H5Utils.getDatatype(yAxisData);
-			long[] shape = H5Utils.getLong(yAxisData.getShape());
 
-			final Dataset yDataset = file.replaceDataset(yAxisName,  yDatatype, shape,((AbstractDataset)yAxisData).getBuffer(), PersistenceConstants.DATA_ENTRY);
-			file.setNexusAttribute(yDataset.getFullName(), Nexus.SDS);
+			final String yDataset = file.replaceDataset(yAxisName,  yAxisData, PersistenceConstants.DATA_ENTRY);
+			file.setNexusAttribute(yDataset, Nexus.SDS);
 		}
 	}
 
@@ -507,17 +494,17 @@ class PersistentFileImpl implements IPersistentFile {
 	 * @param rois
 	 * @throws Exception
 	 */
-	private HObject writeRoi(IHierarchicalDataFile file, 
-			String  parent,
-			String  name,
-			IROI    roi) throws Exception {
+	private String writeRoi(IHierarchicalDataFile file, 
+								String  parent,
+								String  name,
+								IROI    roi) throws Exception {
 		long[] dims = {1};
 		IJSonMarshaller converter = new JacksonMarshaller();
 		String json = converter.marshal(roi);
 		// we create the dataset
-		Dataset dat = file.replaceDataset(name, new H5Datatype(Datatype.CLASS_INTEGER, 4, Datatype.NATIVE, Datatype.NATIVE), dims, new int[]{0}, parent);
+		String dat = file.replaceDataset(name, AbstractDataset.INT32, dims, new int[]{0}, parent);
 		// we set the JSON attribute
-		file.setAttribute(dat.getFullName(), "JSON", json);
+		file.setAttribute(dat, "JSON", json);
 		return dat;
 	}
 
@@ -647,14 +634,14 @@ class PersistentFileImpl implements IPersistentFile {
 		return names;
 	}
 
-	private HObject writeFunction(IHierarchicalDataFile file, String parent,
-			String name, IFunction function, IJSonMarshaller converter) throws Exception {
+	private String writeFunction(IHierarchicalDataFile file, String parent,
+			                     String name, IFunction function, IJSonMarshaller converter) throws Exception {
 		long[] dims = {1};
 		String json = converter.marshal(function);
 		// we create the dataset
-		Dataset dat = file.replaceDataset(name, new H5Datatype(Datatype.CLASS_INTEGER, 4, Datatype.NATIVE, Datatype.NATIVE), dims, new int[]{0}, parent);
+		String dat = file.replaceDataset(name, AbstractDataset.INT32, dims, new int[]{0}, parent);
 		// we set the JSON attribute
-		file.setAttribute(dat.getFullName(), "JSON", json);
+		file.setAttribute(dat, "JSON", json);
 		return dat;
 	}
 	

@@ -22,6 +22,8 @@ import org.dawb.hdf5.IHierarchicalDataFile;
 import org.dawb.hdf5.model.IHierarchicalDataFileModel;
 import org.junit.Test;
 
+import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+
 public class HierarchicalDataFileModelTest {
 
 	private static final IHierarchicalDataFileGetReader get_i05_4859_Reader = new IHierarchicalDataFileGetReader() {
@@ -304,8 +306,8 @@ public class HierarchicalDataFileModelTest {
 				model.getPath("/entry1/instrument/analyser/cps@units"));
 	}
 
-	private Object createNexusFile(final Datatype dtype, final long[] shape,
-			final Object buffer) throws Exception {
+	private Object createNexusFile(final int dtype, final long[] shape, final Object buffer) throws Exception {
+		
 		String PATH = "kichwa1";
 		final File file = File.createTempFile("HierarchicalDataFileModelTest",
 				".nxs");
@@ -313,8 +315,7 @@ public class HierarchicalDataFileModelTest {
 		try {
 
 			// Create a file and verify it
-			IHierarchicalDataFile writer = HierarchicalDataFactory
-					.getWriter(file.getAbsolutePath());
+			IHierarchicalDataFile writer = HierarchicalDataFactory.getWriter(file.getAbsolutePath());
 			writer.createDataset(PATH, dtype, shape, buffer, writer.getRoot());
 			writer.close();
 			try (IHierarchicalDataFile reader = HierarchicalDataFactory
@@ -349,45 +350,37 @@ public class HierarchicalDataFileModelTest {
 	@Test
 	public void testMultiDimArrayString() throws Exception {
 		final String GOLD = "Gold";
-		H5Datatype dtype = new H5Datatype(Datatype.CLASS_STRING,
-				GOLD.length() + 1, Datatype.NATIVE, Datatype.NATIVE);
-		assertEquals(GOLD,
-				createNexusFile(dtype, new long[] { 1 }, new String[] { GOLD }));
+		assertEquals(GOLD, createNexusFile(AbstractDataset.STRING, new long[] { 1 }, new String[] { GOLD }));
 		assertEquals(
-				GOLD,
-				createNexusFile(dtype, new long[] { 1, 1 },
+				GOLD, createNexusFile(AbstractDataset.STRING, new long[] { 1, 1 },
 						new String[] { GOLD }));
 		assertEquals(
-				GOLD,
-				createNexusFile(dtype, new long[] { 1, 1, 1 },
+				GOLD, createNexusFile(AbstractDataset.STRING, new long[] { 1, 1, 1 },
 						new String[] { GOLD }));
 		assertEquals(
-				GOLD,
-				createNexusFile(dtype, new long[] { 1, 1, 1, 1 },
+				GOLD, createNexusFile(AbstractDataset.STRING, new long[] { 1, 1, 1, 1 },
 						new String[] { GOLD }));
 	}
 
 	@Test
 	public void testMultiDimArrayFloat() throws Exception {
-		H5Datatype dtype = new H5Datatype(Datatype.CLASS_FLOAT, 64 / 8,
-				Datatype.NATIVE, Datatype.NATIVE);
 		assertEquals(1.0,
-				createNexusFile(dtype, new long[] { 1 }, new double[] { 1.0 }));
+				createNexusFile(AbstractDataset.FLOAT64, new long[] { 1 }, new double[] { 1.0 }));
 		assertEquals(
 				1.0,
-				createNexusFile(dtype, new long[] { 1, 1 },
+				createNexusFile(AbstractDataset.FLOAT64, new long[] { 1, 1 },
 						new double[][] { { 1.0 } }));
 		assertEquals(
 				1.0,
-				createNexusFile(dtype, new long[] { 1, 1, 1 },
+				createNexusFile(AbstractDataset.FLOAT64, new long[] { 1, 1, 1 },
 						new double[][][] { { { 1.0 } } }));
 		assertEquals(
 				1.0,
-				createNexusFile(dtype, new long[] { 1, 1 },
+				createNexusFile(AbstractDataset.FLOAT64, new long[] { 1, 1 },
 						new double[] { 1.0 }));
 		assertEquals(
 				1.0,
-				createNexusFile(dtype, new long[] { 1, 1, 1 },
+				createNexusFile(AbstractDataset.FLOAT64, new long[] { 1, 1, 1 },
 						new double[] { 1.0 }));
 
 	}

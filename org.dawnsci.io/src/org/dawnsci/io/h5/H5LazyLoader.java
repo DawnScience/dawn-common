@@ -8,6 +8,7 @@ import java.util.Map;
 
 import ncsa.hdf.object.Dataset;
 
+import org.dawb.hdf5.H5Utils;
 import org.dawb.hdf5.HierarchicalDataFactory;
 import org.dawb.hdf5.IHierarchicalDataFile;
 

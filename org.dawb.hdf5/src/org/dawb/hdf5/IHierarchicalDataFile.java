@@ -13,9 +13,8 @@ import java.util.Map;
 
 import javax.swing.tree.TreeNode;
 
-import ncsa.hdf.object.Dataset;
-import ncsa.hdf.object.Datatype;
-import ncsa.hdf.object.HObject;
+import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
+
 
 /**
  * Having this big interface here is not ideal but
@@ -217,21 +216,6 @@ public interface IHierarchicalDataFile extends AutoCloseable {
 	 */
 	public void setIntAttribute(final String   entryPath, final String    name, final int       value) throws Exception;
 	
-	/**
-	 * Set a dataset attribute on an HObject, useful for setting vectors on NXtransformation.
-	 * Does not overwrite the value if it is already set.
-	 * 
-	 * @param file
-	 * @param entry
-	 * @param name
-	 * @param dtype
-	 * @param shape
-	 * @param buffer
-	 * @throws Exception
-	 */
-	public void setDatasetAttribute(final HObject   entry,
-	           final String    name,
-	           final Datatype dtype, final long[] shape, final Object buffer) throws Exception;
 	
 	/**
 	 * This method returns the dataset axes for a given signal node. The nexus path must be the path
@@ -244,13 +228,24 @@ public interface IHierarchicalDataFile extends AutoCloseable {
 	public List<String> getNexusAxesNames(String signalPath, int dimension) throws Exception;
 	
 	/**
-	 * Creates and returns a new dataset with the given name and parent
+	 * Creates a new String dataset with the given name and parent, the string passed in is the value.
 	 * If it already exists then an integer will be appended to the name and it will still be written.
 	 * 
 	 * @param name
 	 * @param value
+	 * @param parentPath
 	 */
-	public Dataset createDataset(final String name, final String value, final String parent) throws Exception;
+	public String createStringDataset(final String name, final String value, final String parentPath) throws Exception;
+
+	/**
+	 * Creates a new String dataset with the given name and parent, the string passed in is the value.
+	 * If it already exists then an integer will be appended to the name and it will still be written.
+	 * 
+	 * @param name
+	 * @param value
+	 * @param parentPath
+	 */
+	public String createStringDataset(final String name, final int size, final String parentPath) throws Exception;
 
 	/**
 	 * Creates and returns a new dataset with the given name and parent
@@ -261,7 +256,21 @@ public interface IHierarchicalDataFile extends AutoCloseable {
 	 * @param buffer
 	 * @param dataGroupPath
 	 */
-	public Dataset createDataset(final String name, final Datatype dtype, final long[] shape, final Object buffer, final String dataGroupPath) throws Exception;
+	public String createDataset(final String name, IDataset data, final String dataGroupPath) throws Exception;
+
+	/**
+	 * Creates and returns a new dataset with the given name and parent
+	 * If it already exists then an integer will be appended to the name and it will still be written.
+     *
+ 	 * @param name
+	 * @param dType
+	 * @param dims
+	 * @param buffer
+	 * @param dataGroupPath
+	 * @return
+	 * @throws Exception
+	 */
+	public String createDataset(final String name, final int dType, final long[] dims, final Object buffer, final String dataGroupPath) throws Exception;
 
 	
 	/**
@@ -269,32 +278,60 @@ public interface IHierarchicalDataFile extends AutoCloseable {
 	 * If it already exists then an integer will be appended to the name and it will still be written.
      *
 	 * @param name
-	 * @param shape
-	 * @param buffer
 	 * @param data
 	 * @param overwrite
 	 */
-	public Dataset createDataset(final String name, final Datatype dtype, final long[] shape, final Object buffer, final String dataGroupPath, final boolean overwrite) throws Exception;
+	public String createDataset(final String name, IDataset data, final String dataGroupPath, final boolean overwrite) throws Exception;
 
 	/**
-	 * Creates and returns a new dataset with the given name and parent
+	 * Creates and returns a new String dataset with the given name and parent and the string value passed in.
 	 * If it already exists then the dataset is overwritten
 	 * 
 	 * @param name
 	 * @param value
 	 */
-	public Dataset replaceDataset(final String name, final String value, final String parent) throws Exception;
+	public String replaceStringDataset(final String name, final String value, final String parent) throws Exception;
 
 	/**
 	 * Creates and returns a new dataset with the given name and parent
 	 * If it already exists then the dataset is overwritten
      *
 	 * @param name
-	 * @param shape
-	 * @param buffer
+	 * @param data
 	 * @param dataGroupPath
 	 */
-	public Dataset replaceDataset(final String name, final Datatype dtype, final long[] shape, final Object buffer, final String dataGroupPath) throws Exception;
+	public String replaceDataset(final String name, final IDataset data, final String dataGroupPath) throws Exception;
+
+	/**
+	 * Creates and returns a new dataset with the given name and parent
+	 * If it already exists then the dataset is overwritten
+	 * @param name
+	 * @param dType
+	 * @param dims
+	 * @param buffer
+	 * @param dataGroupPath
+	 * @return
+	 * @throws Exception
+	 */
+	public String replaceDataset(final String name, final int dType, final long[] dims, final Object buffer, final String dataGroupPath) throws Exception;
+	
+	/**
+	 * Method finds the given data set in the group and adds buffer to the end of the stack.
+	 * 
+	 * If the data set does not exist it is created with dimensions [bufferShape]
+	 * 
+	 * If the data set exists the first dimension is created and increased by one to accomodate it, for instance
+	 * the second image in the stack would resize the data shape to [2, bufferShape...] and
+	 * so forth.
+	 * 
+	 * A more efficient algorithm could be used than increasing by 1 if this proves slow.
+	 * 
+	 * @param datasetName
+	 * @param data
+	 * @param dataGroupPath
+	 * @return
+	 */
+	public String appendDataset(String datasetName, IDataset data, String dataGroupPath)  throws Exception;
 
 	/**
 	 * Method finds the given data set in the group and adds buffer to the end of the stack.
@@ -308,14 +345,15 @@ public interface IHierarchicalDataFile extends AutoCloseable {
 	 * A more efficient algorithm could be used than increasing by 1 if this proves slow.
 	 * 
 	 * @param datasetName
-	 * @param d
+	 * @param dType
 	 * @param shape
 	 * @param buffer
 	 * @param dataGroupPath
 	 * @return
+	 * @throws Exception
 	 */
-	public Dataset appendDataset(String datasetName, Datatype d, long[] bufferShape, Object buffer, String dataGroupPath)  throws Exception;
-
+	public String appendDataset(String datasetName, int dType, long[] shape, Object buffer, String dataGroupPath)  throws Exception;
+	
 	/**
 	 * Creates a link to an existing object
 	 * 
@@ -324,7 +362,7 @@ public interface IHierarchicalDataFile extends AutoCloseable {
 	 * @param sourceFullPath
 	 * @return The link object, or null if sourcePath doesn't exist
 	 */
-	public HObject createLink(String targetGroup, String linkName, String sourceFullPath) throws Exception;
+	public String createLink(String targetGroup, String linkName, String sourceFullPath) throws Exception;
 
 	/**
 	 * Gets the size of a dimension of the dataset.
@@ -350,12 +388,11 @@ public interface IHierarchicalDataFile extends AutoCloseable {
 	 * @param totalShape
 	 * @return
 	 */
-	public Dataset insertSlice(String name,  
-					            final Datatype dtype,
-					            final Object   buffer,
-					            final String   parent,
-					            final long[][] startStopStep,
-					            final long[] totalShape) throws Exception;
+	public String insertSlice(String name,  
+					          final IDataset data,
+					          final String   parent,
+					          final long[][] startStopStep,
+					          final long[] totalShape) throws Exception;
 
 
 	/**

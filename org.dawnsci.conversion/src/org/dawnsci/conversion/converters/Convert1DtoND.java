@@ -133,32 +133,28 @@ public class Convert1DtoND extends AbstractConversion {
 	private void saveAxis(IHierarchicalDataFile file,String entry, AbstractDataset out, String[] paths) throws Exception {
 		
 		String name = paths[paths.length-1];
-		Datatype dt = getDatatype(out);
-		long[] shape = getLong(out.getShape());
+		String d = file.createDataset(name, out, entry);
 		
-		Dataset d = file.createDataset(name, dt, shape, out.getBuffer(), entry);
-		
-		file.setNexusAttribute(d.getFullName(), Nexus.SDS);
-		file.setAttribute(d.getFullName(),"axis","1");
+		file.setNexusAttribute(d, Nexus.SDS);
+		file.setAttribute(d,"axis","1");
 	}
 	
 	private void saveTo2DStack(IHierarchicalDataFile file,String entry, List<ILazyDataset> out,String[] paths,String key, int axisLength) throws Exception{
 		
 		String name = paths[paths.length-1];
-		Datatype dt = getDatatype(out.get(0).getSlice());
-		long[] shape = getLong(out.get(0).getShape());
 		
 		AbstractDataset first = ((AbstractDataset)out.get(0).getSlice());
 		
-		Dataset d = file.appendDataset(name, dt, shape, first.getBuffer(), entry);
+		String d = file.appendDataset(name, first, entry);
 		
-		if (first.getShape()[0] == axisLength) file.setAttribute(d.getFullName(),"signal","1");
+		if (first.getShape()[0] == axisLength) file.setAttribute(d,"signal","1");
 		
-		file.setNexusAttribute(d.getFullName(), Nexus.SDS);
-		file.setAttribute(d.getFullName(), "original_name", key);				
+		file.setNexusAttribute(d, Nexus.SDS);
+		file.setAttribute(d, "original_name", key);				
 		
 		for (int i = 1; i < out.size(); i++) {
-			d = file.appendDataset(name, dt, shape, ((AbstractDataset)out.get(i).getSlice()).getBuffer(), entry);
+			AbstractDataset a = (AbstractDataset)out.get(i).getSlice();
+			d = file.appendDataset(name, a, entry);
 		}
 	}
 	
@@ -167,8 +163,7 @@ public class Convert1DtoND extends AbstractConversion {
 		ILazyDataset[] lz = new ILazyDataset[bean.fastAxis];
 		String name = paths[paths.length-1];
 
-		Datatype dt = getDatatype(out.get(0).getSlice());
-		Dataset d = null;
+		String d = null;
 		
 		AbstractDataset first = ((AbstractDataset)out.get(0).getSlice());
 		
@@ -178,15 +173,15 @@ public class Convert1DtoND extends AbstractConversion {
 				lz[j] = out.get(i*bean.fastAxis + j);
 			}
 			
-			AggregateDataset ds = new AggregateDataset(true, lz);
-			
-			d = file.appendDataset(name, dt, getLong(ds.getShape()), ((AbstractDataset)ds.getSlice()).getBuffer(), entry);
+			ILazyDataset ds = new AggregateDataset(true, lz);
+			AbstractDataset a = (AbstractDataset)ds.getSlice();
+			d = file.appendDataset(name, a, entry);
 			
 		}
 		
-		file.setNexusAttribute(d.getFullName(), Nexus.SDS);
-		file.setAttribute(d.getFullName(), "original_name", key);
-		if (first.getShape()[0] == axisLength) file.setAttribute(d.getFullName(),"signal","1");
+		file.setNexusAttribute(d, Nexus.SDS);
+		file.setAttribute(d, "original_name", key);
+		if (first.getShape()[0] == axisLength) file.setAttribute(d,"signal","1");
 		
 	}
 	

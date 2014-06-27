@@ -1,5 +1,7 @@
 package org.dawnsci.io.h5;
 
+import org.dawb.hdf5.H5Utils;
+
 import ncsa.hdf.object.Dataset;
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.LazyDataset;

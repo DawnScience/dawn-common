@@ -104,12 +104,12 @@ public class ImagesToHDFConverter extends AbstractConversion{
 	protected void convert(IDataset slice) throws Exception {
 		
         final String datasetPath = context.getDatasetNames().get(0);
-		final Datatype        dt = getDatatype(slice);
 		
-		Dataset d = hFile.appendDataset(name, dt, getLong(slice.getShape()), ((AbstractDataset)slice).getBuffer(), group);
+        IDataset a = (AbstractDataset)slice;
+		String d = hFile.appendDataset(name, a, group);
 		if (first) {
-			hFile.setNexusAttribute(d.getFullName(), Nexus.SDS);
-			hFile.setAttribute(d.getFullName(), "original_name", datasetPath);
+			hFile.setNexusAttribute(d, Nexus.SDS);
+			hFile.setAttribute(d, "original_name", datasetPath);
 			first = false;
 		}
 		
