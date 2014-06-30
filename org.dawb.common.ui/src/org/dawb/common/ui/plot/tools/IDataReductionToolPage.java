@@ -26,6 +26,13 @@ import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
 public interface IDataReductionToolPage extends IToolPage {
 
 	/**
+	 * Called before the data reduction starts, gives the tool a chance to setup for the first run
+	 * Also returns a string that will be the main NXData entry name (or null to use default) 
+	 * @return nxDataName
+	 */
+	public String exportInit();
+	
+	/**
 	 * Export the tool results to an hdf5 file under the passed in group.
 	 * 
 	 * This method is used to run the tool multiple times on different slices of the data.
