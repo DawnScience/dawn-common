@@ -62,7 +62,10 @@ public class CustomNCDConverter extends AbstractConversion  {
 	private static final String DEFAULT_SCAN_COMMAND_NODE = "/entry1/scan_command";
 	private static final String CANSAS_JAXB_CONTEXT = "org.cansas.cansas1d";
 	
-	public static enum SAS_FORMAT { ASCII, ATSAS, CANSAS };
+	private static final String ASCII_EXT = ".dat";
+	private static final String TOPAZ_EXT = ".xy";
+	
+	public static enum SAS_FORMAT { ASCII, ATSAS, CANSAS, TOPAZ };
 
 	public CustomNCDConverter(IConversionContext context) {
 		super(context);
@@ -112,7 +115,7 @@ public class CustomNCDConverter extends AbstractConversion  {
 			boolean hasErrors = (lz.getLazyErrors() != null ? true : false);
 			int iterDim;
 			int[] cutAxes;
-			if (stop.length == 1 || exportFormat.equals(SAS_FORMAT.ATSAS)) {
+			if (stop.length == 1 || exportFormat.equals(SAS_FORMAT.ATSAS) || exportFormat.equals(SAS_FORMAT.TOPAZ)) {
 				iterDim = lz.getRank() - 1;
 				cutAxes = new int[] {lz.getRank() - 1};
 			} else {
@@ -213,6 +216,9 @@ public class CustomNCDConverter extends AbstractConversion  {
 				}
 				
 				String nameSuffix = "";
+				String ext = ASCII_EXT;
+				if (exportFormat.equals(SAS_FORMAT.TOPAZ)) ext = TOPAZ_EXT;
+				
 				
 				if (!(Arrays.equals(lz.getShape(), data.getShape()))) {
 					nameSuffix = nameStringFromSliceArray(iterDim, slices);
@@ -220,7 +226,7 @@ public class CustomNCDConverter extends AbstractConversion  {
 				data.setName(nameFrag + nameStringFromSliceArray(iterDim, slices));
 				String pathToFolder = context.getOutputPath();
 				String fileName = buildFileName(context.getSelectedConversionFile().getAbsolutePath(),nameFrag);
-				String fullName = pathToFolder + File.separator + fileName + nameSuffix +".dat";
+				String fullName = pathToFolder + File.separator + fileName + nameSuffix +ext;
 				
 				
 				//Check data suitable then concatenate axis with data
@@ -231,7 +237,15 @@ public class CustomNCDConverter extends AbstractConversion  {
 					}
 				}
 				
-				exportASCII(axis, data, errors, fullName, sb.toString(), headings);
+				String header = sb.toString();
+				
+				if (exportFormat.equals(SAS_FORMAT.TOPAZ)){
+					//Kill headers and headings
+					header = null;
+					headings = null;
+				}
+				
+				exportASCII(axis, data, errors, fullName, header, headings);
 					
 				if (context.getMonitor() != null) {
 					IMonitor mon = context.getMonitor();
