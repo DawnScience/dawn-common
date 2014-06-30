@@ -14,7 +14,7 @@ import org.dawnsci.conversion.converters.ImageConverter;
 import org.dawnsci.conversion.converters.ImagesToHDFConverter;
 import org.dawnsci.conversion.converters.VisitorConversion;
 
-class ConversionServiceImpl implements IConversionService {
+public class ConversionServiceImpl implements IConversionService {
 	
 	@Override
 	public IConversionContext open(String... paths) {
