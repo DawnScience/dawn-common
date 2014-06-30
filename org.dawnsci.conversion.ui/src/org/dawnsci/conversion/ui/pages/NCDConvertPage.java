@@ -142,10 +142,20 @@ public class NCDConvertPage extends ResourceChoosePage implements
 		};
 		exportCanSAS.setText("canSAS XML");
 		exportCanSAS.setToolTipText("Export data into canSAS XML format");
+		
+		Action exportTopaz = new Action() {
+			@Override
+			public void run() {
+				exportFormat = SAS_FORMAT.TOPAZ;
+			}
+		};
+		exportTopaz.setText("Topaz");
+		exportTopaz.setToolTipText("Export data to ASCII XY, no header");
 
 		radioActions.add(exportASCII);
 		radioActions.add(exportATSAS);
 		radioActions.add(exportCanSAS);
+		radioActions.add(exportTopaz);
 
 		return radioActions;
 	}
