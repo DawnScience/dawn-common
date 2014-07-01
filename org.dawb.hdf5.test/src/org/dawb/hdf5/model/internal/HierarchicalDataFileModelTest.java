@@ -30,10 +30,8 @@ public class HierarchicalDataFileModelTest {
 
 		@Override
 		public IHierarchicalDataFile getReader() throws Exception {
-			String absolutePath = Hdf5TestUtils.getBundleFile(
-					"org/dawb/hdf5/model/internal/i05-4859.nxs")
-					.getAbsolutePath();
-			return HierarchicalDataFactory.getReader(absolutePath);
+			File test = new File("testfiles/i05-4859.nxs");
+			return HierarchicalDataFactory.getReader(test.getAbsolutePath());
 		}
 	};
 
