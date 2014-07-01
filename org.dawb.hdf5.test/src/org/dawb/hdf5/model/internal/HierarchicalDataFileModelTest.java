@@ -10,12 +10,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import ncsa.hdf.object.Dataset;
-import ncsa.hdf.object.Datatype;
-import ncsa.hdf.object.Group;
-import ncsa.hdf.object.HObject;
-import ncsa.hdf.object.h5.H5Datatype;
 
-import org.dawb.hdf5.Hdf5TestUtils;
 import org.dawb.hdf5.HierarchicalDataFactory;
 import org.dawb.hdf5.HierarchicalDataUtils;
 import org.dawb.hdf5.IHierarchicalDataFile;
@@ -30,8 +25,7 @@ public class HierarchicalDataFileModelTest {
 
 		@Override
 		public IHierarchicalDataFile getReader() throws Exception {
-			File test = new File("testfiles/i05-4859.nxs");
-			return HierarchicalDataFactory.getReader(test.getAbsolutePath());
+			return HierarchicalDataFactory.getReader(new File("testfiles/i05-4859.nxs").getAbsolutePath());
 		}
 	};
 

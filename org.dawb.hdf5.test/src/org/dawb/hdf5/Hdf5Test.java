@@ -17,6 +17,7 @@ import ncsa.hdf.hdf5lib.H5;
 import ncsa.hdf.hdf5lib.HDF5Constants;
 import ncsa.hdf.object.Dataset;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
@@ -28,6 +29,12 @@ public class Hdf5Test {
 	private static String DATASETNAME = "dset";
 	private static final int DIM_X = 4;
 	private static final int DIM_Y = 6;
+	private static String TestFileAbsolutePath;
+
+	@BeforeClass
+	static public void setUpClass() {
+		TestFileAbsolutePath = new File("testfiles/FeKedge_1_15.nxs").getAbsolutePath();
+	}
 
 	@Test
 	public void writeH5Example() throws Exception {
@@ -84,8 +91,7 @@ public class Hdf5Test {
 
 		int id = -1;
 		try {
-			final String path = Hdf5TestUtils.getBundleFile("org/dawb/hdf5/FeKedge_1_15.nxs").getAbsolutePath();
-			id = H5.H5Fopen(path,
+			id = H5.H5Fopen(TestFileAbsolutePath,
 				            HDF5Constants.H5F_ACC_RDWR,
 					        HDF5Constants.H5P_DEFAULT);
 
@@ -100,7 +106,7 @@ public class Hdf5Test {
 
 	@Test
 	public void testData() throws Exception {
-		getData(Hdf5TestUtils.getBundleFile("org/dawb/hdf5/FeKedge_1_15.nxs").getAbsolutePath());
+		getData(TestFileAbsolutePath);
 	}
 
 	private void getData(String path) throws Exception {
@@ -122,7 +128,7 @@ public class Hdf5Test {
 
 	@Test
 	public void testShowStructure() throws Exception {
-		printStructure(Hdf5TestUtils.getBundleFile("org/dawb/hdf5/FeKedge_1_15.nxs").getAbsolutePath());
+		printStructure(TestFileAbsolutePath);
 		//printStructure(/buffer/linpickard1/results/examples/DCT_201006-good.h5");
 		//printStructure("/buffer/linpickard1/results/large test files/rhodo_f2_datanorm_.h5");
 	}
@@ -222,19 +228,15 @@ public class Hdf5Test {
 		// this is really a compile test to make sure that IHierarchicalDataFile
 		// can be used with a try-with-resources statement (i.e. is
 		// AutoCloseable)
-		String absolutePath = Hdf5TestUtils
-				.getBundleFile("org/dawb/hdf5/FeKedge_1_15.nxs").getAbsolutePath();
 		try (IHierarchicalDataFile reader = HierarchicalDataFactory
-				.getReader(absolutePath)) {
+				.getReader(TestFileAbsolutePath)) {
 		}
 	}
 
 	@Test
 	public void testGetAttributeValues_String() throws Exception {
-		String absolutePath = Hdf5TestUtils
-				.getBundleFile("org/dawb/hdf5/FeKedge_1_15.nxs").getAbsolutePath();
 		try (IHierarchicalDataFile reader = HierarchicalDataFactory
-				.getReader(absolutePath)) {
+				.getReader(TestFileAbsolutePath)) {
 			Map<String, Object> attrs;
 
 			attrs = reader.getAttributeValues("/");

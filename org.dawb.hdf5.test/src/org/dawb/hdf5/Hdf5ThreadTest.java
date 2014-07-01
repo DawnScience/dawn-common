@@ -11,7 +11,6 @@ package org.dawb.hdf5;
 import java.io.File;
 
 import ncsa.hdf.object.Dataset;
-import ncsa.hdf.object.Group;
 
 import org.junit.After;
 import org.junit.Test;
@@ -67,9 +66,9 @@ public class Hdf5ThreadTest extends AbstractThreadTestBase {
 			if (useFileCopy) {
 				test = File.createTempFile("test", ".h5");
 				test.deleteOnExit();
-				HierarchicalDataUtils.copy(Hdf5TestUtils.getBundleFile("org/dawb/hdf5/FeKedge_1_15.nxs"), test);
+				HierarchicalDataUtils.copy(new File("testfiles/FeKedge_1_15.nxs"), test);
 			} else {
-				test = Hdf5TestUtils.getBundleFile("org/dawb/hdf5/FeKedge_1_15.nxs");
+				test = new File("testfiles/FeKedge_1_15.nxs");
 			}
 
 
