@@ -16,7 +16,7 @@ import ncsa.hdf.object.Group;
 import org.junit.After;
 import org.junit.Test;
 
-public class Hdf5ThreadTest extends AbstractThreadTest {
+public class Hdf5ThreadTest extends AbstractThreadTestBase {
 
 	private boolean useFileCopy;
 

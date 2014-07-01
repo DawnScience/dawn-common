@@ -12,7 +12,7 @@ package org.dawb.hdf5;
 /**
  * Class to extend, does not have any tests itself.
  */
-public abstract class AbstractThreadTest {
+public abstract class AbstractThreadTestBase {
 	
 
 	public void testInTestThread() throws Throwable{
