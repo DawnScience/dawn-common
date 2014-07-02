@@ -16,6 +16,9 @@ import org.dawnsci.conversion.converters.VisitorConversion;
 
 public class ConversionServiceImpl implements IConversionService {
 	
+	public ConversionServiceImpl() {
+		System.out.println("Starting conversion service.");
+	}
 	@Override
 	public IConversionContext open(String... paths) {
 		ConversionContext context = new ConversionContext();

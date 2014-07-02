@@ -16,3 +16,4 @@ Import-Package: org.apache.commons.logging,
 Bundle-Vendor: Diamond Light Source
 Export-Package: org.dawnsci.jexl,
  org.dawnsci.jexl.internal;x-internal:=true
+Service-Component: OSGI-INF/component.xml

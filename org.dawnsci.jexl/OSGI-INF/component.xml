@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="true" name="Expression Service">
+   <implementation class="org.dawnsci.jexl.internal.ExpressionServiceImpl"/>
+   <service>
+      <provide interface="org.dawb.common.services.expressions.IExpressionService"/>
+   </service>"/>ce>
+</scr:component>
