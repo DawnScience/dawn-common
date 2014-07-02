@@ -149,6 +149,8 @@ public class ConversionChoicePage extends ResourceChoosePage implements IConvers
         	GridUtils.setVisible(multiFilesLabel, false);
         	GridUtils.setVisible(helpLabel, true);
         } else {
+        	//sort list
+        	Collections.sort(selected);
         	multiFileSelection = true;
           	GridUtils.setVisible(conversionGroup, true);
         	GridUtils.setVisible(multiFilesLabel, true);
