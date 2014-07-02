@@ -3,5 +3,5 @@
    <implementation class="org.dawnsci.jexl.internal.ExpressionServiceImpl"/>
    <service>
       <provide interface="org.dawb.common.services.expressions.IExpressionService"/>
-   </service>"/>ce>
+   </service>
 </scr:component>
