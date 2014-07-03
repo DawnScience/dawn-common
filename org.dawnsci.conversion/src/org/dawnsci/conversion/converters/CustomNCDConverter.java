@@ -536,7 +536,7 @@ public class CustomNCDConverter extends AbstractConversion  {
 		
 		if (datasetName.contains("processing")) {
 			String trimmed = datasetName.replaceAll("(.*_processing/)", "");
-			trimmed = trimmed.replaceAll("/data", "");
+			trimmed = trimmed.replaceAll("/", "_");
 			name = name + "_" + trimmed;
 		}
 		return name;
