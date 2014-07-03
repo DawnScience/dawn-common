@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Boofcv
+Bundle-SymbolicName: org.dawnsci.boofcv;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: org.dawnsci.boofcv.Activator
+Require-Bundle: org.eclipse.core.runtime,
+ uk.ac.diamond.scisoft.analysis.dataset;bundle-version="1.0.0",
+ uk.ac.diamond.georegression;bundle-version="0.6.0",
+ uk.ac.diamond.boofcv;bundle-version="0.16.0"
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Export-Package: org.dawnsci.boofcv.converter
