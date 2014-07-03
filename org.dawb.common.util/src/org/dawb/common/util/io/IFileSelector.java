@@ -1,6 +1,6 @@
 package org.dawb.common.util.io;
 
-import java.io.File;
+import java.nio.file.Path;
 
 /**
  * Used to mark parts as able to return selected files.
@@ -14,5 +14,5 @@ public interface IFileSelector {
 	 * 
 	 * @return
 	 */
-	public File getSelectedFile();
+	public Path getSelectedPath();
 }

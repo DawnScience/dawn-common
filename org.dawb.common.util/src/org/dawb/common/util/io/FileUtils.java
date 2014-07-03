@@ -28,6 +28,9 @@ import java.io.RandomAccessFile;
 import java.io.Reader;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -142,6 +145,33 @@ public final class FileUtils {
 		final String extension = ext != null ? (ext.startsWith(".")) ? ext : "." + ext : null;
 		final File file = ext != null ? new File(dir, template + i + extension) : new File(dir, template + i);
 		if (!file.exists()) {
+			return file;
+		}
+
+		return getUnique(dir, template, ext, ++i);
+	}
+	
+	/**
+	 * 
+	 * @param dir
+	 * @param template
+	 * @param ext
+	 * @return
+	 */
+	public static Path getUnique(final Path dir, final String template, final String ext) {
+		final String extension = ext != null ? (ext.startsWith(".")) ? ext : "." + ext : null;
+		final Path file = Paths.get(dir.toAbsolutePath()+"/"+ template + extension);
+		if (!Files.exists(file)) {
+			return file;
+		}
+
+		return getUnique(dir, template, ext, 1);
+	}
+
+	private static Path getUnique(final Path dir, final String template, final String ext, int i) {
+		final String extension = ext != null ? (ext.startsWith(".")) ? ext : "." + ext : null;
+		final Path file = ext != null ? Paths.get(dir.toAbsolutePath()+"/"+ template + i + extension) : Paths.get(dir.toAbsolutePath()+"/"+ template + i);
+		if (!Files.exists(file)) {
 			return file;
 		}
 

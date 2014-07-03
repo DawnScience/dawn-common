@@ -10,8 +10,18 @@
 
 package org.dawb.common.util.io;
 
+import static java.nio.file.LinkOption.NOFOLLOW_LINKS;
+
 import java.io.File;
 import java.io.FileFilter;
+import java.io.IOException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -19,10 +29,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.regex.Pattern;
 
 import org.dawb.common.util.list.SortNatural;
-
 /**
  * @author fcp94556
  *
@@ -154,6 +165,40 @@ public class SortingUtils {
 
 	    return files;
 	}
+	
+	/**
+	 * Supposed to be faster than getting the list and sorting it. Sort as we go.
+	 * @param dir
+	 * @param dirsFirst
+	 * @return
+	 * @throws IOException
+	 */
+	public static List<Path> getSortedPathList(final Path dir, final boolean dirsFirst) throws IOException {
+		
+		if (!Files.isDirectory(dir)) return null;
+	    
+	    final Map<String, Path> files = new TreeMap<String, Path>();
+	    final Map<String, Path> dirs  = new TreeMap<String, Path>();
+	    
+        try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(dir)) {
+            for (Path file : directoryStream) {
+            	
+               	if (dirsFirst && Files.isDirectory(file)) {
+            	    dirs.put(file.getFileName().toString(), file);
+            	} else {
+            		files.put(file.getFileName().toString(), file);
+            	}
+            }
+        }
+	    
+	    final List<Path> ret = new ArrayList<Path>(files.size()+dirs.size());
+	    ret.addAll(dirs.values());
+	    ret.addAll(files.values());
+	    files.clear();
+	    dirs.clear();
+	    return ret;
+	}
+
 
 	public static void removeIgnoredNames(Collection<String> sets, Collection<Pattern> patterns) {
 		if (patterns==null) return;

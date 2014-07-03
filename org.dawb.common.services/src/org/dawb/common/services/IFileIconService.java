@@ -20,4 +20,11 @@ public interface IFileIconService {
 	 * supports directories.
 	 */
 	public Image getIconForFile(final File file);
+	
+	/**
+	 * Returns the icon to use for a given file, uses eclipse and OS icons,
+	 * supports directories.
+	 */
+	public Image getIconForFile(final String path);
+
 }
