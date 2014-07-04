@@ -37,7 +37,10 @@ import boofcv.struct.image.MultiSpectral;
  * Functions for converting to and from {@link IDataset}.
  *
  */
-public class ConvertIDataset {
+public class Converter {
+
+	public Converter() {
+	}
 
 	/**
 	 * Converts a IDataset into an image of the specified type.
@@ -156,7 +159,7 @@ public class ConvertIDataset {
 	 * @param dst Where the converted image is written to.  If null a new unsigned image is created.
 	 * @return Converted image.
 	 */
-	public static <T extends ImageBase<?>> T convertFrom(IDataset src) {
+	public <T extends ImageBase<?>> T convertFrom(IDataset src) {
 		if(src.getShape().length != 2)
 			throw new IllegalArgumentException("The dataset has to be a 2 dimensionnal array");
 		Class<?> type = src.getClass();
@@ -165,23 +168,23 @@ public class ConvertIDataset {
 
 		if (src instanceof RGBDataset) {
 			ImageFloat32 dst = new ImageFloat32(width, height);
-			datasetToGray(src, dst);
+			datasetToImage(src, dst);
 			return (T) dst;
 		} else if (src instanceof ByteDataset) {
 			ImageUInt8 dst = new ImageUInt8(width, height);
-			datasetToGray(src, dst);
+			datasetToImage(src, dst);
 			return (T) dst;
 		} else if(src instanceof ShortDataset) {
 			ImageInt16 dst = GeneralizedImageOps.createSingleBand(ImageInt16.class, width, height);
-			datasetToGray(src, dst);
+			datasetToImage(src, dst);
 			return (T) dst;
 		} else if (src instanceof FloatDataset) {
 			ImageFloat32 dst = new ImageFloat32(width, height);
-			datasetToGray(src, dst);
+			datasetToImage(src, dst);
 			return (T) dst;
 		} else if (src instanceof DoubleDataset) {
 			ImageFloat64 dst = new ImageFloat64(width, height);
-			datasetToGray(src, dst);
+			datasetToImage(src, dst);
 			return (T) dst;
 		} else if (src instanceof BooleanDataset) {
 			return null;
@@ -207,7 +210,7 @@ public class ConvertIDataset {
 	 * @param src Input image.
 	 * @param dst Output image.
 	 */
-	public static void datasetToGray(IDataset src, ImageUInt8 dst) {
+	public void datasetToImage(IDataset src, ImageUInt8 dst) {
 		if(src.getShape().length != 2)
 			throw new IllegalArgumentException("The dataset has to be a 2 dimensionnal array");
 		final int width = src.getShape()[0];
@@ -246,7 +249,7 @@ public class ConvertIDataset {
 	 * @param src Input image.
 	 * @param dst Output image.
 	 */
-	public static void datasetToGray(IDataset src, ImageInt16<?> dst) {
+	public void datasetToImage(IDataset src, ImageInt16<?> dst) {
 		if(src.getShape().length != 2)
 			throw new IllegalArgumentException("The dataset has to be a 2 dimensionnal array");
 		final int width = src.getShape()[0];
@@ -287,7 +290,7 @@ public class ConvertIDataset {
 	 * @param src Input image.
 	 * @param dst Output image.
 	 */
-	public static void datasetToGray(IDataset src, ImageFloat32 dst) {
+	public void datasetToImage(IDataset src, ImageFloat32 dst) {
 		if(src.getShape().length != 2)
 			throw new IllegalArgumentException("The dataset has to be a 2 dimensionnal array");
 		final int width = src.getShape()[0];
@@ -330,7 +333,7 @@ public class ConvertIDataset {
 	 * @param src Input image.
 	 * @param dst Output image.
 	 */
-	public static void datasetToGray(IDataset src, ImageFloat64 dst) {
+	public void datasetToImage(IDataset src, ImageFloat64 dst) {
 		if(src.getShape().length != 2)
 			throw new IllegalArgumentException("The dataset has to be a 2 dimensionnal array");
 		final int width = src.getShape()[0];
@@ -354,18 +357,18 @@ public class ConvertIDataset {
 	 * @param isBinary if true will convert to a binary image
 	 * @return Converted image.
 	 */
-	public static <T extends ImageBase<?>> IDataset convertTo(T src, boolean isBinary) {
+	public <T extends ImageBase<?>> IDataset convertTo(T src, boolean isBinary) {
 		if( src instanceof ImageSingleBand ) {
 			if (ImageUInt8.class == src.getClass()) {
-				return grayToIDataset((ImageUInt8) src, isBinary);
+				return imageToIDataset((ImageUInt8) src, isBinary);
 			} else if (ImageInt16.class.isInstance(src)) {
-				return grayToIDataset((ImageInt16<?>) src);
+				return imageToIDataset((ImageInt16<?>) src);
 			} else if (ImageFloat32.class == src.getClass()) {
-				return grayToIDataset((ImageFloat32) src);
+				return imageToIDataset((ImageFloat32) src);
 			} else if (ImageFloat64.class == src.getClass()) {
-				return grayToIDataset((ImageFloat64) src);
+				return imageToIDataset((ImageFloat64) src);
 			} else if (ImageSInt32.class == src.getClass()) {
-				return grayToIDataset((ImageSInt32) src, 0);
+				return imageToIDataset((ImageSInt32) src, 0);
 			} else {
 				throw new IllegalArgumentException("ImageSingleBand type is not yet supported: "+src.getClass().getSimpleName());
 			}
@@ -391,7 +394,7 @@ public class ConvertIDataset {
 	 * @param isBinary if true, will convert to a Binary Dataset
 	 * @return dst Where the converted image is written to
 	 */
-	public static IDataset grayToIDataset(ImageUInt8 src, boolean isBinary) {
+	public IDataset imageToIDataset(ImageUInt8 src, boolean isBinary) {
 		final int width = src.getWidth();
 		final int height = src.getHeight();
 		byte[] data = src.data;
@@ -420,7 +423,7 @@ public class ConvertIDataset {
 	 * @param src Input image.
 	 * @return dst Where the converted image is written to
 	 */
-	public static IDataset grayToIDataset(ImageInt16<?> src) {
+	public IDataset imageToIDataset(ImageInt16<?> src) {
 
 		final int width = src.getWidth();
 		final int height = src.getHeight();
@@ -443,7 +446,7 @@ public class ConvertIDataset {
 	 * @param src Input image.
 	 * @return dst Where the converted image is written to
 	 */
-	public static IDataset grayToIDataset(ImageFloat32 src) {
+	public IDataset imageToIDataset(ImageFloat32 src) {
 		final int width = src.getWidth();
 		final int height = src.getHeight();
 		FloatDataset dst = new FloatDataset(width, height);
@@ -471,7 +474,7 @@ public class ConvertIDataset {
 	 * @param src Input image.
 	 * @return dst Where the converted image is written to
 	 */
-	public static IDataset grayToIDataset(ImageFloat64 src) {
+	public IDataset imageToIDataset(ImageFloat64 src) {
 		final int width = src.getWidth();
 		final int height = src.getHeight();
 		DoubleDataset dst = new DoubleDataset(width, height);
@@ -499,7 +502,7 @@ public class ConvertIDataset {
 	 * @param numColors
 	 * @return dst Where the converted image is written to
 	 */
-	public static IDataset grayToIDataset(ImageSInt32 src, int numColors) {
+	public IDataset imageToIDataset(ImageSInt32 src, int numColors) {
 		final int width = src.getWidth();
 		final int height = src.getHeight();
 		int[] data = src.data;
@@ -538,7 +541,7 @@ public class ConvertIDataset {
 	 * @param out (Optional) storage for output image
 	 * @return Rendered contours
 	 */
-	public static IDataset renderContours(List<Contour> contours,
+	public IDataset contourImageToIDataset(List<Contour> contours,
 			int colorExternal, int colorInternal, int width, int height) {
 
 		RGBDataset out = new RGBDataset(width, height);

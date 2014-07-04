@@ -19,7 +19,7 @@ package org.dawnsci.boofcv.examples.imageprocessing;
 
 import java.awt.image.BufferedImage;
 
-import org.dawnsci.boofcv.converter.ConvertIDataset;
+import org.dawnsci.boofcv.converter.Converter;
 import org.dawnsci.boofcv.examples.util.Utils;
 
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
@@ -72,11 +72,12 @@ public class ExampleImageFilter {
 		ImageUInt8 nogenerics = new ImageUInt8(width, height);
 		ImageFloat32 generalized32 = new ImageFloat32(width, height);
 
-		ConvertIDataset.datasetToGray(image, procedural);
-		ConvertIDataset.datasetToGray(image, generalized);
-		ConvertIDataset.datasetToGray(image, filter);
-		ConvertIDataset.datasetToGray(image, nogenerics);
-		ConvertIDataset.datasetToGray(image, generalized32);
+		Converter cvt = new Converter();
+		cvt.datasetToImage(image, procedural);
+		cvt.datasetToImage(image, generalized);
+		cvt.datasetToImage(image, filter);
+		cvt.datasetToImage(image, nogenerics);
+		cvt.datasetToImage(image, generalized32);
 
 		procedural(procedural);
 		generalized(generalized);
