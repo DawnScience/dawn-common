@@ -15,7 +15,6 @@ import java.util.Random;
 
 import uk.ac.diamond.scisoft.analysis.dataset.BooleanDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ByteDataset;
-import uk.ac.diamond.scisoft.analysis.dataset.Dataset;
 import uk.ac.diamond.scisoft.analysis.dataset.DoubleDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.FloatDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
@@ -23,11 +22,14 @@ import uk.ac.diamond.scisoft.analysis.dataset.IntegerDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.RGBDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ShortDataset;
 import boofcv.alg.filter.binary.Contour;
+import boofcv.alg.misc.GImageStatistics;
+import boofcv.alg.misc.ImageStatistics;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageFloat64;
 import boofcv.struct.image.ImageInt16;
+import boofcv.struct.image.ImageInteger;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
@@ -542,9 +544,6 @@ public class Converter {
 			int colorExternal, int colorInternal, int width, int height) {
 
 		RGBDataset out = new RGBDataset(width, height);
-		IDataset red = out.createRedDataset(Dataset.INT16);
-		IDataset green = out.createGreenDataset(Dataset.INT16);
-		IDataset blue = out.createBlueDataset(Dataset.INT16);
 		for( Contour c : contours ) {
 			for(Point2D_I32 p : c.external ) {
 //				out.setRGB(p.x,p.y,colorExternal);
@@ -559,4 +558,104 @@ public class Converter {
 		}
 		return out;
 	}
+
+	/**
+	 * <p>
+	 * Renders a colored image where the color indicates the sign and intensity its magnitude.   The input is divided
+	 * by normalize to render it in the appropriate scale.
+	 * </p>
+	 *
+	 * @param src       Input single band image.
+	 * @param dst       Where the image is rendered into.  If null a new BufferedImage will be created and return.
+	 * @param normalize Used to normalize the input image. If <= 0 then the max value will be used
+	 * @return Rendered image.
+	 */
+	public IDataset colorizeSign(ImageSingleBand<?> src, double normalize) {
+		// TODO (use RGBDataset for colors support...)
+		IDataset dst = new IntegerDataset(src.getWidth(), src.getHeight());
+
+		if (normalize <= 0) {
+			normalize = GImageStatistics.maxAbs(src);
+		}
+
+		if (normalize == 0) {
+			// sets the output to black
+			convertTo(src, true);
+			return dst;
+		}
+
+		if (src.getClass().isAssignableFrom(ImageFloat32.class)) {
+			return colorizeSign((ImageFloat32) src, dst, (float) normalize);
+		} else {
+			return colorizeSign((ImageInteger<?>) src, dst, (int) normalize);
+		}
+	}
+
+	private IDataset colorizeSign(ImageInteger<?> src, IDataset dst, int normalize) {
+		for (int y = 0; y < src.height; y++) {
+			for (int x = 0; x < src.width; x++) {
+				int v = src.get(x, y);
+
+				int rgb;
+				if (v > 0) {
+					rgb = ((255 * v / normalize) << 16);
+				} else {
+					rgb = -((255 * v / normalize) << 8);
+				}
+				dst.set(rgb,  x, y);
+			}
+		}
+		return dst;
+	}
+
+	private IDataset colorizeSign(ImageFloat32 src, IDataset dst, float maxAbsValue) {
+		for (int y = 0; y < src.height; y++) {
+			for (int x = 0; x < src.width; x++) {
+				float v = src.get(x, y);
+
+				int rgb;
+				if (v > 0) {
+					rgb = (int) (255 * v / maxAbsValue) << 16;
+				} else {
+					rgb = (int) (-255 * v / maxAbsValue) << 8;
+				}
+				dst.set(rgb, x, y);
+			}
+		}
+		return dst;
+	}
+
+	public IDataset graySign(ImageFloat32 src, float maxAbsValue) {
+		IDataset dst = new IntegerDataset(src.getWidth(), src.getHeight());
+
+		if (maxAbsValue < 0)
+			maxAbsValue = ImageStatistics.maxAbs(src);
+
+		for (int y = 0; y < src.height; y++) {
+			for (int x = 0; x < src.width; x++) {
+				float v = src.get(x, y);
+
+				int rgb = 127 + (int) (127 * v / maxAbsValue);
+
+				dst.set(rgb << 16 | rgb << 8 | rgb, x, y);
+			}
+		}
+
+		return dst;
+	}
+
+	public IDataset grayMagnitude(ImageFloat32 src, IDataset dst, float maxAbsValue) {
+		for (int y = 0; y < src.height; y++) {
+			for (int x = 0; x < src.width; x++) {
+				float v = Math.abs(src.get(x, y));
+
+				int rgb = (int) (255 * v / maxAbsValue);
+
+				dst.set(rgb << 16 | rgb << 8 | rgb, x, y);
+			}
+		}
+
+		return dst;
+	}
+
 }

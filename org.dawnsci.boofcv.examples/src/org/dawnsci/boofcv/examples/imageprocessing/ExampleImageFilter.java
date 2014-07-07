@@ -60,6 +60,8 @@ public class ExampleImageFilter {
 	public static void runExample() throws Throwable {
 		String dataname = "image-01";
 		IDataHolder holder = LoaderFactory.getData("resources/lena512.bmp", null);
+//		IDataHolder holder = LoaderFactory.getData("resources/pow_M99S5_1_0001.cbf", null);
+		
 		IDataset image = holder.getDataset(dataname);
 		Utils.showPlotView("uk.ac.diamond.scisoft.analysis.rcp.plotViewDP", "Dataset Plot", image);
 
@@ -79,16 +81,16 @@ public class ExampleImageFilter {
 		cvt.datasetToImage(image, nogenerics);
 		cvt.datasetToImage(image, generalized32);
 
-		procedural(procedural);
-		generalized(generalized);
-		filter(filter);
-		nogenerics(nogenerics);
+		procedural(procedural, cvt);
+		generalized(generalized, cvt);
+		filter(filter, cvt);
+		nogenerics(nogenerics, cvt);
 
 		// try another image input type
-		generalized(generalized32);
+		generalized(generalized32, cvt);
 	}
 
-	private static void procedural(ImageUInt8 input) {
+	private static void procedural(ImageUInt8 input, Converter cvt) throws Throwable {
 		ImageUInt8 blurred = new ImageUInt8(input.width, input.height);
 		ImageSInt16 derivX = new ImageSInt16(input.width, input.height);
 		ImageSInt16 derivY = new ImageSInt16(input.width, input.height);
@@ -99,14 +101,15 @@ public class ExampleImageFilter {
 		// Calculate image's derivative
 		GradientSobel.process(blurred, derivX, derivY, FactoryImageBorderAlgs.extend(input));
 
-		//TODO convert back to IDataset
 		// display the results
-		BufferedImage outputImage = VisualizeImageData.colorizeSign(derivX, null, -1);
-		ShowImages.showWindow(outputImage, "Procedural Fixed Type");
+		IDataset outputImage = cvt.colorizeSign(derivX, -1);
+		outputImage.setName("Procedural Fixed Type");
+		Utils.showPlotView("uk.ac.diamond.scisoft.analysis.rcp.plotView1", "Plot 1", outputImage);
+
 	}
 
 	private static <T extends ImageSingleBand, D extends ImageSingleBand> void generalized(
-			T input) {
+			T input, Converter cvt) throws Throwable {
 		Class<T> inputType = (Class<T>) input.getClass();
 		Class<D> derivType = GImageDerivativeOps.getDerivativeType(inputType);
 
@@ -120,14 +123,14 @@ public class ExampleImageFilter {
 		// Calculate image's derivative
 		GImageDerivativeOps.sobel(blurred, derivX, derivY, BorderType.EXTENDED);
 
-		//TODO convert back to IDataset
 		// display the results
-		BufferedImage outputImage = VisualizeImageData.colorizeSign(derivX, null, -1);
-		ShowImages.showWindow(outputImage, "Generalized " + inputType.getSimpleName());
+		IDataset outputImage = cvt.colorizeSign(derivX, -1);
+		outputImage.setName("Generalized " + inputType.getSimpleName());
+		Utils.showPlotView("uk.ac.diamond.scisoft.analysis.rcp.plotView1", "Plot 1", outputImage);
 	}
 
-	private static <T extends ImageSingleBand, D extends ImageSingleBand> void filter(
-			T input) {
+	private static <T extends ImageSingleBand<?>, D extends ImageSingleBand> void filter(
+			T input, Converter cvt) throws Throwable {
 		Class<T> inputType = (Class<T>) input.getClass();
 		Class<D> derivType = GImageDerivativeOps.getDerivativeType(inputType);
 
@@ -143,21 +146,21 @@ public class ExampleImageFilter {
 //		filterBlur.process(input,blurred);
 		gradient.process(blurred, derivX, derivY);
 
-		//TODO convert back to IDataset
 		// display the results
-		BufferedImage outputImage = VisualizeImageData.colorizeSign(derivX, null, -1);
-		ShowImages.showWindow(outputImage, "Filter " + inputType.getSimpleName());
+		IDataset outputImage = cvt.colorizeSign(derivX, -1);
+		outputImage.setName("Filter " + inputType.getSimpleName());
+		Utils.showPlotView("uk.ac.diamond.scisoft.analysis.rcp.plotView1", "Plot 1", outputImage);
 	}
 
-	private static void nogenerics(ImageSingleBand input) {
+	private static void nogenerics(ImageSingleBand<?> input, Converter cvt) throws Throwable {
 		Class inputType = input.getClass();
 		Class derivType = GImageDerivativeOps.getDerivativeType(inputType);
 
-		ImageSingleBand blurred = GeneralizedImageOps.createSingleBand(
+		ImageSingleBand<?> blurred = GeneralizedImageOps.createSingleBand(
 				inputType, input.width, input.height);
-		ImageSingleBand derivX = GeneralizedImageOps.createSingleBand(
+		ImageSingleBand<?> derivX = GeneralizedImageOps.createSingleBand(
 				derivType, input.width, input.height);
-		ImageSingleBand derivY = GeneralizedImageOps.createSingleBand(
+		ImageSingleBand<?> derivY = GeneralizedImageOps.createSingleBand(
 				derivType, input.width, input.height);
 
 		// Gaussian blur: Convolve a Gaussian kernel
@@ -168,7 +171,8 @@ public class ExampleImageFilter {
 
 		//TODO convert back to IDataset
 		// display the results
-		BufferedImage outputImage = VisualizeImageData.colorizeSign(derivX, null, -1);
-		ShowImages.showWindow(outputImage, "Generalized " + inputType.getSimpleName());
+		IDataset outputImage = cvt.colorizeSign(derivX, -1);
+		outputImage.setName("Generalized " + inputType.getSimpleName());
+		Utils.showPlotView("uk.ac.diamond.scisoft.analysis.rcp.plotView1", "Plot 1", outputImage);
 	}
 }
