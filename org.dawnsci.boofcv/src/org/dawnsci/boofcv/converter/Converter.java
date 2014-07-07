@@ -166,7 +166,7 @@ public class Converter {
 		int width = src.getShape()[0];
 		int height = src.getShape()[1];
 
-		if (src instanceof RGBDataset) {
+		if (src instanceof RGBDataset || src instanceof IntegerDataset) {
 			ImageFloat32 dst = new ImageFloat32(width, height);
 			datasetToImage(src, dst);
 			return (T) dst;
@@ -188,10 +188,7 @@ public class Converter {
 			return (T) dst;
 		} else if (src instanceof BooleanDataset) {
 			return null;
-		} else if (src instanceof IntegerDataset) {
-			return null;
-		}
-		else {
+		} else {
 			throw new IllegalArgumentException("Unknown type " + type);
 		}
 	}
