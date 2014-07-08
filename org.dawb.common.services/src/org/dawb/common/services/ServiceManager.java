@@ -39,6 +39,8 @@ public class ServiceManager {
 		OFFLINE_SERVICES.add(ISystemService.class);
 		OFFLINE_SERVICES.add(ITransferService.class);
 		OFFLINE_SERVICES.add(IClassLoaderService.class);
+		OFFLINE_SERVICES.add(IPersistenceService.class);
+		OFFLINE_SERVICES.add(IBoofCVProcessingService.class);
 	}
 	
 	/**
