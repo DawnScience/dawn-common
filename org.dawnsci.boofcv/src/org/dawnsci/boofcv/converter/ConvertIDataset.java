@@ -57,10 +57,7 @@ import boofcv.struct.image.MultiSpectral;
  * Functions for converting to and from {@link IDataset}.
  *
  */
-public class Converter {
-
-	public Converter() {
-	}
+public class ConvertIDataset {
 
 	/**
 	 * Converts a IDataset into an image of the specified type.
@@ -179,7 +176,7 @@ public class Converter {
 	 * @param dst Where the converted image is written to.  If null a new unsigned image is created.
 	 * @return Converted image.
 	 */
-	public <T extends ImageBase<?>> T convertFrom(IDataset src) {
+	public static <T extends ImageBase<?>> T convertFrom(IDataset src) {
 		if(src.getShape().length != 2)
 			throw new IllegalArgumentException("The dataset has to be a 2 dimensionnal array");
 		Class<?> type = src.getClass();
@@ -227,7 +224,7 @@ public class Converter {
 	 * @param src Input image.
 	 * @param dst Output image.
 	 */
-	public void datasetToImage(IDataset src, ImageUInt8 dst) {
+	public static void datasetToImage(IDataset src, ImageUInt8 dst) {
 		if(src.getShape().length != 2)
 			throw new IllegalArgumentException("The dataset has to be a 2 dimensionnal array");
 		final int width = src.getShape()[0];
@@ -266,7 +263,7 @@ public class Converter {
 	 * @param src Input image.
 	 * @param dst Output image.
 	 */
-	public void datasetToImage(IDataset src, ImageInt16<?> dst) {
+	public static void datasetToImage(IDataset src, ImageInt16<?> dst) {
 		if(src.getShape().length != 2)
 			throw new IllegalArgumentException("The dataset has to be a 2 dimensionnal array");
 		final int width = src.getShape()[0];
@@ -307,7 +304,7 @@ public class Converter {
 	 * @param src Input image.
 	 * @param dst Output image.
 	 */
-	public void datasetToImage(IDataset src, ImageFloat32 dst) {
+	public static void datasetToImage(IDataset src, ImageFloat32 dst) {
 		if(src.getShape().length != 2)
 			throw new IllegalArgumentException("The dataset has to be a 2 dimensionnal array");
 		final int width = src.getShape()[0];
@@ -350,7 +347,7 @@ public class Converter {
 	 * @param src Input image.
 	 * @param dst Output image.
 	 */
-	public void datasetToImage(IDataset src, ImageFloat64 dst) {
+	public static void datasetToImage(IDataset src, ImageFloat64 dst) {
 		if(src.getShape().length != 2)
 			throw new IllegalArgumentException("The dataset has to be a 2 dimensionnal array");
 		final int width = src.getShape()[0];
@@ -374,7 +371,7 @@ public class Converter {
 	 * @param isBinary if true will convert to a binary image
 	 * @return Converted image.
 	 */
-	public <T extends ImageBase<?>> IDataset convertTo(T src, boolean isBinary) {
+	public static <T extends ImageBase<?>> IDataset convertTo(T src, boolean isBinary) {
 		if( src instanceof ImageSingleBand ) {
 			if (ImageUInt8.class == src.getClass()) {
 				return imageToIDataset((ImageUInt8) src, isBinary);
@@ -411,7 +408,7 @@ public class Converter {
 	 * @param isBinary if true, will convert to a Binary Dataset
 	 * @return dst Where the converted image is written to
 	 */
-	public IDataset imageToIDataset(ImageUInt8 src, boolean isBinary) {
+	public static IDataset imageToIDataset(ImageUInt8 src, boolean isBinary) {
 		final int width = src.getWidth();
 		final int height = src.getHeight();
 		byte[] data = src.data;
@@ -440,7 +437,7 @@ public class Converter {
 	 * @param src Input image.
 	 * @return dst Where the converted image is written to
 	 */
-	public IDataset imageToIDataset(ImageInt16<?> src) {
+	public static IDataset imageToIDataset(ImageInt16<?> src) {
 
 		final int width = src.getWidth();
 		final int height = src.getHeight();
@@ -463,7 +460,7 @@ public class Converter {
 	 * @param src Input image.
 	 * @return dst Where the converted image is written to
 	 */
-	public IDataset imageToIDataset(ImageFloat32 src) {
+	public static IDataset imageToIDataset(ImageFloat32 src) {
 		final int width = src.getWidth();
 		final int height = src.getHeight();
 		FloatDataset dst = new FloatDataset(width, height);
@@ -491,7 +488,7 @@ public class Converter {
 	 * @param src Input image.
 	 * @return dst Where the converted image is written to
 	 */
-	public IDataset imageToIDataset(ImageFloat64 src) {
+	public static IDataset imageToIDataset(ImageFloat64 src) {
 		final int width = src.getWidth();
 		final int height = src.getHeight();
 		DoubleDataset dst = new DoubleDataset(width, height);
@@ -519,7 +516,7 @@ public class Converter {
 	 * @param numColors
 	 * @return dst Where the converted image is written to
 	 */
-	public IDataset imageToIDataset(ImageSInt32 src, int numColors) {
+	public static IDataset imageToIDataset(ImageSInt32 src, int numColors) {
 		final int width = src.getWidth();
 		final int height = src.getHeight();
 		int[] data = src.data;
@@ -558,7 +555,7 @@ public class Converter {
 	 * @param out (Optional) storage for output image
 	 * @return Rendered contours
 	 */
-	public IDataset contourImageToIDataset(List<Contour> contours,
+	public static IDataset contourImageToIDataset(List<Contour> contours,
 			int colorExternal, int colorInternal, int width, int height) {
 
 		RGBDataset out = new RGBDataset(width, height);
@@ -588,9 +585,9 @@ public class Converter {
 	 * @param normalize Used to normalize the input image. If <= 0 then the max value will be used
 	 * @return Rendered image.
 	 */
-	public IDataset colorizeSign(ImageSingleBand<?> src, double normalize) {
+	public static IDataset colorizeSign(ImageSingleBand<?> src, double normalize) {
 		// TODO (use RGBDataset for colors support...)
-		IDataset dst = new IntegerDataset(src.getWidth(), src.getHeight());
+		IDataset dst = new RGBDataset(src.getWidth(), src.getHeight());
 
 		if (normalize <= 0) {
 			normalize = GImageStatistics.maxAbs(src);
@@ -609,7 +606,7 @@ public class Converter {
 		}
 	}
 
-	private IDataset colorizeSign(ImageInteger<?> src, IDataset dst, int normalize) {
+	private static IDataset colorizeSign(ImageInteger<?> src, IDataset dst, int normalize) {
 		for (int y = 0; y < src.height; y++) {
 			for (int x = 0; x < src.width; x++) {
 				int v = src.get(x, y);
@@ -626,7 +623,7 @@ public class Converter {
 		return dst;
 	}
 
-	private IDataset colorizeSign(ImageFloat32 src, IDataset dst, float maxAbsValue) {
+	private static IDataset colorizeSign(ImageFloat32 src, IDataset dst, float maxAbsValue) {
 		for (int y = 0; y < src.height; y++) {
 			for (int x = 0; x < src.width; x++) {
 				float v = src.get(x, y);
@@ -643,7 +640,7 @@ public class Converter {
 		return dst;
 	}
 
-	public IDataset graySign(ImageFloat32 src, float maxAbsValue) {
+	public static IDataset graySign(ImageFloat32 src, float maxAbsValue) {
 		IDataset dst = new IntegerDataset(src.getWidth(), src.getHeight());
 
 		if (maxAbsValue < 0)
@@ -662,7 +659,7 @@ public class Converter {
 		return dst;
 	}
 
-	public IDataset grayMagnitude(ImageFloat32 src, IDataset dst, float maxAbsValue) {
+	public static IDataset grayMagnitude(ImageFloat32 src, IDataset dst, float maxAbsValue) {
 		for (int y = 0; y < src.height; y++) {
 			for (int x = 0; x < src.width; x++) {
 				float v = Math.abs(src.get(x, y));

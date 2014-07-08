@@ -20,7 +20,7 @@ package org.dawnsci.boofcv.examples.imageprocessing;
 
 import java.util.List;
 
-import org.dawnsci.boofcv.converter.Converter;
+import org.dawnsci.boofcv.converter.ConvertIDataset;
 import org.dawnsci.boofcv.examples.util.Utils;
 
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
@@ -54,8 +54,7 @@ public class ExampleBinaryOps {
 		Utils.showPlotView("uk.ac.diamond.scisoft.analysis.rcp.plotViewDP", "Dataset Plot", data);
 
 		// convert into BoofCV format
-		Converter cvt = new Converter();
-		ImageFloat32 input = cvt.convertFrom(data);
+		ImageFloat32 input = ConvertIDataset.convertFrom(data);
 		ImageUInt8 binary = new ImageUInt8(input.width,input.height);
 		ImageSInt32 label = new ImageSInt32(input.width,input.height);
 
@@ -79,10 +78,10 @@ public class ExampleBinaryOps {
 		int colorInternal = 0xFF2020;
 
 		// Convert back to IDataset
-		IDataset visualBinary = cvt.convertTo(binary, true);
-		IDataset visualFiltered = cvt.convertTo(filtered, true);
-		IDataset visualLabel = cvt.imageToIDataset(label, contours.size());
-		IDataset visualContour = cvt.contourImageToIDataset(contours, colorExternal, colorInternal, input.width, input.height);
+		IDataset visualBinary = ConvertIDataset.convertTo(binary, true);
+		IDataset visualFiltered = ConvertIDataset.convertTo(filtered, true);
+		IDataset visualLabel = ConvertIDataset.imageToIDataset(label, contours.size());
+		IDataset visualContour = ConvertIDataset.contourImageToIDataset(contours, colorExternal, colorInternal, input.width, input.height);
 		visualBinary.setName("Binary Original");
 		visualFiltered.setName("Binary Filtered");
 		visualLabel.setName("Labeled Blobs");
