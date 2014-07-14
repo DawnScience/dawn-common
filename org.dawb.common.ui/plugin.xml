@@ -471,7 +471,7 @@
             category="uk.ac.diamond.sda.meta.category"
             class="org.dawb.common.ui.views.HeaderTableView"
             icon="icons/header_table.gif"
-            id="fable.imageviewer.views.HeaderView"
+            id="org.dawb.common.ui.views.headerTableView"
             name="Header Table">
       </view>
          

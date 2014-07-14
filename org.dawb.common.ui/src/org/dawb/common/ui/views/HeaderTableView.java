@@ -61,7 +61,7 @@ import uk.ac.diamond.scisoft.analysis.io.IMetaData;
  */
 public class HeaderTableView extends ViewPart implements ISelectionListener, IPartListener {
 
-	public static final String ID = "fable.imageviewer.views.HeaderView";
+	public static final String ID = "org.dawb.common.ui.views.headerTableView";
 	
 	private static final Logger logger = LoggerFactory.getLogger(HeaderTableView.class);
 	
