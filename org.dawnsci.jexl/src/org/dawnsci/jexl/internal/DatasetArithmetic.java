@@ -2,7 +2,6 @@ package org.dawnsci.jexl.internal;
 
 import org.apache.commons.jexl2.JexlArithmetic;
 
-import uk.ac.diamond.scisoft.analysis.dataset.Dataset;
 import uk.ac.diamond.scisoft.analysis.dataset.Maths;
 
 /**
@@ -20,13 +19,7 @@ public class DatasetArithmetic extends JexlArithmetic {
 	 */
 	@Override
 	public Object bitwiseXor(Object lhs, Object rhs) {
-		if (lhs instanceof Dataset || rhs instanceof Dataset) {
-			return Maths.power(lhs, rhs);
-		}
-
-		double l = toDouble(lhs);
-		double r = toDouble(rhs);
-		return Math.pow(l, r);
+		return Maths.unwrap(Maths.power(lhs, rhs), lhs, rhs);
 	}
 
 	/**
@@ -41,15 +34,7 @@ public class DatasetArithmetic extends JexlArithmetic {
 	 */
 	@Override
 	public Object add(Object lhs, Object rhs) {
-		if (lhs instanceof Dataset) {
-			return Maths.add((Dataset) lhs, rhs);
-		}
-
-		if (rhs instanceof Dataset) {
-			return Maths.add((Dataset) rhs, lhs);
-		}
-
-		return super.add(lhs, rhs);
+		return Maths.unwrap(Maths.add(lhs, rhs), lhs, rhs);
 	}
 
 	/**
@@ -64,11 +49,7 @@ public class DatasetArithmetic extends JexlArithmetic {
 	 */
 	@Override
 	public Object subtract(Object lhs, Object rhs) {
-		if (lhs instanceof Dataset || rhs instanceof Dataset) {
-			return Maths.subtract(lhs, rhs);
-		}
-
-		return super.subtract(lhs, rhs);
+		return Maths.unwrap(Maths.subtract(lhs, rhs), lhs, rhs);
 	}
 
 	/**
@@ -83,15 +64,7 @@ public class DatasetArithmetic extends JexlArithmetic {
 	 */
 	@Override
 	public Object multiply(Object lhs, Object rhs) {
-		if (lhs instanceof Dataset) {
-			return Maths.multiply((Dataset) lhs, rhs);
-		}
-
-		if (rhs instanceof Dataset) {
-			return Maths.multiply((Dataset) rhs, lhs);
-		}
-
-		return super.multiply(lhs, rhs);
+		return Maths.unwrap(Maths.multiply(lhs, rhs), lhs, rhs);
 	}
 
 	/**
@@ -106,11 +79,7 @@ public class DatasetArithmetic extends JexlArithmetic {
 	 */
 	@Override
 	public Object divide(Object lhs, Object rhs) {
-		if (lhs instanceof Dataset || rhs instanceof Dataset) {
-			return Maths.divide(lhs, rhs);
-		}
-
-		return super.divide(lhs, rhs);
+		return Maths.unwrap(Maths.divide(lhs, rhs), lhs, rhs);
 	}
 
 	/**
@@ -124,10 +93,6 @@ public class DatasetArithmetic extends JexlArithmetic {
 	 */
 	@Override
 	public Object negate(Object ob) {
-		if (ob instanceof Dataset) {
-			return Maths.negative((Dataset) ob);
-		}
-
-		return super.negate(ob);
+		return Maths.unwrap(Maths.negative(ob), ob);
 	}
 }
