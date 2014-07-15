@@ -42,6 +42,7 @@ public class PersistenceServiceImpl implements IPersistenceService{
 	 * Default Constructor
 	 */
 	public PersistenceServiceImpl(){
+		System.out.println("Starting persistence service");
 	}
 
 	@Override
