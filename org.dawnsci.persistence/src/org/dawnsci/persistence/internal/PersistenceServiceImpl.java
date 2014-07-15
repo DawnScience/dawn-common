@@ -38,11 +38,14 @@ public class PersistenceServiceImpl implements IPersistenceService{
 
 	private final Logger logger = LoggerFactory.getLogger(PersistenceServiceImpl.class);
 
+	static {
+		System.out.println("Starting persistence service");
+	}
 	/**
 	 * Default Constructor
 	 */
 	public PersistenceServiceImpl(){
-		System.out.println("Starting persistence service");
+		// Important do nothing here, OSGI may start the service more than once.
 	}
 
 	@Override

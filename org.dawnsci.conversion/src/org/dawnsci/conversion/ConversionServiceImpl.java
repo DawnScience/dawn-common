@@ -16,9 +16,14 @@ import org.dawnsci.conversion.converters.VisitorConversion;
 
 public class ConversionServiceImpl implements IConversionService {
 	
-	public ConversionServiceImpl() {
+	static {
 		System.out.println("Starting conversion service.");
+	
 	}
+	public ConversionServiceImpl() {
+		// Important do nothing here, OSGI may start the service more than once.
+	}
+	
 	@Override
 	public IConversionContext open(String... paths) {
 		ConversionContext context = new ConversionContext();
