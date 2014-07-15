@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.services.conversion.IConversionVisitor;
-import org.dawnsci.plotting.api.IPlottingSystem;
+import org.eclipse.dawnsci.plotting.api.IPlottingSystem;
 
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 

@@ -29,14 +29,14 @@ import ncsa.hdf.object.HObject;
 import ncsa.hdf.object.h5.H5Datatype;
 
 import org.dawb.common.services.IPersistentFile;
-import org.dawb.hdf5.H5Utils;
-import org.dawb.hdf5.HierarchicalDataFactory;
-import org.dawb.hdf5.HierarchicalDataFileUtils;
-import org.dawb.hdf5.IHierarchicalDataFile;
-import org.dawb.hdf5.Nexus;
 import org.dawnsci.io.h5.H5LazyDataset;
 import org.dawnsci.persistence.json.IJSonMarshaller;
 import org.dawnsci.persistence.json.JacksonMarshaller;
+import org.eclipse.dawnsci.hdf5.H5Utils;
+import org.eclipse.dawnsci.hdf5.HierarchicalDataFactory;
+import org.eclipse.dawnsci.hdf5.HierarchicalDataFileUtils;
+import org.eclipse.dawnsci.hdf5.IHierarchicalDataFile;
+import org.eclipse.dawnsci.hdf5.Nexus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -4,10 +4,10 @@ import java.io.File;
 import java.util.Collection;
 
 import org.dawb.common.services.conversion.IConversionContext;
-import org.dawnsci.plotting.api.IPlottingSystem;
-import org.dawnsci.plotting.api.PlotType;
-import org.dawnsci.plotting.api.trace.IImageTrace;
-import org.dawnsci.plotting.api.trace.ITrace;
+import org.eclipse.dawnsci.plotting.api.IPlottingSystem;
+import org.eclipse.dawnsci.plotting.api.PlotType;
+import org.eclipse.dawnsci.plotting.api.trace.IImageTrace;
+import org.eclipse.dawnsci.plotting.api.trace.ITrace;
 
 import uk.ac.diamond.scisoft.analysis.dataset.Dataset;
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;

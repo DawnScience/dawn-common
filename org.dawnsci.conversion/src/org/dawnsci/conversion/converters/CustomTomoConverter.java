@@ -12,10 +12,10 @@ import ncsa.hdf.object.HObject;
 import ncsa.hdf.object.h5.H5ScalarDS;
 
 import org.dawb.common.services.conversion.IConversionContext;
-import org.dawb.hdf5.HierarchicalDataFactory;
-import org.dawb.hdf5.IHierarchicalDataFile;
-import org.dawb.hdf5.nexus.IFindInNexus;
-import org.dawb.hdf5.nexus.NexusUtils;
+import org.eclipse.dawnsci.hdf5.HierarchicalDataFactory;
+import org.eclipse.dawnsci.hdf5.IHierarchicalDataFile;
+import org.eclipse.dawnsci.hdf5.nexus.IFindInNexus;
+import org.eclipse.dawnsci.hdf5.nexus.NexusUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

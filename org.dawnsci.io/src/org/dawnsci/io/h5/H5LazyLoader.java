@@ -8,9 +8,9 @@ import java.util.Map;
 
 import ncsa.hdf.object.Dataset;
 
-import org.dawb.hdf5.H5Utils;
-import org.dawb.hdf5.HierarchicalDataFactory;
-import org.dawb.hdf5.IHierarchicalDataFile;
+import org.eclipse.dawnsci.hdf5.H5Utils;
+import org.eclipse.dawnsci.hdf5.HierarchicalDataFactory;
+import org.eclipse.dawnsci.hdf5.IHierarchicalDataFile;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.io.ILazyLoader;

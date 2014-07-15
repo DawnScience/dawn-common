@@ -5,7 +5,7 @@ import java.io.File;
 import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.ui.util.GridUtils;
 import org.dawnsci.conversion.converters.ImageConverter;
-import org.dawnsci.plotting.api.PlotType;
+import org.eclipse.dawnsci.plotting.api.PlotType;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;

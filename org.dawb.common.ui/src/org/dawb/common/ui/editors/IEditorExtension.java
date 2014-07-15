@@ -1,6 +1,6 @@
 package org.dawb.common.ui.editors;
 
-import org.dawnsci.plotting.api.IPlottingContainer;
+import org.eclipse.dawnsci.plotting.api.IPlottingContainer;
 import org.eclipse.ui.IEditorPart;
 
 /**

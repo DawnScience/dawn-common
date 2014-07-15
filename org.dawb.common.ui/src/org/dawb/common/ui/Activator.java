@@ -9,7 +9,7 @@
  */ 
 package org.dawb.common.ui;
 
-import org.dawnsci.plotting.api.region.IRegionService;
+import org.eclipse.dawnsci.plotting.api.region.IRegionService;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;

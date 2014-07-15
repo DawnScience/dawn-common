@@ -31,8 +31,8 @@ import org.cansas.cansas1d.SASsampleType;
 import org.cansas.cansas1d.SASsourceType;
 import org.cansas.cansas1d.SAStransmissionSpectrumType;
 import org.dawb.common.services.conversion.IConversionContext;
-import org.dawb.hdf5.HierarchicalDataFactory;
-import org.dawb.hdf5.IHierarchicalDataFile;
+import org.eclipse.dawnsci.hdf5.HierarchicalDataFactory;
+import org.eclipse.dawnsci.hdf5.IHierarchicalDataFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

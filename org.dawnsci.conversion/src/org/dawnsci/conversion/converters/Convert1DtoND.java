@@ -11,9 +11,9 @@ import ncsa.hdf.object.Dataset;
 import ncsa.hdf.object.Datatype;
 
 import org.dawb.common.services.conversion.IConversionContext;
-import org.dawb.hdf5.HierarchicalDataFactory;
-import org.dawb.hdf5.IHierarchicalDataFile;
-import org.dawb.hdf5.Nexus;
+import org.eclipse.dawnsci.hdf5.HierarchicalDataFactory;
+import org.eclipse.dawnsci.hdf5.IHierarchicalDataFile;
+import org.eclipse.dawnsci.hdf5.Nexus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

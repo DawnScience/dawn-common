@@ -1,7 +1,7 @@
 package org.dawb.common.ui.parts;
 
-import org.dawnsci.plotting.api.IPlottingContainer;
-import org.dawnsci.plotting.api.IPlottingSystem;
+import org.eclipse.dawnsci.plotting.api.IPlottingContainer;
+import org.eclipse.dawnsci.plotting.api.IPlottingSystem;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.part.MultiPageEditorPart;

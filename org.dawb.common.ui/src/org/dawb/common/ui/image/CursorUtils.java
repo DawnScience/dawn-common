@@ -3,9 +3,9 @@ package org.dawb.common.ui.image;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
-import org.dawnsci.plotting.api.axis.IAxis;
-import org.dawnsci.plotting.api.histogram.ImageServiceBean.ImageOrigin;
-import org.dawnsci.plotting.api.trace.IImageTrace;
+import org.eclipse.dawnsci.plotting.api.axis.IAxis;
+import org.eclipse.dawnsci.plotting.api.histogram.ImageServiceBean.ImageOrigin;
+import org.eclipse.dawnsci.plotting.api.trace.IImageTrace;
 import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.draw2d.FigureUtilities;
 import org.eclipse.draw2d.MouseEvent;

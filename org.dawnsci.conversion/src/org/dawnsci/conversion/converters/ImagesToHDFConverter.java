@@ -12,9 +12,9 @@ import ncsa.hdf.object.Group;
 
 import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.util.list.SortNatural;
-import org.dawb.hdf5.HierarchicalDataFactory;
-import org.dawb.hdf5.IHierarchicalDataFile;
-import org.dawb.hdf5.Nexus;
+import org.eclipse.dawnsci.hdf5.HierarchicalDataFactory;
+import org.eclipse.dawnsci.hdf5.IHierarchicalDataFile;
+import org.eclipse.dawnsci.hdf5.Nexus;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;

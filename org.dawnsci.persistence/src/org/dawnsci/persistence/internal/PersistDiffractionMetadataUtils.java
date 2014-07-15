@@ -6,11 +6,11 @@ import ncsa.hdf.object.Dataset;
 import ncsa.hdf.object.Datatype;
 import ncsa.hdf.object.h5.H5Datatype;
 
-import org.dawb.hdf5.H5Utils;
-import org.dawb.hdf5.HierarchicalDataFileUtils;
-import org.dawb.hdf5.IHierarchicalDataFile;
-import org.dawb.hdf5.Nexus;
-import org.dawb.hdf5.nexus.NexusUtils;
+import org.eclipse.dawnsci.hdf5.H5Utils;
+import org.eclipse.dawnsci.hdf5.HierarchicalDataFileUtils;
+import org.eclipse.dawnsci.hdf5.IHierarchicalDataFile;
+import org.eclipse.dawnsci.hdf5.Nexus;
+import org.eclipse.dawnsci.hdf5.nexus.NexusUtils;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.diffraction.DetectorProperties;

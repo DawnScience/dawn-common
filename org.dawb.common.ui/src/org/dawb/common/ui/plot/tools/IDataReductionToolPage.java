@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.dawb.hdf5.H5Utils;
-import org.dawb.hdf5.IHierarchicalDataFile;
-import org.dawnsci.plotting.api.tool.IToolPage;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.dawnsci.hdf5.H5Utils;
+import org.eclipse.dawnsci.hdf5.IHierarchicalDataFile;
+import org.eclipse.dawnsci.plotting.api.tool.IToolPage;
 
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.Slice;

@@ -17,10 +17,10 @@ package org.dawnsci.persistence.internal;
 
 import org.dawb.common.services.IPersistenceService;
 import org.dawb.common.services.IPersistentFile;
-import org.dawb.hdf5.HierarchicalDataFactory;
-import org.dawb.hdf5.IHierarchicalDataFile;
 import org.dawnsci.persistence.json.JacksonMarshaller;
 import org.dawnsci.persistence.workflow.xml.MomlUpdater;
+import org.eclipse.dawnsci.hdf5.HierarchicalDataFactory;
+import org.eclipse.dawnsci.hdf5.IHierarchicalDataFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

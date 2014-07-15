@@ -1,7 +1,7 @@
 package org.dawnsci.io.h5;
 
-import org.dawb.hdf5.H5Utils;
-import org.dawb.hdf5.IHierarchicalDataFile;
+import org.eclipse.dawnsci.hdf5.H5Utils;
+import org.eclipse.dawnsci.hdf5.IHierarchicalDataFile;
 
 import ncsa.hdf.object.Dataset;
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;

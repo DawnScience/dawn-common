@@ -19,11 +19,11 @@ import java.util.Map;
 import ncsa.hdf.object.Dataset;
 
 import org.dawb.common.util.io.FileUtils;
-import org.dawb.hdf5.H5Utils;
-import org.dawb.hdf5.HierarchicalDataFactory;
-import org.dawb.hdf5.HierarchicalDataUtils;
-import org.dawb.hdf5.HierarchicalInfo;
-import org.dawb.hdf5.IHierarchicalDataFile;
+import org.eclipse.dawnsci.hdf5.H5Utils;
+import org.eclipse.dawnsci.hdf5.HierarchicalDataFactory;
+import org.eclipse.dawnsci.hdf5.HierarchicalDataUtils;
+import org.eclipse.dawnsci.hdf5.HierarchicalInfo;
+import org.eclipse.dawnsci.hdf5.IHierarchicalDataFile;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
