@@ -2346,7 +2346,7 @@ public class PaletteFactory {
 	 */
 	public static PaletteData getPalette() throws Exception {
 		
-		final ScopedPreferenceStore store = new ScopedPreferenceStore(InstanceScope.INSTANCE, "org.dawb.fable.imageviewer");
+		final ScopedPreferenceStore store = new ScopedPreferenceStore(InstanceScope.INSTANCE, "org.dawb.common.ui");
 		final int index = store.getInt("palettePreference");
 		return getPalette(index);
 	}

@@ -17,7 +17,6 @@ Require-Bundle: org.eclipse.ui,
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Import-Package: com.isencia.util.commandline;version="7.0.0",
- jep,
  org.dawb.common.util.eclipse,
  org.dawb.common.util.test,
  org.junit,
