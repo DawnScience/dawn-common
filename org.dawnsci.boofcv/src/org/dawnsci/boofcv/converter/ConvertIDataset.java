@@ -1,22 +1,4 @@
 /*-
- * Copyright (c) 2011-2013, Peter Abeles. All Rights Reserved.
- *
- * This file is part of BoofCV (http://boofcv.org).
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- *=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
- *
  * Copyright (c) 2014 Diamond Light Source Ltd.
  *
  * All rights reserved. This program and the accompanying materials
@@ -28,29 +10,40 @@ package org.dawnsci.boofcv.converter;
 
 import georegression.struct.point.Point2D_I32;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
+import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.BooleanDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ByteDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.Dataset;
+import uk.ac.diamond.scisoft.analysis.dataset.DatasetUtils;
 import uk.ac.diamond.scisoft.analysis.dataset.DoubleDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.FloatDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.IntegerDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.LongDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.RGBDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ShortDataset;
 import boofcv.alg.filter.binary.Contour;
 import boofcv.alg.misc.GImageStatistics;
 import boofcv.alg.misc.ImageStatistics;
-import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageFloat64;
 import boofcv.struct.image.ImageInt16;
 import boofcv.struct.image.ImageInteger;
+import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.ImageSInt64;
+import boofcv.struct.image.ImageSInt8;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageUInt16;
 import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.InterleavedS16;
 import boofcv.struct.image.MultiSpectral;
 
 /**
@@ -60,452 +53,130 @@ import boofcv.struct.image.MultiSpectral;
 public class ConvertIDataset {
 
 	/**
-	 * Converts a IDataset into an image of the specified type.
-	 * 
-	 * @param src Input IDataset which is to be converted
-	 * @param dst The image which it is being converted into
-	 * @param orderRgb If applicable, should it adjust the ordering of each color band to maintain color consistency
-	 */
-//	public static <T extends ImageBase> T convertFrom(IDataset src, boolean orderRgb) {
-//		if( dst instanceof ImageSingleBand ) {
-//			ImageSingleBand sb = (ImageSingleBand)dst;
-//		return convertFromSingle(src);
-//		} else if( dst instanceof MultiSpectral ) {
-//			MultiSpectral ms = (MultiSpectral)dst;
-//			convertFromMulti(src,ms,orderRgb,ms.getType());
-//		} else {
-//			throw new IllegalArgumentException("Unknown type " + dst.getClass().getSimpleName());
-//		}
-//	}
-
-	/**
-	 * Converts the IDataset into an {@link boofcv.struct.image.MultiSpectral} image of the specified
-	 * type. 
-	 *
-	 * @param src Input image. Not modified.
-	 * @param dst Output. The converted image is written to.  If null a new unsigned image is created.
-	 * @param orderRgb If applicable, should it adjust the ordering of each color band to maintain color consistency.
-	 *                 Most of the time you want this to be true.
-	 * @param type Which type of data structure is each band. (ImageUInt8 or ImageFloat32)
-	 * @return Converted image.
-	 */
-	/*public static <T extends ImageSingleBand> MultiSpectral<T> convertFromMulti(
-			IDataset src, MultiSpectral<T> dst, boolean orderRgb,
-			Class<T> type) {
-		if (src == null)
-			throw new IllegalArgumentException("src is null!");
-
-		if (dst != null) {
-			if (src.getShape()[0] != dst.getWidth() || src.getShape()[1] != dst.getHeight()) {
-				throw new IllegalArgumentException("image dimension are different");
-			}
-		}
-		src.elementClass().;
-		try {
-			WritableRaster raster = src.getRaster();
-
-			int numBands;
-			if( src.getType() == BufferedImage.TYPE_BYTE_INDEXED )
-				numBands = 3;
-			else
-				numBands = raster.getNumBands();
-
-			if( dst == null)
-				dst = new MultiSpectral<T>(type,src.getWidth(),src.getHeight(),numBands);
-			else if( dst.getNumBands() != numBands )
-				throw new IllegalArgumentException("Expected "+numBands+" bands in dst not "+dst.getNumBands());
-
-			if( type == ImageUInt8.class ) {
-				if (src.getRaster() instanceof ByteInterleavedRaster &&
-						src.getType() != BufferedImage.TYPE_BYTE_INDEXED ) {
-					if( src.getType() == BufferedImage.TYPE_BYTE_GRAY)  {
-						for( int i = 0; i < dst.getNumBands(); i++ )
-							ConvertRaster.bufferedToGray(src, ((MultiSpectral<ImageUInt8>) dst).getBand(i));
-					} else {
-						ConvertRaster.bufferedToMulti_U8((ByteInterleavedRaster) src.getRaster(), (MultiSpectral<ImageUInt8>)dst);
-					}
-				} else if (src.getRaster() instanceof IntegerInterleavedRaster) {
-					ConvertRaster.bufferedToMulti_U8((IntegerInterleavedRaster) src.getRaster(), (MultiSpectral<ImageUInt8>)dst);
-				} else {
-					ConvertRaster.bufferedToMulti_U8(src, (MultiSpectral<ImageUInt8>)dst);
-				}
-			} else if( type == ImageFloat32.class ) {
-				if (src.getRaster() instanceof ByteInterleavedRaster &&
-						src.getType() != BufferedImage.TYPE_BYTE_INDEXED  ) {
-					if( src.getType() == BufferedImage.TYPE_BYTE_GRAY)  {
-						for( int i = 0; i < dst.getNumBands(); i++ )
-							ConvertRaster.bufferedToGray(src,((MultiSpectral<ImageFloat32>)dst).getBand(i));
-					} else {
-						ConvertRaster.bufferedToMulti_F32((ByteInterleavedRaster) src.getRaster(), (MultiSpectral<ImageFloat32>)dst);
-					}
-				} else if (src.getRaster() instanceof IntegerInterleavedRaster) {
-					ConvertRaster.bufferedToMulti_F32((IntegerInterleavedRaster) src.getRaster(), (MultiSpectral<ImageFloat32>)dst);
-				} else {
-					ConvertRaster.bufferedToMulti_F32(src, (MultiSpectral<ImageFloat32>)dst);
-				}
-			} else {
-				throw new IllegalArgumentException("Band type not supported yet");
-			}
-
-		} catch( java.security.AccessControlException e) {
-			// Applets don't allow access to the raster()
-			if( dst == null )
-				dst = new MultiSpectral<T>(type,src.getWidth(),src.getHeight(),3);
-
-			if( type == ImageUInt8.class ) {
-				ConvertRaster.bufferedToMulti_U8(src, (MultiSpectral<ImageUInt8>)dst);
-			} else if( type == ImageFloat32.class ) {
-				ConvertRaster.bufferedToMulti_F32(src, (MultiSpectral<ImageFloat32>)dst);
-			}
-		}
-
-		// if requested, ensure the ordering of the bands
-		if( orderRgb ) {
-			orderBandsIntoRGB(dst,src);
-		}
-
-		return dst;
-	}
-*/
-
-	/**
-	 * Converts the IDataset image into an {@link boofcv.struct.image.ImageUInt8}.  If the IDataset
-	 * has multiple channels the intensities of each channel are averaged together.
+	 * Converts the IDataset image into an {@link ImageBase}.
 	 *
 	 * @param src Input IDataset.
-	 * @param dst Where the converted image is written to.  If null a new unsigned image is created.
+	 * @param shareData if true, share where possible (i.e. not a boolean dataset) 
 	 * @return Converted image.
 	 */
-	public static <T extends ImageBase<?>> T convertFrom(IDataset src) {
+	public static ImageBase<?> convertFrom(IDataset src, boolean shareData) {
 		if(src.getShape().length != 2)
 			throw new IllegalArgumentException("The dataset has to be a 2 dimensionnal array");
 		Class<?> type = src.getClass();
-		int width = src.getShape()[0];
-		int height = src.getShape()[1];
 
-		if (src instanceof RGBDataset || src instanceof IntegerDataset) {
+		Dataset sd;
+		if (src instanceof Dataset) {
+			if (!shareData && !(src instanceof BooleanDataset)) {
+				sd = ((Dataset) src).clone();
+			} else {
+				sd = (Dataset) src;
+			}
+		} else {
+			sd = DatasetUtils.convertToDataset(src);
+		}
+
+		int height = sd.getShapeRef()[0];
+		int width = sd.getShapeRef()[1];
+
+		if (sd instanceof BooleanDataset) {
+			ImageSInt8 dst = new ImageSInt8(width, height);
+			dst.data = ((ByteDataset) sd.cast(Dataset.INT8)).getData();
+			return dst;
+		} else if (sd instanceof ByteDataset) {
+			ImageSInt8 dst = new ImageSInt8(width, height);
+			dst.data = ((ByteDataset) sd).getData();
+			return dst;
+		} else if(sd instanceof ShortDataset) {
+			ImageSInt16 dst = new ImageSInt16(width, height);
+			dst.data = ((ShortDataset) sd).getData();
+			return dst;
+		} else if (sd instanceof IntegerDataset) {
+			ImageSInt32 dst = new ImageSInt32(width, height);
+			dst.data = ((IntegerDataset) sd).getData();
+			return dst;
+		} else if (sd instanceof LongDataset) {
+			ImageSInt64 dst = new ImageSInt64(width, height);
+			dst.data = ((LongDataset) sd).getData();
+			return dst;
+		} else if (sd instanceof FloatDataset) {
 			ImageFloat32 dst = new ImageFloat32(width, height);
-			datasetToImage(src, dst);
-			return (T) dst;
-		} else if (src instanceof ByteDataset) {
-			ImageUInt8 dst = new ImageUInt8(width, height);
-			datasetToImage(src, dst);
-			return (T) dst;
-		} else if(src instanceof ShortDataset) {
-			ImageInt16 dst = GeneralizedImageOps.createSingleBand(ImageInt16.class, width, height);
-			datasetToImage(src, dst);
-			return (T) dst;
-		} else if (src instanceof FloatDataset) {
-			ImageFloat32 dst = new ImageFloat32(width, height);
-			datasetToImage(src, dst);
-			return (T) dst;
-		} else if (src instanceof DoubleDataset) {
+			dst.data = ((FloatDataset) sd).getData();
+			return dst;
+		} else if (sd instanceof DoubleDataset) {
 			ImageFloat64 dst = new ImageFloat64(width, height);
-			datasetToImage(src, dst);
-			return (T) dst;
-		} else if (src instanceof BooleanDataset) {
-			return null;
+			dst.data = ((DoubleDataset) sd).getData();
+			return dst;
+		} else if (sd instanceof RGBDataset) {
+			InterleavedS16 dst = new InterleavedS16(width, height, 3);
+			dst.data = ((RGBDataset) sd).getData();
+			return dst;
 		} else {
 			throw new IllegalArgumentException("Unknown type " + type);
 		}
 	}
 
-	/**
-	 * <p>
-	 * Converts an IDataset image into an 8bit intensity image using the
-	 * BufferedImage's RGB interface.
-	 * </p>
-	 * <p>
-	 * This is much slower than working
-	 * directly with the BufferedImage's internal raster and should be
-	 * avoided if possible.
-	 * </p>
-	 *
-	 * @param src Input image.
-	 * @param dst Output image.
-	 */
-	public static void datasetToImage(IDataset src, ImageUInt8 dst) {
-		if(src.getShape().length != 2)
-			throw new IllegalArgumentException("The dataset has to be a 2 dimensionnal array");
-		final int width = src.getShape()[0];
-		final int height = src.getShape()[1];
-		byte[] data = dst.data;
+	private static Map<Class <? extends ImageBase<?>>, Class<?>> imageToElementClass;
 
-		for (int y = 0; y < height; y++) {
-			int index = dst.startIndex + y * dst.stride;
-			for (int x = 0; x < width; x++) {
-				data[index++] = src.getByte(x, y);
-			}
-		}
-//		else {
-//			for (int y = 0; y < height; y++) {
-//				int index = dst.startIndex + y * dst.stride;
-//				for (int x = 0; x < width; x++) {
-//					int argb = src.getRGB(x, y);
-//
-//					data[index++] = (byte) ((((argb >>> 16) & 0xFF) + ((argb >>> 8) & 0xFF) + (argb & 0xFF)) / 3);
-//				}
-//			}
-//		}
-	}
-
-	/**
-	 * <p>
-	 * Converts an IDataset image into an 16bit intensity image using the
-	 * BufferedImage's RGB interface.
-	 * </p>
-	 * <p>
-	 * This is much slower than working
-	 * directly with the BufferedImage's internal raster and should be
-	 * avoided if possible.
-	 * </p>
-	 *
-	 * @param src Input image.
-	 * @param dst Output image.
-	 */
-	public static void datasetToImage(IDataset src, ImageInt16<?> dst) {
-		if(src.getShape().length != 2)
-			throw new IllegalArgumentException("The dataset has to be a 2 dimensionnal array");
-		final int width = src.getShape()[0];
-		final int height = src.getShape()[1];
-
-		short[] data = dst.data;
-
-		for (int y = 0; y < height; y++) {
-			int index = dst.startIndex + y * dst.stride;
-			for (int x = 0; x < width; x++) {
-				data[index++] = src.getShort(x, y);
-			}
-		}
-//		} else {
-//			// this will be totally garbage.  just here so that some unit test will pass
-//			for (int y = 0; y < height; y++) {
-//				int index = dst.startIndex + y * dst.stride;
-//				for (int x = 0; x < width; x++) {
-//					int argb = src.getRGB(x, y);
-//
-//					data[index++] = (short) ((((argb >>> 16) & 0xFF) + ((argb >>> 8) & 0xFF) + (argb & 0xFF)) / 3);
-//				}
-//			}
-//		}
-	}
-
-	/**
-	 * <p>
-	 * Converts an IDataset image into an 8bit intensity image using the
-	 * BufferedImage's RGB interface.
-	 * </p>
-	 * <p>
-	 * This is much slower than working
-	 * directly with the BufferedImage's internal raster and should be
-	 * avoided if possible.
-	 * </p>
-	 *
-	 * @param src Input image.
-	 * @param dst Output image.
-	 */
-	public static void datasetToImage(IDataset src, ImageFloat32 dst) {
-		if(src.getShape().length != 2)
-			throw new IllegalArgumentException("The dataset has to be a 2 dimensionnal array");
-		final int width = src.getShape()[0];
-		final int height = src.getShape()[1];
-
-		float[] data = dst.data;
-
-		for (int y = 0; y < height; y++) {
-			int index = dst.startIndex + y * dst.stride;
-			for (int x = 0; x < width; x++) {
-				data[index++] = src.getFloat(x, y);
-			}
-		}
-//		} else {
-//			for (int y = 0; y < height; y++) {
-//				int index = dst.startIndex + y * dst.stride;
-//				for (int x = 0; x < width; x++) {
-//					int argb = src.getRGB(x, y);
-//					int r = (argb >>> 16) & 0xFF;
-//					int g = (argb >>> 8) & 0xFF;
-//					int b = argb & 0xFF;
-//					float ave = (r + g + b) / 3.0f;
-//					data[index++] = ave;
-//				}
-//			}
-//		}
-	}
-
-	/**
-	 * <p>
-	 * Converts an IDataset image into an 8bit intensity image using the
-	 * BufferedImage's RGB interface.
-	 * </p>
-	 * <p>
-	 * This is much slower than working
-	 * directly with the BufferedImage's internal raster and should be
-	 * avoided if possible.
-	 * </p>
-	 *
-	 * @param src Input image.
-	 * @param dst Output image.
-	 */
-	public static void datasetToImage(IDataset src, ImageFloat64 dst) {
-		if(src.getShape().length != 2)
-			throw new IllegalArgumentException("The dataset has to be a 2 dimensionnal array");
-		final int width = src.getShape()[0];
-		final int height = src.getShape()[1];
-
-		double[] data = dst.data;
-
-		for (int y = 0; y < height; y++) {
-			int index = dst.startIndex + y * dst.stride;
-			for (int x = 0; x < width; x++) {
-				data[index++] = src.getDouble(x, y);
-			}
+	static {
+		imageToElementClass = new HashMap<Class<? extends ImageBase<?>>, Class<?>>();
+		for (ImageDataType i : ImageDataType.values()) {
+			imageToElementClass.put(ImageDataType.typeToClass(i), i.getDataType());
 		}
 	}
 
+	@SuppressWarnings("unchecked")
+	public static <T extends ImageBase<?>> T convertFrom(IDataset src, Class<T> clazz, int bands) {
+		Dataset ds;
+		int ddt = AbstractDataset.getDTypeFromClass(imageToElementClass.get(clazz), bands);
+		if (AbstractDataset.getDType(src) != ddt) {
+			ds = DatasetUtils.cast(src, ddt);
+		} else {
+			ds = DatasetUtils.convertToDataset(src);
+		}
+
+		return (T) convertFrom(ds, true);
+	}
+
 	/**
-	 * Converts a {@link boofcv.struct.image.ImageBase} into an IDataset.  If the buffered image
-	 * has multiple channels the intensities of each channel are averaged together.
+	 * Converts a {@link ImageBase} into an IDataset
 	 *
 	 * @param src Input image.
 	 * @param isBinary if true will convert to a binary image
 	 * @return Converted image.
 	 */
 	public static <T extends ImageBase<?>> IDataset convertTo(T src, boolean isBinary) {
-		if( src instanceof ImageSingleBand ) {
-			if (ImageUInt8.class == src.getClass()) {
-				return imageToIDataset((ImageUInt8) src, isBinary);
-			} else if (ImageInt16.class.isInstance(src)) {
-				return imageToIDataset((ImageInt16<?>) src);
-			} else if (ImageFloat32.class == src.getClass()) {
-				return imageToIDataset((ImageFloat32) src);
-			} else if (ImageFloat64.class == src.getClass()) {
-				return imageToIDataset((ImageFloat64) src);
-			} else if (ImageSInt32.class == src.getClass()) {
-				return imageToIDataset((ImageSInt32) src, 0);
-			} else {
-				throw new IllegalArgumentException("ImageSingleBand type is not yet supported: "+src.getClass().getSimpleName());
+		if (src instanceof ImageUInt8 || src instanceof ImageSInt8) {
+			Dataset dst = new ByteDataset(((ImageUInt8) src).data, src.height, src.width);
+			if (isBinary) {
+				dst = dst.cast(Dataset.BOOL);
 			}
-		} else if( src instanceof MultiSpectral ) {
-//			MultiSpectral ms = (MultiSpectral)src;
-//
-//			if( ImageUInt8.class == ms.getType() ) {
-//				return convertTo_U8((MultiSpectral<ImageUInt8>) ms, dst, orderRgb);
-//			} else if( ImageFloat32.class == ms.getType() ) {
-//				return convertTo_F32((MultiSpectral<ImageFloat32>) ms, dst, orderRgb);
-//			} else {
-//				throw new IllegalArgumentException("MultiSpectral type is not yet supported: "+ ms.getType().getSimpleName());
-//			}
-		}
-		return null;
-	}
-
-	/**
-	 * Converts a {@link boofcv.struct.image.ImageUInt8} into an IDataset.  If the buffered image
-	 * has multiple channels the intensities of each channel are averaged together.
-	 *
-	 * @param src Input image.
-	 * @param isBinary if true, will convert to a Binary Dataset
-	 * @return dst Where the converted image is written to
-	 */
-	public static IDataset imageToIDataset(ImageUInt8 src, boolean isBinary) {
-		final int width = src.getWidth();
-		final int height = src.getHeight();
-		byte[] data = src.data;
-		
-		if (!isBinary)
-			return new ByteDataset(data, width, height);
-
-		BooleanDataset dst = new BooleanDataset(width, height);
-		for (int y = 0; y < height; y++) {
-			int indexSrc = src.startIndex + src.stride * y;
-			for (int x = 0; x < width; x++) {
-//				int v = data[indexSrc++] & 0xFF;
-//				int argb = v << 16 | v << 8 | v;
-				boolean value = data[indexSrc++] > 0 ? true : false;
-				dst.set(value, x, y);
-//				dst.setRGB(x, y, argb);
+			return dst;
+		} else if (src instanceof ImageUInt16 || src instanceof ImageSInt16) {
+			Dataset dst = new ShortDataset(((ImageInt16<?>) src).data, src.height, src.width);
+			return dst;
+		} else if (src instanceof ImageSInt32) {
+			Dataset dst = new IntegerDataset(((ImageSInt32) src).data, src.height, src.width);
+			return dst;
+		} else if (src instanceof ImageSInt64) {
+			Dataset dst = new LongDataset(((ImageSInt64) src).data, src.height, src.width);
+			return dst;
+		} else if (src instanceof ImageFloat32) {
+			Dataset dst = new FloatDataset(((ImageFloat32) src).data, src.height, src.width);
+			return dst;
+		} else if (src instanceof ImageFloat64) {
+			Dataset dst = new DoubleDataset(((ImageFloat64) src).data, src.height, src.width);
+			return dst;
+		} else if (src instanceof MultiSpectral) {
+			@SuppressWarnings({ "rawtypes", "unchecked" })
+			MultiSpectral<ImageSingleBand> msrc = (MultiSpectral<ImageSingleBand>) src;
+			int n = msrc.getNumBands();
+			Dataset[] datasets = new Dataset[n];
+			for (int i = 0; i < n; i++) {
+				datasets[i] = (Dataset) convertTo(msrc.getBand(i), isBinary);
 			}
+			return DatasetUtils.createCompoundDataset(datasets);
 		}
-		return dst;
-	}
-
-	/**
-	 * Converts a {@link boofcv.struct.image.ImageInt16} into an IDataset.  If the buffered image
-	 * has multiple channels the intensities of each channel are averaged together.
-	 *
-	 * @param src Input image.
-	 * @return dst Where the converted image is written to
-	 */
-	public static IDataset imageToIDataset(ImageInt16<?> src) {
-
-		final int width = src.getWidth();
-		final int height = src.getHeight();
-		ShortDataset dst = new ShortDataset(width, height);
-
-		short[] data = src.data;
-		for (int y = 0; y < height; y++) {
-			int indexSrc = src.startIndex + src.stride * y;
-			for (int x = 0; x < width; x++) {
-				dst.set(data[indexSrc++], x, y);
-			}
-		}
-		return dst;
-	}
-
-	/**
-	 * Converts a {@link boofcv.struct.image.ImageFloat32} into an IDataset.  If the buffered image
-	 * has multiple channels the intensities of each channel are averaged together.
-	 *
-	 * @param src Input image.
-	 * @return dst Where the converted image is written to
-	 */
-	public static IDataset imageToIDataset(ImageFloat32 src) {
-		final int width = src.getWidth();
-		final int height = src.getHeight();
-		FloatDataset dst = new FloatDataset(width, height);
-
-		float[] data = src.data;
-		for (int y = 0; y < height; y++) {
-			int indexSrc = src.startIndex + src.stride * y;
-
-			for (int x = 0; x < width; x++) {
-//				int v = (int) data[indexSrc++];
-
-//				int argb = v << 16 | v << 8 | v;
-	
-				dst.set(data[indexSrc++], x, y);
-//				dst.setRGB(x, y, argb);
-			}
-		}
-		return dst;
-	}
-
-	/**
-	 * Converts a {@link boofcv.struct.image.ImageFloat64} into an IDataset.  If the buffered image
-	 * has multiple channels the intensities of each channel are averaged together.
-	 *
-	 * @param src Input image.
-	 * @return dst Where the converted image is written to
-	 */
-	public static IDataset imageToIDataset(ImageFloat64 src) {
-		final int width = src.getWidth();
-		final int height = src.getHeight();
-		DoubleDataset dst = new DoubleDataset(width, height);
-
-		double[] data = src.data;
-		for (int y = 0; y < height; y++) {
-			int indexSrc = src.startIndex + src.stride * y;
-
-			for (int x = 0; x < width; x++) {
-//				int v = (int) data[indexSrc++];
-
-//				int argb = v << 16 | v << 8 | v;
-				dst.set(data[indexSrc++], x, y);
-//				dst.setRGB(x, y, argb);
-			}
-		}
-		return dst;
+		throw new IllegalArgumentException("Image type is not yet supported: "+src.getClass().getSimpleName());
 	}
 
 	/**
@@ -527,7 +198,7 @@ public class ConvertIDataset {
 		else {
 			int colors[] = new int[numColors + 1];
 
-			Random rand = new Random(123);
+			Random rand = new Random(123); // FIXME WTF?
 			for( int i = 0; i < colors.length; i++ ) {
 				colors[i] = rand.nextInt();
 			}

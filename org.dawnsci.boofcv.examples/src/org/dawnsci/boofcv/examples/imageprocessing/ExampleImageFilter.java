@@ -61,20 +61,12 @@ public class ExampleImageFilter {
 		IDataset image = holder.getDataset(dataname);
 		Utils.showPlotView("uk.ac.diamond.scisoft.analysis.rcp.plotViewDP", "Dataset Plot", image);
 
-		int width = image.getShape()[0];
-		int height = image.getShape()[1];
 		// produces the same results
-		ImageUInt8 procedural = new ImageUInt8(width, height);
-		ImageUInt8 generalized = new ImageUInt8(width, height);
-		ImageUInt8 filter = new ImageUInt8(width, height);
-		ImageUInt8 nogenerics = new ImageUInt8(width, height);
-		ImageFloat32 generalized32 = new ImageFloat32(width, height);
-
-		ConvertIDataset.datasetToImage(image, procedural);
-		ConvertIDataset.datasetToImage(image, generalized);
-		ConvertIDataset.datasetToImage(image, filter);
-		ConvertIDataset.datasetToImage(image, nogenerics);
-		ConvertIDataset.datasetToImage(image, generalized32);
+		ImageUInt8 procedural      = ConvertIDataset.convertFrom(image, ImageUInt8.class, 1);
+		ImageUInt8 generalized     = ConvertIDataset.convertFrom(image, ImageUInt8.class, 1);
+		ImageUInt8 filter          = ConvertIDataset.convertFrom(image, ImageUInt8.class, 1);
+		ImageUInt8 nogenerics      = ConvertIDataset.convertFrom(image, ImageUInt8.class, 1);
+		ImageFloat32 generalized32 = ConvertIDataset.convertFrom(image, ImageFloat32.class, 1);
 
 		procedural(procedural);
 		generalized(generalized);
@@ -103,7 +95,7 @@ public class ExampleImageFilter {
 
 	}
 
-	private static <T extends ImageSingleBand, D extends ImageSingleBand> void generalized(
+	private static <T extends ImageSingleBand<?>, D extends ImageSingleBand<?>> void generalized(
 			T input) throws Throwable {
 		Class<T> inputType = (Class<T>) input.getClass();
 		Class<D> derivType = GImageDerivativeOps.getDerivativeType(inputType);
@@ -124,7 +116,7 @@ public class ExampleImageFilter {
 		Utils.showPlotView("uk.ac.diamond.scisoft.analysis.rcp.plotView1", "Plot 1", outputImage);
 	}
 
-	private static <T extends ImageSingleBand<?>, D extends ImageSingleBand> void filter(
+	private static <T extends ImageSingleBand<?>, D extends ImageSingleBand<?>> void filter(
 			T input) throws Throwable {
 		Class<T> inputType = (Class<T>) input.getClass();
 		Class<D> derivType = GImageDerivativeOps.getDerivativeType(inputType);
@@ -148,8 +140,9 @@ public class ExampleImageFilter {
 	}
 
 	private static void nogenerics(ImageSingleBand<?> input) throws Throwable {
-		Class inputType = input.getClass();
-		Class derivType = GImageDerivativeOps.getDerivativeType(inputType);
+		@SuppressWarnings("unchecked")
+		Class<ImageSingleBand<?>> inputType = (Class<ImageSingleBand<?>>) input.getClass();
+		Class<? extends ImageSingleBand<?>> derivType = GImageDerivativeOps.getDerivativeType(inputType);
 
 		ImageSingleBand<?> blurred = GeneralizedImageOps.createSingleBand(
 				inputType, input.width, input.height);
