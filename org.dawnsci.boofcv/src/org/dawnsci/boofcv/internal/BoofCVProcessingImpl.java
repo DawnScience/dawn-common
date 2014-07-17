@@ -14,19 +14,17 @@ import java.util.List;
 import org.dawb.common.services.IBoofCVProcessingService;
 import org.dawnsci.boofcv.converter.ConvertIDataset;
 
+import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.Contour;
 import boofcv.alg.filter.binary.ThresholdImageOps;
 import boofcv.alg.filter.blur.BlurImageOps;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
-import boofcv.alg.misc.ImageStatistics;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.BorderType;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
-
-import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 
 /**
  * Implementation of IBoofCVProcessingService<br>
@@ -40,33 +38,28 @@ public class BoofCVProcessingImpl implements IBoofCVProcessingService {
 
 	@Override
 	public IDataset filterGaussianBlur(IDataset input, double sigma, int radius) {
-		int[] lengths = getLengths(input);
+		int[] shape = getShape(input);
 
-		//convert to boofcv image
-		ImageUInt8 converted = new ImageUInt8(lengths[0], lengths[1]);
-		ConvertIDataset.datasetToImage(input, converted);
+		ImageUInt8 converted = ConvertIDataset.convertFrom(input, ImageUInt8.class, 1);
 
-		// apply gaussian blur filter
-		ImageUInt8 blurred = new ImageUInt8(lengths[0], lengths[1]);
+		ImageUInt8 blurred = new ImageUInt8(shape[1], shape[0]);
 		BlurImageOps.gaussian(converted, blurred, sigma, radius, null);
 
-		//convert back to IDataset
-		return ConvertIDataset.imageToIDataset(blurred, false);
+		return ConvertIDataset.convertTo(blurred, false);
 	}
 
 	@Override
-	public List<IDataset> filterDerivativeSobel(IDataset orig) {
-		int[] lengths = getLengths(orig);
+	public List<IDataset> filterDerivativeSobel(IDataset input) {
+		int[] shape = getShape(input);
 
-		ImageUInt8 converted = new ImageUInt8(lengths[0], lengths[1]);
-		ConvertIDataset.datasetToImage(orig, converted);
+		// FIXME why is this not used?
+		ImageUInt8 converted = ConvertIDataset.convertFrom(input, ImageUInt8.class, 1);
 
-		
 		Class<? extends ImageSingleBand<?>> derivType = GImageDerivativeOps.getDerivativeType(ImageUInt8.class);
 
-		ImageSingleBand<?> blurred = GeneralizedImageOps.createSingleBand(ImageUInt8.class, lengths[0], lengths[1]);
-		ImageSingleBand<?> derivX = GeneralizedImageOps.createSingleBand(derivType, lengths[0], lengths[1]);
-		ImageSingleBand<?> derivY = GeneralizedImageOps.createSingleBand(derivType, lengths[0], lengths[1]);
+		ImageSingleBand<?> blurred = GeneralizedImageOps.createSingleBand(ImageUInt8.class, shape[1], shape[0]);
+		ImageSingleBand<?> derivX = GeneralizedImageOps.createSingleBand(derivType, shape[1], shape[0]);
+		ImageSingleBand<?> derivY = GeneralizedImageOps.createSingleBand(derivType, shape[1], shape[0]);
 
 		// Calculate image's derivative
 		GImageDerivativeOps.sobel(blurred, derivX, derivY, BorderType.EXTENDED);
@@ -81,16 +74,13 @@ public class BoofCVProcessingImpl implements IBoofCVProcessingService {
 
 	@Override
 	public IDataset filterThreshold(IDataset input, float threshold, boolean down, boolean isBinary) {
-		int[] lengths = getLengths(input);
+		int[] shape = getShape(input);
 
-		ImageFloat32 converted = ConvertIDataset.convertFrom(input);
-		ImageUInt8 binary = new ImageUInt8(lengths[0], lengths[1]);
-
-		// the mean pixel value is often a reasonable threshold when creating a binary image
-		double mean = ImageStatistics.mean(converted);
+		ImageFloat32 converted = ConvertIDataset.convertFrom(input, ImageFloat32.class, 1);
+		ImageUInt8 binary = new ImageUInt8(shape[1], shape[0]);
 
 		// create a binary image by thresholding
-		ThresholdImageOps.threshold(converted, binary, (float)mean, down);
+		ThresholdImageOps.threshold(converted, binary, threshold, down);
 
 		//convert back to IDataset
 		return ConvertIDataset.convertTo(binary, isBinary);
@@ -98,10 +88,7 @@ public class BoofCVProcessingImpl implements IBoofCVProcessingService {
 
 	@Override
 	public IDataset filterErode(IDataset input, boolean isBinary) {
-		int[] lengths = getLengths(input);
-
-		ImageUInt8 converted = new ImageUInt8(lengths[0], lengths[1]);
-		ConvertIDataset.datasetToImage(input, converted);
+		ImageUInt8 converted = ConvertIDataset.convertFrom(input, ImageUInt8.class, 1);
 
 		ImageUInt8 filtered = BinaryImageOps.erode8(converted, null);
 
@@ -110,10 +97,7 @@ public class BoofCVProcessingImpl implements IBoofCVProcessingService {
 
 	@Override
 	public IDataset filterDilate(IDataset input, boolean isBinary) {
-		int[] lengths = getLengths(input);
-
-		ImageUInt8 converted = new ImageUInt8(lengths[0], lengths[1]);
-		ConvertIDataset.datasetToImage(input, converted);
+		ImageUInt8 converted = ConvertIDataset.convertFrom(input, ImageUInt8.class, 1);
 
 		ImageUInt8 filtered = BinaryImageOps.dilate8(converted, null);
 
@@ -122,9 +106,7 @@ public class BoofCVProcessingImpl implements IBoofCVProcessingService {
 
 	@Override
 	public IDataset filterErodeAndDilate(IDataset input, boolean isBinary) {
-		int[] lengths = getLengths(input);
-		ImageUInt8 converted = new ImageUInt8(lengths[0], lengths[1]);
-		ConvertIDataset.datasetToImage(input, converted);
+		ImageUInt8 converted = ConvertIDataset.convertFrom(input, ImageUInt8.class, 1);
 		ImageUInt8 eroded = BinaryImageOps.erode8(converted, null);
 		ImageUInt8 delated = BinaryImageOps.dilate8(eroded, null);
 		return ConvertIDataset.convertTo(delated, isBinary);
@@ -132,20 +114,19 @@ public class BoofCVProcessingImpl implements IBoofCVProcessingService {
 
 	@Override
 	public IDataset filterContour(IDataset input, int rule, int colorExternal, int colorInternal) {
-		int[] lengths = getLengths(input);
+		int[] shape = getShape(input);
 
-		ImageUInt8 converted = new ImageUInt8(lengths[0], lengths[1]);
-		ConvertIDataset.datasetToImage(input, converted);
+		ImageUInt8 converted = ConvertIDataset.convertFrom(input, ImageUInt8.class, 1);
 		// Detect blobs inside the image using a rule
 		List<Contour> contours = BinaryImageOps.contour(converted, rule, null);
 
-		return ConvertIDataset.contourImageToIDataset(contours, colorExternal, colorInternal, lengths[0], lengths[1]);
+		return ConvertIDataset.contourImageToIDataset(contours, colorExternal, colorInternal, shape[1], shape[0]);
 	}
 
-	private int[] getLengths(IDataset input) {
-		if (input.getShape().length != 2)
+	private int[] getShape(IDataset input) {
+		int[] shape = input.getShape();
+		if (shape.length != 2)
 			throw new IllegalArgumentException("The input data must be of dimension 2");
-		int lengths[] = { input.getShape()[0], input.getShape()[1] };
-		return lengths;
+		return shape;
 	}
 }

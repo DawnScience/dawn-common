@@ -54,7 +54,7 @@ public class ExampleBinaryOps {
 		Utils.showPlotView("uk.ac.diamond.scisoft.analysis.rcp.plotViewDP", "Dataset Plot", data);
 
 		// convert into BoofCV format
-		ImageFloat32 input = ConvertIDataset.convertFrom(data);
+		ImageFloat32 input = ConvertIDataset.convertFrom(data, ImageFloat32.class, 1);
 		ImageUInt8 binary = new ImageUInt8(input.width,input.height);
 		ImageSInt32 label = new ImageSInt32(input.width,input.height);
 
