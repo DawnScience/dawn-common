@@ -14,6 +14,8 @@ import org.dawnsci.conversion.converters.ImageConverter;
 import org.dawnsci.conversion.converters.ImagesToHDFConverter;
 import org.dawnsci.conversion.converters.VisitorConversion;
 
+import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
+
 public class ConversionServiceImpl implements IConversionService {
 	
 	static {

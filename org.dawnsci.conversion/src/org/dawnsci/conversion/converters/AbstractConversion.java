@@ -4,20 +4,14 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import ncsa.hdf.object.Dataset;
-import ncsa.hdf.object.Datatype;
-import ncsa.hdf.object.h5.H5Datatype;
 
 import org.dawb.common.services.conversion.IConversionContext;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
-import uk.ac.diamond.scisoft.analysis.dataset.BooleanDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ByteDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.DatasetUtils;
 import uk.ac.diamond.scisoft.analysis.dataset.DoubleDataset;
@@ -26,10 +20,10 @@ import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.IntegerDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.LongDataset;
-import uk.ac.diamond.scisoft.analysis.dataset.PositionIterator;
 import uk.ac.diamond.scisoft.analysis.dataset.ShortDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.Slice;
-import uk.ac.diamond.scisoft.analysis.dataset.StringDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.SliceVisitor;
+import uk.ac.diamond.scisoft.analysis.dataset.Slicer;
 import uk.ac.diamond.scisoft.analysis.io.IDataHolder;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
@@ -178,92 +172,25 @@ public abstract class AbstractConversion {
 	}
 
 	private void multiRangeIterate(final ILazyDataset         lz, 
-			               final String               nameFrag,
-		                   final IConversionContext   context) throws Exception {
+			                       final String               nameFrag,
+		                           final IConversionContext   context) throws Exception {
 		
-		final Map<Integer, String> sliceDimensions = context.getSliceDimensions();
+		final Map<Integer, String> dims = context.getSliceDimensions();
 
-		final int[] fullDims = lz.getShape();
-		
-		//Construct Slice String
-		StringBuilder sb = new StringBuilder();
-		
-		for (int i = 0; i < fullDims.length; i++) {
-			if (sliceDimensions.containsKey(i)) {
-				String s = sliceDimensions.get(i);
-				if (s.contains("all")) s = ":";
-				sb.append(s);
-				sb.append(",");
-			} else {
-				sb.append(":");
-				sb.append(',');
-			}
-		}
-		
-		sb.deleteCharAt(sb.length()-1);
-		Slice[] slices = Slice.convertFromString(sb.toString());
-		
-		//TODO all this horrible-ness could probably be reduced by taking an initial slice
-		//view from the original lazy dataset
-		
-		//create array of ignored axes values
-		Set<Integer> axesSet = new HashSet<Integer>();
-		for (int i = 0; i < fullDims.length; i++) axesSet.add(i);
-		axesSet.removeAll(sliceDimensions.keySet());
-		int[] axes = new int[axesSet.size()];
-		int count = 0;
-		Iterator<Integer> iter = axesSet.iterator();
-		while (iter.hasNext()) axes[count++] = iter.next(); 
+		Slicer.visitAll(lz, dims, nameFrag, new SliceVisitor() {
 
-		//determine shape of sliced dataset
-		int[] slicedShape = lz.getShape().clone();
-		for (int i = 0; i < slices.length; i++) {
-			if (slices[i].getStop() == null && slices[i].getLength() ==-1) continue;
-			slicedShape[i] = slices[i].getNumSteps();
-		}
-
-		PositionIterator pi = new PositionIterator(lz.getShape(), slices, axes);
-		int[] pos = pi.getPos();
-
-		while (pi.hasNext()) {
-
-			int[] end = pos.clone();
-			for (int i = 0; i<pos.length;i++) {
-				end[i]++;
-			}
-
-			for (int i = 0; i < axes.length; i++){
-				end[axes[i]] = fullDims[axes[i]];
-			}
-
-			int[] st = pos.clone();
-			for (int i = 0; i < st.length;i++) st[i] = 1;
-
-			Slice[] slice = Slice.convertToSlice(pos, end, st);
-			String sliceName = Slice.createString(slice);
-
-			Slice[] outSlice = new Slice[slices.length];
-			for (int i = 0; i < slices.length; i++) {
-				if (slice[i].getStop() == null && slice[i].getLength() ==-1) {
-					outSlice[i] = new Slice();
-				} else {
-					int nSteps = slice[i].getNumSteps();
-					int offset = (slice[i].getStart()-slices[i].getStart())/slices[i].getStep();
-					outSlice[i] = new Slice(offset,offset+nSteps);
+			@Override
+			public void visit(IDataset slice, Slice... slices) throws Exception {
+				context.setSelectedSlice(slices);
+				context.setSelectedShape(slice.getShape());
+				convert(slice);
+				if (context.getMonitor() != null) {
+					IMonitor mon = context.getMonitor();
+					if (mon.isCancelled()) return;
 				}
 			}
-
-			AbstractDataset data = (AbstractDataset)lz.getSlice(slice);
-			data = data.squeeze();
-			data.setName(nameFrag + " ("+ sliceName+")");
-			context.setSelectedSlice(outSlice);
-			context.setSelectedShape(slicedShape);
-			convert(data);
-			if (context.getMonitor() != null) {
-				IMonitor mon = context.getMonitor();
-				if (mon.isCancelled()) return;
-			}
-		}
+			
+		});
 	}
 	
 	/**
