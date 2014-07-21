@@ -261,12 +261,17 @@ public abstract class AbstractConversion {
 	private List<String> getData(List<String> sets, String datasetName) {
 
 		final List<String> ds = new ArrayList<String>(7);
-		for (String hdfPath : sets) {
-			if (hdfPath.matches(datasetName)) {
-				ds.add(hdfPath);
+		
+		if (sets.contains(datasetName)) {
+			ds.add(datasetName);
+		} else {
+			for (String hdfPath : sets) {
+				if (hdfPath.matches(datasetName)) {
+					ds.add(hdfPath);
+				}
 			}
 		}
-
+		
 		return ds.isEmpty() ? null : ds;
 	}
 	

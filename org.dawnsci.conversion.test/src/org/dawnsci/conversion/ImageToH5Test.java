@@ -74,6 +74,7 @@ public class ImageToH5Test {
 			
 	        final IConversionContext context = service.open(dir.getAbsolutePath()+"/copy_.*img");
 	        final File output = new File(dir.getParentFile(), "imageStackTestOutput_"+testname+".h5");
+	        if (output.exists()) output.delete();
 	        output.deleteOnExit();
 	        context.setOutputPath(output.getAbsolutePath());
 	        context.setDatasetName(dPath); // With this conversion dataset is the OUTPUT

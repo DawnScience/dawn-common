@@ -174,7 +174,8 @@ public class CustomTomoConverter extends AbstractConversion {
 			List<String> out = NexusUtils.nexusBreadthFirstSearch(file, finder, object, true);
 			
 			if (out != null && !out.isEmpty()){
-				return out.get(0);
+				final String detectorPath = out.get(0);
+				return file.getParent(detectorPath);
 			}
 			
 		} catch (Exception e) {
@@ -228,6 +229,8 @@ public class CustomTomoConverter extends AbstractConversion {
 			if (ob == null) return false;
 			filePath = path;
 			tomoPath = ob;
+			// tomo Path should end with /
+			if (!tomoPath.endsWith("/")) tomoPath = tomoPath+"/";
 			return true;
 			
 		}
