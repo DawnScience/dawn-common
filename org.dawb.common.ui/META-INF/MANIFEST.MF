@@ -27,7 +27,6 @@ Bundle-ActivationPolicy: lazy
 Export-Package: org.dawb.common.ui,
  org.dawb.common.ui.actions,
  org.dawb.common.ui.components.cell,
- org.dawb.common.ui.databinding,
  org.dawb.common.ui.editors,
  org.dawb.common.ui.file,
  org.dawb.common.ui.image,
