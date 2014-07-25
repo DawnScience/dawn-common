@@ -32,6 +32,7 @@ import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageFloat64;
 import boofcv.struct.image.ImageInt16;
+import boofcv.struct.image.ImageInt8;
 import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageSInt64;
@@ -155,7 +156,7 @@ public class ConvertIDataset {
 	 */
 	public static <T extends ImageBase<?>> IDataset convertTo(T src, boolean isBinary) {
 		if (src instanceof ImageUInt8 || src instanceof ImageSInt8) {
-			Dataset dst = new ByteDataset(((ImageUInt8) src).data, src.height, src.width);
+			Dataset dst = new ByteDataset(((ImageInt8<?>) src).data, src.height, src.width);
 			if (isBinary) {
 				dst = dst.cast(Dataset.BOOL);
 			}

@@ -39,21 +39,15 @@ public class BoofCVProcessingImpl implements IBoofCVProcessingService {
 	@Override
 	public IDataset filterGaussianBlur(IDataset input, double sigma, int radius) {
 		int[] shape = getShape(input);
-
-		ImageUInt8 converted = ConvertIDataset.convertFrom(input, ImageUInt8.class, 1);
-
-		ImageUInt8 blurred = new ImageUInt8(shape[1], shape[0]);
+		ImageFloat32 converted = ConvertIDataset.convertFrom(input, ImageFloat32.class, 1);
+		ImageFloat32 blurred = new ImageFloat32(shape[1], shape[0]);
 		BlurImageOps.gaussian(converted, blurred, sigma, radius, null);
-
 		return ConvertIDataset.convertTo(blurred, false);
 	}
 
 	@Override
 	public List<IDataset> filterDerivativeSobel(IDataset input) {
 		int[] shape = getShape(input);
-
-		// FIXME why is this not used?
-		ImageUInt8 converted = ConvertIDataset.convertFrom(input, ImageUInt8.class, 1);
 
 		Class<? extends ImageSingleBand<?>> derivType = GImageDerivativeOps.getDerivativeType(ImageUInt8.class);
 
