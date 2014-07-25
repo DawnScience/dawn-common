@@ -48,6 +48,7 @@ public class ExpressionEngineImpl implements IExpressionEngine{
 		funcs.put("dat", JexlGeneralFunctions.class);
 		funcs.put("im",  Image.class);
 		funcs.put("lz",  JexlLazyFunctions.class);
+		funcs.put("bcv", JexlBoofFunctions.class);
 		//TODO determine which function classes should be loaded as default
 //		funcs.put("fft", FFT.class);
 //		funcs.put("plt", SDAPlotter.class);
