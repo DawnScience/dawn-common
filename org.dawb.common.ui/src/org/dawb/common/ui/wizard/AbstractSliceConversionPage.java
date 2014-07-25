@@ -78,27 +78,6 @@ public abstract class AbstractSliceConversionPage extends ResourceChoosePage {
 		
 		nameChoice = new CCombo(container, SWT.READ_ONLY|SWT.BORDER);
 		nameChoice.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
-		nameChoice.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				datasetName = nameChoice.getItem(nameChoice.getSelectionIndex());
-				pathChanged();
-				nameChanged();
-				Activator.getDefault().getPreferenceStore().setValue(LAST_SET_KEY, datasetName);
-			}
-		});
-		nameChoice.addModifyListener(new ModifyListener() {
-			
-			@Override
-			public void modifyText(ModifyEvent e) {
-				datasetName = nameChoice.getText();
-				pathChanged();
-				nameChanged();
-				if (getErrorMessage()==null) {
-					int[] shape = sliceComponent.getData().getLazySet().getShape();
-				    sliceComponent.setLabel("Slices matching '"+datasetName+"', based on '"+sliceComponent.getSliceName()+"'.\nWith the shape "+Arrays.toString(shape));
-				}
-			}
-		});
 		
 		final Button editable = new Button(container, SWT.CHECK);
 		editable.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
@@ -290,20 +269,37 @@ public abstract class AbstractSliceConversionPage extends ResourceChoosePage {
 			logger.error("Cannot extract data sets!", e);
 			return;
 		}
-        if (context.getDatasetNames()!=null && context.getDatasetNames().size()>0) {
-        	final List<String> names = Arrays.asList(nameChoice.getItems());
-        	if (names.contains(context.getDatasetNames().get(0))) {
-            	datasetName = context.getDatasetNames().get(0);
-      		    nameChoice.select(names.indexOf(datasetName));
-        		nameChanged();
+        
+        boolean requireChoiceSetup = true;
+        if (datasetName!=null) {
+        	try {
+        		final String tmpName = datasetName; // Store the name because these calls reassign it
+        	    nameChoice.select(Arrays.asList(nameChoice.getItems()).indexOf(tmpName));
+        	    nameChoice.setText(tmpName);
+        	    requireChoiceSetup = false;
+        	} catch (Exception ne) {
+        		logger.debug("Could not find dataset in file!", ne);
+        		requireChoiceSetup = true; // No required but makes code readable.
         	}
         }
-        // if lazydataset if provided, get the name from it
-        if (context.getLazyDataset() != null) {
-        	datasetName = context.getLazyDataset().getName();
-        	nameChoice.setItems(new String[] {datasetName});
-        	nameChoice.select(0);
+        
+        if (requireChoiceSetup) {
+	        if (context.getDatasetNames()!=null && context.getDatasetNames().size()>0) {
+	        	final List<String> names = Arrays.asList(nameChoice.getItems());
+	        	if (names.contains(context.getDatasetNames().get(0))) {
+	            	datasetName = context.getDatasetNames().get(0);
+	      		    nameChoice.select(names.indexOf(datasetName));
+	        		nameChanged();
+	        	}
+	        } 
+	        // if lazydataset if provided, get the name from it
+	        if (context.getLazyDataset() != null) {
+	        	datasetName = context.getLazyDataset().getName();
+	        	nameChoice.setItems(new String[] {datasetName});
+	        	nameChoice.select(0);
+	        }
         }
+        
 		if (defaultDimsList!=null) {
 			try {
 				sliceComponent.setDimsDataList(defaultDimsList);
@@ -312,8 +308,39 @@ public abstract class AbstractSliceConversionPage extends ResourceChoosePage {
 			}
 		}
       
+		nameChoice.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				datasetName = nameChoice.getItem(nameChoice.getSelectionIndex());
+				pathChanged();
+				nameChanged();
+				Activator.getDefault().getPreferenceStore().setValue(LAST_SET_KEY, datasetName);
+			}
+		});
+		nameChoice.addModifyListener(new ModifyListener() {
+			
+			@Override
+			public void modifyText(ModifyEvent e) {
+				if (!isContextSet()) return;
+				String name = nameChoice.getText();
+				if ("".equals(name) && nameChoice.getSelectionIndex()<0) {
+					return;
+				}
+				datasetName = name;
+				pathChanged();
+				nameChanged();
+				if (getErrorMessage()==null) {
+					int[] shape = sliceComponent.getData().getLazySet().getShape();
+				    sliceComponent.setLabel("Slices matching '"+datasetName+"', based on '"+sliceComponent.getSliceName()+"'.\nWith the shape "+Arrays.toString(shape));
+				}
+			}
+		});
+
         setPageComplete(true);
  	}
+	
+	public void setDatasetName(String name) {
+		datasetName = name;
+	}
 	
 	public IConversionContext getContext() {
 		if (context == null) return null;
@@ -360,15 +387,19 @@ public abstract class AbstractSliceConversionPage extends ResourceChoosePage {
                     Display.getDefault().asyncExec(new Runnable() {
                     	public void run() {
                     		nameChoice.setItems(names.toArray(new String[names.size()]));
-                    		final String lastName = Activator.getDefault().getPreferenceStore().getString(LAST_SET_KEY);
+                    		final String lastName = datasetName!=null && !"".equals(datasetName)
+                    				              ? datasetName
+                    				              : Activator.getDefault().getPreferenceStore().getString(LAST_SET_KEY);
                     		
                     		int index = 0;
                     		if (lastName!=null && names.contains(lastName)) {
                     			index = names.indexOf(lastName);
                     		}
                     		
+                    		String name = names.get(index);
                     		nameChoice.select(index);
-                    		datasetName = names.get(index);
+                    		nameChoice.setText(name);
+                    		datasetName = name;
                     		nameChanged();
                     	}
                     });

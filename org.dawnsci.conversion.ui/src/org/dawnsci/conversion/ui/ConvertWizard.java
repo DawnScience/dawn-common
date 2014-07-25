@@ -22,6 +22,7 @@ import org.dawb.common.services.conversion.IConversionContext.ConversionScheme;
 import org.dawb.common.services.conversion.IConversionService;
 import org.dawb.common.ui.monitor.ProgressMonitorWrapper;
 import org.dawb.common.ui.util.EclipseUtils;
+import org.dawb.common.ui.wizard.AbstractSliceConversionPage;
 import org.dawb.common.ui.wizard.ResourceChoosePage;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -61,7 +62,7 @@ public class ConvertWizard extends Wizard implements IExportWizard{
 	private IConversionService service;
 	private ConversionChoicePage setupPage;
 
-	private List<String> overidePaths;
+	private List<String> overidePaths, overideDatasets;
 
 	public ConvertWizard() {
 		setNeedsProgressMonitor(true);
@@ -94,6 +95,9 @@ public class ConvertWizard extends Wizard implements IExportWizard{
 					if (p instanceof ResourceChoosePage) {
 						((ResourceChoosePage)p).setSelectedFiles(overidePaths);
 					}
+					if (overideDatasets!=null && overideDatasets.size()>0 && p instanceof AbstractSliceConversionPage) {
+						((AbstractSliceConversionPage)p).setDatasetName(overideDatasets.get(0));
+					}
 					conversionPages.put(s, p);
 					addPage(p);
 				} catch (CoreException e1) {
@@ -115,10 +119,15 @@ public class ConvertWizard extends Wizard implements IExportWizard{
 	public void setSelectionOverride(List<ITransferableDataObject> selections) {
 		
 		final List<String> paths = new ArrayList<String>(7);
+		final List<String> sets  = new ArrayList<String>(7);
 		for (ITransferableDataObject ob : selections) {
-			if (!paths.contains(ob.getFilePath())) paths.add(ob.getFilePath());
+			if (!paths.contains(ob.getFilePath())) {
+				paths.add(ob.getFilePath());
+				sets.add(ob.getPath());
+			}
 		}
-		this.overidePaths = paths;
+		this.overidePaths    = paths;
+		this.overideDatasets = sets;
 	}
 
 	@Override
