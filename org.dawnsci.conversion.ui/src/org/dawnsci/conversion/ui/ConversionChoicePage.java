@@ -20,7 +20,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -110,32 +109,6 @@ public class ConversionChoicePage extends ResourceChoosePage implements IConvers
 	}
 	
 	protected void createContentAfterFileChoose(Composite container) {
-		
-		if (false) { // TODO FIXME Not using regular expressions for now.
-			Label spacer = new Label(container, SWT.NONE);
-			spacer.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 4, 1));
-			
-			new Label(container, SWT.NONE);
-			final Button check = new Button(container, SWT.CHECK);
-			check.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
-			check.setText("File name regular expression");
-			check.setSelection(false);
-			
-			new Label(container, SWT.NONE);
-			final Label information = new Label(container, SWT.WRAP);
-			information.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 3, 1));
-			information.setText("Help with regular expressions:\n\nX* = none or more\nX+ =  one or more\nX? = none or one\nWhere X could be a number or character or '.' to match any character.\n\nFor example: /dls/results/945(.*)nxs or C:\\results\\945([0-9]+)nxs\n\n(Note back slash operator is not supported, so \\d is not allowed for instance.)");
-			information.setVisible(false);
-			
-			check.addSelectionListener(new SelectionAdapter() {
-				public void widgetSelected(SelectionEvent e) {
-					setPathEditable(check.getSelection());
-					setButtonsEnabled(!check.getSelection());
-					GridUtils.setVisible(information, check.getSelection());
-					information.getParent().layout(new Control[]{information});
-				}
-			});
-		}
 		
 		Label helpLabel = new Label(container, SWT.WRAP);
 		helpLabel.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, true, true, 4, 3));

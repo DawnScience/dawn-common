@@ -10,8 +10,10 @@
 package org.dawnsci.conversion.ui;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.dawb.common.services.ServiceManager;
@@ -20,12 +22,14 @@ import org.dawb.common.services.conversion.IConversionContext.ConversionScheme;
 import org.dawb.common.services.conversion.IConversionService;
 import org.dawb.common.ui.monitor.ProgressMonitorWrapper;
 import org.dawb.common.ui.util.EclipseUtils;
+import org.dawb.common.ui.wizard.ResourceChoosePage;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.dawnsci.slicing.api.data.ITransferableDataObject;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -57,6 +61,8 @@ public class ConvertWizard extends Wizard implements IExportWizard{
 	private IConversionService service;
 	private ConversionChoicePage setupPage;
 
+	private List<String> overidePaths;
+
 	public ConvertWizard() {
 		setNeedsProgressMonitor(true);
 	}
@@ -72,6 +78,7 @@ public class ConvertWizard extends Wizard implements IExportWizard{
 		}
 		// Add choice of file(s) and conversion type page.
 		this.setupPage = new ConversionChoicePage("Conversion Type", service);
+		setupPage.setSelectedFiles(overidePaths);
 		addPage(setupPage);
 		
 		// Create map of possible pages, only one of which will be selected at one time.
@@ -84,6 +91,9 @@ public class ConvertWizard extends Wizard implements IExportWizard{
 			if (s.isUserVisible()) {
 				try {
 					final IConversionWizardPage p = (IConversionWizardPage)e.createExecutableExtension("conversion_page");
+					if (p instanceof ResourceChoosePage) {
+						((ResourceChoosePage)p).setSelectedFiles(overidePaths);
+					}
 					conversionPages.put(s, p);
 					addPage(p);
 				} catch (CoreException e1) {
@@ -97,6 +107,19 @@ public class ConvertWizard extends Wizard implements IExportWizard{
 
 	}
 	
+
+	/**
+	 * Set an alternative file list than the current workbench selection by calling this method.
+	 * @param selections
+	 */
+	public void setSelectionOverride(List<ITransferableDataObject> selections) {
+		
+		final List<String> paths = new ArrayList<String>(7);
+		for (ITransferableDataObject ob : selections) {
+			if (!paths.contains(ob.getFilePath())) paths.add(ob.getFilePath());
+		}
+		this.overidePaths = paths;
+	}
 
 	@Override
 	public void init(IWorkbench workbench, IStructuredSelection selection) {

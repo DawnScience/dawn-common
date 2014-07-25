@@ -26,3 +26,4 @@ Import-Package: org.dawb.common.ui.monitor,
  org.dawb.common.ui.util,
  org.eclipse.dawnsci.plotting.api,
  org.slf4j;version="[1.7.6,1.7.7)"
+Export-Package: org.dawnsci.conversion.ui

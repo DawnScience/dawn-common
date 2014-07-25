@@ -292,6 +292,8 @@ public class ResourceChoosePage extends WizardPage {
 	 * @return the output file path
 	 */
 	public String getAbsoluteFilePath() {
+		
+		if (selectedFiles!=null && selectedFiles.size()==1) return selectedFiles.get(0);
 		try{
 			IResource res = ResourcesPlugin.getWorkspace().getRoot().findMember(getPath());
 			if (res!=null) return res.getLocation().toOSString();
@@ -341,6 +343,8 @@ public class ResourceChoosePage extends WizardPage {
 	}
 	
 	private boolean overwriteVisible = true;
+
+	private List<String> selectedFiles;
 	public void setOverwriteVisible(boolean isVis) {
 		overwriteVisible = isVis;
 		if (overwrite!=null) {
@@ -356,7 +360,16 @@ public class ResourceChoosePage extends WizardPage {
 	        
 	}
 	
+	public void setSelectedFiles(List<String> fileList) {
+		this.selectedFiles = fileList;
+		if (fileList!=null && fileList.size()==1) {
+			setPath(selectedFiles.get(0));
+		}
+	}
+	
 	protected List<String> getSelectedFiles() {
+		
+		if (selectedFiles!=null) return selectedFiles;
 		try {
 			ISelection selection = EclipseUtils.getActivePage().getSelection();
 			StructuredSelection s = (StructuredSelection)selection;
