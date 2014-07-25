@@ -13,7 +13,6 @@ import georegression.struct.point.Point2D_I32;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.BooleanDataset;
@@ -28,14 +27,11 @@ import uk.ac.diamond.scisoft.analysis.dataset.LongDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.RGBDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ShortDataset;
 import boofcv.alg.filter.binary.Contour;
-import boofcv.alg.misc.GImageStatistics;
-import boofcv.alg.misc.ImageStatistics;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageFloat64;
 import boofcv.struct.image.ImageInt16;
-import boofcv.struct.image.ImageInteger;
 import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageSInt64;
@@ -56,10 +52,11 @@ public class ConvertIDataset {
 	 * Converts the IDataset image into an {@link ImageBase}.
 	 *
 	 * @param src Input IDataset.
+	 * @param clazz class of data returned, can be null
 	 * @param shareData if true, share where possible (i.e. not a boolean dataset) 
 	 * @return Converted image.
 	 */
-	public static ImageBase<?> convertFrom(IDataset src, boolean shareData) {
+	public static <T extends ImageBase<?>> ImageBase<?> convertFrom(IDataset src, Class<T> clazz, boolean shareData) {
 		if(src.getShape().length != 2)
 			throw new IllegalArgumentException("The dataset has to be a 2 dimensionnal array");
 		Class<?> type = src.getClass();
@@ -83,13 +80,25 @@ public class ConvertIDataset {
 			dst.data = ((ByteDataset) sd.cast(Dataset.INT8)).getData();
 			return dst;
 		} else if (sd instanceof ByteDataset) {
-			ImageSInt8 dst = new ImageSInt8(width, height);
-			dst.data = ((ByteDataset) sd).getData();
-			return dst;
+			if (clazz == ImageUInt8.class) {
+				ImageUInt8 dst = new ImageUInt8(width, height);
+				dst.data = ((ByteDataset) sd).getData();
+				return dst;
+			} else {
+				ImageSInt8 dst = new ImageSInt8(width, height);
+				dst.data = ((ByteDataset) sd).getData();
+				return dst;
+			}
 		} else if(sd instanceof ShortDataset) {
-			ImageSInt16 dst = new ImageSInt16(width, height);
-			dst.data = ((ShortDataset) sd).getData();
-			return dst;
+			if (clazz == ImageUInt16.class) {
+				ImageUInt16 dst = new ImageUInt16(width, height);
+				dst.data = ((ShortDataset) sd).getData();
+				return dst;
+			} else {
+				ImageSInt16 dst = new ImageSInt16(width, height);
+				dst.data = ((ShortDataset) sd).getData();
+				return dst;
+			}
 		} else if (sd instanceof IntegerDataset) {
 			ImageSInt32 dst = new ImageSInt32(width, height);
 			dst.data = ((IntegerDataset) sd).getData();
@@ -134,7 +143,7 @@ public class ConvertIDataset {
 			ds = DatasetUtils.convertToDataset(src);
 		}
 
-		return (T) convertFrom(ds, true);
+		return (T) convertFrom(ds, clazz, true);
 	}
 
 	/**
@@ -180,42 +189,6 @@ public class ConvertIDataset {
 	}
 
 	/**
-	 * Converts a {@link boofcv.struct.image.ImageSInt32} into an IDataset.  If the buffered image
-	 * has multiple channels the intensities of each channel are averaged together.
-	 *
-	 * @param src Input image.
-	 * @param numColors
-	 * @return dst Where the converted image is written to
-	 */
-	public static IDataset imageToIDataset(ImageSInt32 src, int numColors) {
-		final int width = src.getWidth();
-		final int height = src.getHeight();
-		int[] data = src.data;
-
-		if (numColors == 0)
-			return new IntegerDataset(data, width, height);
-
-		else {
-			int colors[] = new int[numColors + 1];
-
-			Random rand = new Random(123); // FIXME WTF?
-			for( int i = 0; i < colors.length; i++ ) {
-				colors[i] = rand.nextInt();
-			}
-			colors[0] = 0;
-			RGBDataset dst = new RGBDataset(width, height);
-			for( int y = 0; y < height; y++ ) {
-				int indexSrc = src.startIndex + y*src.stride;
-				for( int x = 0; x < width; x++ ) {
-					int value = colors[src.data[indexSrc++]];
-					dst.set(value, x, y);
-				}
-			}
-			return dst;
-		}
-	}
-
-	/**
 	 * Draws contours. Internal and external contours are different user specified colors.
 	 *
 	 * @param contours List of contours
@@ -244,104 +217,4 @@ public class ConvertIDataset {
 		}
 		return out;
 	}
-
-	/**
-	 * <p>
-	 * Renders a colored image where the color indicates the sign and intensity its magnitude.   The input is divided
-	 * by normalize to render it in the appropriate scale.
-	 * </p>
-	 *
-	 * @param src       Input single band image.
-	 * @param dst       Where the image is rendered into.  If null a new BufferedImage will be created and return.
-	 * @param normalize Used to normalize the input image. If <= 0 then the max value will be used
-	 * @return Rendered image.
-	 */
-	public static IDataset colorizeSign(ImageSingleBand<?> src, double normalize) {
-		// TODO (use RGBDataset for colors support...)
-		IDataset dst = new RGBDataset(src.getWidth(), src.getHeight());
-
-		if (normalize <= 0) {
-			normalize = GImageStatistics.maxAbs(src);
-		}
-
-		if (normalize == 0) {
-			// sets the output to black
-			convertTo(src, true);
-			return dst;
-		}
-
-		if (src.getClass().isAssignableFrom(ImageFloat32.class)) {
-			return colorizeSign((ImageFloat32) src, dst, (float) normalize);
-		} else {
-			return colorizeSign((ImageInteger<?>) src, dst, (int) normalize);
-		}
-	}
-
-	private static IDataset colorizeSign(ImageInteger<?> src, IDataset dst, int normalize) {
-		for (int y = 0; y < src.height; y++) {
-			for (int x = 0; x < src.width; x++) {
-				int v = src.get(x, y);
-
-				int rgb;
-				if (v > 0) {
-					rgb = ((255 * v / normalize) << 16);
-				} else {
-					rgb = -((255 * v / normalize) << 8);
-				}
-				dst.set(rgb,  x, y);
-			}
-		}
-		return dst;
-	}
-
-	private static IDataset colorizeSign(ImageFloat32 src, IDataset dst, float maxAbsValue) {
-		for (int y = 0; y < src.height; y++) {
-			for (int x = 0; x < src.width; x++) {
-				float v = src.get(x, y);
-
-				int rgb;
-				if (v > 0) {
-					rgb = (int) (255 * v / maxAbsValue) << 16;
-				} else {
-					rgb = (int) (-255 * v / maxAbsValue) << 8;
-				}
-				dst.set(rgb, x, y);
-			}
-		}
-		return dst;
-	}
-
-	public static IDataset graySign(ImageFloat32 src, float maxAbsValue) {
-		IDataset dst = new IntegerDataset(src.getWidth(), src.getHeight());
-
-		if (maxAbsValue < 0)
-			maxAbsValue = ImageStatistics.maxAbs(src);
-
-		for (int y = 0; y < src.height; y++) {
-			for (int x = 0; x < src.width; x++) {
-				float v = src.get(x, y);
-
-				int rgb = 127 + (int) (127 * v / maxAbsValue);
-
-				dst.set(rgb << 16 | rgb << 8 | rgb, x, y);
-			}
-		}
-
-		return dst;
-	}
-
-	public static IDataset grayMagnitude(ImageFloat32 src, IDataset dst, float maxAbsValue) {
-		for (int y = 0; y < src.height; y++) {
-			for (int x = 0; x < src.width; x++) {
-				float v = Math.abs(src.get(x, y));
-
-				int rgb = (int) (255 * v / maxAbsValue);
-
-				dst.set(rgb << 16 | rgb << 8 | rgb, x, y);
-			}
-		}
-
-		return dst;
-	}
-
 }

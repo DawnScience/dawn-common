@@ -80,8 +80,10 @@ public class ExampleBinaryOps {
 		// Convert back to IDataset
 		IDataset visualBinary = ConvertIDataset.convertTo(binary, true);
 		IDataset visualFiltered = ConvertIDataset.convertTo(filtered, true);
-		IDataset visualLabel = ConvertIDataset.imageToIDataset(label, contours.size());
+//		IDataset visualLabel = ConvertIDataset.imageToIDataset(label, contours.size());
+		IDataset visualLabel = ConvertIDataset.convertTo(label, true);
 		IDataset visualContour = ConvertIDataset.contourImageToIDataset(contours, colorExternal, colorInternal, input.width, input.height);
+
 		visualBinary.setName("Binary Original");
 		visualFiltered.setName("Binary Filtered");
 		visualLabel.setName("Labeled Blobs");

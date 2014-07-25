@@ -89,7 +89,7 @@ public class ExampleImageFilter {
 		GradientSobel.process(blurred, derivX, derivY, FactoryImageBorderAlgs.extend(input));
 
 		// display the results
-		IDataset outputImage = ConvertIDataset.colorizeSign(derivX, -1);
+		IDataset outputImage = ConvertIDataset.convertTo(derivX, false);
 		outputImage.setName("Procedural Fixed Type");
 		Utils.showPlotView("uk.ac.diamond.scisoft.analysis.rcp.plotView1", "Plot 1", outputImage);
 
@@ -111,7 +111,8 @@ public class ExampleImageFilter {
 		GImageDerivativeOps.sobel(blurred, derivX, derivY, BorderType.EXTENDED);
 
 		// display the results
-		IDataset outputImage = ConvertIDataset.colorizeSign(derivX, -1);
+		IDataset outputImage = ConvertIDataset.convertTo(derivX, false);
+
 		outputImage.setName("Generalized " + inputType.getSimpleName());
 		Utils.showPlotView("uk.ac.diamond.scisoft.analysis.rcp.plotView1", "Plot 1", outputImage);
 	}
@@ -130,11 +131,12 @@ public class ExampleImageFilter {
 		ImageGradient<T, D> gradient = FactoryDerivative.sobel(inputType, derivType);
 
 		// process the image
-//		filterBlur.process(input,blurred);
+		filterBlur.process(input,blurred);
 		gradient.process(blurred, derivX, derivY);
 
 		// display the results
-		IDataset outputImage = ConvertIDataset.colorizeSign(derivX, -1);
+		IDataset outputImage = ConvertIDataset.convertTo(derivX, false);
+
 		outputImage.setName("Filter " + inputType.getSimpleName());
 		Utils.showPlotView("uk.ac.diamond.scisoft.analysis.rcp.plotView1", "Plot 1", outputImage);
 	}
@@ -157,9 +159,9 @@ public class ExampleImageFilter {
 		// Calculate image's derivative
 		GImageDerivativeOps.sobel(blurred, derivX, derivY, BorderType.EXTENDED);
 
-		//TODO convert back to IDataset
 		// display the results
-		IDataset outputImage = ConvertIDataset.colorizeSign(derivX, -1);
+		IDataset outputImage = ConvertIDataset.convertTo(derivX, false);
+
 		outputImage.setName("Generalized " + inputType.getSimpleName());
 		Utils.showPlotView("uk.ac.diamond.scisoft.analysis.rcp.plotView1", "Plot 1", outputImage);
 	}
