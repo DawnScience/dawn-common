@@ -20,6 +20,7 @@ import boofcv.alg.filter.binary.Contour;
 import boofcv.alg.filter.binary.ThresholdImageOps;
 import boofcv.alg.filter.blur.BlurImageOps;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
+import boofcv.alg.misc.ImageStatistics;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.BorderType;
 import boofcv.struct.image.ImageFloat32;
@@ -109,10 +110,18 @@ public class BoofCVProcessingImpl implements IBoofCVProcessingService {
 	@Override
 	public IDataset filterContour(IDataset input, int rule, int colorExternal, int colorInternal) {
 		int[] shape = getShape(input);
+		
+		ImageFloat32 converted = ConvertIDataset.convertFrom(input, ImageFloat32.class, 1);
 
-		ImageUInt8 converted = ConvertIDataset.convertFrom(input, ImageUInt8.class, 1);
+		// the mean pixel value is often a reasonable threshold when creating a binary image
+		double mean = ImageStatistics.mean(converted);
+
+		ImageUInt8 binary = new ImageUInt8(shape[1], shape[0]);
+		// create a binary image by thresholding
+		ThresholdImageOps.threshold(converted, binary, (float) mean, true);
+
 		// Detect blobs inside the image using a rule
-		List<Contour> contours = BinaryImageOps.contour(converted, rule, null);
+		List<Contour> contours = BinaryImageOps.contour(binary, rule, null);
 
 		return ConvertIDataset.contourImageToIDataset(contours, colorExternal, colorInternal, shape[1], shape[0]);
 	}

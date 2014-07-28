@@ -54,23 +54,20 @@ public class ImageFilterTest {
 
 	@Test
 	public void filterErode() {
-		//TODO
-//		IDataset eroded = service.filterErode(data, false);
-//		Assert.assertEquals("Value of first item is not the expected one", 67.10220336914062, eroded.getDouble(0), 0);
+		IDataset eroded = service.filterErode(data, false);
+		Assert.assertEquals("Value of item is not the expected one", 1.0, eroded.getDouble(46, 3), 0);
 	}
 
 	@Test
 	public void filterErodeAndDilate() {
-		//TODO
-//		IDataset erodedAndDilated = service.filterErodeAndDilate(data, false);
-//		Assert.assertEquals("Value of first item is not the expected one", 67.10220336914062, erodedAndDilated.getDouble(0), 0);
+		IDataset erodedAndDilated = service.filterErodeAndDilate(data, false);
+		Assert.assertEquals("Value of first item is not the expected one", 1.0, erodedAndDilated.getDouble(45, 2), 0);
 	}
 
 
 	@Test
 	public void filterContour() {
-		//TODO
-//		IDataset blurred = service.filterContour(data, 8, 0xFFFFFF, 0xFF2020);
-//		Assert.assertEquals("Value of first item is not the expected one", 67.10220336914062, blurred.getDouble(0), 0);
+		IDataset contoured = service.filterContour(data, 8, 0xFFFFFF, 0xFF2020);
+		Assert.assertEquals("Value of item is not the expected one", 8224.0, contoured.getDouble(551, 384), 0);
 	}
 }

@@ -93,7 +93,7 @@ public interface IBoofCVProcessingService {
 	 * in the contours are consecutive order in a clockwise or counter-clockwise direction, depending on the
 	 * implementation.
 	 * </p>
-	 *
+	 * The input data is converted to a binary image first then the contour algorithm is applied to it.
 	 * <p>
 	 * The returned contours are traces of the object.  The trace of an object can be found by marking a point
 	 * with a pen and then marking every point on the contour without removing the pen.  It is possible to have
