@@ -49,14 +49,14 @@ public class BoofCVProcessingImpl implements IBoofCVProcessingService {
 	public List<IDataset> filterDerivativeSobel(IDataset input) {
 		int[] shape = getShape(input);
 
-		Class<? extends ImageSingleBand<?>> derivType = GImageDerivativeOps.getDerivativeType(ImageUInt8.class);
+		ImageSingleBand<?> converted = ConvertIDataset.convertFrom(input, ImageUInt8.class, 1);
 
-		ImageSingleBand<?> blurred = GeneralizedImageOps.createSingleBand(ImageUInt8.class, shape[1], shape[0]);
+		Class<? extends ImageSingleBand<?>> derivType = GImageDerivativeOps.getDerivativeType(ImageUInt8.class);
 		ImageSingleBand<?> derivX = GeneralizedImageOps.createSingleBand(derivType, shape[1], shape[0]);
 		ImageSingleBand<?> derivY = GeneralizedImageOps.createSingleBand(derivType, shape[1], shape[0]);
 
 		// Calculate image's derivative
-		GImageDerivativeOps.sobel(blurred, derivX, derivY, BorderType.EXTENDED);
+		GImageDerivativeOps.sobel(converted, derivX, derivY, BorderType.EXTENDED);
 
 		//convert back to IDataset
 		List<IDataset> output = new ArrayList<IDataset>(2);

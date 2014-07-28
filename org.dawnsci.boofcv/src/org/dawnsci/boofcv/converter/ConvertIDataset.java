@@ -17,6 +17,12 @@ import java.util.Map;
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.BooleanDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ByteDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.CompoundByteDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.CompoundDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.CompoundDoubleDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.CompoundFloatDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.CompoundIntegerDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.CompoundShortDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.Dataset;
 import uk.ac.diamond.scisoft.analysis.dataset.DatasetUtils;
 import uk.ac.diamond.scisoft.analysis.dataset.DoubleDataset;
@@ -120,6 +126,49 @@ public class ConvertIDataset {
 			InterleavedS16 dst = new InterleavedS16(width, height, 3);
 			dst.data = ((RGBDataset) sd).getData();
 			return dst;
+		} else if (sd instanceof CompoundDataset) {
+			CompoundDataset cd = (CompoundDataset) sd;
+			int elements = cd.getElementsPerItem();
+			MultiSpectral<ImageSingleBand<?>> msrc = null;
+			if (cd instanceof CompoundByteDataset) {
+				CompoundByteDataset cbd = (CompoundByteDataset) cd;
+				msrc = new MultiSpectral(ImageUInt8.class, width, height, elements);
+				for (int i = 0; i < elements; i++) {
+					msrc.bands[i] = new ImageUInt8(width, height);
+					((ImageUInt8)msrc.bands[i]).data = cbd.getData();
+				}
+			} else if (cd instanceof CompoundShortDataset) {
+				CompoundShortDataset csd = (CompoundShortDataset) cd;
+				msrc = new MultiSpectral(ImageUInt16.class, width, height, elements);
+				for (int i = 0; i < elements; i++) {
+					msrc.bands[i] = new ImageUInt16(width, height);
+					((ImageUInt16)msrc.bands[i]).data = csd.getData();
+				}
+			} else if (cd instanceof CompoundIntegerDataset) {
+				CompoundIntegerDataset cid = (CompoundIntegerDataset) cd;
+				msrc = new MultiSpectral(ImageSInt32.class, width, height, elements);
+				for (int i = 0; i < elements; i++) {
+					msrc.bands[i] = new ImageSInt32(width, height);
+					((ImageSInt32)msrc.bands[i]).data = cid.getData();
+				}
+			} else if (cd instanceof CompoundFloatDataset) {
+				CompoundFloatDataset cfd = (CompoundFloatDataset) cd;
+				msrc = new MultiSpectral(ImageFloat32.class, width, height, elements);
+				for (int i = 0; i < elements; i++) {
+					msrc.bands[i] = new ImageFloat32(width, height);
+					((ImageFloat32)msrc.bands[i]).data = cfd.getData();
+				}
+			} else if (cd instanceof CompoundDoubleDataset) {
+				CompoundDoubleDataset cdd = (CompoundDoubleDataset) cd;
+				msrc = new MultiSpectral(ImageFloat64.class, width, height, elements);
+				for (int i = 0; i < elements; i++) {
+					msrc.bands[i] = new ImageFloat32(width, height);
+					((ImageFloat64)msrc.bands[i]).data = cdd.getData();
+				}
+			}
+			if (elements == 1)
+				return msrc.bands[0];
+			return msrc;
 		} else {
 			throw new IllegalArgumentException("Unknown type " + type);
 		}

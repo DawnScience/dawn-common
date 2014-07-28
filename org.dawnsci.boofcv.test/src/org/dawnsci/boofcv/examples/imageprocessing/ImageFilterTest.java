@@ -1,6 +1,8 @@
 
 package org.dawnsci.boofcv.examples.imageprocessing;
 
+import java.util.List;
+
 import org.dawb.common.services.IBoofCVProcessingService;
 import org.dawb.common.services.ServiceManager;
 import org.junit.Assert;
@@ -34,9 +36,8 @@ public class ImageFilterTest {
 
 	@Test
 	public void filterDerivativeSobel() {
-		//TODO
-//		List<IDataset> derivatives = service.filterDerivativeSobel(data);
-//		Assert.assertEquals("Value of first item is not the expected one", 0, derivatives.get(0).getDouble(0), 0);
+		List<IDataset> derivatives = service.filterDerivativeSobel(data);
+		Assert.assertEquals("Value of first item is not the expected one", -9, derivatives.get(0).getDouble(0), 0);
 	}
 
 	@Test
