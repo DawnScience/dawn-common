@@ -255,12 +255,10 @@ public class ConvertIDataset {
 		RGBDataset out = new RGBDataset(width, height);
 		for( Contour c : contours ) {
 			for(Point2D_I32 p : c.external ) {
-//				out.setRGB(p.x,p.y,colorExternal);
 				out.set(colorExternal, p.x, p.y);
 			}
 			for( List<Point2D_I32> l : c.internal ) {
 				for( Point2D_I32 p : l ) {
-//					out.setRGB(p.x,p.y,colorInternal);
 					out.set(colorInternal, p.x, p.y);
 				}
 			}
