@@ -73,40 +73,65 @@ public class NexusUtils {
 	 * @param entryKey
 	 * @throws Exception
 	 */
-	public static void setAttribute(final FileFormat file, 
-									final HObject    entry,
-									final String     name,
-									final String     entryKey) throws Exception {
-	
+	public static void setAttribute(final FileFormat file,
+			final HObject    entry,
+			final String     name,
+			final String     entryKey) throws Exception {
+		setAttribute(file, entry, name, entryKey, false);
+	}
+	/**
+	 * Set any attribute on a HObject.
+	 * 
+	 * @param file
+	 * @param entry
+	 * @param name
+	 * @param entryKey
+	 * @throws Exception
+	 */
+	public static void setAttribute(final FileFormat file,
+			final HObject    entry,
+			final String     name,
+			final String     entryKey,
+			final boolean overwrite) throws Exception {
+		boolean attributeExist = false;
 		// Check if attribute is already there
 		@SuppressWarnings("unchecked")
 		final List<Object> attrList = entry.getMetadata();
-		if (attrList!=null) for (Object object : attrList) {
-			if (object instanceof Attribute) {
-				final Attribute a      = (Attribute)object;
-				final String[]  aValue = (String[])a.getValue();
-				if (name.equals(a.getName()) && entryKey.equals(aValue[0])) return;
+		if (attrList!=null) {
+			for (Object object : attrList) {
+				if (object instanceof Attribute) {
+					final Attribute a      = (Attribute)object;
+					final String[]  aValue = (String[])a.getValue();
+					if (name.equals(a.getName())) {
+						if (!overwrite && entryKey.equals(aValue[0])) {
+							return;
+						}
+						attributeExist = true;
+					}
+				}
 			}
 		}
-		
+		if (overwrite & !attributeExist) {
+			return;
+		}
 		final int id = entry.open();
 		try {
-	        String[] classValue = {entryKey};
-	        Datatype attrType = new H5Datatype(Datatype.CLASS_STRING, classValue[0].length()+1, -1, -1);
-	        Attribute attr = new Attribute(name, attrType, new long[]{1});
-	        attr.setValue(classValue);
-			
-	        file.writeAttribute(entry, attr, false);
+			String[] classValue = {entryKey};
+			Datatype attrType = new H5Datatype(Datatype.CLASS_STRING, classValue[0].length()+1, -1, -1);
+			Attribute attr = new Attribute(name, attrType, new long[]{1});
+			attr.setValue(classValue);
 
-	        if (entry instanceof Group) {
-	        	attrList.add(attr);
+			file.writeAttribute(entry, attr, overwrite);
+
+			if (entry instanceof Group) {
+				attrList.add(attr);
 				((Group)entry).writeMetadata(attrList);
-	        } else if (entry instanceof Dataset) {
-	        	attrList.add(attr);
+			} else if (entry instanceof Dataset) {
+				attrList.add(attr);
 				((Dataset)entry).writeMetadata(attrList);
-	        }
-		        
-		    
+			}
+
+
 		} finally {
 			entry.close(id);
 		}

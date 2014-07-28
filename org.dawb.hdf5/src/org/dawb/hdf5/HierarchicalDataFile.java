@@ -825,6 +825,11 @@ class HierarchicalDataFile implements IHierarchicalDataFile {
 	}
 
 	@Override
+	public void setAttribute(HObject object, String name, String value, boolean overwrite) throws Exception {
+		NexusUtils.setAttribute(file, object, name, value, overwrite);
+	}
+	
+	@Override
 	public long getDimensionSize(String datasetName, int dimension) throws Exception {
 		
 		Dataset signal = (Dataset)getData(datasetName);
