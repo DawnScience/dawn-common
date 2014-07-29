@@ -180,9 +180,9 @@ public abstract class AbstractConversion {
 		Slicer.visitAll(lz, dims, nameFrag, new SliceVisitor() {
 
 			@Override
-			public void visit(IDataset slice, Slice... slices) throws Exception {
+			public void visit(IDataset slice, Slice[] slices, int[] shape) throws Exception {
 				context.setSelectedSlice(slices);
-				context.setSelectedShape(slice.getShape());
+				context.setSelectedShape(shape);
 				convert(slice);
 				if (context.getMonitor() != null) {
 					IMonitor mon = context.getMonitor();
