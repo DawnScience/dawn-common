@@ -9,6 +9,7 @@
  */ 
 package org.dawb.common.ui.util;
 
+import java.awt.Window;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -64,6 +65,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.FileStoreEditorInput;
+import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.ide.ResourceUtil;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.wizards.IWizardDescriptor;
@@ -722,7 +724,7 @@ public class EclipseUtils {
 		return null;
 	}
 
-	public static void refreshAndOpen(String outputPath, boolean isOpen, IProgressMonitor monitor) throws Exception {
+	public static void refreshAndOpen(final String outputPath, boolean isOpen, IProgressMonitor monitor) throws Exception {
 		
 		IFile file = null;
 		try { // Try to refresh parent incase it is in the worspace.
@@ -739,20 +741,34 @@ public class EclipseUtils {
 		}
 		
 		final IFile finalFile = file; 
+		final Exception[] ex = new Exception[1];
 		if (isOpen &&  finalFile!=null) {
-			final Exception[] ex = new Exception[1];
 			ex[0] = null;
 			Display.getDefault().syncExec(new Runnable() {
 				public void run() {
 					try {
 						EclipseUtils.openEditor(finalFile);
+						return;
 					} catch (PartInitException e) {
 						ex[0] = e;
 					}
 				}
 			});
 			if (ex[0] != null) throw ex[0];
-		}		
+		}
+		
+		Display.getDefault().syncExec(new Runnable() {
+			public void run() {
+			try {
+				openExternalEditor(outputPath);
+			} catch (PartInitException e) {
+				ex[0] = e;
+			}
+				return;
+			}
+		});
+		if (ex[0] != null) throw ex[0];
+		
 	}
 
 }
