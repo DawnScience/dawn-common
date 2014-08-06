@@ -5,16 +5,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import ncsa.hdf.object.Dataset;
-import ncsa.hdf.object.Datatype;
-import ncsa.hdf.object.Group;
-
 import org.dawb.common.services.conversion.IConversionContext;
 import org.eclipse.dawnsci.hdf5.HierarchicalDataFactory;
 import org.eclipse.dawnsci.hdf5.IHierarchicalDataFile;
 import org.eclipse.dawnsci.hdf5.Nexus;
 
-import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.Dataset;
+import uk.ac.diamond.scisoft.analysis.dataset.DatasetFactory;
 import uk.ac.diamond.scisoft.analysis.dataset.DatasetUtils;
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.IndexIterator;
@@ -84,7 +81,7 @@ public class CompareConverter extends AbstractConversion{
  		final String group = groups.get(datasetPath);
  		
  		
- 		AbstractDataset abs = DatasetUtils.convertToAbstractDataset(slice).squeeze();
+ 		Dataset abs = DatasetUtils.convertToDataset(slice).squeeze();
  		
  		// Each dataset must come through as the same shape, even if it is not.
  		// We keep the requiredShapes and force the current dataset to be the same
@@ -105,11 +102,11 @@ public class CompareConverter extends AbstractConversion{
 		}
 	}
  	
-	public static AbstractDataset resize(final AbstractDataset a, final int... shape) {
+	public static Dataset resize(final Dataset a, final int... shape) {
 		
-		if (a.getDtype()==AbstractDataset.STRING) return a;
+		if (a.getDtype()==Dataset.STRING) return a;
 		int size = a.getSize();
-		AbstractDataset rdata = AbstractDataset.zeros(a.getElementsPerItem(), shape, a.getDtype());
+		Dataset rdata = DatasetFactory.zeros(a.getElementsPerItem(), shape, a.getDtype());
 		IndexIterator it = rdata.getIterator();
 		while (it.hasNext()) {
 			rdata.setObjectAbs(it.index, it.index<size ? a.getObjectAbs(it.index) : Double.NaN);

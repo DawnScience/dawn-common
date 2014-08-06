@@ -14,8 +14,6 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Marshaller;
 
-import ncsa.hdf.object.Dataset;
-
 import org.apache.commons.lang.ArrayUtils;
 import org.cansas.cansas1d.FloatUnitType;
 import org.cansas.cansas1d.IdataType;
@@ -36,7 +34,7 @@ import org.eclipse.dawnsci.hdf5.IHierarchicalDataFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.Dataset;
 import uk.ac.diamond.scisoft.analysis.dataset.DatasetUtils;
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.IErrorDataset;
@@ -103,7 +101,7 @@ public class CustomNCDConverter extends AbstractConversion  {
 			//get the x axis if required
 			IErrorDataset axis = null;
 			if (context.getAxisDatasetName() != null) {
-				axis = (IErrorDataset)getAxis(context.getAxisDatasetName(), context.getSelectedConversionFile());
+				axis = getAxis(context.getAxisDatasetName(), context.getSelectedConversionFile());
 				// ATSAS ASCII format doesn't support axis errors
 				if (axis != null && axis.hasErrors() && exportFormat.equals(SAS_FORMAT.ATSAS)) {
 					axis.clearError();
@@ -146,24 +144,20 @@ public class CustomNCDConverter extends AbstractConversion  {
 			sb.append("# Dataset name: " + nameFrag);
 			
 			try {
-				Dataset titleData = (Dataset) hdf5Reader.getData(DEFAULT_TITLE_NODE);
+				ncsa.hdf.object.Dataset titleData = (ncsa.hdf.object.Dataset) hdf5Reader.getData(DEFAULT_TITLE_NODE);
 				String[] str = (String[]) titleData.getData();
-				if (str.length > 0) {
-					String title = str[0];
-					sb.append(separator);
-					sb.append("# Title: " + title);
-				}
+				String title = str[0];
+				sb.append(separator);
+				sb.append("# Title: " + title);
 			} catch (Exception e) {
 				logger.info("Default title node {} was not found", DEFAULT_TITLE_NODE);
 			}
 			try {
-				Dataset scanCommandData = (Dataset)hdf5Reader.getData(DEFAULT_SCAN_COMMAND_NODE);
+				ncsa.hdf.object.Dataset scanCommandData = (ncsa.hdf.object.Dataset) hdf5Reader.getData(DEFAULT_SCAN_COMMAND_NODE);
 				String[] str = (String[])scanCommandData.getData();
-				if (str.length > 0) {
-					String scanCommand = str[0];
-					sb.append(separator);
-					sb.append("# Scan command: " + scanCommand);
-				}
+				String scanCommand = str[0];
+				sb.append(separator);
+				sb.append("# Scan command: " + scanCommand);
 			} catch (Exception e) {
 				logger.info("Default scan command node {} was not found", DEFAULT_SCAN_COMMAND_NODE);
 			}
@@ -206,13 +200,12 @@ public class CustomNCDConverter extends AbstractConversion  {
 				}
 				
 				Slice[] slices = Slice.convertToSlice(start, stop, step);
-				IDataset data = lz.getSlice(slices);
-				data = (IDataset)data.squeeze();
+				Dataset data = DatasetUtils.convertToDataset(lz.getSlice(slices));
+				data = data.squeeze();
 				
-				AbstractDataset errors = null;
+				Dataset errors = null;
 				if (hasErrors) {
-					errors = DatasetUtils.cast((AbstractDataset) ((IErrorDataset) data).getError(),
-							((AbstractDataset)data).getDtype());
+					errors = DatasetUtils.cast(data.getError(), data.getDtype());
 				}
 				
 				String nameSuffix = "";
@@ -265,12 +258,12 @@ public class CustomNCDConverter extends AbstractConversion  {
 		}
 	}
 	
-	private void exportASCII(IErrorDataset axis, IDataset data, IDataset errors, String fullName, String header, List<String> headings) throws ScanFileHolderException {
+	private void exportASCII(IErrorDataset axis, Dataset data, IDataset errors, String fullName, String header, List<String> headings) throws ScanFileHolderException {
 		String dataName = data.getName();
 		IDataset[] columns = new IDataset[] {DatasetUtils.transpose(data, null)};
 		if (axis != null) {
 			if (axis.hasErrors()) {
-				AbstractDataset axisErrors = DatasetUtils.cast((AbstractDataset) axis.getError(), ((AbstractDataset)data).getDtype());
+				Dataset axisErrors = DatasetUtils.cast(axis.getError(), data.getDtype());
 				columns = (IDataset[]) ArrayUtils.addAll(new IDataset[]{axis, axisErrors}, columns);
 				
 			} else {
@@ -303,16 +296,15 @@ public class CustomNCDConverter extends AbstractConversion  {
 		
 		try {
 			//get the x axis if required
-			AbstractDataset axis = null;
-			AbstractDataset axisErrors = null;
+			Dataset axis = null;
+			Dataset axisErrors = null;
 			String axisUnits = "a.u.";
 			if (context.getAxisDatasetName() != null) {
-				axis = (AbstractDataset)getAxis(context.getAxisDatasetName(), context.getSelectedConversionFile());
+				axis = getAxis(context.getAxisDatasetName(), context.getSelectedConversionFile());
 				axis.squeeze();
 				axisUnits = getAxisUnit(context.getAxisDatasetName(), context.getSelectedConversionFile());
 				if (axis.hasErrors()) {
-					axisErrors = DatasetUtils.cast((AbstractDataset) ((IErrorDataset) axis).getError(),
-							axis.getDtype());
+					axisErrors = DatasetUtils.cast(axis.getError(), axis.getDtype());
 					axisErrors.squeeze();
 				}
 			}
@@ -352,14 +344,10 @@ public class CustomNCDConverter extends AbstractConversion  {
 			SAStransmissionSpectrumType sasTransmission  = of.createSAStransmissionSpectrumType();
 			
 			try {
-				Dataset titleData = (Dataset) hdf5Reader.getData(DEFAULT_TITLE_NODE);
+				ncsa.hdf.object.Dataset titleData = (ncsa.hdf.object.Dataset) hdf5Reader.getData(DEFAULT_TITLE_NODE);
 				String[] str = (String[]) titleData.getData();
-				if (str.length > 0) {
-					String title = str[0];
-					sasSample.setID(title);
-				} else {
-					sasSample.setID("N/A");
-				}
+				String title = str[0];
+				sasSample.setID(title);
 			} catch (Exception e) {
 				logger.info("Default title node {} was not found", DEFAULT_TITLE_NODE);
 				sasSample.setID("N/A");
@@ -381,12 +369,11 @@ public class CustomNCDConverter extends AbstractConversion  {
 				}
 				
 				Slice[] slices = Slice.convertToSlice(start, stop, step);
-				IDataset data = lz.getSlice(slices).squeeze();
+				Dataset data = DatasetUtils.convertToDataset(lz.getSlice(slices).squeeze());
 				
-				AbstractDataset errors = null;
+				Dataset errors = null;
 				if (hasErrors) {
-					errors = DatasetUtils.cast((AbstractDataset) ((IErrorDataset) data).getError(),
-							((AbstractDataset)data).getDtype());
+					errors = DatasetUtils.cast(data.getError(), data.getDtype());
 					errors.squeeze();
 				}
 				
@@ -481,11 +468,11 @@ public class CustomNCDConverter extends AbstractConversion  {
 		return t.toString();
 	}
 	
-	private IDataset getAxis(String datasetName, File path) {
+	private Dataset getAxis(String datasetName, File path) {
 		
-		IDataset data = null;
+		Dataset data = null;
 		try {
-			data = LoaderFactory.getDataSet(path.getAbsolutePath(), datasetName, null);
+			data = DatasetUtils.convertToDataset(LoaderFactory.getDataSet(path.getAbsolutePath(), datasetName, null));
 			//expand so the concatenation works later
 			data.setShape(data.getShape()[0],1);
 			data.setName(getAxisDatasetName(datasetName));

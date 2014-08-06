@@ -7,9 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import ncsa.hdf.object.Dataset;
-import ncsa.hdf.object.Datatype;
-
 import org.dawb.common.services.conversion.IConversionContext;
 import org.eclipse.dawnsci.hdf5.HierarchicalDataFactory;
 import org.eclipse.dawnsci.hdf5.IHierarchicalDataFile;

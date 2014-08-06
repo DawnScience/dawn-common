@@ -13,7 +13,7 @@ import uk.ac.diamond.scisoft.analysis.io.JavaImageSaver;
  * 
  * @author fcp94556
  *
- * Mark I suggest that you extend this class either with a sublcass or a mode
+ * Mark I suggest that you extend this class either with a subclass or a mode
  * of this class to process the other parts required.
  * 
  * Please add a Test to TiffConvertTest or similar.

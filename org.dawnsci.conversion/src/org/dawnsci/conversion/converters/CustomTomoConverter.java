@@ -7,7 +7,6 @@ import java.util.regex.Pattern;
 
 import ncsa.hdf.object.Dataset;
 import ncsa.hdf.object.Datatype;
-import ncsa.hdf.object.Group;
 import ncsa.hdf.object.HObject;
 import ncsa.hdf.object.h5.H5ScalarDS;
 
@@ -19,7 +18,6 @@ import org.eclipse.dawnsci.hdf5.nexus.NexusUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 import uk.ac.diamond.scisoft.analysis.io.DataHolder;
@@ -217,7 +215,7 @@ public class CustomTomoConverter extends AbstractConversion {
 		
 		
 		/**
-		 * Method to check is a valid tomograpy file (returns true)
+		 * Method to check is a valid tomography file (returns true)
 		 * and populate some internal data
 		 * @throws Exception 
 		 *

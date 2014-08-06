@@ -7,12 +7,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import ncsa.hdf.object.Dataset;
-
 import org.dawb.common.services.conversion.IConversionContext;
 
-import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ByteDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.Dataset;
 import uk.ac.diamond.scisoft.analysis.dataset.DatasetUtils;
 import uk.ac.diamond.scisoft.analysis.dataset.DoubleDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.FloatDataset;
@@ -201,11 +199,11 @@ public abstract class AbstractConversion {
 	 * @return
 	 * @throws Exception
 	 */
-	public static AbstractDataset getSet(final Object  val, final long[] longShape, final Dataset set) throws Exception {
+	public static IDataset getSet(final Object  val, final long[] longShape, final ncsa.hdf.object.Dataset set) throws Exception {
 
 		final int[] intShape  = getInt(longShape);
          
-		AbstractDataset ret = null;
+		Dataset ret = null;
         if (val instanceof byte[]) {
         	ret = new ByteDataset((byte[])val, intShape);
         } else if (val instanceof short[]) {
@@ -224,15 +222,15 @@ public abstract class AbstractConversion {
         
 		if (set.getDatatype().isUnsigned()) {
 			switch (ret.getDtype()) {
-			case AbstractDataset.INT32:
+			case Dataset.INT32:
 				ret = new LongDataset(ret);
 				DatasetUtils.unwrapUnsigned(ret, 32);
 				break;
-			case AbstractDataset.INT16:
+			case Dataset.INT16:
 				ret = new IntegerDataset(ret);
 				DatasetUtils.unwrapUnsigned(ret, 16);
 				break;
-			case AbstractDataset.INT8:
+			case Dataset.INT8:
 				ret = new ShortDataset(ret);
 				DatasetUtils.unwrapUnsigned(ret, 8);
 				break;

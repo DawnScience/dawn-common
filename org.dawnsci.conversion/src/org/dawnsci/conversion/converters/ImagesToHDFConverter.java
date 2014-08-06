@@ -6,17 +6,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import ncsa.hdf.object.Dataset;
-import ncsa.hdf.object.Datatype;
-import ncsa.hdf.object.Group;
-
 import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.util.list.SortNatural;
 import org.eclipse.dawnsci.hdf5.HierarchicalDataFactory;
 import org.eclipse.dawnsci.hdf5.IHierarchicalDataFile;
 import org.eclipse.dawnsci.hdf5.Nexus;
 
-import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.LazyDataset;
@@ -105,8 +100,7 @@ public class ImagesToHDFConverter extends AbstractConversion{
 		
         final String datasetPath = context.getDatasetNames().get(0);
 		
-        IDataset a = (AbstractDataset)slice;
-		String d = hFile.appendDataset(name, a, group);
+		String d = hFile.appendDataset(name, slice, group);
 		if (first) {
 			hFile.setNexusAttribute(d, Nexus.SDS);
 			hFile.setAttribute(d, "original_name", datasetPath);
