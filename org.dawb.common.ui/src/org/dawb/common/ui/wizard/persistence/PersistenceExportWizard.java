@@ -2,6 +2,7 @@ package org.dawb.common.ui.wizard.persistence;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -28,6 +29,7 @@ import org.eclipse.dawnsci.plotting.api.region.IRegion;
 import org.eclipse.dawnsci.plotting.api.tool.IToolPage;
 import org.eclipse.dawnsci.plotting.api.tool.IToolPageSystem;
 import org.eclipse.dawnsci.plotting.api.trace.IImageTrace;
+import org.eclipse.dawnsci.plotting.api.trace.ILineTrace;
 import org.eclipse.dawnsci.plotting.api.trace.ITrace;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -209,6 +211,9 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
 								 if (trace instanceof IImageTrace) {
 									 final List<IDataset> iaxes = ((IImageTrace)trace).getAxes();
 									 if (iaxes!=null) file.setAxes(iaxes);
+								 } else if (trace instanceof ILineTrace) {
+									 IDataset xData = ((ILineTrace)trace).getXData();
+									 if (xData != null) file.setAxes(Arrays.asList(new IDataset[]{xData,null}));
 								 }
 							 }
 						 }
