@@ -755,19 +755,21 @@ public class EclipseUtils {
 				}
 			});
 			if (ex[0] != null) throw ex[0];
+		} else {
+			Display.getDefault().syncExec(new Runnable() {
+				public void run() {
+				try {
+					openExternalEditor(outputPath);
+				} catch (PartInitException e) {
+					ex[0] = e;
+				}
+					return;
+				}
+			});
+			if (ex[0] != null) throw ex[0];
 		}
 		
-		Display.getDefault().syncExec(new Runnable() {
-			public void run() {
-			try {
-				openExternalEditor(outputPath);
-			} catch (PartInitException e) {
-				ex[0] = e;
-			}
-				return;
-			}
-		});
-		if (ex[0] != null) throw ex[0];
+		
 		
 	}
 
