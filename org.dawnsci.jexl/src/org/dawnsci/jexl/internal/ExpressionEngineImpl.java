@@ -56,7 +56,6 @@ public class ExpressionEngineImpl implements IExpressionEngine{
 		
 		expressionListeners = new HashSet<IExpressionEngineListener>();
 	}
-	
 
 	@Override
 	public void createExpression(String expr) throws Exception {

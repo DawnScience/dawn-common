@@ -71,7 +71,7 @@ public class JexlBoofCVFunctions {
 
 	/**
 	 * <p>
-	 * Erodes an image according to a 8-neighborhood.  Unless a pixel is connected to all its neighbors its value
+	 * Erodes an image according to a 8-neighbourhood.  Unless a pixel is connected to all its neighbours its value
 	 * is set to zero.
 	 * </p>
 	 *
@@ -87,7 +87,7 @@ public class JexlBoofCVFunctions {
 
 	/**
 	 * <p>
-	 * Dilates an image according to a 8-neighborhood.  If a pixel is connected to any other pixel then its output
+	 * Dilates an image according to a 8-neighbourhood.  If a pixel is connected to any other pixel then its output
 	 * value will be one.
 	 * </p>
 	 *
@@ -119,7 +119,7 @@ public class JexlBoofCVFunctions {
 	/**
 	 * <p>
 	 * Given a binary image, connect together pixels to form blobs/clusters using the specified connectivity rule.
-	 * The found blobs will be labeled in an output image and also described as a set of contours.  Pixels
+	 * The found blobs will be labelled in an output image and also described as a set of contours.  Pixels
 	 * in the contours are consecutive order in a clockwise or counter-clockwise direction, depending on the
 	 * implementation.
 	 * </p>
@@ -132,8 +132,8 @@ public class JexlBoofCVFunctions {
 	 *
 	 * @param input Input binary image.  Not modified.
 	 * @param rule Connectivity rule.  Can be 4 or 8.  8 is more commonly used.
-	 * @param colorExternal RGB color
-	 * @param colorInternal RGB color
+	 * @param colorExternal RGB colour
+	 * @param colorInternal RGB colour
 	 * @return Dataset contours for each blob.
 	 * @throws Exception 
 	 */
