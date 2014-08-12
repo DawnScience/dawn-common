@@ -32,7 +32,7 @@ public class ConversionServiceImpl implements IConversionService {
 		try {
 			context.setFilePaths(paths);
 		} catch (Exception e) {
-			MessageDialog.openError(Display.getDefault().getActiveShell(), "Reading error", e.getMessage());
+			MessageDialog.openWarning(Display.getDefault().getActiveShell(), "Error opening conversion wizard", e.getMessage());
 			e.printStackTrace();
 		}
 		return context;

@@ -48,7 +48,7 @@ class ConversionContext implements IConversionContext {
 		for (int i = 0; i < paths.length; i++) {
 			// In order to parse the regex, it must have / not \
 			if (paths[i] == null)
-				throw new Exception("Error retrieving the file path");
+				throw new Exception("A folder, file or list of files compatible with the conversion tool needs to be selected.");
 			String path = paths[i].replace('\\', '/');
 			if (path.startsWith("file:/")) {
 				path = path.substring("file:/".length());
