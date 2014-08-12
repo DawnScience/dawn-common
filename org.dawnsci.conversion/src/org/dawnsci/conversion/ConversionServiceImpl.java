@@ -13,6 +13,8 @@ import org.dawnsci.conversion.converters.CustomTomoConverter;
 import org.dawnsci.conversion.converters.ImageConverter;
 import org.dawnsci.conversion.converters.ImagesToHDFConverter;
 import org.dawnsci.conversion.converters.VisitorConversion;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.swt.widgets.Display;
 
 public class ConversionServiceImpl implements IConversionService {
 	
@@ -27,7 +29,12 @@ public class ConversionServiceImpl implements IConversionService {
 	@Override
 	public IConversionContext open(String... paths) {
 		ConversionContext context = new ConversionContext();
-		context.setFilePaths(paths);
+		try {
+			context.setFilePaths(paths);
+		} catch (Exception e) {
+			MessageDialog.openError(Display.getDefault().getActiveShell(), "Reading error", e.getMessage());
+			e.printStackTrace();
+		}
 		return context;
 	}
 

@@ -42,11 +42,13 @@ class ConversionContext implements IConversionContext {
 	public List<String> getFilePaths() {
 		return filePaths;
 	}
-	public void setFilePaths(String... paths) {
+	public void setFilePaths(String... paths) throws Exception {
 		this.filePaths = new ArrayList<String>(paths.length);
 		
 		for (int i = 0; i < paths.length; i++) {
 			// In order to parse the regex, it must have / not \
+			if (paths[i] == null)
+				throw new Exception("Error retrieving the file path");
 			String path = paths[i].replace('\\', '/');
 			if (path.startsWith("file:/")) {
 				path = path.substring("file:/".length());
