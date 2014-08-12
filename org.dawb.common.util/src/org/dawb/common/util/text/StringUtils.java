@@ -71,7 +71,7 @@ public class StringUtils {
 	 * Deals with primitive arrays
 	 * @param value
 	 */
-	public static Object toString(Object value) {
+	public static String toString(Object value) {
 		
 		if (value==null) return null;
 		
