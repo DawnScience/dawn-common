@@ -9,24 +9,15 @@
  */ 
 package org.dawnsci.conversion.ui;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import org.dawb.common.ui.util.EclipseUtils;
-import org.dawb.common.util.io.FileUtils;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IObjectActionDelegate;
-import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.handlers.HandlerUtil;
 
@@ -65,55 +56,15 @@ public class ConvertWizardHandler extends AbstractHandler implements IObjectActi
 	public void selectionChanged(IAction action, ISelection selection) {
 		
 	}
-	
+
+	@Override
 	public boolean isEnabled() {
-		IWorkbenchPage page = EclipseUtils.getActivePage();
-		if (page == null)
-			return false;
-
-		final ISelection selection = page.getSelection();
-		if (selection instanceof StructuredSelection) {
-			StructuredSelection s = (StructuredSelection)selection;
-			final Object        o = s.getFirstElement();
-			
-			// Currently can only parse nexus files with conversion
-			// tool
-			final String path = FileUtils.getAbsolutePath(o);
-			if (path!=null) {
-				if (isH5(path))  return true;
-				if (isDir(path)) return true;
-			}
-		}
-        return false;
-	}
-	
-	private boolean isDir(String path) {
-		final File file = new File(path);
-		return file.isDirectory();
+		return true;
 	}
 
-	public final static List<String> EXT;
-	static {
-		List<String> tmp = new ArrayList<String>(7);
-		tmp.add("h5");
-		tmp.add("nxs");
-		tmp.add("hd5");
-		tmp.add("hdf5");
-		tmp.add("hdf");
-		tmp.add("nexus");
-		EXT = Collections.unmodifiableList(tmp);
-	}	
-
-	public static boolean isH5(final String filePath) {
-		if (filePath==null) return false;
-		final String ext = FileUtils.getFileExtension(filePath);
-		if (ext==null) return false;
-		return EXT.contains(ext.toLowerCase());
-	}
-
-	
+	@Override
 	public boolean isHandled() {
-		return  isEnabled();
+		return true;
 	}
 	
 	@Override
