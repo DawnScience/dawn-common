@@ -1223,10 +1223,14 @@ public final class FileUtils {
 			if (fileOrResource instanceof File)
 				result = (File)fileOrResource;
 			else if (fileOrResource instanceof IAdaptable) {
-				final Object object = ((IAdaptable)fileOrResource).getAdapter(File.class);
-				if (object instanceof File)
-					result = (File)object;
-			}
+				Object object = ((IAdaptable)fileOrResource).getAdapter(IFile.class);
+				if (object == null)
+					object = ((IAdaptable)fileOrResource).getAdapter(IFolder.class);
+				if (object instanceof IFile)
+					result = ((IFile)object).getLocation().toFile();
+				else if (object instanceof IFolder)
+					result = ((IFolder)object).getLocation().toFile();
+			};
 		}
 		return result;
 	}
