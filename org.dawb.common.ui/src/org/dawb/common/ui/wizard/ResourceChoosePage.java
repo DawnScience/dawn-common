@@ -19,9 +19,11 @@ import org.dawb.common.util.io.FileUtils;
 import org.dawnsci.common.widgets.content.FileContentProposalProvider;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
@@ -382,10 +384,21 @@ public class ResourceChoosePage extends WizardPage {
 			for (Object object : oa) {
 				if (object instanceof IFile) {
 					ret.add(((IFile)object).getLocation().toOSString());
-				}
-				if (object instanceof File) {
+				} else if (object instanceof File) {
 					final File file = (File)object;
-					if (file.isFile()) ret.add(file.getAbsolutePath());
+					if (file.isFile())
+						ret.add(file.getAbsolutePath());
+				} else if (object instanceof IResource) {
+					ret.add(((IResource)object).getLocation().toOSString());
+				} else if (object instanceof IAdaptable) { // if selected object is part of specific project nature (python project for example)
+					Object obj = ((IAdaptable) object).getAdapter(IFile.class);
+					if (obj == null)
+						obj = ((IAdaptable) object).getAdapter(IFolder.class);
+					if (obj instanceof IFile) {
+						ret.add(((IFile)obj).getLocation().toOSString());
+					} else if (object instanceof IFolder) {
+						ret.add(((IFolder) obj).getLocation().toOSString());
+					}
 				}
 			}
 			return ret.size()>0 ? ret : null;
