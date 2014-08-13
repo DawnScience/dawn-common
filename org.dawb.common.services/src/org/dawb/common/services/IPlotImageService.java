@@ -16,7 +16,7 @@ import org.eclipse.ui.services.IDisposable;
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 
 /**
- * A service for getting thumnails from datasets as images and for
+ * A service for getting thumbnails from datasets as images and for
  * getting system file icons for File objects.
  * 
  * The implementor or this service contributes using an eclipse extension
@@ -27,7 +27,7 @@ import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 public interface IPlotImageService extends IFileIconService{
 
 	/**
-	 * Create a sqaure image from a specified file, f of given side size, size in pixels.
+	 * Create a square image from a specified file, f of given side size, size in pixels.
 	 * @param f
 	 * @param size
 	 * @return
@@ -35,7 +35,7 @@ public interface IPlotImageService extends IFileIconService{
 	public Image createImage(final File f, final int width, int height);
 
 	/**
-	 * Get a thumbnail AbstractDataset of square shape.
+	 * Get a thumbnail Dataset of square shape.
 	 * @param set - must be 2D set
 	 * @param size
 	 * @return

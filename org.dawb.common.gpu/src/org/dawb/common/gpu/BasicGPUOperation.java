@@ -4,7 +4,7 @@ package org.dawb.common.gpu;
 import com.amd.aparapi.Kernel;
 import com.amd.aparapi.Range;
 
-import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.Dataset;
 import uk.ac.diamond.scisoft.analysis.dataset.DatasetUtils;
 import uk.ac.diamond.scisoft.analysis.dataset.DoubleDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.IntegerDataset;
@@ -22,7 +22,7 @@ class BasicGPUOperation implements IOperation {
 	private ScalarOperationKernel scalarKernel;
 	
 	@Override
-	public AbstractDataset process(AbstractDataset a, double b, Operator operation) {
+	public Dataset process(Dataset a, double b, Operator operation) {
 		
 		if (Boolean.getBoolean("org.dawb.common.gpu.operation.use.cpu")) {
 			switch (operation) {
@@ -58,7 +58,7 @@ class BasicGPUOperation implements IOperation {
 	}
 
 	@Override
-	public AbstractDataset process(AbstractDataset a, AbstractDataset b, Operator operation) {
+	public Dataset process(Dataset a, Dataset b, Operator operation) {
 		
 		if (Boolean.getBoolean("org.dawb.common.gpu.operation.use.cpu")) {
 			switch (operation) {
@@ -101,14 +101,14 @@ class BasicGPUOperation implements IOperation {
         return new DoubleDataset(arrayKernel.getResult(), a.getShape());
 	}
 	
-	private static final Object[] getPrimitives(AbstractDataset a) {
+	private static final Object[] getPrimitives(Dataset a) {
 		
 		final int[]     ia = a instanceof IntegerDataset
                            ? ((IntegerDataset)a).getData()
 		                   : null;
                            
         final double[]  da = ia==null
-		                   ? ((DoubleDataset)DatasetUtils.cast(a, AbstractDataset.FLOAT)).getData()
+		                   ? ((DoubleDataset)DatasetUtils.cast(a, Dataset.FLOAT)).getData()
 	                       : null;
 		                   
 		return new Object[]{ia,da};

@@ -20,7 +20,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.Dataset;
 import uk.ac.diamond.scisoft.analysis.io.AbstractFileLoader;
 import uk.ac.diamond.scisoft.analysis.io.DataHolder;
 import uk.ac.diamond.scisoft.analysis.io.ExtendedMetadataAdapter;
@@ -62,8 +62,8 @@ public class SpecLoader extends AbstractFileLoader implements IMetaLoader {
 			final MultiScanDataParser parser = new MultiScanDataParser(new FileInputStream(new File(filePath)));
 			final Collection<String> scans = parser.getScanNames();
 			for (String scanName : scans) {
-				final Collection<AbstractDataset> sets = parser.getSets(scanName);
-				for (AbstractDataset abstractDataset : sets) {
+				final Collection<Dataset> sets = parser.getSets(scanName);
+				for (Dataset abstractDataset : sets) {
 					holder.addDataset(scanName+"/"+abstractDataset.getName(), abstractDataset);
 				}
 			}
@@ -89,8 +89,8 @@ public class SpecLoader extends AbstractFileLoader implements IMetaLoader {
 			final MultiScanDataParser parser = new MultiScanDataParser(new FileInputStream(new File(filePath)));
 			final Collection<String> scans = parser.getScanNames();
 			for (String scanName : scans) {
-				final Collection<AbstractDataset> sets = parser.getSets(scanName);
-				for (AbstractDataset abstractDataset : sets) {
+				final Collection<Dataset> sets = parser.getSets(scanName);
+				for (Dataset abstractDataset : sets) {
 					final String name = scanName+"/"+abstractDataset.getName();
 					dataNames.add(name);
 					dataSizes.put(name, abstractDataset.getSize());

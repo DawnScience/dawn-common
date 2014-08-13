@@ -25,7 +25,7 @@ import javax.swing.tree.TreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.Dataset;
 import uk.ac.diamond.scisoft.analysis.dataset.FloatDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.IntegerDataset;
 
@@ -50,7 +50,7 @@ public class MultiScanDataParser {
 	private static final Logger logger = LoggerFactory.getLogger(MultiScanDataParser.class);
 	
 	private int scanNumber = 0;
-	private Map<String,Collection<AbstractDataset>> data;
+	private Map<String,Collection<Dataset>> data;
 	private MultiScanDataListener listener;
 	private boolean parseComplete = false;
 	
@@ -61,7 +61,7 @@ public class MultiScanDataParser {
 	 */
 	public MultiScanDataParser(final InputStream input) throws Exception {
 		
-		data = new LinkedHashMap<String, Collection<AbstractDataset>>(27);
+		data = new LinkedHashMap<String, Collection<Dataset>>(27);
 		createData(input);
 		finishScan(getScanName());
 		parseComplete = true;
@@ -79,7 +79,7 @@ public class MultiScanDataParser {
 	public MultiScanDataParser(final InputStream input, final MultiScanDataListener listener) {
 		
 		this.listener = listener;
-		this.data     = new LinkedHashMap<String, Collection<AbstractDataset>>(1);
+		this.data     = new LinkedHashMap<String, Collection<Dataset>>(1);
 		this.inputStream = input;
 	}
 	
@@ -111,11 +111,11 @@ public class MultiScanDataParser {
 	}
 
 
-	public Collection<AbstractDataset> getSets(final String scanName) {
+	public Collection<Dataset> getSets(final String scanName) {
 		return data.get(scanName);
 	}
 	
-	public Collection<AbstractDataset> removeScan(final String scanName) {
+	public Collection<Dataset> removeScan(final String scanName) {
 		return data.remove(scanName);
 	}
 	
@@ -154,9 +154,9 @@ public class MultiScanDataParser {
 				if (scan.getUserObject().equals(newScanName)) {
 					scan.removeAllChildren();
 					
-					final Collection<AbstractDataset> sets = data.get(newScanName);
+					final Collection<Dataset> sets = data.get(newScanName);
 					if (sets==null) return null;
-					for (AbstractDataset as : sets) {
+					for (Dataset as : sets) {
 						scan.add(new DefaultMutableTreeNode(as));
 					}
 					return scan;
@@ -166,9 +166,9 @@ public class MultiScanDataParser {
 			// Did not find it.
 			final DefaultMutableTreeNode scan = new DefaultMutableTreeNode(newScanName);
 			root.add(scan);
-			final Collection<AbstractDataset> sets = data.get(newScanName);
+			final Collection<Dataset> sets = data.get(newScanName);
 			if (sets==null) return null;
-			for (AbstractDataset as : sets) {
+			for (Dataset as : sets) {
 				scan.add(new DefaultMutableTreeNode(as));
 			}
 			return scan;
@@ -257,7 +257,7 @@ public class MultiScanDataParser {
 		update(true);
 		
 		if (listener!=null) {
-			final Collection<AbstractDataset> data = removeScan(scanName);
+			final Collection<Dataset> data = removeScan(scanName);
 			if (data==null) return true;
 			return listener.specDataPerformed(new MultiScanDataEvent(this, scanName, data));
 		}
@@ -269,7 +269,7 @@ public class MultiScanDataParser {
 		
 		if (currentScans==null) return;
 		
-		final Collection<AbstractDataset> sets = data.get(getScanName());
+		final Collection<Dataset> sets = data.get(getScanName());
 		
 		// We will add new datasets now
 		if (sets!=null) {
@@ -298,7 +298,7 @@ public class MultiScanDataParser {
 			currentNames.add(name.trim());
 		}
 		
-		Collection<AbstractDataset> sets = new ArrayList<AbstractDataset>(currentScans.size());
+		Collection<Dataset> sets = new ArrayList<Dataset>(currentScans.size());
 		data.put(getScanName(), sets);
 	}
 	
@@ -346,10 +346,10 @@ public class MultiScanDataParser {
 		NumberObject() {
 			setNumbers(new ArrayList<T>(31));
 		}
-		public AbstractDataset toDataset() {
+		public Dataset toDataset() {
 			if (numbers.isEmpty()) return null;
 			
-			AbstractDataset ret = null;
+			Dataset ret = null;
             if (numbers.get(0) instanceof Integer) {
             	final Integer[] ia   = numbers.toArray(new Integer[numbers.size()]);
             	final int    [] intA = new int[ia.length];

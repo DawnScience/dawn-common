@@ -15,7 +15,7 @@ package org.dawb.common.services;
  * two data analysis processes. For instance if workflows and the UI are 
  * communicating.
  * 
- * The class loader will include things like AbstractDataset and beans used
+ * The class loader will include things like Dataset and beans used
  * to communicate tool data.
  * 
  * Usage:

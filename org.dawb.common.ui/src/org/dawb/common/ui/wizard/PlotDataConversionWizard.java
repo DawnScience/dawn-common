@@ -22,7 +22,8 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.Dataset;
+import uk.ac.diamond.scisoft.analysis.dataset.DatasetFactory;
 
 public class PlotDataConversionWizard extends Wizard implements IExportWizard {
 	
@@ -70,7 +71,7 @@ public class PlotDataConversionWizard extends Wizard implements IExportWizard {
 		context.setConversionVisitor(visitor);
 		
 		//HACK - put in a dataset so the conversion class goes straight to iterate
-		context.setLazyDataset(AbstractDataset.zeros(new int[]{10},AbstractDataset.INT32));
+		context.setLazyDataset(DatasetFactory.zeros(new int[]{10},Dataset.INT32));
 		context.addSliceDimension(0, "all");
 		
 		conversionPage = new PlotDataConversionPage();

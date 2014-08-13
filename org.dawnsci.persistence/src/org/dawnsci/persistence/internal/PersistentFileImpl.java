@@ -22,11 +22,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import ncsa.hdf.object.Dataset;
-import ncsa.hdf.object.Datatype;
 import ncsa.hdf.object.Group;
 import ncsa.hdf.object.HObject;
-import ncsa.hdf.object.h5.H5Datatype;
 
 import org.dawb.common.services.IPersistentFile;
 import org.dawnsci.io.h5.H5LazyDataset;
@@ -40,7 +37,7 @@ import org.eclipse.dawnsci.hdf5.Nexus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.Dataset;
 import uk.ac.diamond.scisoft.analysis.dataset.BooleanDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.Comparisons;
 import uk.ac.diamond.scisoft.analysis.dataset.DatasetUtils;
@@ -118,7 +115,7 @@ class PersistentFileImpl implements IPersistentFile {
 				// Inverse the dataset
 				bd = Comparisons.logicalNot(bd);
 
-				AbstractDataset id = DatasetUtils.cast(bd, AbstractDataset.INT8);
+				Dataset id = DatasetUtils.cast(bd, Dataset.INT8);
 
 				final String dataset = file.replaceDataset(name, id, PersistenceConstants.MASK_ENTRY);
 				file.setNexusAttribute(dataset, Nexus.SDS);
@@ -130,7 +127,7 @@ class PersistentFileImpl implements IPersistentFile {
 	public void addMask(String name, IDataset mask, IMonitor mon) throws Exception{
 		// Inverse the dataset
 		mask = Comparisons.logicalNot((BooleanDataset)mask);
-		AbstractDataset id = DatasetUtils.cast((BooleanDataset)mask, AbstractDataset.INT8);
+		Dataset id = DatasetUtils.cast((BooleanDataset)mask, Dataset.INT8);
 		//check if parent group exists
 		Object parentObj = file.getData(PersistenceConstants.MASK_ENTRY);
 		if(parentObj == null) {
@@ -230,7 +227,7 @@ class PersistentFileImpl implements IPersistentFile {
 		if (file == null)
 			file = HierarchicalDataFactory.getReader(filePath);
 		dataName = !dataName.equals("") ? dataName : "data";
-		Dataset set = (Dataset)file.getData(PersistenceConstants.DATA_ENTRY+"/"+dataName);
+		ncsa.hdf.object.Dataset set = (ncsa.hdf.object.Dataset)file.getData(PersistenceConstants.DATA_ENTRY+"/"+dataName);
 		set.getMetadata();
 		return new H5LazyDataset(set);
 	}
@@ -274,10 +271,10 @@ class PersistentFileImpl implements IPersistentFile {
 	public BooleanDataset getMask(String maskName, IMonitor mon) throws Exception {
 		if(file == null)
 			file = HierarchicalDataFactory.getReader(filePath);
-		Dataset data = (Dataset)file.getData(PersistenceConstants.MASK_ENTRY+"/"+maskName);
+		ncsa.hdf.object.Dataset data = (ncsa.hdf.object.Dataset)file.getData(PersistenceConstants.MASK_ENTRY+"/"+maskName);
 		Object val = data.read();
-		AbstractDataset ret =  H5Utils.getSet(val,data);
-		BooleanDataset bd = (BooleanDataset) DatasetUtils.cast(ret, AbstractDataset.BOOL);
+		Dataset ret =  H5Utils.getSet(val,data);
+		BooleanDataset bd = (BooleanDataset) DatasetUtils.cast(ret, Dataset.BOOL);
 		if (getVersionNumber() > 1) {
 			// Inverse the dataset
 			bd = Comparisons.logicalNot(bd);
@@ -294,10 +291,10 @@ class PersistentFileImpl implements IPersistentFile {
 		Iterator<String> it = names.iterator();
 		while (it.hasNext()) {
 			String name = (String) it.next();
-			Dataset data = (Dataset)file.getData(PersistenceConstants.MASK_ENTRY+"/"+name);
+			ncsa.hdf.object.Dataset data = (ncsa.hdf.object.Dataset)file.getData(PersistenceConstants.MASK_ENTRY+"/"+name);
 			Object val = data.read();
-			AbstractDataset ret =  H5Utils.getSet(val,data);
-			BooleanDataset bd = (BooleanDataset) DatasetUtils.cast(ret, AbstractDataset.BOOL);
+			Dataset ret =  H5Utils.getSet(val,data);
+			BooleanDataset bd = (BooleanDataset) DatasetUtils.cast(ret, Dataset.BOOL);
 			if (getVersionNumber() > 1) {
 				// Inverse the dataset
 				bd = Comparisons.logicalNot(bd);
@@ -502,7 +499,7 @@ class PersistentFileImpl implements IPersistentFile {
 		IJSonMarshaller converter = new JacksonMarshaller();
 		String json = converter.marshal(roi);
 		// we create the dataset
-		String dat = file.replaceDataset(name, AbstractDataset.INT32, dims, new int[]{0}, parent);
+		String dat = file.replaceDataset(name, Dataset.INT32, dims, new int[]{0}, parent);
 		// we set the JSON attribute
 		file.setAttribute(dat, "JSON", json);
 		return dat;
@@ -533,9 +530,9 @@ class PersistentFileImpl implements IPersistentFile {
 	private BooleanDataset readH5Mask(IDataHolder dh, String maskName) throws Exception{
 		ILazyDataset ld = dh.getLazyDataset(PersistenceConstants.MASK_ENTRY+"/"+maskName);
 		if (ld instanceof H5LazyDataset) {
-			return (BooleanDataset)DatasetUtils.cast(((H5LazyDataset)ld).getCompleteData(null), AbstractDataset.BOOL);
+			return (BooleanDataset)DatasetUtils.cast(((H5LazyDataset)ld).getCompleteData(null), Dataset.BOOL);
 		} else {
-			return (BooleanDataset)DatasetUtils.cast(dh.getDataset(PersistenceConstants.MASK_ENTRY+"/"+maskName), AbstractDataset.BOOL);
+			return (BooleanDataset)DatasetUtils.cast(dh.getDataset(PersistenceConstants.MASK_ENTRY+"/"+maskName), Dataset.BOOL);
 		}
 	}
 
@@ -639,7 +636,7 @@ class PersistentFileImpl implements IPersistentFile {
 		long[] dims = {1};
 		String json = converter.marshal(function);
 		// we create the dataset
-		String dat = file.replaceDataset(name, AbstractDataset.INT32, dims, new int[]{0}, parent);
+		String dat = file.replaceDataset(name, Dataset.INT32, dims, new int[]{0}, parent);
 		// we set the JSON attribute
 		file.setAttribute(dat, "JSON", json);
 		return dat;

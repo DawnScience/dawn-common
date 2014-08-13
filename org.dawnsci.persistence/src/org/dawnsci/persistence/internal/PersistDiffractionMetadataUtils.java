@@ -2,17 +2,12 @@ package org.dawnsci.persistence.internal;
 
 import javax.vecmath.Matrix3d;
 
-import ncsa.hdf.object.Dataset;
-import ncsa.hdf.object.Datatype;
-import ncsa.hdf.object.h5.H5Datatype;
-
-import org.eclipse.dawnsci.hdf5.H5Utils;
 import org.eclipse.dawnsci.hdf5.HierarchicalDataFileUtils;
 import org.eclipse.dawnsci.hdf5.IHierarchicalDataFile;
 import org.eclipse.dawnsci.hdf5.Nexus;
 import org.eclipse.dawnsci.hdf5.nexus.NexusUtils;
 
-import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.Dataset;
 import uk.ac.diamond.scisoft.analysis.diffraction.DetectorProperties;
 import uk.ac.diamond.scisoft.analysis.diffraction.IPowderCalibrationInfo;
 
@@ -21,8 +16,8 @@ public class PersistDiffractionMetadataUtils {
 	public static final String SAMPLEGROUPNAME = "/entry/calibration_sample";
 
 	public static void writeDetectorProperties(IHierarchicalDataFile file, String parent, DetectorProperties detprop) throws Exception {
-		int intType    = AbstractDataset.INT32;
-		int doubleType = AbstractDataset.FLOAT64;
+		int intType    = Dataset.INT32;
+		int doubleType = Dataset.FLOAT64;
 
 		final String nXPix = file.replaceDataset("x_pixel_number", intType, new long[] {1}, new int[]{detprop.getPx()}, parent);
 		file.setAttribute(nXPix,NexusUtils.UNIT, "pixels");
@@ -56,7 +51,7 @@ public class PersistDiffractionMetadataUtils {
 	public static void writeWavelengthMono(IHierarchicalDataFile file, String instrument, double wavelength) throws Exception {
 		String group = file.group("monochromator", instrument);
 		file.setNexusAttribute(group, Nexus.MONO);
-		final String energy = file.replaceDataset("wavelength", AbstractDataset.FLOAT64, new long[] {1}, new double[]{wavelength}, group);
+		final String energy = file.replaceDataset("wavelength", Dataset.FLOAT64, new long[] {1}, new double[]{wavelength}, group);
 		file.setAttribute(energy, NexusUtils.UNIT, "Angstrom");
 	}
 	
@@ -72,7 +67,7 @@ public class PersistDiffractionMetadataUtils {
 		String beam = file.group("beam",sample);
 		file.setNexusAttribute(beam, "NXbeam");
 		
-		final String w = file.createDataset("incident_wavelength", AbstractDataset.FLOAT64, new long[] {1}, new double[]{wavelength}, beam);
+		final String w = file.createDataset("incident_wavelength", Dataset.FLOAT64, new long[] {1}, new double[]{wavelength}, beam);
 		file.setAttribute(w, NexusUtils.UNIT, "Angstrom");
 	}
 }

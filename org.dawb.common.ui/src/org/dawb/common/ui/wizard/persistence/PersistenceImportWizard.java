@@ -36,7 +36,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 
-import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.Dataset;
 import uk.ac.diamond.scisoft.analysis.dataset.BooleanDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.DatasetUtils;
 import uk.ac.diamond.scisoft.analysis.diffraction.DiffractionMetadataUtils;
@@ -224,7 +224,7 @@ public class PersistenceImportWizard extends AbstractPersistenceWizard implement
 	protected void createFit2DMask(String filePath, IPlottingSystem system, IProgressMonitor monitor) throws Exception {
 		
 		final IDataHolder     holder = LoaderFactory.getData(filePath, new ProgressMonitorWrapper(monitor));
-		final AbstractDataset mask   = DatasetUtils.cast(holder.getDataset(0), AbstractDataset.BOOL);
+		final Dataset mask   = DatasetUtils.cast(holder.getDataset(0), Dataset.BOOL);
 		final ITrace          trace  = system.getTraces().iterator().next();
 		
 		if (mask!=null && trace!=null && trace instanceof IImageTrace) {
@@ -320,9 +320,9 @@ public class PersistenceImportWizard extends AbstractPersistenceWizard implement
 					public void run() {
 						if (lockedmeta != null) {
 							DiffractionMetadataUtils.copyNewOverOld(fileMeta, lockedmeta);
-						} else if (image.getData() != null && ((AbstractDataset)image.getData()).getMetadata()!= null){
+						} else if (image.getData() != null && ((Dataset)image.getData()).getMetadata()!= null){
 							//Should only need to copy over here, not replace
-							IMetaData meta = ((AbstractDataset)image.getData()).getMetadata();
+							IMetaData meta = ((Dataset)image.getData()).getMetadata();
 							if (meta instanceof IDiffractionMetadata) {
 								DiffractionMetadataUtils.copyNewOverOld(fileMeta, (IDiffractionMetadata)meta);
 							}

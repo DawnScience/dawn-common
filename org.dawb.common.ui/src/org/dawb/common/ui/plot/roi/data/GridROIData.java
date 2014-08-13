@@ -19,7 +19,7 @@ package org.dawb.common.ui.plot.roi.data;
 import org.eclipse.swt.graphics.RGB;
 
 import uk.ac.diamond.scisoft.analysis.axis.AxisValues;
-import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.Dataset;
 import uk.ac.diamond.scisoft.analysis.roi.GridROI;
 
 /**
@@ -32,7 +32,7 @@ public class GridROIData extends RectangularROIData {
 	 * @param roi
 	 * @param data
 	 */
-	public GridROIData(GridROI roi, AbstractDataset data) {
+	public GridROIData(GridROI roi, Dataset data) {
 		super(roi, data);
 		plotColourRGB = new RGB(0,0,0);
 	}
@@ -43,7 +43,7 @@ public class GridROIData extends RectangularROIData {
 	 * @param axes
 	 * @param profileSum
 	 */
-	public GridROIData(GridROI roi, AbstractDataset[] profileData, AxisValues[] axes, double profileSum) {
+	public GridROIData(GridROI roi, Dataset[] profileData, AxisValues[] axes, double profileSum) {
 		super(roi, profileData, axes, profileSum);
 		plotColourRGB = new RGB(0,0,0);
 	}

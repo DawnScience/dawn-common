@@ -1,7 +1,7 @@
 package org.dawb.common.gpu;
 
 
-import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.Dataset;
 import uk.ac.diamond.scisoft.analysis.dataset.Maths;
 
 /**
@@ -14,7 +14,7 @@ class BasicCPUOperation implements IOperation {
 
 
 	@Override
-	public AbstractDataset process(AbstractDataset a, double b, Operator operation) {
+	public Dataset process(Dataset a, double b, Operator operation) {
 
 		switch (operation) {
 		case ADD:
@@ -30,7 +30,7 @@ class BasicCPUOperation implements IOperation {
 	}
 
 	@Override
-	public AbstractDataset process(AbstractDataset a, AbstractDataset b, Operator operation) {
+	public Dataset process(Dataset a, Dataset b, Operator operation) {
 
 		switch (operation) {
 		case ADD:

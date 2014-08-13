@@ -17,8 +17,8 @@
 package org.dawb.common.ui.plot.roi.data;
 
 import uk.ac.diamond.scisoft.analysis.axis.AxisValues;
-import uk.ac.diamond.scisoft.analysis.dataset.AbstractCompoundDataset;
-import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.CompoundDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.Dataset;
 import uk.ac.diamond.scisoft.analysis.roi.ROIProfile;
 import uk.ac.diamond.scisoft.analysis.roi.RectangularROI;
 
@@ -31,11 +31,11 @@ public class RectangularROIData extends ROIData {
 	 * @param rroi
 	 * @param data
 	 */
-	public RectangularROIData(RectangularROI rroi, AbstractDataset data) {
+	public RectangularROIData(RectangularROI rroi, Dataset data) {
 		this(rroi, data, null, 1.);
 	}
 
-	public RectangularROIData(RectangularROI rroi, AbstractDataset data, AbstractDataset mask) {
+	public RectangularROIData(RectangularROI rroi, Dataset data, Dataset mask) {
 		this(rroi, data, mask, 1.);
 	}
 	
@@ -46,7 +46,7 @@ public class RectangularROIData extends ROIData {
 	 * @param data
 	 * @param subFactor
 	 */
-	public RectangularROIData(RectangularROI rroi, AbstractDataset data, AbstractDataset mask, double subFactor) {
+	public RectangularROIData(RectangularROI rroi, Dataset data, Dataset mask, double subFactor) {
 		super();
 
 		setROI(rroi.copy());
@@ -54,11 +54,11 @@ public class RectangularROIData extends ROIData {
 		if (data != null)
 			profileData = ROIProfile.box(data, mask, (RectangularROI) roi);
 		if (profileData != null && profileData[0].getShape()[0] > 1 && profileData[1].getShape()[0] > 1) {
-			AbstractDataset pdata;
+			Dataset pdata;
 			for (int i = 0; i < 2; i++) {
 				pdata = profileData[i];
-				if (pdata instanceof AbstractCompoundDataset) // use first element
-					profileData[i] = ((AbstractCompoundDataset) pdata).getElements(0);
+				if (pdata instanceof CompoundDataset) // use first element
+					profileData[i] = ((CompoundDataset) pdata).getElements(0);
 			}
 			Number sum = (Number) profileData[0].sum();
 			profileSum = sum.doubleValue();
@@ -67,7 +67,7 @@ public class RectangularROIData extends ROIData {
 			xAxes[0] = new AxisValues();
 			xAxes[1] = new AxisValues();
 
-			AbstractDataset axis;
+			Dataset axis;
 			axis = profileData[0].getIndices().squeeze();
 			axis.imultiply(subFactor);
 			xAxes[0].setValues(axis);
@@ -86,7 +86,7 @@ public class RectangularROIData extends ROIData {
 	 * @param axes
 	 * @param profileSum
 	 */
-	public RectangularROIData(RectangularROI roi, AbstractDataset[] profileData, AxisValues[] axes, double profileSum) {
+	public RectangularROIData(RectangularROI roi, Dataset[] profileData, AxisValues[] axes, double profileSum) {
 		super();
 		setROI(roi.copy());
 		this.profileData = profileData.clone();

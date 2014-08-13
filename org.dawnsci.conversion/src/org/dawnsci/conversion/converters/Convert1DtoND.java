@@ -14,7 +14,7 @@ import org.eclipse.dawnsci.hdf5.Nexus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.Dataset;
 import uk.ac.diamond.scisoft.analysis.dataset.AggregateDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
@@ -112,7 +112,7 @@ public class Convert1DtoND extends AbstractConversion {
 						if (i<(paths.length-1)) file.setNexusAttribute(entry, Nexus.ENTRY);
 					}
 				}
-				saveAxis(file, entry, (AbstractDataset)axis, paths);
+				saveAxis(file, entry, (Dataset)axis, paths);
 			}
 			
 			
@@ -127,7 +127,7 @@ public class Convert1DtoND extends AbstractConversion {
 		}
 	}
 	
-	private void saveAxis(IHierarchicalDataFile file,String entry, AbstractDataset out, String[] paths) throws Exception {
+	private void saveAxis(IHierarchicalDataFile file,String entry, Dataset out, String[] paths) throws Exception {
 		
 		String name = paths[paths.length-1];
 		String d = file.createDataset(name, out, entry);
@@ -140,7 +140,7 @@ public class Convert1DtoND extends AbstractConversion {
 		
 		String name = paths[paths.length-1];
 		
-		AbstractDataset first = ((AbstractDataset)out.get(0).getSlice());
+		Dataset first = ((Dataset)out.get(0).getSlice());
 		
 		String d = file.appendDataset(name, first, entry);
 		
@@ -150,7 +150,7 @@ public class Convert1DtoND extends AbstractConversion {
 		file.setAttribute(d, "original_name", key);				
 		
 		for (int i = 1; i < out.size(); i++) {
-			AbstractDataset a = (AbstractDataset)out.get(i).getSlice();
+			Dataset a = (Dataset)out.get(i).getSlice();
 			d = file.appendDataset(name, a, entry);
 		}
 	}
@@ -162,7 +162,7 @@ public class Convert1DtoND extends AbstractConversion {
 
 		String d = null;
 		
-		AbstractDataset first = ((AbstractDataset)out.get(0).getSlice());
+		Dataset first = ((Dataset)out.get(0).getSlice());
 		
 		for (int i = 0; i < bean.slowAxis; i++) {
 			
@@ -171,7 +171,7 @@ public class Convert1DtoND extends AbstractConversion {
 			}
 			
 			ILazyDataset ds = new AggregateDataset(true, lz);
-			AbstractDataset a = (AbstractDataset)ds.getSlice();
+			Dataset a = (Dataset)ds.getSlice();
 			d = file.appendDataset(name, a, entry);
 			
 		}

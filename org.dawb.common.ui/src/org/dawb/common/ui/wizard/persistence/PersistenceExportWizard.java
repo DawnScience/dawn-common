@@ -42,7 +42,7 @@ import org.eclipse.ui.IExportWizard;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPart;
 
-import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.Dataset;
 import uk.ac.diamond.scisoft.analysis.dataset.BooleanDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.IFunction;
@@ -154,7 +154,7 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
     				}
     				
     				if (trace!=null && trace instanceof IImageTrace && trace.getData() != null) {
-    					IMetaData meta = ((AbstractDataset)trace.getData()).getMetadata();
+    					IMetaData meta = ((Dataset)trace.getData()).getMetadata();
     					if (meta != null && (meta instanceof IDiffractionMetadata)) {
     						options.setOptionEnabled(PersistWizardConstants.DIFF_META, true);
     					}
@@ -207,7 +207,7 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
 						 if (options.is(PersistWizardConstants.ORIGINAL_DATA)) {
 							 Collection<ITrace> traces  = system.getTraces();
 							 for (ITrace trace : traces) {
-								 file.setData((AbstractDataset)trace.getData());
+								 file.setData((Dataset)trace.getData());
 								 if (trace instanceof IImageTrace) {
 									 final List<IDataset> iaxes = ((IImageTrace)trace).getAxes();
 									 if (iaxes!=null) file.setAxes(iaxes);

@@ -12,7 +12,7 @@ package org.dawnsci.io.spec;
 import java.util.Collection;
 import java.util.EventObject;
 
-import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.Dataset;
 
 public class MultiScanDataEvent extends EventObject {
 
@@ -21,10 +21,10 @@ public class MultiScanDataEvent extends EventObject {
 	 */
 	private static final long serialVersionUID = 3884474453471553765L;
 	private String                      scanName;
-	private Collection<AbstractDataset> data;
+	private Collection<Dataset> data;
 	private Object                      userObject;
 
-	public MultiScanDataEvent(Object source, final String scanName, Collection<AbstractDataset> data) {
+	public MultiScanDataEvent(Object source, final String scanName, Collection<Dataset> data) {
 		super(source);
 		this.scanName = scanName;
 		this.data     = data;
@@ -38,11 +38,11 @@ public class MultiScanDataEvent extends EventObject {
 		this.scanName = scanName;
 	}
 
-	public Collection<AbstractDataset> getData() {
+	public Collection<Dataset> getData() {
 		return data;
 	}
 
-	public void setData(Collection<AbstractDataset> data) {
+	public void setData(Collection<Dataset> data) {
 		this.data = data;
 	}
 

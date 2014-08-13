@@ -1,6 +1,6 @@
 package org.dawb.common.gpu;
 
-import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.Dataset;
 
 public interface IOperation {
 
@@ -14,7 +14,7 @@ public interface IOperation {
 	 * @param operation
 	 * @return
 	 */
-	public AbstractDataset process(AbstractDataset a, double b, Operator operation);
+	public Dataset process(Dataset a, double b, Operator operation);
 
 	/**
 	 * Processes the operator on the GPU making a Kernel if required and
@@ -26,7 +26,7 @@ public interface IOperation {
 	 * @param operation
 	 * @return
 	 */
-	public AbstractDataset process(AbstractDataset a, AbstractDataset b, Operator operation);
+	public Dataset process(Dataset a, Dataset b, Operator operation);
 	
 	/**
 	 * Disposes any GPU Kernels which the operation may have.

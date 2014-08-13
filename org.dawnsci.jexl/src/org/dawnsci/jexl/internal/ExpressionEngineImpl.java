@@ -39,7 +39,7 @@ public class ExpressionEngineImpl implements IExpressionEngine{
 	
 	public ExpressionEngineImpl() {
 		//Create the Jexl engine with the DatasetArthmetic object to allows basic
-		//mathematical calculations to be performed on AbstractDatasets
+		//mathematical calculations to be performed on Datasets
 		jexl = new JexlEngine(null, new DatasetArithmetic(false),null,null);
 
 		//Add some useful functions to the engine

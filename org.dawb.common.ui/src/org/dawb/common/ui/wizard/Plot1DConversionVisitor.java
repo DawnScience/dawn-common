@@ -12,6 +12,7 @@ import org.eclipse.dawnsci.plotting.api.trace.ILineTrace;
 import org.eclipse.dawnsci.plotting.api.trace.ITrace;
 
 import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.Dataset;
 import uk.ac.diamond.scisoft.analysis.dataset.DatasetUtils;
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.io.ASCIIDataHolderSaver;
@@ -99,7 +100,7 @@ public class Plot1DConversionVisitor extends AbstractPlotConversionVisitor {
 				if (ddtype == axdtype) {
 					dtype = ddtype;
 				} else if (ddtype > axdtype) {
-					data = DatasetUtils.cast((AbstractDataset)data, ddtype);
+					data = DatasetUtils.cast((Dataset)data, ddtype);
 					dtype = ddtype;
 				} else {
 					dtype = axdtype;
@@ -114,7 +115,7 @@ public class Plot1DConversionVisitor extends AbstractPlotConversionVisitor {
 			data = ((ILineTrace)trace).getData();
 
 			if (dtype != AbstractDataset.getDType(data)) {
-				data = DatasetUtils.cast((AbstractDataset)data, dtype);
+				data = DatasetUtils.cast((Dataset)data, dtype);
 			}
 
 			data.setShape(data.getShape()[0],1);
@@ -123,7 +124,7 @@ public class Plot1DConversionVisitor extends AbstractPlotConversionVisitor {
 			i++;
 		}
 
-		AbstractDataset allTraces = DatasetUtils.concatenate(datasets.toArray(new IDataset[datasets.size()]), 1);
+		Dataset allTraces = DatasetUtils.concatenate(datasets.toArray(new IDataset[datasets.size()]), 1);
 
 		ASCIIDataWithHeadingSaver saver = new ASCIIDataWithHeadingSaver(filename);
 		DataHolder dh = new DataHolder();

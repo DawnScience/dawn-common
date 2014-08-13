@@ -21,7 +21,8 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.Dataset;
+import uk.ac.diamond.scisoft.analysis.dataset.DatasetFactory;
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 
@@ -57,15 +58,15 @@ public class NumpyRpcTest {
 			throw new Exception("No server going!");
 		}
 		
-		final AbstractDataset             set  = AbstractDataset.arange(0,100,1,AbstractDataset.INT32);
-		final Map<String,AbstractDataset> data = new HashMap<String, AbstractDataset>();
+		final Dataset             set  = DatasetFactory.createRange(0,100,1,Dataset.INT32);
+		final Map<String,Dataset> data = new HashMap<String, Dataset>();
 		data.put("x", set);
 		
 		final String scriptPath = BundleUtils.getBundleLocation("org.dawb.common.python").getAbsolutePath()+"/test/org/dawb/common/python/test/rpc/2x.py";	
 		
 		final Map<String,? extends Object> out  = service.runScript(scriptPath, data, Arrays.asList(new String[]{"x","y"})); // Calls the method 'run' in the script with the arguments
 
-		final AbstractDataset y = (AbstractDataset)out.get("y");
+		final Dataset y = (Dataset)out.get("y");
 		if (y.getDouble(1)!=2) throw new Exception("Testing x*2 failed!");
 		
 		// Got to here, then we have passed.
@@ -79,9 +80,9 @@ public class NumpyRpcTest {
 			throw new Exception("No server going!");
 		}
 		
-		final AbstractDataset             q  = AbstractDataset.arange(1,100,1,AbstractDataset.INT32);
-		final AbstractDataset             p  = AbstractDataset.arange(201,300,1,AbstractDataset.INT32);
-		final Map<String,AbstractDataset> data = new HashMap<String, AbstractDataset>();
+		final Dataset             q  = DatasetFactory.createRange(1,100,1,Dataset.INT32);
+		final Dataset             p  = DatasetFactory.createRange(201,300,1,Dataset.INT32);
+		final Map<String,Dataset> data = new HashMap<String, Dataset>();
 		data.put("p", p);
 		data.put("q", q);
 		
@@ -89,7 +90,7 @@ public class NumpyRpcTest {
 		
 		final Map<String,? extends Object> out  = service.runScript(scriptPath, data, Arrays.asList(new String[]{"res"})); // Calls the method 'run' in the script with the arguments
 
-		final AbstractDataset res = (AbstractDataset)out.get("res");
+		final Dataset res = (Dataset)out.get("res");
 		
 		// Got to here, then we have passed.
 		final double val = res.getDouble(1);
@@ -115,7 +116,7 @@ public class NumpyRpcTest {
 		
 		final Map<String,? extends Object> out  = service.runScript(scriptPath, data, Arrays.asList(new String[]{"y"})); // Calls the method 'run' in the script with the arguments
 
-		final AbstractDataset y = (AbstractDataset)out.get("y");
+		final Dataset y = (Dataset)out.get("y");
 		final double val = y.getDouble(1);
 		if (val!=202d) throw new Exception("Testing x*2 failed!");
 		
