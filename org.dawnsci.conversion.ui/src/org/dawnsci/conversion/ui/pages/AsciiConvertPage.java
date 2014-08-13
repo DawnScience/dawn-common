@@ -182,7 +182,7 @@ public class AsciiConvertPage extends AbstractDatasetChoosePage {
 
 
 	protected int getMinimumDataSize() {
-		return 2; // Data must be 1D or better
+		return 1; // Data must be 1D or better
 	}
 
 	@Override

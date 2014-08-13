@@ -48,7 +48,7 @@ public class AsciiConvert1D extends AbstractConversion {
 			sortedData.clear();
 			selected = context.getSelectedConversionFile();
 		}
-        sortedData.put(slice.getName(), slice);
+        sortedData.put(slice.getName(), slice.squeeze());
         if (context.getMonitor()!=null) context.getMonitor().worked(1);
 	}
 	
@@ -158,7 +158,7 @@ public class AsciiConvert1D extends AbstractConversion {
 				if (format!=null) {
 					value = format.format(set.getDouble(i));
 				} else {
-					value = (i<set.getSize()) ? set.getString(i) : " ";
+					value = (i<set.getSize()) ? set.getString(i) : "0";
 				}
 
 				
