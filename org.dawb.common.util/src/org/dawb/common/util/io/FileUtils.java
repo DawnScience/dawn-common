@@ -1219,18 +1219,18 @@ public final class FileUtils {
 			result = new File(((IFile)fileOrResource).getLocation().toOSString());
 		} else if (fileOrResource instanceof IResource) {
 			result = new File(((IResource)fileOrResource).getLocation().toOSString());
-		} else {
-			if (fileOrResource instanceof File)
+		} else if (fileOrResource instanceof File) {
 				result = (File)fileOrResource;
-			else if (fileOrResource instanceof IAdaptable) {
-				Object object = ((IAdaptable)fileOrResource).getAdapter(IFile.class);
-				if (object == null)
-					object = ((IAdaptable)fileOrResource).getAdapter(IFolder.class);
-				if (object instanceof IFile)
-					result = ((IFile)object).getLocation().toFile();
-				else if (object instanceof IFolder)
-					result = ((IFolder)object).getLocation().toFile();
-			};
+		} else if (fileOrResource instanceof IAdaptable) {
+			Object object = ((IAdaptable)fileOrResource).getAdapter(IFile.class);
+			if (object == null)
+				object = ((IAdaptable)fileOrResource).getAdapter(IFolder.class);
+			if (object instanceof IFile)
+				result = ((IFile)object).getLocation().toFile();
+			else if (object instanceof IFolder)
+				result = ((IFolder)object).getLocation().toFile();
+		} else if (fileOrResource instanceof java.nio.file.Path) {
+			result = ((java.nio.file.Path)fileOrResource).toFile();
 		}
 		return result;
 	}

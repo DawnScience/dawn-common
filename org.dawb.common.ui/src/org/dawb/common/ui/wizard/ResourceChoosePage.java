@@ -399,6 +399,9 @@ public class ResourceChoosePage extends WizardPage {
 					} else if (object instanceof IFolder) {
 						ret.add(((IFolder) obj).getLocation().toOSString());
 					}
+				} else if(object instanceof java.nio.file.Path) {
+					String path = ((java.nio.file.Path)object).toString();
+					ret.add(path);
 				}
 			}
 			return ret.size()>0 ? ret : null;
