@@ -9,8 +9,8 @@ import java.util.Map;
 import org.dawb.common.services.IExpressionObject;
 import org.dawb.common.services.IExpressionObjectService;
 import org.dawb.common.services.conversion.IConversionContext;
-import org.dawb.common.services.conversion.IConversionVisitor;
 import org.dawb.common.services.conversion.IConversionContext.ConversionScheme;
+import org.dawb.common.services.conversion.IConversionVisitor;
 import org.dawb.common.ui.Activator;
 import org.dawb.common.ui.monitor.ProgressMonitorWrapper;
 import org.dawb.common.ui.util.EclipseUtils;
@@ -141,7 +141,6 @@ public class ResourceChoosePage extends WizardPage {
 		});
 
 		this.resourceButton = new Button(container, SWT.PUSH);
-		resourceButton.setText("...");
 		resourceButton.setImage(Activator.getImageDescriptor("icons/Project-data.png").createImage());
 		resourceButton.setToolTipText("Browse to "+(isDirectory()?"folder":"file")+" inside a project");
 		resourceButton.addSelectionListener(new SelectionAdapter() {
@@ -153,8 +152,7 @@ public class ResourceChoosePage extends WizardPage {
 		resourceButton.setEnabled(buttonsEnabled);
 		
 		this.fileButton = new Button(container, SWT.PUSH);
-		fileButton.setText("...");
-		fileButton.setImage(Activator.getImageDescriptor("icons/data_folder_link.gif").createImage());
+		fileButton.setImage(Activator.getImageDescriptor("icons/folder.png").createImage());
 		fileButton.setToolTipText("Browse to an external "+(isDirectory()?"folder":"file")+".");
 		fileButton.addSelectionListener(new SelectionAdapter() {
 			@Override
