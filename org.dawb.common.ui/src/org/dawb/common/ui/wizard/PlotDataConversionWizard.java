@@ -39,7 +39,7 @@ public class PlotDataConversionWizard extends Wizard implements IExportWizard {
 	
 	public PlotDataConversionWizard() {
 		super();
-		setWindowTitle("Convert Data");
+		setWindowTitle("Export Data");
 		
 		// It's an OSGI service, not required to use ServiceManager
 		try {
@@ -76,8 +76,6 @@ public class PlotDataConversionWizard extends Wizard implements IExportWizard {
 		
 		conversionPage = new PlotDataConversionPage();
 		conversionPage.setPath(System.getProperty("user.home") +File.separator+ "plotdata."+ visitor.getExtension());
-		
-		conversionPage.setDescription("Convert plotted data to file");
 		
 		addPage(conversionPage);
 	
