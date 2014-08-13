@@ -21,7 +21,7 @@ import java.awt.Color;
 import org.eclipse.swt.graphics.RGB;
 
 import uk.ac.diamond.scisoft.analysis.axis.AxisValues;
-import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.Dataset;
 import uk.ac.diamond.scisoft.analysis.roi.IROI;
 
 /**
@@ -29,7 +29,7 @@ import uk.ac.diamond.scisoft.analysis.roi.IROI;
  */
 public class ROIData implements IRowData {
 	protected IROI roi;
-	protected AbstractDataset[] profileData;
+	protected Dataset[] profileData;
 	protected double profileSum;
 	protected RGB plotColourRGB;
 	protected AxisValues[] xAxes;
@@ -83,7 +83,7 @@ public class ROIData implements IRowData {
 	 * @param index
 	 * @param profileData The profileData to set.
 	 */
-	public void setProfileData(int index, AbstractDataset profileData) {
+	public void setProfileData(int index, Dataset profileData) {
 		this.profileData[index] = profileData;
 	}
 
@@ -91,14 +91,14 @@ public class ROIData implements IRowData {
 	 * @param index
 	 * @return Returns the profileData.
 	 */
-	public AbstractDataset getProfileData(int index) {
+	public Dataset getProfileData(int index) {
 		return profileData[index];
 	}
 
 	/**
 	 * @return Returns the profileData.
 	 */
-	public AbstractDataset[] getProfileData() {
+	public Dataset[] getProfileData() {
 		return profileData;
 	}
 

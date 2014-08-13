@@ -14,7 +14,8 @@ import org.dawnsci.persistence.PersistenceServiceCreator;
 import org.junit.Assert;
 import org.junit.Test;
 
-import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.Dataset;
+import uk.ac.diamond.scisoft.analysis.dataset.DatasetFactory;
 import uk.ac.diamond.scisoft.analysis.dataset.DatasetUtils;
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.diffraction.DetectorProperties;
@@ -46,13 +47,13 @@ public class ReadWritePowderCalibration {
 			// create the PersistentService
 			IPersistenceService persist = PersistenceServiceCreator.createPersistenceService();
 
-			IDataset ds = AbstractDataset.ones(new int[] {1000, 1500}, AbstractDataset.INT16);
+			IDataset ds = DatasetFactory.ones(new int[] {1000, 1500}, Dataset.INT16);
 			
 			IPowderCalibrationInfo info = new IPowderCalibrationInfo() {
 				
 				@Override
 				public IDataset getUsedDSpaceIndexValues() {
-					return DatasetUtils.linSpace(0, 3, 4, AbstractDataset.INT16);
+					return DatasetUtils.linSpace(0, 3, 4, Dataset.INT16);
 				}
 				
 				@Override
@@ -77,7 +78,7 @@ public class ReadWritePowderCalibration {
 				
 				@Override
 				public IDataset getCalibrantDSpaceValues() {
-					return DatasetUtils.linSpace(1, 4, 4, AbstractDataset.INT16);
+					return DatasetUtils.linSpace(1, 4, 4, Dataset.INT16);
 				}
 
 				@Override

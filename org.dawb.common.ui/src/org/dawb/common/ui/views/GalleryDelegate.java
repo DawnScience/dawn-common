@@ -50,7 +50,7 @@ import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.Dataset;
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 
 /**
@@ -222,7 +222,7 @@ public class GalleryDelegate implements SelectionListener {
             try {
             	IDataset slice = info.getData(true, ii);
             	slice.setName(selectionDataLabel+" "+info.getItemName(item.getItemCount(), false));
-				ys.add((AbstractDataset)slice);
+				ys.add((Dataset)slice);
 			} catch (Exception e) {
 				logger.error("Cannot slice ", e);
 				continue;

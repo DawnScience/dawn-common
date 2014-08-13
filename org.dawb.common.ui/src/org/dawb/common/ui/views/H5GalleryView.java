@@ -50,7 +50,7 @@ import org.eclipse.ui.part.ViewPart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.Dataset;
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.Maths;
@@ -250,8 +250,8 @@ public class H5GalleryView extends ViewPart implements MouseListener, SelectionL
 				system.createPlot1D(null, ys, null);
 			} else if (ys.get(0).getShape().length==2) {
 				// Average the images, then plot
-			    AbstractDataset added = Maths.add(Arrays.asList(ys.toArray(new IDataset[ys.size()])), false);
-			    AbstractDataset mean  = Maths.divide(added, ys.size());
+			    Dataset added = Maths.add(Arrays.asList(ys.toArray(new IDataset[ys.size()])), false);
+			    Dataset mean  = Maths.divide(added, ys.size());
 			    system.createPlot2D(mean, null, null);
 			}
 		}

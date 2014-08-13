@@ -16,7 +16,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.Dataset;
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 import uk.ac.diamond.scisoft.analysis.io.SliceObject;
@@ -154,8 +154,8 @@ public class H5GalleryInfo implements GalleryDelegateInfo {
 		try {
 			set = lazySet.getSlice(getSliceStart(ii.getIndex()), getSliceStop(ii.getIndex()), getSliceStep(ii.getIndex()));
 			if (set==null) return null;
-			if (set instanceof AbstractDataset) {
-				set = ((AbstractDataset)set).squeeze();
+			if (set instanceof Dataset) {
+				set = ((Dataset)set).squeeze();
 			}
 		} catch (java.lang.IllegalArgumentException ne) {
 			// We do not want the thread to stop in this case.

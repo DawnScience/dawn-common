@@ -1,6 +1,5 @@
 package org.dawnsci.jexl.internal;
 
-import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.Dataset;
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
@@ -24,7 +23,7 @@ public class JexlLazyFunctions {
 	 * @param axis
 	 * @return
 	 */
-	public static AbstractDataset rmean(final ILazyDataset data, final int axis) {
+	public static Dataset rmean(final ILazyDataset data, final int axis) {
 		final int length = data.getShape()[axis];
 		return LazyMaths.sum(data, axis).idivide(length);
 	}

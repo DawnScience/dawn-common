@@ -13,7 +13,8 @@ import org.dawb.common.services.IPersistentFile;
 import org.dawnsci.persistence.PersistenceServiceCreator;
 import org.junit.Test;
 
-import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.Dataset;
+import uk.ac.diamond.scisoft.analysis.dataset.DatasetFactory;
 import uk.ac.diamond.scisoft.analysis.dataset.DoubleDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
@@ -28,7 +29,7 @@ public class ReadWriteDataTest extends AbstractThreadTestBase {
 			tmp.createNewFile();
 			
 			// dataset
-			AbstractDataset  da = createTestData();
+			Dataset  da = createTestData();
 			List<IDataset> axes = createTestAxesData();
 
 			// create the PersistentService
@@ -83,7 +84,7 @@ public class ReadWriteDataTest extends AbstractThreadTestBase {
 			tmp.createNewFile();
 			
 			// dataset
-			AbstractDataset da  = createTestData();
+			Dataset da  = createTestData();
 			List<IDataset> axes = createTestAxesData();
 			
 			// create the PersistentService
@@ -160,14 +161,14 @@ public class ReadWriteDataTest extends AbstractThreadTestBase {
 		testWriteReadData();
 	}
 
-	private AbstractDataset createTestData(){
+	private Dataset createTestData(){
 		// dataset
 		final double[] random = new double[100];
 		for (int i = 0; i < 100; i++) {
 			random[i] = Math.random();
 		}
-		AbstractDataset da = AbstractDataset.arange(4194304,
-				AbstractDataset.FLOAT64);
+		Dataset da = DatasetFactory.createRange(4194304,
+				Dataset.FLOAT64);
 		da.setName("data");
 		da.setShape(2048, 2048);
 		

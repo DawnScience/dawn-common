@@ -13,7 +13,8 @@ import org.dawb.common.services.IPersistentFile;
 import org.dawnsci.persistence.PersistenceServiceCreator;
 import org.junit.Test;
 
-import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.Dataset;
+import uk.ac.diamond.scisoft.analysis.dataset.DatasetFactory;
 import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
 
@@ -27,7 +28,7 @@ public class ReadWriteHistoryTest extends AbstractThreadTestBase {
 			tmp.createNewFile();
 			
 			// dataset
-			AbstractDataset[]  da = new AbstractDataset[]{createTestData(new int []{512}, 1), 
+			Dataset[]  da = new Dataset[]{createTestData(new int []{512}, 1), 
 					                                      createTestData(new int []{256}, 2), 
 					                                      createTestData(new int []{128}, 3)};
 
@@ -84,7 +85,7 @@ public class ReadWriteHistoryTest extends AbstractThreadTestBase {
 			tmp.createNewFile();
 			
 			// dataset
-			AbstractDataset  da = createTestData(new int[]{2048, 2048});
+			Dataset  da = createTestData(new int[]{2048, 2048});
 
 			// create the PersistentService
 			IPersistenceService persist = PersistenceServiceCreator.createPersistenceService();
@@ -137,7 +138,7 @@ public class ReadWriteHistoryTest extends AbstractThreadTestBase {
 			tmp.createNewFile();
 			
 			// dataset
-			AbstractDataset da  = createTestData(new int[]{2048, 2048});
+			Dataset da  = createTestData(new int[]{2048, 2048});
 			
 			// create the PersistentService
 			IPersistenceService persist = PersistenceServiceCreator.createPersistenceService();
@@ -212,10 +213,10 @@ public class ReadWriteHistoryTest extends AbstractThreadTestBase {
 		testWriteReadHistoImage();
 	}
 
-	private AbstractDataset createTestData(int[] shape){
+	private Dataset createTestData(int[] shape){
         return createTestData(shape, -1);
 	}
-	private AbstractDataset createTestData(int[] shape, int index){
+	private Dataset createTestData(int[] shape, int index){
 		// dataset
 		final double[] random = new double[100];
 		for (int i = 0; i < 100; i++) {
@@ -224,7 +225,7 @@ public class ReadWriteHistoryTest extends AbstractThreadTestBase {
 		int size = 1;
 		for (int d : shape) size *= d;
 		
-		AbstractDataset da = AbstractDataset.arange(size, AbstractDataset.FLOAT64);
+		Dataset da = DatasetFactory.createRange(size, Dataset.FLOAT64);
 		if (index>-1) {
 			da.setName("history"+index);
 		} else {

@@ -2,17 +2,12 @@ package org.dawnsci.persistence.internal;
 
 import javax.vecmath.Vector3d;
 
-import ncsa.hdf.object.Dataset;
-import ncsa.hdf.object.Datatype;
-import ncsa.hdf.object.h5.H5Datatype;
-
-import org.eclipse.dawnsci.hdf5.H5Utils;
 import org.eclipse.dawnsci.hdf5.HierarchicalDataFileUtils;
 import org.eclipse.dawnsci.hdf5.IHierarchicalDataFile;
 import org.eclipse.dawnsci.hdf5.Nexus;
 import org.eclipse.dawnsci.hdf5.nexus.NexusUtils;
 
-import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.Dataset;
 import uk.ac.diamond.scisoft.analysis.dataset.DoubleDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.diffraction.DetectorProperties;
@@ -107,7 +102,7 @@ public class PersistSinglePowderCalibration {
 		file.createStringDataset("author", DAWNCALIBRATIONID, note);
 		file.createStringDataset("description", info.getMethodDescription(), note);
 		
-		AbstractDataset data = (AbstractDataset)info.getUsedDSpaceIndexValues();
+		Dataset data = (Dataset)info.getUsedDSpaceIndexValues();
 		final String datasetd = file.createDataset("d_space_index",  data, note);
 		file.setNexusAttribute(datasetd, Nexus.SDS);
 		
@@ -124,7 +119,7 @@ public class PersistSinglePowderCalibration {
 		
 	}
 	
-	private static String createNXtransformation(String name, String type, AbstractDataset vector, AbstractDataset offset, String units, String depends_on, double value, IHierarchicalDataFile file, String group) throws Exception {
+	private static String createNXtransformation(String name, String type, Dataset vector, Dataset offset, String units, String depends_on, double value, IHierarchicalDataFile file, String group) throws Exception {
 		
 		String ds = createDoubleDataset(name, value,file, group);
 		NexusUtils.setDatasetAttribute(vector, ds, file);
@@ -137,7 +132,7 @@ public class PersistSinglePowderCalibration {
 		
 	private static String createDoubleDataset(String name, double val, IHierarchicalDataFile file, String group) throws Exception {
 		
-		return file.createDataset(name, AbstractDataset.INT64, new long[]{1}, new double[]{val}, group);
+		return file.createDataset(name, Dataset.INT64, new long[]{1}, new double[]{val}, group);
 		
 	}
 	

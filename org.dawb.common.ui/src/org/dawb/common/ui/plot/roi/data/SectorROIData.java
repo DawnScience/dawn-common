@@ -17,8 +17,8 @@
 package org.dawb.common.ui.plot.roi.data;
 
 import uk.ac.diamond.scisoft.analysis.axis.AxisValues;
-import uk.ac.diamond.scisoft.analysis.dataset.AbstractCompoundDataset;
-import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.CompoundDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.Dataset;
 import uk.ac.diamond.scisoft.analysis.dataset.DatasetUtils;
 import uk.ac.diamond.scisoft.analysis.roi.ROIProfile;
 import uk.ac.diamond.scisoft.analysis.roi.SectorROI;
@@ -32,11 +32,11 @@ public class SectorROIData extends ROIData {
 	 * @param sroi
 	 * @param data 
 	 */
-	public SectorROIData(SectorROI sroi, AbstractDataset data) {
+	public SectorROIData(SectorROI sroi, Dataset data) {
 		this(sroi, data, null, 1.);
 	}
 
-	public SectorROIData(SectorROI sroi, AbstractDataset data, AbstractDataset mask) {
+	public SectorROIData(SectorROI sroi, Dataset data, Dataset mask) {
 		this(sroi, data, mask, 1.);
 	}
 
@@ -46,21 +46,21 @@ public class SectorROIData extends ROIData {
 	 * @param data
 	 * @param subFactor
 	 */
-	public SectorROIData(SectorROI sroi, AbstractDataset data, double subFactor) {
+	public SectorROIData(SectorROI sroi, Dataset data, double subFactor) {
 		this(sroi, data, null, subFactor);
 	}
 
-	public SectorROIData(SectorROI sroi, AbstractDataset data, AbstractDataset mask, double subFactor) {
+	public SectorROIData(SectorROI sroi, Dataset data, Dataset mask, double subFactor) {
 		super();
 		setROI(sroi.copy());
 		roi.downsample(subFactor);
 		profileData = ROIProfile.sector(data, mask, (SectorROI) roi);
 		if (profileData != null && profileData[0].getShape()[0] > 1 && profileData[1].getShape()[0] > 1) {
-			AbstractDataset pdata;
+			Dataset pdata;
 			for (int i = 0; i < 4; i++) {
 				pdata = profileData[i];
-				if (pdata instanceof AbstractCompoundDataset) // use first element
-					profileData[i] = ((AbstractCompoundDataset) pdata).getElements(0);
+				if (pdata instanceof CompoundDataset) // use first element
+					profileData[i] = ((CompoundDataset) pdata).getElements(0);
 			}
 			Number sum = (Number) profileData[0].sum();
 			profileSum = sum.doubleValue();
@@ -71,20 +71,20 @@ public class SectorROIData extends ROIData {
 			xAxes[2] = new AxisValues();
 			xAxes[3] = new AxisValues();
 
-			AbstractDataset axis;
-			axis = DatasetUtils.linSpace(sroi.getRadius(0), sroi.getRadius(1), profileData[0].getSize(), AbstractDataset.FLOAT64);//profileData[0].getIndices().squeeze();
+			Dataset axis;
+			axis = DatasetUtils.linSpace(sroi.getRadius(0), sroi.getRadius(1), profileData[0].getSize(), Dataset.FLOAT64);//profileData[0].getIndices().squeeze();
 			xAxes[0].setValues(axis);
 
 			if (sroi.getSymmetry() != SectorROI.FULL)
-				axis = DatasetUtils.linSpace(sroi.getAngleDegrees(0), sroi.getAngleDegrees(1), profileData[1].getSize(), AbstractDataset.FLOAT64);
+				axis = DatasetUtils.linSpace(sroi.getAngleDegrees(0), sroi.getAngleDegrees(1), profileData[1].getSize(), Dataset.FLOAT64);
 			else
-				axis = DatasetUtils.linSpace(sroi.getAngleDegrees(0), sroi.getAngleDegrees(0) + 360., profileData[1].getSize(), AbstractDataset.FLOAT64);
+				axis = DatasetUtils.linSpace(sroi.getAngleDegrees(0), sroi.getAngleDegrees(0) + 360., profileData[1].getSize(), Dataset.FLOAT64);
 			xAxes[1].setValues(axis);
 
 			if (sroi.hasSeparateRegions()) {
-				axis = DatasetUtils.linSpace(sroi.getRadius(0), sroi.getRadius(1), profileData[2].getSize(), AbstractDataset.FLOAT64);//profileData[0].getIndices().squeeze();
+				axis = DatasetUtils.linSpace(sroi.getRadius(0), sroi.getRadius(1), profileData[2].getSize(), Dataset.FLOAT64);//profileData[0].getIndices().squeeze();
 				xAxes[2].setValues(axis);
-				axis = DatasetUtils.linSpace(sroi.getAngleDegrees(0), sroi.getAngleDegrees(1), profileData[3].getSize(), AbstractDataset.FLOAT64);
+				axis = DatasetUtils.linSpace(sroi.getAngleDegrees(0), sroi.getAngleDegrees(1), profileData[3].getSize(), Dataset.FLOAT64);
 				xAxes[3].setValues(axis);
 			}
 		} else {
@@ -99,7 +99,7 @@ public class SectorROIData extends ROIData {
 	 * @param axes
 	 * @param profileSum
 	 */
-	public SectorROIData(SectorROI sroi, AbstractDataset[] profileData, AxisValues[] axes, double profileSum) {
+	public SectorROIData(SectorROI sroi, Dataset[] profileData, AxisValues[] axes, double profileSum) {
 		super();
 		setROI(sroi.copy());
 		this.profileData = profileData.clone();

@@ -6,13 +6,11 @@ import java.lang.ref.SoftReference;
 import java.util.HashMap;
 import java.util.Map;
 
-import ncsa.hdf.object.Dataset;
-
 import org.eclipse.dawnsci.hdf5.H5Utils;
 import org.eclipse.dawnsci.hdf5.HierarchicalDataFactory;
 import org.eclipse.dawnsci.hdf5.IHierarchicalDataFile;
 
-import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.Dataset;
 import uk.ac.diamond.scisoft.analysis.io.ILazyLoader;
 import uk.ac.diamond.scisoft.analysis.io.ScanFileHolderException;
 import uk.ac.diamond.scisoft.analysis.io.SliceObject;
@@ -20,7 +18,7 @@ import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
 
 public class H5LazyLoader implements ILazyLoader {
 
-	private Map<SliceObject,Reference<AbstractDataset>> cache;
+	private Map<SliceObject,Reference<Dataset>> cache;
 	/**
 	 * 
 	 */
@@ -35,7 +33,7 @@ public class H5LazyLoader implements ILazyLoader {
 		this.loader   = new H5Loader();
 		this.path     = path;
 		this.fullPath = fullPath;
-		this.cache    = new HashMap<SliceObject, Reference<AbstractDataset>>(31);
+		this.cache    = new HashMap<SliceObject, Reference<Dataset>>(31);
 	}
 
 	@Override
@@ -44,7 +42,7 @@ public class H5LazyLoader implements ILazyLoader {
 	}
 
 	@Override
-	public AbstractDataset getDataset(IMonitor mon, 
+	public Dataset getDataset(IMonitor mon, 
 			                          int[] shape, int[] start,
 			                          int[] stop,  int[] step) throws ScanFileHolderException {
 		
@@ -66,28 +64,28 @@ public class H5LazyLoader implements ILazyLoader {
 		slice.setSliceStep(step);
 		
 		if (cache.containsKey(slice)) {
-			final Reference<AbstractDataset> sr = cache.get(slice);
+			final Reference<Dataset> sr = cache.get(slice);
 			if (sr.get()!=null) {
 				return sr.get();
 			}
 		}
 		try {
-			AbstractDataset set = loader.slice(slice, mon);
-			cache.put(slice, new SoftReference<AbstractDataset>(set));
+			Dataset set = loader.slice(slice, mon);
+			cache.put(slice, new SoftReference<Dataset>(set));
 			return set;
 		} catch (Exception e) {
 			throw new ScanFileHolderException("Cannot slice "+path+", "+fullPath, e);
 		}	
 	}
 
-	protected AbstractDataset getCompleteData(IMonitor mon) throws Exception {
+	protected Dataset getCompleteData(IMonitor mon) throws Exception {
 		
 		IHierarchicalDataFile file = null;
 		try {
 			if (mon!=null) mon.worked(1);
 			file = HierarchicalDataFactory.getReader(path);
 			
-			final Dataset set = (Dataset)file.getData(fullPath);
+			final ncsa.hdf.object.Dataset set = (ncsa.hdf.object.Dataset)file.getData(fullPath);
 			if (set.getStartDims()==null) set.getMetadata();
 			
 			/**

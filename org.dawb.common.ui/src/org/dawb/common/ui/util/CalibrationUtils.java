@@ -9,7 +9,8 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
 
-import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.Dataset;
+import uk.ac.diamond.scisoft.analysis.dataset.DatasetFactory;
 import uk.ac.diamond.scisoft.analysis.dataset.DoubleDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 
@@ -31,7 +32,7 @@ public class CalibrationUtils {
 
 		if (checkEnabled) {
 			final boolean        isCalib = store.getBoolean(CalibrationConstants.USE);
-			if (!isCalib)  return AbstractDataset.arange(0, set.getSize(), 1, AbstractDataset.INT32);
+			if (!isCalib)  return DatasetFactory.createRange(0, set.getSize(), 1, Dataset.INT32);
 		}
 		
      	final String expr = store.getString(CalibrationConstants.EXPR);

@@ -17,8 +17,8 @@
 package org.dawb.common.ui.plot.roi.data;
 
 import uk.ac.diamond.scisoft.analysis.axis.AxisValues;
-import uk.ac.diamond.scisoft.analysis.dataset.AbstractCompoundDataset;
-import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.CompoundDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.Dataset;
 import uk.ac.diamond.scisoft.analysis.roi.LinearROI;
 import uk.ac.diamond.scisoft.analysis.roi.ROIProfile;
 
@@ -32,17 +32,17 @@ public class LinearROIData extends ROIData {
 	 * @param data
 	 * @param step
 	 */
-	public LinearROIData(LinearROI roi, AbstractDataset data, double step) {
+	public LinearROIData(LinearROI roi, Dataset data, double step) {
 		super();
 
 		setROI(roi.copy());
 		profileData = ROIProfile.line(data, roi, step);
 		if (profileData != null && profileData[0].getShape()[0] > 1) {
-			AbstractDataset pdata;
+			Dataset pdata;
 			for (int i = 0; i < 2; i++) {
 				pdata = profileData[i];
-				if (pdata instanceof AbstractCompoundDataset) // use first element
-					profileData[i] = ((AbstractCompoundDataset) pdata).getElements(0);
+				if (pdata instanceof CompoundDataset) // use first element
+					profileData[i] = ((CompoundDataset) pdata).getElements(0);
 			}
 			Number sum = (Number) profileData[0].sum();
 			profileSum = sum.doubleValue() * step;
@@ -51,7 +51,7 @@ public class LinearROIData extends ROIData {
 			xAxes[0] = new AxisValues();
 			xAxes[1] = new AxisValues();
 
-			AbstractDataset axis;
+			Dataset axis;
 			axis = profileData[0].getIndices().squeeze();
 			axis.imultiply(step);
 			xAxes[0].setValues(axis);
@@ -73,7 +73,7 @@ public class LinearROIData extends ROIData {
 	 * @param axes
 	 * @param profileSum
 	 */
-	public LinearROIData(LinearROI roi, AbstractDataset[] profileData, AxisValues[] axes, double profileSum) {
+	public LinearROIData(LinearROI roi, Dataset[] profileData, AxisValues[] axes, double profileSum) {
 		super();
 		setROI(roi.copy());
 		this.profileData = profileData.clone();

@@ -20,7 +20,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import uk.ac.diamond.scisoft.analysis.dataset.AbstractDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.Dataset;
 
 import com.isencia.util.commandline.ManagedCommandline;
 
@@ -53,7 +53,7 @@ public class OutputRpcTest {
 				+ "/test/org/dawb/common/python/test/rpc/" + script;
 
 		// Run the script
-		service.runScript(scriptPath, new HashMap<String, AbstractDataset>(),
+		service.runScript(scriptPath, new HashMap<String, Dataset>(),
 				Arrays.asList(new String[] {})); // Calls the method 'run'
 													// in the script with
 													// the arguments
