@@ -12,6 +12,7 @@ import org.dawnsci.conversion.converters.CustomNCDConverter;
 import org.dawnsci.conversion.converters.CustomTomoConverter;
 import org.dawnsci.conversion.converters.ImageConverter;
 import org.dawnsci.conversion.converters.ImagesToHDFConverter;
+import org.dawnsci.conversion.converters.ProcessConversion;
 import org.dawnsci.conversion.converters.VisitorConversion;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
@@ -73,6 +74,9 @@ public class ConversionServiceImpl implements IConversionService {
 					break;
 				case COMPARE:
 					deligate = new CompareConverter(context);
+					break;
+				case PROCESS:
+					deligate = new ProcessConversion(context);
 					break;
 				default:
 					throw new Exception("No conversion for "+context.getConversionScheme());

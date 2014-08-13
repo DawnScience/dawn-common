@@ -370,6 +370,8 @@ public abstract class AbstractSliceConversionPage extends ResourceChoosePage {
         ILazyDataset set = getLazyExpression();
         if (set != null) context.setLazyDataset(set);
 
+        context.setAxesNames(sliceComponent.getAxesNames());
+        
 		return context;
 	}
 

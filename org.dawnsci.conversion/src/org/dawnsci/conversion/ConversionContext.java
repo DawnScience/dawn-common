@@ -32,6 +32,7 @@ class ConversionContext implements IConversionContext {
 	private boolean             expression=false;
 	private Slice[]             selectedSlice;
 	private int[]               selectedShape;
+	private Map<Integer,String> axesNames;
 	
 	public ConversionScheme getConversionScheme() {
 		return conversionScheme;
@@ -252,6 +253,16 @@ class ConversionContext implements IConversionContext {
 	@Override
 	public void setSelectedShape(int[] shape) {
 		this.selectedShape = shape;
+	}
+	
+	@Override
+	public Map<Integer, String> getAxesNames() {
+		return axesNames;
+	}
+	@Override
+	public void setAxesNames(Map<Integer, String> axesNames) {
+		this.axesNames = axesNames;
+		
 	}
 
 }

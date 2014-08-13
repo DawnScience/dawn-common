@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.ui.PlatformUI;
 
 import uk.ac.diamond.scisoft.analysis.io.ILoaderService;
+import uk.ac.diamond.scisoft.analysis.processing.IOperationService;
 /**
  * This class gets a service even if we are running in headless mode.
  * 
@@ -41,6 +42,7 @@ public class ServiceManager {
 		OFFLINE_SERVICES.add(IClassLoaderService.class);
 		OFFLINE_SERVICES.add(IPersistenceService.class);
 		OFFLINE_SERVICES.add(IBoofCVProcessingService.class);
+		OFFLINE_SERVICES.add(IOperationService.class);
 	}
 	
 	/**
