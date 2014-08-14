@@ -24,6 +24,7 @@ import org.dawb.common.ui.monitor.ProgressMonitorWrapper;
 import org.dawb.common.ui.util.EclipseUtils;
 import org.dawb.common.ui.wizard.AbstractSliceConversionPage;
 import org.dawb.common.ui.wizard.ResourceChoosePage;
+import org.dawnsci.conversion.ui.pages.ImageProcessConvertPage;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -63,6 +64,8 @@ public class ConvertWizard extends Wizard implements IExportWizard{
 	private ConversionChoicePage setupPage;
 
 	private List<String> overidePaths, overideDatasets;
+	
+	private IWorkbench workbench;
 
 	public ConvertWizard() {
 		setNeedsProgressMonitor(true);
@@ -98,6 +101,9 @@ public class ConvertWizard extends Wizard implements IExportWizard{
 					if (overideDatasets!=null && overideDatasets.size()>0 && p instanceof AbstractSliceConversionPage) {
 						((AbstractSliceConversionPage)p).setDatasetName(overideDatasets.get(0));
 					}
+					
+					if (p instanceof ImageProcessConvertPage) ((ImageProcessConvertPage)p).setWorkbench(workbench);
+					
 					conversionPages.put(s, p);
 					addPage(p);
 				} catch (CoreException e1) {
@@ -132,7 +138,7 @@ public class ConvertWizard extends Wizard implements IExportWizard{
 
 	@Override
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
-		      
+		      this.workbench = workbench;
  	}
 	
     public boolean canFinish() {
