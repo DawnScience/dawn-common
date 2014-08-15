@@ -110,12 +110,13 @@ public abstract class AbstractSliceConversionPage extends ResourceChoosePage {
 			return;
 		}
 
-		final Control slicer = sliceComponent.createPartControl(container);
+	    sliceComponent.setRangeMode(RangeMode.MULTI_RANGE);
+
+	    final Control slicer = sliceComponent.createPartControl(container);
 		GridData data = new GridData(SWT.FILL, SWT.FILL, true, true, 4, 1);
 		data.minimumHeight=560;
 		slicer.setLayoutData(data);
 		sliceComponent.setVisible(true);
-	    sliceComponent.setRangeMode(RangeMode.MULTI_RANGE);
 		sliceComponent.setSliceActionsEnabled(false);
 		
 		pathChanged();

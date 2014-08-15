@@ -10,9 +10,15 @@
 package org.dawb.common.services.conversion;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.widgets.Display;
 
 import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.Slice;
@@ -28,6 +34,7 @@ public interface IConversionContext {
 	 * of the conversions we have spoken about before.
 	 */
 	public enum ConversionScheme {
+
 		ASCII_FROM_1D(" ascii from 1D data",   true,  1), 
 		ASCII_FROM_2D(" ascii from 2D data",   false, 2), 
 		TIFF_FROM_3D(" image files from image stack", true, 2,3,4,5),
@@ -104,6 +111,41 @@ public interface IConversionContext {
 		}
 		public boolean isNexusOnly() {
 			return nexusOnly;
+		}
+		
+		public String getDescription() {
+			final StringBuilder buf = new StringBuilder();
+			buf.append("Conversion Name:\t");
+			buf.append(uiLabel);
+			buf.append("\n\n");
+			
+			buf.append("Data Source:\t");
+			buf.append(isNexusOnly()?"HDF5 or Nexus files only":"Any loadable data of correct rank");
+			buf.append("\n\n");
+			
+			buf.append("Supported Data Ranks:\t");
+			buf.append(Arrays.toString(preferredRanks));
+			buf.append("\n\n");
+			
+			return buf.toString();
+		}
+		
+		private Image cachedImage;
+		/**
+		 * If there is an image in this directory called <enum_name>.png
+		 * we return it here.
+		 * 
+		 * @return
+		 */
+		public Image getImage() {
+			InputStream in = getClass().getResourceAsStream(toString()+".png");
+			if (in==null) return null;
+			
+			if (cachedImage!=null) return cachedImage;
+			
+			final ImageData id = new ImageData(in);
+			this.cachedImage = new Image(Display.getDefault(), id);
+			return cachedImage;
 		}
 	}
 	

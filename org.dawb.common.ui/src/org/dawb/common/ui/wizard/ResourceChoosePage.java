@@ -105,6 +105,11 @@ public class ResourceChoosePage extends WizardPage {
 		setControl(container);
 
 	}
+	
+    public void setPageComplete(boolean complete) {
+    	if (complete==super.isPageComplete()) return;
+        super.setPageComplete(complete);
+    }
 
 	/**
 	 * 

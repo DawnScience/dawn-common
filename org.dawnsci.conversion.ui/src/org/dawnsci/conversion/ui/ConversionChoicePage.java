@@ -108,10 +108,26 @@ public class ConversionChoicePage extends ResourceChoosePage implements IConvers
 		singleFile.addSelectionListener(selAd);
 	}
 	
+	private Label infoDiagram, infoText;
+	
 	protected void createContentAfterFileChoose(Composite container) {
 		
+		final Composite infoArea = new Composite(container, SWT.NONE);
+		
+		GridLayout layout = new GridLayout(2, false);
+		layout.horizontalSpacing = 20;
+		infoArea.setLayout(layout);
+		infoArea.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, true, true, 4, 3));
+		
+		this.infoDiagram = new Label(infoArea, SWT.NONE);
+		infoDiagram.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
+		infoDiagram.setText(" ");
+		
+		this.infoText    = new Label(infoArea, SWT.WRAP);
+		infoText.setLayoutData(new GridData(SWT.FILL, SWT.LEFT, true, false));
+		
 		Label helpLabel = new Label(container, SWT.WRAP);
-		helpLabel.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, true, true, 4, 3));
+		helpLabel.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, true, false, 4, 3));
 		helpLabel.setText("(This wizard has been started in single file mode. To select multiple files, cancel and use the 'Project Explorer' to select a folder or hold down control and select several files with the mouse. Afterwards restart this wizard and the files selected will be the conversion input files. The files selected should all be of the same type please.)");
 		
 		final List<String> selected = getSelectedFiles();
@@ -146,22 +162,32 @@ public class ConversionChoicePage extends ResourceChoosePage implements IConvers
 			return;
 		}
 		
-		if (chosenConversion!=null && chosenConversion.isNexusOnly()) {
-			if (getSelectedFiles()!=null && getSelectedFiles().size()>1 && multiFileSelection) {		
-				for (String path : getSelectedFiles()) {
-					if (!isH5(path)) {
-						setErrorMessage("The conversion '"+chosenConversion.getUiLabel()+"' supports nexus/hdf5 files only. The file '"+((new File(path).getName())+"' is not a nexus/hdf5 file."));
+		if (chosenConversion!=null) {
+			
+			infoDiagram.setImage(chosenConversion.getImage());
+			infoText.setText(chosenConversion.getDescription());
+			
+			if (chosenConversion.isNexusOnly()) {
+	
+				if (getSelectedFiles()!=null && getSelectedFiles().size()>1 && multiFileSelection) {		
+					for (String path : getSelectedFiles()) {
+						if (!isH5(path)) {
+							setErrorMessage("The conversion '"+chosenConversion.getUiLabel()+"' supports nexus/hdf5 files only. The file '"+((new File(path).getName())+"' is not a nexus/hdf5 file."));
+							setPageComplete(false);
+							return;
+						}				
+					}
+				} else {
+					if (!isH5(filePath)) {
+						setErrorMessage("The conversion '"+chosenConversion.getUiLabel()+"' supports nexus/hdf5 files only.");
 						setPageComplete(false);
 						return;
-					}				
-				}
-			} else {
-				if (!isH5(filePath)) {
-					setErrorMessage("The conversion '"+chosenConversion.getUiLabel()+"' supports nexus/hdf5 files only.");
-					setPageComplete(false);
-					return;
+					}
 				}
 			}
+			
+			infoText.getParent().getParent().layout();
+
 		}
 		
 		final File file = new File(filePath);

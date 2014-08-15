@@ -37,6 +37,7 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IExportWizard;
 import org.eclipse.ui.IWorkbench;
@@ -153,7 +154,7 @@ public class ConvertWizard extends Wizard implements IExportWizard{
     	if (page==setupPage) {
        		IConversionContext.ConversionScheme scheme = setupPage.getScheme();
        		selectedConversionPage = conversionPages.get(scheme);
-       		selectedConversionPage.setContext(setupPage.getContext());
+       		if (selectedConversionPage!=null) selectedConversionPage.setContext(setupPage.getContext());
        		return selectedConversionPage;
     	} else if (page instanceof IConversionWizardPage) {
     		return null; // Only 1 allowed.
