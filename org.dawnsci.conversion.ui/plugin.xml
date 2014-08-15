@@ -114,11 +114,6 @@
             conversion_scheme="COMPARE"
             id="org.dawnsci.conversion.ui.compareConversion">
       </conversion_page>
-      <conversion_page
-            conversion_page="org.dawnsci.conversion.ui.pages.ImageProcessConvertPage"
-            conversion_scheme="PROCESS"
-            id="org.dawnsci.conversion.ui.pages.ImageProcessConvertPage">
-      </conversion_page>
    </extension>
 
 </plugin>
