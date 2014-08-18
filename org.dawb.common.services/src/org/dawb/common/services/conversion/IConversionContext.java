@@ -40,11 +40,11 @@ public interface IConversionContext {
 		TIFF_FROM_3D(" image files from image stack", true, 2,3,4,5),
 		AVI_FROM_3D(" video from image stack", true, 2,3,4,5),
 		H5_FROM_IMAGEDIR(" nexus stack from directory of images", true, false, 2),
-		H5_FROM_1D(" nexus from 1D data",   true,  1),
+		H5_FROM_1D(" nexus from 1D data",   true, false,  1),
 		CUSTOM_NCD(" ascii from NCD data",     true, 2,3,4,5,6),
 		CUSTOM_TOMO(" tiff from tomography nexus file(s) [nxtomo]",    true, 3),
 		COMPARE(" compare data",    true,  false, 0,1,2,3,4,5),
-		PROCESS(" process data", true, true, 2,3,4,5);
+		PROCESS(" process data", false, true, 2,3,4,5);
 		
 		private final String  uiLabel;
 		private final int[]   preferredRanks;

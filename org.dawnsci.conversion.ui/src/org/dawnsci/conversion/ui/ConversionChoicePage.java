@@ -21,6 +21,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -126,9 +127,27 @@ public class ConversionChoicePage extends ResourceChoosePage implements IConvers
 		this.infoText    = new Label(infoArea, SWT.WRAP);
 		infoText.setLayoutData(new GridData(SWT.FILL, SWT.LEFT, true, false));
 		
-		Label helpLabel = new Label(container, SWT.WRAP);
-		helpLabel.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, true, false, 4, 3));
-		helpLabel.setText("(This wizard has been started in single file mode. To select multiple files, cancel and use the 'Project Explorer' to select a folder or hold down control and select several files with the mouse. Afterwards restart this wizard and the files selected will be the conversion input files. The files selected should all be of the same type please.)");
+		final Link helpLink = new Link(container, SWT.WRAP);
+		helpLink.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, true, false, 4, 3));
+		helpLink.setText("This wizard has been started in single file mode (<a>more</a>)");
+		
+		final Label helpLabelMore = new Label(container, SWT.WRAP);
+		helpLabelMore.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, true, false, 4, 3));
+		helpLabelMore.setText("To select multiple files, cancel and use the 'Project Explorer' to select a folder or hold down control and select several files with the mouse. Afterwards restart this wizard and the files selected will be the conversion input files. The files selected should all be of the same type.");
+		GridUtils.setVisible(helpLabelMore, false);
+		
+		helpLink.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				GridUtils.setVisible(helpLabelMore, !helpLabelMore.isVisible());
+				if (helpLabelMore.isVisible()) {
+					helpLink.setText("This wizard has been started in single file mode (<a>less</a>)");
+				} else {
+					helpLink.setText("This wizard has been started in single file mode (<a>more</a>)");
+				}
+				helpLabelMore.getParent().layout();
+			}
+		});
+
 		
 		final List<String> selected = getSelectedFiles();
 		if (selected!=null) setPath(selected.get(0));
@@ -136,7 +155,7 @@ public class ConversionChoicePage extends ResourceChoosePage implements IConvers
         if (selected==null || selected.size()<2) {
         	GridUtils.setVisible(conversionGroup, false);
         	GridUtils.setVisible(multiFilesLabel, false);
-        	GridUtils.setVisible(helpLabel, true);
+        	GridUtils.setVisible(helpLink, true);
         } else {
         	//sort list
         	Collections.sort(selected);
@@ -147,7 +166,7 @@ public class ConversionChoicePage extends ResourceChoosePage implements IConvers
         	final File end   = new File(selected.get(selected.size()-1));
         	multiFilesLabel.setText("Selected files:   "+start.getName()+" - "+end.getName()+"  (List of "+selected.size()+" files)");
         	setFileChoosingEnabled(false);
-        	GridUtils.setVisible(helpLabel, false);
+        	GridUtils.setVisible(helpLink, false);
       }
        
        pathChanged();
