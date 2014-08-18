@@ -55,6 +55,10 @@ public class AVIImageConverter extends AbstractImageConversion {
 		super(context);
 		
 		final File avi = new File(context.getOutputPath());
+		
+		if (context.getFilePaths().contains(avi.getAbsolutePath())) {
+			throw new Exception("The output path is the same as the input path! "+avi);
+		}
 		if (!avi.exists()) {
 			avi.getParentFile().mkdirs();
 			try {

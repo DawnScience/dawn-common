@@ -93,9 +93,6 @@ public class ConvertWizard extends Wizard implements IExportWizard{
 			if (s.isUserVisible()) {
 				try {
 					final IConversionWizardPage p = (IConversionWizardPage)e.createExecutableExtension("conversion_page");
-					if (p instanceof ResourceChoosePage) {
-						((ResourceChoosePage)p).setSelectedFiles(overidePaths);
-					}
 					if (overideDatasets!=null && overideDatasets.size()>0 && p instanceof AbstractSliceConversionPage) {
 						((AbstractSliceConversionPage)p).setDatasetName(overideDatasets.get(0));
 					}
