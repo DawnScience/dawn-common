@@ -1,11 +1,16 @@
 package org.dawnsci.conversion.ui.pages;
 
 import java.io.File;
+import java.util.Collection;
 
+import org.dawb.common.services.ISystemService;
 import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.ui.util.GridUtils;
 import org.dawnsci.conversion.converters.ImageConverter;
+import org.eclipse.dawnsci.plotting.api.IPlottingSystem;
 import org.eclipse.dawnsci.plotting.api.PlotType;
+import org.eclipse.dawnsci.plotting.api.trace.IImageTrace;
+import org.eclipse.dawnsci.plotting.api.trace.ITrace;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
@@ -21,10 +26,12 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.events.ExpansionAdapter;
 import org.eclipse.ui.forms.events.ExpansionEvent;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 
+import uk.ac.diamond.scisoft.analysis.Activator;
 import uk.ac.diamond.scisoft.analysis.dataset.function.DownsampleMode;
 
 /**
@@ -49,7 +56,8 @@ public final class AVIConvertPage extends AbstractSliceConversionPage {
 	private String         downsampleName;
 	private int            downsampleSize;
 	private int            frameRate;
-	private boolean        alwaysShowTitle = false;
+	private boolean        alwaysShowTitle   = false;
+	private boolean        useCurrentColours = true;
 
 	public AVIConvertPage() {
 		super("wizardPage", "Page for exporting HDF5 data slices into a video.", null);
@@ -131,6 +139,17 @@ public final class AVIConvertPage extends AbstractSliceConversionPage {
 		label.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
 		label.setText("image/s");
 		
+        final Button useMap = new Button(advanced, SWT.CHECK);
+        useMap.setText("Try to use colour map from current plot for all images.");
+        useMap.setToolTipText("If off the colours will be taken from the current default color map and the max and min will be regenerated for each image.");
+        useMap.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
+        useMap.setSelection(useCurrentColours);
+        useMap.addSelectionListener(new SelectionAdapter() {
+        	public void widgetSelected(SelectionEvent e) {
+        		useCurrentColours = useMap.getSelection();
+        	}
+		});
+        
         final Button showTitle = new Button(advanced, SWT.CHECK);
         showTitle.setText("Show title and axes when exporting image stacks.");
         showTitle.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
@@ -140,6 +159,8 @@ public final class AVIConvertPage extends AbstractSliceConversionPage {
         		alwaysShowTitle = showTitle.getSelection();
         	}
 		});
+
+
 
 		GridUtils.setVisible(advanced, false);
 		ExpansionAdapter expansionListener = new ExpansionAdapter() {
@@ -238,12 +259,38 @@ public final class AVIConvertPage extends AbstractSliceConversionPage {
 		bean.setDownsampleMode(DownsampleMode.valueOf(downsampleName));
 		bean.setDownsampleBin(downsampleSize);
 		bean.setFrameRate(frameRate);
-		context.setUserObject(bean);
 		bean.setSliceType(sliceComponent.getSliceType());
 		bean.setAlwaysShowTitle(alwaysShowTitle);
 		
+		if (useCurrentColours) {
+			ISystemService<IPlottingSystem> service = (ISystemService<IPlottingSystem>)PlatformUI.getWorkbench().getService(ISystemService.class);
+			if (service!=null) {
+				// If we have a plotting system for the input file, use that.
+				final File file = new File(context.getFilePaths().get(0));
+				IPlottingSystem system = service.getSystem(file.getName());
+				if (system!=null) {
+					IImageTrace image = getImageTrace(system);
+					if (image!=null) bean.setImageServiceBean(image.getImageServiceBean());
+				}
+			}
+		}
+		
+		context.setUserObject(bean);
+		
 		return context;
 	}
+	private IImageTrace getImageTrace(IPlottingSystem system) {
+		final ITrace trace = getTrace(system);
+		return trace instanceof IImageTrace ? (IImageTrace)trace : null;
+	}
+	private ITrace getTrace(IPlottingSystem system) {
+		if (system == null) return null;
+
+		final Collection<ITrace> traces = system.getTraces();
+		if (traces==null || traces.size()==0) return null;
+        return  traces.iterator().next();
+	}
+
 
 	
 	@Override
