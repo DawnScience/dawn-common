@@ -104,13 +104,13 @@ public class CustomNCDConverter extends AbstractConversion  {
 				axis = getAxis(context.getAxisDatasetName(), context.getSelectedConversionFile());
 				// ATSAS ASCII format doesn't support axis errors
 				if (axis != null && axis.hasErrors() && exportFormat.equals(SAS_FORMAT.ATSAS)) {
-					axis.clearError();
+					axis.setError(null);
 				}
 			}
 			
 			//Set up position iterator (final 2 dimensions saved in a single file
 			int[] stop = lz.getShape();
-			boolean hasErrors = (lz.getLazyErrors() != null ? true : false);
+			boolean hasErrors = (lz.getError() != null ? true : false);
 			int iterDim;
 			int[] cutAxes;
 			if (stop.length == 1 || exportFormat.equals(SAS_FORMAT.ATSAS) || exportFormat.equals(SAS_FORMAT.TOPAZ)) {
@@ -311,7 +311,7 @@ public class CustomNCDConverter extends AbstractConversion  {
 			
 			//Set up position iterator (final 2 dimensions saved in a single file
 			int[] stop = lz.getShape();
-			boolean hasErrors = (lz.getLazyErrors() != null ? true : false);
+			boolean hasErrors = (lz.getError() != null ? true : false);
 			int iterDim = lz.getRank() - 1;
 			int[] cutAxes = new int[] {lz.getRank() - 1};
 			

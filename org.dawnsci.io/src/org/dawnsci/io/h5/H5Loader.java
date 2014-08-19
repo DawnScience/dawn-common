@@ -212,7 +212,7 @@ public class H5Loader extends AbstractFileLoader implements IMetaLoader {
 				if (error!=null) {
 					error.getMetadata();
 					final LazyDataset errLazy = new H5LazyDataset(error);
-					lazy.setLazyErrors(errLazy);
+					lazy.setError(errLazy);
 					ret.put(errorPath, errLazy);
 				}
 			}
