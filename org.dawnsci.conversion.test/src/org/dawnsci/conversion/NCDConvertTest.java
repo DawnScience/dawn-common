@@ -9,6 +9,7 @@ import java.util.Map;
 
 import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.services.conversion.IConversionContext.ConversionScheme;
+import org.dawb.common.services.conversion.IConversionService;
 import org.dawnsci.conversion.converters.CustomNCDConverter.SAS_FORMAT;
 import org.junit.Test;
 
@@ -20,7 +21,7 @@ public class NCDConvertTest {
 	@Test
 	public void testNCDSimple() throws Exception {
 		
-		ConversionServiceImpl service = new ConversionServiceImpl();
+		IConversionService service = new ConversionServiceImpl();
 		
 		// Determine path to test file
 		final String path = getTestFilePath("results_i22-102527_Pilatus2M_280313_112434.nxs");
@@ -54,7 +55,7 @@ public class NCDConvertTest {
 	@Test
 	public void testNCDSimpleNoAxis() throws Exception {
 		
-		ConversionServiceImpl service = new ConversionServiceImpl();
+		IConversionService service = new ConversionServiceImpl();
 		
 		// Determine path to test file
 		final String path = getTestFilePath("results_i22-102527_Pilatus2M_280313_112434.nxs");
@@ -88,7 +89,7 @@ public class NCDConvertTest {
 	@Test
 	public void testNCDMultiDims() throws Exception {
 		
-		ConversionServiceImpl service = new ConversionServiceImpl();
+		IConversionService service = new ConversionServiceImpl();
 		
 		// Determine path to test file
 		final String path = getTestFilePath("results_i22-114346_Pilatus2M_220313_090939.nxs");
@@ -123,7 +124,7 @@ public class NCDConvertTest {
 	@Test
 	public void testNCDSingleAndNormalised() throws Exception {
 		
-		ConversionServiceImpl service = new ConversionServiceImpl();
+		IConversionService service = new ConversionServiceImpl();
 		
 		// Determine path to test file
 		final String path = getTestFilePath("results_i22-118040_Pilatus2M_010513_125108.nxs");
@@ -158,7 +159,7 @@ public class NCDConvertTest {
 	@Test
 	public void testNCDMultiFile() throws Exception {
 		
-		ConversionServiceImpl service = new ConversionServiceImpl();
+		IConversionService service = new ConversionServiceImpl();
 		
 		// Determine path to test file
 		final String path = getTestFilePath("results_i22-118040_Pilatus2M_010513_125108.nxs");

@@ -23,10 +23,11 @@ import java.util.Arrays;
 
 import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.services.conversion.IConversionContext.ConversionScheme;
+import org.dawb.common.services.conversion.IConversionService;
 import org.dawb.common.util.io.FileUtils;
 import org.junit.Test;
-import static org.junit.Assert.fail;
 
+import static org.junit.Assert.fail;
 import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 
@@ -70,7 +71,7 @@ public class ImageToH5Test {
 				FileUtils.copyNio(image, nf);
 			}
 			
-			ConversionServiceImpl service = new ConversionServiceImpl();
+			IConversionService service = new ConversionServiceImpl();
 			
 	        final IConversionContext context = service.open(dir.getAbsolutePath()+"/copy_.*img");
 	        final File output = new File(dir.getParentFile(), "imageStackTestOutput_"+testname+".h5");

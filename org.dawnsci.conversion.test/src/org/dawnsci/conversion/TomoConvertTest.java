@@ -4,6 +4,7 @@ import java.io.File;
 
 import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.services.conversion.IConversionContext.ConversionScheme;
+import org.dawb.common.services.conversion.IConversionService;
 import org.dawnsci.conversion.converters.CustomTomoConverter;
 import org.junit.Test;
 
@@ -16,7 +17,7 @@ public class TomoConvertTest {
 	@Test
 	public void testTomoSimple() throws Exception {
 		
-		ConversionServiceImpl service = new ConversionServiceImpl();
+		IConversionService service = new ConversionServiceImpl();
 		final String path = getTestFilePath("extraction_test_small.nxs");
 		
 		final IConversionContext context = service.open(path);
@@ -71,7 +72,7 @@ public class TomoConvertTest {
 	@Test
 	public void testTomoDifferentPaths() throws Exception {
 		
-		ConversionServiceImpl service = new ConversionServiceImpl();
+		IConversionService service = new ConversionServiceImpl();
 		final String path = getTestFilePath("extraction_test_small.nxs");
 		
 		final IConversionContext context = service.open(path);
@@ -129,7 +130,7 @@ public class TomoConvertTest {
 	@Test
 	public void testTomoDifferentNumberWidth() throws Exception {
 		
-		ConversionServiceImpl service = new ConversionServiceImpl();
+		IConversionService service = new ConversionServiceImpl();
 		final String path = getTestFilePath("extraction_test_small.nxs");
 		
 		final IConversionContext context = service.open(path);

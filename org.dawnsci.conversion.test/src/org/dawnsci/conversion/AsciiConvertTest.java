@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.dawb.common.services.conversion.IConversionContext;
+import org.dawb.common.services.conversion.IConversionService;
 import org.dawb.common.services.conversion.IConversionContext.ConversionScheme;
 import org.dawnsci.conversion.converters.AsciiConvert1D;
 import org.junit.Test;
@@ -26,7 +27,7 @@ public class AsciiConvertTest {
 	@Test
 	public void testAsciiSimple() throws Exception {
 		
-		ConversionServiceImpl service = new ConversionServiceImpl();
+		IConversionService service = new ConversionServiceImpl();
 		
 		// Determine path to test file
 		final String path = getTestFilePath(testfile);
@@ -50,7 +51,7 @@ public class AsciiConvertTest {
 	@Test
 	public void testAsciiCustomConfig() throws Exception {
 		
-		ConversionServiceImpl service = new ConversionServiceImpl();
+		IConversionService service = new ConversionServiceImpl();
 		
 		// Determine path to test file
 		final String path = getTestFilePath(testfile);
@@ -94,7 +95,7 @@ public class AsciiConvertTest {
 	@Test
 	public void testAsciiCustomConfig2() throws Exception {
 		
-		ConversionServiceImpl service = new ConversionServiceImpl();
+		IConversionService service = new ConversionServiceImpl();
 		
 		// Determine path to test file
 		final String path = getTestFilePath(testfile);

@@ -4,6 +4,7 @@ import java.io.File;
 
 import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.services.conversion.IConversionContext.ConversionScheme;
+import org.dawb.common.services.conversion.IConversionService;
 import org.dawnsci.conversion.converters.ImageConverter;
 import org.junit.Test;
 
@@ -18,7 +19,7 @@ public class ImageConvertTest {
 	@Test
 	public void testTiffSimple() throws Exception {
 		
-		ConversionServiceImpl service = new ConversionServiceImpl();
+		IConversionService service = new ConversionServiceImpl();
 		
 		// Determine path to test file
 		final String path = getTestFilePath("export.h5");
@@ -65,7 +66,7 @@ public class ImageConvertTest {
 	@Test
 	public void testPNGCustomConfig() throws Exception {
 		
-		ConversionServiceImpl service = new ConversionServiceImpl();
+		IConversionService service = new ConversionServiceImpl();
 		
 		// Determine path to test file
 		final String path = getTestFilePath("export.h5");

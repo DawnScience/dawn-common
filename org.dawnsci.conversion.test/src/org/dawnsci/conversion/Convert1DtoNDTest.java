@@ -26,6 +26,7 @@ import java.util.List;
 
 import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.services.conversion.IConversionContext.ConversionScheme;
+import org.dawb.common.services.conversion.IConversionService;
 import org.dawnsci.conversion.converters.Convert1DtoND.Convert1DInfoBean;
 import org.junit.Test;
 
@@ -41,7 +42,7 @@ public class Convert1DtoNDTest {
 	@Test
 	public void test1DSimple() throws Exception {
 		
-		ConversionServiceImpl service = new ConversionServiceImpl();
+		IConversionService service = new ConversionServiceImpl();
 		
 		// Determine path to test file
 		final String path = getTestFilePath(testfile);
@@ -73,7 +74,7 @@ public class Convert1DtoNDTest {
 	@Test
 	public void test3DSimple() throws Exception {
 		
-		ConversionServiceImpl service = new ConversionServiceImpl();
+		IConversionService service = new ConversionServiceImpl();
 		
 		// Determine path to test file
 		final String path = getTestFilePath(testfile);
@@ -110,7 +111,7 @@ public class Convert1DtoNDTest {
 	@Test
 	public void test1DNotNexus() throws Exception {
 		
-		ConversionServiceImpl service = new ConversionServiceImpl();
+		IConversionService service = new ConversionServiceImpl();
 		
 		// Determine path to test file
 		final String path = getTestFilePath(nonNexusTest);

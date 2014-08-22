@@ -25,6 +25,7 @@ import java.util.Arrays;
 
 import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.services.conversion.IConversionContext.ConversionScheme;
+import org.dawb.common.services.conversion.IConversionService;
 import org.dawb.common.util.io.FileUtils;
 import org.junit.Test;
 
@@ -56,7 +57,7 @@ public class CompareConvertTest {
 			}
 			
 							
-			ConversionServiceImpl service = new ConversionServiceImpl();
+			IConversionService service = new ConversionServiceImpl();
 	
 			final IConversionContext context = service.open(dir.getAbsolutePath()+"/.*nxs");
 			final File output = new File(dir.getAbsolutePath()+"/compare_convert_test.h5");

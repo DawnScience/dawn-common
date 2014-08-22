@@ -7,6 +7,7 @@ import org.dawb.common.services.IPlotImageService;
 import org.dawb.common.services.ServiceManager;
 import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.services.conversion.IConversionContext.ConversionScheme;
+import org.dawb.common.services.conversion.IConversionService;
 import org.dawb.common.ui.image.PaletteFactory;
 import org.dawnsci.conversion.converters.AbstractImageConversion.ConversionInfoBean;
 import org.dawnsci.plotting.histogram.service.PaletteService;
@@ -29,7 +30,7 @@ public class AVIImageConvertTest {
 	@Test
 	public void testAVISimple() throws Exception {
 		
-		ConversionServiceImpl service = new ConversionServiceImpl();
+		IConversionService service = new ConversionServiceImpl();
 		
 		// Not sure of this will work...
 		ServiceManager.setService(IImageService.class,       new ImageService());
