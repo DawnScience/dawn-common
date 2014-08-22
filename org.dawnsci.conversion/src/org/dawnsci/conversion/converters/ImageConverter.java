@@ -37,7 +37,12 @@ public class ImageConverter extends AbstractImageConversion {
 
 		final File sliceFile = new File(getFilePath(slice));
 		if (!sliceFile.getParentFile().exists()) sliceFile.getParentFile().mkdirs();
-		final JavaImageSaver saver = new JavaImageSaver(sliceFile.getAbsolutePath(), getExtension(), getBits(), true);
+		
+		// JavaImageSaver likes 33 but users don't 
+		int bits = getBits();
+		if (bits==32 && getExtension().toLowerCase().startsWith("tif")) bits = 33;
+		
+		final JavaImageSaver saver = new JavaImageSaver(sliceFile.getAbsolutePath(), getExtension(), bits, true);
 		final DataHolder     dh    = new DataHolder();
 		dh.addDataset(slice.getName(), slice);
 		dh.setFilePath(context.getSelectedConversionFile().getAbsolutePath());
@@ -50,7 +55,7 @@ public class ImageConverter extends AbstractImageConversion {
 	}
 
 	protected String getExtension() {
-		if (context.getUserObject()==null) return "tiff";
+		if (context.getUserObject()==null) return "tif";
 		return ((ConversionInfoBean)context.getUserObject()).getExtension();
 	}
 

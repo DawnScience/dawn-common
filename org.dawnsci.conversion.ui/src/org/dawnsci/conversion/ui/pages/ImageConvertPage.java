@@ -28,12 +28,12 @@ public final class ImageConvertPage extends AbstractSliceConversionPage {
 	
 	private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ImageConvertPage.class);
 	
-	private static final String[] IMAGE_FORMATS = new String[]{"tiff", "png", "jpg"};
+	private static final String[] IMAGE_FORMATS = new String[]{"tif", "png", "jpg"};
 	private static final Map<String,int[]> BIT_DEPTHS;
 	static {
 		BIT_DEPTHS = new HashMap<String, int[]>(3);
 		// TODO investigate other bit depths for different formats.
-		BIT_DEPTHS.put("tiff", new int[]{33,16});
+		BIT_DEPTHS.put("tif", new int[]{32,16});
 		BIT_DEPTHS.put("png", new int[]{16});
 		BIT_DEPTHS.put("jpg", new int[]{8});
 	}
@@ -75,7 +75,7 @@ public final class ImageConvertPage extends AbstractSliceConversionPage {
 		final CCombo imf = new CCombo(advanced, SWT.READ_ONLY|SWT.BORDER);
 		imf.setItems(IMAGE_FORMATS);
 		imf.select(0);
-		imageFormat = "tiff";
+		imageFormat = "tif";
 		imf.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
 		
 		label = new Label(advanced, SWT.NULL);
@@ -85,13 +85,13 @@ public final class ImageConvertPage extends AbstractSliceConversionPage {
 		final CCombo bd = new CCombo(advanced, SWT.READ_ONLY|SWT.BORDER);
 		bd.setItems(getStringArray(BIT_DEPTHS.get(imageFormat)));
 		bd.select(0);
-		bitDepth = 33;
+		bitDepth = 32;
 		bd.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
 		bd.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				final String str = bd.getItem(bd.getSelectionIndex());
 				bitDepth = Integer.parseInt(str);
-				GridUtils.setVisible(warningLabel, bitDepth<33);
+				GridUtils.setVisible(warningLabel, bitDepth<32);
 				warningLabel.getParent().layout();
 				pathChanged();
 			}
@@ -105,7 +105,7 @@ public final class ImageConvertPage extends AbstractSliceConversionPage {
 				bd.setItems(sa);
 				bitDepth = depths[0];
 				bd.select(0);
-				GridUtils.setVisible(warningLabel, bitDepth<33);
+				GridUtils.setVisible(warningLabel, bitDepth<32);
 				warningLabel.getParent().layout();
 				pathChanged();
 			}
