@@ -37,9 +37,9 @@ import org.eclipse.dawnsci.hdf5.Nexus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.ac.diamond.scisoft.analysis.dataset.Dataset;
 import uk.ac.diamond.scisoft.analysis.dataset.BooleanDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.Comparisons;
+import uk.ac.diamond.scisoft.analysis.dataset.Dataset;
 import uk.ac.diamond.scisoft.analysis.dataset.DatasetUtils;
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
@@ -468,12 +468,14 @@ class PersistentFileImpl implements IPersistentFile {
 
 			final String dataset = file.replaceDataset(dataName,  data, PersistenceConstants.DATA_ENTRY);
 			file.setNexusAttribute(dataset, Nexus.SDS);
+			file.setIntAttribute(dataset, "signal", 1);
 		}
 		if(xAxisData != null){
 			String xAxisName = !xAxisData.getName().equals("") ? xAxisData.getName() : "X Axis";
 	
 			final String xDataset = file.replaceDataset(xAxisName,  xAxisData, PersistenceConstants.DATA_ENTRY);
 			file.setNexusAttribute(xDataset, Nexus.SDS);
+			file.setIntAttribute(xDataset, "axis", 1);
 		}
 
 		if(yAxisData != null){
@@ -481,6 +483,7 @@ class PersistentFileImpl implements IPersistentFile {
 
 			final String yDataset = file.replaceDataset(yAxisName,  yAxisData, PersistenceConstants.DATA_ENTRY);
 			file.setNexusAttribute(yDataset, Nexus.SDS);
+			file.setIntAttribute(yDataset, "axis", 2);
 		}
 	}
 
