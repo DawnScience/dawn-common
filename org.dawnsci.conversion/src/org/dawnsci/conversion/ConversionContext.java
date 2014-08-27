@@ -14,7 +14,7 @@ import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.Slice;
 import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
 
-class ConversionContext implements IConversionContext {
+public class ConversionContext implements IConversionContext {
 
 	private ConversionScheme    conversionScheme;
 	private IConversionVisitor  conversionVisitor;
