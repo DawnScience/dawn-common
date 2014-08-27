@@ -20,11 +20,11 @@ import uk.ac.diamond.scisoft.analysis.dataset.IntegerDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.LongDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.ShortDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.Slice;
-import uk.ac.diamond.scisoft.analysis.dataset.SliceVisitor;
-import uk.ac.diamond.scisoft.analysis.dataset.Slicer;
 import uk.ac.diamond.scisoft.analysis.io.IDataHolder;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
+import uk.ac.diamond.scisoft.analysis.slice.SliceVisitor;
+import uk.ac.diamond.scisoft.analysis.slice.Slicer;
 
 /**
  * AbstractConversion details converting from hdf/nexus to other
