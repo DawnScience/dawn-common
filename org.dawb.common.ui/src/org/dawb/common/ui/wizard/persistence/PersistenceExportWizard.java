@@ -42,8 +42,8 @@ import org.eclipse.ui.IExportWizard;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPart;
 
-import uk.ac.diamond.scisoft.analysis.dataset.Dataset;
 import uk.ac.diamond.scisoft.analysis.dataset.BooleanDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.Dataset;
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.IFunction;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.IFunctionService;
@@ -62,7 +62,10 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
 	private static String staticFileName;
  
 	public PersistenceExportWizard() {
+		
 		setWindowTitle("Export");
+		setNeedsProgressMonitor(true);
+		
 		this.fcp = new NewFileChoosePage("Export Location", new StructuredSelection());
 		fcp.setDescription("Please choose the location of the file to export. (This file will be a nexus HDF5 file.)");
 		fcp.setFileExtension("nxs");
@@ -199,15 +202,24 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
 					 IPersistentFile file = null;
 					 try {
 						 IPersistenceService service = (IPersistenceService)ServiceManager.getService(IPersistenceService.class);
+						 
+						 final File ioFile = new File(finalFile.getLocation().toOSString());
+						 if (ioFile.exists()) ioFile.delete();
+						 
 						 file    = service.createPersistentFile(finalFile.getLocation().toOSString());
 						 
+						 final int length = getTotalWork(options, system, funcService);
+						 monitor.beginTask("Export", length);
 						 final IMonitor mon = new ProgressMonitorWrapper(monitor);
 
 						 // Save things.
 						 if (options.is(PersistWizardConstants.ORIGINAL_DATA)) {
 							 Collection<ITrace> traces  = system.getTraces();
 							 for (ITrace trace : traces) {
-								 file.setData((Dataset)trace.getData());
+								 monitor.worked(1);
+								 Dataset data = (Dataset)trace.getData();
+								 if (trace.getName()!=null) data.setName(trace.getName());
+								 file.setData(data);
 								 if (trace instanceof IImageTrace) {
 									 final List<IDataset> iaxes = ((IImageTrace)trace).getAxes();
 									 if (iaxes!=null) file.setAxes(iaxes);
@@ -224,6 +236,7 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
 			    					final Map<String, IDataset> data = (Map<String, IDataset>)tool.getToolData();
 			    					if (data!=null && !data.isEmpty()) {
 			    						file.setHistory(data.values().toArray(new IDataset[data.size()]));
+			    						monitor.worked(1);
 			    					}
 			    				}
 						 }
@@ -234,12 +247,14 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
 							 final String name = options.getString(PersistWizardConstants.MASK);
 							 if (image.getMask()!=null) {
 								 file.addMask(name, (BooleanDataset)image.getMask(), mon);
+								 monitor.worked(1);
 							 }
 						 }
 						 
 						 final Collection<IRegion> regions = system.getRegions();
 						 if (options.is(PersistWizardConstants.REGIONS) && regions!=null && !regions.isEmpty()) {
 							 for (IRegion iRegion : regions) {
+								 monitor.worked(1);
 								 if (!file.isRegionSupported(iRegion.getROI())) {
 									logger.debug("Region "+ iRegion.getName() + " of type "
 											+ iRegion.getClass().getName() + " is not supported");
@@ -257,17 +272,19 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
 							 if (trace!=null && trace instanceof IImageTrace && trace.getData() != null) {
 								 IMetaData meta = trace.getData().getMetadata();
 								 if (meta == null || meta instanceof IDiffractionMetadata) {
+									 monitor.worked(1);
 									 file.setDiffractionMetadata((IDiffractionMetadata) meta);
 								 }
 							 }
 						 }
-						 
+
 						 if (options.is(PersistWizardConstants.FUNCTIONS)) {
 							 if (funcService != null) {
 								 Map<String, IFunction> functions = funcService.getFunctions();
 								 if (functions != null) {
+									 monitor.worked(functions.size());
 									 file.setFunctions(functions);
-								}
+								 }
 							 }
 						 }
 						 
@@ -304,6 +321,59 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
 		 staticFileName    = fcp.getFileName();
 		 
 		 return true;
+	}
+
+	private int getTotalWork(CheckWizardPage options, IPlottingSystem system,  final IFunctionService funcService) {
+
+		try {
+			int ret = 1;
+			if (options.is(PersistWizardConstants.ORIGINAL_DATA)) {
+				Collection<ITrace> traces  = system.getTraces();
+				ret+=traces!=null?traces.size():0;
+			}
+			if (options.is(PersistWizardConstants.IMAGE_HIST)) {
+				final IToolPageSystem tsystem = (IToolPageSystem)system.getAdapter(IToolPageSystem.class);
+				final IToolPage       tool    = tsystem.getActiveTool();
+				if (tool != null && tool.getToolId().equals("org.dawb.workbench.plotting.tools.imageCompareTool")) {
+					final Map<String, IDataset> data = (Map<String, IDataset>)tool.getToolData();
+					if (data!=null && !data.isEmpty()) {
+						ret+=data.size();
+					}
+				}
+			}
+
+			final ITrace trace = system.getTraces().iterator().next();
+			if (options.is(PersistWizardConstants.MASK) && trace instanceof IImageTrace) {
+				IImageTrace image = (IImageTrace)trace;
+				final String name = options.getString(PersistWizardConstants.MASK);
+				if (image.getMask()!=null) {
+					ret+=1;
+				}
+			}
+
+			final Collection<IRegion> regions = system.getRegions();
+			if (options.is(PersistWizardConstants.REGIONS) && regions!=null && !regions.isEmpty()) {
+				ret+=regions.size();
+			}
+
+			if (options.is(PersistWizardConstants.DIFF_META)) {
+				if (trace!=null && trace instanceof IImageTrace && trace.getData() != null) {
+					ret+=1;
+				}
+			}
+
+			if (options.is(PersistWizardConstants.FUNCTIONS)) {
+				if (funcService != null) {
+					Map<String, IFunction> functions = funcService.getFunctions();
+					if (functions != null) ret+=functions.size();
+				}
+			}
+
+			return ret;
+		} catch (Exception ne) {
+			logger.error("Cannot estimate work, assuming 100 things to do!", ne);
+			return 100;
+		}
 	}
 
 	private IPlottingSystem getPlottingSystem() {
