@@ -70,6 +70,7 @@ public class ResourceChoosePage extends WizardPage {
 	private boolean newFile=false;
 	private boolean pathEditable=false;
 	private boolean buttonsEnabled=true;
+	private boolean isOverwrite=true;
 	
 	private String   path;
 	private String   fileLabel=null;
@@ -178,6 +179,7 @@ public class ResourceChoosePage extends WizardPage {
 			overwrite.setSelection(true);
 			overwrite.addSelectionListener(new SelectionAdapter() {
 				public void widgetSelected(SelectionEvent e) {
+					isOverwrite = overwrite.getSelection();
 					pathChanged();
 				}
 			});
@@ -553,5 +555,13 @@ public class ResourceChoosePage extends WizardPage {
 
 	protected IExpressionObject getExpression(String datasetName) {
 		return expressions!=null ? expressions.get(datasetName) : null;
+	}
+
+	public boolean isOverwrite() {
+		return isOverwrite;
+	}
+
+	public void setOverwrite(boolean isOverwrite) {
+		this.isOverwrite = isOverwrite;
 	}
 }

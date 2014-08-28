@@ -77,6 +77,6 @@ public class Plot2DConversionVisitor extends AbstractPlotConversionVisitor {
 
 	@Override
 	public String getExtension() {
-		return "tiff";
+		return "tif";
 	}
 }

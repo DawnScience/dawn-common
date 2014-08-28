@@ -2,6 +2,8 @@ package org.dawb.common.ui.wizard;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.dawb.common.services.ServiceManager;
 import org.dawb.common.services.conversion.IConversionContext;
@@ -11,6 +13,7 @@ import org.dawb.common.ui.util.EclipseUtils;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.dawnsci.plotting.api.IPlottingSystem;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
@@ -31,15 +34,17 @@ public class PlotDataConversionWizard extends Wizard implements IExportWizard {
 	
 	private IConversionService            service;
 	private IConversionContext            context;
-	private AbstractPlotConversionVisitor            visitor;
+	private AbstractPlotConversionVisitor visitor;
 	private PlotDataConversionPage        conversionPage;
-	private IPlottingSystem system;
+	private IPlottingSystem               system;
+	private String                        filePath;
 	
 	private static final Logger logger = LoggerFactory.getLogger(PlotDataConversionWizard.class);
 	
 	public PlotDataConversionWizard() {
 		super();
 		setWindowTitle("Export Data");
+		setNeedsProgressMonitor(true);
 		
 		// It's an OSGI service, not required to use ServiceManager
 		try {
@@ -75,7 +80,11 @@ public class PlotDataConversionWizard extends Wizard implements IExportWizard {
 		context.addSliceDimension(0, "all");
 		
 		conversionPage = new PlotDataConversionPage();
-		conversionPage.setPath(System.getProperty("user.home") +File.separator+ "plotdata."+ visitor.getExtension());
+		if (filePath!=null) {
+			conversionPage.setPath(filePath);
+		} else {
+		    conversionPage.setPath(System.getProperty("user.home") +File.separator+ "plotdata."+ visitor.getExtension());
+		}
 		
 		addPage(conversionPage);
 	
@@ -95,7 +104,27 @@ public class PlotDataConversionWizard extends Wizard implements IExportWizard {
 				public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {				 
 
 					try {
-						context.setOutputPath(conversionPage.getAbsoluteFilePath());
+						filePath = conversionPage.getAbsoluteFilePath();
+						
+						final File ioFile = new File(filePath);
+						
+						final List<Boolean> ok = new ArrayList<Boolean>(1);
+						ok.add(Boolean.TRUE);
+						if (ioFile.exists() && !conversionPage.isOverwrite()) {
+							
+							Display.getDefault().syncExec(new Runnable() {
+								public void run() {
+									boolean fine = MessageDialog.openConfirm(Display.getDefault().getActiveShell(), "Do you want to overwrite?", "The file '"+ioFile.getName()+"' exists.\n\nWould like to overwrite it anyway?");
+								    if (!fine) {
+								    	ok.clear();
+								    	ok.add(Boolean.FALSE);
+								    }
+								}
+							});
+						}
+						if (!ok.get(0)) return;
+						
+						context.setOutputPath(filePath);
 						context.setMonitor(new ProgressMonitorWrapper(monitor));
 						context.setConversionVisitor(visitor);
 						// Bit with the juice
@@ -141,4 +170,12 @@ public class PlotDataConversionWizard extends Wizard implements IExportWizard {
 		return null;
 	}
 
+	public String getFilePath() {
+		return filePath;
+	}
+
+	public void setFilePath(String filePath) {
+		this.filePath = filePath;
+		if (conversionPage!=null && filePath!=null) conversionPage.setPath(filePath);
+	}
 }
