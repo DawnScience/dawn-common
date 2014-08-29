@@ -1,6 +1,6 @@
 package org.dawnsci.boofcv;
 
-import org.dawb.common.services.IBoofCVProcessingService;
+import org.dawb.common.services.IImageProcessingService;
 import org.dawnsci.boofcv.internal.BoofCVProcessingImpl;
 
 /**
@@ -19,7 +19,7 @@ public class BoofCVProcessingServiceCreator {
 	 * Used only for testing - DO NOT USE Externally. Instead get the Service by class.
 	 * @return
 	 */
-	public static IBoofCVProcessingService createPersistenceService(){
+	public static IImageProcessingService createPersistenceService(){
 		return new BoofCVProcessingImpl();
 	}
 }
