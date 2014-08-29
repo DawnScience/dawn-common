@@ -9,6 +9,7 @@ import org.eclipse.dawnsci.plotting.api.PlotType;
 import org.eclipse.dawnsci.plotting.api.histogram.ImageServiceBean;
 
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
+import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.function.Downsample;
 import uk.ac.diamond.scisoft.analysis.dataset.function.DownsampleMode;
 
@@ -18,6 +19,15 @@ public abstract class AbstractImageConversion extends AbstractConversion {
 	
 	public AbstractImageConversion(IConversionContext context) {
 		super(context);
+	}
+	
+	protected void iterate(final ILazyDataset         lz, 
+            final String               nameFrag,
+            final IConversionContext   context) throws Exception {
+		
+		imageCounter = 0;
+		
+		super.iterate(lz, nameFrag, context);
 	}
 
 	/**

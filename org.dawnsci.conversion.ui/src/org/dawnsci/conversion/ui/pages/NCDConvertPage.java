@@ -149,7 +149,7 @@ public class NCDConvertPage extends ResourceChoosePage implements
 				exportFormat = SAS_FORMAT.TOPAZ;
 			}
 		};
-		exportTopaz.setText("Topaz");
+		exportTopaz.setText("Topas");
 		exportTopaz.setToolTipText("Export data to ASCII XY, no header");
 
 		radioActions.add(exportASCII);
