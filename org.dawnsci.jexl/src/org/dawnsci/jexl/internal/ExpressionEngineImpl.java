@@ -48,7 +48,7 @@ public class ExpressionEngineImpl implements IExpressionEngine{
 		funcs.put("dat", JexlGeneralFunctions.class);
 		funcs.put("im",  Image.class);
 		funcs.put("lz",  JexlLazyFunctions.class);
-		funcs.put("bcv", JexlBoofCVFunctions.class);
+		funcs.put("bcv", JexlImageProcessingFunctions.class);
 		//TODO determine which function classes should be loaded as default
 //		funcs.put("fft", FFT.class);
 //		funcs.put("plt", SDAPlotter.class);
@@ -70,8 +70,16 @@ public class ExpressionEngineImpl implements IExpressionEngine{
 	 * @throws Exception
 	 */
 	private void checkFunctions(String expr)  throws Exception {
-        // We now evaluate the expression to try and trap invalid functions.
+		
+		// We do not support the . operator for now because
+		// otherwise http://jira.diamond.ac.uk/browse/SCI-1731
+		if  (expr.indexOf('.')>-1) {
+			throw new Exception("The dot operator '.' is not supported.");
+		}
+
+		// We now evaluate the expression to try and trap invalid functions.
 		try {
+			
 			final Script script = jexl.createScript(expr);
 			Set<List<String>> names = script.getVariables();
 			Collection<String> vars = unpack(names);

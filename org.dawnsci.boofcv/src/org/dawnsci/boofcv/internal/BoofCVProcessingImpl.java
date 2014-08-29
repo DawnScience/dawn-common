@@ -11,7 +11,7 @@ package org.dawnsci.boofcv.internal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.dawb.common.services.IBoofCVProcessingService;
+import org.dawb.common.services.IImageProcessingService;
 import org.dawnsci.boofcv.converter.ConvertIDataset;
 
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
@@ -28,14 +28,14 @@ import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 
 /**
- * Implementation of IBoofCVProcessingService<br>
+ * Implementation of IImageProcessingService<br>
  * 
  * This class is internal and not supposed to be used out of this bundle.
  * 
  * @author wqk87977
  *
  */
-public class BoofCVProcessingImpl implements IBoofCVProcessingService {
+public class BoofCVProcessingImpl implements IImageProcessingService {
 
 	@Override
 	public IDataset filterGaussianBlur(IDataset input, double sigma, int radius) {
