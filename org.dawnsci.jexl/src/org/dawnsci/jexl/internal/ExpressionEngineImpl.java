@@ -70,8 +70,16 @@ public class ExpressionEngineImpl implements IExpressionEngine{
 	 * @throws Exception
 	 */
 	private void checkFunctions(String expr)  throws Exception {
-        // We now evaluate the expression to try and trap invalid functions.
+		
+		// We do not support the . operator for now because
+		// otherwise http://jira.diamond.ac.uk/browse/SCI-1731
+		if  (expr.indexOf('.')>-1) {
+			throw new Exception("The dot operator '.' is not supported.");
+		}
+
+		// We now evaluate the expression to try and trap invalid functions.
 		try {
+			
 			final Script script = jexl.createScript(expr);
 			Set<List<String>> names = script.getVariables();
 			Collection<String> vars = unpack(names);
