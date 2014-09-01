@@ -37,6 +37,14 @@ import boofcv.struct.image.ImageUInt8;
  */
 public class BoofCVProcessingImpl implements IImageProcessingService {
 
+	static {
+		System.out.println("Starting BoofCV image processing service.");
+	}
+
+	public BoofCVProcessingImpl() {
+		// Important do nothing here, OSGI may start the service more than once.
+	}
+
 	@Override
 	public IDataset filterGaussianBlur(IDataset input, double sigma, int radius) {
 		int[] shape = getShape(input);

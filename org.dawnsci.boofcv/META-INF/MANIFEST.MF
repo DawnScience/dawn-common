@@ -13,3 +13,4 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Export-Package: org.dawnsci.boofcv,
  org.dawnsci.boofcv.converter
 Import-Package: org.dawb.common.services
+Service-Component: OSGI-INF/component.xml
