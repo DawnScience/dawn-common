@@ -44,12 +44,18 @@ public class JexlImageProcessingFunctions {
 	 * Computes the derivative in the X and Y direction using an integer Sobel edge detector.
 	 *
 	 * @param orig   Input image.  Not modified.
+	 * @param isY true to return the Y derivative, false to return the x.
 	 * @return Output list containing the image derivative along the x-axis and y-axis 
 	 * @throws Exception 
 	 */
-	public static List<IDataset> filterDerivativeSobel(IDataset orig) throws Exception {
+	public static IDataset filterDerivativeSobel(IDataset orig, boolean isY) throws Exception {
 		createService();
-		return service.filterDerivativeSobel(orig);
+		List<IDataset> ret = service.filterDerivativeSobel(orig);
+		if (isY) {
+			return ret.get(1);
+		} else {
+			return ret.get(0);
+		}
 	}
 
 	/**
