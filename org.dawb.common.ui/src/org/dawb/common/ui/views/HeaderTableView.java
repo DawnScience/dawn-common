@@ -18,10 +18,12 @@ import java.util.Collection;
 import org.dawb.common.ui.util.EclipseUtils;
 import org.dawb.common.ui.util.GridUtils;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.dawnsci.slicing.api.system.ISliceSystem;
 import org.eclipse.dawnsci.slicing.api.util.ProgressMonitorWrapper;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ISelection;
@@ -46,6 +48,7 @@ import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.part.Page;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.progress.UIJob;
 import org.slf4j.Logger;
@@ -163,27 +166,33 @@ public class HeaderTableView extends ViewPart implements ISelectionListener, IPa
 			} else if (sel instanceof File) {
 				final String filePath = ((File)sel).getAbsolutePath();
 				updatePath(filePath);
+			} else if (sel instanceof IMetaData) {
+				selectMetadata((IMetaData)sel);
 			} else if( sel instanceof IMetadataProvider){
 				try {
-					meta = ((IMetadataProvider)sel).getMetadata();
-					updatePartName();
-					updateTable.schedule();
+					selectMetadata(((IMetadataProvider)sel).getMetadata());
 				} catch (Exception e) {
-					logger.error("Could not capture metadata from selection",e);
+					logger.error("Cannot get metadata", e);
 				}
-				
 			}
 		} 
 	}
 	
 	
+	private void selectMetadata(IMetaData sel) {
+		meta = sel;
+		updatePartName();
+		updateTable.schedule();
+	}
+	
 	private void updatePartName() {
-		if(meta!=null){
-		Collection<String> partName = meta.getDataNames();
-		if ( partName!=null)
-			setFileName(partName.toString());
-		else
-			setFileName("");
+		if(meta!=null) {
+			if ( meta.getFilePath()!=null) {
+				final File file = new File(meta.getFilePath());
+				setFileName(file.getName());
+			} else {
+				setFileName("");
+			}
 		}
 	}
 
@@ -232,8 +241,8 @@ public class HeaderTableView extends ViewPart implements ISelectionListener, IPa
 				}
 				@Override
 				public Object[] getElements(Object inputElement) {
-					if (meta == null)
-						return new Object[]{""};
+					
+					if (meta == null) return new Object[]{""};
 
 					try {
 						return meta.getMetaNames().toArray(new Object[meta.getMetaNames().size()]);
@@ -281,7 +290,8 @@ public class HeaderTableView extends ViewPart implements ISelectionListener, IPa
 	
 	@Override
 	public void selectionChanged(IWorkbenchPart part, ISelection selection) {
-		if (part instanceof IMetadataProvider)
+
+		if (part instanceof IMetadataProvider) {
 			try {
 				meta = ((IMetadataProvider) part).getMetadata();
 				if (meta != null)
@@ -289,8 +299,22 @@ public class HeaderTableView extends ViewPart implements ISelectionListener, IPa
 			} catch (Exception e) {
 				logger.error("There was a error reading the metadata from the selection", e);
 			}
-		else
+		} else {
+			ISliceSystem slicer = (ISliceSystem)part.getAdapter(ISliceSystem.class);
+			if (slicer == null) {
+				final IAdaptable page = (IAdaptable)part.getAdapter(Page.class);
+				if (page!=null) slicer = (ISliceSystem)page.getAdapter(ISliceSystem.class);
+			}
+			if (slicer!=null) {
+				IMetaData md = slicer.getSliceMetadata();
+				if (md!=null) {
+					selectMetadata(md);
+					return;
+				}
+			}
+			
 			updateSelection(selection);
+		}
 	}
 
 	/*
