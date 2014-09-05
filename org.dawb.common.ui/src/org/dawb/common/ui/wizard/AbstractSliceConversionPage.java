@@ -4,6 +4,7 @@ import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.dawb.common.services.IExpressionObject;
@@ -38,6 +39,7 @@ import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 import uk.ac.diamond.scisoft.analysis.io.IDataHolder;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
+import uk.ac.diamond.scisoft.analysis.slice.Slicer;
 
 public abstract class AbstractSliceConversionPage extends ResourceChoosePage {
 
@@ -354,18 +356,32 @@ public abstract class AbstractSliceConversionPage extends ResourceChoosePage {
 				context.addSliceDimension(dd.getDimension(), String.valueOf(dd.getSlice()));
 			} else if (dd.isTextRange()) {
 				context.addSliceDimension(dd.getDimension(), dd.getSliceRange()!=null ? dd.getSliceRange() : "all");
-				try {
-					ILazyDataset lazy = sliceComponent.getData().getLazySet();
-					if (lazy == null) {
-						//check the lazy dataset in the context
-						lazy = context.getLazyDataset();
-					}
-				    context.setWorkSize(lazy.getShape()[dd.getDimension()]);
-				} catch (Exception ne) {
-					logger.error("Cannot set work size!", ne);
-				}
 			}
 		}
+		
+		try {
+			Map<Integer, String> sliceDimensions = context.getSliceDimensions();
+			ILazyDataset lazy = sliceComponent.getData().getLazySet();
+			if (lazy == null) {
+				//check the lazy dataset in the context
+				lazy = context.getLazyDataset();
+			}
+			int[] shape = lazy.getShape();
+			int[] dd = Slicer.getDataDimensions(shape, sliceDimensions);
+			
+			Arrays.sort(dd);
+			
+			int work = 1;
+			
+			for (int i = 0; i< shape.length; i++) {
+				if (Arrays.binarySearch(dd, i) < 0) work*=shape[i];
+			}
+			
+			context.setWorkSize(work);
+		} catch (Exception ne) {
+			logger.error("Cannot set work size!", ne);
+		}
+		
 		        
         // Set any lazy dataset which can be an expression.
         ILazyDataset set = getLazyExpression();
