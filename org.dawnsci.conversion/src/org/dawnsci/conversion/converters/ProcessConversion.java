@@ -77,7 +77,7 @@ public class ProcessConversion extends AbstractConversion {
 		String full = outputFolder + File.separator + name + PROCESSED;
 		
 		//TODO output path
-		service.executeSeries(rich, null, info.getExecutionVisitor(full), info.getOperationSeries());
+		service.executeSeries(rich, context.getMonitor(), info.getExecutionVisitor(full), info.getOperationSeries());
 	}
 	
 	@Override
