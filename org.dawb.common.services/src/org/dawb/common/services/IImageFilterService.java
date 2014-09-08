@@ -13,7 +13,7 @@ import java.util.List;
 
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 
-public interface IImageFilterService extends IImageProcessingService{
+public interface IImageFilterService {
 
 	/**
 	 * Applies a median filter

@@ -1,17 +1,17 @@
 package org.dawnsci.boofcv;
 
-import org.dawb.common.services.IImageProcessingService;
+import org.dawb.common.services.IImageFilterService;
 import org.dawnsci.boofcv.internal.BoofCVFilterImpl;
 
 /**
- * Class used to test the BoofCVProcessingImpl
+ * Class used to test the BoofCVFilterImpl
  * @author wqk87977
  *
  * @internal only use in unit tests.
  */
-public class BoofCVProcessingServiceCreator {
+public class BoofCVFilterServiceCreator {
 
-	public BoofCVProcessingServiceCreator(){
+	public BoofCVFilterServiceCreator(){
 		
 	}
 
@@ -19,7 +19,7 @@ public class BoofCVProcessingServiceCreator {
 	 * Used only for testing - DO NOT USE Externally. Instead get the Service by class.
 	 * @return
 	 */
-	public static IImageProcessingService createPersistenceService(){
+	public static IImageFilterService createPersistenceService(){
 		return new BoofCVFilterImpl();
 	}
 }

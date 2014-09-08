@@ -9,7 +9,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.dawnsci.boofcv.BoofCVProcessingServiceCreator;
+import org.dawnsci.boofcv.BoofCVFilterServiceCreator;
 
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.io.IDataHolder;
@@ -24,7 +24,7 @@ public class ImageFilterTest {
 
 	@BeforeClass
 	public static void beforeClass() {
-		ServiceManager.setService(IImageFilterService.class, BoofCVProcessingServiceCreator.createPersistenceService());
+		ServiceManager.setService(IImageFilterService.class, BoofCVFilterServiceCreator.createPersistenceService());
 	}
 
 	@Before
