@@ -47,8 +47,7 @@ public class ExampleBinaryOps {
 	 */
 	public static void runExample() throws Throwable {
 		String dataname = "image-01";
-		IDataHolder holder = LoaderFactory.getData("resources/82715_750-0001.tif", null);
-//		IDataHolder holder = LoaderFactory.getData("resources/particles01.jpg", null);
+		IDataHolder holder = LoaderFactory.getData("resources/particles01.jpg", null);
 //		IDataHolder holder = LoaderFactory.getData("resources/pow_M99S5_1_0001.cbf", null);
 
 		IDataset data = holder.getDataset(dataname);

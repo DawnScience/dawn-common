@@ -11,7 +11,7 @@ package org.dawnsci.boofcv.internal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.dawb.common.services.IImageFilterService;
+import org.dawb.common.services.IImageProcessingService;
 import org.dawnsci.boofcv.converter.ConvertIDataset;
 
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
@@ -35,13 +35,13 @@ import boofcv.struct.image.ImageUInt8;
  * @author wqk87977
  *
  */
-public class BoofCVFilterImpl implements IImageFilterService {
+public class BoofCVProcessingImpl implements IImageProcessingService {
 
 	static {
 		System.out.println("Starting BoofCV image processing service.");
 	}
 
-	public BoofCVFilterImpl() {
+	public BoofCVProcessingImpl() {
 		// Important do nothing here, OSGI may start the service more than once.
 	}
 
@@ -139,29 +139,5 @@ public class BoofCVFilterImpl implements IImageFilterService {
 		if (shape.length != 2)
 			throw new IllegalArgumentException("The input data must be of dimension 2");
 		return shape;
-	}
-
-	@Override
-	public IDataset filterMedian(IDataset input, int radius) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public IDataset filterMean(IDataset input, int radius) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public IDataset filterMin(IDataset input, int radius) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public IDataset filterMax(IDataset input, int radius) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 }
