@@ -140,4 +140,30 @@ public class BoofCVProcessingImpl implements IImageProcessingService {
 			throw new IllegalArgumentException("The input data must be of dimension 2");
 		return shape;
 	}
+
+	@Override
+	public IDataset filterMedian(IDataset input, int radius) {
+		ImageUInt8 converted = ConvertIDataset.convertFrom(input, ImageUInt8.class, 1);
+		ImageUInt8 median = BlurImageOps.median(converted, null, radius);
+		return ConvertIDataset.convertTo(median, false);
+	}
+
+	@Override
+	public IDataset filterMean(IDataset input, int radius) {
+		ImageUInt8 converted = ConvertIDataset.convertFrom(input, ImageUInt8.class, 1);
+		ImageUInt8 mean = BlurImageOps.mean(converted, null, radius, null);
+		return ConvertIDataset.convertTo(mean, false);
+	}
+
+	@Override
+	public IDataset filterMin(IDataset input, int radius) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public IDataset filterMax(IDataset input, int radius) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

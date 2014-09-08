@@ -21,6 +21,42 @@ import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 public interface IImageProcessingService {
 
 	/**
+	 * Applies a median filter
+	 * 
+	 * @param input
+	 * @param radius
+	 * @return output filtered image
+	 */
+	public IDataset filterMedian(IDataset input, int radius);
+
+	/**
+	 * Applies a mean box filter
+	 * 
+	 * @param input
+	 * @param radius
+	 * @return output filtered image
+	 */
+	public IDataset filterMean(IDataset input, int radius);
+
+	/**
+	 * Applies a min filter
+	 * 
+	 * @param input
+	 * @param radius
+	 * @return output filtered image
+	 */
+	public IDataset filterMin(IDataset input, int radius);
+
+	/**
+	 * Applies a max filter
+	 * 
+	 * @param input
+	 * @param radius
+	 * @return output filtered image
+	 */
+	public IDataset filterMax(IDataset input, int radius);
+
+	/**
 	 * Applies Gaussian blur.
 	 *
 	 * @param input Input image.  Not modified.
