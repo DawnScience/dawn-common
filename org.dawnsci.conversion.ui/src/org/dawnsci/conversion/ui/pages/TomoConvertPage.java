@@ -325,7 +325,7 @@ public final class TomoConvertPage extends ResourceChoosePage implements IConver
 		
 		label = new Label(composite, SWT.NULL);
 		label.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 4, 1));
-		label.setText("Use %s to refer to the output folder path");
+		label.setText("Use %s to refer to the output folder path plus a folder named after the file");
 		label = new Label(composite, SWT.NULL);
 		label.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 4, 1));
 		label.setText("Use %0d (where d is an integer) to set the leading zero width of the file name");

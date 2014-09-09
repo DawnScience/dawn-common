@@ -96,13 +96,15 @@ public class CustomTomoConverter extends AbstractConversion {
 		
 		TomoInfoBean bean = (TomoInfoBean)context.getUserObject();
 
-		if( context.getOutputPath() != null) bean.setOutputPath(context.getOutputPath());
+		if( context.getOutputPath() != null) bean.setOutputPath(context.getOutputPath() + File.separator + getFileNameNoExtension(path));
 		
-		if (bean.getImageKey() == null) {
-			IDataset key = getImageKey(bean, path);
-			if (key != null) bean.setImageKey(key);
-			else throw new IllegalArgumentException("Tomography file does not contain image key");
-		}
+
+		IDataset key = getImageKey(bean, path);
+		if (key != null) bean.setImageKey(key);
+		else throw new IllegalArgumentException("Tomography file does not contain image key");
+		
+		counter = 0;
+		bean.resetCounters();
 	}
 	
 	private IDataset getImageKey(TomoInfoBean bean, File path) {
@@ -231,6 +233,12 @@ public class CustomTomoConverter extends AbstractConversion {
 			if (!tomoPath.endsWith("/")) tomoPath = tomoPath+"/";
 			return true;
 			
+		}
+		
+		public void resetCounters() {
+			dark = 0;
+			flat = 0;
+			projection = 0;
 		}
 		
 		public int getNumberOfImages() {

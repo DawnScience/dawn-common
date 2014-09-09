@@ -50,7 +50,9 @@ public class TomoConvertTest {
         
         service.process(context);
         
-        final File[] fa = dir.listFiles();
+        File f = new File(dir.getAbsolutePath() + File.separator+ "extraction_test_small");
+        
+        final File[] fa = f.listFiles();
         fa.toString();
         for (File file : fa) {
         	file.deleteOnExit();
@@ -163,7 +165,9 @@ public class TomoConvertTest {
         
         service.process(context);
         
-        final File[] fa = dir.listFiles();
+        File f = new File(dir.getAbsolutePath() + File.separator+ "extraction_test_small");
+        
+        final File[] fa = f.listFiles();
         
         double lastVal = 0;
         
