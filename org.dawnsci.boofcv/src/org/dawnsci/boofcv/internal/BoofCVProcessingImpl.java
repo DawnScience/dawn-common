@@ -19,6 +19,7 @@ import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.Contour;
 import boofcv.alg.filter.binary.ThresholdImageOps;
 import boofcv.alg.filter.blur.BlurImageOps;
+import boofcv.alg.filter.blur.GBlurImageOps;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.core.image.GeneralizedImageOps;
@@ -143,15 +144,15 @@ public class BoofCVProcessingImpl implements IImageProcessingService {
 
 	@Override
 	public IDataset filterMedian(IDataset input, int radius) {
-		ImageUInt8 converted = ConvertIDataset.convertFrom(input, ImageUInt8.class, 1);
-		ImageUInt8 median = BlurImageOps.median(converted, null, radius);
+		ImageFloat32 converted = ConvertIDataset.convertFrom(input, ImageFloat32.class, 1);
+		ImageFloat32 median = GBlurImageOps.median(converted, null, radius);
 		return ConvertIDataset.convertTo(median, false);
 	}
 
 	@Override
 	public IDataset filterMean(IDataset input, int radius) {
-		ImageUInt8 converted = ConvertIDataset.convertFrom(input, ImageUInt8.class, 1);
-		ImageUInt8 mean = BlurImageOps.mean(converted, null, radius, null);
+		ImageFloat32 converted = ConvertIDataset.convertFrom(input, ImageFloat32.class, 1);
+		ImageFloat32 mean = GBlurImageOps.mean(converted, null, radius, null);
 		return ConvertIDataset.convertTo(mean, false);
 	}
 
