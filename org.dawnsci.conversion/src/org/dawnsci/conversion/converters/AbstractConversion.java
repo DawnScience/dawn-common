@@ -182,10 +182,11 @@ public abstract class AbstractConversion {
 				context.setSelectedSlice(slices);
 				context.setSelectedShape(shape);
 				convert(slice);
-				if (context.getMonitor() != null) {
-					IMonitor mon = context.getMonitor();
-					if (mon.isCancelled()) return;
-				}
+			}
+
+			@Override
+			public boolean isCancelled() {
+				return context.getMonitor()!=null ? context.getMonitor().isCancelled() : false;
 			}
 			
 		});
