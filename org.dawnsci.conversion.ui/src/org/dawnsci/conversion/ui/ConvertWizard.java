@@ -182,7 +182,9 @@ public class ConvertWizard extends Wizard implements IExportWizard{
 						monitor.worked(1);
 						service.process(context);
 						File f = new File(context.getOutputPath());
-						if (f.exists() && f.isFile()) EclipseUtils.refreshAndOpen(context.getOutputPath(), selectedConversionPage.isOpen(), monitor);
+						if (f.exists() && f.isFile() && !f.getName().toLowerCase().endsWith(".avi") && !f.getName().toLowerCase().endsWith(".mp4")) {
+							EclipseUtils.refreshAndOpen(context.getOutputPath(), selectedConversionPage.isOpen(), monitor);
+						}
 						
 					} catch (final Exception e) {
 						logger.error("Cannot process", e);
