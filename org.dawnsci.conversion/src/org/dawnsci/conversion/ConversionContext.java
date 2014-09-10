@@ -14,7 +14,7 @@ import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.Slice;
 import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
 
-public class ConversionContext implements IConversionContext {
+class ConversionContext implements IConversionContext {
 
 	private ConversionScheme    conversionScheme;
 	private IConversionVisitor  conversionVisitor;
@@ -43,6 +43,7 @@ public class ConversionContext implements IConversionContext {
 	public List<String> getFilePaths() {
 		return filePaths;
 	}
+	
 	public void setFilePaths(String... paths) throws Exception {
 		this.filePaths = new ArrayList<String>(paths.length);
 		

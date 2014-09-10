@@ -383,4 +383,10 @@ public interface IConversionContext {
 	 * number.
 	 */
 	public void setAxesNames(Map<Integer, String> axesNames);
+
+	/**
+	 * Expert use: override the file paths before running the conversion.
+	 * @param array
+	 */
+	public void setFilePaths(String... paths)  throws Exception;
 }
