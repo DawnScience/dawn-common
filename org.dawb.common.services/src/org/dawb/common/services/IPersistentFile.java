@@ -17,6 +17,9 @@ import uk.ac.diamond.scisoft.analysis.diffraction.IPowderCalibrationInfo;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.IFunction;
 import uk.ac.diamond.scisoft.analysis.io.IDiffractionMetadata;
 import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
+import uk.ac.diamond.scisoft.analysis.processing.IOperation;
+import uk.ac.diamond.scisoft.analysis.processing.OperationData;
+import uk.ac.diamond.scisoft.analysis.processing.model.IOperationModel;
 import uk.ac.diamond.scisoft.analysis.roi.IROI;
 
 /**
@@ -42,7 +45,8 @@ import uk.ac.diamond.scisoft.analysis.roi.IROI;
  * entry/region/JSON           |   Attribute    |  String                 
  * entry/function              |   Dataset      |  64-bit floating-point  
  * entry/function/JSON         |   Attribute    |  String                 
- * entry/instrument/detector  |   Group        |                         
+ * entry/instrument/detector   |   Group        |                         
+ * entry/process               |   Group        |                         
  * </pre>
  * The image can contain more than one Dataset with its corresponding axes.<br>
  * The region is an JSON serialized dataset. It can therefore contain more than one region.<br>
@@ -403,4 +407,18 @@ public interface IPersistentFile {
 	 * @throws Exception
 	 */
 	public void setPowderCalibrationInformation(IDataset calibrationImage, IDiffractionMetadata metadata, IPowderCalibrationInfo info) throws Exception;
+	
+	/**
+	 * Method to store a series of operations in a NeXus file
+	 * @param array of operations
+	 * @throws Exception
+	 */
+	public void setOperations(IOperation<? extends IOperationModel, ? extends OperationData>[] operations) throws Exception;
+	
+	/**
+	 * Method to read a series of operations from a Nexus file
+	 * @return array of operations
+	 * @throws Exception
+	 */
+	public IOperation<? extends IOperationModel, ? extends OperationData>[] getOperations() throws Exception;
 }

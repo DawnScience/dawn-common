@@ -52,6 +52,9 @@ import uk.ac.diamond.scisoft.analysis.io.IDiffractionMetadata;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 import uk.ac.diamond.scisoft.analysis.io.NexusDiffractionMetaReader;
 import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
+import uk.ac.diamond.scisoft.analysis.processing.IOperation;
+import uk.ac.diamond.scisoft.analysis.processing.OperationData;
+import uk.ac.diamond.scisoft.analysis.processing.model.IOperationModel;
 import uk.ac.diamond.scisoft.analysis.roi.IROI;
 
 /**
@@ -651,5 +654,17 @@ class PersistentFileImpl implements IPersistentFile {
 		
 		PersistSinglePowderCalibration.writeCalibrationToFile(file, calibrationImage, metadata, info);
 		
+	}
+	
+	public void setOperations(IOperation<? extends IOperationModel, ? extends OperationData>[] operations) throws Exception  {
+		if (file == null) file = HierarchicalDataFactory.getWriter(filePath);
+		PersistJsonOperationHelper helper = new PersistJsonOperationHelper();
+		helper.writeOperations(file, operations);
+	}
+	
+	public IOperation<? extends IOperationModel, ? extends OperationData>[] getOperations() throws Exception  {
+		if (file == null) file = HierarchicalDataFactory.getReader(filePath);
+		PersistJsonOperationHelper helper = new PersistJsonOperationHelper();
+		return helper.readOperations(file);
 	}
 }
