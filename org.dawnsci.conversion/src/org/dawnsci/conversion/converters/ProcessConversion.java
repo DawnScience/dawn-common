@@ -80,6 +80,22 @@ public class ProcessConversion extends AbstractConversion {
 		service.executeSeries(rich, context.getMonitor(), info.getExecutionVisitor(full), info.getOperationSeries());
 	}
 	
+	protected ILazyDataset getLazyDataset(final File                 path, 
+            final String               dsPath,
+            final IConversionContext   context) throws Exception {
+		ILazyDataset lazyDataset = super.getLazyDataset(path, dsPath, context);
+		
+		if (lazyDataset != null) return lazyDataset;
+		
+
+		final IDataHolder   dh = LoaderFactory.getData(path.getAbsolutePath());
+		context.setSelectedH5Path(dsPath);
+		if (context.getMonitor()!=null) {
+			context.getMonitor().subTask("Process '"+path.getAbsolutePath() +"''"+dsPath+"'");
+		}
+		return dh.getLazyDataset(dsPath);
+	}
+	
 	@Override
 	protected void convert(IDataset slice) throws Exception {
 		// does nothing, conversion is in the iterate method

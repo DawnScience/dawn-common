@@ -33,7 +33,7 @@ public class PersistJsonOperationHelper {
 		List<String> memberList = file.memberList(group);
 
 		int i = 0;
-		String[] name = new String[]{PersistenceConstants.PROCESS_ENTRY+ Integer.toString(i)};
+		String[] name = new String[]{PersistenceConstants.PROCESS_ENTRY+ "/"+ Integer.toString(i)};
 
 		while (memberList.contains(name[0])){
 			Object data = file.getData(name[0] +"/data");

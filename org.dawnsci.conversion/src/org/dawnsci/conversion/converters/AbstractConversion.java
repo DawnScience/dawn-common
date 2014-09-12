@@ -128,7 +128,7 @@ public abstract class AbstractConversion {
 			return null;
 		}
 		if (context.getMonitor()!=null) {
-			context.getMonitor().subTask("Process '"+dsPath+"'");
+			context.getMonitor().subTask("Process '"+path.getAbsolutePath() +"''"+dsPath+"'");
 		}
 		return dh.getLazyDataset(dsPath);
 	}
