@@ -13,12 +13,12 @@ import java.util.List;
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 
 /**
- * This service can be called to process IDataset using BoofCV algorithms
+ * This service can be called to process IDataset using BoofCV filtering algorithms
  * 
  * @author wqk87977
  *
  */
-public interface IImageProcessingService {
+public interface IImageFilterService {
 
 	/**
 	 * Applies a median filter

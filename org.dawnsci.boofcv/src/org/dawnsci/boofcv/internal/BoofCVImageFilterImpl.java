@@ -11,7 +11,7 @@ package org.dawnsci.boofcv.internal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.dawb.common.services.IImageProcessingService;
+import org.dawb.common.services.IImageFilterService;
 import org.dawnsci.boofcv.converter.ConvertIDataset;
 
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
@@ -29,20 +29,20 @@ import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 
 /**
- * Implementation of IImageProcessingService<br>
+ * Implementation of IImageFilterService<br>
  * 
  * This class is internal and not supposed to be used out of this bundle.
  * 
  * @author wqk87977
  *
  */
-public class BoofCVProcessingImpl implements IImageProcessingService {
+public class BoofCVImageFilterImpl implements IImageFilterService {
 
 	static {
-		System.out.println("Starting BoofCV image processing service.");
+		System.out.println("Starting BoofCV image filter service.");
 	}
 
-	public BoofCVProcessingImpl() {
+	public BoofCVImageFilterImpl() {
 		// Important do nothing here, OSGI may start the service more than once.
 	}
 

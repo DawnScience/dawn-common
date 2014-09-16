@@ -2,7 +2,7 @@ package org.dawnsci.jexl.internal;
 
 import java.util.List;
 
-import org.dawb.common.services.IImageProcessingService;
+import org.dawb.common.services.IImageFilterService;
 import org.dawb.common.services.ServiceManager;
 
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
@@ -17,13 +17,13 @@ import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
  * @author wqk87977
  *
  */
-public class JexlImageProcessingFunctions {
+public class JexlImageFilterFunctions {
 
-	private static IImageProcessingService service;
+	private static IImageFilterService service;
 
 	private static void createService() throws Exception {
 		if (service == null)
-			service = (IImageProcessingService) ServiceManager.getService(IImageProcessingService.class);
+			service = (IImageFilterService) ServiceManager.getService(IImageFilterService.class);
 	}
 
 	/**

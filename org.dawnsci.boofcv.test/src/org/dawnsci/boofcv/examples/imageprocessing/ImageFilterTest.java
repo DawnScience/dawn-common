@@ -3,13 +3,13 @@ package org.dawnsci.boofcv.examples.imageprocessing;
 
 import java.util.List;
 
-import org.dawb.common.services.IImageProcessingService;
+import org.dawb.common.services.IImageFilterService;
 import org.dawb.common.services.ServiceManager;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.dawnsci.boofcv.BoofCVProcessingServiceCreator;
+import org.dawnsci.boofcv.BoofCVImageFilterServiceCreator;
 
 import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.io.IDataHolder;
@@ -17,19 +17,19 @@ import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 
 public class ImageFilterTest {
 
-	private IImageProcessingService service;
+	private IImageFilterService service;
 	private String dataname = "image-01";
 	private IDataHolder holder;
 	private IDataset data;
 
 	@BeforeClass
 	public static void beforeClass() {
-		ServiceManager.setService(IImageProcessingService.class, BoofCVProcessingServiceCreator.createPersistenceService());
+		ServiceManager.setService(IImageFilterService.class, BoofCVImageFilterServiceCreator.createPersistenceService());
 	}
 
 	@Before
 	public void before() throws Exception {
-		service = (IImageProcessingService) ServiceManager.getService(IImageProcessingService.class);
+		service = (IImageFilterService) ServiceManager.getService(IImageFilterService.class);
 		holder = LoaderFactory.getData("resources/particles01.jpg", null);
 		data = holder.getDataset(dataname);
 	}
