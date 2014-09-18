@@ -28,7 +28,7 @@ import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 import uk.ac.diamond.scisoft.analysis.dataset.LazyDataset;
 import uk.ac.diamond.scisoft.analysis.io.AbstractFileLoader;
 import uk.ac.diamond.scisoft.analysis.io.DataHolder;
-import uk.ac.diamond.scisoft.analysis.io.IMetaData;
+import uk.ac.diamond.scisoft.analysis.io.IMetadata;
 import uk.ac.diamond.scisoft.analysis.io.IMetaLoader;
 import uk.ac.diamond.scisoft.analysis.io.MetaDataAdapter;
 import uk.ac.diamond.scisoft.analysis.io.ScanFileHolderException;
@@ -232,7 +232,7 @@ public class H5Loader extends AbstractFileLoader implements IMetaLoader {
 	private HierarchicalInfo metaInfo;
 
 	@Override
-	public void loadMetaData(IMonitor mon) throws Exception {
+	public void loadMetadata(IMonitor mon) throws Exception {
 		
 		IHierarchicalDataFile file = null;
 		try {
@@ -247,10 +247,10 @@ public class H5Loader extends AbstractFileLoader implements IMetaLoader {
 	}
 
 	@Override
-	public IMetaData getMetaData() {
+	public IMetadata getMetaData() {
 		
  		return new MetaDataAdapter() {
-			private static final long serialVersionUID = IMetaData.serialVersionUID;
+			private static final long serialVersionUID = IMetadata.serialVersionUID;
 			private Map<String, Object> attributeValues;
 			
 			@Override

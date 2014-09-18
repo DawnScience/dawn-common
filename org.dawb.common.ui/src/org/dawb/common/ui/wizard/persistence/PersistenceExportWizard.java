@@ -48,7 +48,7 @@ import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.IFunction;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.IFunctionService;
 import uk.ac.diamond.scisoft.analysis.io.IDiffractionMetadata;
-import uk.ac.diamond.scisoft.analysis.io.IMetaData;
+import uk.ac.diamond.scisoft.analysis.io.IMetadata;
 import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
 
 public class PersistenceExportWizard extends AbstractPersistenceWizard implements IExportWizard {
@@ -157,7 +157,7 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
     				}
     				
     				if (trace!=null && trace instanceof IImageTrace && trace.getData() != null) {
-    					IMetaData meta = ((Dataset)trace.getData()).getMetadata();
+    					IMetadata meta = ((Dataset)trace.getData()).getMetadata();
     					if (meta != null && (meta instanceof IDiffractionMetadata)) {
     						options.setOptionEnabled(PersistWizardConstants.DIFF_META, true);
     					}
@@ -270,7 +270,7 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
 						 
 						 if (options.is(PersistWizardConstants.DIFF_META)) {
 							 if (trace!=null && trace instanceof IImageTrace && trace.getData() != null) {
-								 IMetaData meta = trace.getData().getMetadata();
+								 IMetadata meta = trace.getData().getMetadata();
 								 if (meta == null || meta instanceof IDiffractionMetadata) {
 									 monitor.worked(1);
 									 file.setDiffractionMetadata((IDiffractionMetadata) meta);

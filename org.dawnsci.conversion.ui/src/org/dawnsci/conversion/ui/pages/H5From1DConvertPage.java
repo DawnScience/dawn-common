@@ -48,7 +48,7 @@ import org.mihalis.opal.checkBoxGroup.CheckBoxGroup;
 import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 import uk.ac.diamond.scisoft.analysis.io.DataHolder;
 import uk.ac.diamond.scisoft.analysis.io.IDataHolder;
-import uk.ac.diamond.scisoft.analysis.io.IMetaData;
+import uk.ac.diamond.scisoft.analysis.io.IMetadata;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 
 public class H5From1DConvertPage extends ResourceChoosePage implements
@@ -57,7 +57,7 @@ IConversionWizardPage {
 
 	private CheckboxTableViewer checkboxTableViewer;
 	private String[]            dataSetNames;
-	private IMetaData          imeta;
+	private IMetadata          imeta;
 	private IDataHolder        holder;
 	private IConversionContext context;
 	private Spinner fastSpinner;
@@ -247,7 +247,7 @@ IConversionWizardPage {
 					final String source = getSourcePath(context);
 					if (source==null || "".equals(source)) return;
 					// Attempt to use meta data, save memory
-					final IMetaData    meta = LoaderFactory.getMetaData(source, new ProgressMonitorWrapper(monitor));
+					final IMetadata    meta = LoaderFactory.getMetaData(source, new ProgressMonitorWrapper(monitor));
 					if (meta != null) {
 						final Collection<String> names = meta.getDataNames();
 						if (names !=null) {
@@ -270,7 +270,7 @@ IConversionWizardPage {
 
 		});
 	}
-	protected void setDataNames(String[] array, final IMetaData imeta, final IDataHolder holder) {
+	protected void setDataNames(String[] array, final IMetadata imeta, final IDataHolder holder) {
 		dataSetNames = array;
 		this.imeta   = imeta;
 		this.holder  = holder;

@@ -56,7 +56,7 @@ import org.slf4j.LoggerFactory;
 
 import uk.ac.diamond.scisoft.analysis.dataset.IMetadataProvider;
 import uk.ac.diamond.scisoft.analysis.io.ILoaderService;
-import uk.ac.diamond.scisoft.analysis.io.IMetaData;
+import uk.ac.diamond.scisoft.analysis.io.IMetadata;
 
 /**
  * @author suchet + gerring
@@ -68,7 +68,7 @@ public class HeaderTableView extends ViewPart implements ISelectionListener, IPa
 	
 	private static final Logger logger = LoggerFactory.getLogger(HeaderTableView.class);
 	
-	private IMetaData           meta;
+	private IMetadata           meta;
 	private StructuredSelection lastSelection;
 	private boolean             requirePageUpdates;
 	private TableViewer         table;
@@ -166,8 +166,8 @@ public class HeaderTableView extends ViewPart implements ISelectionListener, IPa
 			} else if (sel instanceof File) {
 				final String filePath = ((File)sel).getAbsolutePath();
 				updatePath(filePath);
-			} else if (sel instanceof IMetaData) {
-				selectMetadata((IMetaData)sel);
+			} else if (sel instanceof IMetadata) {
+				selectMetadata((IMetadata)sel);
 			} else if( sel instanceof IMetadataProvider){
 				try {
 					selectMetadata(((IMetadataProvider)sel).getMetadata());
@@ -179,7 +179,7 @@ public class HeaderTableView extends ViewPart implements ISelectionListener, IPa
 	}
 	
 	
-	private void selectMetadata(IMetaData sel) {
+	private void selectMetadata(IMetadata sel) {
 		meta = sel;
 		updatePartName();
 		updateTable.schedule();
@@ -306,7 +306,7 @@ public class HeaderTableView extends ViewPart implements ISelectionListener, IPa
 				if (page!=null) slicer = (ISliceSystem)page.getAdapter(ISliceSystem.class);
 			}
 			if (slicer!=null) {
-				IMetaData md = slicer.getSliceMetadata();
+				IMetadata md = slicer.getSliceMetadata();
 				if (md!=null) {
 					selectMetadata(md);
 					return;

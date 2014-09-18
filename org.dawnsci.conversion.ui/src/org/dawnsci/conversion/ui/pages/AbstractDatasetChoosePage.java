@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
 
 import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 import uk.ac.diamond.scisoft.analysis.io.IDataHolder;
-import uk.ac.diamond.scisoft.analysis.io.IMetaData;
+import uk.ac.diamond.scisoft.analysis.io.IMetadata;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 
 public abstract class AbstractDatasetChoosePage extends ResourceChoosePage implements IConversionWizardPage{
@@ -54,7 +54,7 @@ public abstract class AbstractDatasetChoosePage extends ResourceChoosePage imple
 	protected boolean open      = true;
 	protected boolean overwrite = false;
 
-	protected IMetaData          imeta;
+	protected IMetadata          imeta;
 	protected IDataHolder        holder;
 	
 
@@ -211,7 +211,7 @@ public abstract class AbstractDatasetChoosePage extends ResourceChoosePage imple
 
 	protected abstract int getMinimumDataSize();
 
-	protected void setDataNames(String[] array, final IMetaData imeta, final IDataHolder holder) {
+	protected void setDataNames(String[] array, final IMetadata imeta, final IDataHolder holder) {
 		dataSetNames = array;
 		this.imeta   = imeta;
 		this.holder  = holder;

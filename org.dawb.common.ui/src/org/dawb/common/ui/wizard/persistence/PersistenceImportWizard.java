@@ -45,7 +45,7 @@ import uk.ac.diamond.scisoft.analysis.fitting.functions.IFunctionService;
 import uk.ac.diamond.scisoft.analysis.io.IDataHolder;
 import uk.ac.diamond.scisoft.analysis.io.IDiffractionMetadata;
 import uk.ac.diamond.scisoft.analysis.io.ILoaderService;
-import uk.ac.diamond.scisoft.analysis.io.IMetaData;
+import uk.ac.diamond.scisoft.analysis.io.IMetadata;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
 import uk.ac.diamond.scisoft.analysis.roi.IROI;
@@ -322,7 +322,7 @@ public class PersistenceImportWizard extends AbstractPersistenceWizard implement
 							DiffractionMetadataUtils.copyNewOverOld(fileMeta, lockedmeta);
 						} else if (image.getData() != null && ((Dataset)image.getData()).getMetadata()!= null){
 							//Should only need to copy over here, not replace
-							IMetaData meta = ((Dataset)image.getData()).getMetadata();
+							IMetadata meta = ((Dataset)image.getData()).getMetadata();
 							if (meta instanceof IDiffractionMetadata) {
 								DiffractionMetadataUtils.copyNewOverOld(fileMeta, (IDiffractionMetadata)meta);
 							}

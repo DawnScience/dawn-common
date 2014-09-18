@@ -24,7 +24,7 @@ import uk.ac.diamond.scisoft.analysis.dataset.Dataset;
 import uk.ac.diamond.scisoft.analysis.io.AbstractFileLoader;
 import uk.ac.diamond.scisoft.analysis.io.DataHolder;
 import uk.ac.diamond.scisoft.analysis.io.ExtendedMetadataAdapter;
-import uk.ac.diamond.scisoft.analysis.io.IMetaData;
+import uk.ac.diamond.scisoft.analysis.io.IMetadata;
 import uk.ac.diamond.scisoft.analysis.io.IMetaLoader;
 import uk.ac.diamond.scisoft.analysis.io.ScanFileHolderException;
 import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
@@ -80,7 +80,7 @@ public class SpecLoader extends AbstractFileLoader implements IMetaLoader {
 	 * it is slow to run on big files and light on memory.
 	 */
 	@Override
-	public void loadMetaData(IMonitor mon) throws Exception {
+	public void loadMetadata(IMonitor mon) throws Exception {
 		try {
 			this.dataNames  = new ArrayList<String>(31);
 			this.dataSizes  = new HashMap<String,Integer>(31);
@@ -104,9 +104,9 @@ public class SpecLoader extends AbstractFileLoader implements IMetaLoader {
 	}
 
 	@Override
-	public IMetaData getMetaData() {
+	public IMetadata getMetaData() {
 		return new ExtendedMetadataAdapter(new File(filePath)) {
-			private static final long serialVersionUID = IMetaData.serialVersionUID;
+			private static final long serialVersionUID = IMetadata.serialVersionUID;
 
 			@Override
 			public Collection<String> getDataNames() {

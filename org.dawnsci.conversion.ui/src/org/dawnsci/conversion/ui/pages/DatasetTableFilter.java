@@ -14,12 +14,12 @@ import java.util.Arrays;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 
-import uk.ac.diamond.scisoft.analysis.io.IMetaData;
+import uk.ac.diamond.scisoft.analysis.io.IMetadata;
 
 class DatasetTableFilter extends ViewerFilter {
 
 	private String    searchString;
-	private IMetaData meta;
+	private IMetadata meta;
 
 	public void setSearchText(String s) {
 		if (s==null) s="";
@@ -59,7 +59,7 @@ class DatasetTableFilter extends ViewerFilter {
 		return false;
 	}
 
-	public void setMetaData(IMetaData metaData) {
+	public void setMetaData(IMetadata metaData) {
 		this.meta = metaData;
 	}
 
