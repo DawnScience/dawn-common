@@ -90,7 +90,7 @@ public class H5Loader extends AbstractFileLoader implements IMetaLoader {
 
 			if (loadMetadata) {
 				metaInfo = file.getDatasetInformation(IHierarchicalDataFile.NUMBER_ARRAY);
-				holder.setMetadata(getMetaData());
+				holder.setMetadata(getMetadata());
 			}
 			return holder;
 			
@@ -247,7 +247,7 @@ public class H5Loader extends AbstractFileLoader implements IMetaLoader {
 	}
 
 	@Override
-	public IMetadata getMetaData() {
+	public IMetadata getMetadata() {
 		
  		return new MetaDataAdapter() {
 			private static final long serialVersionUID = IMetadata.serialVersionUID;
