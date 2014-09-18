@@ -48,8 +48,8 @@ import org.mihalis.opal.checkBoxGroup.CheckBoxGroup;
 import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 import uk.ac.diamond.scisoft.analysis.io.DataHolder;
 import uk.ac.diamond.scisoft.analysis.io.IDataHolder;
-import uk.ac.diamond.scisoft.analysis.io.IMetadata;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
+import uk.ac.diamond.scisoft.analysis.metadata.IMetadata;
 
 public class H5From1DConvertPage extends ResourceChoosePage implements
 IConversionWizardPage {

@@ -14,7 +14,7 @@ import java.util.Arrays;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 
-import uk.ac.diamond.scisoft.analysis.io.IMetadata;
+import uk.ac.diamond.scisoft.analysis.metadata.IMetadata;
 
 class DatasetTableFilter extends ViewerFilter {
 
