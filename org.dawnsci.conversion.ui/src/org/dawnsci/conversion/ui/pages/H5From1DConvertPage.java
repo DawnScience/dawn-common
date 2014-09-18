@@ -247,7 +247,7 @@ IConversionWizardPage {
 					final String source = getSourcePath(context);
 					if (source==null || "".equals(source)) return;
 					// Attempt to use meta data, save memory
-					final IMetadata    meta = LoaderFactory.getMetaData(source, new ProgressMonitorWrapper(monitor));
+					final IMetadata    meta = LoaderFactory.getMetadata(source, new ProgressMonitorWrapper(monitor));
 					if (meta != null) {
 						final Collection<String> names = meta.getDataNames();
 						if (names !=null) {

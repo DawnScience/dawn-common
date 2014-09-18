@@ -455,7 +455,7 @@ public class ResourceChoosePage extends WizardPage {
 
 		final ConversionScheme scheme = context.getConversionScheme();
 		IConversionVisitor     visitor= context.getConversionVisitor();
-		final IMetadata        meta   = LoaderFactory.getMetaData(source, new ProgressMonitorWrapper(monitor));
+		final IMetadata        meta   = LoaderFactory.getMetadata(source, new ProgressMonitorWrapper(monitor));
         final List<String>     names  = new ArrayList<String>(7);
         if (meta!=null) for (String name : meta.getDataShapes().keySet()) {
 			final int[] shape = meta.getDataShapes().get(name);

@@ -209,7 +209,7 @@ public class HeaderTableView extends ViewPart implements ISelectionListener, IPa
 				
 				final ILoaderService service = (ILoaderService)PlatformUI.getWorkbench().getService(ILoaderService.class);
 				try {
-					meta = service.getMetaData(filePath,new ProgressMonitorWrapper( monitor));
+					meta = service.getMetadata(filePath,new ProgressMonitorWrapper( monitor));
 				} catch (Exception e1) {
 					logger.error("Cannot get meta data for "+filePath, e1);
 					return Status.CANCEL_STATUS;
