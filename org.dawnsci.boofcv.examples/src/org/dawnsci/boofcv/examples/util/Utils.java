@@ -9,10 +9,10 @@
 package org.dawnsci.boofcv.examples.util;
 
 import org.dawb.common.ui.util.EclipseUtils;
+import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.ui.IWorkbenchPage;
 
 import uk.ac.diamond.scisoft.analysis.SDAPlotter;
-import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 
 public class Utils {
 

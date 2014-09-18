@@ -5,14 +5,14 @@ import java.util.List;
 
 import org.dawb.common.services.IImageFilterService;
 import org.dawb.common.services.ServiceManager;
+import org.dawnsci.boofcv.BoofCVImageFilterServiceCreator;
+import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
+import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.dawnsci.boofcv.BoofCVImageFilterServiceCreator;
 
-import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
-import uk.ac.diamond.scisoft.analysis.io.IDataHolder;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 
 public class ImageFilterTest {

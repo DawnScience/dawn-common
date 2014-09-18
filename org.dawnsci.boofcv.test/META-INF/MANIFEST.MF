@@ -7,7 +7,6 @@ Bundle-Activator: org.dawnsci.boofcv.Activator
 Require-Bundle: org.eclipse.core.runtime;bundle-version="3.8.0",
  org.junit,
  org.dawnsci.boofcv;bundle-version="1.0.0",
- uk.ac.diamond.scisoft.analysis.api,
  uk.ac.diamond.scisoft.analysis;bundle-version="1.3.0",
  uk.ac.diamond.boofcv;bundle-version="0.16.0",
  org.dawnsci.boofcv.examples;bundle-version="1.0.0"
