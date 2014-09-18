@@ -12,8 +12,8 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-import uk.ac.diamond.scisoft.analysis.roi.IROI;
-import uk.ac.diamond.scisoft.analysis.roi.PolygonalROI;
+import org.eclipse.dawnsci.analysis.api.roi.IROI;
+import org.eclipse.dawnsci.analysis.dataset.roi.PolygonalROI;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 

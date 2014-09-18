@@ -12,7 +12,7 @@ package org.dawnsci.io.spec;
 import java.util.Collection;
 import java.util.EventObject;
 
-import uk.ac.diamond.scisoft.analysis.dataset.Dataset;
+import org.eclipse.dawnsci.analysis.dataset.impl.Dataset;
 
 public class MultiScanDataEvent extends EventObject {
 

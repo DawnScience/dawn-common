@@ -13,8 +13,8 @@ import java.util.List;
 
 import org.dawb.common.services.IImageFilterService;
 import org.dawnsci.boofcv.converter.ConvertIDataset;
+import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 
-import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.Contour;
 import boofcv.alg.filter.binary.ThresholdImageOps;

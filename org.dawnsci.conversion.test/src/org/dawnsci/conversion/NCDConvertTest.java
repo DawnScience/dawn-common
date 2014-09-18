@@ -11,9 +11,9 @@ import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.services.conversion.IConversionContext.ConversionScheme;
 import org.dawb.common.services.conversion.IConversionService;
 import org.dawnsci.conversion.converters.CustomNCDConverter.SAS_FORMAT;
+import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
 import org.junit.Test;
 
-import uk.ac.diamond.scisoft.analysis.io.IDataHolder;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 
 public class NCDConvertTest {

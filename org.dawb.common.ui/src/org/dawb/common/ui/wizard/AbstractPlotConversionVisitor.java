@@ -4,9 +4,8 @@ import java.util.List;
 
 import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.services.conversion.IConversionVisitor;
+import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.plotting.api.IPlottingSystem;
-
-import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 
 public abstract class AbstractPlotConversionVisitor implements IConversionVisitor {
 

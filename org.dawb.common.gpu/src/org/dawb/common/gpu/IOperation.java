@@ -1,6 +1,6 @@
 package org.dawb.common.gpu;
 
-import uk.ac.diamond.scisoft.analysis.dataset.Dataset;
+import org.eclipse.dawnsci.analysis.dataset.impl.Dataset;
 
 public interface IOperation {
 

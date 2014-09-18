@@ -12,7 +12,7 @@ package org.dawb.common.services.expressions;
 import java.util.Collection;
 import java.util.Map;
 
-import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
+import org.eclipse.dawnsci.analysis.api.monitor.IMonitor;
 
 /**
  * This service can be called to save and/or load data from an hdf5 file.

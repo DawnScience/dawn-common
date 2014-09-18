@@ -9,10 +9,10 @@
 
 package org.dawnsci.persistence.json.roi;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.eclipse.dawnsci.analysis.api.roi.IROI;
+import org.eclipse.dawnsci.analysis.dataset.roi.PointROI;
 
-import uk.ac.diamond.scisoft.analysis.roi.IROI;
-import uk.ac.diamond.scisoft.analysis.roi.PointROI;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class PointROIBean extends ROIBean {
 

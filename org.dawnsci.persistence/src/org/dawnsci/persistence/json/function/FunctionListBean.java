@@ -12,10 +12,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 
 import org.dawnsci.persistence.util.PersistenceUtils;
-
-
-import uk.ac.diamond.scisoft.analysis.fitting.functions.IFunction;
-import uk.ac.diamond.scisoft.analysis.fitting.functions.IOperator;
+import org.eclipse.dawnsci.analysis.api.fitting.functions.IFunction;
+import org.eclipse.dawnsci.analysis.api.fitting.functions.IOperator;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 

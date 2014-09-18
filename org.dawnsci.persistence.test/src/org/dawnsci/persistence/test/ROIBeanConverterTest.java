@@ -11,13 +11,12 @@ import org.dawnsci.persistence.json.roi.PolylineROIBean;
 import org.dawnsci.persistence.json.roi.ROIBean;
 import org.dawnsci.persistence.json.roi.RectangularROIBean;
 import org.dawnsci.persistence.json.roi.SectorROIBean;
+import org.eclipse.dawnsci.analysis.dataset.roi.CircularROI;
+import org.eclipse.dawnsci.analysis.dataset.roi.PolylineROI;
+import org.eclipse.dawnsci.analysis.dataset.roi.RectangularROI;
+import org.eclipse.dawnsci.analysis.dataset.roi.SectorROI;
 import org.junit.Before;
 import org.junit.Test;
-
-import uk.ac.diamond.scisoft.analysis.roi.CircularROI;
-import uk.ac.diamond.scisoft.analysis.roi.PolylineROI;
-import uk.ac.diamond.scisoft.analysis.roi.RectangularROI;
-import uk.ac.diamond.scisoft.analysis.roi.SectorROI;
 
 public class ROIBeanConverterTest {
 

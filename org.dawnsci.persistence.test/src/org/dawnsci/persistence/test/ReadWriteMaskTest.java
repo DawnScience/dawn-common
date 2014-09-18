@@ -12,10 +12,9 @@ import java.util.Map;
 import org.dawb.common.services.IPersistenceService;
 import org.dawb.common.services.IPersistentFile;
 import org.dawnsci.persistence.PersistenceServiceCreator;
+import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
+import org.eclipse.dawnsci.analysis.dataset.impl.BooleanDataset;
 import org.junit.Test;
-
-import uk.ac.diamond.scisoft.analysis.dataset.BooleanDataset;
-import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 
 public class ReadWriteMaskTest extends AbstractThreadTestBase{
 	

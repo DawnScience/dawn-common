@@ -14,9 +14,9 @@ import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.services.conversion.IConversionService;
 import org.dawb.common.services.conversion.IConversionContext.ConversionScheme;
 import org.dawnsci.conversion.converters.AsciiConvert1D;
+import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
 import org.junit.Test;
 
-import uk.ac.diamond.scisoft.analysis.io.IDataHolder;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 
 

@@ -1,8 +1,7 @@
 package org.dawnsci.conversion.converters;
 
 import org.dawb.common.services.conversion.IConversionContext;
-
-import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
+import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 
 public class VisitorConversion extends AbstractConversion {
 

@@ -4,8 +4,7 @@ import java.util.List;
 
 import org.dawb.common.services.IImageFilterService;
 import org.dawb.common.services.ServiceManager;
-
-import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
+import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 
 /**
  * Class to wrap the methods used to IDataset object with BoofCV algorithms

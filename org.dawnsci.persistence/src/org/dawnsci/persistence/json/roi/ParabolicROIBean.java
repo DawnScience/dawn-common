@@ -10,8 +10,8 @@ package org.dawnsci.persistence.json.roi;
 
 import java.util.Arrays;
 
-import uk.ac.diamond.scisoft.analysis.roi.IROI;
-import uk.ac.diamond.scisoft.analysis.roi.ParabolicROI;
+import org.eclipse.dawnsci.analysis.api.roi.IROI;
+import org.eclipse.dawnsci.analysis.dataset.roi.ParabolicROI;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 

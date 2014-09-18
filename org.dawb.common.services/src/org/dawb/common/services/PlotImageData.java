@@ -9,9 +9,8 @@
 
 package org.dawb.common.services;
 
+import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.ui.services.IDisposable;
-
-import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 
 public class PlotImageData {
 

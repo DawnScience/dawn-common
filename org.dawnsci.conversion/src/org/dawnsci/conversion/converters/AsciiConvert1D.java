@@ -12,8 +12,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.dawb.common.services.conversion.IConversionContext;
-
-import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
+import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 
 /**
  * This class converts neuxs data sets to .dat file syntax, @see  uk.ac.diamond.scisoft.analysis.io.DatLoader

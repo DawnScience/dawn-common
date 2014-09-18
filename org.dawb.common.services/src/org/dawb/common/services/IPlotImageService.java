@@ -10,10 +10,9 @@ package org.dawb.common.services;
 
 import java.io.File;
 
+import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.services.IDisposable;
-
-import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
 
 /**
  * A service for getting thumbnails from datasets as images and for

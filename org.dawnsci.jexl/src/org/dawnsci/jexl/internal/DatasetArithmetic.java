@@ -1,8 +1,7 @@
 package org.dawnsci.jexl.internal;
 
 import org.apache.commons.jexl2.JexlArithmetic;
-
-import uk.ac.diamond.scisoft.analysis.dataset.Maths;
+import org.eclipse.dawnsci.analysis.dataset.impl.Maths;
 
 /**
  * DatasetArithmetic class overriding the plus, minus, multiplication and

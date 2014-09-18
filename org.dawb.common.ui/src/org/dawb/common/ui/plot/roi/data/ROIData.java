@@ -18,11 +18,11 @@ package org.dawb.common.ui.plot.roi.data;
 
 import java.awt.Color;
 
+import org.eclipse.dawnsci.analysis.api.roi.IROI;
+import org.eclipse.dawnsci.analysis.dataset.impl.Dataset;
 import org.eclipse.swt.graphics.RGB;
 
 import uk.ac.diamond.scisoft.analysis.axis.AxisValues;
-import uk.ac.diamond.scisoft.analysis.dataset.Dataset;
-import uk.ac.diamond.scisoft.analysis.roi.IROI;
 
 /**
  * Base class to contain bare essentials of region of interest data

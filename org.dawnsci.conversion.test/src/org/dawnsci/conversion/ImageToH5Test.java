@@ -25,10 +25,10 @@ import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.services.conversion.IConversionContext.ConversionScheme;
 import org.dawb.common.services.conversion.IConversionService;
 import org.dawb.common.util.io.FileUtils;
+import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
 import org.junit.Test;
 
 import static org.junit.Assert.fail;
-import uk.ac.diamond.scisoft.analysis.dataset.ILazyDataset;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 
 public class ImageToH5Test {

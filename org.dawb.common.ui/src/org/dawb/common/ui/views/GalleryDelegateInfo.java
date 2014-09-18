@@ -1,6 +1,6 @@
 package org.dawb.common.ui.views;
 
-import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
+import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 
 /**
  * Information provided to GalleryDelegate when 

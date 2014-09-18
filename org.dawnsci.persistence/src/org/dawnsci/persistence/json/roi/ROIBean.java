@@ -8,9 +8,9 @@
  */
 package org.dawnsci.persistence.json.roi;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.eclipse.dawnsci.analysis.api.roi.IROI;
 
-import uk.ac.diamond.scisoft.analysis.roi.IROI;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * ROI bean used to marshall/unmarshall to / from JSON strings <br>

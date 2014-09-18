@@ -16,8 +16,8 @@
 
 package org.dawb.common.services.conversion;
 
-import uk.ac.diamond.scisoft.analysis.processing.IExecutionVisitor;
-import uk.ac.diamond.scisoft.analysis.processing.IOperation;
+import org.eclipse.dawnsci.analysis.api.processing.IExecutionVisitor;
+import org.eclipse.dawnsci.analysis.api.processing.IOperation;
 
 public interface IProcessingConversionInfo {
 

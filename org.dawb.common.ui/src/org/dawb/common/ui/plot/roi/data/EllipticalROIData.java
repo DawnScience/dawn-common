@@ -16,9 +16,9 @@
 
 package org.dawb.common.ui.plot.roi.data;
 
-import uk.ac.diamond.scisoft.analysis.roi.EllipticalFitROI;
-import uk.ac.diamond.scisoft.analysis.roi.EllipticalROI;
-import uk.ac.diamond.scisoft.analysis.roi.PolylineROI;
+import org.eclipse.dawnsci.analysis.dataset.roi.EllipticalFitROI;
+import org.eclipse.dawnsci.analysis.dataset.roi.EllipticalROI;
+import org.eclipse.dawnsci.analysis.dataset.roi.PolylineROI;
 
 public class EllipticalROIData extends ROIData {
 	public EllipticalROIData(EllipticalROI eroi) {

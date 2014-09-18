@@ -16,7 +16,7 @@
 
 package org.dawb.common.ui.plot.roi.data;
 
-import uk.ac.diamond.scisoft.analysis.roi.PolygonalROI;
+import org.eclipse.dawnsci.analysis.dataset.roi.PolygonalROI;
 
 public class PolygonalROIData extends ROIData {
 

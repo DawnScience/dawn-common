@@ -10,7 +10,7 @@ package org.dawb.common.services;
 
 import java.util.List;
 
-import uk.ac.diamond.scisoft.analysis.dataset.IDataset;
+import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 
 /**
  * This service can be called to process IDataset using BoofCV filtering algorithms

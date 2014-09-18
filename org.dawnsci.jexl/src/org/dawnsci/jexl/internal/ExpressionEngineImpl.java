@@ -23,10 +23,9 @@ import org.apache.commons.jexl2.Script;
 import org.dawb.common.services.expressions.ExpressionEngineEvent;
 import org.dawb.common.services.expressions.IExpressionEngine;
 import org.dawb.common.services.expressions.IExpressionEngineListener;
-
-import uk.ac.diamond.scisoft.analysis.dataset.Image;
-import uk.ac.diamond.scisoft.analysis.dataset.Maths;
-import uk.ac.diamond.scisoft.analysis.monitor.IMonitor;
+import org.eclipse.dawnsci.analysis.api.monitor.IMonitor;
+import org.eclipse.dawnsci.analysis.dataset.impl.Image;
+import org.eclipse.dawnsci.analysis.dataset.impl.Maths;
 
 public class ExpressionEngineImpl implements IExpressionEngine{
 	

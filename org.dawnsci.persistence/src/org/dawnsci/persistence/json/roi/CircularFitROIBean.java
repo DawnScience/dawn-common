@@ -12,9 +12,9 @@ package org.dawnsci.persistence.json.roi;
 import java.util.Iterator;
 import java.util.List;
 
-import uk.ac.diamond.scisoft.analysis.roi.CircularFitROI;
-import uk.ac.diamond.scisoft.analysis.roi.IROI;
-import uk.ac.diamond.scisoft.analysis.roi.PolylineROI;
+import org.eclipse.dawnsci.analysis.api.roi.IROI;
+import org.eclipse.dawnsci.analysis.dataset.roi.CircularFitROI;
+import org.eclipse.dawnsci.analysis.dataset.roi.PolylineROI;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 

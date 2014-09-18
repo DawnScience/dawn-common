@@ -9,8 +9,8 @@
 
 package org.dawnsci.persistence.json.roi;
 
-import uk.ac.diamond.scisoft.analysis.roi.IROI;
-import uk.ac.diamond.scisoft.analysis.roi.LinearROI;
+import org.eclipse.dawnsci.analysis.api.roi.IROI;
+import org.eclipse.dawnsci.analysis.dataset.roi.LinearROI;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
