@@ -1,6 +1,7 @@
 package org.dawnsci.persistence.test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
 import org.dawnsci.persistence.json.JacksonMarshaller;
 import org.dawnsci.persistence.json.function.FunctionBean;
@@ -8,10 +9,10 @@ import org.dawnsci.persistence.json.roi.RectangularROIBean;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-
 import uk.ac.diamond.scisoft.analysis.fitting.functions.Fermi;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.Parameter;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 /**
  * Test the marshallizer with Jackson

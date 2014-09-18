@@ -1,6 +1,6 @@
 package org.dawnsci.persistence.test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 import org.dawnsci.persistence.workflow.xml.MomlUpdater;
 import org.junit.Before;
