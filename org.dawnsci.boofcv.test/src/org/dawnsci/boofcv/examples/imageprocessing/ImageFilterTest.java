@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 Diamond Light Source Ltd.
+ * Copyright (c) 2014 Diamond Light Source Ltd.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -32,7 +32,7 @@ public class ImageFilterTest {
 
 	@BeforeClass
 	public static void beforeClass() {
-		ServiceManager.setService(IImageFilterService.class, BoofCVImageFilterServiceCreator.createPersistenceService());
+		ServiceManager.setService(IImageFilterService.class, BoofCVImageFilterServiceCreator.createFilterService());
 	}
 
 	@Before

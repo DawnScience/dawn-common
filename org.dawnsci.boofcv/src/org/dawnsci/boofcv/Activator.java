@@ -15,6 +15,8 @@ public class Activator implements BundleActivator {
 
 	private static BundleContext context;
 
+	public static String PLUGIN_ID = "org.dawnsci.boofcv";
+
 	static BundleContext getContext() {
 		return context;
 	}

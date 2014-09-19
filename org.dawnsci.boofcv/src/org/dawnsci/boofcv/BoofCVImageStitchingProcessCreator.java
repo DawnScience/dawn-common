@@ -8,18 +8,18 @@
  */
 package org.dawnsci.boofcv;
 
-import org.dawnsci.boofcv.internal.BoofCVImageFilterImpl;
-import org.eclipse.dawnsci.analysis.api.image.IImageFilterService;
+import org.dawnsci.boofcv.stitching.BoofCVImageStitchingImpl;
+import org.eclipse.dawnsci.analysis.api.image.IImageStitchingProcess;
 
 /**
- * Class used to test the BoofCVImageFilterImpl
+ * Class used to test the BoofCVImageStitchingImpl
  * @author wqk87977
  *
  * @internal only use in unit tests.
  */
-public class BoofCVImageFilterServiceCreator {
+public class BoofCVImageStitchingProcessCreator {
 
-	public BoofCVImageFilterServiceCreator(){
+	public BoofCVImageStitchingProcessCreator(){
 		
 	}
 
@@ -27,7 +27,7 @@ public class BoofCVImageFilterServiceCreator {
 	 * Used only for testing - DO NOT USE Externally. Instead get the Service by class.
 	 * @return
 	 */
-	public static IImageFilterService createFilterService(){
-		return new BoofCVImageFilterImpl();
+	public static IImageStitchingProcess createStitchingProcess(){
+		return new BoofCVImageStitchingImpl();
 	}
 }
