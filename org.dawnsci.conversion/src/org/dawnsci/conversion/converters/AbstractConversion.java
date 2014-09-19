@@ -38,7 +38,7 @@ import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
  * AbstractConversion details converting from hdf/nexus to other
  * things only at the moment.
  * 
- * @author fcp94556
+ * @author Matthew Gerring
  *
  */
 public abstract class AbstractConversion {

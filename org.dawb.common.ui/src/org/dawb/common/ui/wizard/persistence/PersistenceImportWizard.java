@@ -60,7 +60,7 @@ import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 
 /**
  * 
- * @author fcp94556
+ * @author Matthew Gerring
  *
  */
 public class PersistenceImportWizard extends AbstractPersistenceWizard implements IImportWizard {

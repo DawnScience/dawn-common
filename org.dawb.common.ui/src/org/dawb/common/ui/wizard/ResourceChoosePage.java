@@ -67,7 +67,7 @@ import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 /**
  * A page with a field for choosing an external file.
  * The file chosen may also be in a project or typed in.
- * @author fcp94556
+ * @author Matthew Gerring
  *
  */
 public class ResourceChoosePage extends WizardPage {

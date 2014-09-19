@@ -135,7 +135,7 @@ public abstract class AbstractImageConversion extends AbstractConversion {
 	
 	/**
 	 * To be used as the user object to convey data about the conversion.
-	 * @author fcp94556
+	 * @author Matthew Gerring
 	 *
 	 */
 	public static final class ConversionInfoBean {

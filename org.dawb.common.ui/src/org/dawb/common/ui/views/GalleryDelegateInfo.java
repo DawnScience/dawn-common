@@ -14,7 +14,7 @@ import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
  * Information provided to GalleryDelegate when 
  * implementing a custom gallery.
  * 
- * @author fcp94556
+ * @author Matthew Gerring
  *
  */
 public interface GalleryDelegateInfo {

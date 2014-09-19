@@ -14,7 +14,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 /**
  * AbstractSliceConversionPage which declares as IConversionWizardPage specifically for use
  * with the conversion wizard.
- * @author fcp94556
+ * @author Matthew Gerring
  *
  */
 public abstract class AbstractSliceConversionPage extends org.dawb.common.ui.wizard.AbstractSliceConversionPage implements IConversionWizardPage {

@@ -24,7 +24,7 @@ import org.eclipse.ui.PlatformUI;
  * This is useful for unit tests and workflows to get services which would otherwise
  * only be available when a workbench is running
  * 
- * @author fcp94556
+ * @author Matthew Gerring
  *
  */
 public class ServiceManager {

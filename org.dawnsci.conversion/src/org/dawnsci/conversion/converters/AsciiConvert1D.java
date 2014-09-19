@@ -26,7 +26,7 @@ import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
  * This class converts neuxs data sets to .dat file syntax, @see  uk.ac.diamond.scisoft.analysis.io.DatLoader
  * 
  * @see org.dawnsci.conversion.AsciiConvertTest
- * @author fcp94556
+ * @author Matthew Gerring
  *
  */
 public class AsciiConvert1D extends AbstractConversion {

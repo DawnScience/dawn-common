@@ -19,7 +19,7 @@ import uk.ac.diamond.scisoft.analysis.io.JavaImageSaver;
 /**
  * Class to save tiff slices out from an hdf file.
  * 
- * @author fcp94556
+ * @author Matthew Gerring
  *
  * Mark I suggest that you extend this class either with a subclass or a mode
  * of this class to process the other parts required.

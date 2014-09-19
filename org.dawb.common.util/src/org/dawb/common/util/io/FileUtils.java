@@ -43,7 +43,7 @@ import org.eclipse.core.runtime.IAdaptable;
  * A class with a collection of file management static utility classes. Several method contents copied from code
  * snippets available on the web.
  * 
- * @author fcp94556
+ * @author Matthew Gerring
  */
 public final class FileUtils {
 

@@ -17,7 +17,7 @@ import org.eclipse.jface.viewers.Viewer;
  * This class assumes that the root is the content and that the 
  * children of the root are the top level to be shown.
  * 
- * @author fcp94556
+ * @author Matthew Gerring
  *
  */
 public class TreeNodeContentProvider implements ITreeContentProvider {

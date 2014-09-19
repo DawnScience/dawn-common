@@ -35,7 +35,7 @@ import org.eclipse.swt.widgets.Widget;
 
 /**
  * A page for editing a list of booleans.
- * @author fcp94556
+ * @author Matthew Gerring
  *
  */
 public class CheckWizardPage extends WizardPage implements SelectionListener{

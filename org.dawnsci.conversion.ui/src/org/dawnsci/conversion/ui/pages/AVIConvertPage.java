@@ -45,7 +45,7 @@ import uk.ac.diamond.scisoft.analysis.dataset.function.DownsampleMode;
 /**
  * Page for exporting slice to video.
  * 
- * @author fcp94556
+ * @author Matthew Gerring
  *
  */
 public final class AVIConvertPage extends AbstractSliceConversionPage {

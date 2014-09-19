@@ -45,7 +45,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Class to create a video of slices.
  * 
- * @author fcp94556
+ * @author Matthew Gerring
  *
  */
 public class AVIImageConverter extends AbstractImageConversion {

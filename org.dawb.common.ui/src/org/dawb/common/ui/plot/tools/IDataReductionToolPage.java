@@ -27,7 +27,7 @@ import org.eclipse.dawnsci.plotting.api.tool.IToolPage;
  * for instance radial integration of an image (2d) to 1d. They can also be applied
  * n+1 data dimensions using the @see DataReductionWizard
  * 
- * @author fcp94556
+ * @author Matthew Gerring
  *
  */
 public interface IDataReductionToolPage extends IToolPage {
@@ -58,7 +58,7 @@ public interface IDataReductionToolPage extends IToolPage {
 
 	/**
 	 * Bean to contain data for slice of tool.
-	 * @author fcp94556
+	 * @author Matthew Gerring
 	 *
 	 */
 	public final class DataReductionSlice {

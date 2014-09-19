@@ -13,7 +13,7 @@ import java.nio.file.Path;
 /**
  * Used to mark parts as able to return selected files.
  * 
- * @author fcp94556
+ * @author Matthew Gerring
  *
  */
 public interface IFileSelector {

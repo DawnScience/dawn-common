@@ -21,7 +21,7 @@ import com.amd.aparapi.Range;
 /**
  * Operation which supports basic operators.
  * 
- * @author fcp94556
+ * @author Matthew Gerring
  *
  */
 class BasicGPUOperation implements IOperation {

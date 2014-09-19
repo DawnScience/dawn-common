@@ -17,7 +17,7 @@ import org.eclipse.ui.part.Page;
 
 /**
  * This class used as a page in the Data page view.
- * @author fcp94556
+ * @author Matthew Gerring
  *
  */
 public class HeaderTablePage extends Page implements IAdaptable{

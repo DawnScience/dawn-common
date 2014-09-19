@@ -18,7 +18,7 @@ import org.eclipse.ui.IEditorPart;
  * The part will be added at the start of the editor stack. To support
  * other locations, a method getPreferredEditorIndex() could be implemented here.
  * 
- * @author fcp94556
+ * @author Matthew Gerring
  *
  */
 public interface IEditorExtension extends IEditorPart, IPlottingContainer {

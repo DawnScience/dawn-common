@@ -21,7 +21,7 @@ import org.eclipse.ui.services.IDisposable;
  * The implementor or this service contributes using an eclipse extension
  * point and then later any plugin may ask for an implementation of the service.
  * 
- * @author fcp94556
+ * @author Matthew Gerring
  */
 public interface IPlotImageService extends IFileIconService{
 

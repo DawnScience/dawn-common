@@ -18,7 +18,7 @@ import org.eclipse.ui.services.IServiceLocator;
 
 /**
  * We rely on OSGI to only make one of these. Too many would not work!
- * @author fcp94556
+ * @author Matthew Gerring
  *
  */
 public class PlottingSystemService extends AbstractServiceFactory implements ISystemService<IPlottingSystem> {

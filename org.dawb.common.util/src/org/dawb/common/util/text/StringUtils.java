@@ -13,7 +13,7 @@ import java.util.Arrays;
 
 
 /**
- * @author fcp94556
+ * @author Matthew Gerring
  *
  */
 public class StringUtils {

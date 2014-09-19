@@ -26,7 +26,7 @@ import org.eclipse.dawnsci.hdf5.Nexus;
 /**
  * This converter creates stacks from 
  * 
- * @author fcp94556
+ * @author Matthew Gerring
  *
  */
 public class CompareConverter extends AbstractConversion{
@@ -141,7 +141,7 @@ public class CompareConverter extends AbstractConversion{
 	
 	/**
 	 * To be used as the user object to convey data about the conversion.
-	 * @author fcp94556
+	 * @author Matthew Gerring
 	 *
 	 */
 	public static final class ConversionInfoBean {

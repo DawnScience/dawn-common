@@ -21,7 +21,7 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
  * Joins several selection providers so that one view
  * can report selections from many places.
  * 
- * @author fcp94556
+ * @author Matthew Gerring
  *
  */
 public class CompositeSelectionProvider implements ISelectionProvider, ISelectionChangedListener {

@@ -31,7 +31,7 @@ import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
  * This converter converts a directory of images to a stack in HDF5
  * which allows slicing tools to be run in a faster way.
  * 
- * @author fcp94556
+ * @author Matthew Gerring
  *
  */
 public class ImagesToHDFConverter extends AbstractConversion{

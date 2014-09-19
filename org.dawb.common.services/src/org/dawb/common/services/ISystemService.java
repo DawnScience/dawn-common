@@ -33,7 +33,7 @@ package org.dawb.common.services;
  *      // provide its plotting.
  *<code>
  *
- * @author fcp94556
+ * @author Matthew Gerring
  *
  */
 public interface ISystemService<T> {

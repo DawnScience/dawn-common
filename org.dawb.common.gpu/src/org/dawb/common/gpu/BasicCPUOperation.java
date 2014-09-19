@@ -15,7 +15,7 @@ import org.eclipse.dawnsci.analysis.dataset.impl.Maths;
 /**
  * Operation which supports basic operators.
  * 
- * @author fcp94556
+ * @author Matthew Gerring
  *
  */
 class BasicCPUOperation implements IOperation {

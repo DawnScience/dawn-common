@@ -26,7 +26,7 @@ import org.eclipse.ui.dialogs.WizardNewFileCreationPage;
 /**
  * A wizard page for choosing any file in a project.
  * 
- * @author fcp94556
+ * @author Matthew Gerring
  *
  */
 public class NewFileChoosePage extends WizardNewFileCreationPage {

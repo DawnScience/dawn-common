@@ -34,7 +34,7 @@ import java.util.regex.Pattern;
 
 import org.dawb.common.util.list.SortNatural;
 /**
- * @author fcp94556
+ * @author Matthew Gerring
  *
  */
 public class SortingUtils {

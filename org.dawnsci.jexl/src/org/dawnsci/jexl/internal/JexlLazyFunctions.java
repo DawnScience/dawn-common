@@ -17,7 +17,7 @@ import org.eclipse.dawnsci.analysis.dataset.impl.LazyMaths;
 /**
  * Functions able to process without loading all the data at once.
  * 
- * @author fcp94556
+ * @author Matthew Gerring
  *
  */
 public class JexlLazyFunctions {

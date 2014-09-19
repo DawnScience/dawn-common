@@ -70,7 +70,7 @@ import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.wizards.IWizardDescriptor;
 
 /**
- * @author fcp94556
+ * @author Matthew Gerring
  *
  */
 public class EclipseUtils {

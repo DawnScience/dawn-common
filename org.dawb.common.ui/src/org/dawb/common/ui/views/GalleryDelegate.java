@@ -63,7 +63,7 @@ import org.slf4j.LoggerFactory;
 /**
  * May be used to create a lazy gallery of images.
  * 
- * @author fcp94556
+ * @author Matthew Gerring
  *
  */
 public class GalleryDelegate implements SelectionListener {
