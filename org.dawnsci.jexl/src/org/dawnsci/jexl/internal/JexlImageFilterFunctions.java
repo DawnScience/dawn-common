@@ -10,9 +10,9 @@ package org.dawnsci.jexl.internal;
 
 import java.util.List;
 
-import org.dawb.common.services.IImageFilterService;
 import org.dawb.common.services.ServiceManager;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
+import org.eclipse.dawnsci.analysis.api.image.IImageFilterService;
 
 /**
  * Class to wrap the methods used to IDataset object with BoofCV algorithms

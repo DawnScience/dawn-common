@@ -11,9 +11,9 @@ package org.dawnsci.boofcv.internal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.dawb.common.services.IImageFilterService;
 import org.dawnsci.boofcv.converter.ConvertIDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
+import org.eclipse.dawnsci.analysis.api.image.IImageFilterService;
 
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.Contour;

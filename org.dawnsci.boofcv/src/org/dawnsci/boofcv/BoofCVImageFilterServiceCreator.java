@@ -8,8 +8,8 @@
  */
 package org.dawnsci.boofcv;
 
-import org.dawb.common.services.IImageFilterService;
 import org.dawnsci.boofcv.internal.BoofCVImageFilterImpl;
+import org.eclipse.dawnsci.analysis.api.image.IImageFilterService;
 
 /**
  * Class used to test the BoofCVImageFilterImpl
