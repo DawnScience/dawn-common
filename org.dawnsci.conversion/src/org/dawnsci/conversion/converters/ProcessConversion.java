@@ -9,6 +9,7 @@
 package org.dawnsci.conversion.converters;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.Map;
 
 import org.dawb.common.services.ServiceManager;
@@ -58,12 +59,21 @@ public class ProcessConversion extends AbstractConversion {
 					String axesName = axesNames.get(key);
 					IDataHolder dataHolder = LoaderFactory.getData(context.getSelectedConversionFile().getAbsolutePath());
 					ILazyDataset lazyDataset = dataHolder.getLazyDataset(axesName);
-					axMeta.setAxis(key, new ILazyDataset[] {lazyDataset});
+					if (lazyDataset != null && lazyDataset.getRank() != lz.getRank()) {
+						lazyDataset = lazyDataset.getSliceView();
+						int[] shape = new int[lz.getRank()];
+						Arrays.fill(shape, 1);
+						shape[key-1]= lazyDataset.getShape()[0];
+						lazyDataset.setShape(shape);
+					}
+					
+					axMeta.setAxis(key-1, new ILazyDataset[] {lazyDataset});
 				}
 				
 				lz.setMetadata(axMeta);
 			} catch (Exception e) {
 				//no axes metadata
+				e.printStackTrace();
 			}
 		}
 		
