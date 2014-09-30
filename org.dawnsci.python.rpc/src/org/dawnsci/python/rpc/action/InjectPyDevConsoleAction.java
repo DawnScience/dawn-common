@@ -45,6 +45,13 @@ public class InjectPyDevConsoleAction extends Action {
 		}
 	}
 	
+	/**
+	 * Call this method to manually set the dataset which we should use to 
+	 * send to the console. This data is currently sent using flattening.
+	 * 
+	 * @param name
+	 * @param data
+	 */
 	public void setData(String name, IDataset data) {
 		this.name = name;
 		this.data = data;
