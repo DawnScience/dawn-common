@@ -194,6 +194,11 @@ public class InjectPyDevConsole {
 		PydevConsole pydevConsole = (PydevConsole) console;
 		IDocument document = pydevConsole.getDocument();
 
+		// Done because they can open the scripting elsewhere and then run the action
+		// to send data. Therefore there is a chance "import numpy" was not done.
+		if (!document.get().contains("import numpy") && cmd.contains("numpy")) {
+			cmd = "import numpy\n"+cmd;
+		}
 		if (cmd != null) {
 			document.replace(document.getLength(), 0, cmd);
 		}

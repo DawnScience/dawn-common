@@ -4,7 +4,7 @@
    <extension point="org.eclipse.ui.commands">
    
          <command
-            defaultHandler="org.dawb.common.python.InjectPyDevConsoleHandler"
+            defaultHandler="org.dawnsci.python.rpc.action.InjectPyDevConsoleHandler"
             description="Inject commands into active console, prompts to open a PyDev console if none active"
             id="uk.ac.diamond.scisoft.analysis.rcp.plotting.actions.injectPyDevConsole"
             name="Inject PyDev Console">
