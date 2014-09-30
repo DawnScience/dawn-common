@@ -3,10 +3,9 @@ package org.dawnsci.python.rpc.action;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.dawnsci.python.rpc.Activator;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.swt.widgets.Display;
 
 public class InjectPyDevConsoleAction extends Action {
 
@@ -15,9 +14,9 @@ public class InjectPyDevConsoleAction extends Action {
 	private String   name;
 	private IDataset data;
 
-	public InjectPyDevConsoleAction(String label, ImageDescriptor imageDescriptor) {
+	public InjectPyDevConsoleAction(String label) {
 		
-		super(label, imageDescriptor);
+		super(label, Activator.getImageDescriptor("icons/application_osx_terminal.png"));
 		this.params = new HashMap<String,String>(7);
 	}
 
