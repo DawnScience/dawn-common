@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension point="org.eclipse.ui.commands">
+   
+         <command
+            defaultHandler="org.dawb.common.python.InjectPyDevConsoleHandler"
+            description="Inject commands into active console, prompts to open a PyDev console if none active"
+            id="uk.ac.diamond.scisoft.analysis.rcp.plotting.actions.injectPyDevConsole"
+            name="Inject PyDev Console">
+         <commandParameter
+               id="uk.ac.diamond.scisoft.analysis.rcp.plotting.actions.injectPyDevConsole.createNewConsoleAlways"
+               name="Create a New Console"
+               optional="true">
+         </commandParameter>
+         <commandParameter
+               id="uk.ac.diamond.scisoft.analysis.rcp.plotting.actions.injectPyDevConsole.viewName"
+               name="Plot View Name"
+               optional="true">
+         </commandParameter>
+         <commandParameter
+               id="uk.ac.diamond.scisoft.analysis.rcp.plotting.actions.injectPyDevConsole.addScisoftPySetup"
+               name="Setup scisoftpy"
+               optional="true"
+               values="org.dawb.common.python.InjectPyDevConsoleHandler.SetupSciSoftPyParameterValues">
+         </commandParameter>
+         <commandParameter
+               id="uk.ac.diamond.scisoft.analysis.rcp.plotting.actions.injectPyDevConsole.commandToInject"
+               name="Commands To Inject"
+               optional="true">
+         </commandParameter>
+      </command>
+   
+   </extension>
+
+</plugin>

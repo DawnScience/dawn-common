@@ -1,0 +1,63 @@
+package org.dawnsci.python.rpc.action;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.widgets.Display;
+
+public class InjectPyDevConsoleAction extends Action {
+
+	private Map<String, String> params;
+	private InjectPyDevConsole injector;
+	private String   name;
+	private IDataset data;
+
+	public InjectPyDevConsoleAction(String label, ImageDescriptor imageDescriptor) {
+		
+		super(label, imageDescriptor);
+		this.params = new HashMap<String,String>(7);
+	}
+
+	public void run() {
+		try {
+			
+			// Console may have been closed, see if we can get the active
+			// one that they are using.
+			if (injector != null && !injector.isConsoleAvailable()) {
+				injector = null;
+			}
+			
+			// Otherwise open one.
+			if (injector==null) {
+				injector = new InjectPyDevConsole(params);
+				// Opens the console if required, including if it was closed.
+				injector.inject(name, data);
+				injector.open(true);
+			} else {
+				injector.inject(name, data);
+			}
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void setData(String name, IDataset data) {
+		this.name = name;
+		this.data = data;
+	}
+	
+	/**
+	 * Set a connection parameter
+	 * @param name
+	 * @param value
+	 */
+	public void setParameter(String name, String value) {
+		params.put(name, value);
+	}
+
+}
