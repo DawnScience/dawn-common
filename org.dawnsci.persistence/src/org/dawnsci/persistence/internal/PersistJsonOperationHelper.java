@@ -103,7 +103,7 @@ public class PersistJsonOperationHelper {
 	public void writeOperations(IHierarchicalDataFile file, IOperation<? extends IOperationModel, ? extends OperationData>[] operations) throws Exception {
 			
 		String process = file.group(PersistenceConstants.PROCESS_ENTRY);
-		file.setNexusAttribute(process, Nexus.PROCESS);
+		//file.setNexusAttribute(process, Nexus.PROCESS);
 
 		for (int i = 0; i < operations.length; i++) {
 			writeOperationToProcess(file, process, i, operations[i]);
@@ -123,7 +123,7 @@ public class PersistJsonOperationHelper {
 		IDataset save = op.isStoreOutput() ? boolTrue : boolFalse;
 		
 		String note = file.group(Integer.toString(i), group);
-		file.setNexusAttribute(note, Nexus.NOTE);
+		//file.setNexusAttribute(note, Nexus.NOTE);
 		file.createStringDataset(NAME, name, note);
 		file.createStringDataset(ID, opId, note);
 		file.createStringDataset(DATA, modelJson, note);
