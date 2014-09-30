@@ -30,6 +30,7 @@ import org.python.pydev.debug.newconsole.env.UserCanceledException;
 import org.python.pydev.debug.newconsole.prefs.InteractiveConsolePrefs;
 import org.python.pydev.shared_interactive_console.console.ui.ScriptConsole;
 import org.python.pydev.shared_interactive_console.console.ui.internal.ScriptConsoleViewer;
+import org.python.pydev.ui.pythonpathconf.InterpreterInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,16 +89,30 @@ public class InjectPyDevConsole {
 
 		try {
 			String cmd  = createPythonCommands(console == null, params);
+						
+			InterpreterInfo        info = null;
+			PydevConsoleFactory     pcf = null;
+			PydevConsoleInterpreter pci = null;
 			
-			if (varName!=null && data!=null) cmd = cmd.concat("import numpy\n");
-	        String flat = createFlattenCommands(varName, data);
-            if (flat!=null) cmd = cmd.concat(flat);
-
 			if (console == null) {
-				PydevConsoleFactory pcf = new PydevConsoleFactory();
-				PydevConsoleInterpreter pci = getConsole();
+				pcf = new PydevConsoleFactory();
+				pci = getConsole();
 				if (pci == null) return;
+				info = (InterpreterInfo)pci.getInterpreterInfo();
+			} else {
+				info = (InterpreterInfo)((PydevConsole)console).getInterpreterInfo();
+			}
 
+			if (varName!=null && data!=null) {
+				if (info.executableOrJar!=null && info.executableOrJar.toLowerCase().contains("python")) {
+				    cmd = cmd.concat("import numpy\n");
+				}
+			}
+
+	        String flat = createFlattenCommands(varName, data, info);
+            if (flat!=null) cmd = cmd.concat(flat);
+            
+            if (console == null) {
 				pcf.createConsole(pci, cmd);
 				
 			} else {                
@@ -136,7 +151,7 @@ public class InjectPyDevConsole {
 		} else {
 			this.varName = null;
 			this.data    = null;
-            String cmds  = createFlattenCommands(varName, data);
+            String cmds  = createFlattenCommands(varName, data, (InterpreterInfo)console.getInterpreterInfo());
 			if (cmds!=null) sendCommand(cmds, console);
 		}
 		
@@ -144,7 +159,7 @@ public class InjectPyDevConsole {
 		return false;
 	}
 	
-	private String createFlattenCommands(String varName, IDataset data) {
+	private String createFlattenCommands(String varName, IDataset data, InterpreterInfo info) {
 		
 		if (varName==null || data==null) return null;
 		
@@ -156,7 +171,13 @@ public class InjectPyDevConsole {
 			String flattenedPath = (String)map.get("filename");
 
 			if (flattenedPath!=null) {
-				return varName+" = numpy.load(r'"+flattenedPath+"')\n";
+				if (info.executableOrJar!=null) {
+					if (info.executableOrJar.toLowerCase().contains("python")) {
+					    return varName+" = numpy.load(r'"+flattenedPath+"')\n";
+					} else if (info.executableOrJar.toLowerCase().contains("jython")) {
+						return varName+" = dnp.io.load(r'"+flattenedPath+"')\n";
+					}
+				}
 			}
 		}
 		return null;
