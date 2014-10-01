@@ -8,7 +8,6 @@
  */
 package org.dawb.common.ui.parts;
 
-import org.eclipse.dawnsci.plotting.api.IPlottingContainer;
 import org.eclipse.dawnsci.plotting.api.IPlottingSystem;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPart;
@@ -22,6 +21,7 @@ public class PartUtils {
 	 * @return plotting system (may return null)
 	 */
 	public static IPlottingSystem getPlottingSystem(IWorkbenchPart part) {
+		
 		if (part instanceof MultiPageEditorPart) {
 			MultiPageEditorPart mpp = (MultiPageEditorPart) part;
 			Object page = mpp.getSelectedPage();
@@ -33,12 +33,6 @@ public class PartUtils {
 			}
 		}
 
-		IPlottingSystem system = (IPlottingSystem)part.getAdapter(IPlottingSystem.class);
-		
-		if (system==null && part instanceof IPlottingContainer) {
-			system = ((IPlottingContainer) part).getPlottingSystem();
-		}
-
-		return system;
+		return (IPlottingSystem)part.getAdapter(IPlottingSystem.class);
 	}
 }
