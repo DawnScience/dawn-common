@@ -20,6 +20,7 @@ import org.dawnsci.conversion.converters.CustomNCDConverter;
 import org.dawnsci.conversion.converters.CustomTomoConverter;
 import org.dawnsci.conversion.converters.ImageConverter;
 import org.dawnsci.conversion.converters.ImagesToHDFConverter;
+import org.dawnsci.conversion.converters.ImagesToStitchedConverter;
 import org.dawnsci.conversion.converters.ProcessConversion;
 import org.dawnsci.conversion.converters.VisitorConversion;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -67,6 +68,9 @@ public class ConversionServiceImpl implements IConversionService {
 					break;
 				case TIFF_FROM_3D:
 					deligate = new ImageConverter(context);
+					break;
+				case STITCHED_FROM_IMAGEDIR:
+					deligate = new ImagesToStitchedConverter(context);
 					break;
 				case H5_FROM_IMAGEDIR:
 					deligate = new ImagesToHDFConverter(context);

@@ -88,6 +88,8 @@
                   </enumeration>
                   <enumeration value="TIFF_FROM_3D">
                   </enumeration>
+                  <enumeration value="STITCHED_FROM_IMAGEDIR">
+                  </enumeration>
                   <enumeration value="H5_FROM_IMAGEDIR">
                   </enumeration>
                   <enumeration value="CUSTOM_NCD">

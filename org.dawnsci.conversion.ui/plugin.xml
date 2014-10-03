@@ -84,6 +84,11 @@
             conversion_scheme="TIFF_FROM_3D"
             id="org.dawnsci.conversion.ui.conversionImage">
       </conversion_page>
+     <conversion_page
+            conversion_page="org.dawnsci.conversion.ui.pages.ImagesToStitchedConversionPage"
+            conversion_scheme="STITCHED_FROM_IMAGEDIR"
+            id="org.dawnsci.conversion.ui.conversionStitchedImage">
+      </conversion_page>
       <conversion_page
             conversion_page="org.dawnsci.conversion.ui.pages.TomoConvertPage"
             conversion_scheme="CUSTOM_TOMO"
