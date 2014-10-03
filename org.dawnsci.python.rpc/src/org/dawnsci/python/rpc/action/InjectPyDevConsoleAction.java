@@ -61,9 +61,14 @@ public class InjectPyDevConsoleAction extends Action {
 		data.put(name, value);
 	}
 	
+	/**
+	 * Set the map of datsets which should be avialable once the console is started.
+	 * @param data
+	 */
 	public void setData(Map<String, IDataset> data) {
 		this.data = data;
 	}
+	
 
 	/**
 	 * Set a connection parameter
