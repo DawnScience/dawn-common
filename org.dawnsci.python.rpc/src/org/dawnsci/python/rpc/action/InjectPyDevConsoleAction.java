@@ -1,6 +1,7 @@
 package org.dawnsci.python.rpc.action;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.dawnsci.python.rpc.Activator;
@@ -11,8 +12,7 @@ public class InjectPyDevConsoleAction extends Action {
 
 	private Map<String, String> params;
 	private InjectPyDevConsole injector;
-	private String   name;
-	private IDataset data;
+	private Map<String, IDataset> data;
 
 	public InjectPyDevConsoleAction(String label) {
 		
@@ -33,10 +33,10 @@ public class InjectPyDevConsoleAction extends Action {
 			if (injector==null) {
 				injector = new InjectPyDevConsole(params);
 				// Opens the console if required, including if it was closed.
-				injector.inject(name, data);
+				injector.inject(data);
 				injector.open(true);
 			} else {
-				injector.inject(name, data);
+				injector.inject(data);
 			}
 			
 		} catch (Exception e) {
@@ -49,14 +49,22 @@ public class InjectPyDevConsoleAction extends Action {
 	 * Call this method to manually set the dataset which we should use to 
 	 * send to the console. This data is currently sent using flattening.
 	 * 
+	 * This will clear other datasets already sent. To set more than one
+	 * dataset at once, call setData(Map).
+	 * 
 	 * @param name
 	 * @param data
 	 */
-	public void setData(String name, IDataset data) {
-		this.name = name;
-		this.data = data;
+	public void setData(String name, IDataset value) {
+		if (this.data==null) data = new LinkedHashMap<String, IDataset>();
+		data.clear();
+		data.put(name, value);
 	}
 	
+	public void setData(Map<String, IDataset> data) {
+		this.data = data;
+	}
+
 	/**
 	 * Set a connection parameter
 	 * @param name

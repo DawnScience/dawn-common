@@ -2,6 +2,8 @@ package org.dawnsci.python.rpc.action;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -103,13 +105,13 @@ public class InjectPyDevConsole {
 				info = (InterpreterInfo)((PydevConsole)console).getInterpreterInfo();
 			}
 
-			if (varName!=null && data!=null) {
+			if (data!=null) {
 				if (info.executableOrJar!=null && info.executableOrJar.toLowerCase().contains("python")) {
 				    cmd = cmd.concat("import numpy\n");
 				}
 			}
 
-	        String flat = createFlattenCommands(varName, data, info);
+	        String flat = createFlattenCommands(data, info);
             if (flat!=null) cmd = cmd.concat(flat);
             
             if (console == null) {
@@ -130,8 +132,7 @@ public class InjectPyDevConsole {
 		return;
 	}
 
-	private String   varName;
-	private IDataset data;
+	private Map<String, IDataset> data;
 	/**
 	 * If there is a running console, then the variable are flattened and sent to it,
 	 * if there is no console the variables are assigned and then if a console is started
@@ -141,17 +142,16 @@ public class InjectPyDevConsole {
 	 * @param data
 	 * @return true if inject happened.
 	 */
-	public boolean inject(String varName, IDataset data) throws Exception {
+	public boolean inject(Map<String,IDataset> curData) throws Exception {
 		
 		PydevConsole console = (PydevConsole)getActiveScriptConsole(PydevConsoleConstants.CONSOLE_TYPE);
 		
 		if (console==null || console.getDocument()==null) {
-			this.varName = varName;
-			this.data    = data;
+			data = curData;
+			
 		} else {
-			this.varName = null;
 			this.data    = null;
-            String cmds  = createFlattenCommands(varName, data, (InterpreterInfo)console.getInterpreterInfo());
+            String cmds  = createFlattenCommands(curData, (InterpreterInfo)console.getInterpreterInfo());
 			if (cmds!=null) sendCommand(cmds, console);
 		}
 		
@@ -159,29 +159,58 @@ public class InjectPyDevConsole {
 		return false;
 	}
 	
-	private String createFlattenCommands(String varName, IDataset data, InterpreterInfo info) {
+	private String createFlattenCommands(Map<String, IDataset> data, InterpreterInfo info) {
 		
-		if (varName==null || data==null) return null;
+		if (data==null || data.isEmpty()) return null;
 		
-		Object object = FlatteningService.getFlattener().flatten(data);
-		if (object instanceof Map) {
+		final StringBuilder     buf = new StringBuilder();
+		final List<String> sentData = new ArrayList<String>(3);
+		for (String varName : data.keySet()) {
+			
+			final IDataset set = data.get(varName);
+			Object object = FlatteningService.getFlattener().flatten(set);
+			if (object instanceof Map) {
 
-			final Map<String, Object> map = (Map<String, Object>)object;
+				final Map<String, Object> map = (Map<String, Object>)object;
 
-			String flattenedPath = (String)map.get("filename");
+				String flattenedPath = (String)map.get("filename");
 
-			if (flattenedPath!=null) {
-				if (info.executableOrJar!=null) {
-					if (info.executableOrJar.toLowerCase().contains("python")) {
-					    return varName+" = numpy.load(r'"+flattenedPath+"')\n";
-					} else if (info.executableOrJar.toLowerCase().contains("jython")) {
-						return varName+" = dnp.io.load(r'"+flattenedPath+"')\n";
+				if (flattenedPath!=null) {
+					if (info.executableOrJar!=null) {
+						if (info.executableOrJar.toLowerCase().contains("python")) {
+							buf.append( varName+" = numpy.load(r'"+flattenedPath+"')\n");
+						} else if (info.executableOrJar.toLowerCase().contains("jython")) {
+							buf.append( varName+" = dnp.io.load(r'"+flattenedPath+"')\n");
+						}
+						sentData.add(varName);
 					}
 				}
 			}
 		}
+		
+		// We make a dictionary for them.
+		if (sentData.size()>1) {
+			buf.append("data = "+createDictionaryText(sentData)+"\n");
+		}
+		if (buf.length()>0) return buf.toString();
+		
 		return null;
 
+	}
+
+	private String createDictionaryText(List<String> sentData) {
+		
+		final StringBuilder buf = new StringBuilder("{");
+		for (Iterator<String> iterator = sentData.iterator(); iterator.hasNext();) {
+			String varName = iterator.next();
+			buf.append("'");
+			buf.append(varName);
+			buf.append("' : ");
+			buf.append(varName);
+			if (iterator.hasNext()) buf.append(", ");
+		}
+		buf.append("}");
+		return buf.toString();
 	}
 
 	public boolean isConsoleAvailable() {
