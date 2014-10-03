@@ -1,11 +1,13 @@
 package org.dawnsci.python.rpc.action;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IParameterValues;
@@ -421,5 +423,43 @@ public class InjectPyDevConsole {
 		}
 
 	}
+
+
+	
+	public static String getLegalVarName(String setName) {
+		return getLegalVarName(setName, null);
+	}
+	
+	/**
+	 * Attempts to generate legal variable name. Does not take into account key words.
+	 * @param setName
+	 * @return
+	 * @throws Exception 
+	 */
+	public static String getLegalVarName(String setName, final Collection<String> names) {
+		
+		if (setName.endsWith("/"))   setName = setName.substring(0,setName.length()-1);
+		if (setName.indexOf('/')>-1) setName = setName.substring(setName.lastIndexOf('/'));
+		
+		setName = setName.replaceAll(" ", "_");
+		setName = setName.replaceAll("[^a-zA-Z0-9_]", "");
+		final Matcher matcher = Pattern.compile("(\\d+)(.+)").matcher(setName);
+		if (matcher.matches()) {
+			setName = matcher.group(2);
+		}
+		
+		if (Pattern.compile("(\\d+)").matcher(setName).matches()) {
+			return "data"+setName;
+		}
+		
+		if (names!=null) if (names.contains(setName)) {
+			int i = 1;
+			while(names.contains(setName+i)) i++;
+			setName = setName+i;
+		}
+		
+		return setName;
+	}
+
 
 }
