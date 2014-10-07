@@ -100,6 +100,9 @@ public class ProcessConversion extends AbstractConversion {
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyMMdd_HHmmss") ;
 		String timeStamp = "_" +dateFormat.format(date);
 		String full = outputFolder + File.separator + name + PROCESSED+ timeStamp + EXT;
+		File fh = new File(outputFolder);
+		fh.mkdir();
+		
 		
 		//TODO output path
 		service.executeSeries(rich, context.getMonitor(), info.getExecutionVisitor(full), info.getOperationSeries());
