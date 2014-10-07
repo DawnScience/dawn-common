@@ -9,7 +9,10 @@
 package org.dawnsci.conversion.converters;
 
 import java.io.File;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Map;
 
 import org.dawb.common.services.ServiceManager;
@@ -27,7 +30,8 @@ import uk.ac.diamond.scisoft.analysis.metadata.AxesMetadataImpl;
 public class ProcessConversion extends AbstractConversion {
 
 	IOperationService service;
-	private final static String PROCESSED = "_processed.nxs";
+	private final static String PROCESSED = "_processed";
+	private final static String EXT= ".nxs";
 	
 	public ProcessConversion(IConversionContext context) {
 		super(context);
@@ -60,7 +64,7 @@ public class ProcessConversion extends AbstractConversion {
 					IDataHolder dataHolder = LoaderFactory.getData(context.getSelectedConversionFile().getAbsolutePath());
 					ILazyDataset lazyDataset = dataHolder.getLazyDataset(axesName);
 					if (lazyDataset != null && lazyDataset.getRank() != lz.getRank()) {
-						lazyDataset = lazyDataset.getSliceView();
+						lazyDataset = lazyDataset.getSlice();
 						int[] shape = new int[lz.getRank()];
 						Arrays.fill(shape, 1);
 						shape[key-1]= lazyDataset.getShape()[0];
@@ -92,7 +96,10 @@ public class ProcessConversion extends AbstractConversion {
 		
 		String name = getFileNameNoExtension(context.getSelectedConversionFile());
 		String outputFolder = context.getOutputPath();
-		String full = outputFolder + File.separator + name + PROCESSED;
+		Date date = new Date() ;
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyMMdd_HHmmss") ;
+		String timeStamp = "_" +dateFormat.format(date);
+		String full = outputFolder + File.separator + name + PROCESSED+ timeStamp + EXT;
 		
 		//TODO output path
 		service.executeSeries(rich, context.getMonitor(), info.getExecutionVisitor(full), info.getOperationSeries());

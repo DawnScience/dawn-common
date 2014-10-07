@@ -35,6 +35,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
 import org.eclipse.dawnsci.analysis.api.metadata.IMetadata;
+import org.eclipse.dawnsci.analysis.dataset.impl.AbstractDataset;
 import org.eclipse.dawnsci.plotting.api.expressions.IExpressionObject;
 import org.eclipse.dawnsci.plotting.api.expressions.IExpressionObjectService;
 import org.eclipse.emf.common.ui.dialogs.WorkspaceResourceDialog;
@@ -466,8 +467,10 @@ public class ResourceChoosePage extends WizardPage {
 		final IMetadata        meta   = LoaderFactory.getMetadata(source, new ProgressMonitorWrapper(monitor));
         final List<String>     names  = new ArrayList<String>(7);
         if (meta!=null) for (String name : meta.getDataShapes().keySet()) {
-			final int[] shape = meta.getDataShapes().get(name);
+			int[] shape = meta.getDataShapes().get(name);
 			if (shape != null) {
+				//squeeze to get usable rank
+				shape = AbstractDataset.squeezeShape(shape, false);
 				if (scheme!=null && scheme.isRankSupported(shape.length)) {
 					names.add(name);
 				} else if (visitor!=null && visitor.isRankSupported(shape.length)) {
@@ -477,9 +480,15 @@ public class ResourceChoosePage extends WizardPage {
 		}
        
         // Add names from image stacks.
+        // Check not added ignored ranks from earlier
 		final IDataHolder  dataHolder = LoaderFactory.getData(source, true, true, new ProgressMonitorWrapper(monitor));
         if (dataHolder!=null) for (String name : dataHolder.getNames()) {
-			if (!names.contains(name)) names.add(name);
+			if (!names.contains(name)) {
+				if (meta == null || !meta.getDataShapes().keySet().contains(name)) {
+					names.add(name);
+				}
+				
+			}
 		}
         
         // Process any expressions

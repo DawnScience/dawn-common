@@ -44,7 +44,7 @@ public interface IConversionContext {
 		CUSTOM_NCD(" ascii from NCD data",     true, 2,3,4,5,6),
 		CUSTOM_TOMO(" tiff from tomography nexus file(s) [nxtomo]",    true, 3),
 		COMPARE(" compare data",    true,  false, 0,1,2,3,4,5),
-		PROCESS(" process data", false, true, 2,3,4,5);
+		PROCESS(" process data", false, true, 1,2,3,4,5);
 		
 		private final String  uiLabel;
 		private final int[]   preferredRanks;
