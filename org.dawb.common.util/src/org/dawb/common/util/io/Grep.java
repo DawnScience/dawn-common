@@ -62,6 +62,20 @@ public class Grep {
      * @throws Exception
      */
     public static List<CharSequence> grep(final File toSearch, 
+								          final String regExp) throws Exception {
+    	
+        return grep(new FileInputStream(toSearch), regExp, "UTF-8");
+    }
+
+    /**
+     * 
+     * @param toSearch
+     * @param regExp
+     * @param charsetText
+     * @return
+     * @throws Exception
+     */
+    public static List<CharSequence> grep(final File toSearch, 
 								          final String regExp,
 								          final String charsetText) throws Exception {
     	
