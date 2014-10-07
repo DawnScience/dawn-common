@@ -43,20 +43,23 @@ public class BoofCVImageStitchingImpl implements IImageStitchingProcess {
 
 	@Override
 	public IDataset stitch(List<IDataset> input) {
-		return stitch(input, 6);
+		return stitch(input, 3, 3, -49);
 	}
 
 	@Override
-	public IDataset stitch(List<IDataset> input, int matrixSize) {
+	public IDataset stitch(List<IDataset> input, int rows, int columns, double angle) {
 
-		IDataset[][] images = ImagePreprocessing.ListToArray(input, matrixSize);
+		IDataset[][] images = ImagePreprocessing.ListToArray(input, rows, columns);
 		List<List<ImageFloat32>> inputImages = new ArrayList<List<ImageFloat32>>();
+//		List<List<ImageSInt16>> inputImages = new ArrayList<List<ImageSInt16>>();
 
 		for (int i = 0; i < images.length; i++) {
 			inputImages.add(new ArrayList<ImageFloat32>());
+
 			for (int j = 0; j < images[0].length; j++) {
-				images[i][j] = ImagePreprocessing.rotateAndCrop(images[i][j], -49);
+				images[i][j] = ImagePreprocessing.rotateAndCrop(images[i][j], angle);
 				ImageFloat32 image = ConvertIDataset.convertFrom(images[i][j], ImageFloat32.class, 1);
+
 //				IPeemMetadata md = (IPeemMetadata)images[i][j].getMetadata(IPeemMetadata.class);
 //				ImageAndMetadata imageAndMd = new ImageAndMetadata(image, md);
 				inputImages.get(i).add(image);

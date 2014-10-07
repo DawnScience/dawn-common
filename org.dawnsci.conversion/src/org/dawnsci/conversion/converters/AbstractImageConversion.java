@@ -120,7 +120,7 @@ public abstract class AbstractImageConversion extends AbstractConversion {
 		return slice;
 	}
 	
-	protected Enum getSliceType() {
+	protected Enum<?> getSliceType() {
 		if (context.getUserObject()==null) return null;
         return ((ConversionInfoBean)context.getUserObject()).getSliceType();
 	}
@@ -138,9 +138,9 @@ public abstract class AbstractImageConversion extends AbstractConversion {
 	 * @author Matthew Gerring
 	 *
 	 */
-	public static final class ConversionInfoBean {
+	public static class ConversionInfoBean {
 		
-		private Enum sliceType=PlotType.IMAGE;
+		private Enum<?> sliceType=PlotType.IMAGE;
 		private int frameRate = 20;
 		private ImageServiceBean imageServiceBean;
 		private int downsampleBin=1;
@@ -275,10 +275,10 @@ public abstract class AbstractImageConversion extends AbstractConversion {
 		public void setSliceIndexFormat(String sliceIndexFormat) {
 			this.sliceIndexFormat = sliceIndexFormat;
 		}
-		public Enum getSliceType() {
+		public Enum<?> getSliceType() {
 			return sliceType;
 		}
-		public void setSliceType(Enum sliceType) {
+		public void setSliceType(Enum<?> sliceType) {
 			this.sliceType = sliceType;
 		}
 		public boolean isAlwaysShowTitle() {

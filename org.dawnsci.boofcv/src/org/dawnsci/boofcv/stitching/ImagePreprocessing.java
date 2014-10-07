@@ -42,8 +42,8 @@ public class ImagePreprocessing {
 	}
 
 	public static IDataset rotateAndCrop(IDataset image, double angle) {
-		double angleFromMeta = 0;
 		//TODO use metadata
+//		double angleFromMeta = 0;
 //		try {
 //			angleFromMeta = ((IPeemMetadata)image.getMetadata(IPeemMetadata.class)).getRotation();
 //		} catch (Exception e) {
@@ -63,14 +63,14 @@ public class ImagePreprocessing {
 
 		// find the top left corner of the largest square within the rotated
 		// circle
-		rotateTranslation(translation, Math.toRadians(angleFromMeta));
+		rotateTranslation(translation, Math.toRadians(angle));
 		// find its position relative to the top left corner of the image
 		int useablex = (int) (image.getShape()[0] / 2 - translation[0]);
 		int useabley = (int) (image.getShape()[1] / 2 - translation[1]);
 
 		// rotate image
 		MapToRotatedCartesian rotator = new MapToRotatedCartesian(useablex,
-				useabley, width, height, angleFromMeta);
+				useabley, width, height, angle);
 		List<Dataset> rotated = rotator.value(image);
 
 		return rotated.get(0);
@@ -79,13 +79,12 @@ public class ImagePreprocessing {
 	/**
 	 * 
 	 * @param input
-	 * @param matrixSize
+	 * @param rows
+	 * @param columns
 	 * @return Ordered array of Dataset
 	 * @throws Exception
 	 */
-	public static IDataset[][] ListToArray(List<IDataset> input, int matrixSize) {
-		int rows = matrixSize;
-		int columns = matrixSize;
+	public static IDataset[][] ListToArray(List<IDataset> input, int rows, int columns) {
 		IDataset[][] images = new Dataset[rows][columns];
 		for (int i = 0; i < rows; i++) {
 			for(int j = 0; j < columns; j++) {

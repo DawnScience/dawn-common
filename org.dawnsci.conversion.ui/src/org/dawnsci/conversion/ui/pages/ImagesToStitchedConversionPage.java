@@ -13,10 +13,20 @@ import java.io.File;
 import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.ui.wizard.ResourceChoosePage;
 import org.dawb.common.util.io.FileUtils;
+import org.dawnsci.conversion.converters.ImagesToStitchedConverter.ConversionStitchedBean;
 import org.dawnsci.conversion.ui.IConversionWizardPage;
+import org.eclipse.nebula.widgets.formattedtext.FormattedText;
+import org.eclipse.nebula.widgets.formattedtext.NumberFormatter;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Spinner;
 
 /**
- * TODO add UI spinners and other UI widget to set necessary parameters
+ * 
+ * 
  * @author wqk87977
  *
  */
@@ -24,6 +34,9 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 		implements IConversionWizardPage {
 
 	private IConversionContext context;
+	private Spinner rowsSpinner;
+	private Spinner columnsSpinner;
+	private FormattedText angleText;
 
 	public ImagesToStitchedConversionPage() {
 		super("Convert image directory", null, null);
@@ -37,10 +50,58 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 
 	@Override
 	public IConversionContext getContext() {
+		if (context == null)
+			return null;
 		context.setOutputPath(getAbsoluteFilePath());
 		final File dir = new File(getSourcePath(context)).getParentFile();
 		context.setWorkSize(dir.list().length);
+
+		final ConversionStitchedBean bean = new ConversionStitchedBean();
+		bean.setRows(rowsSpinner.getSelection());
+		bean.setColumns(columnsSpinner.getSelection());
+		Object val = angleText.getValue();
+		if (val instanceof Long)
+			bean.setAngle((Long)val);
+		else if (val instanceof Double)
+			bean.setAngle((Double)val);
+		context.setUserObject(bean);
+		
 		return context;
+	}
+
+	@Override
+	protected void createContentAfterFileChoose(Composite container) {
+		Composite comp = new Composite(container, SWT.NONE);
+		comp.setLayout(new GridLayout(6, false));
+		comp.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 4, 1));
+
+		final Label labelRow = new Label(comp, SWT.NONE);
+		labelRow.setText("Rows");
+		labelRow.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
+		rowsSpinner = new Spinner(comp, SWT.BORDER);
+		rowsSpinner.setMinimum(1);
+		rowsSpinner.setSelection(3);
+		rowsSpinner.setToolTipText("Number of rows for the resulting stitched image");
+		rowsSpinner.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+		final Label labelColumn = new Label(comp, SWT.NONE);
+		labelColumn.setText("Columns");
+		labelColumn.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
+		columnsSpinner = new Spinner(comp, SWT.BORDER);
+		columnsSpinner.setMinimum(1);
+		columnsSpinner.setSelection(3);
+		columnsSpinner.setToolTipText("Number of columns for the resulting stitched image");
+		columnsSpinner.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+		
+		final Label labelAngle = new Label(comp, SWT.NONE);
+		labelAngle.setText("Angle");
+		labelAngle.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
+		angleText = new FormattedText(comp, SWT.BORDER);
+		NumberFormatter formatter = new NumberFormatter("-##0.0");
+		formatter.setFixedLengths(false, true);
+		angleText.setFormatter(formatter);
+		angleText.setValue(new Double(-49.0));
+		angleText.getControl().setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+
 	}
 
 	@Override
@@ -56,8 +117,7 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 		}
 
 		final File dir = new File(getSourcePath(context)).getParentFile();
-		setPath(FileUtils.getUnique(dir, "StitchedImage", "tif")
-				.getAbsolutePath());
+		setPath(FileUtils.getUnique(dir, "StitchedImage", "tif").getAbsolutePath());
 
 	}
 
