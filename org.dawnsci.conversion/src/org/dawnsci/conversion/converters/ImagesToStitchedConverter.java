@@ -65,10 +65,10 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 		}
 
 		List<String> paths = context.getFilePaths();
-
 		imageStack.add(slice);
 
 		if (imageStack.size() == paths.size()) {
+			String outputPath = context.getOutputPath();
 			ConversionStitchedBean conversionBean = (ConversionStitchedBean)context.getUserObject();
 			int rows = conversionBean.getRows();
 			int columns = conversionBean.getColumns();
@@ -76,10 +76,10 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 			createImageStitcher();
 			IDataset stitched = stitcher.stitch(imageStack, rows, columns, angle);
 			stitched.setName("stitched");
-			final File sliceFile = new File(getFilePath(stitched));
+			final File outputFile = new File(outputPath);
 
-			if (!sliceFile.getParentFile().exists())
-				sliceFile.getParentFile().mkdirs();
+			if (!outputFile.getParentFile().exists())
+				outputFile.getParentFile().mkdirs();
 
 			// JavaImageSaver likes 33 but users don't
 			int bits = getBits();
@@ -87,10 +87,10 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 				bits = 33;
 
 			final JavaImageSaver saver = new JavaImageSaver(
-					sliceFile.getAbsolutePath(), getExtension(), bits, true);
+					outputFile.getAbsolutePath(), getExtension(), bits, true);
 			final DataHolder dh = new DataHolder();
 			dh.addDataset(stitched.getName(), stitched);
-			dh.setFilePath(sliceFile.getAbsolutePath());
+			dh.setFilePath(outputFile.getAbsolutePath());
 			saver.saveFile(dh);
 		}
 		if (context.getMonitor() != null)
