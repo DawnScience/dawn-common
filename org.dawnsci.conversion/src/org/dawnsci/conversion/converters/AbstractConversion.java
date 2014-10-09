@@ -187,6 +187,8 @@ public abstract class AbstractConversion {
 
 			@Override
 			public void visit(IDataset slice, Slice[] slices, int[] shape) throws Exception {
+				//no longer squeeze in slicer
+				slice.squeeze();
 				context.setSelectedSlice(slices);
 				context.setSelectedShape(shape);
 				convert(slice);
