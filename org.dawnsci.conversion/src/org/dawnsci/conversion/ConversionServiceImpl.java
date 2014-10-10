@@ -50,53 +50,53 @@ public class ConversionServiceImpl implements IConversionService {
 
 	@Override
 	public void process(IConversionContext context) throws Exception {
-		AbstractConversion deligate=null;
+		AbstractConversion delegate=null;
 		try {
 			if (context.getConversionVisitor()!=null) {
-				deligate = new VisitorConversion(context);
+				delegate = new VisitorConversion(context);
 			}
-			if (deligate==null) {
+			if (delegate==null) {
 				switch(context.getConversionScheme()) {
 				case ASCII_FROM_2D:
-					deligate = new AsciiConvert2D(context);
+					delegate = new AsciiConvert2D(context);
 					break;
 				case ASCII_FROM_1D:
-					deligate = new AsciiConvert1D(context);
+					delegate = new AsciiConvert1D(context);
 					break;
 				case CUSTOM_NCD:
-					deligate = new CustomNCDConverter(context);
+					delegate = new CustomNCDConverter(context);
 					break;
 				case TIFF_FROM_3D:
-					deligate = new ImageConverter(context);
+					delegate = new ImageConverter(context);
 					break;
 				case STITCHED_FROM_IMAGEDIR:
-					deligate = new ImagesToStitchedConverter(context);
+					delegate = new ImagesToStitchedConverter(context);
 					break;
 				case H5_FROM_IMAGEDIR:
-					deligate = new ImagesToHDFConverter(context);
+					delegate = new ImagesToHDFConverter(context);
 					break;
 				case AVI_FROM_3D:
-					deligate = new AVIImageConverter(context);
+					delegate = new AVIImageConverter(context);
 					break;
 				case CUSTOM_TOMO:
-					deligate = new CustomTomoConverter(context);
+					delegate = new CustomTomoConverter(context);
 					break;
 				case H5_FROM_1D:
-					deligate = new Convert1DtoND(context);
+					delegate = new Convert1DtoND(context);
 					break;
 				case COMPARE:
-					deligate = new CompareConverter(context);
+					delegate = new CompareConverter(context);
 					break;
 				case PROCESS:
-					deligate = new ProcessConversion(context);
+					delegate = new ProcessConversion(context);
 					break;
 				default:
 					throw new Exception("No conversion for "+context.getConversionScheme());
 				}
 			}
-			deligate.process(context);
+			delegate.process(context);
 		} finally {
-			if (deligate!=null) deligate.close(context);
+			if (delegate!=null) delegate.close(context);
 		}
 	}
 
