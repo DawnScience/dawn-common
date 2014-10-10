@@ -45,7 +45,7 @@ public class BoofCVImageStitchingImpl implements IImageStitchingProcess {
 
 	@Override
 	public IDataset stitch(List<IDataset> input) {
-		return stitch(input, 3, 3, -49);
+		return stitch(input, 1, 6, 49);
 	}
 
 	@Override

@@ -15,14 +15,25 @@ import org.dawb.common.ui.wizard.ResourceChoosePage;
 import org.dawb.common.util.io.FileUtils;
 import org.dawnsci.conversion.converters.ImagesToStitchedConverter.ConversionStitchedBean;
 import org.dawnsci.conversion.ui.IConversionWizardPage;
+import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
+import org.eclipse.dawnsci.analysis.dataset.impl.DoubleDataset;
+import org.eclipse.dawnsci.plotting.api.IPlottingSystem;
+import org.eclipse.dawnsci.plotting.api.PlotType;
+import org.eclipse.dawnsci.plotting.api.PlottingFactory;
 import org.eclipse.nebula.widgets.formattedtext.FormattedText;
 import org.eclipse.nebula.widgets.formattedtext.NumberFormatter;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
+import org.eclipse.ui.forms.events.ExpansionAdapter;
+import org.eclipse.ui.forms.events.ExpansionEvent;
+import org.eclipse.ui.forms.widgets.ExpandableComposite;
 
 /**
  * 
@@ -37,6 +48,10 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 	private Spinner rowsSpinner;
 	private Spinner columnsSpinner;
 	private FormattedText angleText;
+	private boolean hasCropping = false;
+	private ExpandableComposite plotExpandComp;
+	private IPlottingSystem plotSystem;
+	private Composite container;
 
 	public ImagesToStitchedConversionPage() {
 		super("Convert image directory", null, null);
@@ -65,43 +80,98 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 		else if (val instanceof Double)
 			bean.setAngle((Double)val);
 		context.setUserObject(bean);
-		
+
+		ILazyDataset lazy = context.getLazyDataset();
+
 		return context;
 	}
 
 	@Override
 	protected void createContentAfterFileChoose(Composite container) {
-		Composite comp = new Composite(container, SWT.NONE);
-		comp.setLayout(new GridLayout(6, false));
-		comp.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 4, 1));
+		this.container = container;
+		Composite controlComp = new Composite(container, SWT.NONE);
+		controlComp.setLayout(new GridLayout(7, false));
+		controlComp.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 4, 1));
 
-		final Label labelRow = new Label(comp, SWT.NONE);
+		final Label labelRow = new Label(controlComp, SWT.NONE);
 		labelRow.setText("Rows");
 		labelRow.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
-		rowsSpinner = new Spinner(comp, SWT.BORDER);
+		rowsSpinner = new Spinner(controlComp, SWT.BORDER);
 		rowsSpinner.setMinimum(1);
 		rowsSpinner.setSelection(3);
 		rowsSpinner.setToolTipText("Number of rows for the resulting stitched image");
 		rowsSpinner.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-		final Label labelColumn = new Label(comp, SWT.NONE);
+		final Label labelColumn = new Label(controlComp, SWT.NONE);
 		labelColumn.setText("Columns");
 		labelColumn.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
-		columnsSpinner = new Spinner(comp, SWT.BORDER);
+		columnsSpinner = new Spinner(controlComp, SWT.BORDER);
 		columnsSpinner.setMinimum(1);
 		columnsSpinner.setSelection(3);
 		columnsSpinner.setToolTipText("Number of columns for the resulting stitched image");
 		columnsSpinner.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 		
-		final Label labelAngle = new Label(comp, SWT.NONE);
+		final Label labelAngle = new Label(controlComp, SWT.NONE);
 		labelAngle.setText("Angle");
 		labelAngle.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
-		angleText = new FormattedText(comp, SWT.BORDER);
+		angleText = new FormattedText(controlComp, SWT.BORDER);
 		NumberFormatter formatter = new NumberFormatter("-##0.0");
 		formatter.setFixedLengths(false, true);
 		angleText.setFormatter(formatter);
 		angleText.setValue(new Double(-49.0));
 		angleText.getControl().setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
+		final Button croppingButton = new Button(controlComp, SWT.CHECK);
+		croppingButton.setText("Crop selected images");
+		croppingButton.setSelection(hasCropping);
+		croppingButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				hasCropping = croppingButton.getSelection();
+				plotExpandComp.setEnabled(hasCropping);
+				plotExpandComp.setExpanded(hasCropping);
+			}
+		});
+
+		// create plot system in expandable composite
+		plotExpandComp = new ExpandableComposite(container, SWT.NONE);
+		plotExpandComp.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 4, 1));
+		plotExpandComp.setLayout(new GridLayout(1, false));
+		plotExpandComp.setText("Pre-process Plot");
+		plotExpandComp.setEnabled(hasCropping);
+
+		Composite plotComp = new Composite(plotExpandComp, SWT.NONE);
+		plotComp.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		plotComp.setLayout(new GridLayout(1, false));
+
+		try {
+			plotSystem = PlottingFactory.createPlottingSystem();
+			plotSystem.createPlotPart(plotComp, "Preprocess", null, PlotType.IMAGE, null);
+			plotSystem.getPlotComposite().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+//			plotSystem.createPlot2D(new DoubleDataset(), null, null);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		plotExpandComp.setClient(plotComp);
+		plotExpandComp.addExpansionListener(createExpansionAdapter());
+		plotExpandComp.setExpanded(hasCropping);
+
+
+	}
+
+	private ExpansionAdapter createExpansionAdapter() {
+		return new ExpansionAdapter() {
+			@Override
+			public void expansionStateChanged(ExpansionEvent e) {
+				container.layout();
+//				logger.trace("regionsExpander");
+//				Rectangle r = scrollComposite.getClientArea();
+//				scrollComposite.setMinSize(contentComposite.computeSize(
+//						r.width, SWT.DEFAULT));
+//				contentComposite.layout();
+			}
+		};
 	}
 
 	@Override
