@@ -19,6 +19,8 @@ import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.feature.detect.interest.ConfigFastHessian;
+import boofcv.alg.distort.DistortImageOps;
+import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.struct.image.ImageFloat32;
@@ -48,21 +50,25 @@ public class BoofCVImageStitchingImpl implements IImageStitchingProcess {
 
 	@Override
 	public IDataset stitch(List<IDataset> input, int rows, int columns, double angle) {
+		return stitch(input, rows, columns, angle, new int[] {478, 478}, 20);
+	}
+
+	public IDataset stitch(List<IDataset> input, int rows, int columns, double angle, int[] diameters, int buffer) {
 
 		IDataset[][] images = ImagePreprocessing.ListToArray(input, rows, columns);
 		List<List<ImageFloat32>> inputImages = new ArrayList<List<ImageFloat32>>();
-//		List<List<ImageSInt16>> inputImages = new ArrayList<List<ImageSInt16>>();
 
 		for (int i = 0; i < images.length; i++) {
 			inputImages.add(new ArrayList<ImageFloat32>());
-
 			for (int j = 0; j < images[0].length; j++) {
-				images[i][j] = ImagePreprocessing.rotateAndCrop(images[i][j], angle);
 				ImageFloat32 image = ConvertIDataset.convertFrom(images[i][j], ImageFloat32.class, 1);
+				ImageFloat32 rotated = new ImageFloat32(image.height, image.width);
 
+				DistortImageOps.rotate(image, rotated, TypeInterpolate.BILINEAR, (float)Math.toRadians(angle));
+				ImageFloat32 cropped = ImagePreprocessing.maxRectangleFromEllipticalImage(rotated, diameters[0], diameters[1], buffer);
 //				IPeemMetadata md = (IPeemMetadata)images[i][j].getMetadata(IPeemMetadata.class);
 //				ImageAndMetadata imageAndMd = new ImageAndMetadata(image, md);
-				inputImages.get(i).add(image);
+				inputImages.get(i).add(cropped);
 			}
 		}
 		Class<ImageFloat32> imageType = ImageFloat32.class;

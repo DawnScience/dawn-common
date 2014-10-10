@@ -12,68 +12,45 @@ import java.util.List;
 
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.dataset.impl.Dataset;
-import org.eclipse.dawnsci.analysis.dataset.impl.function.MapToRotatedCartesian;
+
+import boofcv.struct.image.ImageBase;
 
 /**
+ * Static methods used to pre-process the images
  * 
- * @authors Alex Andrassy, Baha El-Kassaby
+ * @authors Baha El-Kassaby
  *
  */
 public class ImagePreprocessing {
 
-	private static int xdiameter = 478;
-	private static int ydiameter = 472;
-	private static int  buffer = 10;
-
-	public static void rotateTranslation(double[] translation, double angle) {
-		/*
-		 * x2 = x1costheta + y1sintheta y2 = -x1sintheta + y1costheta
-		 */
-		// calculates the horizontal and vertical components of the given translation
-		double x1Horizontal = translation[0] * Math.cos(angle);
-		double x1Vertical = translation[0] * Math.sin(angle);
-		double y1Horizontal = translation[1] * Math.sin(angle);
-		double y1Vertical = translation[1] * Math.cos(angle);
-
-		// calculates the total horizontal and vertical translations
-		translation[0] = x1Horizontal + y1Horizontal;
-		translation[1] = y1Vertical - x1Vertical;
-		
-	}
-
-	public static IDataset rotateAndCrop(IDataset image, double angle) {
-		//TODO use metadata
-//		double angleFromMeta = 0;
-//		try {
-//			angleFromMeta = ((IPeemMetadata)image.getMetadata(IPeemMetadata.class)).getRotation();
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		};
-		// set dimensions of returned image
-		int width = (int) (xdiameter * Math.cos(Math.PI / 4) - buffer);
-		int height = (int) (ydiameter * Math.cos(Math.PI / 4) - buffer);
+	/**
+	 * Image cropped is a rectangle inside of the circular image
+	 * 
+	 * if centre of ellipse is (0, 0) then (x, y) = (a/sqrt(2), b/sqrt(2)) where a = xdiameter/2 and b = ydiameter/2<br>
+	 * With origin of image being top left of the image, (x, y) the top left corner of the rectangle becomes
+	 * (buffer + (a * (sqrt(2)-1)/sqrt(2) , buffer + (b * (sqrt(2)-1)/sqrt(2))
+	 * and width = 2*a/sqrt(2) and height = 2*b/sqrt(2)
+	 * 
+	 * @param image
+	 * @param xdiameter
+	 * @param ydiameter
+	 * @param buffer
+	 * @return
+	 */
+	public static <T extends ImageBase<?>> T maxRectangleFromEllipticalImage(T image, int xdiameter, int ydiameter, int buffer) {
+		// maximum rectangle dimension
+		int a = xdiameter / 2;
+		int b = ydiameter / 2;
+		int width = (int) (xdiameter / Math.sqrt(2));
+		int height = (int) (ydiameter / Math.sqrt(2));
 
 		// find the top left corner of the largest square within the circle
-		int cornerx = (image.getShape()[0] - width) / 2;
-		int cornery = ((image.getShape()[1] - height) / 2);
-		// find its position relative to the centre
-		double[] translation = new double[2];
-		translation[0] = image.getShape()[0] / 2 - cornerx;
-		translation[1] = image.getShape()[1] / 2 - cornery;
+		int cornerx = (int) (buffer + (a * (Math.sqrt(2)-1)/Math.sqrt(2)));
+		int cornery = (int) (buffer + (b * (Math.sqrt(2)-1)/Math.sqrt(2)));
 
-		// find the top left corner of the largest square within the rotated
-		// circle
-		rotateTranslation(translation, Math.toRadians(angle));
-		// find its position relative to the top left corner of the image
-		int useablex = (int) (image.getShape()[0] / 2 - translation[0]);
-		int useabley = (int) (image.getShape()[1] / 2 - translation[1]);
-
-		// rotate image
-		MapToRotatedCartesian rotator = new MapToRotatedCartesian(useablex,
-				useabley, width, height, angle);
-		List<Dataset> rotated = rotator.value(image);
-
-		return rotated.get(0);
+		T cropped = (T) image.subimage(cornerx, cornery, cornerx + width, cornery + height, null);
+		T result = (T) cropped.clone();
+		return result;
 	}
 
 	/**
