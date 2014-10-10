@@ -15,8 +15,6 @@ import org.dawb.common.ui.wizard.ResourceChoosePage;
 import org.dawb.common.util.io.FileUtils;
 import org.dawnsci.conversion.converters.ImagesToStitchedConverter.ConversionStitchedBean;
 import org.dawnsci.conversion.ui.IConversionWizardPage;
-import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
-import org.eclipse.dawnsci.analysis.dataset.impl.DoubleDataset;
 import org.eclipse.dawnsci.plotting.api.IPlottingSystem;
 import org.eclipse.dawnsci.plotting.api.PlotType;
 import org.eclipse.dawnsci.plotting.api.PlottingFactory;
@@ -81,7 +79,7 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 			bean.setAngle((Double)val);
 		context.setUserObject(bean);
 
-		ILazyDataset lazy = context.getLazyDataset();
+//		ILazyDataset lazy = context.getLazyDataset();
 
 		return context;
 	}
