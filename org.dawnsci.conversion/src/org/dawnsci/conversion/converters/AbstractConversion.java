@@ -20,7 +20,6 @@ import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.Slice;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
-import org.eclipse.dawnsci.analysis.api.monitor.IMonitor;
 import org.eclipse.dawnsci.analysis.api.slice.SliceVisitor;
 import org.eclipse.dawnsci.analysis.api.slice.Slicer;
 import org.eclipse.dawnsci.analysis.dataset.impl.ByteDataset;
@@ -124,7 +123,7 @@ public abstract class AbstractConversion {
 		// if there is a lazydataset, we return it
 		ILazyDataset lazy = context.getLazyDataset();
 		if (lazy != null)
-			return context.getLazyDataset();
+			return lazy;
 
 		final IDataHolder   dh = LoaderFactory.getData(path.getAbsolutePath());
 		context.setSelectedH5Path(dsPath);
