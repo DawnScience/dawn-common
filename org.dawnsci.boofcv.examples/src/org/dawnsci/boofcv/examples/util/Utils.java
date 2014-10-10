@@ -48,7 +48,7 @@ public class Utils {
 	}
 
 	/**
-	 * Loads images given a List of paths and returns them as a List of abstractdataset
+	 * Loads images given a List of paths and returns them as a List of dataset
 	 * @param names
 	 * @param progressMonitorWrapper
 	 * @param pngMode
