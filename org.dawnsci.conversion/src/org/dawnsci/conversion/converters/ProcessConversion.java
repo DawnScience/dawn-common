@@ -22,7 +22,7 @@ import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
 import org.eclipse.dawnsci.analysis.api.processing.IOperationService;
-import org.eclipse.dawnsci.analysis.api.processing.IRichDataset;
+import org.eclipse.dawnsci.analysis.api.processing.ISliceConfiguration;
 
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 import uk.ac.diamond.scisoft.analysis.metadata.AxesMetadataImpl;
@@ -81,7 +81,7 @@ public class ProcessConversion extends AbstractConversion {
 			}
 		}
 		
-		IRichDataset rich = new IRichDataset() {
+		ISliceConfiguration rich = new ISliceConfiguration() {
 			
 			@Override
 			public Map<Integer, String> getSlicing() {
