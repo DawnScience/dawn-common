@@ -74,7 +74,20 @@ public class BoofCVImageStitchingImpl implements IImageStitchingProcess {
 			inputImages.add(new ArrayList<ImageFloat32>());
 			for (int j = 0; j < images[0].length; j++) {
 				ImageFloat32 image = ConvertIDataset.convertFrom(images[i][j], ImageFloat32.class, 1);
-				ImageFloat32 rotated = new ImageFloat32(image.height, image.width);
+				int width = 0, height = 0;
+				if (hasCropping) {
+					width = image.width;
+					height = image.height;
+				} else {
+					// calculate resulting bounding box
+					width = (int) (image.width
+							* Math.cos(Math.toRadians(angle)) + image.height
+							* Math.sin(Math.toRadians(angle)));
+					height = (int) (image.height
+							* Math.cos(Math.toRadians(angle)) + image.width
+							* Math.sin(Math.toRadians(angle)));
+				}
+				ImageFloat32 rotated = new ImageFloat32(height, width);
 
 				DistortImageOps.rotate(image, rotated, TypeInterpolate.BILINEAR, (float)Math.toRadians(angle));
 				if (hasCropping && roi instanceof EllipticalROI) {
