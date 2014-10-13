@@ -14,6 +14,8 @@ import java.util.List;
 import org.dawnsci.boofcv.converter.ConvertIDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.image.IImageStitchingProcess;
+import org.eclipse.dawnsci.analysis.api.roi.IROI;
+import org.eclipse.dawnsci.analysis.dataset.roi.EllipticalROI;
 
 import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.associate.ScoreAssociation;
@@ -39,6 +41,11 @@ public class BoofCVImageStitchingImpl implements IImageStitchingProcess {
 		System.out.println("Starting BoofCV image Stitching service.");
 	}
 
+	/**
+	 * Region of Interest used for cropping
+	 */
+	private IROI roi;
+
 	public BoofCVImageStitchingImpl() {
 		// Important do nothing here, OSGI may start the service more than once.
 	}
@@ -50,10 +57,15 @@ public class BoofCVImageStitchingImpl implements IImageStitchingProcess {
 
 	@Override
 	public IDataset stitch(List<IDataset> input, int rows, int columns, double angle) {
-		return stitch(input, rows, columns, angle, new int[] {478, 478}, 20);
+		return stitch(input, rows, columns, angle, false);
 	}
 
-	public IDataset stitch(List<IDataset> input, int rows, int columns, double angle, int[] diameters, int buffer) {
+	public IDataset stitch(List<IDataset> input, int rows, int columns, double angle, IROI roi) {
+		this.roi = roi;
+		return stitch(input, rows, columns, angle, true);
+	}
+
+	public IDataset stitch(List<IDataset> input, int rows, int columns, double angle, boolean hasCropping) {
 
 		IDataset[][] images = ImagePreprocessing.ListToArray(input, rows, columns);
 		List<List<ImageFloat32>> inputImages = new ArrayList<List<ImageFloat32>>();
@@ -65,10 +77,14 @@ public class BoofCVImageStitchingImpl implements IImageStitchingProcess {
 				ImageFloat32 rotated = new ImageFloat32(image.height, image.width);
 
 				DistortImageOps.rotate(image, rotated, TypeInterpolate.BILINEAR, (float)Math.toRadians(angle));
-				ImageFloat32 cropped = ImagePreprocessing.maxRectangleFromEllipticalImage(rotated, diameters[0], diameters[1], buffer);
+				if (hasCropping && roi instanceof EllipticalROI) {
+					ImageFloat32 cropped = ImagePreprocessing.maxRectangleFromEllipticalImage(rotated, (EllipticalROI)roi);
+					inputImages.get(i).add(cropped);
+				} else {
+					inputImages.get(i).add(rotated);
+				}
 //				IPeemMetadata md = (IPeemMetadata)images[i][j].getMetadata(IPeemMetadata.class);
 //				ImageAndMetadata imageAndMd = new ImageAndMetadata(image, md);
-				inputImages.get(i).add(cropped);
 			}
 		}
 		Class<ImageFloat32> imageType = ImageFloat32.class;
@@ -87,4 +103,6 @@ public class BoofCVImageStitchingImpl implements IImageStitchingProcess {
 		ImageFloat32 result = stitchObj.stitchFloat32(inputImages);
 		return ConvertIDataset.convertTo(result, true);
 	}
+
+	
 }

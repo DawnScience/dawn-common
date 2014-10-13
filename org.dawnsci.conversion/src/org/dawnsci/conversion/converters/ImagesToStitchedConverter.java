@@ -20,6 +20,7 @@ import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
 import org.eclipse.dawnsci.analysis.api.image.IImageStitchingProcess;
 import org.eclipse.dawnsci.analysis.dataset.impl.Activator;
 import org.eclipse.dawnsci.analysis.dataset.impl.LazyDataset;
+import org.eclipse.dawnsci.plotting.api.region.IRegion;
 
 import uk.ac.diamond.scisoft.analysis.io.DataHolder;
 import uk.ac.diamond.scisoft.analysis.io.ImageStackLoader;
@@ -74,7 +75,13 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 			int columns = conversionBean.getColumns();
 			double angle = conversionBean.getAngle();
 			createImageStitcher();
-			IDataset stitched = stitcher.stitch(imageStack, rows, columns, angle);
+			IDataset stitched = null;
+			IRegion region = conversionBean.getRoi();
+			if (region != null) {
+				stitched = stitcher.stitch(imageStack, rows, columns, angle, region.getROI());
+			} else {
+				stitched = stitcher.stitch(imageStack, rows, columns, angle);
+			}
 			stitched.setName("stitched");
 			final File outputFile = new File(outputPath);
 
@@ -148,6 +155,7 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 		private int rows = 3;
 		private int columns = 3;
 		private double angle = 49;
+		private IRegion region;
 
 		public int getRows() {
 			return rows;
@@ -195,6 +203,12 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 		}
 		public void setAngle(double angle) {
 			this.angle = angle;
+		}
+		public void setRoi(IRegion region) {
+			this.region = region;
+		}
+		public IRegion getRoi() {
+			return region;
 		}
 	}
 }

@@ -12,6 +12,8 @@ import java.util.List;
 
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.dataset.impl.Dataset;
+import org.eclipse.dawnsci.analysis.dataset.roi.EllipticalROI;
+import org.eclipse.dawnsci.analysis.dataset.roi.RectangularROI;
 
 import boofcv.struct.image.ImageBase;
 
@@ -24,6 +26,30 @@ import boofcv.struct.image.ImageBase;
 public class ImagePreprocessing {
 
 	/**
+	 * Image cropped is a rectangle inside of the given ellipse
+	 * 
+	 * @param image
+	 * @param ellipse
+	 * @return
+	 */
+	public static <T extends ImageBase<?>> T maxRectangleFromEllipticalImage(T image, EllipticalROI ellipse) {
+		// TODO make it work for ellipses with non-null angle
+		RectangularROI boundingBox = ellipse.getBounds();
+		double width = boundingBox.getLength(0);
+		double height = boundingBox.getLength(1);
+		int[] center = ellipse.getIntPoint();
+		double majorSemiAxis = ellipse.getSemiAxis(0);
+		double minorSemiAxis = ellipse.getSemiAxis(1);
+		int x = center[0];
+		int y = center[1];
+		if (width >= height) {
+			return maxRectangleFromEllipticalImage(image, majorSemiAxis * 2, minorSemiAxis *2, (int)(x - majorSemiAxis), (int)(y - minorSemiAxis));
+		} else {
+			return maxRectangleFromEllipticalImage(image, minorSemiAxis * 2, majorSemiAxis * 2, (int)(x - minorSemiAxis), (int)(y - majorSemiAxis));
+		}
+	}
+
+	/**
 	 * Image cropped is a rectangle inside of the circular image
 	 * 
 	 * if centre of ellipse is (0, 0) then (x, y) = (a/sqrt(2), b/sqrt(2)) where a = xdiameter/2 and b = ydiameter/2<br>
@@ -34,19 +60,20 @@ public class ImagePreprocessing {
 	 * @param image
 	 * @param xdiameter
 	 * @param ydiameter
-	 * @param buffer
+	 * @param xbuffer
+	 * @param ybuffer
 	 * @return
 	 */
-	public static <T extends ImageBase<?>> T maxRectangleFromEllipticalImage(T image, int xdiameter, int ydiameter, int buffer) {
+	public static <T extends ImageBase<?>> T maxRectangleFromEllipticalImage(T image, double xdiameter, double ydiameter, int xbuffer, int ybuffer) {
 		// maximum rectangle dimension
-		int a = xdiameter / 2;
-		int b = ydiameter / 2;
+		double a = xdiameter / 2;
+		double b = ydiameter / 2;
 		int width = (int) (xdiameter / Math.sqrt(2));
 		int height = (int) (ydiameter / Math.sqrt(2));
 
 		// find the top left corner of the largest square within the circle
-		int cornerx = (int) (buffer + (a * (Math.sqrt(2)-1)/Math.sqrt(2)));
-		int cornery = (int) (buffer + (b * (Math.sqrt(2)-1)/Math.sqrt(2)));
+		int cornerx = (int) (xbuffer + (a * (Math.sqrt(2)-1)/Math.sqrt(2)));
+		int cornery = (int) (ybuffer + (b * (Math.sqrt(2)-1)/Math.sqrt(2)));
 
 		T cropped = (T) image.subimage(cornerx, cornery, cornerx + width, cornery + height, null);
 		T result = (T) cropped.clone();

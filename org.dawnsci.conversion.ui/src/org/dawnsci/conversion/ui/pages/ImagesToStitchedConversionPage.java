@@ -15,9 +15,16 @@ import org.dawb.common.ui.wizard.ResourceChoosePage;
 import org.dawb.common.util.io.FileUtils;
 import org.dawnsci.conversion.converters.ImagesToStitchedConverter.ConversionStitchedBean;
 import org.dawnsci.conversion.ui.IConversionWizardPage;
+import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
+import org.eclipse.dawnsci.analysis.api.image.IImageTransform;
+import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
+import org.eclipse.dawnsci.analysis.dataset.impl.Activator;
+import org.eclipse.dawnsci.analysis.dataset.roi.EllipticalROI;
 import org.eclipse.dawnsci.plotting.api.IPlottingSystem;
 import org.eclipse.dawnsci.plotting.api.PlotType;
 import org.eclipse.dawnsci.plotting.api.PlottingFactory;
+import org.eclipse.dawnsci.plotting.api.region.IRegion;
+import org.eclipse.dawnsci.plotting.api.region.IRegion.RegionType;
 import org.eclipse.nebula.widgets.formattedtext.FormattedText;
 import org.eclipse.nebula.widgets.formattedtext.NumberFormatter;
 import org.eclipse.swt.SWT;
@@ -32,6 +39,10 @@ import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.ui.forms.events.ExpansionAdapter;
 import org.eclipse.ui.forms.events.ExpansionEvent;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 
 /**
  * 
@@ -42,14 +53,20 @@ import org.eclipse.ui.forms.widgets.ExpandableComposite;
 public class ImagesToStitchedConversionPage extends ResourceChoosePage
 		implements IConversionWizardPage {
 
+	private static final Logger logger = LoggerFactory.getLogger(ImagesToStitchedConversionPage.class);
+
 	private IConversionContext context;
 	private Spinner rowsSpinner;
 	private Spinner columnsSpinner;
 	private FormattedText angleText;
-	private boolean hasCropping = false;
+	private boolean hasCropping = true;
 	private ExpandableComposite plotExpandComp;
 	private IPlottingSystem plotSystem;
 	private Composite container;
+
+	private IDataset firstImage;
+
+	private IImageTransform transformer;
 
 	public ImagesToStitchedConversionPage() {
 		super("Convert image directory", null, null);
@@ -77,9 +94,10 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 			bean.setAngle((Long)val);
 		else if (val instanceof Double)
 			bean.setAngle((Double)val);
+		if (hasCropping) {
+			bean.setRoi(plotSystem.getRegion("Cropping"));
+		}
 		context.setUserObject(bean);
-
-//		ILazyDataset lazy = context.getLazyDataset();
 
 		return context;
 	}
@@ -109,14 +127,17 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 		columnsSpinner.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 		
 		final Label labelAngle = new Label(controlComp, SWT.NONE);
-		labelAngle.setText("Angle");
+		labelAngle.setText("Rotation angle");
 		labelAngle.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
 		angleText = new FormattedText(controlComp, SWT.BORDER);
 		NumberFormatter formatter = new NumberFormatter("-##0.0");
 		formatter.setFixedLengths(false, true);
 		angleText.setFormatter(formatter);
-		angleText.setValue(new Double(-49.0));
-		angleText.getControl().setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+		angleText.getControl().setToolTipText("Rotation angle in degrees");
+		angleText.setValue(new Double(0.0));
+		GridData gridData = new GridData(SWT.FILL, SWT.CENTER, true, false); 
+		gridData.widthHint = 50;
+		angleText.getControl().setLayoutData(gridData);
 
 		final Button croppingButton = new Button(controlComp, SWT.CHECK);
 		croppingButton.setText("Crop selected images");
@@ -141,21 +162,96 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 		plotComp.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		plotComp.setLayout(new GridLayout(1, false));
 
+		Composite subComp = new Composite(plotComp, SWT.NONE);
+		subComp.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
+		subComp.setLayout(new GridLayout(2, false));
+		
+		Label description = new Label(subComp, SWT.WRAP);
+		description.setText("Press 'Rotate' to select the region on the rotated image then select an "
+				+ "elliptical region which will be used to generate a rectangular sub-image.");
+		description.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+		Button rotateButton = new Button(subComp, SWT.NONE);
+		rotateButton.setText("Rotate");
+		rotateButton.setToolTipText("Rotates the original image by n degrees");
+		rotateButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				createImageTransformer();
+				try {
+					Object val = angleText.getValue();
+					IDataset rotated = null;
+					if (val instanceof Long) {
+						rotated = transformer.rotate(firstImage, ((Long)val).doubleValue());
+					} else if (val instanceof Double) {
+						rotated = transformer.rotate(firstImage, ((Double)val).doubleValue());
+					}
+					plotSystem.updatePlot2D(rotated, null, null);
+				} catch (Exception e1) {
+					logger.error("Error rotating image:" + e1.getMessage());
+				}
+			}
+		});
 		try {
 			plotSystem = PlottingFactory.createPlottingSystem();
 			plotSystem.createPlotPart(plotComp, "Preprocess", null, PlotType.IMAGE, null);
 			plotSystem.getPlotComposite().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-//			plotSystem.createPlot2D(new DoubleDataset(), null, null);
+			IDataHolder holder = LoaderFactory.getData(getSelectedPaths()[0]);
+			firstImage = holder.getDataset(0);
+			plotSystem.createPlot2D(firstImage, null, null);
+			createRegion(firstImage);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+			logger.error("Error creating the plotting system:" + e.getMessage());
 			e.printStackTrace();
 		}
-
 		plotExpandComp.setClient(plotComp);
 		plotExpandComp.addExpansionListener(createExpansionAdapter());
 		plotExpandComp.setExpanded(hasCropping);
+	}
 
+	private void createRegion(IDataset data) {
+		String regionName = "Cropping";
+		try {
+			IRegion region = plotSystem.getRegion(regionName);
+			if (region == null) {
+				region = plotSystem
+						.createRegion(regionName, RegionType.ELLIPSE);
+				double width, height;
+				EllipticalROI eroi = null;
+				if (data != null) {
+					width = data.getShape()[0];
+					height = data.getShape()[1];
+					double bufferX = width / 100;
+					double bufferY = height / 100;
+					double centreX = width / 2;
+					double centreY = height / 2;
+					if (width >= height) {
+						eroi = new EllipticalROI((width - bufferX) / 2,
+								(height - bufferY) / 2, 0, centreX, centreY);
+					} else {
+						eroi = new EllipticalROI((height - bufferY) / 2,
+								(width - bufferX) / 2, 0, centreX, centreY);
+					}
+					eroi.setName(regionName);
+					eroi.setPlot(true);
+					region.setROI(eroi);
+					region.setUserRegion(true);
+					region.setMobile(true);
+					plotSystem.addRegion(region);
+				} else {
+					logger.error("Could not create Elliptical region");
+				}
+			}
+		} catch (Exception e) {
+			logger.error("Cannot create region for perimeter PlotView!");
+		}
+	}
 
+	private void createImageTransformer() {
+		if (transformer == null) {
+			transformer = (IImageTransform) Activator
+					.getService(IImageTransform.class);
+		}
 	}
 
 	private ExpansionAdapter createExpansionAdapter() {
@@ -163,11 +259,6 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 			@Override
 			public void expansionStateChanged(ExpansionEvent e) {
 				container.layout();
-//				logger.trace("regionsExpander");
-//				Rectangle r = scrollComposite.getClientArea();
-//				scrollComposite.setMinSize(contentComposite.computeSize(
-//						r.width, SWT.DEFAULT));
-//				contentComposite.layout();
 			}
 		};
 	}
