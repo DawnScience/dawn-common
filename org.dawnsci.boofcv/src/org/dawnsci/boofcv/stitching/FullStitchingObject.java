@@ -16,8 +16,6 @@ import java.util.List;
 import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.struct.feature.TupleDesc;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.MultiSpectral;
 
@@ -60,7 +58,7 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 	 */
 	public FullStitchingObject(DetectDescribePoint<T, TD> detDesc,
 			AssociateDescription<TD> associate, Class<T> imageType) {
-		this.test = new TranslationObject(detDesc, associate, imageType);
+		this.test = new TranslationObject<T, TD>(detDesc, associate, imageType);
 	}
 
 	/**
@@ -96,14 +94,15 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 	 *            The expected translation in microns in the y direction
 	 *            relating successive images in a column
 	 */
-	public void translationArray(List<List<T>> images, double xtrans,
-			double ytrans) {
+	public void translationArray(List<List<ImageAndMetadata>> images) {
 
 		// stores the translations
 		translations = new double[images.size()][images.get(0).size()][2];
 
 		for (int x = 0; x < translations.length; x++) {
 			for (int y = 0; y < translations[0].length; y++) {
+				double xtrans = images.get(x).get(y).getMetadata().getXYMotorPosition()[0];
+				double ytrans = images.get(x).get(y).getMetadata().getXYMotorPosition()[1];
 				if (y == 0) {
 					// translation of first image is 0
 					if (x == 0) {
@@ -111,7 +110,8 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 					// translation of all images in the first column is
 					// calculated using the above image
 					else {
-						test.associate(images.get(x - 1).get(y), images.get(x).get(y), 0, ytrans);
+						test.associate(images.get(x - 1).get(y).getImage(),
+								images.get(x).get(y).getImage(), 0, ytrans);
 						translations[x][y] = test.translation();
 						// translation of previous image is added to give the
 						// translation relative to the first image
@@ -121,7 +121,8 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 				}
 				// translation of all images other images is calculated using the image to the left
 				else {
-					test.associate(images.get(x).get(y-1), images.get(x).get(y), xtrans, 0);
+					test.associate(images.get(x).get(y - 1).getImage(), images
+							.get(x).get(y).getImage(), xtrans, 0);
 					translations[x][y] = test.translation();
 					// translation of previous image is added to give the translation relative to the first image
 					translations[x][y][0] += translations[x][y-1][0];
@@ -149,8 +150,7 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 	 *            The expected translation in microns in the y direction
 	 *            relating successive images in a column
 	 */
-	public void translationArrayHomography(List<List<T>> images, double xtrans,
-			double ytrans) {
+	public void translationArrayHomography(List<List<ImageAndMetadata>> images) {
 		// temporarily stores the transforms
 		Homography2D_F64 transform;
 
@@ -159,13 +159,16 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 
 		for (int x = 0; x < translations.length; x++) {
 			for (int y = 0; y < translations[0].length; y++) {
+				double xtrans = images.get(x).get(y).getMetadata().getXYMotorPosition()[0];
+				double ytrans = images.get(x).get(y).getMetadata().getXYMotorPosition()[1];
 				if (y == 0) {
 					// translation of first image is 0
 					if (x == 0) {
 					}
 					// translation of all images in the first column is calculated using the above image
 					else {
-						test.associate(images.get(x - 1).get(y), images.get(x).get(y), 0, ytrans);
+						test.associate(images.get(x - 1).get(y).getImage(),
+								images.get(x).get(y).getImage(), 0, ytrans);
 						transform = test.homographyTransform();
 						// only the translation of the transform is used
 						translations[x][y][0] = transform.a13;
@@ -178,7 +181,8 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 				}
 				// translation of all images other images is calculated using the image to the left
 				else {
-					test.associate(images.get(x).get(y-1), images.get(x).get(y), xtrans, 0);
+					test.associate(images.get(x).get(y - 1).getImage(), images
+							.get(x).get(y).getImage(), xtrans, 0);
 					transform = test.homographyTransform();
 					// only the translation of the transform is used
 					translations[x][y][0] = transform.a13;
@@ -190,7 +194,6 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 				}
 			}
 		}
-		
 	}
 
 	/**
@@ -211,7 +214,7 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 	 *            The expected translation in microns in the y direction
 	 *            relating successive images in a column
 	 */
-	public void translationArraySpecial(List<List<T>> images, double xtrans, double ytrans) {
+	public void translationArraySpecial(List<List<ImageAndMetadata>> images) {
 		// temporarily stores the transforms
 		Se2_F64 transform;
 
@@ -220,13 +223,16 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 
 		for (int x = 0; x < translations.length; x++) {
 			for (int y = 0; y < translations[0].length; y++) {
+				double xtrans = images.get(x).get(y).getMetadata().getXYMotorPosition()[0];
+				double ytrans = images.get(x).get(y).getMetadata().getXYMotorPosition()[1];
 				if (y == 0) {
 					// translation of first image is 0
 					if (x == 0) {
 					}
 					// translation of all images in the first column is calculated using the above image
 					else {
-						test.associate(images.get(x-1).get(y), images.get(x).get(y), 0, ytrans);
+						test.associate(images.get(x - 1).get(y).getImage(),
+								images.get(x).get(y).getImage(), 0, ytrans);
 						transform = test.specialTransform();
 						// only the translation of the transform is used
 						translations[x][y][0] = transform.getX();
@@ -239,7 +245,8 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 				}
 				// translation of all images other images is calculated using the image to the left
 				else {
-					test.associate(images.get(x).get(y-1), images.get(x).get(y), xtrans, 0);
+					test.associate(images.get(x).get(y - 1).getImage(), images
+							.get(x).get(y).getImage(), xtrans, 0);
 					transform = test.specialTransform();
 					// only the translation of the transform is used
 					translations[x][y][0] = transform.getX();
@@ -265,17 +272,18 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 	 *            The expected translation in microns in the y direction
 	 *            relating successive images in a column
 	 */
-	public void theoreticalTranslation(List<List<T>> images, double xtrans, double ytrans) {
+	public void theoreticalTranslation(List<List<ImageAndMetadata>> images) {
 		// stores the translations
 		translations = new double[images.size()][images.get(0).size()][2];
-
-		// convert the translations from microns into pixels
-		xtrans = micronsToPixels * xtrans;
-		ytrans = micronsToPixels * ytrans;
-
 		// calculates the translations of each image relative to the first image
 		for (int x = 0; x < translations.length; x++) {
 			for (int y = 0; y < translations[0].length; y++) {
+				double xtrans = images.get(x).get(y).getMetadata().getXYMotorPosition()[0];
+				double ytrans = images.get(x).get(y).getMetadata().getXYMotorPosition()[1];
+				// convert the translations from microns into pixels
+				xtrans = micronsToPixels * xtrans;
+				ytrans = micronsToPixels * ytrans;
+
 				translations[x][y][0] = -xtrans*y;
 				translations[x][y][1] = -ytrans*x;
 			}
@@ -292,22 +300,19 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 	 */
 	public MultiSpectral<T> stitchMultiSpectral(
 			List<List<MultiSpectral<T>>> images) {
-
 		// define an origin to be the top-corner of the first image such that
 		// all the translations can be given relative to this image
 		double[] origin = new double[2];
 		origin[0] = 0;
 		origin[1] = 0;
-
 		MultiSpectral<T> result = images.get(0).get(0);
-
 		// stitch each image together with another, in turn, onto a new image
 		for (int i = 0; i < images.size(); i++) {
 			for (int j = 0; j < images.get(0).size(); j++) {
 
 				if (i != 0 || j != 0) {
 					StitchingObject stitch = new StitchingObject(translations[i][j]);
-					result = stitch.stitch(result, images.get(i).get(j), origin);
+					result = stitch.stitchMultiBand(result, images.get(i).get(j), origin);
 				}
 			}
 		}
@@ -315,59 +320,25 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 	}
 
 	/**
-	 * Stitches a set of images together onto a new image. The image type is
-	 * ImageSInt16.
+	 * Stitches a list of images together onto a new image.
 	 * 
 	 * @param images
-	 *            The set of images to be stitched
+	 *            The list of images to be stitched
 	 * @return The new image with all the images stitched to it
 	 */
-	public ImageSInt16 stitchSInt16(List<List<ImageSInt16>> images) {
+	public ImageSingleBand<?> stitch(List<List<ImageAndMetadata>> images) {
 		// define an origin to be the top-corner of the first image such that
 		// all the translations can be given relative to this image
 		double[] origin = new double[2];
 		origin[0] = 0;
 		origin[1] = 0;
-
-		ImageSInt16 result = images.get(0).get(0);
-
-		// stitch each image together with another, in turn, onto a new image
-		for (int i = 0; i < images.size(); i++) {
-			for (int j = 0; j < images.get(0).size(); j++) {
-
-				if (i != 0 || j != 0) {
-					StitchingObject<?> stitch = new StitchingObject(translations[i][j]);
-					result = stitch.stitch(result, images.get(i).get(j), origin);
-				}
-			}
-		}
-		return result;
-	}
-
-	/**
-	 * Stitches a set of images together onto a new image. The image type is
-	 * ImageFloat32.
-	 * 
-	 * @param images
-	 *            The set of images to be stitched
-	 * @return The new image with all the images stitched to it
-	 */
-	public ImageFloat32 stitchFloat32(List<List<ImageFloat32>> images) {
-
-		// define an origin to be the top-corner of the first image such that
-		// all the translations can be given relative to this image
-		double[] origin = new double[2];
-		origin[0] = 0;
-		origin[1] = 0;
-
-		ImageFloat32 result = images.get(0).get(0);
-
+		ImageSingleBand<?> result = images.get(0).get(0).getImage();
 		// stitch each image together with another, in turn, onto a new image
 		for (int i = 0; i < images.size(); i++) {
 			for (int j = 0; j < images.get(0).size(); j++) {
 				if (i != 0 || j != 0) {
-					StitchingObject<?> stitch = new StitchingObject(translations[i][j]);
-					result = stitch.stitch(result, images.get(i).get(j), origin);
+					StitchingObject<?> stitcher = new StitchingObject(translations[i][j]);
+					result = stitcher.stitch(result, images.get(i).get(j).getImage(), origin);
 				}
 			}
 		}
