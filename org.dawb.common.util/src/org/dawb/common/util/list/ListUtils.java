@@ -42,7 +42,7 @@ public class ListUtils {
 	 * @param value
 	 * @return v
 	 */
-	public static String getString(final List<String> value) {
+	public static String getString(final List<? extends Object> value) {
 		if (value == null)   return null;
 		if (value.isEmpty()) return null;
 		final String line = value.toString();
