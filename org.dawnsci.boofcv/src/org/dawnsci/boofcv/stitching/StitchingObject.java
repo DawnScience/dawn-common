@@ -92,7 +92,7 @@ public class StitchingObject<T extends ImageSingleBand<?>> {
 	 *            stitched at the origin.
 	 * @return The new image with both images stitched to it
 	 */
-	public MultiSpectral<ImageFloat32> stitch(
+	public MultiSpectral<ImageFloat32> stitchMultiBand(
 			MultiSpectral<ImageFloat32> imageA,
 			MultiSpectral<ImageFloat32> imageB, double[] origin) {
 
@@ -159,10 +159,10 @@ public class StitchingObject<T extends ImageSingleBand<?>> {
 	}
 
 	/**
+	 * 
 	 * Creates a new image exactly big enough to fit both images at the given
 	 * relative distance. The images are then stitched to this new image
-	 * according to the translation between them. Used for image type
-	 * ImageSInt16.
+	 * according to the translation between them.
 	 * 
 	 * @param imageA
 	 *            The first image to be stitched
@@ -177,16 +177,14 @@ public class StitchingObject<T extends ImageSingleBand<?>> {
 	 *            stitched at the origin.
 	 * @return The new image with both images stitched to it
 	 */
-	public ImageSInt16 stitch(ImageSInt16 imageA, ImageSInt16 imageB, double[] origin) {
+	public ImageSingleBand<?> stitch(ImageSingleBand<?> imageA, ImageSingleBand<?> imageB, double[] origin) {
 		// update the translation such that it is relative to the given origin
 		fromAtoB.set(fromAtoB.a11, fromAtoB.a12, fromAtoB.a13 - origin[0],
 				fromAtoB.a21, fromAtoB.a22, fromAtoB.a23 - origin[1],
 				fromAtoB.a31, fromAtoB.a32, fromAtoB.a33);
-
 		// specify size of output image
 		int outputWidth = imageA.getWidth();
 		int outputHeight = imageA.getHeight();
-
 		// if the second image is right of the first, extend the output image to
 		// accommodate both
 		if (fromAtoB.a13 - imageB.getWidth() < -outputWidth) {
@@ -197,7 +195,6 @@ public class StitchingObject<T extends ImageSingleBand<?>> {
 		if (fromAtoB.a23 - imageB.getHeight() < -outputHeight) {
 			outputHeight = (int) (-fromAtoB.a23 + imageB.getHeight());
 		}
-
 		// if the second image is left of the first, extend the output image and
 		// shift the images to accommodate and display both
 		double xshift = 0;
@@ -214,119 +211,47 @@ public class StitchingObject<T extends ImageSingleBand<?>> {
 			yshift = fromAtoB.a23;
 			origin[1] = origin[1] + yshift;
 		}
-
-		// where the output images are rendered into
-		ImageSInt16 work = new ImageSInt16(outputWidth, outputHeight);
-
-		// create a transform to stitch an image to the top corner of the new image
-		Homography2D_F64 fromAToWork = new Homography2D_F64(1, 0, xshift, 0, 1, yshift, 0, 0, 1);
-		Homography2D_F64 fromWorkToA = fromAToWork.invert(null);
-
-		// used to render the results onto an image
-		PixelTransformHomography_F32 model = new PixelTransformHomography_F32();
-		ImplImageDistort_I16<ImageSInt16> distort = new ImplImageDistort_I16<ImageSInt16>(
-				new NearestNeighborPixel_S16(), null);
-
-		distort.setModel(model);
-
-		// render first image
-		model.set(fromWorkToA);
-		distort.apply(imageA, work, 0, 0, outputWidth, outputHeight);
-
-		// render second image
-		Homography2D_F64 fromWorkToB = fromWorkToA.concat(fromAtoB, null);
-		model.set(fromWorkToB);
-		distort.apply(imageB, work, 0, 0, outputWidth, outputHeight);
-
-		return work;
-	}
-
-	/**
-	 * 
-	 * Creates a new image exactly big enough to fit both images at the given
-	 * relative distance. The images are then stitched to this new image
-	 * according to the translation between them. Used for image type
-	 * ImageFloat32.
-	 * TODO refactor code replication
-	 * 
-	 * @param imageA
-	 *            The first image to be stitched
-	 * @param imageB
-	 *            The second image to be stitched
-	 * @param origin
-	 *            The pixel coordinates of some origin. If the position of the
-	 *            second image is specified relative to the first image, the
-	 *            origin should be 0. If the position of the second image is
-	 *            specified relative to an origin, the coordinates of the origin
-	 *            should be specified here. Note, the first image will be
-	 *            stitched at the origin.
-	 * @return The new image with both images stitched to it
-	 */
-	public ImageFloat32 stitch(ImageFloat32 imageA, ImageFloat32 imageB, double[] origin) {
-		// update the translation such that it is relative to the given origin
-		fromAtoB.set(fromAtoB.a11, fromAtoB.a12, fromAtoB.a13 - origin[0],
-				fromAtoB.a21, fromAtoB.a22, fromAtoB.a23 - origin[1],
-				fromAtoB.a31, fromAtoB.a32, fromAtoB.a33);
-
-		// specify size of output image
-		int outputWidth = imageA.getWidth();
-		int outputHeight = imageA.getHeight();
-
-		// if the second image is right of the first, extend the output image to
-		// accommodate both
-		if (fromAtoB.a13 - imageB.getWidth() < -outputWidth) {
-			outputWidth = (int) (-fromAtoB.a13 + imageB.getWidth());
-		}
-
-		// if the second image is below the first, extend the output image to
-		// accommodate both
-		if (fromAtoB.a23 - imageB.getHeight() < -outputHeight) {
-			outputHeight = (int) (-fromAtoB.a23 + imageB.getHeight());
-		}
-
-		// if the second image is left of the first, extend the output image and
-		// shift the images to accommodate and display both
-		double xshift = 0;
-		if (fromAtoB.a13 > 0) {
-			outputWidth = (int) (outputWidth + fromAtoB.a13);
-			xshift = fromAtoB.a13;
-			origin[0] = origin[0] + xshift;
-		}
-
-		// if the second image is above the first, extend the output image and
-		// shift the images to accommodate and display both
-		double yshift = 0;
-		if (fromAtoB.a23 > 0) {
-			outputHeight = (int) (outputHeight + fromAtoB.a23);
-			yshift = fromAtoB.a23;
-			origin[1] = origin[1] + yshift;
-		}
-
-		// where the output images are rendered into
-		ImageFloat32 work = new ImageFloat32(outputWidth, outputHeight);
-
 		// create a transform to stitch an image to the top corner of the new
 		// image
-		Homography2D_F64 fromAToWork = new Homography2D_F64(1, 0, xshift, 0, 1,
-				yshift, 0, 0, 1);
+		Homography2D_F64 fromAToWork = new Homography2D_F64(1, 0, xshift, 0, 1, yshift, 0, 0, 1);
 		Homography2D_F64 fromWorkToA = fromAToWork.invert(null);
+		ImageSingleBand<?> work = null;
+		if (imageA instanceof ImageSInt16 && imageB instanceof ImageSInt16) {
+			// where the output images are rendered into
+			work = new ImageSInt16(outputWidth, outputHeight);
 
-		// used to render the results onto an image
-		PixelTransformHomography_F32 model = new PixelTransformHomography_F32();
-		ImplImageDistort_F32 distort = new ImplImageDistort_F32(
-				new ImplBilinearPixel_F32(), null);
+			// used to render the results onto an image
+			PixelTransformHomography_F32 model = new PixelTransformHomography_F32();
+			ImplImageDistort_I16<ImageSInt16> distort = new ImplImageDistort_I16<ImageSInt16>(
+					new NearestNeighborPixel_S16(), null);
+			distort.setModel(model);
 
-		distort.setModel(model);
+			// render first image
+			model.set(fromWorkToA);
+			distort.apply((ImageSInt16)imageA, (ImageSInt16) work, 0, 0, outputWidth, outputHeight);
 
-		// render first image
-		model.set(fromWorkToA);
-		distort.apply(imageA, work, 0, 0, outputWidth, outputHeight);
+			// render second image
+			Homography2D_F64 fromWorkToB = fromWorkToA.concat(fromAtoB, null);
+			model.set(fromWorkToB);
+			distort.apply((ImageSInt16)imageB, (ImageSInt16) work, 0, 0, outputWidth, outputHeight);
 
-		// render second image
-		Homography2D_F64 fromWorkToB = fromWorkToA.concat(fromAtoB, null);
-		model.set(fromWorkToB);
-		distort.apply(imageB, work, 0, 0, outputWidth, outputHeight);
+		} else if (imageA instanceof ImageFloat32 && imageB instanceof ImageFloat32) {
+			// where the output images are rendered into
+			work = new ImageFloat32(outputWidth, outputHeight);
+			// used to render the results onto an image
+			PixelTransformHomography_F32 model = new PixelTransformHomography_F32();
+			ImplImageDistort_F32 distort = new ImplImageDistort_F32(
+					new ImplBilinearPixel_F32(), null);
+			distort.setModel(model);
+			// render first image
+			model.set(fromWorkToA);
+			distort.apply((ImageFloat32)imageA, (ImageFloat32) work, 0, 0, outputWidth, outputHeight);
 
+			// render second image
+			Homography2D_F64 fromWorkToB = fromWorkToA.concat(fromAtoB, null);
+			model.set(fromWorkToB);
+			distort.apply((ImageFloat32)imageB, (ImageFloat32) work, 0, 0, outputWidth, outputHeight);
+		}
 		return work;
 	}
 }

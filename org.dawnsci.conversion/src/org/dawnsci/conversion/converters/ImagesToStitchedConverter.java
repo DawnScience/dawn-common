@@ -74,11 +74,13 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 			int rows = conversionBean.getRows();
 			int columns = conversionBean.getColumns();
 			double angle = conversionBean.getAngle();
+			boolean useFeatureAssociation = conversionBean.isFeatureAssociated();
+			double fieldOfView = conversionBean.getFieldOfView();
 			createImageStitcher();
 			IDataset stitched = null;
 			IRegion region = conversionBean.getRoi();
 			if (region != null) {
-				stitched = stitcher.stitch(imageStack, rows, columns, angle, region.getROI());
+				stitched = stitcher.stitch(imageStack, rows, columns, angle, fieldOfView, region.getROI(), useFeatureAssociation);
 			} else {
 				stitched = stitcher.stitch(imageStack, rows, columns, angle);
 			}
@@ -155,6 +157,8 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 		private int rows = 3;
 		private int columns = 3;
 		private double angle = 49;
+		private double fieldOfView = 50;
+		private boolean featureAssociated;
 		private IRegion region;
 
 		public int getRows() {
@@ -169,35 +173,6 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 		public void setColumns(int columns) {
 			this.columns = columns;
 		}
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			long temp;
-			temp = Double.doubleToLongBits(angle);
-			result = prime * result + (int) (temp ^ (temp >>> 32));
-			result = prime * result + columns;
-			result = prime * result + rows;
-			return result;
-		}
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			ConversionStitchedBean other = (ConversionStitchedBean) obj;
-			if (Double.doubleToLongBits(angle) != Double
-					.doubleToLongBits(other.angle))
-				return false;
-			if (columns != other.columns)
-				return false;
-			if (rows != other.rows)
-				return false;
-			return true;
-		}
 		public double getAngle() {
 			return angle;
 		}
@@ -209,6 +184,59 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 		}
 		public IRegion getRoi() {
 			return region;
+		}
+		public void setFieldOfView(double fieldOfView) {
+			this.fieldOfView = fieldOfView;
+		}
+		public double getFieldOfView() {
+			return fieldOfView;
+		}
+		public boolean isFeatureAssociated() {
+			return featureAssociated;
+		}
+		public void setFeatureAssociated(boolean featureAssociated) {
+			this.featureAssociated = featureAssociated;
+		}
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = super.hashCode();
+			long temp;
+			temp = Double.doubleToLongBits(angle);
+			result = prime * result + (int) (temp ^ (temp >>> 32));
+			result = prime * result + columns;
+			temp = Double.doubleToLongBits(fieldOfView);
+			result = prime * result + (int) (temp ^ (temp >>> 32));
+			result = prime * result
+					+ ((region == null) ? 0 : region.hashCode());
+			result = prime * result + rows;
+			return result;
+		}
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (!super.equals(obj))
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			ConversionStitchedBean other = (ConversionStitchedBean) obj;
+			if (Double.doubleToLongBits(angle) != Double
+					.doubleToLongBits(other.angle))
+				return false;
+			if (columns != other.columns)
+				return false;
+			if (Double.doubleToLongBits(fieldOfView) != Double
+					.doubleToLongBits(other.fieldOfView))
+				return false;
+			if (region == null) {
+				if (other.region != null)
+					return false;
+			} else if (!region.equals(other.region))
+				return false;
+			if (rows != other.rows)
+				return false;
+			return true;
 		}
 	}
 }

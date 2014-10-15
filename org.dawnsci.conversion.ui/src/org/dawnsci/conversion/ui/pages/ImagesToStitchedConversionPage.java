@@ -60,6 +60,7 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 	private Spinner columnsSpinner;
 	private FormattedText angleText;
 	private boolean hasCropping = true;
+	private boolean hasFeatureAssociated = true;
 	private ExpandableComposite plotExpandComp;
 	private IPlottingSystem plotSystem;
 	private Composite container;
@@ -67,6 +68,8 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 	private IDataset firstImage;
 
 	private IImageTransform transformer;
+
+	private FormattedText fovText;
 
 	public ImagesToStitchedConversionPage() {
 		super("Convert image directory", null, null);
@@ -94,9 +97,14 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 			bean.setAngle((Long)val);
 		else if (val instanceof Double)
 			bean.setAngle((Double)val);
-		if (hasCropping) {
+		val = fovText.getValue();
+		if (val instanceof Long)
+			bean.setFieldOfView((Long)val);
+		else if (val instanceof Double)
+			bean.setFieldOfView((Double)val);
+		if (hasCropping)
 			bean.setRoi(plotSystem.getRegion("Cropping"));
-		}
+		bean.setFeatureAssociated(hasFeatureAssociated);
 		context.setUserObject(bean);
 
 		return context;
@@ -106,7 +114,7 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 	protected void createContentAfterFileChoose(Composite container) {
 		this.container = container;
 		Composite controlComp = new Composite(container, SWT.NONE);
-		controlComp.setLayout(new GridLayout(7, false));
+		controlComp.setLayout(new GridLayout(8, false));
 		controlComp.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 4, 1));
 
 		final Label labelRow = new Label(controlComp, SWT.NONE);
@@ -139,15 +147,46 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 		gridData.widthHint = 50;
 		angleText.getControl().setLayoutData(gridData);
 
+		final Label labelFOV = new Label(controlComp, SWT.NONE);
+		labelFOV.setText("Field of view");
+		labelFOV.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
+		fovText = new FormattedText(controlComp, SWT.BORDER);
+		formatter = new NumberFormatter("-##0.0");
+		formatter.setFixedLengths(false, true);
+		fovText.setFormatter(formatter);
+		fovText.getControl().setToolTipText("Field of view in microns");
+		fovText.setValue(new Double(50));
+		gridData = new GridData(SWT.FILL, SWT.CENTER, true, false); 
+		gridData.widthHint = 50;
+		fovText.getControl().setLayoutData(gridData);
+
 		final Button croppingButton = new Button(controlComp, SWT.CHECK);
 		croppingButton.setText("Crop selected images");
+		croppingButton.setToolTipText("If selected, the largest rectangle area "
+				+ "inside of the ellipse will be the image on which the stitching "
+				+ "process will be done.");
 		croppingButton.setSelection(hasCropping);
+		croppingButton.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, true, false, 4, 1));
 		croppingButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				hasCropping = croppingButton.getSelection();
 				plotExpandComp.setEnabled(hasCropping);
 				plotExpandComp.setExpanded(hasCropping);
+			}
+		});
+		final Button featureButton = new Button(controlComp, SWT.CHECK);
+		featureButton.setText("Use feature association");
+		featureButton
+				.setToolTipText("If selected, automatic feature association will "
+						+ "be done. If not, only the motor positions and angle of "
+						+ "images will be taken into account.");
+		featureButton.setSelection(hasFeatureAssociated);
+		featureButton.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, true, false, 4, 1));
+		featureButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				hasFeatureAssociated = featureButton.getSelection();
 			}
 		});
 
