@@ -10,6 +10,7 @@ package org.dawnsci.conversion.converters;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -76,11 +77,12 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 			double angle = conversionBean.getAngle();
 			boolean useFeatureAssociation = conversionBean.isFeatureAssociated();
 			double fieldOfView = conversionBean.getFieldOfView();
+			double[] translations = conversionBean.getTranslations();
 			createImageStitcher();
 			IDataset stitched = null;
 			IRegion region = conversionBean.getRoi();
 			if (region != null) {
-				stitched = stitcher.stitch(imageStack, rows, columns, angle, fieldOfView, region.getROI(), useFeatureAssociation);
+				stitched = stitcher.stitch(imageStack, rows, columns, angle, fieldOfView, translations, region.getROI(), useFeatureAssociation);
 			} else {
 				stitched = stitcher.stitch(imageStack, rows, columns, angle);
 			}
@@ -159,6 +161,7 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 		private double angle = 49;
 		private double fieldOfView = 50;
 		private boolean featureAssociated;
+		private double[] translations;
 		private IRegion region;
 
 		public int getRows() {
@@ -197,6 +200,12 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 		public void setFeatureAssociated(boolean featureAssociated) {
 			this.featureAssociated = featureAssociated;
 		}
+		public void setTranslations(double[] translations) {
+			this.translations = translations;
+		}
+		public double[] getTranslations() {
+			return translations;
+		}
 		@Override
 		public int hashCode() {
 			final int prime = 31;
@@ -205,11 +214,13 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 			temp = Double.doubleToLongBits(angle);
 			result = prime * result + (int) (temp ^ (temp >>> 32));
 			result = prime * result + columns;
+			result = prime * result + (featureAssociated ? 1231 : 1237);
 			temp = Double.doubleToLongBits(fieldOfView);
 			result = prime * result + (int) (temp ^ (temp >>> 32));
 			result = prime * result
 					+ ((region == null) ? 0 : region.hashCode());
 			result = prime * result + rows;
+			result = prime * result + Arrays.hashCode(translations);
 			return result;
 		}
 		@Override
@@ -226,6 +237,8 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 				return false;
 			if (columns != other.columns)
 				return false;
+			if (featureAssociated != other.featureAssociated)
+				return false;
 			if (Double.doubleToLongBits(fieldOfView) != Double
 					.doubleToLongBits(other.fieldOfView))
 				return false;
@@ -235,6 +248,8 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 			} else if (!region.equals(other.region))
 				return false;
 			if (rows != other.rows)
+				return false;
+			if (!Arrays.equals(translations, other.translations))
 				return false;
 			return true;
 		}

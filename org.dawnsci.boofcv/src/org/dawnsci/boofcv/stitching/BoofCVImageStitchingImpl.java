@@ -63,22 +63,22 @@ public class BoofCVImageStitchingImpl implements IImageStitchingProcess {
 
 	@Override
 	public IDataset stitch(List<IDataset> input, int rows, int columns, double angle) {
-		return stitch(input, rows, columns, angle, 50, false, true);
+		return stitch(input, rows, columns, angle, 50, new double[] {25, 25}, false, true);
 	}
 
 	@Override
 	public IDataset stitch(List<IDataset> input, int rows, int columns, double angle, double fieldOfView, IROI roi) {
 		this.roi = roi;
-		return stitch(input, rows, columns, angle, fieldOfView, true, true);
+		return stitch(input, rows, columns, angle, fieldOfView, new double[] {25, 25}, true, true);
 	}
 
 	@Override
-	public IDataset stitch(List<IDataset> input, int rows, int columns, double angle, double fieldOfView, IROI roi, boolean hasFeatureAssociation) {
+	public IDataset stitch(List<IDataset> input, int rows, int columns, double angle, double fieldOfView, double[] translations, IROI roi, boolean hasFeatureAssociation) {
 		this.roi = roi;
-		return stitch(input, rows, columns, angle, fieldOfView, true, hasFeatureAssociation);
+		return stitch(input, rows, columns, angle, fieldOfView, translations, true, hasFeatureAssociation);
 	}
 
-	public IDataset stitch(List<IDataset> input, int rows, int columns, double angle, double fieldOfView, boolean hasCropping, boolean hasFeatureAssociation) {
+	public IDataset stitch(List<IDataset> input, int rows, int columns, double angle, double fieldOfView, double[] translations, boolean hasCropping, boolean hasFeatureAssociation) {
 
 		IDataset[][] images = ImagePreprocessing.ListToArray(input, rows, columns);
 		List<List<ImageAndMetadata>> inputImages = new ArrayList<List<ImageAndMetadata>>();
@@ -113,7 +113,7 @@ public class BoofCVImageStitchingImpl implements IImageStitchingProcess {
 				}
 				// set default values if no metadata (scaling = width/fieldofview? 512/50)
 				if (md == null)
-					md = new PeemMetadataImpl(new double[]{25, 25 }, image.width / fieldOfView, fieldOfView, angle);
+					md = new PeemMetadataImpl(new double[]{translations[0], translations[1]}, image.width / fieldOfView, fieldOfView, angle);
 				ImageAndMetadata imageAndMd = null;
 				if (hasCropping && roi instanceof EllipticalROI) {
 					ImageFloat32 cropped = ImagePreprocessing.maxRectangleFromEllipticalImage(rotated, (EllipticalROI)roi);

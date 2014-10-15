@@ -59,6 +59,9 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 	private Spinner rowsSpinner;
 	private Spinner columnsSpinner;
 	private FormattedText angleText;
+	private FormattedText fovText;
+	private FormattedText xTranslationText;
+	private FormattedText yTranslationText;
 	private boolean hasCropping = true;
 	private boolean hasFeatureAssociated = true;
 	private ExpandableComposite plotExpandComp;
@@ -69,12 +72,10 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 
 	private IImageTransform transformer;
 
-	private FormattedText fovText;
-
 	public ImagesToStitchedConversionPage() {
 		super("Convert image directory", null, null);
 		setDirectory(false);
-		setFileLabel("Stitched image file");
+		setFileLabel("Stitched image output file");
 		setNewFile(true);
 		setOverwriteVisible(true);
 		setPathEditable(true);
@@ -92,19 +93,17 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 		final ConversionStitchedBean bean = new ConversionStitchedBean();
 		bean.setRows(rowsSpinner.getSelection());
 		bean.setColumns(columnsSpinner.getSelection());
-		Object val = angleText.getValue();
-		if (val instanceof Long)
-			bean.setAngle((Long)val);
-		else if (val instanceof Double)
-			bean.setAngle((Double)val);
-		val = fovText.getValue();
-		if (val instanceof Long)
-			bean.setFieldOfView((Long)val);
-		else if (val instanceof Double)
-			bean.setFieldOfView((Double)val);
+		Number angle = (Number) angleText.getValue();
+		bean.setAngle(angle.doubleValue());
+		Number fov = (Number) fovText.getValue();
+		bean.setFieldOfView(fov.doubleValue());
 		if (hasCropping)
 			bean.setRoi(plotSystem.getRegion("Cropping"));
 		bean.setFeatureAssociated(hasFeatureAssociated);
+		Number xTrans = (Number) xTranslationText.getValue();
+		Number yTrans = (Number) yTranslationText.getValue();
+		bean.setTranslations(new double[] { xTrans.doubleValue(),
+				yTrans.doubleValue() });
 		context.setUserObject(bean);
 
 		return context;
@@ -125,15 +124,7 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 		rowsSpinner.setSelection(3);
 		rowsSpinner.setToolTipText("Number of rows for the resulting stitched image");
 		rowsSpinner.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-		final Label labelColumn = new Label(controlComp, SWT.NONE);
-		labelColumn.setText("Columns");
-		labelColumn.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
-		columnsSpinner = new Spinner(controlComp, SWT.BORDER);
-		columnsSpinner.setMinimum(1);
-		columnsSpinner.setSelection(3);
-		columnsSpinner.setToolTipText("Number of columns for the resulting stitched image");
-		columnsSpinner.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-		
+
 		final Label labelAngle = new Label(controlComp, SWT.NONE);
 		labelAngle.setText("Rotation angle");
 		labelAngle.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
@@ -147,6 +138,32 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 		gridData.widthHint = 50;
 		angleText.getControl().setLayoutData(gridData);
 
+		final Label xTranslationLabel = new Label(controlComp, SWT.NONE);
+		xTranslationLabel.setText("X translation");
+		xTranslationLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
+		xTranslationText = new FormattedText(controlComp, SWT.BORDER);
+		formatter = new NumberFormatter("-##0.0");
+		formatter.setFixedLengths(false, true);
+		xTranslationText.setFormatter(formatter);
+		xTranslationText.getControl().setToolTipText("Expected translation in microns in the X direction");
+		xTranslationText.setValue(new Double(25));
+		xTranslationText.getControl().setEnabled(!hasFeatureAssociated);
+		gridData = new GridData(SWT.FILL, SWT.CENTER, true, false); 
+		gridData.widthHint = 30;
+		xTranslationText.getControl().setLayoutData(gridData);
+
+		new Label(controlComp, SWT.NONE);
+		new Label(controlComp, SWT.NONE);
+
+		final Label labelColumn = new Label(controlComp, SWT.NONE);
+		labelColumn.setText("Columns");
+		labelColumn.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
+		columnsSpinner = new Spinner(controlComp, SWT.BORDER);
+		columnsSpinner.setMinimum(1);
+		columnsSpinner.setSelection(3);
+		columnsSpinner.setToolTipText("Number of columns for the resulting stitched image");
+		columnsSpinner.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+
 		final Label labelFOV = new Label(controlComp, SWT.NONE);
 		labelFOV.setText("Field of view");
 		labelFOV.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
@@ -159,6 +176,23 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 		gridData = new GridData(SWT.FILL, SWT.CENTER, true, false); 
 		gridData.widthHint = 50;
 		fovText.getControl().setLayoutData(gridData);
+
+		final Label yTranslationLable = new Label(controlComp, SWT.NONE);
+		yTranslationLable.setText("Y translation");
+		yTranslationLable.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
+		yTranslationText = new FormattedText(controlComp, SWT.BORDER);
+		formatter = new NumberFormatter("-##0.0");
+		formatter.setFixedLengths(false, true);
+		yTranslationText.setFormatter(formatter);
+		yTranslationText.getControl().setToolTipText("Expected translation in microns in the y direction");
+		yTranslationText.setValue(new Double(25));
+		yTranslationText.getControl().setEnabled(!hasFeatureAssociated);
+		gridData = new GridData(SWT.FILL, SWT.CENTER, true, false); 
+		gridData.widthHint = 30;
+		yTranslationText.getControl().setLayoutData(gridData);
+
+		new Label(controlComp, SWT.NONE);
+		new Label(controlComp, SWT.NONE);
 
 		final Button croppingButton = new Button(controlComp, SWT.CHECK);
 		croppingButton.setText("Crop selected images");
@@ -187,6 +221,8 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				hasFeatureAssociated = featureButton.getSelection();
+				xTranslationText.getControl().setEnabled(!hasFeatureAssociated);
+				yTranslationText.getControl().setEnabled(!hasFeatureAssociated);
 			}
 		});
 
