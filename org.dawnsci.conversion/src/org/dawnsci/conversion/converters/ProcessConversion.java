@@ -19,12 +19,15 @@ import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.services.conversion.IProcessingConversionInfo;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
+import org.eclipse.dawnsci.analysis.api.dataset.Slice;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
 import org.eclipse.dawnsci.analysis.api.processing.IOperationService;
 import org.eclipse.dawnsci.analysis.api.processing.ISliceConfiguration;
+import org.eclipse.dawnsci.analysis.api.slice.Slicer;
 
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 import uk.ac.diamond.scisoft.analysis.metadata.AxesMetadataImpl;
+import uk.ac.diamond.scisoft.analysis.metadata.OriginMetadataImpl;
 
 public class ProcessConversion extends AbstractConversion {
 
@@ -80,6 +83,11 @@ public class ProcessConversion extends AbstractConversion {
 			}
 		}
 		
+		Slice[] init = Slicer.getSliceArrayFromSliceDimensions(sliceDimensions,lz.getShape());
+		int[] dataDims = Slicer.getDataDimensions(lz.getShape(), sliceDimensions);
+		
+		OriginMetadataImpl om = new OriginMetadataImpl(lz, init, dataDims, context.getSelectedConversionFile().getAbsolutePath(), context.getDatasetNames().get(0));
+		lz.setMetadata(om);
 		ISliceConfiguration rich = new ISliceConfiguration() {
 			
 			@Override
