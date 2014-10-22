@@ -68,6 +68,7 @@ public class PersistenceImportWizard extends AbstractPersistenceWizard implement
 	public static final String ID = "org.dawnsci.plotting.importMask";
 	private ResourceChoosePage fcp;
 	private CheckWizardPage options;
+	private int idxPage = 0;
 
 	public PersistenceImportWizard() {
 		
@@ -161,17 +162,23 @@ public class PersistenceImportWizard extends AbstractPersistenceWizard implement
 
 						} catch (Throwable ne) {
 							logger.error("Cannot read persistence file at "+file);
+							return false;
 						} finally {
 							if (pf!=null) pf.close();
 						}
 
 					}
 				}
-
-
+				// use an index to grey out the finish button on the first page
+				if (idxPage == 0) {
+					idxPage ++;
+					return false;
+				} else {
+					return true;
+				}
 			}
 		}
-	return super.canFinish();
+		return super.canFinish();
 	}
 
 	@Override
