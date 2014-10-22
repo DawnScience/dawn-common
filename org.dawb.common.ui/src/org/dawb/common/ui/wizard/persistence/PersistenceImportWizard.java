@@ -219,8 +219,8 @@ public class PersistenceImportWizard extends AbstractPersistenceWizard implement
 			 } else {
 				 message = "Cannot import file.";
 			 }
-			 logger.error("Cannot export mask file!", ne);
-		     ErrorDialog.openError(Display.getDefault().getActiveShell(), "Export failure", message, new Status(IStatus.WARNING, "org.dawb.common.ui", ne.getMessage(), ne));
+			 logger.error("Cannot import mask file!", ne);
+		     ErrorDialog.openError(Display.getDefault().getActiveShell(), "Import failure", message, new Status(IStatus.WARNING, "org.dawb.common.ui", ne.getMessage(), ne));
 		     return true;
 		 }
 		 
