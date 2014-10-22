@@ -268,6 +268,8 @@ class PersistentFileImpl implements IPersistentFile {
 		if(file == null)
 			file = HierarchicalDataFactory.getReader(filePath);
 		ncsa.hdf.object.Dataset data = (ncsa.hdf.object.Dataset)file.getData(PersistenceConstants.MASK_ENTRY+"/"+maskName);
+		if (data == null)
+			throw new Exception("The mask with the name " + maskName + " is null");
 		Object val = data.read();
 		Dataset ret =  H5Utils.getSet(val,data);
 		BooleanDataset bd = (BooleanDataset) DatasetUtils.cast(ret, Dataset.BOOL);
