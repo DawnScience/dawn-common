@@ -7,6 +7,8 @@ import java.lang.reflect.ParameterizedType;
 
 import org.dawb.common.services.ServiceManager;
 import org.dawnsci.persistence.internal.PersistJsonOperationHelper;
+import org.eclipse.dawnsci.analysis.api.dataset.Slice;
+import org.eclipse.dawnsci.analysis.api.metadata.OriginMetadata;
 import org.eclipse.dawnsci.analysis.api.processing.IOperation;
 import org.eclipse.dawnsci.analysis.api.processing.IOperationService;
 import org.eclipse.dawnsci.analysis.api.processing.model.IOperationModel;
@@ -21,6 +23,7 @@ import org.junit.Test;
 
 import uk.ac.diamond.scisoft.analysis.fitting.functions.Gaussian;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.Lorentzian;
+import uk.ac.diamond.scisoft.analysis.metadata.OriginMetadataImpl;
 import uk.ac.diamond.scisoft.analysis.processing.OperationServiceImpl;
 
 public class ReadWriteOperationTest {
@@ -64,8 +67,7 @@ public class ReadWriteOperationTest {
 
 			
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			fail(e.getMessage());
 		}
 	
 	}
@@ -112,8 +114,38 @@ public class ReadWriteOperationTest {
 
 			
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			fail(e.getMessage());
+		}
+	
+	}
+	
+	@Test
+	public void testWriteOrigin() {
+		
+		try {
+			
+			Slice[] slices = Slice.convertFromString("0:10:2,2:20,:,:");
+			int[] dataDims = new int[]{2,3};
+			String path = "pathvalue";
+			String dsname = "dsname";
+			
+			
+			OriginMetadata om = new OriginMetadataImpl(null, slices, dataDims, path, dsname);
+			
+			PersistJsonOperationHelper util = new PersistJsonOperationHelper();
+			
+			final File tmp = File.createTempFile("Test", ".nxs");
+			tmp.deleteOnExit();
+			tmp.createNewFile();
+			IHierarchicalDataFile file = HierarchicalDataFactory.getWriter(tmp.getAbsolutePath());
+			
+			util.writeOriginalDataInformation(file, om);
+			
+			OriginMetadata outOm = util.readOriginalDataInformation(file);
+			outOm.toString();
+			
+		} catch (Exception e) {
+			fail(e.getMessage());
 		}
 	
 	}

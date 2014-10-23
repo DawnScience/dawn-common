@@ -30,6 +30,7 @@ import org.eclipse.dawnsci.analysis.api.diffraction.IPowderCalibrationInfo;
 import org.eclipse.dawnsci.analysis.api.fitting.functions.IFunction;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
 import org.eclipse.dawnsci.analysis.api.metadata.IDiffractionMetadata;
+import org.eclipse.dawnsci.analysis.api.metadata.OriginMetadata;
 import org.eclipse.dawnsci.analysis.api.monitor.IMonitor;
 import org.eclipse.dawnsci.analysis.api.processing.IOperation;
 import org.eclipse.dawnsci.analysis.api.processing.OperationData;
@@ -662,4 +663,16 @@ class PersistentFileImpl implements IPersistentFile {
 		PersistJsonOperationHelper helper = new PersistJsonOperationHelper();
 		return helper.readOperations(file);
 	}
+	
+	public void setOperationDataOrigin(OriginMetadata origin) throws Exception  {
+		if (origin == null) return;
+		if (file == null) file = HierarchicalDataFactory.getWriter(filePath);
+		PersistJsonOperationHelper helper = new PersistJsonOperationHelper();
+		helper.writeOriginalDataInformation(file, origin);
+	}
+	
+	public OriginMetadata getOperationDataOrigin() throws Exception {
+		return null;
+	}
+
 }

@@ -16,6 +16,7 @@ import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
 import org.eclipse.dawnsci.analysis.api.diffraction.IPowderCalibrationInfo;
 import org.eclipse.dawnsci.analysis.api.fitting.functions.IFunction;
 import org.eclipse.dawnsci.analysis.api.metadata.IDiffractionMetadata;
+import org.eclipse.dawnsci.analysis.api.metadata.OriginMetadata;
 import org.eclipse.dawnsci.analysis.api.monitor.IMonitor;
 import org.eclipse.dawnsci.analysis.api.processing.IOperation;
 import org.eclipse.dawnsci.analysis.api.processing.OperationData;
@@ -421,4 +422,9 @@ public interface IPersistentFile {
 	 * @throws Exception
 	 */
 	public IOperation<? extends IOperationModel, ? extends OperationData>[] getOperations() throws Exception;
+	
+	public void setOperationDataOrigin(OriginMetadata origin) throws Exception;
+	
+	public OriginMetadata getOperationDataOrigin() throws Exception;
+
 }

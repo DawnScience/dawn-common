@@ -20,7 +20,9 @@ import org.dawb.common.services.ServiceManager;
 import org.dawnsci.persistence.json.IJSonMarshaller;
 import org.dawnsci.persistence.json.JacksonMarshaller;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
+import org.eclipse.dawnsci.analysis.api.dataset.Slice;
 import org.eclipse.dawnsci.analysis.api.fitting.functions.IFunction;
+import org.eclipse.dawnsci.analysis.api.metadata.OriginMetadata;
 import org.eclipse.dawnsci.analysis.api.processing.IOperation;
 import org.eclipse.dawnsci.analysis.api.processing.IOperationService;
 import org.eclipse.dawnsci.analysis.api.processing.OperationData;
@@ -28,12 +30,15 @@ import org.eclipse.dawnsci.analysis.api.processing.model.IOperationModel;
 import org.eclipse.dawnsci.analysis.api.roi.IROI;
 import org.eclipse.dawnsci.analysis.dataset.impl.Dataset;
 import org.eclipse.dawnsci.analysis.dataset.impl.DatasetFactory;
+import org.eclipse.dawnsci.analysis.dataset.impl.DatasetUtils;
+import org.eclipse.dawnsci.analysis.dataset.impl.IntegerDataset;
 import org.eclipse.dawnsci.hdf5.IHierarchicalDataFile;
 import org.eclipse.dawnsci.hdf5.Nexus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
+import uk.ac.diamond.scisoft.analysis.metadata.OriginMetadataImpl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -51,6 +56,7 @@ public class PersistJsonOperationHelper {
 	private final static String REGIONS = "regions";
 	private final static String FUNCTIONS = "functions";
 	private final static String DATASETS = "datasets";
+	private final static String ORIGIN = "origin";
 	
 	private final static Logger logger = LoggerFactory.getLogger(PersistJsonOperationHelper.class);
 	
@@ -240,4 +246,28 @@ public class PersistJsonOperationHelper {
 		 }
 	}
 	
+	public void writeOriginalDataInformation(IHierarchicalDataFile file, OriginMetadata origin) throws Exception {
+		String entry = file.group(PersistenceConstants.ENTRY);
+		String process = file.group(PersistenceConstants.PROCESS_ENTRY);
+		file.setNexusAttribute(process, Nexus.PROCESS);
+		String note = file.group(ORIGIN, process);
+		file.createStringDataset("path", origin.getFilePath(), note);
+		file.createStringDataset("dataset", origin.getDatasetName(), note);
+		file.createStringDataset("sampling", Slice.createString(origin.getInitialSlice()), note);
+		Dataset dd = DatasetFactory.createFromObject(origin.getDataDimensions());
+		file.createDataset("data dimensions", dd, note);
+		
+	}
+	
+	public OriginMetadata readOriginalDataInformation(IHierarchicalDataFile file) throws Exception {
+		String path = file.getPath();
+		String group = file.group(PersistenceConstants.PROCESS_ENTRY + SLASH + ORIGIN);
+		String fp = LoaderFactory.getDataSet(path,  PersistenceConstants.PROCESS_ENTRY + SLASH + ORIGIN+ SLASH + "path", null).getString(0);
+		String dsn = LoaderFactory.getDataSet(path,  PersistenceConstants.PROCESS_ENTRY + SLASH + ORIGIN+ SLASH + "dataset", null).getString(0);
+		String ss = LoaderFactory.getDataSet(path,  PersistenceConstants.PROCESS_ENTRY + SLASH + ORIGIN+ SLASH + "sampling", null).getString(0);
+		IDataset dd = LoaderFactory.getDataSet(path,  PersistenceConstants.PROCESS_ENTRY + SLASH + ORIGIN + SLASH+ "data dimensions", null);
+		int[] dataDims = (int[])DatasetUtils.cast(dd, Dataset.INT32).getBuffer();
+		
+		return new OriginMetadataImpl(null, Slice.convertFromString(ss), dataDims, fp, dsn);
+	}
 }
