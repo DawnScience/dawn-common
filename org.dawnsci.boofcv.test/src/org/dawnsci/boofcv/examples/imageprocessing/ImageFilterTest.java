@@ -74,7 +74,7 @@ public class ImageFilterTest {
 
 
 	@Test
-	public void filterContour() {
+	public void filterContour() throws Exception {
 		IDataset contoured = service.filterContour(data, 8, 0xFFFFFF, 0xFF2020);
 		Assert.assertEquals("Value of item is not the expected one", 8224.0, contoured.getDouble(551, 384), 0);
 	}

@@ -21,6 +21,7 @@ import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.Contour;
 import boofcv.alg.filter.binary.ThresholdImageOps;
 import boofcv.alg.misc.ImageStatistics;
+import boofcv.struct.ConnectRule;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
@@ -58,11 +59,11 @@ public class ExampleBinaryOps {
 		// remove small blobs through erosion and dilation
 		// The null in the input indicates that it should internally declare the work image it needs
 		// this is less efficient, but easier to code.
-		ImageUInt8 filtered = BinaryImageOps.erode8(binary, null);
-		filtered = BinaryImageOps.dilate8(filtered, null);
+		ImageUInt8 filtered = BinaryImageOps.erode8(binary, 1, null);
+		filtered = BinaryImageOps.dilate8(filtered, 1, null);
 
 		// Detect blobs inside the image using an 8-connect rule
-		List<Contour> contours = BinaryImageOps.contour(filtered, 8, label);
+		List<Contour> contours = BinaryImageOps.contour(filtered, ConnectRule.EIGHT, label);
 
 		// colors of contours
 		int colorExternal = 0xFFFFFF;

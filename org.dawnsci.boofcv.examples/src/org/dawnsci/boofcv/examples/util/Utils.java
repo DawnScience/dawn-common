@@ -56,7 +56,9 @@ public class Utils {
 	 */
 	public static List<IDataset> getImageDatasets(List<String> names, IMonitor progressMonitorWrapper) {
 		List<IDataset> data = new ArrayList<IDataset>();
-		Class<? extends AbstractFileLoader> loaderClass = LoaderFactory.getLoaderClass("tiff");
+		String[] tmp = names.get(0).split("\\.");
+		String extension = tmp[tmp.length - 1];
+		Class<? extends AbstractFileLoader> loaderClass = LoaderFactory.getLoaderClass(extension);
 		try {
 			Constructor<?> constructor = loaderClass.getConstructor(String.class);
 			for (String n : names) {
