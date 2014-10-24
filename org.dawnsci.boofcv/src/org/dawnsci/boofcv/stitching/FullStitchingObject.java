@@ -8,7 +8,7 @@
  */
 package org.dawnsci.boofcv.stitching;
 
-import georegression.struct.homo.Homography2D_F64;
+import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.se.Se2_F64;
 
 import java.util.List;

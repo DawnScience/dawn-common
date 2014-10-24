@@ -7,10 +7,9 @@ Bundle-Activator: org.dawnsci.boofcv.Activator
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.dawnsci.analysis.api;bundle-version="1.0.0",
  org.eclipse.dawnsci.analysis.dataset;bundle-version="1.0.0",
- uk.ac.diamond.georegression;bundle-version="[0.5.0,0.6.0)",
- uk.ac.diamond.boofcv;bundle-version="0.16.0",
- uk.ac.diamond.ddogleg;bundle-version="0.5.0",
- uk.ac.diamond.ejml;bundle-version="0.25.0"
+ org.ddogleg;bundle-version="[0.6.0,0.7.0)",
+ com.googlecode.efficient-java-matrix-library.core;bundle-version="[0.26.0,0.27.0)",
+ org.georegression;bundle-version="[0.7.0,0.8.0)"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Export-Package: org.dawnsci.boofcv,
@@ -19,3 +18,8 @@ Import-Package: org.dawb.common.services,
  org.slf4j;version="1.7.6",
  uk.ac.diamond.scisoft.analysis.metadata
 Service-Component: OSGI-INF/*.xml
+Bundle-ClassPath: .,
+ jars/org.boofcv.feature_0.18.0.jar,
+ jars/org.boofcv.geo_0.18.0.jar,
+ jars/org.boofcv.ip_0.18.0.jar,
+ jars/org.boofcv.sfm_0.18.0.jar

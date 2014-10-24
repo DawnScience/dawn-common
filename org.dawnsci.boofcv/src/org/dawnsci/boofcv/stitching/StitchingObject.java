@@ -8,7 +8,7 @@
  */
 package org.dawnsci.boofcv.stitching;
 
-import georegression.struct.homo.Homography2D_F64;
+import georegression.struct.homography.Homography2D_F64;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.PixelTransformHomography_F32;
 import boofcv.alg.distort.impl.DistortSupport;
@@ -144,9 +144,8 @@ public class StitchingObject<T extends ImageSingleBand<?>> {
 
 		// used to render the results onto an image
 		PixelTransformHomography_F32 model = new PixelTransformHomography_F32();
-		ImageDistort<MultiSpectral<ImageFloat32>> distort =
-		DistortSupport.createDistortMS(ImageFloat32.class, model, new ImplBilinearPixel_F32(), null);
-
+		ImageDistort<MultiSpectral<ImageFloat32>, MultiSpectral<ImageFloat32>> distort =
+		DistortSupport.createDistortMS(ImageFloat32.class, model, new ImplBilinearPixel_F32(), true, null);
 		// render first image
 		model.set(fromWorkToA);
 		distort.apply(imageA, work);
@@ -222,7 +221,7 @@ public class StitchingObject<T extends ImageSingleBand<?>> {
 
 			// used to render the results onto an image
 			PixelTransformHomography_F32 model = new PixelTransformHomography_F32();
-			ImplImageDistort_I16<ImageSInt16> distort = new ImplImageDistort_I16<ImageSInt16>(
+			ImplImageDistort_I16<ImageSInt16, ImageSInt16> distort = new ImplImageDistort_I16<ImageSInt16, ImageSInt16>(
 					new NearestNeighborPixel_S16(), null);
 			distort.setModel(model);
 

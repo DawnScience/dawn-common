@@ -24,6 +24,7 @@ import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.BorderType;
+import boofcv.struct.ConnectRule;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
@@ -94,7 +95,7 @@ public class BoofCVImageFilterImpl implements IImageFilterService {
 	public IDataset filterErode(IDataset input, boolean isBinary) {
 		ImageUInt8 converted = ConvertIDataset.convertFrom(input, ImageUInt8.class, 1);
 
-		ImageUInt8 filtered = BinaryImageOps.erode8(converted, null);
+		ImageUInt8 filtered = BinaryImageOps.erode8(converted, 1, null);
 
 		return ConvertIDataset.convertTo(filtered, isBinary);
 	}
@@ -103,7 +104,7 @@ public class BoofCVImageFilterImpl implements IImageFilterService {
 	public IDataset filterDilate(IDataset input, boolean isBinary) {
 		ImageUInt8 converted = ConvertIDataset.convertFrom(input, ImageUInt8.class, 1);
 
-		ImageUInt8 filtered = BinaryImageOps.dilate8(converted, null);
+		ImageUInt8 filtered = BinaryImageOps.dilate8(converted, 1, null);
 
 		return ConvertIDataset.convertTo(filtered, isBinary);
 	}
@@ -111,13 +112,13 @@ public class BoofCVImageFilterImpl implements IImageFilterService {
 	@Override
 	public IDataset filterErodeAndDilate(IDataset input, boolean isBinary) {
 		ImageUInt8 converted = ConvertIDataset.convertFrom(input, ImageUInt8.class, 1);
-		ImageUInt8 eroded = BinaryImageOps.erode8(converted, null);
-		ImageUInt8 delated = BinaryImageOps.dilate8(eroded, null);
+		ImageUInt8 eroded = BinaryImageOps.erode8(converted, 1, null);
+		ImageUInt8 delated = BinaryImageOps.dilate8(eroded, 1, null);
 		return ConvertIDataset.convertTo(delated, isBinary);
 	}
 
 	@Override
-	public IDataset filterContour(IDataset input, int rule, int colorExternal, int colorInternal) {
+	public IDataset filterContour(IDataset input, int rule, int colorExternal, int colorInternal) throws Exception {
 		int[] shape = getShape(input);
 		
 		ImageFloat32 converted = ConvertIDataset.convertFrom(input, ImageFloat32.class, 1);
@@ -130,7 +131,15 @@ public class BoofCVImageFilterImpl implements IImageFilterService {
 		ThresholdImageOps.threshold(converted, binary, (float) mean, true);
 
 		// Detect blobs inside the image using a rule
-		List<Contour> contours = BinaryImageOps.contour(binary, rule, null);
+		ConnectRule[] rules = ConnectRule.values();
+		ConnectRule contourRule = null;
+		for (int i = 0; i < rules.length; i++) {
+			if (rules[i].getShortName().equals(String.valueOf(rule)))
+				contourRule = rules[i];
+		}
+		if (contourRule == null)
+			throw new Exception("Rule parameter can be 4 or 8 only");
+		List<Contour> contours = BinaryImageOps.contour(binary, contourRule, null);
 
 		return ConvertIDataset.contourImageToIDataset(contours, colorExternal, colorInternal, shape[1], shape[0]);
 	}

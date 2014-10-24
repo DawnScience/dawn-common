@@ -12,7 +12,7 @@ import georegression.fitting.MotionTransformPoint;
 import georegression.fitting.homography.ModelManagerHomography2D_F64;
 import georegression.fitting.se.ModelManagerSe2_F64;
 import georegression.fitting.se.MotionSe2PointSVD_F64;
-import georegression.struct.homo.Homography2D_F64;
+import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se2_F64;
 

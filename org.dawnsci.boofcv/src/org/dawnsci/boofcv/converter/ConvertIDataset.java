@@ -180,11 +180,10 @@ public class ConvertIDataset {
 	static {
 		imageToElementClass = new HashMap<Class<? extends ImageBase<?>>, Class<?>>();
 		for (ImageDataType i : ImageDataType.values()) {
-			imageToElementClass.put(ImageDataType.typeToClass(i), i.getDataType());
+			imageToElementClass.put(ImageDataType.typeToSingleClass(i), i.getDataType());
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	public static <T extends ImageBase<?>> T convertFrom(IDataset src, Class<T> clazz, int bands) {
 		Dataset ds;
 		int ddt = AbstractDataset.getDTypeFromClass(imageToElementClass.get(clazz), bands);
