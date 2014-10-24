@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.dawb.common.services.ServiceManager;
 import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.util.list.SortNatural;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
@@ -22,6 +23,8 @@ import org.eclipse.dawnsci.analysis.api.image.IImageStitchingProcess;
 import org.eclipse.dawnsci.analysis.dataset.impl.Activator;
 import org.eclipse.dawnsci.analysis.dataset.impl.LazyDataset;
 import org.eclipse.dawnsci.plotting.api.region.IRegion;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import uk.ac.diamond.scisoft.analysis.io.DataHolder;
 import uk.ac.diamond.scisoft.analysis.io.ImageStackLoader;
@@ -36,6 +39,7 @@ import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
  */
 public class ImagesToStitchedConverter extends AbstractImageConversion {
 
+	private static final Logger logger = LoggerFactory.getLogger(ImagesToStitchedConverter.class);
 	private List<IDataset> imageStack = new ArrayList<IDataset>();
 
 	private IImageStitchingProcess stitcher;
@@ -56,6 +60,14 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 		if (stitcher == null) {
 			stitcher = (IImageStitchingProcess) Activator
 					.getService(IImageStitchingProcess.class);
+			if (stitcher == null) {
+				try {
+					stitcher = (IImageStitchingProcess) ServiceManager.getService(IImageStitchingProcess.class);
+				} catch (Exception e) {
+					logger.error("Error getting Stitching service:" + e);
+					e.printStackTrace();
+				}
+			}
 		}
 	}
 

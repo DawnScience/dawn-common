@@ -10,6 +10,7 @@ package org.dawnsci.conversion.ui.pages;
 
 import java.io.File;
 
+import org.dawb.common.services.ServiceManager;
 import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.ui.wizard.ResourceChoosePage;
 import org.dawb.common.util.io.FileUtils;
@@ -324,8 +325,14 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 
 	private void createImageTransformer() {
 		if (transformer == null) {
-			transformer = (IImageTransform) Activator
-					.getService(IImageTransform.class);
+			transformer = (IImageTransform) Activator.getService(IImageTransform.class);
+			if (transformer == null) {
+				try {
+					transformer = (IImageTransform) ServiceManager.getService(IImageTransform.class);
+				} catch (Exception e) {
+					logger.error("Error getting transform service :" + e);
+				}
+			}
 		}
 	}
 
