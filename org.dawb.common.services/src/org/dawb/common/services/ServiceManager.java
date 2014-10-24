@@ -16,6 +16,8 @@ import java.util.Map;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.dawnsci.analysis.api.image.IImageFilterService;
+import org.eclipse.dawnsci.analysis.api.image.IImageStitchingProcess;
+import org.eclipse.dawnsci.analysis.api.image.IImageTransform;
 import org.eclipse.dawnsci.analysis.api.io.ILoaderService;
 import org.eclipse.dawnsci.analysis.api.processing.IOperationService;
 import org.eclipse.ui.PlatformUI;
@@ -32,7 +34,7 @@ public class ServiceManager {
 	
 	private static final Collection<Class<? extends Object>> OFFLINE_SERVICES; 
 	static {
-		OFFLINE_SERVICES = new HashSet<Class<? extends Object>>(4);
+		OFFLINE_SERVICES = new HashSet<Class<? extends Object>>(12);
 		OFFLINE_SERVICES.add(IHardwareService.class);
 		OFFLINE_SERVICES.add(ILoaderService.class);
 		OFFLINE_SERVICES.add(IPlotImageService.class);
@@ -42,6 +44,8 @@ public class ServiceManager {
 		OFFLINE_SERVICES.add(IClassLoaderService.class);
 		OFFLINE_SERVICES.add(IPersistenceService.class);
 		OFFLINE_SERVICES.add(IImageFilterService.class);
+		OFFLINE_SERVICES.add(IImageTransform.class);
+		OFFLINE_SERVICES.add(IImageStitchingProcess.class);
 		OFFLINE_SERVICES.add(IOperationService.class);
 	}
 	
