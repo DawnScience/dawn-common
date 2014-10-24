@@ -12,7 +12,20 @@ Require-Bundle: org.eclipse.core.runtime,
  org.georegression;bundle-version="[0.7.0,0.8.0)"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
-Export-Package: org.dawnsci.boofcv,
+Export-Package: boofcv.abst.filter,
+ boofcv.abst.filter.blur,
+ boofcv.abst.filter.derivative,
+ boofcv.alg.filter.binary,
+ boofcv.alg.filter.blur,
+ boofcv.alg.filter.derivative,
+ boofcv.alg.misc,
+ boofcv.core.image,
+ boofcv.core.image.border,
+ boofcv.factory.filter.blur,
+ boofcv.factory.filter.derivative,
+ boofcv.struct,
+ boofcv.struct.image,
+ org.dawnsci.boofcv,
  org.dawnsci.boofcv.converter
 Import-Package: org.dawb.common.services,
  org.slf4j;version="1.7.6",
