@@ -51,7 +51,7 @@ public class CursorUtils {
 		
 		double xCoordinate = xAxis.getPositionValue(me.x);
 		double yCoordinate = yAxis.getPositionValue(me.y);
-		double intensity   = Double.NaN;
+		String intensityText = null;
 		if (imageTrace!=null) {
 			xCoordinate = Math.floor(xCoordinate);
 			yCoordinate = Math.floor(yCoordinate);
@@ -72,8 +72,11 @@ public class CursorUtils {
 			if (j >= shape[1]) {
 				j = shape[1] - 1;
 			}
-			intensity = image.getDouble(i, j);
-		    
+			double intensity = image.getDouble(i, j);
+		    if (!Double.isNaN(intensity)) {
+		    	image.setStringFormat(intensityFormat);
+		    	intensityText = image.getString(i, j);
+		    }
 			try {
 				double[] axisPnt = imageTrace.getPointInAxisCoordinates(new double[]{xCoordinate, yCoordinate});
 			    xCoordinate = axisPnt[0];
@@ -84,8 +87,8 @@ public class CursorUtils {
 		}
 		
 		StringBuilder buf = new StringBuilder();
-		if (!Double.isNaN(intensity)) {
-			buf.append(intensityFormat.format(intensity));
+		if (intensityText != null) {
+			buf.append(intensityText);
 			//buf.append("  ");
 		}
 		buf.append("\n[");
