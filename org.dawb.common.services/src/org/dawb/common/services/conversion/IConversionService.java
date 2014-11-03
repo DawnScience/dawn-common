@@ -39,6 +39,8 @@ package org.dawb.common.services.conversion;
  * 2.2 Set this visitor on the context using IConversionContext.setConversionVisitor(...)
  * 2.3 Call conversion as normal, each slice will be sent for the visitor to do the writing.
  * 
+ * 
+ * TODO FIXME Move this service to org.eclipse.dawnsci.conversion with few dependencies.
  */
 public interface IConversionService {
 
