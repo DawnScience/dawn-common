@@ -43,13 +43,13 @@ import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.Slice;
 import org.eclipse.dawnsci.analysis.api.io.ScanFileHolderException;
 import org.eclipse.dawnsci.analysis.api.monitor.IMonitor;
+import org.eclipse.dawnsci.analysis.api.tree.Node;
+import org.eclipse.dawnsci.analysis.api.tree.TreeFile;
 import org.eclipse.dawnsci.analysis.dataset.impl.Dataset;
 import org.eclipse.dawnsci.analysis.dataset.impl.DatasetUtils;
 import org.eclipse.dawnsci.analysis.dataset.impl.PositionIterator;
 import org.eclipse.dawnsci.hdf5.HierarchicalDataFactory;
 import org.eclipse.dawnsci.hdf5.IHierarchicalDataFile;
-import org.eclipse.dawnsci.hdf5.api.HDF5File;
-import org.eclipse.dawnsci.hdf5.api.HDF5Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -492,8 +492,8 @@ public class CustomNCDConverter extends AbstractConversion  {
 	
 	private String getAxisUnit(String datasetName, File path) {
 		try {
-			HDF5File tree = new HDF5Loader(path.getAbsolutePath()).loadTree();
-			HDF5Node node = tree.findNodeLink(datasetName).getDestination();
+			TreeFile tree = new HDF5Loader(path.getAbsolutePath()).loadTree();
+			Node node = tree.findNodeLink(datasetName).getDestination();
 			String units = null;
 			if (node.containsAttribute("units")) {
 				units = node.getAttribute("units").getFirstElement();
