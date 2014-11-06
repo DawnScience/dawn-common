@@ -44,7 +44,7 @@ import org.eclipse.dawnsci.analysis.api.dataset.Slice;
 import org.eclipse.dawnsci.analysis.api.io.ScanFileHolderException;
 import org.eclipse.dawnsci.analysis.api.monitor.IMonitor;
 import org.eclipse.dawnsci.analysis.api.tree.Node;
-import org.eclipse.dawnsci.analysis.api.tree.TreeFile;
+import org.eclipse.dawnsci.analysis.api.tree.Tree;
 import org.eclipse.dawnsci.analysis.dataset.impl.Dataset;
 import org.eclipse.dawnsci.analysis.dataset.impl.DatasetUtils;
 import org.eclipse.dawnsci.analysis.dataset.impl.PositionIterator;
@@ -492,7 +492,7 @@ public class CustomNCDConverter extends AbstractConversion  {
 	
 	private String getAxisUnit(String datasetName, File path) {
 		try {
-			TreeFile tree = new HDF5Loader(path.getAbsolutePath()).loadTree();
+			Tree tree = new HDF5Loader(path.getAbsolutePath()).loadTree();
 			Node node = tree.findNodeLink(datasetName).getDestination();
 			String units = null;
 			if (node.containsAttribute("units")) {
