@@ -9,7 +9,6 @@
 package org.dawnsci.persistence.internal;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -23,6 +22,7 @@ import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.Slice;
 import org.eclipse.dawnsci.analysis.api.fitting.functions.IFunction;
 import org.eclipse.dawnsci.analysis.api.metadata.OriginMetadata;
+import org.eclipse.dawnsci.analysis.api.processing.AbstractOperation;
 import org.eclipse.dawnsci.analysis.api.processing.IOperation;
 import org.eclipse.dawnsci.analysis.api.processing.IOperationService;
 import org.eclipse.dawnsci.analysis.api.processing.OperationData;
@@ -91,7 +91,7 @@ public class PersistJsonOperationHelper {
 			if (service == null) service = (IOperationService)ServiceManager.getService(IOperationService.class);
 
 			IOperation op = service.create(sid);
-			Class modelType = (Class)((ParameterizedType)op.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+			Class modelType = ((AbstractOperation)op).getModelClass();
 			if (mapper == null) mapper = new ObjectMapper();
 			
 			try {
