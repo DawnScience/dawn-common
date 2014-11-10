@@ -46,7 +46,7 @@ public class JunkTestOperation extends AbstractOperation<JunkTestOperationModel,
 		ax1.setName("Junk1Dax");
 		
 		AxesMetadataImpl am = new AxesMetadataImpl(1);
-		am.addAxis(ax1, 0);
+		am.addAxis(0, ax1);
 		
 		out.setMetadata(am);
 		
