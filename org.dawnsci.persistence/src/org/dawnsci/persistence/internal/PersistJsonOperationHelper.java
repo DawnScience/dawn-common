@@ -41,6 +41,7 @@ import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 import uk.ac.diamond.scisoft.analysis.metadata.OriginMetadataImpl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 public class PersistJsonOperationHelper {
 
@@ -163,6 +164,7 @@ public class PersistJsonOperationHelper {
 	public String getModelJson(IOperationModel model) throws Exception {
 		
 		if (mapper == null ) mapper = new ObjectMapper();
+		mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
 		return mapper.writeValueAsString(model);
 	}
 
