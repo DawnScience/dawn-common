@@ -273,6 +273,12 @@ public abstract class AbstractSliceConversionPage extends ResourceChoosePage {
 	        setPageComplete(false);
 			return;
 		}
+		
+		// If we have a suggested datasetName, try that
+		if (context.getDatasetNames()!=null && !context.getDatasetNames().isEmpty()) {
+			this.datasetName = context.getDatasetNames().get(0);
+		}
+		
 		// We populate the names later using a wizard task.
         try {
         	getNamesOfSupportedRank();
