@@ -11,6 +11,7 @@ package org.dawb.common.ui.wizard;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -416,6 +417,7 @@ public abstract class AbstractSliceConversionPage extends ResourceChoosePage {
 				try {
                     final List<String> names = getActiveDatasets(context, monitor);
                     if (names==null || names.isEmpty()) return;
+                    Collections.sort(names);
                     
                     Display.getDefault().asyncExec(new Runnable() {
                     	public void run() {
