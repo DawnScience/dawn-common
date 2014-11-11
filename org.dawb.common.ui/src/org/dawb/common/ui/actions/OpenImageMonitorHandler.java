@@ -8,16 +8,12 @@
  */ 
 package org.dawb.common.ui.actions;
 
-import java.io.File;
-
 import org.dawb.common.ui.util.EclipseUtils;
 import org.dawb.common.ui.views.ImageMonitorView;
 import org.dawb.common.util.io.FileUtils;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IFolder;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -26,13 +22,13 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
 
 
 public class OpenImageMonitorHandler extends AbstractHandler implements IObjectActionDelegate {
 
-	private static final Logger logger = LoggerFactory.getLogger(OpenImageMonitorHandler.class);
+//	private static final Logger logger = LoggerFactory.getLogger(OpenImageMonitorHandler.class);
 	
 	@Override
 	public void run(IAction action) {
