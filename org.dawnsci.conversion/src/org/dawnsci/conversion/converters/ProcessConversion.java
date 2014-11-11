@@ -9,7 +9,6 @@
 package org.dawnsci.conversion.converters;
 
 import java.io.File;
-import java.security.acl.LastOwnerException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -25,7 +24,6 @@ import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
 import org.eclipse.dawnsci.analysis.api.processing.IOperationService;
 import org.eclipse.dawnsci.analysis.api.processing.ISliceConfiguration;
 import org.eclipse.dawnsci.analysis.api.slice.Slicer;
-import org.eclipse.dawnsci.analysis.dataset.impl.LazyDataset;
 
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 import uk.ac.diamond.scisoft.analysis.metadata.AxesMetadataImpl;
@@ -78,7 +76,7 @@ public class ProcessConversion extends AbstractConversion {
 						}
 					}
 					
-					axMeta.setAxis(key-1, new ILazyDataset[] {lazyDataset});
+					axMeta.setAxis(key-1, lazyDataset);
 				}
 				
 				lz.setMetadata(axMeta);
