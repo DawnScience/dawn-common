@@ -28,3 +28,4 @@ Import-Package: org.dawb.common.ui.monitor,
  org.eclipse.nebula.widgets.formattedtext,
  org.slf4j;version="[1.7.6,1.7.7)"
 Export-Package: org.dawnsci.conversion.ui
+Service-Component: OSGI-INF/*.xml

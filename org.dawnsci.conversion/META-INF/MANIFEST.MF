@@ -31,4 +31,4 @@ Export-Package: org.dawnsci.conversion,
 Bundle-ClassPath: .,
  jars/cansas1d-1.1.jar
 Bundle-ActivationPolicy: lazy
-Service-Component: OSGI-INF/component.xml
+Service-Component: OSGI-INF/*.xml

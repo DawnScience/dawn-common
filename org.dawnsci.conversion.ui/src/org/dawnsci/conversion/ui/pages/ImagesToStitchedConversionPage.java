@@ -71,7 +71,7 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 
 	private IDataset firstImage;
 
-	private IImageTransform transformer;
+	private static IImageTransform transformer;
 
 	public ImagesToStitchedConversionPage() {
 		super("Convert image directory", null, null);
@@ -323,15 +323,20 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 		}
 	}
 
+	/**
+	 * Injected by OSGI
+	 * @param it
+	 */
+	public static void setImageTransform(IImageTransform it) {
+		transformer = it;
+	}
+	
 	private void createImageTransformer() {
 		if (transformer == null) {
-			transformer = (IImageTransform) Activator.getService(IImageTransform.class);
-			if (transformer == null) {
-				try {
-					transformer = (IImageTransform) ServiceManager.getService(IImageTransform.class);
-				} catch (Exception e) {
-					logger.error("Error getting transform service :" + e);
-				}
+			try {
+				transformer = (IImageTransform) ServiceManager.getService(IImageTransform.class);
+			} catch (Exception e) {
+				logger.error("Error getting transform service :" + e);
 			}
 		}
 	}

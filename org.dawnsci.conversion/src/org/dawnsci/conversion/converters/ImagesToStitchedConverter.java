@@ -20,7 +20,6 @@ import org.dawb.common.util.list.SortNatural;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
 import org.eclipse.dawnsci.analysis.api.image.IImageStitchingProcess;
-import org.eclipse.dawnsci.analysis.dataset.impl.Activator;
 import org.eclipse.dawnsci.analysis.dataset.impl.LazyDataset;
 import org.eclipse.dawnsci.plotting.api.region.IRegion;
 import org.slf4j.Logger;
@@ -42,10 +41,13 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 	private static final Logger logger = LoggerFactory.getLogger(ImagesToStitchedConverter.class);
 	private List<IDataset> imageStack = new ArrayList<IDataset>();
 
-	private IImageStitchingProcess stitcher;
+	private static IImageStitchingProcess stitcher;
 
-	public ImagesToStitchedConverter(IConversionContext context)
-			throws Exception {
+	public ImagesToStitchedConverter() {
+		super(null);
+	}
+	
+	public ImagesToStitchedConverter(IConversionContext context) throws Exception {
 		super(context);
 		final File dir = new File(context.getOutputPath());
 		dir.mkdirs();
@@ -55,18 +57,22 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 		context.setLazyDataset(set);
 		context.addSliceDimension(0, "all");
 	}
+	
+	/**
+	 * OSGI Calls this
+	 * @param s
+	 */
+	public static void setImageSticher(IImageStitchingProcess s) {
+		stitcher = s;
+	}
 
 	private void createImageStitcher() {
 		if (stitcher == null) {
-			stitcher = (IImageStitchingProcess) Activator
-					.getService(IImageStitchingProcess.class);
-			if (stitcher == null) {
-				try {
-					stitcher = (IImageStitchingProcess) ServiceManager.getService(IImageStitchingProcess.class);
-				} catch (Exception e) {
-					logger.error("Error getting Stitching service:" + e);
-					e.printStackTrace();
-				}
+			try {
+				stitcher = (IImageStitchingProcess) ServiceManager.getService(IImageStitchingProcess.class);
+			} catch (Exception e) {
+				logger.error("Error getting Stitching service:" + e);
+				e.printStackTrace();
 			}
 		}
 	}
