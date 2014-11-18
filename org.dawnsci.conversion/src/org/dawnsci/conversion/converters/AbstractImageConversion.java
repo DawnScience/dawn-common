@@ -11,15 +11,23 @@ package org.dawnsci.conversion.converters;
 import java.io.File;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import org.dawb.common.services.conversion.IConversionContext;
+import org.dawb.common.util.list.SortNatural;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
+import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
+import org.eclipse.dawnsci.analysis.dataset.impl.LazyDataset;
 import org.eclipse.dawnsci.plotting.api.PlotType;
 import org.eclipse.dawnsci.plotting.api.histogram.ImageServiceBean;
 
 import uk.ac.diamond.scisoft.analysis.dataset.function.Downsample;
 import uk.ac.diamond.scisoft.analysis.dataset.function.DownsampleMode;
+import uk.ac.diamond.scisoft.analysis.io.ImageStackLoader;
+import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 
 public abstract class AbstractImageConversion extends AbstractConversion {
 
@@ -29,9 +37,59 @@ public abstract class AbstractImageConversion extends AbstractConversion {
 		super(context);
 	}
 	
+	public void process(IConversionContext context) throws Exception {
+		
+		if (context.getLazyDataset()==null) { // We might be able to make one from images
+			try {
+				// Detect if the input is a directory of images and
+				// then set the lazy dataset to be the loader factory getImageStack(...)
+				List<String> images = null;
+				
+				final List<String> filePaths = context.getFilePaths();
+				String firstPath = filePaths.get(0);
+				File first = expand(firstPath).get(0);
+				if (first.isFile()) {
+					final List<String> sets  = getDataNames(first);
+					final List<String> names = context.getDatasetNames();
+	
+					// If they chose 'Image Stack' only, it might be a stack of images 
+					// In this case we get the one image we are on for this file and
+					// this is the data top convert.
+					// This fixes being able to convert a directory of images to tiffs.
+					if (sets!=null && sets.size()==1 && names!=null && names.size()==1) {
+						// In this case sets contains something like 'EDF' and names contains Image Stack.
+						if (names.get(0).equals("Image Stack") && !sets.containsAll(names)) {
+							images = new ArrayList<String>(89);
+						}
+					}
+				}
+				
+				// Directory parse wanted if not, null.
+				if (images!=null) {
+					for (String filePathRegEx : filePaths) {
+						final List<File> paths = expand(filePathRegEx);
+						for (File file : paths) images.add(file.getAbsolutePath());
+					}
+					
+					final IDataHolder holder = LoaderFactory.getData(images.get(0), context.getMonitor());
+		 		    Collections.sort(images, new SortNatural<String>(true));
+					ImageStackLoader loader = new ImageStackLoader(images, holder, context.getMonitor());
+					LazyDataset lazyDataset = new LazyDataset("Image Stack", loader.getDtype(), loader.getShape(), loader);
+				    context.setLazyDataset(lazyDataset);
+				}
+				
+			} catch (Exception ne) {
+				// We have not managed to assign the image directory and carry on...
+			}
+		}
+
+		
+		super.process(context);
+	}
+	
 	protected void iterate(final ILazyDataset         lz, 
-            final String               nameFrag,
-            final IConversionContext   context) throws Exception {
+		                   final String               nameFrag,
+		                   final IConversionContext   context) throws Exception {
 		
 		imageCounter = 0;
 		
