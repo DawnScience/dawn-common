@@ -11,7 +11,6 @@ package org.dawnsci.persistence.internal;
 import org.dawb.common.services.IPersistenceService;
 import org.dawb.common.services.IPersistentFile;
 import org.dawnsci.persistence.json.JacksonMarshaller;
-import org.dawnsci.persistence.workflow.xml.MomlUpdater;
 import org.eclipse.dawnsci.hdf5.HierarchicalDataFactory;
 import org.eclipse.dawnsci.hdf5.IHierarchicalDataFile;
 import org.slf4j.Logger;
@@ -72,10 +71,5 @@ public class PersistenceServiceImpl implements IPersistenceService{
 			e.printStackTrace();
 			return null;
 		}
-	}
-
-	@Override
-	public String deleteExpressionModeFromMoml(String filePath) {
-		return MomlUpdater.updateMoml(filePath);
 	}
 }
