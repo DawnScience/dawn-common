@@ -56,7 +56,6 @@ import org.eclipse.ui.forms.events.ExpansionEvent;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.mihalis.opal.checkBoxGroup.CheckBoxGroup;
 
-import uk.ac.diamond.scisoft.analysis.io.DataHolder;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 
 public class H5From1DConvertPage extends ResourceChoosePage implements

@@ -39,7 +39,6 @@ import org.eclipse.ui.forms.events.ExpansionAdapter;
 import org.eclipse.ui.forms.events.ExpansionEvent;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 
-import uk.ac.diamond.scisoft.analysis.Activator;
 import uk.ac.diamond.scisoft.analysis.dataset.function.DownsampleMode;
 
 /**
