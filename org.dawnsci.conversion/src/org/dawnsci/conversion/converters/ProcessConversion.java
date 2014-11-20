@@ -21,8 +21,8 @@ import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.Slice;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
+import org.eclipse.dawnsci.analysis.api.processing.IOperationContext;
 import org.eclipse.dawnsci.analysis.api.processing.IOperationService;
-import org.eclipse.dawnsci.analysis.api.processing.ISliceConfiguration;
 import org.eclipse.dawnsci.analysis.api.slice.Slicer;
 
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
@@ -91,18 +91,9 @@ public class ProcessConversion extends AbstractConversion {
 		
 		OriginMetadataImpl om = new OriginMetadataImpl(lz, init, dataDims, context.getSelectedConversionFile().getAbsolutePath(), context.getDatasetNames().get(0));
 		lz.setMetadata(om);
-		ISliceConfiguration rich = new ISliceConfiguration() {
-			
-			@Override
-			public Map<Integer, String> getSlicing() {
-				return sliceDimensions;
-			}
-			
-			@Override
-			public ILazyDataset getData() {
-				return lz;
-			}
-		};
+		IOperationContext cc = service.createContext();
+		cc.setData(lz);
+		cc.setSlicing(sliceDimensions);
 		
 		String name = getFileNameNoExtension(context.getSelectedConversionFile());
 		String outputFolder = context.getOutputPath();
@@ -115,7 +106,12 @@ public class ProcessConversion extends AbstractConversion {
 		
 		
 		//TODO output path
-		service.executeSeries(rich, context.getMonitor(), info.getExecutionVisitor(full), info.getOperationSeries());
+		
+		// Run
+		cc.setMonitor(context.getMonitor());
+		cc.setVisitor(info.getExecutionVisitor(full));
+		cc.setSeries(info.getOperationSeries());
+		service.execute(cc);
 	}
 	
 	protected ILazyDataset getLazyDataset(final File                 path, 
