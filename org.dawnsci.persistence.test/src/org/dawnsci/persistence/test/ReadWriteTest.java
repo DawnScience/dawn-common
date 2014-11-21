@@ -14,10 +14,10 @@ import static org.junit.Assert.fail;
 
 import java.io.File;
 
-import org.dawb.common.services.IPersistenceService;
-import org.dawb.common.services.IPersistentFile;
 import org.dawnsci.persistence.PersistenceServiceCreator;
 import org.dawnsci.persistence.internal.PersistenceConstants;
+import org.eclipse.dawnsci.analysis.api.persistence.IPersistenceService;
+import org.eclipse.dawnsci.analysis.api.persistence.IPersistentFile;
 import org.junit.Test;
 
 public class ReadWriteTest extends AbstractThreadTestBase {

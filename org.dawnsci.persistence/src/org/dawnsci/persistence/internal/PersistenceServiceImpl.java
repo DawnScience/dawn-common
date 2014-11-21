@@ -8,9 +8,10 @@
  */
 package org.dawnsci.persistence.internal;
 
-import org.dawb.common.services.IPersistenceService;
-import org.dawb.common.services.IPersistentFile;
+import org.dawb.common.services.ServiceManager;
 import org.dawnsci.persistence.json.JacksonMarshaller;
+import org.eclipse.dawnsci.analysis.api.persistence.IPersistenceService;
+import org.eclipse.dawnsci.analysis.api.persistence.IPersistentFile;
 import org.eclipse.dawnsci.hdf5.HierarchicalDataFactory;
 import org.eclipse.dawnsci.hdf5.IHierarchicalDataFile;
 import org.slf4j.Logger;
@@ -37,7 +38,11 @@ public class PersistenceServiceImpl implements IPersistenceService{
 	 * Default Constructor
 	 */
 	public PersistenceServiceImpl(){
-		// Important do nothing here, OSGI may start the service more than once.
+		// Makes the lookup faster. Also until we remove
+		// ServiceManager there are a number of places which use
+		// the ServiceManager to get the IPersistenceService when
+		// they should be using OSGI.
+		ServiceManager.setService(IPersistenceService.class, this);
 	}
 
 	@Override

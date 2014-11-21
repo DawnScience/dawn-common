@@ -8,8 +8,8 @@
  */
 package org.dawnsci.persistence;
 
-import org.dawb.common.services.IPersistenceService;
 import org.dawnsci.persistence.internal.PersistenceServiceImpl;
+import org.eclipse.dawnsci.analysis.api.persistence.IPersistenceService;
 
 /**
  * Class used to test the PersistenceServiceImpl

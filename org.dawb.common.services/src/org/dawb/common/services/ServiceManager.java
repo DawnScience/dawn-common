@@ -19,6 +19,7 @@ import org.eclipse.dawnsci.analysis.api.image.IImageFilterService;
 import org.eclipse.dawnsci.analysis.api.image.IImageStitchingProcess;
 import org.eclipse.dawnsci.analysis.api.image.IImageTransform;
 import org.eclipse.dawnsci.analysis.api.io.ILoaderService;
+import org.eclipse.dawnsci.analysis.api.persistence.IPersistenceService;
 import org.eclipse.dawnsci.analysis.api.processing.IOperationService;
 import org.eclipse.ui.PlatformUI;
 /**
@@ -28,8 +29,10 @@ import org.eclipse.ui.PlatformUI;
  * only be available when a workbench is running
  * 
  * @author Matthew Gerring
- *
+ * 
+ * @deprecated Use OSGI Services instead. Get in touch if you need help with this...
  */
+@Deprecated
 public class ServiceManager {
 	
 	private static final Collection<Class<? extends Object>> OFFLINE_SERVICES; 
@@ -48,7 +51,7 @@ public class ServiceManager {
 		OFFLINE_SERVICES.add(IImageStitchingProcess.class);
 		OFFLINE_SERVICES.add(IOperationService.class);
 	}
-	
+
 	/**
 	 * Tries eclipse service, then osgi service, then reading eclipse extension points.
 	 * 

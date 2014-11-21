@@ -15,7 +15,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.dawb.common.services.ServiceManager;
 import org.dawnsci.persistence.json.IJSonMarshaller;
 import org.dawnsci.persistence.json.JacksonMarshaller;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
@@ -31,7 +30,6 @@ import org.eclipse.dawnsci.analysis.api.roi.IROI;
 import org.eclipse.dawnsci.analysis.dataset.impl.Dataset;
 import org.eclipse.dawnsci.analysis.dataset.impl.DatasetFactory;
 import org.eclipse.dawnsci.analysis.dataset.impl.DatasetUtils;
-import org.eclipse.dawnsci.analysis.dataset.impl.IntegerDataset;
 import org.eclipse.dawnsci.hdf5.IHierarchicalDataFile;
 import org.eclipse.dawnsci.hdf5.Nexus;
 import org.slf4j.Logger;
@@ -45,9 +43,10 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 
 public class PersistJsonOperationHelper {
 
-	ObjectMapper mapper;
-	IOperationService service;
 	
+	private final static Logger logger = LoggerFactory.getLogger(PersistJsonOperationHelper.class);
+
+	// Static stuff
 	private final static String DATA = "data";
 	private final static String ID = "id";
 	private final static String SLASH = "/";
@@ -59,7 +58,14 @@ public class PersistJsonOperationHelper {
 	private final static String DATASETS = "datasets";
 	private final static String ORIGIN = "origin";
 	
-	private final static Logger logger = LoggerFactory.getLogger(PersistJsonOperationHelper.class);
+    // Encapsulation is good
+	private ObjectMapper       mapper;
+	private IOperationService  service;
+	
+	// OSGI Kindly fills this for us
+	public void setOperationService(IOperationService s) {
+		service = s;
+	}
 	
 	public IOperation<? extends IOperationModel, ? extends OperationData>[] readOperations(IHierarchicalDataFile file) throws Exception{
 		
@@ -89,8 +95,6 @@ public class PersistJsonOperationHelper {
 				logger.error("Could not read pass/save nodes", e);
 			}
 			
-			if (service == null) service = (IOperationService)ServiceManager.getService(IOperationService.class);
-
 			IOperation op = service.create(sid);
 			Class modelType = ((AbstractOperation)op).getModelClass();
 			if (mapper == null) mapper = new ObjectMapper();
