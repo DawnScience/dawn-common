@@ -17,11 +17,11 @@ import java.util.List;
 
 import org.dawb.common.ui.util.EclipseUtils;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
+import org.eclipse.dawnsci.analysis.api.io.IFileLoader;
 import org.eclipse.dawnsci.analysis.api.monitor.IMonitor;
 import org.eclipse.ui.IWorkbenchPage;
 
 import uk.ac.diamond.scisoft.analysis.SDAPlotter;
-import uk.ac.diamond.scisoft.analysis.io.AbstractFileLoader;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 
 public class Utils {
@@ -58,13 +58,13 @@ public class Utils {
 		List<IDataset> data = new ArrayList<IDataset>();
 		String[] tmp = names.get(0).split("\\.");
 		String extension = tmp[tmp.length - 1];
-		Class<? extends AbstractFileLoader> loaderClass = LoaderFactory.getLoaderClass(extension);
+		Class<? extends IFileLoader> loaderClass = LoaderFactory.getLoaderClass(extension);
 		try {
 			Constructor<?> constructor = loaderClass.getConstructor(String.class);
 			for (String n : names) {
 				IDataset a;
 				try {
-					AbstractFileLoader l = (AbstractFileLoader) constructor.newInstance(n);
+					IFileLoader l = (IFileLoader) constructor.newInstance(n);
 					a = l.loadFile(progressMonitorWrapper).getDataset(0);
 					if (n.contains("/")) {
 						String name = n.substring(n.lastIndexOf("/") + 1);
