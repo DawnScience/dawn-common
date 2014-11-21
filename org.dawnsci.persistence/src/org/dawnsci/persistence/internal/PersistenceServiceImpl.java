@@ -38,11 +38,7 @@ public class PersistenceServiceImpl implements IPersistenceService{
 	 * Default Constructor
 	 */
 	public PersistenceServiceImpl(){
-		// Makes the lookup faster. Also until we remove
-		// ServiceManager there are a number of places which use
-		// the ServiceManager to get the IPersistenceService when
-		// they should be using OSGI.
-		ServiceManager.setService(IPersistenceService.class, this);
+		// Do nothing
 	}
 
 	@Override
