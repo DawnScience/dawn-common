@@ -64,13 +64,15 @@ public class PersistJsonOperationHelper {
 	private final static String ORIGIN = "origin";
 	
     // Encapsulation is good
-	private ObjectMapper       mapper;
-	private IOperationService  service;
+	private static IOperationService  service;
 	
 	// OSGI Kindly fills this for us
-	public void setOperationService(IOperationService s) {
+	public static void setOperationService(IOperationService s) {
 		service = s;
 	}
+	
+	private ObjectMapper       mapper;
+
 	
 	public IOperation<? extends IOperationModel, ? extends OperationData>[] readOperations(IHierarchicalDataFile file) throws Exception{
 		
