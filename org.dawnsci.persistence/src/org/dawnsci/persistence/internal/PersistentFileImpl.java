@@ -652,7 +652,7 @@ class PersistentFileImpl implements IPersistentFile {
 		
 	}
 	
-	public void setOperations(IOperation<? extends IOperationModel, ? extends OperationData>[] operations) throws Exception  {
+	public void setOperations(IOperation<? extends IOperationModel, ? extends OperationData>... operations) throws Exception  {
 		if (file == null) file = HierarchicalDataFactory.getWriter(filePath);
 		PersistJsonOperationHelper helper = new PersistJsonOperationHelper();
 		helper.writeOperations(file, operations);

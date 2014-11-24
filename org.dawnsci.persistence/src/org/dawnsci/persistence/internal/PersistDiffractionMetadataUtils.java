@@ -18,7 +18,7 @@ import org.eclipse.dawnsci.hdf5.IHierarchicalDataFile;
 import org.eclipse.dawnsci.hdf5.Nexus;
 import org.eclipse.dawnsci.hdf5.nexus.NexusUtils;
 
-public class PersistDiffractionMetadataUtils {
+class PersistDiffractionMetadataUtils {
 	
 	public static final String SAMPLEGROUPNAME = "/entry/calibration_sample";
 

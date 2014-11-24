@@ -41,6 +41,11 @@ import uk.ac.diamond.scisoft.analysis.metadata.OriginMetadataImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
+/**
+ * 
+ * @author fcp94556
+ *
+ */
 public class PersistJsonOperationHelper {
 
 	

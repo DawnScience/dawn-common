@@ -22,7 +22,7 @@ import org.eclipse.dawnsci.hdf5.IHierarchicalDataFile;
 import org.eclipse.dawnsci.hdf5.Nexus;
 import org.eclipse.dawnsci.hdf5.nexus.NexusUtils;
 
-public class PersistSinglePowderCalibration {
+class PersistSinglePowderCalibration {
 
 	public static final String DAWNCALIBRATIONID = "DAWNScience";
 	public static final String DEFAULTDETECTORNAME = "detector";
