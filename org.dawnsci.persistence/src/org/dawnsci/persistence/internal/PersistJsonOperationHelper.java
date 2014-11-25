@@ -131,7 +131,7 @@ public class PersistJsonOperationHelper {
 		return opList.isEmpty() ? null : opList.toArray(new IOperation[opList.size()]);
 	}
 	
-	public void writeOperations(IHierarchicalDataFile file, IOperation<? extends IOperationModel, ? extends OperationData>[] operations) throws Exception {
+	public void writeOperations(IHierarchicalDataFile file, IOperation<? extends IOperationModel, ? extends OperationData>... operations) throws Exception {
 		String entry = file.group(PersistenceConstants.ENTRY);
 		String process = file.group(PersistenceConstants.PROCESS_ENTRY);
 		file.setNexusAttribute(process, Nexus.PROCESS);
