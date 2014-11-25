@@ -37,7 +37,7 @@ public class ReadWriteOperationTest {
 		ServiceManager.setService(IOperationService.class, new OperationServiceImpl());
 		service = (IOperationService)ServiceManager.getService(IOperationService.class);
 		service.createOperations(service.getClass().getClassLoader(), "org.dawnsci.persistence.test.operations");
-		
+		PersistJsonOperationHelper.setOperationService(service);
 	}
 	
 	@Test
