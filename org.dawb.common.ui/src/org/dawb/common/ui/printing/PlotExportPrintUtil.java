@@ -53,9 +53,6 @@ import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.gmf.runtime.draw2d.ui.render.awt.internal.svg.export.GraphicsSVG;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.dnd.Clipboard;
-import org.eclipse.swt.dnd.ImageTransfer;
-import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.ImageLoader;
@@ -315,13 +312,25 @@ public class PlotExportPrintUtil {
 		}
 	}
 
-	private static void copytoClipboard(Image image) {
-		Display display = Display.getDefault();
-		Clipboard clipboard = new Clipboard(display);
+//	private static void copytoClipboard(Image image) {
+//		Display display = Display.getDefault();
+//		Clipboard clipboard = new Clipboard(display);
+//
+//		clipboard.setContents(new Object[] { image.getImageData() },
+//				new Transfer[] { ImageTransfer.getInstance() });
+//		clipboard.dispose();
+//		logger.debug("Plot copied to clip-board");
+//	}
 
-		clipboard.setContents(new Object[] { image.getImageData() },
-				new Transfer[] { ImageTransfer.getInstance() });
-		clipboard.dispose();
+	/**
+	 * Use AWT clipboard as there is a bug with the SWT one on Linux x86_64
+	 * that makes the code above not work:
+	 * https://bugs.eclipse.org/bugs/show_bug.cgi?id=283960
+	 * @param image
+	 */
+	private static void copytoClipboard(Image image) {
+		BufferedImage awtImage = convertToAWT(image.getImageData());
+		new ImageToAWTClipboard(awtImage);
 		logger.debug("Plot copied to clip-board");
 	}
 
