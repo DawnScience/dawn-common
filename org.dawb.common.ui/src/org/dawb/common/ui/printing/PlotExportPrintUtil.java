@@ -54,18 +54,12 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.dnd.Clipboard;
-import org.eclipse.swt.dnd.FileTransfer;
-import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.ImageLoader;
 import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.PlatformUI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
@@ -82,7 +76,6 @@ public class PlotExportPrintUtil {
 	public static final String[] FILE_FORMATS = new String[] { "png", "jpg", "jpeg", "ps", "eps", "svg" };
 
 	private static final Logger logger = LoggerFactory.getLogger(PlotExportPrintUtil.class);
-	private static final String tempDirectory = System.getProperty("java.io.tmpdir");
 
 	private static void savePostScript(File imageFile, Image image)
 			throws FileNotFoundException {
@@ -320,23 +313,26 @@ public class PlotExportPrintUtil {
 		}
 	}
 
+	// private static void copytoClipboard(Image image) {
+	// Display display = Display.getDefault();
+	// Clipboard clipboard = new Clipboard(display);
+	//
+	// clipboard.setContents(new Object[] { image.getImageData() },
+	// new Transfer[] { ImageTransfer.getInstance() });
+	// clipboard.dispose();
+	// logger.debug("Plot copied to clip-board");
+	// }
+
+	/**
+	 * Use AWT clipboard as there is a bug with the SWT one on Linux x86_64 that
+	 * makes the code above not work:
+	 * https://bugs.eclipse.org/bugs/show_bug.cgi?id=283960
+	 * 
+	 * @param image
+	 */
 	private static void copytoClipboard(Image image) {
-		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-		IWorkbenchPart active = page.getActivePart();
-
-		ImageLoader loader = new ImageLoader();
-		loader.data = new ImageData[] { image.getImageData() };
-		loader.save(tempDirectory + "/" + active.getTitle() + ".png", SWT.IMAGE_PNG);
-
-		// we read the new image created
-		File imageFile = new File(tempDirectory + "/" + active.getTitle() + ".png");
-
-		// copy temp file created to clipboard
-		Display display = Display.getCurrent();
-		Clipboard clipboard = new Clipboard(display);
-		String[] data = { imageFile.getAbsolutePath() };
-		clipboard.setContents(new Object[] { data }, new Transfer[] { FileTransfer.getInstance() });
-		clipboard.dispose();
+		BufferedImage awtImage = convertToAWT(image.getImageData());
+		new ImageToAWTClipboard(awtImage);
 		logger.debug("Plot copied to clip-board");
 	}
 
