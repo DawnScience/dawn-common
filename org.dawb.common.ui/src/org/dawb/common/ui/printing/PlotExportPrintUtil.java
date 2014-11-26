@@ -44,17 +44,17 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.dawb.common.ui.util.DisplayUtils;
-import org.eclipse.gmf.runtime.draw2d.ui.render.awt.internal.svg.export.GraphicsSVG;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.geometry.Rectangle;
+import org.eclipse.gmf.runtime.draw2d.ui.render.awt.internal.svg.export.GraphicsSVG;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.Clipboard;
-import org.eclipse.swt.dnd.FileTransfer;
+import org.eclipse.swt.dnd.ImageTransfer;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
@@ -62,9 +62,6 @@ import org.eclipse.swt.graphics.ImageLoader;
 import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.PlatformUI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
@@ -81,7 +78,6 @@ public class PlotExportPrintUtil {
 	public static final String[] FILE_FORMATS = new String[] { "png", "jpg", "jpeg", "ps", "eps", "svg" };
 
 	private static final Logger logger = LoggerFactory.getLogger(PlotExportPrintUtil.class);
-	private static final String tempDirectory = System.getProperty("java.io.tmpdir");
 
 	private static void savePostScript(File imageFile, Image image)
 			throws FileNotFoundException {
@@ -320,21 +316,11 @@ public class PlotExportPrintUtil {
 	}
 
 	private static void copytoClipboard(Image image) {
-		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-		IWorkbenchPart active = page.getActivePart();
-
-		ImageLoader loader = new ImageLoader();
-		loader.data = new ImageData[] { image.getImageData() };
-		loader.save(tempDirectory + "/" + active.getTitle() + ".png", SWT.IMAGE_PNG);
-
-		// we read the new image created
-		File imageFile = new File(tempDirectory + "/" + active.getTitle() + ".png");
-
-		// copy temp file created to clipboard
-		Display display = Display.getCurrent();
+		Display display = Display.getDefault();
 		Clipboard clipboard = new Clipboard(display);
-		String[] data = { imageFile.getAbsolutePath() };
-		clipboard.setContents(new Object[] { data }, new Transfer[] { FileTransfer.getInstance() });
+
+		clipboard.setContents(new Object[] { image.getImageData() },
+				new Transfer[] { ImageTransfer.getInstance() });
 		clipboard.dispose();
 		logger.debug("Plot copied to clip-board");
 	}
