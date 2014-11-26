@@ -17,22 +17,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.dawnsci.analysis.api.io.ScanFileHolderException;
-import org.eclipse.dawnsci.analysis.api.metadata.IMetaLoader;
 import org.eclipse.dawnsci.analysis.api.metadata.IMetadata;
 import org.eclipse.dawnsci.analysis.api.monitor.IMonitor;
 import org.eclipse.dawnsci.analysis.dataset.impl.Dataset;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import uk.ac.diamond.scisoft.analysis.io.AbstractFileLoader;
 import uk.ac.diamond.scisoft.analysis.io.DataHolder;
 import uk.ac.diamond.scisoft.analysis.io.ExtendedMetadataAdapter;
 
-public class SpecLoader extends AbstractFileLoader implements IMetaLoader {
+public class SpecLoader extends AbstractFileLoader {
 	
-	private static Logger logger = LoggerFactory.getLogger(SpecLoader.class);
+//	private static Logger logger = LoggerFactory.getLogger(SpecLoader.class);
 	
-	private String filePath;
 	private Collection<String> dataNames;
 	private Map<String,Integer>dataSizes;
 	private Map<String,int[]>  dataShapes;
@@ -42,12 +38,20 @@ public class SpecLoader extends AbstractFileLoader implements IMetaLoader {
 	}
 	
 	public SpecLoader(final String path) {
-		this.filePath = path;
+		this.fileName = path;
 	}
-	
+
+	@Override
+	protected void clearMetadata() {
+		metadata = null;
+		dataNames.clear();
+		dataSizes.clear();
+		dataShapes.clear();
+	}
+
 	@Override
 	public DataHolder loadFile() throws ScanFileHolderException {
-        return this.loadFile(null);
+        return loadFile(null);
 	}
 	
 	/**
@@ -58,19 +62,19 @@ public class SpecLoader extends AbstractFileLoader implements IMetaLoader {
 		
 		try {
 			final DataHolder holder = new DataHolder();
-			final MultiScanDataParser parser = new MultiScanDataParser(new FileInputStream(new File(filePath)));
+			final MultiScanDataParser parser = new MultiScanDataParser(new FileInputStream(new File(fileName)));
 			final Collection<String> scans = parser.getScanNames();
 			for (String scanName : scans) {
 				final Collection<Dataset> sets = parser.getSets(scanName);
-				for (Dataset abstractDataset : sets) {
-					holder.addDataset(scanName+"/"+abstractDataset.getName(), abstractDataset);
+				for (Dataset dataset : sets) {
+					holder.addDataset(scanName+"/"+dataset.getName(), dataset);
 				}
 			}
 			
 			return holder;
 			
 		} catch (Exception e) {
-			throw new ScanFileHolderException("Cannot parse "+filePath, e);
+			throw new ScanFileHolderException("Cannot parse "+fileName, e);
 		}
 	}
 
@@ -85,7 +89,7 @@ public class SpecLoader extends AbstractFileLoader implements IMetaLoader {
 			this.dataSizes  = new HashMap<String,Integer>(31);
 			this.dataShapes = new HashMap<String,int[]>(31);
 			
-			final MultiScanDataParser parser = new MultiScanDataParser(new FileInputStream(new File(filePath)));
+			final MultiScanDataParser parser = new MultiScanDataParser(new FileInputStream(new File(fileName)));
 			final Collection<String> scans = parser.getScanNames();
 			for (String scanName : scans) {
 				final Collection<Dataset> sets = parser.getSets(scanName);
@@ -98,13 +102,13 @@ public class SpecLoader extends AbstractFileLoader implements IMetaLoader {
 			}
 					
 		} catch (Exception e) {
-			throw new ScanFileHolderException("Cannot parse "+filePath, e);
+			throw new ScanFileHolderException("Cannot parse "+fileName, e);
 		}
 	}
 
 	@Override
 	public IMetadata getMetadata() {
-		return new ExtendedMetadataAdapter(new File(filePath)) {
+		return new ExtendedMetadataAdapter(new File(fileName)) {
 			private static final long serialVersionUID = IMetadata.serialVersionUID;
 
 			@Override

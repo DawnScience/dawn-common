@@ -31,10 +31,14 @@ public class H5LazyLoader implements ILazyLoader {
 	 */
 	private static final long serialVersionUID = 8487401618753205118L;
 	
-	private String   path;
-	private String   fullPath;
+	private String   path; // file path
+	private String   fullPath; // dataset path within file
 	private H5Loader loader;
 
+	/**
+	 * @param path file path
+	 * @param fullPath dataset path within file
+	 */
 	public H5LazyLoader(final String   path, 
 			            final String   fullPath) {
 		this.loader   = new H5Loader();

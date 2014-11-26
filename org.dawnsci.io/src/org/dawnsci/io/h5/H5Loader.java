@@ -19,7 +19,6 @@ import org.dawb.common.util.io.FileUtils;
 import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
 import org.eclipse.dawnsci.analysis.api.io.ScanFileHolderException;
 import org.eclipse.dawnsci.analysis.api.io.SliceObject;
-import org.eclipse.dawnsci.analysis.api.metadata.IMetaLoader;
 import org.eclipse.dawnsci.analysis.api.metadata.IMetadata;
 import org.eclipse.dawnsci.analysis.api.monitor.IMonitor;
 import org.eclipse.dawnsci.analysis.dataset.impl.Dataset;
@@ -34,7 +33,7 @@ import uk.ac.diamond.scisoft.analysis.io.AbstractFileLoader;
 import uk.ac.diamond.scisoft.analysis.io.DataHolder;
 import uk.ac.diamond.scisoft.analysis.io.MetaDataAdapter;
 
-public class H5Loader extends AbstractFileLoader implements IMetaLoader {
+public class H5Loader extends AbstractFileLoader {
 
 	public final static List<String> EXT;
 	static {
@@ -56,16 +55,20 @@ public class H5Loader extends AbstractFileLoader implements IMetaLoader {
 	}
 
 	
-	private String filePath;
-
 	public H5Loader() {
 		
 	}
 	
 	public H5Loader(final String path) {
-		this.filePath = path;
+		this.fileName = path;
 	}
-	
+
+	@Override
+	protected void clearMetadata() {
+		if (metaInfo != null)
+			metaInfo.clear();
+	}
+
 	@Override
 	public DataHolder loadFile() throws ScanFileHolderException {
         return this.loadFile(null);
@@ -77,7 +80,7 @@ public class H5Loader extends AbstractFileLoader implements IMetaLoader {
 		final DataHolder holder = new DataHolder();
 		IHierarchicalDataFile file = null;
 		try {
-			file = HierarchicalDataFactory.getReader(filePath);
+			file = HierarchicalDataFactory.getReader(fileName);
 			if (mon!=null) mon.worked(1);
 			final List<String>     fullPaths = file.getDatasetNames(IHierarchicalDataFile.NUMBER_ARRAY);
 			if (mon!=null) mon.worked(1);
@@ -181,7 +184,7 @@ public class H5Loader extends AbstractFileLoader implements IMetaLoader {
 		}
 	}
 
-	public Map<String, ILazyDataset> loadSets(String path, List<String> fullPaths, IMonitor mon) throws Exception {
+	public static Map<String, ILazyDataset> loadSets(String path, List<String> fullPaths, IMonitor mon) throws Exception {
 		IHierarchicalDataFile file = null;
 		try {
 			if (mon!=null) mon.worked(1);
@@ -192,7 +195,7 @@ public class H5Loader extends AbstractFileLoader implements IMetaLoader {
 		}
 	}
 
-	private Map<String, ILazyDataset> getSets(final IHierarchicalDataFile file, List<String> fullPaths, IMonitor mon) throws Exception {
+	private static Map<String, ILazyDataset> getSets(final IHierarchicalDataFile file, List<String> fullPaths, IMonitor mon) throws Exception {
 		
 		final Map<String, ILazyDataset> ret = new HashMap<String,ILazyDataset>(fullPaths.size());
 		for (String fullPath : fullPaths) {
@@ -219,7 +222,7 @@ public class H5Loader extends AbstractFileLoader implements IMetaLoader {
 		return ret;
 	}
 
-	private String getErrorPath(String fullPath) {
+	private static String getErrorPath(String fullPath) {
 		if (fullPath==null) return  null;
 		if (fullPath.endsWith("/data")) {
 			return fullPath.substring(0, fullPath.lastIndexOf('/'))+"/errors";
@@ -235,7 +238,7 @@ public class H5Loader extends AbstractFileLoader implements IMetaLoader {
 		
 		IHierarchicalDataFile file = null;
 		try {
-			file = HierarchicalDataFactory.getReader(filePath);
+			file = HierarchicalDataFactory.getReader(fileName);
 			if (mon!=null) mon.worked(1);
 			
 			metaInfo = file.getDatasetInformation(IHierarchicalDataFile.NUMBER_ARRAY);
@@ -289,7 +292,7 @@ public class H5Loader extends AbstractFileLoader implements IMetaLoader {
 				if (attributeValues==null) {
 					IHierarchicalDataFile file = null;
 					try {
-						file = HierarchicalDataFactory.getReader(filePath);
+						file = HierarchicalDataFactory.getReader(fileName);
 						
 						attributeValues = file.getAttributeValues();
 					} finally {
