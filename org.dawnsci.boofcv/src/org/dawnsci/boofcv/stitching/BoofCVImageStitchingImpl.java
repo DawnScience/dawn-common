@@ -63,24 +63,29 @@ public class BoofCVImageStitchingImpl implements IImageStitchingProcess {
 
 	@Override
 	public IDataset stitch(List<IDataset> input, int rows, int columns, double angle) {
-		return stitch(input, rows, columns, angle, 50, new double[] {25, 25}, false, true);
+		List<double[]> translations = new ArrayList<double[]>(1);
+		translations.add(new double[] {25, 25});
+		return stitch(input, rows, columns, angle, 50, translations, false, true);
 	}
 
 	@Override
 	public IDataset stitch(List<IDataset> input, int rows, int columns, double angle, double fieldOfView, IROI roi) {
 		this.roi = roi;
-		return stitch(input, rows, columns, angle, fieldOfView, new double[] {25, 25}, true, true);
+		List<double[]> translations = new ArrayList<double[]>(1);
+		translations.add(new double[] {25, 25});
+		return stitch(input, rows, columns, angle, fieldOfView, translations, true, true);
 	}
 
 	@Override
-	public IDataset stitch(List<IDataset> input, int rows, int columns, double angle, double fieldOfView, double[] translations, IROI roi, boolean hasFeatureAssociation) {
+	public IDataset stitch(List<IDataset> input, int rows, int columns, double angle, double fieldOfView, List<double[]> translations, IROI roi, boolean hasFeatureAssociation) {
 		this.roi = roi;
 		return stitch(input, rows, columns, angle, fieldOfView, translations, true, hasFeatureAssociation);
 	}
 
-	public IDataset stitch(List<IDataset> input, int rows, int columns, double angle, double fieldOfView, double[] translations, boolean hasCropping, boolean hasFeatureAssociation) {
+	public IDataset stitch(List<IDataset> input, int rows, int columns, double angle, double fieldOfView, List<double[]> translations, boolean hasCropping, boolean hasFeatureAssociation) {
 
-		IDataset[][] images = ImagePreprocessing.ListToArray(input, rows, columns);
+		IDataset[][] images = ImagePreprocessing.listToArray(input, rows, columns);
+		double[][][] trans = ImagePreprocessing.transToArraysInMicrons(translations, rows, columns);
 		List<List<ImageAndMetadata>> inputImages = new ArrayList<List<ImageAndMetadata>>();
 
 		for (int i = 0; i < images.length; i++) {
@@ -112,8 +117,9 @@ public class BoofCVImageStitchingImpl implements IImageStitchingProcess {
 					e.printStackTrace();
 				}
 				// set default values if no metadata (scaling = width/fieldofview? 512/50)
-				if (md == null)
-					md = new PeemMetadataImpl(translations, image.width / fieldOfView, fieldOfView, angle);
+				if (md == null) {
+					md = new PeemMetadataImpl(trans[i][j], image.width / fieldOfView, fieldOfView, angle);
+				}
 				ImageAndMetadata imageAndMd = null;
 				if (hasCropping && roi instanceof EllipticalROI) {
 					ImageFloat32 cropped = ImagePreprocessing.maxRectangleFromEllipticalImage(rotated, (EllipticalROI)roi);

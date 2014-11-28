@@ -88,11 +88,32 @@ public class ImagePreprocessing {
 	 * @return Ordered array of Dataset
 	 * @throws Exception
 	 */
-	public static IDataset[][] ListToArray(List<IDataset> input, int rows, int columns) {
+	public static IDataset[][] listToArray(List<IDataset> input, int rows, int columns) {
 		IDataset[][] images = new Dataset[rows][columns];
 		for (int i = 0; i < rows; i++) {
 			for(int j = 0; j < columns; j++) {
 				images[i][j] = input.get((i * columns) + j);
+				//	images[i][j].setMetadata(getUniqueMetadata(i+1, j+1));
+			}
+		}
+		return images;
+	}
+
+	/**
+	 * 
+	 * @param input
+	 * @param rows
+	 * @param columns
+	 * @return Ordered array of Dataset
+	 * @throws Exception
+	 */
+	public static double[][][] transToArraysInMicrons(List<double[]> input, int rows, int columns) {
+		double[][][] images = new double[rows][columns][2];
+		for (int i = 0; i < rows; i++) {
+			for(int j = 0; j < columns; j++) {
+				images[i][j] = input.get((i * columns) + j);
+				images[i][j][0] *= 10;
+				images[i][j][1] *= 10;
 				//	images[i][j].setMetadata(getUniqueMetadata(i+1, j+1));
 			}
 		}

@@ -10,16 +10,15 @@ package org.dawnsci.conversion.converters;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.dawb.common.services.ServiceManager;
 import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.util.list.SortNatural;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
 import org.eclipse.dawnsci.analysis.api.image.IImageStitchingProcess;
+import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
 import org.eclipse.dawnsci.analysis.dataset.impl.LazyDataset;
 import org.eclipse.dawnsci.plotting.api.region.IRegion;
 import org.slf4j.Logger;
@@ -66,16 +65,16 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 		stitcher = s;
 	}
 
-	private void createImageStitcher() {
-		if (stitcher == null) {
-			try {
-				stitcher = (IImageStitchingProcess) ServiceManager.getService(IImageStitchingProcess.class);
-			} catch (Exception e) {
-				logger.error("Error getting Stitching service:" + e);
-				e.printStackTrace();
-			}
-		}
-	}
+//	private void createImageStitcher() {
+//		if (stitcher == null) {
+//			try {
+//				stitcher = (IImageStitchingProcess) ServiceManager.getService(IImageStitchingProcess.class);
+//			} catch (Exception e) {
+//				logger.error("Error getting Stitching service:" + e);
+//				e.printStackTrace();
+//			}
+//		}
+//	}
 
 	@Override
 	protected void convert(IDataset slice) throws Exception {
@@ -83,11 +82,10 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 		if (context.getMonitor() != null && context.getMonitor().isCancelled()) {
 			throw new Exception(getClass().getSimpleName() + " is cancelled");
 		}
-
-		List<String> paths = context.getFilePaths();
+		ILazyDataset lazy = context.getLazyDataset();
 		imageStack.add(slice);
-
-		if (imageStack.size() == paths.size()) {
+		int stackSize = lazy.getShape()[0];
+		if (imageStack.size() == stackSize) {
 			String outputPath = context.getOutputPath();
 			ConversionStitchedBean conversionBean = (ConversionStitchedBean)context.getUserObject();
 			int rows = conversionBean.getRows();
@@ -95,8 +93,8 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 			double angle = conversionBean.getAngle();
 			boolean useFeatureAssociation = conversionBean.isFeatureAssociated();
 			double fieldOfView = conversionBean.getFieldOfView();
-			double[] translations = conversionBean.getTranslations();
-			createImageStitcher();
+			List<double[]> translations = conversionBean.getTranslations();
+//			createImageStitcher();
 			IDataset stitched = null;
 			IRegion region = conversionBean.getRoi();
 			if (region != null) {
@@ -127,9 +125,20 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 	}
 
 	private ILazyDataset getLazyDataset() throws Exception {
-		final List<String> regexs = context.getFilePaths();
+		List<String> regexs = context.getFilePaths();
 		final List<String> paths = new ArrayList<String>(Math.max(
 				regexs.size(), 10));
+		ILazyDataset lazyDataset = null;
+		// if dat file: try to parse it and populate the list of all images paths 
+		if (regexs.size() == 1 && regexs.get(0).endsWith(".dat")) {
+			IDataHolder holder = LoaderFactory.getData(regexs.get(0));
+			String[] names = holder.getNames();
+			for (String name : names) {
+				lazyDataset = holder.getLazyDataset(name);
+				if (lazyDataset != null && lazyDataset.getRank() == 3) 
+					return lazyDataset;
+			}
+		}
 		for (String regex : regexs) {
 			final List<File> files = expand(regex);
 			for (File file : files) {
@@ -140,6 +149,7 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 					if (data.getRank() == 2)
 						paths.add(file.getAbsolutePath());
 				} catch (Exception ignored) {
+					logger.debug("Exception ignored:"+ignored.getMessage());
 					continue;
 				}
 			}
@@ -147,7 +157,7 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 		Collections.sort(paths, new SortNatural<String>(true));
 		ImageStackLoader loader = new ImageStackLoader(paths,
 				context.getMonitor());
-		LazyDataset lazyDataset = new LazyDataset("Folder Stack",
+		lazyDataset = new LazyDataset("Folder Stack",
 				loader.getDtype(), loader.getShape(), loader);
 		return lazyDataset;
 	}
@@ -179,7 +189,7 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 		private double angle = 49;
 		private double fieldOfView = 50;
 		private boolean featureAssociated;
-		private double[] translations;
+		private List<double[]> translations;
 		private IRegion region;
 
 		public int getRows() {
@@ -218,10 +228,10 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 		public void setFeatureAssociated(boolean featureAssociated) {
 			this.featureAssociated = featureAssociated;
 		}
-		public void setTranslations(double[] translations) {
+		public void setTranslations(List<double[]> translations) {
 			this.translations = translations;
 		}
-		public double[] getTranslations() {
+		public List<double[]> getTranslations() {
 			return translations;
 		}
 		@Override
@@ -238,7 +248,8 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 			result = prime * result
 					+ ((region == null) ? 0 : region.hashCode());
 			result = prime * result + rows;
-			result = prime * result + Arrays.hashCode(translations);
+			result = prime * result
+					+ ((translations == null) ? 0 : translations.hashCode());
 			return result;
 		}
 		@Override
@@ -267,9 +278,13 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 				return false;
 			if (rows != other.rows)
 				return false;
-			if (!Arrays.equals(translations, other.translations))
+			if (translations == null) {
+				if (other.translations != null)
+					return false;
+			} else if (!translations.equals(other.translations))
 				return false;
 			return true;
 		}
+		
 	}
 }

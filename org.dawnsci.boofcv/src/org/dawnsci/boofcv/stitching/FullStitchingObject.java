@@ -311,7 +311,7 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 			for (int j = 0; j < images.get(0).size(); j++) {
 
 				if (i != 0 || j != 0) {
-					StitchingObject stitch = new StitchingObject(translations[i][j]);
+					StitchingObject stitch = new StitchingObject<>(translations[i][j]);
 					result = stitch.stitchMultiBand(result, images.get(i).get(j), origin);
 				}
 			}
@@ -337,7 +337,7 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 		for (int i = 0; i < images.size(); i++) {
 			for (int j = 0; j < images.get(0).size(); j++) {
 				if (i != 0 || j != 0) {
-					StitchingObject<?> stitcher = new StitchingObject(translations[i][j]);
+					StitchingObject<?> stitcher = new StitchingObject<>(translations[i][j]);
 					result = stitcher.stitch(result, images.get(i).get(j).getImage(), origin);
 				}
 			}

@@ -9,14 +9,17 @@
 package org.dawnsci.conversion.ui.pages;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.dawb.common.services.ServiceManager;
 import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.ui.wizard.ResourceChoosePage;
 import org.dawb.common.util.io.FileUtils;
 import org.dawnsci.conversion.converters.ImagesToStitchedConverter.ConversionStitchedBean;
 import org.dawnsci.conversion.ui.IConversionWizardPage;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
+import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
+import org.eclipse.dawnsci.analysis.api.dataset.Slice;
 import org.eclipse.dawnsci.analysis.api.image.IImageTransform;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
 import org.eclipse.dawnsci.analysis.dataset.roi.EllipticalROI;
@@ -28,6 +31,8 @@ import org.eclipse.dawnsci.plotting.api.region.IRegion.RegionType;
 import org.eclipse.nebula.widgets.formattedtext.FormattedText;
 import org.eclipse.nebula.widgets.formattedtext.NumberFormatter;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -58,7 +63,7 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 	private IConversionContext context;
 	private Spinner rowsSpinner;
 	private Spinner columnsSpinner;
-	private FormattedText angleText;
+	private Spinner angleSpinner;
 	private FormattedText fovText;
 	private FormattedText xTranslationText;
 	private FormattedText yTranslationText;
@@ -69,6 +74,8 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 	private Composite container;
 
 	private IDataset firstImage;
+
+	private boolean datFileLoaded = false;
 
 	private static IImageTransform transformer;
 
@@ -93,7 +100,7 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 		final ConversionStitchedBean bean = new ConversionStitchedBean();
 		bean.setRows(rowsSpinner.getSelection());
 		bean.setColumns(columnsSpinner.getSelection());
-		Number angle = (Number) angleText.getValue();
+		Number angle = (Number) angleSpinner.getSelection();
 		bean.setAngle(angle.doubleValue());
 		Number fov = (Number) fovText.getValue();
 		bean.setFieldOfView(fov.doubleValue());
@@ -102,8 +109,44 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 		bean.setFeatureAssociated(hasFeatureAssociated);
 		Number xTrans = (Number) xTranslationText.getValue();
 		Number yTrans = (Number) yTranslationText.getValue();
-		bean.setTranslations(new double[] { xTrans.doubleValue(),
-				yTrans.doubleValue() });
+		
+		String filePath = getSelectedPaths()[0];
+		IDataHolder holder = null;
+		try {
+			holder = LoaderFactory.getData(filePath);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		List<double[]> translations = new ArrayList<double[]>();
+		if (filePath.endsWith(".dat")) {
+			String[] names = holder.getNames();
+			ILazyDataset lazyDataset = null;
+			for (String name : names) {
+				lazyDataset = holder.getLazyDataset(name);
+				if (lazyDataset != null && lazyDataset.getRank() == 3)
+					break;
+			}
+			int[] shape = lazyDataset.getShape();
+			firstImage = lazyDataset.getSlice(new Slice(0, shape[0], shape[1]));
+			firstImage.squeeze();
+			
+			IDataset psxData = holder.getDataset("psx");
+			IDataset psyData = holder.getDataset("psy");
+			for (int i = 0; i < lazyDataset.getShape()[0]; i++) {
+				double posX = psxData.getDouble(i);
+				double posY = psyData.getDouble(i);
+				translations.add(new double[]{posX, posY});
+			}
+		} else {
+			firstImage = holder.getDataset(0);
+			translations.add(new double[] { xTrans.doubleValue(),
+					yTrans.doubleValue() });
+		}
+
+		
+		
+		bean.setTranslations(translations);
 		context.setUserObject(bean);
 
 		return context;
@@ -116,33 +159,72 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 		controlComp.setLayout(new GridLayout(8, false));
 		controlComp.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 4, 1));
 
+		// Check type of data and load first image
+		String filePath = getSelectedPaths()[0];
+		if (filePath.endsWith(".dat"))
+			datFileLoaded = true;
+		int rowNum = 3, columnNum = 3;
+		try {
+			IDataHolder holder = LoaderFactory.getData(filePath);
+			if (datFileLoaded) {
+				ILazyDataset lazy = holder.getLazyDataset("uv_image");
+				int[] shape = lazy.getShape();
+				firstImage = lazy.getSlice(new Slice(0, shape[0], shape[1]));
+				firstImage.squeeze();
+				rowNum = (int)Math.sqrt(shape[0]);
+				columnNum = shape[0] / rowNum;
+			} else {
+				firstImage = holder.getDataset(0);
+			}
+		} catch (Exception e) {
+			logger.error("Error loading file:" + e.getMessage());
+		}
+		
 		final Label labelRow = new Label(controlComp, SWT.NONE);
 		labelRow.setText("Rows");
 		labelRow.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
 		rowsSpinner = new Spinner(controlComp, SWT.BORDER);
 		rowsSpinner.setMinimum(1);
-		rowsSpinner.setSelection(3);
+		rowsSpinner.setSelection(rowNum);
 		rowsSpinner.setToolTipText("Number of rows for the resulting stitched image");
 		rowsSpinner.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+		rowsSpinner.setEnabled(!datFileLoaded);
 
 		final Label labelAngle = new Label(controlComp, SWT.NONE);
 		labelAngle.setText("Rotation angle");
 		labelAngle.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
-		angleText = new FormattedText(controlComp, SWT.BORDER);
-		NumberFormatter formatter = new NumberFormatter("-##0.0");
-		formatter.setFixedLengths(false, true);
-		angleText.setFormatter(formatter);
-		angleText.getControl().setToolTipText("Rotation angle in degrees");
-		angleText.setValue(new Double(0.0));
+		angleSpinner = new Spinner(controlComp, SWT.BORDER);
+		angleSpinner.setDigits(1);
+		angleSpinner.setToolTipText("Rotates the original image by n degrees");
+		angleSpinner.setSelection(0);
+		angleSpinner.setMaximum(3600);
 		GridData gridData = new GridData(SWT.FILL, SWT.CENTER, true, false); 
 		gridData.widthHint = 50;
-		angleText.getControl().setLayoutData(gridData);
+		angleSpinner.setLayoutData(gridData);
+		angleSpinner.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent e) {
+//				createImageTransformer();
+				try {
+					Object val = getSpinnerAngle();
+					IDataset rotated = null;
+					if (val instanceof Long) {
+						rotated = transformer.rotate(firstImage, ((Long)val).doubleValue());
+					} else if (val instanceof Double) {
+						rotated = transformer.rotate(firstImage, ((Double)val).doubleValue());
+					}
+					plotSystem.updatePlot2D(rotated, null, null);
+				} catch (Exception e1) {
+					logger.error("Error rotating image:" + e1.getMessage());
+				}
+			}
+		});
 
 		final Label xTranslationLabel = new Label(controlComp, SWT.NONE);
 		xTranslationLabel.setText("X translation");
 		xTranslationLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
 		xTranslationText = new FormattedText(controlComp, SWT.BORDER);
-		formatter = new NumberFormatter("-##0.0");
+		NumberFormatter formatter = new NumberFormatter("-##0.0");
 		formatter.setFixedLengths(false, true);
 		xTranslationText.setFormatter(formatter);
 		xTranslationText.getControl().setToolTipText("Expected translation in microns in the X direction");
@@ -151,6 +233,7 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 		gridData = new GridData(SWT.FILL, SWT.CENTER, true, false); 
 		gridData.widthHint = 30;
 		xTranslationText.getControl().setLayoutData(gridData);
+		xTranslationText.getControl().setEnabled(!datFileLoaded);
 
 		new Label(controlComp, SWT.NONE);
 		new Label(controlComp, SWT.NONE);
@@ -160,9 +243,10 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 		labelColumn.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
 		columnsSpinner = new Spinner(controlComp, SWT.BORDER);
 		columnsSpinner.setMinimum(1);
-		columnsSpinner.setSelection(3);
+		columnsSpinner.setSelection(columnNum);
 		columnsSpinner.setToolTipText("Number of columns for the resulting stitched image");
 		columnsSpinner.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+		columnsSpinner.setEnabled(!datFileLoaded);
 
 		final Label labelFOV = new Label(controlComp, SWT.NONE);
 		labelFOV.setText("Field of view");
@@ -190,6 +274,7 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 		gridData = new GridData(SWT.FILL, SWT.CENTER, true, false); 
 		gridData.widthHint = 30;
 		yTranslationText.getControl().setLayoutData(gridData);
+		yTranslationText.getControl().setEnabled(!datFileLoaded);
 
 		new Label(controlComp, SWT.NONE);
 		new Label(controlComp, SWT.NONE);
@@ -221,8 +306,10 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				hasFeatureAssociated = featureButton.getSelection();
-				xTranslationText.getControl().setEnabled(!hasFeatureAssociated);
-				yTranslationText.getControl().setEnabled(!hasFeatureAssociated);
+				if (!datFileLoaded) {
+					xTranslationText.getControl().setEnabled(!hasFeatureAssociated);
+					yTranslationText.getControl().setEnabled(!hasFeatureAssociated);
+				}
 			}
 		});
 
@@ -246,33 +333,11 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 				+ "elliptical region which will be used to generate a rectangular sub-image.");
 		description.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-		Button rotateButton = new Button(subComp, SWT.NONE);
-		rotateButton.setText("Rotate");
-		rotateButton.setToolTipText("Rotates the original image by n degrees");
-		rotateButton.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				createImageTransformer();
-				try {
-					Object val = angleText.getValue();
-					IDataset rotated = null;
-					if (val instanceof Long) {
-						rotated = transformer.rotate(firstImage, ((Long)val).doubleValue());
-					} else if (val instanceof Double) {
-						rotated = transformer.rotate(firstImage, ((Double)val).doubleValue());
-					}
-					plotSystem.updatePlot2D(rotated, null, null);
-				} catch (Exception e1) {
-					logger.error("Error rotating image:" + e1.getMessage());
-				}
-			}
-		});
 		try {
 			plotSystem = PlottingFactory.createPlottingSystem();
 			plotSystem.createPlotPart(plotComp, "Preprocess", null, PlotType.IMAGE, null);
 			plotSystem.getPlotComposite().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-			IDataHolder holder = LoaderFactory.getData(getSelectedPaths()[0]);
-			firstImage = holder.getDataset(0);
+			
 			plotSystem.createPlot2D(firstImage, null, null);
 			createRegion(firstImage);
 		} catch (Exception e) {
@@ -282,6 +347,12 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 		plotExpandComp.setClient(plotComp);
 		plotExpandComp.addExpansionListener(createExpansionAdapter());
 		plotExpandComp.setExpanded(hasCropping);
+	}
+
+	private double getSpinnerAngle() {
+		int selection = angleSpinner.getSelection();
+		int digits = angleSpinner.getDigits();
+		return (selection / Math.pow(10, digits));
 	}
 
 	private void createRegion(IDataset data) {
@@ -330,15 +401,15 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 		transformer = it;
 	}
 	
-	private void createImageTransformer() {
-		if (transformer == null) {
-			try {
-				transformer = (IImageTransform) ServiceManager.getService(IImageTransform.class);
-			} catch (Exception e) {
-				logger.error("Error getting transform service :" + e);
-			}
-		}
-	}
+//	private void createImageTransformer() {
+//		if (transformer == null) {
+//			try {
+//				transformer = (IImageTransform) ServiceManager.getService(IImageTransform.class);
+//			} catch (Exception e) {
+//				logger.error("Error getting transform service :" + e);
+//			}
+//		}
+//	}
 
 	private ExpansionAdapter createExpansionAdapter() {
 		return new ExpansionAdapter() {
