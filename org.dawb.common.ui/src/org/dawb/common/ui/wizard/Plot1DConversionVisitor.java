@@ -102,7 +102,8 @@ public class Plot1DConversionVisitor extends AbstractPlotConversionVisitor {
 
 			if (firstTrace) {
 				int ddtype = AbstractDataset.getDType(((ILineTrace)trace).getData());
-				data = ((ILineTrace)trace).getXData();
+				data = ((ILineTrace)trace).getXData().getSliceView();
+				data.squeeze();
 				int axdtype = AbstractDataset.getDType(data);
 
 				if (ddtype == axdtype) {
@@ -120,8 +121,8 @@ public class Plot1DConversionVisitor extends AbstractPlotConversionVisitor {
 				firstTrace = false;
 			}
 
-			data = ((ILineTrace)trace).getData();
-
+			data = ((ILineTrace)trace).getData().getSliceView();
+			data.squeeze();
 			if (dtype != AbstractDataset.getDType(data)) {
 				data = DatasetUtils.cast((Dataset)data, dtype);
 			}
