@@ -94,6 +94,10 @@ class ConversionContext implements IConversionContext {
 		if (sliceDimensions == null) sliceDimensions = new HashMap<Integer,String>(7);
 		sliceDimensions.put(dim, sliceString);
 	}
+	@Override
+	public void setSliceDimensions(Map<Integer, String> dims) {
+		sliceDimensions = dims;
+	}
 	/**
 	 * 
 	 * @return the dimensions to slice in, may be null, in which case no slice done.

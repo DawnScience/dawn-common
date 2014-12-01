@@ -26,7 +26,6 @@ import org.eclipse.dawnsci.analysis.api.monitor.IMonitor;
 import org.eclipse.dawnsci.analysis.api.slice.Slicer;
 import org.eclipse.dawnsci.plotting.api.expressions.IExpressionObject;
 import org.eclipse.dawnsci.slicing.api.SlicingFactory;
-import org.eclipse.dawnsci.slicing.api.system.DimsData;
 import org.eclipse.dawnsci.slicing.api.system.DimsDataList;
 import org.eclipse.dawnsci.slicing.api.system.ISliceSystem;
 import org.eclipse.dawnsci.slicing.api.system.RangeMode;
@@ -365,14 +364,9 @@ public abstract class AbstractSliceConversionPage extends ResourceChoosePage {
 		context.setDatasetName(datasetName);
 		context.setOutputPath(getAbsoluteFilePath());
 		context.setExpression(isExpression);
+		
 		final DimsDataList dims = sliceComponent.getDimsDataList();
-		for (DimsData dd : dims.iterable()) {
-			if (dd.isSlice()) {
-				context.addSliceDimension(dd.getDimension(), String.valueOf(dd.getSlice()));
-			} else if (dd.isTextRange()) {
-				context.addSliceDimension(dd.getDimension(), dd.getSliceRange()!=null ? dd.getSliceRange() : "all");
-			}
-		}
+		context.setSliceDimensions(dims.toMap());
 		
 		try {
 			Map<Integer, String> sliceDimensions = context.getSliceDimensions();

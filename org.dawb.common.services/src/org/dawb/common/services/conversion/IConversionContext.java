@@ -263,6 +263,11 @@ public interface IConversionContext {
 	public void addSliceDimension(int dim, String sliceString);
 
 	/**
+	 * Set the dimensions in one go, overriding any previous addSliceDimension(...) calls
+	 */
+	public void setSliceDimensions(Map<Integer, String> dims);
+
+	/**
 	 * 
 	 * @return the dimensions to slice in.
 	 */
