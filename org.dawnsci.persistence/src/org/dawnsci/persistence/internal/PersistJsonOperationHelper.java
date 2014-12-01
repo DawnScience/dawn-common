@@ -203,6 +203,12 @@ public class PersistJsonOperationHelper {
 
 	}
 
+	/**
+	 * If this is changed, please update OperationModelMarshaller as well.
+	 * 
+	 * @param model
+	 * @return
+	 */
 	private Map<Class,Map<String, Object>> getSpecialObjects(IOperationModel model) {
 
 		Map<Class,Map<String, Object>> out = new HashMap<Class, Map<String,Object>>();
