@@ -56,7 +56,6 @@ public class ProcessConversion extends AbstractConversion {
 		final Map<Integer, String> sliceDimensions = context.getSliceDimensions();
 		
 		Map<Integer, String> axesNames = context.getAxesNames();
-		lz.clearMetadata(null);
 		if (axesNames != null) {
 			
 			AxesMetadataImpl axMeta = null;
