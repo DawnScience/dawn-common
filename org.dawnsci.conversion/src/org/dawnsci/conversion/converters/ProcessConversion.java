@@ -26,10 +26,10 @@ import org.eclipse.dawnsci.analysis.api.processing.IOperationService;
 import org.eclipse.dawnsci.analysis.api.slice.SliceFromSeriesMetadata;
 import org.eclipse.dawnsci.analysis.api.slice.Slicer;
 import org.eclipse.dawnsci.analysis.api.slice.SourceInformation;
+import org.eclipse.dawnsci.analysis.dataset.metadata.AxesMetadataImpl;
+import org.eclipse.dawnsci.analysis.dataset.metadata.OriginMetadataImpl;
 
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
-import uk.ac.diamond.scisoft.analysis.metadata.AxesMetadataImpl;
-import uk.ac.diamond.scisoft.analysis.metadata.OriginMetadataImpl;
 
 public class ProcessConversion extends AbstractConversion {
 
