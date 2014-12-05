@@ -28,8 +28,7 @@ Export-Package: boofcv.abst.filter,
  org.dawnsci.boofcv,
  org.dawnsci.boofcv.converter
 Import-Package: org.dawb.common.services,
- org.slf4j;version="1.7.6",
- uk.ac.diamond.scisoft.analysis.metadata
+ org.slf4j;version="1.7.6"
 Service-Component: OSGI-INF/*.xml
 Bundle-ClassPath: .,
  jars/org.boofcv.feature_0.18.0.jar,
