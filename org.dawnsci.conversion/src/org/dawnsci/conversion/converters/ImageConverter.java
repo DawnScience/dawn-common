@@ -41,23 +41,33 @@ public class ImageConverter extends AbstractImageConversion {
 		if (context.getMonitor()!=null && context.getMonitor().isCancelled()) {
 			throw new Exception(getClass().getSimpleName()+" is cancelled");
 		}
-		slice = getDownsampled(slice);
+		
+		try {
+			if (context.getMonitor()!=null) context.getMonitor().subTask(slice.getName());
+			
+			slice = getDownsampled(slice);
 
-		final File sliceFile = new File(getFilePath(slice));
-		if (!sliceFile.getParentFile().exists()) sliceFile.getParentFile().mkdirs();
+			final File sliceFile = new File(getFilePath(slice));
+			if (!sliceFile.getParentFile().exists()) sliceFile.getParentFile().mkdirs();
+
+			// JavaImageSaver likes 33 but users don't 
+			int bits = getBits();
+			if (bits==32 && getExtension().toLowerCase().startsWith("tif")) bits = 33;
+
+			final JavaImageSaver saver = new JavaImageSaver(sliceFile.getAbsolutePath(), getExtension(), bits, true);
+			final DataHolder     dh    = new DataHolder();
+			dh.addDataset(slice.getName(), slice);
+			if (context.getSelectedConversionFile()!=null) {
+				dh.setFilePath(context.getSelectedConversionFile().getAbsolutePath());
+			}
+			saver.saveFile(dh);
 		
-		// JavaImageSaver likes 33 but users don't 
-		int bits = getBits();
-		if (bits==32 && getExtension().toLowerCase().startsWith("tif")) bits = 33;
-		
-		final JavaImageSaver saver = new JavaImageSaver(sliceFile.getAbsolutePath(), getExtension(), bits, true);
-		final DataHolder     dh    = new DataHolder();
-		dh.addDataset(slice.getName(), slice);
-		if (context.getSelectedConversionFile()!=null) {
-			dh.setFilePath(context.getSelectedConversionFile().getAbsolutePath());
+		} finally {
+	        if (context.getMonitor()!=null) {
+	        	context.getMonitor().worked(1);
+	        }
 		}
-		saver.saveFile(dh);
-        if (context.getMonitor()!=null) context.getMonitor().worked(1);
+
 	}
 	@Override
 	public void close(IConversionContext context) {

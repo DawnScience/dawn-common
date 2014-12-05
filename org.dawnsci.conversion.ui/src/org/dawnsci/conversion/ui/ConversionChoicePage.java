@@ -12,6 +12,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import org.dawb.common.services.conversion.IConversionContext;
@@ -19,10 +20,13 @@ import org.dawb.common.services.conversion.IConversionContext.ConversionScheme;
 import org.dawb.common.services.conversion.IConversionService;
 import org.dawb.common.ui.util.GridUtils;
 import org.dawb.common.ui.wizard.ResourceChoosePage;
+import org.dawb.common.util.list.ListUtils;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
 import org.eclipse.dawnsci.analysis.api.monitor.IMonitor;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -32,6 +36,7 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
+import org.eclipse.swt.widgets.Text;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,6 +51,8 @@ public class ConversionChoicePage extends ResourceChoosePage implements IConvers
 	private Composite          conversionGroup;
 	private Label              multiFilesLabel;
 	private boolean            multiFileSelection=false;
+	private boolean            filterFiles = false;
+	private String             extensionsFilter = "*.cbf";
 
 	protected ConversionChoicePage(String pageName, IConversionService service) {
 		super(pageName, "Please choose what you would like to convert", null);
@@ -102,22 +109,84 @@ public class ConversionChoicePage extends ResourceChoosePage implements IConvers
 		singleFile.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 		singleFile.setText("Single file");
 		singleFile.setSelection(false);
-
+		
 		multiFilesLabel = new Label(container, SWT.WRAP);
 		multiFilesLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 4, 1));
+		
+		final Button filter = new Button(container, SWT.CHECK);
+		filter.setText("Filter");
+		filter.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+
+		final Text extensions = new Text(container, SWT.BORDER);
+		extensions.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
+		extensions.setToolTipText("Commana separated list of file extensions. E.g. '*.cbf' or '*.h5, *.nxs, *.hdf5'");
+		extensions.setVisible(false);
+		extensions.setText(extensionsFilter);
+		extensions.addModifyListener(new ModifyListener() {			
+			@Override
+			public void modifyText(ModifyEvent e) {
+				extensionsFilter = extensions.getText();
+				updateFilesLabel();
+			}
+		});
+		
+		filter.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				filterFiles = filter.getSelection();
+				extensions.setVisible(filter.getSelection());
+				extensions.getParent().layout();
+				updateFilesLabel();
+			}
+		});
+
 		
 		SelectionAdapter selAd = new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				multiFileSelection = useFiles.getSelection();
 				GridUtils.setVisible(multiFilesLabel, multiFileSelection);
 				setFileChoosingEnabled(!multiFileSelection);
+				GridUtils.setVisible(filter, multiFileSelection);
+				GridUtils.setVisible(extensions, multiFileSelection);
 			}
 		};
 		useFiles.addSelectionListener(selAd);
 		singleFile.addSelectionListener(selAd);
 	}
 	
+	/**
+	 * Overridden so that filter can be applied.
+	 * @return
+	 */
+	protected List<String> getSelectedFiles() {
+
+		final List<String> files = new ArrayList<String>(super.getSelectedFiles());
+		try {
+			if (filterFiles && extensionsFilter.length()>0) {
+				final List<String> exts = ListUtils.getList(extensionsFilter);
+				
+				for (Iterator<String> iterator = files.iterator(); iterator.hasNext();) {
+					String file = (String) iterator.next();
+					boolean oneOk = false;
+					for (String ext : exts) {
+						if (ext.length()>1 && ext.startsWith("*")) ext = ext.substring(1);
+						if (file.toLowerCase().endsWith(ext)) {
+							oneOk = true;
+							break;
+						}
+					}
+					if (!oneOk) iterator.remove();
+				}
+			}
+			return files;
+		} catch (Exception ne) {
+			logger.error("Cannot filter files!", ne);
+			return files;
+		}
+	}
+
 	private Label infoDiagram, infoText;
+
+	private Link helpLink;
 	
 	protected void createContentAfterFileChoose(Composite container) {
 		
@@ -135,7 +204,7 @@ public class ConversionChoicePage extends ResourceChoosePage implements IConvers
 		this.infoText    = new Label(infoArea, SWT.WRAP);
 		infoText.setLayoutData(new GridData(SWT.FILL, SWT.LEFT, true, false));
 		
-		final Link helpLink = new Link(container, SWT.WRAP);
+		this.helpLink = new Link(container, SWT.WRAP);
 		helpLink.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, true, false, 4, 3));
 		helpLink.setText("This wizard has been started in single file mode (<a>more</a>)");
 		
@@ -157,30 +226,35 @@ public class ConversionChoicePage extends ResourceChoosePage implements IConvers
 		});
 
 		
-		final List<String> selected = getSelectedFiles();
-		if (selected!=null) setPath(selected.get(0));
-		
-        if (selected==null || selected.size()<2) {
-        	GridUtils.setVisible(conversionGroup, false);
-        	GridUtils.setVisible(multiFilesLabel, false);
-        	GridUtils.setVisible(helpLink, true);
-        } else {
-        	//sort list
-        	Collections.sort(selected);
-        	multiFileSelection = true;
-          	GridUtils.setVisible(conversionGroup, true);
-        	GridUtils.setVisible(multiFilesLabel, true);
-        	final File start = new File(selected.get(0));
-        	final File end   = new File(selected.get(selected.size()-1));
-        	multiFilesLabel.setText("Selected files:   "+start.getName()+" - "+end.getName()+"  (List of "+selected.size()+" files)");
-        	setFileChoosingEnabled(false);
-        	GridUtils.setVisible(helpLink, false);
-      }
-       
-       pathChanged();
+        updateFilesLabel();
+		pathChanged();
         
 	}
 	
+	private void updateFilesLabel() {
+
+		final List<String> selected = getSelectedFiles();
+		if (selected!=null && selected.size()>0) setPath(selected.get(0));
+
+		if (!filterFiles && (selected==null || selected.size()<2)) {
+			GridUtils.setVisible(conversionGroup, false);
+			GridUtils.setVisible(multiFilesLabel, false);
+			GridUtils.setVisible(helpLink, true);
+		} else {
+			//sort list
+			Collections.sort(selected);
+			multiFileSelection = true;
+			GridUtils.setVisible(conversionGroup, true);
+			GridUtils.setVisible(multiFilesLabel, true);
+			final File start = new File(selected.get(0));
+			final File end   = new File(selected.get(selected.size()-1));
+			multiFilesLabel.setText("Selected files:   "+start.getName()+" - "+end.getName()+"  (List of "+selected.size()+" files)");
+			setFileChoosingEnabled(false);
+			GridUtils.setVisible(helpLink, false);
+		}
+
+	}
+
 	protected void pathChanged()  {
 		final String filePath = getAbsoluteFilePath();
 		if (filePath==null || "".equals(filePath)) {
