@@ -1,8 +1,8 @@
 package org.dawnsci.persistence.test.operations;
 
-import org.eclipse.dawnsci.analysis.api.processing.AbstractOperation;
 import org.eclipse.dawnsci.analysis.api.processing.OperationData;
 import org.eclipse.dawnsci.analysis.api.processing.OperationRank;
+import org.eclipse.dawnsci.analysis.dataset.operations.AbstractOperation;
 
 public class JunkTestOperationROI extends AbstractOperation<JunkTestModelROI, OperationData> {
 
