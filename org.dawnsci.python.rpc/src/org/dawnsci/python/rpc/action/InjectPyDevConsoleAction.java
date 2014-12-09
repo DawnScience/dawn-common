@@ -13,7 +13,7 @@ public class InjectPyDevConsoleAction extends Action {
 	private Map<String, String> params;
 	private InjectPyDevConsole injector;
 	private Map<String, IDataset> data;
-	private boolean injectData;
+	private boolean isDataInjected;
 
 	public InjectPyDevConsoleAction(String label) {
 		this(label, true);
@@ -22,13 +22,14 @@ public class InjectPyDevConsoleAction extends Action {
 	/**
 	 * 
 	 * @param label
-	 * @param injectData
-	 *            boolean flag to inject or not data
+	 * @param isDataInjected
+	 *            boolean flag to inject or not data (if false, then only the
+	 *            default injected command is sent)
 	 */
-	public InjectPyDevConsoleAction(String label, boolean injectData) {
+	public InjectPyDevConsoleAction(String label, boolean isDataInjected) {
 		super(label, Activator.getImageDescriptor("icons/application_osx_terminal.png"));
 		this.params = new HashMap<String,String>(7);
-		this.injectData = injectData;
+		this.isDataInjected = isDataInjected;
 	}
 
 	public void run() {
@@ -42,9 +43,9 @@ public class InjectPyDevConsoleAction extends Action {
 			if (injector==null) {
 				injector = new InjectPyDevConsole(params);
 			} 
-			if (injectData) injector.inject(data);
+			if (isDataInjected) injector.inject(data);
 			// if we don't inject data (simple cmd injection, then we run the open method)
-			if (!injectData) injector.open(true);
+			if (!isDataInjected) injector.open(true);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
