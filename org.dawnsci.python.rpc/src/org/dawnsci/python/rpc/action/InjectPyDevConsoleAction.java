@@ -13,38 +13,44 @@ public class InjectPyDevConsoleAction extends Action {
 	private Map<String, String> params;
 	private InjectPyDevConsole injector;
 	private Map<String, IDataset> data;
+	private boolean injectData;
 
 	public InjectPyDevConsoleAction(String label) {
-		
+		this(label, true);
+	}
+
+	/**
+	 * 
+	 * @param label
+	 * @param injectData
+	 *            boolean flag to inject or not data
+	 */
+	public InjectPyDevConsoleAction(String label, boolean injectData) {
 		super(label, Activator.getImageDescriptor("icons/application_osx_terminal.png"));
 		this.params = new HashMap<String,String>(7);
+		this.injectData = injectData;
 	}
 
 	public void run() {
 		try {
-			
 			// Console may have been closed, see if we can get the active
 			// one that they are using.
 			if (injector != null && !injector.isConsoleAvailable()) {
 				injector = null;
 			}
-			
 			// Otherwise open one.
 			if (injector==null) {
 				injector = new InjectPyDevConsole(params);
-				// Opens the console if required, including if it was closed.
-				injector.inject(data);
-				injector.open(true);
-			} else {
-				injector.inject(data);
-			}
-			
+			} 
+			if (injectData) injector.inject(data);
+			// if we don't inject data (simple cmd injection, then we run the open method)
+			if (!injectData) injector.open(true);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * Call this method to manually set the dataset which we should use to 
 	 * send to the console. This data is currently sent using flattening.
