@@ -13,23 +13,11 @@ public class InjectPyDevConsoleAction extends Action {
 	private Map<String, String> params;
 	private InjectPyDevConsole injector;
 	private Map<String, IDataset> data;
-	private boolean isDataInjected;
+	private boolean isDataInjected = true;
 
 	public InjectPyDevConsoleAction(String label) {
-		this(label, true);
-	}
-
-	/**
-	 * 
-	 * @param label
-	 * @param isDataInjected
-	 *            boolean flag to inject or not data (if false, then only the
-	 *            default injected command is sent)
-	 */
-	public InjectPyDevConsoleAction(String label, boolean isDataInjected) {
 		super(label, Activator.getImageDescriptor("icons/application_osx_terminal.png"));
 		this.params = new HashMap<String,String>(7);
-		this.isDataInjected = isDataInjected;
 	}
 
 	public void run() {
@@ -42,10 +30,18 @@ public class InjectPyDevConsoleAction extends Action {
 			// Otherwise open one.
 			if (injector==null) {
 				injector = new InjectPyDevConsole(params);
-			} 
-			if (isDataInjected) injector.inject(data);
-			// if we don't inject data (simple cmd injection, then we run the open method)
-			if (!isDataInjected) injector.open(true);
+				// Opens the console if required, including if it was closed.
+				if (isDataInjected)
+					injector.inject(data);
+				injector.open(true);
+			} else {
+				if (isDataInjected)
+					injector.inject(data);
+				if (!isDataInjected)
+					// if we don't inject data (simple cmd injection, then we
+					// run the open method)
+					injector.open(true);
+			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -75,7 +71,20 @@ public class InjectPyDevConsoleAction extends Action {
 	public void setData(Map<String, IDataset> data) {
 		this.data = data;
 	}
-	
+
+	public boolean isDataInjected() {
+		return isDataInjected;
+	}
+
+	/**
+	 * is set by default to True. Set to False if no need for data and only a
+	 * basic command needs to be injected into the console
+	 * 
+	 * @param isDataInjected
+	 */
+	public void setDataInjected(boolean isDataInjected) {
+		this.isDataInjected = isDataInjected;
+	}
 
 	/**
 	 * Set a connection parameter
