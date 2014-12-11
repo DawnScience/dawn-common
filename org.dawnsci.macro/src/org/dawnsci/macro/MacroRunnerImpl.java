@@ -58,6 +58,6 @@ public class MacroRunnerImpl implements IMacroRunner {
 		}
 		loader.add(JythonInterpreterUtils.class.getClassLoader());
 
-		interpreter = JythonInterpreterUtils.getFullInterpreter(loader);
+		interpreter = JythonInterpreterUtils.getFullInterpreter(loader, "org.eclipse.dawnsci.*");
 	}
 }
