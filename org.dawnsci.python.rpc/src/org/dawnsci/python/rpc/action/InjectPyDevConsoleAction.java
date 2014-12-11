@@ -13,38 +13,41 @@ public class InjectPyDevConsoleAction extends Action {
 	private Map<String, String> params;
 	private InjectPyDevConsole injector;
 	private Map<String, IDataset> data;
+	private boolean isDataInjected = true;
 
 	public InjectPyDevConsoleAction(String label) {
-		
 		super(label, Activator.getImageDescriptor("icons/application_osx_terminal.png"));
 		this.params = new HashMap<String,String>(7);
 	}
 
 	public void run() {
 		try {
-			
 			// Console may have been closed, see if we can get the active
 			// one that they are using.
 			if (injector != null && !injector.isConsoleAvailable()) {
 				injector = null;
 			}
-			
 			// Otherwise open one.
 			if (injector==null) {
 				injector = new InjectPyDevConsole(params);
 				// Opens the console if required, including if it was closed.
-				injector.inject(data);
+				if (isDataInjected)
+					injector.inject(data);
 				injector.open(true);
 			} else {
-				injector.inject(data);
+				if (isDataInjected)
+					injector.inject(data);
+				if (!isDataInjected)
+					// if we don't inject data (simple cmd injection, then we
+					// run the open method)
+					injector.open(true);
 			}
-			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * Call this method to manually set the dataset which we should use to 
 	 * send to the console. This data is currently sent using flattening.
@@ -68,7 +71,20 @@ public class InjectPyDevConsoleAction extends Action {
 	public void setData(Map<String, IDataset> data) {
 		this.data = data;
 	}
-	
+
+	public boolean isDataInjected() {
+		return isDataInjected;
+	}
+
+	/**
+	 * is set by default to True. Set to False if no need for data and only a
+	 * basic command needs to be injected into the console
+	 * 
+	 * @param isDataInjected
+	 */
+	public void setDataInjected(boolean isDataInjected) {
+		this.isDataInjected = isDataInjected;
+	}
 
 	/**
 	 * Set a connection parameter
