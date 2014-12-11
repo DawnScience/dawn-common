@@ -40,6 +40,8 @@ public class MacroFactory {
 	 */
 	public static MacroEventObject generate(MacroEventObject evt) {
 		
+		if (!evt.isGeneratable()) return evt;
+		
 		ClassKey key = new ClassKey(evt.getSource().getClass());
 		if (translators.containsKey(key)) {
 			return translators.get(key).generate(evt);
