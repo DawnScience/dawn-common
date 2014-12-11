@@ -11,5 +11,21 @@
          </enablement>
       </consolePageParticipant>
    </extension>
+   <extension
+         point="org.eclipse.ui.editorActions">
+      <editorContribution
+            id="org.dawnsci.macro.macroEditorContribution"
+            targetID="org.python.pydev.editor.PythonEditor">
+         <action
+               class="org.dawnsci.macro.console.RecordMacroAction"
+               icon="icons/recordMacro.png"
+               id="org.dawnsci.macro.recordMacroEditorAction"
+               label="Record Macro form DAWN"
+               style="toggle"
+               toolbarPath="Normal/additions"
+               tooltip="Records a macro as you use DAWN. The macro attempts to mimic what you do in the user interface in python commands, subject to if this is possible and curently linked.">
+         </action>
+      </editorContribution>
+   </extension>
 
 </plugin>
