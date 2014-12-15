@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.dawnsci.macro.generator.MacroFactory;
+import org.eclipse.dawnsci.macro.api.AbstractMacroGenerator;
 import org.eclipse.dawnsci.macro.api.IMacroEventListener;
 import org.eclipse.dawnsci.macro.api.IMacroService;
 import org.eclipse.dawnsci.macro.api.MacroEventObject;
@@ -57,6 +58,11 @@ public class MacroServiceImpl implements IMacroService {
 	@Override
 	public void removeMacroListener(IMacroEventListener l) {
 		listeners.remove(l);
+	}
+
+	@Override
+	public AbstractMacroGenerator getGenerator(Class<? extends Object> clazz) {
+		return MacroFactory.getGenerator(clazz);
 	}
 
 }

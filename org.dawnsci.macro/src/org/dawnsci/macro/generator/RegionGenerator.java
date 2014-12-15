@@ -5,14 +5,15 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.dawnsci.macro.AbstractMacroGenerator;
 import org.eclipse.dawnsci.analysis.api.roi.IROI;
 import org.eclipse.dawnsci.analysis.dataset.roi.CircularROI;
 import org.eclipse.dawnsci.analysis.dataset.roi.EllipticalROI;
 import org.eclipse.dawnsci.analysis.dataset.roi.LinearROI;
 import org.eclipse.dawnsci.analysis.dataset.roi.RectangularROI;
 import org.eclipse.dawnsci.analysis.dataset.roi.SectorROI;
+import org.eclipse.dawnsci.macro.api.AbstractMacroGenerator;
 import org.eclipse.dawnsci.macro.api.MacroEventObject;
+import org.eclipse.dawnsci.macro.api.MacroUtils;
 import org.eclipse.dawnsci.plotting.api.region.IRegion;
 
 import uk.ac.diamond.scisoft.analysis.rpc.FlatteningService;
@@ -48,7 +49,12 @@ class RegionGenerator extends AbstractMacroGenerator {
         if (source instanceof IROI)    roi = (IROI)source;
         if (roi    == null) return evt;
         
-        return  createCommands(roi, evt);
+        String cmd = createCommand(roi);
+        if (cmd!=null) {
+           	evt.setPythonCommand(cmd);
+           	evt.setJythonCommand(cmd);
+        }
+        return evt;
 	}
 
 	/**
@@ -56,27 +62,22 @@ class RegionGenerator extends AbstractMacroGenerator {
 	 * @param roi
 	 * @param evt
 	 */
-	private MacroEventObject createCommands(IROI roi, MacroEventObject evt) {
+	private String createCommand(IROI roi) {
 		
 		if (!pythonCmdMap.containsKey(new ClassKey(roi.getClass()))) {
-			String cmd = "print '"+roi.getClass().getSimpleName()+" does not have a python command'";
-			evt.setPythonCommand(cmd);
-			evt.setJythonCommand(cmd);
-			return evt;
+			return "print '"+roi.getClass().getSimpleName()+" does not have a python command'";
 		}
 		IRootFlattener service = FlatteningService.getFlattener();
 		Map<String, Object> flat = (Map<String, Object>)service.flatten(roi);
 		
- 		StringBuilder cmd = new StringBuilder(evt.getLegalName(roi.getName()));
+ 		StringBuilder cmd = new StringBuilder(MacroUtils.getLegalName(roi.getName()));
 		cmd.append(" = ");
 		cmd.append("dnp.roi.");
 		cmd.append(pythonCmdMap.get(new ClassKey(roi.getClass())));
 		cmd.append("(");
 		cmd.append(getArguments(flat));
 		cmd.append(")");
-		evt.setPythonCommand(cmd.toString());
-		evt.setJythonCommand(cmd.toString());
-		return evt;
+		return cmd.toString();
 	}
 
 	private String getArguments(Map<String, Object> flat) {
@@ -95,5 +96,23 @@ class RegionGenerator extends AbstractMacroGenerator {
 		
 		return args.toString();
 	}
+
+	@Override
+	public String getPythonCommand(Object source) {
+        IROI roi = null;
+        if (source instanceof IRegion) roi = ((IRegion)source).getROI();
+        if (source instanceof IROI)    roi = (IROI)source;
+        if (roi    == null) return null;
+        return createCommand(roi);
+ 	}
+
+	@Override
+	public String getJythonCommand(Object source) {
+        IROI roi = null;
+        if (source instanceof IRegion) roi = ((IRegion)source).getROI();
+        if (source instanceof IROI)    roi = (IROI)source;
+        if (roi    == null) return null;
+        return createCommand(roi);
+ 	}
 
 }
