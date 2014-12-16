@@ -1,10 +1,9 @@
 package org.dawnsci.macro.console;
 
+import org.dawnsci.macro.Activator;
 import org.eclipse.dawnsci.macro.api.IMacroEventListener;
 import org.eclipse.dawnsci.macro.api.IMacroService;
 import org.eclipse.dawnsci.macro.api.MacroEventObject;
-import org.eclipse.jface.text.BadLocationException;
-import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.source.ISourceViewer;
 
 /**
@@ -23,30 +22,21 @@ public class DocumentInserter implements IMacroEventListener {
 		return mservice;
 	}
 	
-	private IDocument     document;
-	private ISourceViewer viewer;
-	private InsertionType type;
-	
-	public void init(IDocument document, InsertionType type) {
-		this.document = document;
-		this.type     = type;
-	}
-	
+	private ISourceViewer  viewer;
+	private InsertionType  type;
+	private DocumentInsertionJob job;
+		
 	public void init(ISourceViewer viewer, InsertionType type) {
 		this.viewer   = viewer;
-		this.document = viewer.getDocument();
 		this.type     = type;
+		Activator.setLoadedNumpy(false);
+		this.job      = new DocumentInsertionJob(viewer);
 	}
 
 	@Override
 	public void macroChangePerformed(MacroEventObject mevt) {
-		
 		String cmd = type==InsertionType.PYTHON ? mevt.getPythonCommand() : mevt.getJythonCommand();
-		try {
-			document.replace(document.getLength(), 0, cmd+"\n");
-		} catch (BadLocationException e) {
-			e.printStackTrace(); 
-		}
+		job.schedule(cmd);
 	}
 
 	@Override
@@ -65,6 +55,7 @@ public class DocumentInserter implements IMacroEventListener {
 	public void disconnect() {
 		mservice.removeMacroListener(this);
 		isConnected = false;
+		if (job!=null) job.cancel();
 	}
 
 	public boolean isConnected() {

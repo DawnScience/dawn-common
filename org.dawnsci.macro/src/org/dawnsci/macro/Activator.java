@@ -14,4 +14,14 @@ public class Activator extends AbstractUIPlugin {
   	public static ImageDescriptor getImage(String path) {
 		return AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, path);
 	}
+  	
+  	private static volatile boolean loadedNumpy = false;
+
+	public static boolean isLoadedNumpy() {
+		return loadedNumpy;
+	}
+
+	public static void setLoadedNumpy(boolean loadedNumpy) {
+		Activator.loadedNumpy = loadedNumpy;
+	}
 }

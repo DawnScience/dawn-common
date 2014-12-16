@@ -5,7 +5,6 @@ import org.eclipse.dawnsci.macro.api.IMacroService;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.text.IDocument;
 import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.IConsolePageParticipant;
 import org.eclipse.ui.part.IPageBookViewPage;
@@ -28,9 +27,8 @@ public class ConsoleParticipant implements IConsolePageParticipant {
         IInterpreterInfo info = (IInterpreterInfo)oinfo;
         int type = info.getInterpreterType(); 
 
-        IDocument document = console.getDocument();        
         this.inserter = new DocumentInserter();
-        inserter.init(document, InsertionType.forPydevCode(type));
+        inserter.init(console.getViewer(), InsertionType.forPydevCode(type));
 
  
 		final IAction recordMacro = new Action("Record Macro", IAction.AS_CHECK_BOX) {

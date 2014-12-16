@@ -2,6 +2,7 @@ package org.dawnsci.macro.generator;
 
 import java.util.Map;
 
+import org.dawnsci.macro.Activator;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.macro.api.AbstractMacroGenerator;
 import org.eclipse.dawnsci.macro.api.MacroUtils;
@@ -44,6 +45,12 @@ public class DatasetGenerator extends AbstractMacroGenerator {
 				}
 			}
 		}
+		
+		if (!Activator.isLoadedNumpy() && type==0) {
+			buf.insert(0, "import numpy\n");
+			Activator.setLoadedNumpy(true);
+		}
+
 		return buf.toString();
     }
 }

@@ -192,6 +192,7 @@ public class InjectPyDevConsole {
 			cmd = "import numpy\n"+cmd;
 		}
 		if (cmd != null) {
+			if (!cmd.endsWith("\n")) cmd = cmd+"\n";
 			document.replace(document.getLength(), 0, cmd);
 		}
 
