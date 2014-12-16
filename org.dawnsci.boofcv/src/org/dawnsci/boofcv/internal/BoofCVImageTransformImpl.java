@@ -60,7 +60,7 @@ public class BoofCVImageTransformImpl<T extends ImageSingleBand<?>, TD extends T
 			height = (int) (image.height * Math.cos(Math.toRadians(angle)) + image.width
 					* Math.sin(Math.toRadians(angle)));
 		}
-		ImageFloat32 rotated = new ImageFloat32(height, width);
+		ImageFloat32 rotated = new ImageFloat32(width, height);
 
 		DistortImageOps.rotate(image, rotated, TypeInterpolate.BILINEAR, (float)Math.toRadians(angle));
 		return ConvertIDataset.convertTo(rotated, true);
@@ -78,9 +78,9 @@ public class BoofCVImageTransformImpl<T extends ImageSingleBand<?>, TD extends T
 			if (images.get(i).getShape().length != 2)
 				throw new Exception("Data shape is not 2D");
 			ImageFloat32 imageB = ConvertIDataset.convertFrom(images.get(i), ImageFloat32.class, 1);
-			//TODO
-//			MultiSpectral<ImageFloat32> aligned = ImageRegistration.register(imageA, imageB);
+//			ImageSingleBand<?> aligned = ImageRegistration.register(imageA, imageB);
 //			IDataset alignedData = ConvertIDataset.convertTo(aligned, true);
+//			alignedData.setName(images.get(i).getName());
 //			alignedList.add(alignedData);
 		}
 		return alignedList;
