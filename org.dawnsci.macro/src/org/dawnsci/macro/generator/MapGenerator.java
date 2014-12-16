@@ -5,9 +5,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
+import org.eclipse.dawnsci.analysis.api.INameable;
 import org.eclipse.dawnsci.macro.api.AbstractMacroGenerator;
 
+/**
+ * Creates a python dictionary from whatever 
+ * @author fcp94556
+ *
+ */
 public class MapGenerator extends AbstractMacroGenerator {
 
 	@Override
@@ -35,22 +40,36 @@ public class MapGenerator extends AbstractMacroGenerator {
  
 			if (gen!=null) {
 			
-				if (object instanceof IDataset) {
-					IDataset dset = (IDataset)object;
-					String origName = dset.getName();
-					dset.setName(varName);
-					buf.append(type==0 ? gen.getPythonCommand(dset) : gen.getJythonCommand(dset));
-					dset.setName(origName);
-					
-				} else {
-					buf.append(type==0 ? gen.getPythonCommand(object) : gen.getJythonCommand(object));
+				String cmd;
+				
+				// If it is nameable, we override its name temporarily with the mapped name
+				if (object instanceof INameable) {
+					INameable nameable = (INameable)object;
+					String origName = nameable.getName();
+					try {
+						nameable.setName(varName);
+						cmd = type==0 ? gen.getPythonCommand(nameable) : gen.getJythonCommand(nameable);
+						buf.append(cmd);
+					} finally {
+					    nameable.setName(origName);
+					}
 
+				} else {
+					cmd = type==0 ? gen.getPythonCommand(object) : gen.getJythonCommand(object);
+					buf.append(cmd);
 				}
-				sentData.add(varName);
+
+				// The name may still have been changed when the command was generated
+				// Therefore we parse it back out.
+				if (cmd!=null && cmd.contains("=")) {
+					String[] sa = cmd.split("=");
+				    if (sa!=null && sa.length>0) sentData.add(sa[0].trim());
+				}
+
 			}
 		}
 		
-		// We make a dictionary for them.
+		// We make a dictionary for them, if there is more than 1.
 		if (sentData.size()>1) {
 			buf.append("data = "+createDictionaryText(sentData)+"\n");
 		}

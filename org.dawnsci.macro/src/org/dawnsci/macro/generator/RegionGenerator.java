@@ -57,6 +57,7 @@ class RegionGenerator extends AbstractMacroGenerator {
         return evt;
 	}
 
+	private static int count;
 	/**
 	 * 
 	 * @param roi
@@ -70,13 +71,15 @@ class RegionGenerator extends AbstractMacroGenerator {
 		IRootFlattener service = FlatteningService.getFlattener();
 		Map<String, Object> flat = (Map<String, Object>)service.flatten(roi);
 		
- 		StringBuilder cmd = new StringBuilder(MacroUtils.getLegalName(roi.getName()));
+		String varName = roi.getName();
+		if (varName==null || "".equals(varName)) varName = "roi"+(++count);
+ 		StringBuilder cmd = new StringBuilder(MacroUtils.getLegalName(varName));
 		cmd.append(" = ");
 		cmd.append("dnp.roi.");
 		cmd.append(pythonCmdMap.get(new ClassKey(roi.getClass())));
 		cmd.append("(");
 		cmd.append(getArguments(flat));
-		cmd.append(")");
+		cmd.append(")\n");
 		return cmd.toString();
 	}
 

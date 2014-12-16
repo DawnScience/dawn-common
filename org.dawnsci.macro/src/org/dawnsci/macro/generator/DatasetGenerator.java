@@ -20,6 +20,8 @@ public class DatasetGenerator extends AbstractMacroGenerator {
     	return getCommand((IDataset)source, 1);
 	}
 
+	private static int count = 0;
+	
     private String getCommand(IDataset set, int type) {
     	
     	final StringBuilder buf = new StringBuilder();
@@ -32,6 +34,7 @@ public class DatasetGenerator extends AbstractMacroGenerator {
 
 			if (flattenedPath!=null) {
 				String varName = set.getName();
+				if (varName==null || "".equals(varName)) varName = "dataset"+(++count);
 				buf.append(MacroUtils.getLegalName(varName));
 				buf.append(" = ");
 				if (type == 0) { // Python

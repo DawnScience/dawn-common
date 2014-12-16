@@ -2,6 +2,7 @@ package org.dawnsci.macro.generator;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
@@ -30,6 +31,7 @@ public class MacroFactory {
 		tmp.put(new ClassKey(IROI.class),     new RegionGenerator());
 		tmp.put(new ClassKey(IDataset.class), new DatasetGenerator());
 		tmp.put(new ClassKey(Map.class),      new MapGenerator());
+		tmp.put(new ClassKey(List.class),     new ListGenerator());
 	    generators = Collections.unmodifiableMap(tmp);
 	}
 	
