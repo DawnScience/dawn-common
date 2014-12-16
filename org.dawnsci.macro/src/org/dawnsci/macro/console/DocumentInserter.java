@@ -29,8 +29,8 @@ public class DocumentInserter implements IMacroEventListener {
 	public void init(ISourceViewer viewer, InsertionType type) {
 		this.viewer   = viewer;
 		this.type     = type;
-		Activator.setLoadedNumpy(false);
 		this.job      = new DocumentInsertionJob(viewer);
+		Activator.setLoadedNumpy(false);
 	}
 
 	@Override
