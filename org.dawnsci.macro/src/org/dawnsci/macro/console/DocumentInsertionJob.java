@@ -10,6 +10,7 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.widgets.Display;
 import org.python.pydev.debug.newconsole.prefs.InteractiveConsolePrefs;
+import org.python.pydev.shared_interactive_console.console.ui.internal.ScriptConsoleViewer;
 
 public class DocumentInsertionJob extends Job {
 	
@@ -47,7 +48,7 @@ public class DocumentInsertionJob extends Job {
 						e.printStackTrace(); 
 					}
 
-					if (InteractiveConsolePrefs.getFocusConsoleOnSendCommand() && viewer!=null) {
+					if (InteractiveConsolePrefs.getFocusConsoleOnSendCommand() && viewer!=null && viewer instanceof ScriptConsoleViewer) {
 						StyledText textWidget = viewer.getTextWidget();
 						if (textWidget != null) textWidget.setFocus();
 					}

@@ -201,9 +201,8 @@ public class InjectPyDevConsole {
 			if (viewer != null) {
 
 				StyledText textWidget = viewer.getTextWidget();
-				if (textWidget != null) {
-					textWidget.setFocus();
-				}
+				if (textWidget != null) textWidget.setFocus();
+
 			}
 		}
 	}
