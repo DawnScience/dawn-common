@@ -59,6 +59,7 @@ import org.eclipse.ui.IURIEditorInput;
 import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
@@ -206,6 +207,18 @@ public class EclipseUtils {
 	 * @return the page
 	 */
 	public static IWorkbenchPage getPage() {
+		return getPage(null);
+	}
+	
+	/**
+	 * Gets the page, even during startup.
+	 * @return the page
+	 */
+	public static IWorkbenchPage getPage(IWorkbenchPartSite site) {
+		if (site != null) {
+			IWorkbenchPage page = site.getPage();
+			if (page != null) return page;
+		}
 		IWorkbenchPage activePage = EclipseUtils.getActivePage();
 		if (activePage!=null) return activePage;
 		return EclipseUtils.getDefaultPage();
