@@ -32,9 +32,15 @@ public class DocumentInserter implements IMacroEventListener {
 	}
 
 	@Override
-	public void macroChangePerformed(MacroEventObject mevt) {
+	public synchronized void macroChangePerformed(MacroEventObject mevt) {
+		
 		String cmd = type==InsertionType.PYTHON ? mevt.getPythonCommand() : mevt.getJythonCommand();
-		job.schedule(cmd);
+		String contents = viewer.getDocument().get().trim();
+		if (contents.endsWith(cmd.trim()) || contents.endsWith(cmd.trim()+"\n>>>") || contents.endsWith(cmd.trim()+"\r\n>>>")) {
+			System.out.println("Command already made : "+cmd);
+			return; // Avoid recursion, do nothing
+		}
+		job.add(cmd);
 	}
 
 	@Override
