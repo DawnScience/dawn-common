@@ -110,7 +110,11 @@ public class DocumentInsertionJob extends Job {
 
 	}
 
-	public void add(String cmd) {
+	/**
+	 * Commands must be added in order
+	 * @param cmd
+	 */
+	public synchronized void add(String cmd) {
 		String next = queue.peek();
 		if (cmd.equals(next)) return; // Two the same not usually required.
 		queue.add(cmd);

@@ -32,7 +32,7 @@ public class DocumentInserter implements IMacroEventListener {
 	}
 
 	@Override
-	public synchronized void macroChangePerformed(MacroEventObject mevt) {
+	public void macroChangePerformed(MacroEventObject mevt) {
 		
 		String cmd = type==InsertionType.PYTHON ? mevt.getPythonCommand() : mevt.getJythonCommand();
 		String contents = viewer.getDocument().get().trim();

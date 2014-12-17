@@ -33,12 +33,13 @@ public class MacroServiceImpl implements IMacroService {
 	}
 
 	@Override
-	public void publish(MacroEventObject evt) {
+	public synchronized void publish(MacroEventObject evt) {
 		
 		// We can automatically deal with some events, to reduce dependency
 		// inside the API generating the objects. For instance regions can be generically
 		// translated into the python which creates them
 		evt = MacroFactory.generate(evt);
+		if (evt==null) return;
 		
 		for (Iterator<IMacroEventListener> iterator = listeners.iterator(); iterator.hasNext();) {
 			IMacroEventListener l = iterator.next();
