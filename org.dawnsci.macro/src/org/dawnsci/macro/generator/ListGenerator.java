@@ -33,7 +33,7 @@ public class ListGenerator extends AbstractMacroGenerator {
 		final StringBuilder     buf = new StringBuilder();
 		final List<String> sentData = new ArrayList<String>(3);
 		for (Object var : data) {		
-			
+			if (var == null) continue;
 			AbstractMacroGenerator gen = MacroFactory.getGenerator(var.getClass());
 			if (gen!=null) {
 				String cmd = type==0 ? gen.getPythonCommand(var) : gen.getJythonCommand(var);
