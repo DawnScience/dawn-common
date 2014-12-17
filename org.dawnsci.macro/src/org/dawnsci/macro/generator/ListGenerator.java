@@ -13,15 +13,15 @@ import org.eclipse.dawnsci.macro.api.AbstractMacroGenerator;
  * @author fcp94556
  *
  */
-public class ListGenerator extends AbstractMacroGenerator {
+public class ListGenerator extends AbstractMacroGenerator<List> {
 
 	@Override
-	public String getPythonCommand(Object source) {
+	public String getPythonCommand(List source) {
 		return createFlattenCommands((List<? extends Object>)source, 0);
 	}
 
 	@Override
-	public String getJythonCommand(Object source) {
+	public String getJythonCommand(List source) {
 		return createFlattenCommands((List<? extends Object>)source, 1);
 	}
 

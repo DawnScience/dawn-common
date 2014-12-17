@@ -26,7 +26,7 @@ import uk.ac.diamond.scisoft.analysis.rpc.flattening.IRootFlattener;
  * @author fcp94556
  *
  */
-class RegionGenerator extends AbstractMacroGenerator {
+class RegionGenerator extends AbstractMacroGenerator<Object> {
 	
 	static final Map<ClassKey, String> pythonCmdMap;
 	static {
@@ -93,7 +93,7 @@ class RegionGenerator extends AbstractMacroGenerator {
 			
 			args.append(key);
 			args.append(" = ");
-			args.append(toPythonString(flat.get(key)));
+			args.append(MacroUtils.toPythonString(flat.get(key)));
 			if (it.hasNext()) args.append(", ");
 		}
 		

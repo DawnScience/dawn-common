@@ -13,15 +13,15 @@ import org.eclipse.dawnsci.macro.api.AbstractMacroGenerator;
  * @author fcp94556
  *
  */
-public class MapGenerator extends AbstractMacroGenerator {
+public class MapGenerator extends AbstractMacroGenerator<Map> {
 
 	@Override
-	public String getPythonCommand(Object source) {
+	public String getPythonCommand(Map source) {
 		return createFlattenCommands((Map<String,? extends Object>)source, 0);
 	}
 
 	@Override
-	public String getJythonCommand(Object source) {
+	public String getJythonCommand(Map source) {
 		return createFlattenCommands((Map<String,? extends Object>)source, 1);
 	}
 

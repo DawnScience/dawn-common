@@ -1,6 +1,5 @@
 package org.dawnsci.macro.console;
 
-import org.dawnsci.macro.Activator;
 import org.eclipse.dawnsci.macro.api.IMacroEventListener;
 import org.eclipse.dawnsci.macro.api.IMacroService;
 import org.eclipse.dawnsci.macro.api.MacroEventObject;
@@ -30,7 +29,6 @@ public class DocumentInserter implements IMacroEventListener {
 		this.viewer   = viewer;
 		this.type     = type;
 		this.job      = new DocumentInsertionJob(viewer);
-		Activator.setLoadedNumpy(false);
 	}
 
 	@Override

@@ -29,6 +29,22 @@ public class DocumentInsertionJob extends Job {
 	public IStatus run(IProgressMonitor mon) {
 
 		if (!cmd.endsWith("\n")) cmd = cmd+"\n";
+		
+		// Check numpy
+		if (cmd.indexOf("import numpy")<0) {
+			Display.getDefault().syncExec(new Runnable() {
+				public void run() {
+					IDocument document = viewer.getDocument();
+	                if (document.get().indexOf("import numpy")<0) {
+						try {
+							document.replace(document.getLength(), 0, "import numpy\n");
+						} catch (BadLocationException e) {
+							e.printStackTrace();
+						}
+	                }
+				}
+			});
+		}
 
 		// If a single line, takes a while, the console will not respond until
 		// it has completed ( numpy console bug )

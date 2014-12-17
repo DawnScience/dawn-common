@@ -2,23 +2,22 @@ package org.dawnsci.macro.generator;
 
 import java.util.Map;
 
-import org.dawnsci.macro.Activator;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.macro.api.AbstractMacroGenerator;
 import org.eclipse.dawnsci.macro.api.MacroUtils;
 
 import uk.ac.diamond.scisoft.analysis.rpc.FlatteningService;
 
-public class DatasetGenerator extends AbstractMacroGenerator {
+public class DatasetGenerator extends AbstractMacroGenerator<IDataset> {
 
 	@Override
-	public String getPythonCommand(Object source) {
-	   	return getCommand((IDataset)source, 0);
+	public String getPythonCommand(IDataset source) {
+	   	return getCommand(source, 0);
 	}
 
 	@Override
-	public String getJythonCommand(Object source) {
-    	return getCommand((IDataset)source, 1);
+	public String getJythonCommand(IDataset source) {
+    	return getCommand(source, 1);
 	}
 
 	private static int count = 0;
@@ -44,11 +43,6 @@ public class DatasetGenerator extends AbstractMacroGenerator {
 					buf.append( "dnp.io.load(r'"+flattenedPath+"')\n");
 				}
 			}
-		}
-		
-		if (!Activator.isLoadedNumpy() && type==0) {
-			buf.insert(0, "import numpy\n");
-			Activator.setLoadedNumpy(true);
 		}
 
 		return buf.toString();
