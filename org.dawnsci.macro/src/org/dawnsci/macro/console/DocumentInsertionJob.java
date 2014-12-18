@@ -11,6 +11,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.dawnsci.plotting.api.IPlottingSystem;
+import org.eclipse.dawnsci.plotting.api.PlottingFactory;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.source.ISourceViewer;
@@ -123,6 +124,10 @@ public class DocumentInsertionJob extends Job {
 						try {
 							// We see if the active part might be a plotting system and take this name
 							IPlottingSystem active = (IPlottingSystem)EclipseUtils.getPage().getActivePart().getAdapter(IPlottingSystem.class);
+							if (active==null) active = (IPlottingSystem)EclipseUtils.getPage().getActiveEditor().getAdapter(IPlottingSystem.class);
+							if (active==null) active = PlottingFactory.getPlottingSystems()!=null
+									                 ? PlottingFactory.getPlottingSystems()[0]
+									                 : null;
 							StringBuilder buf = new StringBuilder("ps = dnp.plot.getPlottingSystem(");
 							if (active!=null) {
 								buf.append("\"");
