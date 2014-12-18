@@ -5,10 +5,12 @@ import java.util.List;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
 
+import org.dawb.common.ui.util.EclipseUtils;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.dawnsci.plotting.api.IPlottingSystem;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.source.ISourceViewer;
@@ -21,10 +23,12 @@ public class DocumentInsertionJob extends Job {
 	
 	private ISourceViewer         viewer;
 	private BlockingDeque<String> queue;
+	private InsertionType  type;
 
-	public DocumentInsertionJob(ISourceViewer viewer) {
+	public DocumentInsertionJob(InsertionType  type, ISourceViewer viewer) {
 		
 		super("Document Insertion Job");
+		this.type   = type;
 		this.viewer = viewer;
 		setPriority(Job.INTERACTIVE);
 		setUser(false);
@@ -45,31 +49,8 @@ public class DocumentInsertionJob extends Job {
 
 				if (!cmd.endsWith("\n")) cmd = cmd+"\n";
 				
-				// Check numpy
-				final List<Boolean> inserted = new ArrayList<Boolean>(1);
-				if (cmd.indexOf("import numpy")<0) {
-					Display.getDefault().syncExec(new Runnable() {
-						public void run() {
-							IDocument document = viewer.getDocument();
-			                if (document.get().indexOf("import numpy")<0) {
-								try {
-									document.replace(document.getLength(), 0, "import numpy\n");
-									inserted.add(Boolean.TRUE);
-								} catch (BadLocationException e) {
-									e.printStackTrace();
-								}
-			                }
-						}
-					});
-				}
 				
-				if (inserted.size()==1 && inserted.get(0)) {
-					try {
-						Thread.sleep(1000); // Load numpy - how longs a piece of string?
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-				}
+				checkSetup(cmd);
 
 				// If a single line, takes a while, the console will not respond until
 				// it has completed ( numpy console bug )
@@ -83,6 +64,8 @@ public class DocumentInsertionJob extends Job {
 								IDocument document = viewer.getDocument();
 								document.replace(document.getLength(), 0, c);
 								document.replace(document.getLength(), 0, "\n");
+							    viewer.setSelectedRange(document.getLength(), -1);
+							    
 							} catch (BadLocationException e) {
 								e.printStackTrace(); 
 							}
@@ -104,10 +87,106 @@ public class DocumentInsertionJob extends Job {
 				}
 			}
 		} catch (InterruptedException e) {
-			return new Status(IStatus.ERROR, "org.dawnsci.macro", "Interupted thread!", e);
+			// This is allowed when the job is being stopped
+			return Status.CANCEL_STATUS;
 		}
 		return Status.OK_STATUS;
 
+	}
+	
+	
+	/**
+	 * This method inserts various setup commands if they cannot be found.
+	 * This step ensures that future plotting system commands echoed to python
+	 * are less likely to stack trace in the console.
+	 * 
+	 * @param cmd
+	 * @return
+	 */
+	private void checkSetup(String cmd) {
+		
+		
+		// Check numpy
+		if (type==InsertionType.PYTHON) {
+
+			checkAdd("# Turn py4j on under Window->Preferences->Py4j Default Server > 'Py4j active'", cmd, 150);
+			checkAdd("import numpy", cmd, 1200);
+			
+		}
+			
+		if (cmd.indexOf("ps = dnp.plot.getPlottingSystem(")<0) {
+			final List<Boolean> inserted = new ArrayList<Boolean>(1);
+			Display.getDefault().syncExec(new Runnable() {
+				public void run() {
+					IDocument document = viewer.getDocument();
+	                if (document.get().indexOf("ps = dnp.plot.getPlottingSystem(")<0) {
+						try {
+							// We see if the active part might be a plotting system and take this name
+							IPlottingSystem active = (IPlottingSystem)EclipseUtils.getPage().getActivePart().getAdapter(IPlottingSystem.class);
+							StringBuilder buf = new StringBuilder("ps = dnp.plot.getPlottingSystem(");
+							if (active!=null) {
+								buf.append("\"");
+								buf.append(active.getPlotName());
+								buf.append("\"");
+							}
+							buf.append(")\n");
+							
+							document.replace(document.getLength(), 0, buf.toString());
+						    viewer.setSelectedRange(document.getLength(), -1);
+							inserted.add(Boolean.TRUE);
+							
+						} catch (BadLocationException e) {
+							e.printStackTrace();
+						}
+	                }
+				}
+			});
+			if (inserted.size()==1 && inserted.get(0)) {
+				try {
+					Thread.sleep(250); // Load system - how longs a piece of string?
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	private void checkAdd(final String toAdd, String cmd, long time) {
+		
+		final List<Boolean> inserted = new ArrayList<Boolean>(1);
+		if (cmd.indexOf(toAdd)>-1) return;
+		
+		Display.getDefault().syncExec(new Runnable() {
+			public void run() {
+				try {
+					IDocument document = viewer.getDocument();
+					if (document.get().indexOf(toAdd)<0) {
+						document.replace(document.getLength(), 0, toAdd+"\n");
+						inserted.add(Boolean.TRUE);
+					}
+				} catch (BadLocationException e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		
+		if (inserted.size()==1 && inserted.get(0)) {
+			try {
+				Thread.sleep(time); // Load system - how longs a piece of string?
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+
+	}
+
+	public void stop() {
+		super.cancel();
+		try {
+		    getThread().interrupt(); // Incase waiting on a take
+		} catch (Throwable swallowed) {
+			// we just try this in case
+		}
 	}
 
 	/**

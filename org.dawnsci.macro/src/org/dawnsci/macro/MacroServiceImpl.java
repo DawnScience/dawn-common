@@ -47,7 +47,11 @@ public class MacroServiceImpl implements IMacroService {
 				iterator.remove();
 				continue;
 			}
-			l.macroChangePerformed(evt);
+			try {
+			    l.macroChangePerformed(evt);
+			} catch (Exception ne) {
+				ne.printStackTrace();
+			}
 		}
 	}
 
