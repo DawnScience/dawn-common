@@ -5,6 +5,8 @@ import org.eclipse.dawnsci.macro.api.IMacroEventListener;
 import org.eclipse.dawnsci.macro.api.IMacroService;
 import org.eclipse.dawnsci.macro.api.MacroEventObject;
 import org.eclipse.dawnsci.plotting.api.IPlottingSystem;
+import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IWorkbenchPart;
@@ -46,7 +48,19 @@ public class DocumentInserter implements IMacroEventListener, IPartListener {
 			System.out.println("Command already made : "+cmd);
 			return; // Avoid recursion, do nothing
 		}
-		job.add(cmd);
+		if (mevt.isImmediate()) {
+			try {
+				IDocument document = viewer.getDocument();
+				document.replace(document.getLength(), 0, cmd);
+				document.replace(document.getLength(), 0, "\n");
+
+			} catch (BadLocationException e) {
+				e.printStackTrace(); 
+			}
+
+		} else {
+		    job.add(cmd);
+		}
 	}
 
 	@Override

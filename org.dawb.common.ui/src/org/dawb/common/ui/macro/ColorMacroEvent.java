@@ -15,6 +15,9 @@ public class ColorMacroEvent extends MethodEventObject<Color>{
 	public ColorMacroEvent(String varName, Object source, Color... args) {
 		super(varName, Thread.currentThread().getStackTrace(), source, args);
 	}
+	public ColorMacroEvent(String varName, String methodName, Object source, Color... args) {
+		super(varName, methodName, source, args);
+	}
 
 	protected String createPythonCommand(String varName, String methodName, Object source, Color... args) {
 		
