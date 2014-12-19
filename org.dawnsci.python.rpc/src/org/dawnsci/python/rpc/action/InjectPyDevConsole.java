@@ -122,7 +122,7 @@ public class InjectPyDevConsole {
 				}
 			}
 
-	        String flat = createFlattenCommands(data, info.getInterpreterType());
+	        String flat = data != null ? createFlattenCommands(data, info.getInterpreterType()) : null;
             if (flat!=null) cmd = cmd.concat(flat);
             
             if (console == null) {
@@ -145,7 +145,7 @@ public class InjectPyDevConsole {
 
 	private String createFlattenCommands(Map<String, IDataset> d, int interpreterType) {
 		
-		AbstractMacroGenerator gen = mservice.getGenerator(d.getClass());
+		AbstractMacroGenerator<Map<String, IDataset>> gen = mservice.getGenerator(d.getClass());
 		return interpreterType==0 ? gen.getPythonCommand(d) : gen.getJythonCommand(d);
 	}
 
