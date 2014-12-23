@@ -208,11 +208,13 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 				try {
 					Object val = getSpinnerAngle();
 					IDataset rotated = null;
+					double value = 0;
 					if (val instanceof Long) {
-						rotated = transformer.rotate(firstImage, ((Long)val).doubleValue());
+						value = ((Long)val).doubleValue();
 					} else if (val instanceof Double) {
-						rotated = transformer.rotate(firstImage, ((Double)val).doubleValue());
+						value = ((Double)val).doubleValue();
 					}
+					rotated = transformer.rotate(firstImage, value);
 					plotSystem.updatePlot2D(rotated, null, null);
 				} catch (Exception e1) {
 					logger.error("Error rotating image:" + e1.getMessage());
