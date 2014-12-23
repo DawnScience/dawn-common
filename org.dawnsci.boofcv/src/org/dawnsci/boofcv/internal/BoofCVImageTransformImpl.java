@@ -55,10 +55,10 @@ public class BoofCVImageTransformImpl<T extends ImageSingleBand<?>, TD extends T
 			height = image.height;
 		} else {
 			// calculate resulting bounding box
-			width = (int) (image.width * Math.cos(Math.toRadians(angle)) + image.height
-					* Math.sin(Math.toRadians(angle)));
-			height = (int) (image.height * Math.cos(Math.toRadians(angle)) + image.width
-					* Math.sin(Math.toRadians(angle)));
+			double cos = Math.abs(Math.cos(Math.toRadians(angle)));
+			double sin = Math.abs(Math.sin(Math.toRadians(angle)));
+			width = (int) (image.width * cos + image.height * sin);
+			height = (int) (image.height * cos + image.width * sin);
 		}
 		ImageFloat32 rotated = new ImageFloat32(width, height);
 
