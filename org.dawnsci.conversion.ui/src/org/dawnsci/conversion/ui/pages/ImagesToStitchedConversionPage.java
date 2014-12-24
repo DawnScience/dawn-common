@@ -341,6 +341,7 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 			plotSystem.getPlotComposite().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 			
 			plotSystem.createPlot2D(firstImage, null, null);
+			plotSystem.setKeepAspect(true);
 			createRegion(firstImage);
 		} catch (Exception e) {
 			logger.error("Error creating the plotting system:" + e.getMessage());
