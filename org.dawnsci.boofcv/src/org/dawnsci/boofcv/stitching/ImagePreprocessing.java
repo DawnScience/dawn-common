@@ -111,10 +111,10 @@ public class ImagePreprocessing {
 		double[][][] images = new double[rows][columns][2];
 		for (int i = 0; i < rows; i++) {
 			for(int j = 0; j < columns; j++) {
-				if (input.size() < 2)
-					images[i][j] = input.get(0);
-				else 
-					images[i][j] = input.get((i * columns) + j);
+				if (input.size() < 2) {
+					images[i][j] = input.get(0).clone();
+				} else 
+					images[i][j] = input.get((i * columns) + j).clone();
 				images[i][j][0] *= 10;
 				images[i][j][1] *= 10;
 				//	images[i][j].setMetadata(getUniqueMetadata(i+1, j+1));
