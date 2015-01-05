@@ -31,6 +31,7 @@ import org.eclipse.dawnsci.analysis.dataset.impl.DatasetFactory;
 import org.eclipse.dawnsci.analysis.dataset.impl.DatasetUtils;
 import org.eclipse.dawnsci.analysis.dataset.metadata.OriginMetadataImpl;
 import org.eclipse.dawnsci.analysis.dataset.operations.AbstractOperation;
+import org.eclipse.dawnsci.analysis.dataset.slicer.SliceFromSeriesMetadata;
 import org.eclipse.dawnsci.hdf5.IHierarchicalDataFile;
 import org.eclipse.dawnsci.hdf5.Nexus;
 import org.slf4j.Logger;
@@ -272,7 +273,8 @@ public class PersistJsonOperationHelper {
 		String note = file.group(ORIGIN, process);
 		file.createStringDataset("path", origin.getFilePath(), note);
 		file.createStringDataset("dataset", origin.getDatasetName(), note);
-		file.createStringDataset("sampling", Slice.createString(origin.getInitialSlice()), note);
+		if (origin instanceof SliceFromSeriesMetadata) file.createStringDataset("sampling",
+				Slice.createString(((SliceFromSeriesMetadata)origin).getSliceInfo().getSubSampling()), note);
 		Dataset dd = DatasetFactory.createFromObject(origin.getDataDimensions());
 		file.createDataset("data dimensions", dd, note);
 		
