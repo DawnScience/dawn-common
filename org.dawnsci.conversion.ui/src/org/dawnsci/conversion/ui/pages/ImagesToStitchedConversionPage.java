@@ -107,6 +107,7 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 		if (hasCropping)
 			bean.setRoi(plotSystem.getRegion("Cropping"));
 		bean.setFeatureAssociated(hasFeatureAssociated);
+		bean.setInputDatFile(datFileLoaded);
 		Number xTrans = (Number) xTranslationText.getValue();
 		Number yTrans = (Number) yTranslationText.getValue();
 		

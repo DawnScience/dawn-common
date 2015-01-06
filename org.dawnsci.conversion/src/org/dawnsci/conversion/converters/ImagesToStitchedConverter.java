@@ -81,12 +81,13 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 			int columns = conversionBean.getColumns();
 			double angle = conversionBean.getAngle();
 			boolean useFeatureAssociation = conversionBean.isFeatureAssociated();
+			boolean isInputDatFile = conversionBean.isInputDatFile();
 			double fieldOfView = conversionBean.getFieldOfView();
 			List<double[]> translations = conversionBean.getTranslations();
 			IDataset stitched = null;
 			IRegion region = conversionBean.getRoi();
 			if (region != null) {
-				stitched = stitcher.stitch(imageStack, rows, columns, angle, fieldOfView, translations, region.getROI(), useFeatureAssociation);
+				stitched = stitcher.stitch(imageStack, rows, columns, angle, fieldOfView, translations, region.getROI(), useFeatureAssociation, isInputDatFile);
 			} else {
 				stitched = stitcher.stitch(imageStack, rows, columns, angle);
 			}
@@ -177,6 +178,7 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 		private double angle = 49;
 		private double fieldOfView = 50;
 		private boolean featureAssociated;
+		private boolean isInputDatFile = false;
 		private List<double[]> translations;
 		private IRegion region;
 
@@ -216,6 +218,12 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 		public void setFeatureAssociated(boolean featureAssociated) {
 			this.featureAssociated = featureAssociated;
 		}
+		public boolean isInputDatFile() {
+			return isInputDatFile;
+		}
+		public void setInputDatFile(boolean isInputDatFile) {
+			this.isInputDatFile = isInputDatFile;
+		}
 		public void setTranslations(List<double[]> translations) {
 			this.translations = translations;
 		}
@@ -233,6 +241,7 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 			result = prime * result + (featureAssociated ? 1231 : 1237);
 			temp = Double.doubleToLongBits(fieldOfView);
 			result = prime * result + (int) (temp ^ (temp >>> 32));
+			result = prime * result + (isInputDatFile ? 1231 : 1237);
 			result = prime * result
 					+ ((region == null) ? 0 : region.hashCode());
 			result = prime * result + rows;
@@ -259,6 +268,8 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 			if (Double.doubleToLongBits(fieldOfView) != Double
 					.doubleToLongBits(other.fieldOfView))
 				return false;
+			if (isInputDatFile != other.isInputDatFile)
+				return false;
 			if (region == null) {
 				if (other.region != null)
 					return false;
@@ -273,6 +284,5 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 				return false;
 			return true;
 		}
-		
 	}
 }
