@@ -100,8 +100,8 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 		final ConversionStitchedBean bean = new ConversionStitchedBean();
 		bean.setRows(rowsSpinner.getSelection());
 		bean.setColumns(columnsSpinner.getSelection());
-		Number angle = (Number) angleSpinner.getSelection();
-		bean.setAngle(angle.doubleValue());
+		double angle = getSpinnerAngle();
+		bean.setAngle(angle);
 		Number fov = (Number) fovText.getValue();
 		bean.setFieldOfView(fov.doubleValue());
 		if (hasCropping)
@@ -144,8 +144,6 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 					yTrans.doubleValue() });
 		}
 
-		
-		
 		bean.setTranslations(translations);
 		context.setUserObject(bean);
 
