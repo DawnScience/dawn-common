@@ -65,17 +65,6 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 		stitcher = s;
 	}
 
-//	private void createImageStitcher() {
-//		if (stitcher == null) {
-//			try {
-//				stitcher = (IImageStitchingProcess) ServiceManager.getService(IImageStitchingProcess.class);
-//			} catch (Exception e) {
-//				logger.error("Error getting Stitching service:" + e);
-//				e.printStackTrace();
-//			}
-//		}
-//	}
-
 	@Override
 	protected void convert(IDataset slice) throws Exception {
 
@@ -94,7 +83,6 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 			boolean useFeatureAssociation = conversionBean.isFeatureAssociated();
 			double fieldOfView = conversionBean.getFieldOfView();
 			List<double[]> translations = conversionBean.getTranslations();
-//			createImageStitcher();
 			IDataset stitched = null;
 			IRegion region = conversionBean.getRoi();
 			if (region != null) {
