@@ -66,15 +66,9 @@ public class ProcessConversion extends AbstractConversion {
 					String axesName = axesNames.get(key);
 					IDataHolder dataHolder = LoaderFactory.getData(context.getSelectedConversionFile().getAbsolutePath());
 					ILazyDataset lazyDataset = dataHolder.getLazyDataset(axesName);
-					if (lazyDataset != null && lazyDataset.getRank() != lz.getRank()) {
-						lazyDataset = lazyDataset.getSlice();
-						int[] shape = new int[lz.getRank()];
-						Arrays.fill(shape, 1);
-						shape[key-1]= lazyDataset.getShape()[0];
-						lazyDataset.setShape(shape);
-						if (lazyDataset.getName() == null || lazyDataset.getName().isEmpty()) {
-							lazyDataset.setName(axesName);
-						}
+					
+					if ( lazyDataset != null && (lazyDataset.getName() == null || lazyDataset.getName().isEmpty())) {
+						lazyDataset.setName(axesName);
 					}
 					
 					axMeta.setAxis(key-1, lazyDataset);
