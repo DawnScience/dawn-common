@@ -18,4 +18,6 @@ public interface IProcessingConversionInfo {
 	
 	IOperation[] getOperationSeries();
 	
+	ProcessingOutputType getProcessingOutputType();
+	
 }

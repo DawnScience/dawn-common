@@ -10,13 +10,13 @@ package org.dawnsci.conversion.converters;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.Map;
 
 import org.dawb.common.services.ServiceManager;
 import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.services.conversion.IProcessingConversionInfo;
+import org.dawb.common.services.conversion.ProcessingOutputType;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.Slice;
@@ -28,10 +28,15 @@ import org.eclipse.dawnsci.analysis.dataset.metadata.OriginMetadataImpl;
 import org.eclipse.dawnsci.analysis.dataset.slicer.SliceFromSeriesMetadata;
 import org.eclipse.dawnsci.analysis.dataset.slicer.Slicer;
 import org.eclipse.dawnsci.analysis.dataset.slicer.SourceInformation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
+import uk.ac.diamond.scisoft.analysis.utils.FileUtils;
 
 public class ProcessConversion extends AbstractConversion {
+	
+	private final static Logger logger = LoggerFactory.getLogger(ProcessConversion.class);
 
 	IOperationService service;
 	private final static String PROCESSED = "_processed";
@@ -102,6 +107,16 @@ public class ProcessConversion extends AbstractConversion {
 		SourceInformation si = new SourceInformation(context.getSelectedConversionFile().getAbsolutePath(), context.getDatasetNames().get(0), lz);
 		lz.setMetadata(new SliceFromSeriesMetadata(si));
 		//TODO output path
+		
+		// If we need to keep the original data, sort it out here.
+		if (info.getProcessingOutputType() == ProcessingOutputType.ORIGINAL_AND_PROCESSED) {
+			File source = new File(context.getSelectedConversionFile().getAbsolutePath());
+			File dest = new File(full);
+			logger.debug("Copying original data ("+source.getAbsolutePath()+") to output file ("+dest.getAbsolutePath()+")");
+			long start = System.currentTimeMillis();
+			FileUtils.copyNio(source, dest);
+			logger.debug("Copy ran in: " +(System.currentTimeMillis()-start)/1000. + " s : Thread" +Thread.currentThread().toString());
+		}
 		
 		// Run
 		cc.setMonitor(context.getMonitor());
