@@ -14,6 +14,7 @@ import java.lang.ref.SoftReference;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.dawnsci.analysis.api.dataset.SliceND;
 import org.eclipse.dawnsci.analysis.api.io.ILazyLoader;
 import org.eclipse.dawnsci.analysis.api.io.ScanFileHolderException;
 import org.eclipse.dawnsci.analysis.api.io.SliceObject;
@@ -53,12 +54,10 @@ public class H5LazyLoader implements ILazyLoader {
 	}
 
 	@Override
-	public Dataset getDataset(IMonitor mon, 
-			                          int[] shape, int[] start,
-			                          int[] stop,  int[] step) throws ScanFileHolderException {
+	public Dataset getDataset(IMonitor mon, SliceND slice) throws ScanFileHolderException {
 		
 		
-		if (shape==null||start==null||stop==null||step==null) {
+		if (slice.isAll()) {
 			try {
 				return getCompleteData(mon);
 			} catch (Exception e) {
@@ -66,23 +65,23 @@ public class H5LazyLoader implements ILazyLoader {
 			}
 		}
 		
-		final SliceObject slice = new SliceObject();
-		slice.setPath(path);
-		slice.setName(fullPath);
-		slice.setSlicedShape(shape);
-		slice.setSliceStart(start);
-		slice.setSliceStop(stop);
-		slice.setSliceStep(step);
+		final SliceObject so = new SliceObject();
+		so.setPath(path);
+		so.setName(fullPath);
+		so.setSlicedShape(slice.getSourceShape());
+		so.setSliceStart(slice.getStart());
+		so.setSliceStop(slice.getStop());
+		so.setSliceStep(slice.getStep());
 		
-		if (cache.containsKey(slice)) {
-			final Reference<Dataset> sr = cache.get(slice);
+		if (cache.containsKey(so)) {
+			final Reference<Dataset> sr = cache.get(so);
 			if (sr.get()!=null) {
 				return sr.get();
 			}
 		}
 		try {
-			Dataset set = loader.slice(slice, mon);
-			cache.put(slice, new SoftReference<Dataset>(set));
+			Dataset set = loader.slice(so, mon);
+			cache.put(so, new SoftReference<Dataset>(set));
 			return set;
 		} catch (Exception e) {
 			throw new ScanFileHolderException("Cannot slice "+path+", "+fullPath, e);
