@@ -10,6 +10,7 @@ import org.dawb.common.services.ServiceManager;
 import org.dawnsci.persistence.internal.PersistJsonOperationHelper;
 import org.dawnsci.persistence.internal.PersistenceServiceImpl;
 import org.eclipse.dawnsci.analysis.api.dataset.Slice;
+import org.eclipse.dawnsci.analysis.api.dataset.SliceND;
 import org.eclipse.dawnsci.analysis.api.fitting.functions.IFunction;
 import org.eclipse.dawnsci.analysis.api.metadata.OriginMetadata;
 import org.eclipse.dawnsci.analysis.api.persistence.IPersistenceService;
@@ -22,6 +23,9 @@ import org.eclipse.dawnsci.analysis.dataset.impl.DatasetFactory;
 import org.eclipse.dawnsci.analysis.dataset.metadata.OriginMetadataImpl;
 import org.eclipse.dawnsci.analysis.dataset.roi.RectangularROI;
 import org.eclipse.dawnsci.analysis.dataset.roi.SectorROI;
+import org.eclipse.dawnsci.analysis.dataset.slicer.SliceFromSeriesMetadata;
+import org.eclipse.dawnsci.analysis.dataset.slicer.SliceInformation;
+import org.eclipse.dawnsci.analysis.dataset.slicer.SourceInformation;
 import org.eclipse.dawnsci.hdf5.HierarchicalDataFactory;
 import org.eclipse.dawnsci.hdf5.IHierarchicalDataFile;
 import org.junit.BeforeClass;
@@ -157,12 +161,14 @@ public class ReadWriteOperationTest {
 	public void testWriteOrigin() throws Exception {
 
 		Slice[] slices = Slice.convertFromString("0:10:2,2:20,:,:");
+		int[] shape = new int[]{100,100,100,100};
 		int[] dataDims = new int[]{2,3};
 		String path = "pathvalue";
 		String dsname = "dsname";
-
-
-		OriginMetadata om = new OriginMetadataImpl(null, slices, dataDims, path, dsname);
+		
+		SliceInformation si = new SliceInformation(null, null, new SliceND(shape,slices), shape, dataDims, 100*100, 200);
+		SourceInformation so = new SourceInformation(path, dsname, null);
+		SliceFromSeriesMetadata ssm = new SliceFromSeriesMetadata(so,si);
 
 		PersistJsonOperationHelper util = new PersistJsonOperationHelper();
 
@@ -171,7 +177,7 @@ public class ReadWriteOperationTest {
 		tmp.createNewFile();
 		IHierarchicalDataFile file = HierarchicalDataFactory.getWriter(tmp.getAbsolutePath());
 
-		util.writeOriginalDataInformation(file, om);
+		util.writeOriginalDataInformation(file, ssm);
 
 		OriginMetadata outOm = util.readOriginalDataInformation(file);
 		outOm.toString();	
