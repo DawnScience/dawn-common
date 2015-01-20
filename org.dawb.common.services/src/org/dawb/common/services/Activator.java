@@ -48,4 +48,16 @@ public class Activator implements BundleActivator {
 		if (ref==null) return null;
 		return context.getService(ref);
 	}
+	
+	/**
+	 * Looks for OSGI service. This method must be kept as it is called from python.
+	 * @param clazz
+	 * @return
+	 */
+	public static Object getService(String clazz) {
+		if (context==null) return null;
+		ServiceReference<?> ref = context.getServiceReference(clazz);
+		if (ref==null) return null;
+		return context.getService(ref);
+	}
 }

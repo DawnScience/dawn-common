@@ -26,19 +26,7 @@ public class ColorMacroEvent extends MethodEventObject<Color>{
 		}
 		
 		StringBuilder buf = new StringBuilder();
-		
-		for (int i = 1; i <= args.length; i++) {
-			Color col = args[i-1];
-			buf.append("color");
-			buf.append(i);
-			buf.append(" = dnp.plot.createColor(");
-			buf.append(col.getRed());
-			buf.append(", ");
-			buf.append(col.getGreen());
-			buf.append(", ");
-			buf.append(col.getBlue());
-			buf.append(")\n");
-		}
+		buf.append(createColorCommand(args));
 				
 		// Make method call
 		buf.append(varName);
@@ -67,6 +55,32 @@ public class ColorMacroEvent extends MethodEventObject<Color>{
 		buf.append(")");
 		
 		return buf.toString();
+	}
+	
+	
+	private static final String createColorCommand(Color... args) {
+		StringBuilder buf = new StringBuilder();
+		
+		for (int i = 1; i <= args.length; i++) {
+			
+			Color col = args[i-1];
+			buf.append(createColorCommand(i, new int[]{col.getRed(), col.getGreen(), col.getBlue()}));
+		}
+        return buf.toString();
+	}
+	
+	private static final String createColorCommand(int count, int[] is) {
+		StringBuilder buf = new StringBuilder();
+		buf.append("color");
+		buf.append(count);
+		buf.append(" = dnp.plot.createColor(");
+		buf.append(is[0]);
+		buf.append(", ");
+		buf.append(is[1]);
+		buf.append(", ");
+		buf.append(is[2]);
+		buf.append(")\n");
+        return buf.toString();
 	}
 
 }
