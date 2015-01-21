@@ -78,10 +78,10 @@ public class BoofCVImageTransformImpl<T extends ImageSingleBand<?>, TD extends T
 			if (images.get(i).getShape().length != 2)
 				throw new Exception("Data shape is not 2D");
 			ImageFloat32 imageB = ConvertIDataset.convertFrom(images.get(i), ImageFloat32.class, 1);
-//			ImageSingleBand<?> aligned = ImageRegistration.register(imageA, imageB);
-//			IDataset alignedData = ConvertIDataset.convertTo(aligned, true);
-//			alignedData.setName(images.get(i).getName());
-//			alignedList.add(alignedData);
+			ImageSingleBand<?> aligned = ImageRegistration.register(imageA, imageB);
+			IDataset alignedData = ConvertIDataset.convertTo(aligned, true);
+			alignedData.setName(images.get(i).getName());
+			alignedList.add(alignedData);
 		}
 		return alignedList;
 	}
