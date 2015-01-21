@@ -159,6 +159,8 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 		controlComp.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 4, 1));
 
 		// Check type of data and load first image
+		if (getSelectedPaths() == null)
+			return;
 		String filePath = getSelectedPaths()[0];
 		if (filePath.endsWith(".dat"))
 			datFileLoaded = true;
