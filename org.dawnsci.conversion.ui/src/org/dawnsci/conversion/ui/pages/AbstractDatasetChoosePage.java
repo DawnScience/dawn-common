@@ -244,7 +244,7 @@ public abstract class AbstractDatasetChoosePage extends ResourceChoosePage imple
 			}
 			if (rank<0 && holder!=null) {
 				final ILazyDataset ld = holder.getLazyDataset(name);
-				rank = ld!=null ? ld.squeeze().getRank() : -1;
+				rank = ld!=null ? ld.squeeze(true).getRank() : -1;
 			}
 			
 			if (rank==1) {
