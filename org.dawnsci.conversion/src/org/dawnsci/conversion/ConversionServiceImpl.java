@@ -122,12 +122,20 @@ public class ConversionServiceImpl implements IConversionService {
 		
 		if (mservice==null) return;
 		
-		MacroEventObject evt = new MacroEventObject(this);
-		evt.setPythonCommand("cservice = dnp.plot.getService('"+IConversionService.class.getName()+"')\n");
-		evt.append("context = cservice.open("+evt.getStringArguments(context.getFilePaths())+")");
-		evt.append("context.setConversionScheme('"+context.getConversionScheme().name()+"')");
-		evt.append("context.setDatasetNames("+evt.getStringArguments(context.getDatasetNames())+")");
-		mservice.publish(evt);
+		try {
+			MacroEventObject evt = new MacroEventObject(this);
+			evt.setPythonCommand("cservice = dnp.plot.getService('"+IConversionService.class.getName()+"')\n");
+			evt.append("context = cservice.open("+evt.getStringArguments(context.getFilePaths())+")");
+			evt.append("context.setConversionScheme('"+context.getConversionScheme().name()+"')");
+			evt.append("context.setDatasetNames("+evt.getStringArguments(context.getDatasetNames())+")");
+			evt.append("context.setOutputPath('"+context.getOutputPath().replace('\\', '/')+"')");
+			evt.append("context.setSliceDimensions("+evt.getMap(context.getSliceDimensions())+")");
+			
+			mservice.publish(evt);
+			
+		} catch (Exception ne) {
+			ne.printStackTrace();
+		}
 	}
 
 }
