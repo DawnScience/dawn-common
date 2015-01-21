@@ -41,7 +41,7 @@ public class AlignJob extends Job {
 
 	// loaded data
 	private List<IDataset> data;
-	private int peemMode;
+	private int mode;
 
 	private List<List<double[]>> shifts = null;
 	private List<IDataset> shiftedImages = new ArrayList<IDataset>();
@@ -73,8 +73,8 @@ public class AlignJob extends Job {
 		if (data == null)
 			return new Status(IStatus.ERROR, "uk.ac.diamond.scisoft.analysis", "No data loaded!");
 		int n = data.size();
-		if (n % peemMode != 0) {
-			String msg = "Missing file? Could not load multiple of " + peemMode + " images";
+		if (n % mode != 0) {
+			String msg = "Missing file? Could not load multiple of " + mode + " images";
 			logger.warn(msg);
 			return new Status(IStatus.ERROR, "uk.ac.diamond.scisoft.analysis", msg);
 		}
@@ -98,7 +98,7 @@ public class AlignJob extends Job {
 	}
 
 	private IStatus alignWithROI(int n, RectangularROI roi, IProgressMonitor monitor) {
-		int nsets = n / peemMode;
+		int nsets = n / mode;
 
 		if (roi == null)
 			return Status.CANCEL_STATUS;
@@ -112,8 +112,8 @@ public class AlignJob extends Job {
 		int index = 0;
 		int nr = rois.size();
 		if (nr > 0) {
-			if (nr < peemMode) { // clean up roi list
-				if (peemMode == 2) {
+			if (nr < mode) { // clean up roi list
+				if (mode == 2) {
 					rois.add(rois.get(0));
 				} else {
 					switch (nr) {
@@ -138,15 +138,15 @@ public class AlignJob extends Job {
 			// Example: [0,1,2]-[3,4,5]-[6,7,8]-[9,10,11] for 12 images on 4 columns
 			// with images 0,3,6,9 as the top images of each column.
 			List<double[]> topShifts = new ArrayList<double[]>();
-			IDataset[] topImages = new IDataset[peemMode];
+			IDataset[] topImages = new IDataset[mode];
 			List<IDataset> anchorList = new ArrayList<IDataset>();
-			for (int i = 0; i < peemMode; i++) {
+			for (int i = 0; i < mode; i++) {
 				topImages[i] = data.get(i * nsets);
 			}
 			// align top images
 			topShifts = AlignImages.align(topImages, anchorList, rois.get(0), true, null);
 
-			for (int p = 0; p < peemMode; p++) {
+			for (int p = 0; p < mode; p++) {
 				for (int i = 0; i < nsets; i++) {
 					tImages[i] = data.get(index++);
 				}
@@ -209,8 +209,12 @@ public class AlignJob extends Job {
 		return shiftedImages;
 	}
 
-	public void setPeemMode(int peemMode) {
-		this.peemMode = peemMode;
+	/**
+	 * Set the number of column used for ROI alignment method (2 or 4)
+	 * @param mode
+	 */
+	public void setMode(int mode) {
+		this.mode = mode;
 	}
 
 	public void setAlignMethod(AlignMethod alignState) {
