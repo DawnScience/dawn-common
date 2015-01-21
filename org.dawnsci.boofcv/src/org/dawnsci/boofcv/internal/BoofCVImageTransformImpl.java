@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.dawnsci.boofcv.converter.ConvertIDataset;
+import org.dawnsci.boofcv.registration.ImageHessianRegistration;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.image.IImageTransform;
 
@@ -78,7 +79,7 @@ public class BoofCVImageTransformImpl<T extends ImageSingleBand<?>, TD extends T
 			if (images.get(i).getShape().length != 2)
 				throw new Exception("Data shape is not 2D");
 			ImageFloat32 imageB = ConvertIDataset.convertFrom(images.get(i), ImageFloat32.class, 1);
-			ImageSingleBand<?> aligned = ImageRegistration.register(imageA, imageB);
+			ImageSingleBand<?> aligned = ImageHessianRegistration.registerHessian(imageA, imageB);
 			IDataset alignedData = ConvertIDataset.convertTo(aligned, true);
 			alignedData.setName(images.get(i).getName());
 			alignedList.add(alignedData);

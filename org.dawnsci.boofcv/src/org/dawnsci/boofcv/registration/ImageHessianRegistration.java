@@ -1,20 +1,13 @@
-package org.dawnsci.boofcv.internal;
-
-/* Copyright (C) 2013, 2014 Zachary Scott <zscott.dev@gmail.com>
+/*-
+ * Copyright (c) 2015 Diamond Light Source Ltd.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
  */
+package org.dawnsci.boofcv.registration;
+
 import georegression.fitting.affine.ModelManagerAffine2D_F64;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.point.Point2D_F64;
@@ -51,34 +44,24 @@ import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.MultiSpectral;
 
 /**
- * Utility for registering/stabilising images. Does so using BoofCV to first
- * find pints of interest then transform.
- * 
  * This code is heavily based on the example code given as part of the BoofCV
  * documentation. Example Image Stitching:
  * http://boofcv.org/index.php?title=Example_Image_Stitching
  * 
- * @author Zachary Scott <zscott.dev@gmail.com>, Peter Abeles
+ * @author wqk87977
+ * 
  */
-public class ImageRegistration {
-	private static final Logger logger = LoggerFactory.getLogger(ImageRegistration.class);
-	/** Hessian feature detector configuration. */
-	public static final float detectThreshold = 1;
-	public static final int extractRadius = 2;
-	public static final int maxFeaturesPerScale = 200;
-	public static final int sampleSize = 1;
-	public static final int initialSize = 9;
-	public static final int numberOfOctaves = 4;
-	public static final int numberScalesPerOctave = 4;
+public class ImageHessianRegistration {
+	private static final Logger logger = LoggerFactory.getLogger(ImageHessianRegistration.class);
 
 	private static <T extends ImageSingleBand<?>, FD extends TupleDesc<?>> Affine2D_F64 computeTransform(
 			T imageA, T imageB, DetectDescribePoint<T, FD> detDesc,
 			AssociateDescription<FD> associate,
 			ModelMatcher<Affine2D_F64, AssociatedPair> modelMatcher) {
 		// get the length of the description
-		List<Point2D_F64> pointsA = new ArrayList<>();
+		List<Point2D_F64> pointsA = new ArrayList<Point2D_F64>();
 		FastQueue<FD> descA = UtilFeature.createQueue(detDesc, 100);
-		List<Point2D_F64> pointsB = new ArrayList<>();
+		List<Point2D_F64> pointsB = new ArrayList<Point2D_F64>();
 		FastQueue<FD> descB = UtilFeature.createQueue(detDesc, 100);
 		// extract feature locations and descriptions from each image
 		describeImage(imageA, detDesc, pointsA, descA);
@@ -99,15 +82,17 @@ public class ImageRegistration {
 		}
 		// find the best fit model to describe the change between these images
 		if (!modelMatcher.process(pairs)) {
-			logger.info("Model matcher failed (i.e. images cannot be registered)");
+			logger.info("Model matcher failed: images cannot be registered");
 			return null;
 		}
 		// return the found image transform
 		return modelMatcher.getModelParameters().copy();
 	}
 
-	// Detects features inside the two images and computes descriptions at those
-	// points.
+	/**
+	 * Detects features inside the two images and computes descriptions at those
+	 * points.
+	 */
 	private static <T extends ImageSingleBand<?>, FD extends TupleDesc> void describeImage(
 			T image, DetectDescribePoint<T, FD> detDesc,
 			List<Point2D_F64> points, FastQueue<FD> listDescs) {
@@ -120,19 +105,17 @@ public class ImageRegistration {
 	}
 
 	/**
-	 * Registers {@code imageB} to the source image {@code imageA}.
+	 * Registers imageB to imageA
 	 * 
 	 * @param imageA
-	 *            The reference image. Must not be {@code null}.
+	 *            The reference image
 	 * @param imageB
-	 *            The image to be registered. Must not be {@code null}.
-	 * @return The rendered, registered image.
+	 *            The image to be registered
+	 * @return The rendered, registered image
 	 */
-	public static ImageSingleBand<?> register(ImageSingleBand<?> imageA,
+	public static ImageSingleBand<?> registerHessian(ImageSingleBand<?> imageA,
 			ImageSingleBand<?> imageB) {
-		ConfigFastHessian config = new ConfigFastHessian(detectThreshold,
-				extractRadius, maxFeaturesPerScale, sampleSize, initialSize,
-				numberOfOctaves, numberScalesPerOctave);
+		ConfigFastHessian config = new ConfigFastHessian(1, 2, 200, 1, 9, 4, 4);
 		// Detect using the standard SURF feature descriptor and describer
 		DetectDescribePoint detDesc = FactoryDetectDescribe.surfStable(config,
 				null, null, ImageFloat32.class);
@@ -148,24 +131,24 @@ public class ImageRegistration {
 
 		DistanceAffine2D distance = new DistanceAffine2D();
 
-		ModelMatcher<Affine2D_F64, AssociatedPair> modelMatcher = new Ransac<>(
+		ModelMatcher<Affine2D_F64, AssociatedPair> modelMatcher = new Ransac<Affine2D_F64, AssociatedPair>(
 				123, manager, modelFitter, distance, 60, 9);
 		Affine2D_F64 H = computeTransform(imageA, imageB, detDesc,
 				associate, modelMatcher);
 		if (H == null) {
 			return (ImageFloat32) imageB;
 		}
-		// render the
-		ImageSingleBand<?> output = render(imageA, (ImageFloat32) imageB, H);
+		ImageSingleBand<?> output = renderHessianRegistration(imageA, (ImageFloat32) imageB, H);
 		return output;
 	}
 
-	// render the registration transformation
-	private static ImageSingleBand<?> render(
+	/**
+	 * Renders and displays the stitched together images
+	 */
+	private static ImageSingleBand<?> renderHessianRegistration(
 			ImageSingleBand<?> imageA, ImageSingleBand<?> colorB,
 			Affine2D_F64 fromAtoB) {
 		// specify size of output image
-		double scale = 1;
 		int outputWidth = imageA.getWidth();
 		int outputHeight = imageA.getHeight();
 		// Where the output images are rendered into
