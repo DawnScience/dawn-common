@@ -74,6 +74,9 @@ class ConversionContext implements IConversionContext {
 	public void setDatasetNames(List<String> datasetNames) {
 		this.datasetNames = datasetNames;
 	}
+	public void setDatasetNames(String... names) {
+		this.datasetNames = Arrays.asList(names);
+	}
 	public String getOutputPath() {
 		return outputFolder;
 	}

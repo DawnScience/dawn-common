@@ -203,10 +203,14 @@ public interface IConversionContext {
 	/**
 	 * The dataset(s) we will process. Allows regular expressions inside
 	 * each set.
-	 * 
-	 * @return regexp of data set name (using / as the path separator)
 	 */
 	public void setDatasetNames(List<String> sets);
+	
+	/**
+	 * The dataset(s) we will process. Allows regular expressions inside
+	 * each set.
+	 */
+	public void setDatasetNames(String...    names);
 	
 	/**
 	 * Instead of specifying a dataset name(s) to loop over
