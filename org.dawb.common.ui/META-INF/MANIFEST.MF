@@ -27,6 +27,7 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Export-Package: org.dawb.common.ui,
  org.dawb.common.ui.actions,
+ org.dawb.common.ui.alignment,
  org.dawb.common.ui.components.cell,
  org.dawb.common.ui.editors,
  org.dawb.common.ui.file,
@@ -60,3 +61,4 @@ Import-Package: org.dawb.common.services,
  org.eclipse.gmf.runtime.draw2d.ui.render.awt.internal.svg.export,
  org.slf4j;version="[1.7.6,1.7.7)"
 Bundle-ClassPath: .
+Service-Component: OSGI-INF/*.xml
