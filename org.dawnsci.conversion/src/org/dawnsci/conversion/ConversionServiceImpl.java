@@ -8,6 +8,8 @@
  */
 package org.dawnsci.conversion;
 
+import java.util.List;
+
 import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.services.conversion.IConversionService;
 import org.dawnsci.conversion.converters.AVIImageConverter;
@@ -23,10 +25,18 @@ import org.dawnsci.conversion.converters.ImagesToHDFConverter;
 import org.dawnsci.conversion.converters.ImagesToStitchedConverter;
 import org.dawnsci.conversion.converters.ProcessConversion;
 import org.dawnsci.conversion.converters.VisitorConversion;
+import org.eclipse.dawnsci.macro.api.IMacroService;
+import org.eclipse.dawnsci.macro.api.MacroEventObject;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 
 public class ConversionServiceImpl implements IConversionService {
+	
+	private static IMacroService mservice;
+	
+	public static void setMacroService(IMacroService s) {
+		mservice = s;
+	}
 	
 	static {
 		System.out.println("Starting conversion service.");
@@ -94,10 +104,28 @@ public class ConversionServiceImpl implements IConversionService {
 					throw new Exception("No conversion for "+context.getConversionScheme());
 				}
 			}
+			
+			// We send some macro commands, to tell people how to drive the service with
+			// macros.
+			sendMacroCommands(context);
+			
 			delegate.process(context);
 		} finally {
 			if (delegate!=null) delegate.close(context);
 		}
+	}
+
+	/**
+	 * Constructs a macro by mirroring the context into the python layer. 
+	 */
+	private void sendMacroCommands(IConversionContext context) {
+		
+		if (mservice==null) return;
+		
+		MacroEventObject evt = new MacroEventObject(this);
+		evt.setPythonCommand("cservice = dnp.plot.getService('"+IConversionService.class.getName()+"')\n");
+		evt.append("context = cservice.open("+evt.getStringArguments(context.getFilePaths())+")");
+		mservice.publish(evt);
 	}
 
 }
