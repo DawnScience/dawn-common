@@ -23,7 +23,7 @@ import uk.ac.diamond.scisoft.analysis.fitting.functions.FunctionFactory;
  * This class now uses FunctionFactory, although this does not actually
  * make much difference as it was fine as it was. It does mean that 
  * package private constructors could be used for functions and 
- * package private classes to make functions truely swappable at some
+ * package private classes to make functions truly swappable at some
  * point in the future.
  */
 public enum FunctionType {
