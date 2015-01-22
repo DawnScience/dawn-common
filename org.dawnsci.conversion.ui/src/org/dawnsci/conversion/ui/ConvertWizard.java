@@ -64,16 +64,8 @@ public class ConvertWizard extends Wizard implements IExportWizard{
 		setNeedsProgressMonitor(true);
 	}
 
-	/**
-	 * Injected by OSGI
-	 * @param cs
-	 */
-	public static void setConversionService(IConversionService cs) {
-		service = cs;
-	}
-
 	public void addPages() {
-		
+		service = ConversionServiceLoader.getService();
 		if (service == null) {
 			logger.error("Cannot get conversion service through OSGI injection");
 			return;

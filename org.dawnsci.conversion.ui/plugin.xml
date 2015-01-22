@@ -119,6 +119,11 @@
             conversion_scheme="COMPARE"
             id="org.dawnsci.conversion.ui.compareConversion">
       </conversion_page>
+      <conversion_page
+            conversion_page="org.dawnsci.conversion.ui.pages.AlignImagesConversionPage"
+            conversion_scheme="ALIGNED_FROM_IMAGEDIR"
+            id="org.dawnsci.conversion.ui.conversionAlignImages">
+      </conversion_page>
    </extension>
 
 </plugin>

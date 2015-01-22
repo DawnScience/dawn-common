@@ -45,8 +45,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.ui.forms.events.ExpansionAdapter;
-import org.eclipse.ui.forms.events.ExpansionEvent;
+import org.eclipse.swt.widgets.Slider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,6 +70,7 @@ public class AlignImagesConversionPage extends ResourceChoosePage
 
 	private IDataset firstImage;
 	private List<IDataset> data;
+	private List<IDataset> shifted;
 
 	private static IImageTransform transformer;
 
@@ -83,14 +83,19 @@ public class AlignImagesConversionPage extends ResourceChoosePage
 	private List<Button> radioButtons;
 	private int mode = 4; // Should be 2 or four
 
+	private Slider sldProgress;
+	private int currentPosition;
+	private List<Button> sliderButtons;
+	private boolean showCorrected = false;
+
 	public AlignImagesConversionPage() {
 		super("Convert image directory", null, null);
 		setDirectory(false);
-		setFileLabel("Stitched image output file");
+		setFileLabel("Aligned images output folder");
 		setNewFile(true);
 		setOverwriteVisible(true);
 		setPathEditable(true);
-		setDescription("Returns a stitched image given a stack of images");
+		setDescription("Returns an aligned stack of images given a stack of images");
 	}
 
 	/**
@@ -130,8 +135,8 @@ public class AlignImagesConversionPage extends ResourceChoosePage
 	protected void createContentAfterFileChoose(Composite container) {
 		this.container = container;
 		Composite controlComp = new Composite(container, SWT.NONE);
-		controlComp.setLayout(new GridLayout(3, false));
-		controlComp.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false));
+		controlComp.setLayout(new GridLayout(2, false));
+		controlComp.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 4, 1));
 
 		// Check type of data and load first image
 		if (getSelectedPaths() == null)
@@ -143,7 +148,8 @@ public class AlignImagesConversionPage extends ResourceChoosePage
 		} catch (Exception e) {
 			logger.error("Error loading file:" + e.getMessage());
 		}
-		
+		Label methodLabel = new Label(controlComp, SWT.NONE);
+		methodLabel.setText("Align method:");
 		alignMethodCombo = new Combo(controlComp, SWT.READ_ONLY);
 		alignMethodCombo.setItems(new String[] {"With ROI", "Affine transform"});
 		alignMethodCombo.setToolTipText("Choose the method of alignement: with a region of interest or without using an affine transformation");
@@ -160,17 +166,18 @@ public class AlignImagesConversionPage extends ResourceChoosePage
 		// set default selection
 		alignMethodCombo.select(AlignMethod.WITH_ROI.getIdx());
 
-		final Group g = new Group(controlComp, SWT.NONE);
-		g.setLayout(new RowLayout());
-		g.setText("Mode");
-		g.setToolTipText("Number of columns");
+		Label modeLabel = new Label(controlComp, SWT.NONE);
+		modeLabel.setText("Mode:");
+		final Composite modeComp = new Composite(controlComp, SWT.NONE);
+		modeComp.setLayout(new RowLayout());
+		modeComp.setToolTipText("Number of columns");
 		Button b;
 		radioButtons = new ArrayList<Button>();
-		b = new Button(g, SWT.RADIO);
+		b = new Button(modeComp, SWT.RADIO);
 		b.setText("2");
 		b.addSelectionListener(radioListener);
 		radioButtons.add(b);
-		b = new Button(g, SWT.RADIO);
+		b = new Button(modeComp, SWT.RADIO);
 		b.setText("4");
 		b.addSelectionListener(radioListener);
 		radioButtons.add(b);
@@ -178,9 +185,8 @@ public class AlignImagesConversionPage extends ResourceChoosePage
 
 		align = new Button(controlComp, SWT.NONE);
 		align.setText("Align");
-		align.setEnabled(false);
 		align.setToolTipText("Run the alignment calculation with the corresponding alignment type chosen");
-		GridData gd = new GridData(SWT.LEFT, SWT.CENTER, true, false);
+		GridData gd = new GridData(SWT.LEFT, SWT.CENTER, true, false, 2, 1);
 		align.setLayoutData(gd);
 		align.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -204,11 +210,50 @@ public class AlignImagesConversionPage extends ResourceChoosePage
 			}
 		});
 
-		new Label(controlComp, SWT.NONE);
-		new Label(controlComp, SWT.NONE);
+		Group sliderGroup = new Group(container, SWT.NONE);
+		sliderGroup.setText("Image stack slicing");
+		sliderGroup.setToolTipText("Use the slider to browse through the original " +
+				"loaded images or through the corrected images");
+		sliderGroup.setLayout(new GridLayout(1, false));
+		sliderGroup.setLayoutData(new GridData(SWT.FILL, SWT.NONE, true, false, 4, 1));
+
+		sliderButtons = new ArrayList<Button>();
+		b = new Button(sliderGroup, SWT.RADIO);
+		b.setText("Original Data");
+		b.setToolTipText("Show original stack of images");
+		b.addSelectionListener(sliderListener);
+		sliderButtons.add(b);
+		b = new Button(sliderGroup, SWT.RADIO);
+		b.setText("Aligned Data");
+		b.setToolTipText("Show aligned stack of images");
+		b.addSelectionListener(sliderListener);
+		sliderButtons.add(b);
+		b.setSelection(true);
+		
+		sldProgress = new Slider(sliderGroup, SWT.HORIZONTAL);
+		sldProgress.setPageIncrement(1);
+		sldProgress.setThumb(1);
+		sldProgress.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				int p = sldProgress.getSelection();
+				if (p != currentPosition) {
+					currentPosition = p;
+					if (showCorrected) {
+						if (shifted != null && shifted.size() > 0) {
+							plotSystem.updatePlot2D(shifted.get(0), null, null);
+						}
+					} else {
+						if (data != null && data.size() > 0)
+							plotSystem.updatePlot2D(data.get(0), null, null);
+					}
+				}
+			}
+		});
+		sldProgress.setLayoutData(new GridData(SWT.FILL, SWT.LEFT, true, false));
 
 		Composite plotComp = new Composite(container, SWT.NONE);
-		plotComp.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		plotComp.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 4, 1));
 		plotComp.setLayout(new GridLayout(1, false));
 
 		Composite subComp = new Composite(plotComp, SWT.NONE);
@@ -216,8 +261,7 @@ public class AlignImagesConversionPage extends ResourceChoosePage
 		subComp.setLayout(new GridLayout(2, false));
 		
 		Label description = new Label(subComp, SWT.WRAP);
-		description.setText("Press 'Rotate' to select the region on the rotated image then select an "
-				+ "elliptical region which will be used to generate a rectangular sub-image.");
+		description.setText("Press 'Align' to register the stack of images loaded ");
 		description.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 		try {
@@ -242,6 +286,26 @@ public class AlignImagesConversionPage extends ResourceChoosePage
 				btn.setSelection(false);
 			} else {
 				mode = radioButtons.indexOf(btn) == 0 ? 2 : 4;
+			}
+		}
+	};
+
+	private SelectionListener sliderListener = new SelectionAdapter() {
+		@Override
+		public void widgetSelected(SelectionEvent e) {
+			Button btn = (Button) e.widget;
+			if (!btn.getSelection()) {
+				btn.setSelection(false);
+			} else {
+				boolean showOriginal = sliderButtons.indexOf(btn) == 0;
+				if (showOriginal && data != null && data.size() > 0) {
+					plotSystem.updatePlot2D(data.get(0), null, null);
+					showCorrected = false;
+				} else if (!showOriginal && shifted != null && shifted.size() > 0){
+					plotSystem.updatePlot2D(shifted.get(0), null, null);
+					showCorrected = true;
+				}
+				sldProgress.setSelection(0);
 			}
 		}
 	};
