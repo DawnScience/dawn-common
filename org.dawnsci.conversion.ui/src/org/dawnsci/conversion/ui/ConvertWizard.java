@@ -16,7 +16,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.dawb.common.services.ServiceManager;
 import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.services.conversion.IConversionContext.ConversionScheme;
 import org.dawb.common.services.conversion.IConversionService;
@@ -42,8 +41,6 @@ import org.eclipse.ui.PlatformUI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
-
 /**
  *   ConvertWizard
  *
@@ -58,7 +55,7 @@ public class ConvertWizard extends Wizard implements IExportWizard{
 	private IConversionWizardPage selectedConversionPage;
 	private Map<ConversionScheme, IConversionWizardPage> conversionPages;
 
-	private IConversionService service;
+	private static IConversionService service;
 	private ConversionChoicePage setupPage;
 
 	private List<String> overidePaths, overideDatasets;
@@ -66,14 +63,19 @@ public class ConvertWizard extends Wizard implements IExportWizard{
 	public ConvertWizard() {
 		setNeedsProgressMonitor(true);
 	}
-	
+
+	/**
+	 * Injected by OSGI
+	 * @param cs
+	 */
+	public static void setConversionService(IConversionService cs) {
+		service = cs;
+	}
+
 	public void addPages() {
 		
-		// It's an OSGI service, not required to use ServiceManager
-		try {
-			this.service = (IConversionService)ServiceManager.getService(IConversionService.class);
-		} catch (Exception e) {
-			logger.error("Cannot get conversion service!", e);
+		if (service == null) {
+			logger.error("Cannot get conversion service through OSGI injection");
 			return;
 		}
 		// Add choice of file(s) and conversion type page.
