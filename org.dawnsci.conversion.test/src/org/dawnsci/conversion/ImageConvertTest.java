@@ -13,7 +13,7 @@ import java.io.File;
 import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.services.conversion.IConversionContext.ConversionScheme;
 import org.dawb.common.services.conversion.IConversionService;
-import org.dawnsci.conversion.converters.ImageConverter;
+import org.dawnsci.conversion.converters.ConversionInfoBean;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
 import org.junit.Test;
@@ -90,7 +90,7 @@ public class ImageConvertTest {
         context.setDatasetName("/entry/edf/data");
         context.addSliceDimension(0, "all");
         
-        ImageConverter.ConversionInfoBean bean = new ImageConverter.ConversionInfoBean();
+        ConversionInfoBean bean = new ConversionInfoBean();
         bean.setExtension("png");
         bean.setBits(16);
         bean.setAlternativeNamePrefix("Export");

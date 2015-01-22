@@ -118,7 +118,8 @@ class ConversionContext implements IConversionContext {
 	}
 	public void createUserObject(String className, String json) throws Exception{
 		ObjectMapper mapper = new ObjectMapper();
-		userObject = mapper.readValue(json, Class.forName(className));
+		Class clazz = Class.forName(className);
+		userObject = mapper.readValue(json, clazz);
 	}
 	@Override
 	public IMonitor getMonitor() {

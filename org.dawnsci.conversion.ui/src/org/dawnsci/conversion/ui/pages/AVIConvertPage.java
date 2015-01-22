@@ -14,7 +14,7 @@ import java.util.Collection;
 import org.dawb.common.services.ISystemService;
 import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.ui.util.GridUtils;
-import org.dawnsci.conversion.converters.ImageConverter;
+import org.dawnsci.conversion.converters.ConversionInfoBean;
 import org.eclipse.dawnsci.plotting.api.IPlottingSystem;
 import org.eclipse.dawnsci.plotting.api.PlotType;
 import org.eclipse.dawnsci.plotting.api.trace.IImageTrace;
@@ -262,11 +262,11 @@ public final class AVIConvertPage extends AbstractSliceConversionPage {
 		if (context == null) return null;
 		IConversionContext context = super.getContext();
 		
-		final ImageConverter.ConversionInfoBean bean = new ImageConverter.ConversionInfoBean();
+		final ConversionInfoBean bean = new ConversionInfoBean();
 		bean.setDownsampleMode(DownsampleMode.valueOf(downsampleName));
 		bean.setDownsampleBin(downsampleSize);
 		bean.setFrameRate(frameRate);
-		bean.setSliceType(sliceComponent.getSliceType());
+		bean.setSliceType((PlotType)sliceComponent.getSliceType());
 		bean.setAlwaysShowTitle(alwaysShowTitle);
 		
 		if (useCurrentColours) {

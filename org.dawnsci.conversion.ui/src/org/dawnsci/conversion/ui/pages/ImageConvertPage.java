@@ -14,7 +14,7 @@ import java.util.Map;
 
 import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.ui.util.GridUtils;
-import org.dawnsci.conversion.converters.ImageConverter;
+import org.dawnsci.conversion.converters.ConversionInfoBean;
 import org.dawnsci.conversion.ui.Activator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
@@ -215,7 +215,7 @@ public final class ImageConvertPage extends AbstractSliceConversionPage {
 		if (context == null) return null;
 		IConversionContext context = super.getContext();
 		
-		final ImageConverter.ConversionInfoBean bean = new ImageConverter.ConversionInfoBean();
+		final ConversionInfoBean bean = new ConversionInfoBean();
 		bean.setExtension(imageFormat);
 		bean.setBits(bitDepth);
 		bean.setAlternativeNamePrefix(imagePrefixBox.getText());

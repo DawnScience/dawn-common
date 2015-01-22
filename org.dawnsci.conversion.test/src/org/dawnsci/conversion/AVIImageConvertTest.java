@@ -17,7 +17,7 @@ import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.services.conversion.IConversionContext.ConversionScheme;
 import org.dawb.common.services.conversion.IConversionService;
 import org.dawb.common.ui.image.PaletteFactory;
-import org.dawnsci.conversion.converters.AbstractImageConversion.ConversionInfoBean;
+import org.dawnsci.conversion.converters.ConversionInfoBean;
 import org.dawnsci.plotting.histogram.service.PaletteService;
 import org.dawnsci.plotting.services.ImageService;
 import org.dawnsci.plotting.services.PlotImageService;

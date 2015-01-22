@@ -136,7 +136,7 @@ public class ConversionServiceImpl implements IConversionService {
 			if (context.getUserObject()!=null) { // We make a JSON one to provide that
 				ObjectMapper mapper = new ObjectMapper();
 				final Object uOb    = context.getUserObject();
-                String bean = mapper.writeValueAsString(uOb);
+                String       bean   = mapper.writeValueAsString(uOb);
                 evt.append("context.createUserObject('"+uOb.getClass().getName()+"', '"+bean+"')");
 			}
 			
