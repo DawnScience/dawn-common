@@ -135,4 +135,8 @@ public class DocumentInserter implements IMacroEventListener, IPartListener {
 		// TODO Auto-generated method stub
 		
 	}
+	public void dispose() {
+		disconnect();
+		if (job!=null) job.stop();
+	}
 }

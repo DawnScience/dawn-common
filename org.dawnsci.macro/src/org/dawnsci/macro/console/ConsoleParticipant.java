@@ -54,7 +54,9 @@ public class ConsoleParticipant implements IConsolePageParticipant {
 
 	@Override
 	public void dispose() {
-		if (inserter!=null) inserter.disconnect();
+		if (inserter!=null) {
+			inserter.dispose();
+		}
 	}
 
 	@Override
