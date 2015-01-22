@@ -39,6 +39,7 @@ public interface IConversionContext {
 		TIFF_FROM_3D(" image files from image stack", true, false, 2,3,4,5),
 		AVI_FROM_3D(" video from image stack", true, 2,3,4,5),
 		STITCHED_FROM_IMAGEDIR(" stitched image from directory of images", true, false, 1, 2),
+		ALIGNED_FROM_IMAGEDIR(" align stack of images", true, false, 1, 2),
 		H5_FROM_IMAGEDIR(" nexus stack from directory of images", true, false, 2),
 		H5_FROM_1D(" nexus from 1D data",   true, false,  1),
 		CUSTOM_NCD(" ascii from NCD data",     true, 2,3,4,5,6),
