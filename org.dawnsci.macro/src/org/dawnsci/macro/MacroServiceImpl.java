@@ -11,6 +11,8 @@ import org.eclipse.dawnsci.macro.api.IMacroEventListener;
 import org.eclipse.dawnsci.macro.api.IMacroService;
 import org.eclipse.dawnsci.macro.api.MacroEventObject;
 
+import py4j.reflection.MethodInvoker;
+
 /**
  * 
  * When defining services, if OSGi gets its knickers in a knot, you can delete 
@@ -34,19 +36,42 @@ public class MacroServiceImpl implements IMacroService {
 
 	@Override
 	public synchronized void publish(MacroEventObject evt) {
-		
+				
+		if (listeners.isEmpty()) return;
+
 		// We can automatically deal with some events, to reduce dependency
 		// inside the API generating the objects. For instance regions can be generically
 		// translated into the python which creates them
 		evt = MacroFactory.generate(evt);
 		if (evt==null) return;
 		
+		// If we have no command, not much point doing anythin
+		if (!evt.isCommandAvailable()) return;
+		
+		// Clean up
 		for (Iterator<IMacroEventListener> iterator = listeners.iterator(); iterator.hasNext();) {
 			IMacroEventListener l = iterator.next();
 			if (l.isDisposed()) {
 				iterator.remove();
 				continue;
 			}
+		}
+		
+		if (listeners.isEmpty()) return;
+		
+		// If Py4j is in the stack, we do not want to publish.
+		// This operation parses the stack so is dangerously slow, do
+		// not do it unless there are definitely macro listeners active
+		StackTraceElement[] stack = Thread.currentThread().getStackTrace();
+		for (StackTraceElement stackTraceElement : stack) {
+			if (stackTraceElement.getClassName()!=null && stackTraceElement.getClassName().equals(MethodInvoker.class.getName())) {
+				return; // We do not publish commands coming from p4j because these commands
+				        // come from the console. We only publish things that the user does in the UI.
+			}
+		}
+	
+		for (Iterator<IMacroEventListener> iterator = listeners.iterator(); iterator.hasNext();) {
+			IMacroEventListener l = iterator.next();
 			try {
 			    l.macroChangePerformed(evt);
 			} catch (Exception ne) {

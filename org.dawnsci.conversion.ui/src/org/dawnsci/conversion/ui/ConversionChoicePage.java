@@ -159,6 +159,7 @@ public class ConversionChoicePage extends ResourceChoosePage implements IConvers
 	 */
 	protected List<String> getSelectedFiles() {
 
+		if (super.getSelectedFiles()==null) return null;
 		final List<String> files = new ArrayList<String>(super.getSelectedFiles());
 		try {
 			if (filterFiles && extensionsFilter.length()>0) {

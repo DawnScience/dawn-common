@@ -33,12 +33,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ConversionServiceImpl implements IConversionService {
 	
-	private static IMacroService mservice;
-	
-	public static void setMacroService(IMacroService s) {
-		mservice = s;
-	}
-	
 	static {
 		System.out.println("Starting conversion service.");
 	
@@ -124,6 +118,7 @@ public class ConversionServiceImpl implements IConversionService {
 	 */
 	private void sendMacroCommands(IConversionContext context) {
 		
+		IMacroService mservice = (IMacroService)Activator.getService(IMacroService.class);
 		if (mservice==null) return;
 		
 		try {
@@ -134,6 +129,7 @@ public class ConversionServiceImpl implements IConversionService {
 			evt.append("context.setDatasetNames("+evt.getStringArguments(context.getDatasetNames())+")");
 			evt.append("context.setOutputPath('"+context.getOutputPath().replace('\\', '/')+"')");
 			evt.append("context.setSliceDimensions("+evt.getMap(context.getSliceDimensions())+")");
+			evt.append("context.setAxesNames("+evt.getMap(context.getAxesNames())+")");
 			
 			if (context.getUserObject()!=null) { // We make a JSON one to provide that
 				ObjectMapper mapper = new ObjectMapper();
@@ -142,6 +138,9 @@ public class ConversionServiceImpl implements IConversionService {
                 evt.append("context.createUserObject('"+uOb.getClass().getName()+"', '"+bean+"')");
 			}
 			
+			evt.append("# To execute the conversion (commented out for now)");
+			evt.append("# cservice.process(context)");
+
 			mservice.publish(evt);
 			
 		} catch (Exception ne) {

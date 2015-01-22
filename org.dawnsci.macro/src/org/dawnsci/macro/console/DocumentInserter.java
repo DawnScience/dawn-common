@@ -8,6 +8,8 @@ import org.eclipse.dawnsci.plotting.api.IPlottingSystem;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.source.ISourceViewer;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IWorkbenchPart;
 
@@ -35,6 +37,13 @@ public class DocumentInserter implements IMacroEventListener, IPartListener {
 		this.viewer   = viewer;
 		this.type     = type;
 		this.job      = new DocumentInsertionJob(type, viewer);
+		
+		viewer.getTextWidget().addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(DisposeEvent e) {
+				if (job!=null) job.stop();
+			}
+		});
 	}
 
 	@Override
@@ -79,10 +88,9 @@ public class DocumentInserter implements IMacroEventListener, IPartListener {
 		EclipseUtils.getPage().addPartListener(this);
 	}
 	public void disconnect() {
-		if (job!=null) job.stop();
 		mservice.removeMacroListener(this);
 		isConnected = false;
-		EclipseUtils.getPage().removePartListener(this);
+		if (EclipseUtils.getPage()!=null) EclipseUtils.getPage().removePartListener(this);
 	}
 
 	public boolean isConnected() {

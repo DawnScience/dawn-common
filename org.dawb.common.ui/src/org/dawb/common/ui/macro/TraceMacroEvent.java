@@ -40,10 +40,12 @@ public class TraceMacroEvent extends MethodEventObject<Object> {
 	}
 		
 	public static final String getTraceCommand(ITrace trace) {
-		return getVarName(trace)+" = ps.getTrace(\""+trace.getName()+"\")";
+		if (trace==null || trace.getName()==null || "".equals(trace.getName())) return null;
+ 		return getVarName(trace)+" = ps.getTrace(\""+trace.getName()+"\")";
 	}
 
 	public static String getVarName(ITrace trace) {
+		if (trace==null || trace.getName()==null || "".equals(trace.getName())) return null;
 		return "trace_"+MacroUtils.getLegalName(trace.getName());
 	}
 	
