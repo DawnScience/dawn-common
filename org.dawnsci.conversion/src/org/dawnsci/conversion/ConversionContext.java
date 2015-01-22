@@ -21,6 +21,8 @@ import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.Slice;
 import org.eclipse.dawnsci.analysis.api.monitor.IMonitor;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 class ConversionContext implements IConversionContext {
 
 	private ConversionScheme    conversionScheme;
@@ -113,6 +115,10 @@ class ConversionContext implements IConversionContext {
 	}
 	public void setUserObject(Object userObject) {
 		this.userObject = userObject;
+	}
+	public void createUserObject(String className, String json) throws Exception{
+		ObjectMapper mapper = new ObjectMapper();
+		userObject = mapper.readValue(json, Class.forName(className));
 	}
 	@Override
 	public IMonitor getMonitor() {

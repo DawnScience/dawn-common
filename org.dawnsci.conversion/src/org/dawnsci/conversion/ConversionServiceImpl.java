@@ -30,6 +30,8 @@ import org.eclipse.dawnsci.macro.api.MacroEventObject;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 public class ConversionServiceImpl implements IConversionService {
 	
 	private static IMacroService mservice;
@@ -130,6 +132,13 @@ public class ConversionServiceImpl implements IConversionService {
 			evt.append("context.setDatasetNames("+evt.getStringArguments(context.getDatasetNames())+")");
 			evt.append("context.setOutputPath('"+context.getOutputPath().replace('\\', '/')+"')");
 			evt.append("context.setSliceDimensions("+evt.getMap(context.getSliceDimensions())+")");
+			
+			if (context.getUserObject()!=null) { // We make a JSON one to provide that
+				ObjectMapper mapper = new ObjectMapper();
+				final Object uOb    = context.getUserObject();
+                String bean = mapper.writeValueAsString(uOb);
+                evt.append("context.createUserObject('"+uOb.getClass().getName()+"', '"+bean+"')");
+			}
 			
 			mservice.publish(evt);
 			

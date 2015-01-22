@@ -290,6 +290,17 @@ public interface IConversionContext {
 	public void setUserObject(Object object);
 	
 	/**
+	 * Attempts to create a new user object from a json string by deserializing it
+	 * using the user object class for this context then asssigning the userObject field to the
+	 * deserialization result.
+	 * @param className - the className of the object type to be deserialised.
+	 * @param json - the json string itself.
+	 * @return
+	 * @throws Exception if the json string cannot be deserialized.
+	 */
+	public void createUserObject(String className, String json) throws Exception;
+
+	/**
 	 * During converting many files the current active file being converted may be returned here.
 	 * @return current conversion file, may be null.
 	 */
