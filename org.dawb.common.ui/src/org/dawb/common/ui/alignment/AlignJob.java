@@ -73,7 +73,7 @@ public class AlignJob extends Job {
 		if (data == null)
 			return new Status(IStatus.ERROR, "uk.ac.diamond.scisoft.analysis", "No data loaded!");
 		int n = data.size();
-		if (n % mode != 0) {
+		if (alignState == AlignMethod.WITH_ROI && n % mode != 0) {
 			String msg = "Missing file? Could not load multiple of " + mode + " images";
 			logger.warn(msg);
 			return new Status(IStatus.ERROR, "uk.ac.diamond.scisoft.analysis", msg);
