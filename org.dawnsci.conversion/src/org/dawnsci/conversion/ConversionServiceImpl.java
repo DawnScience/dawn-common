@@ -83,7 +83,7 @@ public class ConversionServiceImpl implements IConversionService {
 				case STITCHED_FROM_IMAGEDIR:
 					delegate = new ImagesToStitchedConverter(context);
 					break;
-				case ALIGN_FROM_IMAGEDIR:
+				case ALIGNED_FROM_IMAGEDIR:
 					delegate = new AlignImagesConverter(context);
 					break;
 				case H5_FROM_IMAGEDIR:
