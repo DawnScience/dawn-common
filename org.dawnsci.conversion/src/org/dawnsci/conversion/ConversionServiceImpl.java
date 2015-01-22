@@ -8,12 +8,11 @@
  */
 package org.dawnsci.conversion;
 
-import java.util.List;
-
 import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.services.conversion.IConversionService;
 import org.dawnsci.conversion.converters.AVIImageConverter;
 import org.dawnsci.conversion.converters.AbstractConversion;
+import org.dawnsci.conversion.converters.AlignImagesConverter;
 import org.dawnsci.conversion.converters.AsciiConvert1D;
 import org.dawnsci.conversion.converters.AsciiConvert2D;
 import org.dawnsci.conversion.converters.CompareConverter;
@@ -83,6 +82,9 @@ public class ConversionServiceImpl implements IConversionService {
 					break;
 				case STITCHED_FROM_IMAGEDIR:
 					delegate = new ImagesToStitchedConverter(context);
+					break;
+				case ALIGN_FROM_IMAGEDIR:
+					delegate = new AlignImagesConverter(context);
 					break;
 				case H5_FROM_IMAGEDIR:
 					delegate = new ImagesToHDFConverter(context);
