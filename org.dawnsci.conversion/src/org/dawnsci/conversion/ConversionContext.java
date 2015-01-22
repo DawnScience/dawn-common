@@ -25,23 +25,31 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 class ConversionContext implements IConversionContext {
 
+	// Core data to drive the context (some can still be null)
 	private ConversionScheme    conversionScheme;
-	private IConversionVisitor  conversionVisitor;
 	private List<String>        filePaths;
-	private ILazyDataset        lazyDataset;
 	private List<String>        datasetNames;
 	private String              outputFolder;
 	private Map<Integer,String> sliceDimensions;
 	private Object              userObject;
-	private IMonitor            monitor;
-	private File                selectedConversionFile;
-	private String              selectedH5Path;
-	private String              axisDatasetName;
-	private int                 workSize=100;
+	
+	// Optional data, which changes the way the context works.
+	private ILazyDataset        lazyDataset;
+	private IConversionVisitor  conversionVisitor;
 	private boolean             expression=false;
+	private String              axisDatasetName;
+	private Map<Integer,String> axesNames;
+
+	// Transient data used during evaluation
 	private Slice[]             selectedSlice;
 	private int[]               selectedShape;
-	private Map<Integer,String> axesNames;
+	private File                selectedConversionFile;
+	private String              selectedH5Path;
+
+	// Monitoring
+	private IMonitor            monitor;
+	private int                 workSize=100;
+
 	
 	public ConversionScheme getConversionScheme() {
 		return conversionScheme;
