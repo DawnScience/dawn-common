@@ -207,10 +207,12 @@ public class AlignImagesConversionPage extends ResourceChoosePage
 		radioButtons = new ArrayList<Button>();
 		b = new Button(modeComp, SWT.RADIO);
 		b.setText("2");
+		b.setToolTipText("Use 2 columns to implement image alignment with ROI");
 		b.addSelectionListener(radioListener);
 		radioButtons.add(b);
 		b = new Button(modeComp, SWT.RADIO);
 		b.setText("4");
+		b.setToolTipText("Use 4 columns to implement image alignment with ROI");
 		b.addSelectionListener(radioListener);
 		radioButtons.add(b);
 		b.setSelection(true);
