@@ -10,7 +10,7 @@ package org.dawnsci.persistence.json;
 
 import org.dawnsci.persistence.json.function.FunctionBean;
 import org.eclipse.dawnsci.analysis.dataset.roi.json.CircularROIBean;
-import org.eclipse.dawnsci.analysis.dataset.roi.json.FreedrawROIBean;
+import org.eclipse.dawnsci.analysis.dataset.roi.json.FreeDrawROIBean;
 import org.eclipse.dawnsci.analysis.dataset.roi.json.LinearROIBean;
 import org.eclipse.dawnsci.analysis.dataset.roi.json.PerimeterBoxROIBean;
 import org.eclipse.dawnsci.analysis.dataset.roi.json.PointROIBean;
@@ -76,7 +76,7 @@ public class GSonMarshaller implements IJSonMarshaller {
 		} else if(type.equals("PolygonalROI")){
 			return gson.fromJson(json, PolygonalROIBean.class);
 		} else if(type.equals("FreedrawROI")){
-			return gson.fromJson(json, FreedrawROIBean.class);
+			return gson.fromJson(json, FreeDrawROIBean.class);
 		} else if(type.equals("RingROI")){
 			return gson.fromJson(json, RingROIBean.class);
 		} else if(type.equals("SectorROI")){

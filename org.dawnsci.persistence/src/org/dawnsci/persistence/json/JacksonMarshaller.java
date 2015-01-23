@@ -34,7 +34,6 @@ import org.eclipse.dawnsci.analysis.dataset.roi.RingROI;
 import org.eclipse.dawnsci.analysis.dataset.roi.SectorROI;
 import org.eclipse.dawnsci.analysis.dataset.roi.XAxisBoxROI;
 import org.eclipse.dawnsci.analysis.dataset.roi.YAxisBoxROI;
-import org.eclipse.dawnsci.analysis.dataset.roi.json.ROIBean;
 import org.eclipse.dawnsci.analysis.dataset.roi.json.ROIBeanFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,7 +76,7 @@ public class JacksonMarshaller implements IJSonMarshaller{
 			}
 		} else if (obj instanceof IROI) {
 			IROI roi = (IROI)obj;
-			ROIBean rbean = ROIBeanFactory.encapsulate(roi);
+			Object rbean = ROIBeanFactory.encapsulate(roi);
 			return mapper.writeValueAsString(rbean);
 		} else {
 			return mapper.writeValueAsString(obj);
@@ -98,8 +97,8 @@ public class JacksonMarshaller implements IJSonMarshaller{
 		// if the ROI keyword is present we assume the data is a roi
 		if (type.contains("ROI")) {
 			// Return the corresponding ROIBean class name
-			Class<? extends ROIBean> clazz = ROIBeanFactory.getClass(type);
-			ROIBean bean = (ROIBean) mapper.readValue(json, clazz);
+			Class<?> clazz = ROIBeanFactory.getClass(type);
+			Object bean = mapper.readValue(json, clazz);
 			return ROIBeanFactory.decapsulate(bean);
 		}
 		// if the function keyword is present we assume the data is a function
