@@ -97,39 +97,18 @@ public class CustomNCDConverter extends AbstractConversion  {
 			exportFormat = SAS_FORMAT.ASCII;
 		}
 		
+		OutputBean bean = createBean(exportFormat);
+
 		if (exportFormat.equals(SAS_FORMAT.CANSAS)) {
-			exportCanSAS(lz, nameFrag, context);
+			exportCanSAS(lz, nameFrag, context, bean);
 			return;
 		}
 		
-		String titleNodeString = null;
-		String commandNodeString = null;
-		String selFilePath = null;
-		if (context.getSelectedConversionFile() != null) {
-			IHierarchicalDataFile hdf5Reader = null;
-			try {
-				selFilePath = context.getSelectedConversionFile().getAbsolutePath();
-				hdf5Reader = HierarchicalDataFactory.getReader(selFilePath);
-				titleNodeString = getTitleNodeString(hdf5Reader);
-				commandNodeString = getCommandNodeString(hdf5Reader);
-			}
-			finally {
-				if (hdf5Reader != null) {
-					hdf5Reader.close();
-				}
-			}
-		}
+		String selFilePath = bean.filepath;
+		String titleNodeString = bean.title;
+		String commandNodeString = bean.command;
+		Dataset axis = bean.axis;
 		
-		//get the x axis if required
-		IErrorDataset axis = null;
-		if (context.getAxisDatasetName() != null) {
-			axis = getAxis(context.getAxisDatasetName(), context.getSelectedConversionFile());
-			// ATSAS ASCII format doesn't support axis errors
-			if (axis != null && axis.hasErrors() && exportFormat.equals(SAS_FORMAT.ATSAS)) {
-				axis.setError(null);
-			}
-		}
-
 		//Set up position iterator (final 2 dimensions saved in a single file
 		int[] stop = lz.getShape();
 		boolean hasErrors = (lz.getError() != null ? true : false);
@@ -181,7 +160,7 @@ public class CustomNCDConverter extends AbstractConversion  {
 		String stringFormat = "%-12s";
 
 		if (axis != null) {
-			String axisUnit = getAxisUnit(context.getAxisDatasetName(), context.getSelectedConversionFile());
+			String axisUnit = bean.axisUnits;
 			String axisName = String.format(stringFormat, String.format("%s(%s)", axis.getName(), axisUnit));
 			headings.add(" ".concat(axisName));
 			if (axis.hasErrors()) {
@@ -301,38 +280,17 @@ public class CustomNCDConverter extends AbstractConversion  {
 	
 	private void exportCanSAS(final ILazyDataset         lz, 
             final String               nameFrag,
-            final IConversionContext   context) throws Exception {
+            final IConversionContext   context,
+            final OutputBean           outputBean) throws Exception {
 		
-		String titleNodeString = null;
-		String selFilePath = null;
-		if (context.getSelectedConversionFile() != null) {
-			IHierarchicalDataFile hdf5Reader = null;
-			try {
-				selFilePath = context.getSelectedConversionFile().getAbsolutePath();
-				hdf5Reader = HierarchicalDataFactory.getReader(selFilePath);
-				titleNodeString = getTitleNodeString(hdf5Reader);
-			}
-			finally {
-				if (hdf5Reader != null) {
-					hdf5Reader.close();
-				}
-			}
-		}
+		String titleNodeString = outputBean.title;
+		String selFilePath = outputBean.filepath;
 		
 		//get the x axis if required
-		Dataset axis = null;
-		Dataset axisErrors = null;
-		String axisUnits = "a.u.";
-		if (context.getAxisDatasetName() != null) {
-			axis = getAxis(context.getAxisDatasetName(), context.getSelectedConversionFile());
-			axis.squeeze();
-			axisUnits = getAxisUnit(context.getAxisDatasetName(), context.getSelectedConversionFile());
-			if (axis.hasErrors()) {
-				axisErrors = DatasetUtils.cast(axis.getError(), axis.getDtype());
-				axisErrors.squeeze();
-			}
-		}
-
+		Dataset axis = outputBean.axis;
+		Dataset axisErrors = outputBean.axis.getError();
+		String axisUnits = outputBean.axisUnits;
+	
 		//Set up position iterator (final 2 dimensions saved in a single file
 		int[] stop = lz.getShape();
 		boolean hasErrors = (lz.getError() != null ? true : false);
@@ -560,5 +518,44 @@ public class CustomNCDConverter extends AbstractConversion  {
 		String[] str = (String[])scanCommandData.getData();
 		String scanCommand = str[0];
 		return scanCommand;
+	}
+	
+	public OutputBean createBean(SAS_FORMAT exportFormat) throws Exception {
+		OutputBean outputBean = new OutputBean();
+		if (context.getSelectedConversionFile() != null) {
+			IHierarchicalDataFile hdf5Reader = null;
+			try {
+				outputBean.filepath = context.getSelectedConversionFile().getAbsolutePath();
+				hdf5Reader = HierarchicalDataFactory.getReader(outputBean.filepath);
+				outputBean.title = getTitleNodeString(hdf5Reader);
+				outputBean.command = getCommandNodeString(hdf5Reader);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			finally {
+				if (hdf5Reader != null) {
+					hdf5Reader.close();
+				}
+			}
+		}
+		
+		if (context.getAxisDatasetName() != null) {
+			outputBean.axis = getAxis(context.getAxisDatasetName(), context.getSelectedConversionFile());
+			// ATSAS ASCII format doesn't support axis errors
+			if (outputBean.axis != null && outputBean.axis.hasErrors() && exportFormat.equals(SAS_FORMAT.ATSAS)) {
+				outputBean.axis.setError(null);
+			}
+			outputBean.axisUnits = getAxisUnit(context.getAxisDatasetName(), context.getSelectedConversionFile());
+		}
+		return outputBean;
+	}
+	
+	private class OutputBean {
+		String filepath;
+		String title;
+		String command;
+		Dataset axis;
+		String axisUnits;
 	}
 }
