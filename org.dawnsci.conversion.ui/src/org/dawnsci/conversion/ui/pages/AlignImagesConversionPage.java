@@ -350,30 +350,15 @@ public class AlignImagesConversionPage extends ResourceChoosePage
 	private void align(final RectangularROI roi) {
 		if (alignProgressJob == null) {
 			alignProgressJob = new AlignProgressJob();
-//			alignJob.addJobChangeListener(new JobChangeAdapter() {
-//				@Override
-//				public void done(IJobChangeEvent event) {
-//					aligned = alignJob.getShiftedImages();
-//					Display.getDefault().syncExec(new Runnable() {
-//						@Override
-//						public void run() {
-//							sliderButtons.get(1).setEnabled(aligned != null);
-//							sliderButtons.get(0).setSelection(false);
-//							sliderButtons.get(1).setSelection(true);
-//							showCorrected = true;
-//						}
-//					});
-//				}
-//			});
 		}
 		alignProgressJob.setRectangularROI(roi);
 		alignProgressJob.setMode(mode);
 		alignProgressJob.setData(data);
 		alignProgressJob.setAlignMethod(alignState);
-		ProgressMonitorDialog dia = new ProgressMonitorDialog(Display.getCurrent().getActiveShell());
-		dia.setCancelable(true);
+		ProgressMonitorDialog alignProgress = new ProgressMonitorDialog(Display.getCurrent().getActiveShell());
+		alignProgress.setCancelable(true);
 		try {
-			dia.run(true, true, alignProgressJob);
+			alignProgress.run(true, true, alignProgressJob);
 		} catch (InvocationTargetException e1) {
 			MessageDialog
 					.openError(
