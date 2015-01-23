@@ -17,10 +17,8 @@ import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.util.list.SortNatural;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
-import org.eclipse.dawnsci.analysis.api.image.IImageStitchingProcess;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
 import org.eclipse.dawnsci.analysis.dataset.impl.LazyDataset;
-import org.eclipse.dawnsci.plotting.api.region.IRegion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,8 +37,7 @@ public class AlignImagesConverter extends AbstractImageConversion {
 
 	private static final Logger logger = LoggerFactory.getLogger(AlignImagesConverter.class);
 	private List<IDataset> imageStack = new ArrayList<IDataset>();
-
-	private static IImageStitchingProcess stitcher;
+	private List<IDataset> alignedImages = new ArrayList<IDataset>();
 
 	public AlignImagesConverter() {
 		super(null);
@@ -57,14 +54,6 @@ public class AlignImagesConverter extends AbstractImageConversion {
 		context.addSliceDimension(0, "all");
 	}
 	
-	/**
-	 * OSGI Calls this
-	 * @param s
-	 */
-	public static void setImageSticher(IImageStitchingProcess s) {
-		stitcher = s;
-	}
-
 	@Override
 	protected void convert(IDataset slice) throws Exception {
 
@@ -77,21 +66,9 @@ public class AlignImagesConverter extends AbstractImageConversion {
 		if (imageStack.size() == stackSize) {
 			String outputPath = context.getOutputPath();
 			ConversionAlignBean conversionBean = (ConversionAlignBean)context.getUserObject();
-			int rows = conversionBean.getRows();
-			int columns = conversionBean.getColumns();
-			double angle = conversionBean.getAngle();
-			boolean useFeatureAssociation = conversionBean.isFeatureAssociated();
-			boolean isInputDatFile = conversionBean.isInputDatFile();
-			double fieldOfView = conversionBean.getFieldOfView();
-			List<double[]> translations = conversionBean.getTranslations();
-			IDataset stitched = null;
-			IRegion region = conversionBean.getRoi();
-			if (region != null) {
-				stitched = stitcher.stitch(imageStack, rows, columns, angle, fieldOfView, translations, region.getROI(), useFeatureAssociation, isInputDatFile);
-			} else {
-				stitched = stitcher.stitch(imageStack, rows, columns, angle);
-			}
-			stitched.setName("stitched");
+			// TODO save aligned
+			alignedImages = conversionBean.getAligned();
+			
 			final File outputFile = new File(outputPath);
 
 			if (!outputFile.getParentFile().exists())
@@ -105,7 +82,7 @@ public class AlignImagesConverter extends AbstractImageConversion {
 			final JavaImageSaver saver = new JavaImageSaver(
 					outputFile.getAbsolutePath(), getExtension(), bits, true);
 			final DataHolder dh = new DataHolder();
-			dh.addDataset(stitched.getName(), stitched);
+			dh.addDataset(alignedImages.get(0).getName(), alignedImages.get(0));
 			dh.setFilePath(outputFile.getAbsolutePath());
 			saver.saveFile(dh);
 		}
@@ -173,80 +150,20 @@ public class AlignImagesConverter extends AbstractImageConversion {
 	 *
 	 */
 	public static class ConversionAlignBean extends ConversionInfoBean {
-		private int rows = 3;
-		private int columns = 3;
-		private double angle = 49;
-		private double fieldOfView = 50;
-		private boolean featureAssociated;
-		private boolean isInputDatFile = false;
-		private List<double[]> translations;
-		private IRegion region;
+		private List<IDataset> aligned;
 
-		public int getRows() {
-			return rows;
+		public void setAligned(List<IDataset> aligned) {
+			this.aligned = aligned;
 		}
-		public void setRows(int rows) {
-			this.rows = rows;
-		}
-		public int getColumns() {
-			return columns;
-		}
-		public void setColumns(int columns) {
-			this.columns = columns;
-		}
-		public double getAngle() {
-			return angle;
-		}
-		public void setAngle(double angle) {
-			this.angle = angle;
-		}
-		public void setRoi(IRegion region) {
-			this.region = region;
-		}
-		public IRegion getRoi() {
-			return region;
-		}
-		public void setFieldOfView(double fieldOfView) {
-			this.fieldOfView = fieldOfView;
-		}
-		public double getFieldOfView() {
-			return fieldOfView;
-		}
-		public boolean isFeatureAssociated() {
-			return featureAssociated;
-		}
-		public void setFeatureAssociated(boolean featureAssociated) {
-			this.featureAssociated = featureAssociated;
-		}
-		public boolean isInputDatFile() {
-			return isInputDatFile;
-		}
-		public void setInputDatFile(boolean isInputDatFile) {
-			this.isInputDatFile = isInputDatFile;
-		}
-		public void setTranslations(List<double[]> translations) {
-			this.translations = translations;
-		}
-		public List<double[]> getTranslations() {
-			return translations;
+		public List<IDataset> getAligned() {
+			return aligned;
 		}
 		@Override
 		public int hashCode() {
 			final int prime = 31;
 			int result = super.hashCode();
-			long temp;
-			temp = Double.doubleToLongBits(angle);
-			result = prime * result + (int) (temp ^ (temp >>> 32));
-			result = prime * result + columns;
-			result = prime * result + (featureAssociated ? 1231 : 1237);
-			temp = Double.doubleToLongBits(fieldOfView);
-			result = prime * result + (int) (temp ^ (temp >>> 32));
-			result = prime * result + (isInputDatFile ? 1231 : 1237);
 			result = prime * result
-					+ ((region == null) ? 0 : region.hashCode());
-			result = prime * result + rows;
-			result = prime * result
-					+ ((translations == null) ? 0 : translations.hashCode());
+					+ ((aligned == null) ? 0 : aligned.hashCode());
 			return result;
 		}
 		@Override
@@ -258,31 +175,13 @@ public class AlignImagesConverter extends AbstractImageConversion {
 			if (getClass() != obj.getClass())
 				return false;
 			ConversionAlignBean other = (ConversionAlignBean) obj;
-			if (Double.doubleToLongBits(angle) != Double
-					.doubleToLongBits(other.angle))
-				return false;
-			if (columns != other.columns)
-				return false;
-			if (featureAssociated != other.featureAssociated)
-				return false;
-			if (Double.doubleToLongBits(fieldOfView) != Double
-					.doubleToLongBits(other.fieldOfView))
-				return false;
-			if (isInputDatFile != other.isInputDatFile)
-				return false;
-			if (region == null) {
-				if (other.region != null)
+			if (aligned == null) {
+				if (other.aligned != null)
 					return false;
-			} else if (!region.equals(other.region))
-				return false;
-			if (rows != other.rows)
-				return false;
-			if (translations == null) {
-				if (other.translations != null)
-					return false;
-			} else if (!translations.equals(other.translations))
+			} else if (!aligned.equals(other.aligned))
 				return false;
 			return true;
 		}
+		
 	}
 }

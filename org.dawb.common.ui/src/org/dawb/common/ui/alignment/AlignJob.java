@@ -82,7 +82,6 @@ public class AlignJob extends Job {
 			super.setName("Calculating image alignment with ROI...");
 			return alignWithROI(n, roi, monitor);
 		} else if (alignState == AlignMethod.AFFINE_TRANSFORM) {
-			super.setName("Calculating image alignment with affine transformation...");
 			// align with boofcv
 			try {
 				shiftedImages = transformer.align(data);
@@ -218,6 +217,10 @@ public class AlignJob extends Job {
 	}
 
 	public void setAlignMethod(AlignMethod alignState) {
+		if (alignState == AlignMethod.WITH_ROI)
+			setName("Aligning image stack with ROI");
+		else if (alignState == AlignMethod.AFFINE_TRANSFORM)
+			setName("Aligning image stack with Affine Transformation");;
 		this.alignState = alignState;
 	}
 
