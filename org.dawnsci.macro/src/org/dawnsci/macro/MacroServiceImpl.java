@@ -38,15 +38,6 @@ public class MacroServiceImpl implements IMacroService {
 	public synchronized void publish(MacroEventObject evt) {
 				
 		if (listeners.isEmpty()) return;
-
-		// We can automatically deal with some events, to reduce dependency
-		// inside the API generating the objects. For instance regions can be generically
-		// translated into the python which creates them
-		evt = MacroFactory.generate(evt);
-		if (evt==null) return;
-		
-		// If we have no command, not much point doing anythin
-		if (!evt.isCommandAvailable()) return;
 		
 		// Clean up
 		for (Iterator<IMacroEventListener> iterator = listeners.iterator(); iterator.hasNext();) {
@@ -56,8 +47,16 @@ public class MacroServiceImpl implements IMacroService {
 				continue;
 			}
 		}
-		
 		if (listeners.isEmpty()) return;
+
+		// We can automatically deal with some events, to reduce dependency
+		// inside the API generating the objects. For instance regions can be generically
+		// translated into the python which creates them
+		evt = MacroFactory.generate(evt);
+		if (evt==null) return;
+		
+		// If we have no command, not much point doing anything
+		if (!evt.isCommandAvailable()) return;
 		
 		// If Py4j is in the stack, we do not want to publish.
 		// This operation parses the stack so is dangerously slow, do
