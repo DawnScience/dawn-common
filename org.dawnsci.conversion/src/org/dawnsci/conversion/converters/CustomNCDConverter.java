@@ -530,8 +530,7 @@ public class CustomNCDConverter extends AbstractConversion  {
 				outputBean.title = getTitleNodeString(hdf5Reader);
 				outputBean.command = getCommandNodeString(hdf5Reader);
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				logger.error("Exception while getting title and command information", e);
 			}
 			finally {
 				if (hdf5Reader != null) {
