@@ -9,16 +9,16 @@
 package org.dawnsci.persistence.json;
 
 import org.dawnsci.persistence.json.function.FunctionBean;
-import org.dawnsci.persistence.json.roi.CircularROIBean;
-import org.dawnsci.persistence.json.roi.FreedrawROIBean;
-import org.dawnsci.persistence.json.roi.LinearROIBean;
-import org.dawnsci.persistence.json.roi.PerimeterBoxROIBean;
-import org.dawnsci.persistence.json.roi.PointROIBean;
-import org.dawnsci.persistence.json.roi.PolygonalROIBean;
-import org.dawnsci.persistence.json.roi.PolylineROIBean;
-import org.dawnsci.persistence.json.roi.RectangularROIBean;
-import org.dawnsci.persistence.json.roi.RingROIBean;
-import org.dawnsci.persistence.json.roi.SectorROIBean;
+import org.eclipse.dawnsci.analysis.dataset.roi.json.CircularROIBean;
+import org.eclipse.dawnsci.analysis.dataset.roi.json.FreedrawROIBean;
+import org.eclipse.dawnsci.analysis.dataset.roi.json.LinearROIBean;
+import org.eclipse.dawnsci.analysis.dataset.roi.json.PerimeterBoxROIBean;
+import org.eclipse.dawnsci.analysis.dataset.roi.json.PointROIBean;
+import org.eclipse.dawnsci.analysis.dataset.roi.json.PolygonalROIBean;
+import org.eclipse.dawnsci.analysis.dataset.roi.json.PolylineROIBean;
+import org.eclipse.dawnsci.analysis.dataset.roi.json.RectangularROIBean;
+import org.eclipse.dawnsci.analysis.dataset.roi.json.RingROIBean;
+import org.eclipse.dawnsci.analysis.dataset.roi.json.SectorROIBean;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

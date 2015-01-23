@@ -13,14 +13,12 @@ import static org.junit.Assert.assertEquals;
 
 import org.dawnsci.persistence.json.JacksonMarshaller;
 import org.dawnsci.persistence.json.function.FunctionBean;
-import org.dawnsci.persistence.json.roi.RectangularROIBean;
+import org.eclipse.dawnsci.analysis.dataset.roi.json.RectangularROIBean;
 import org.junit.Before;
 import org.junit.Test;
 
 import uk.ac.diamond.scisoft.analysis.fitting.functions.Fermi;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.Parameter;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
 
 /**
  * Test the marshallizer with Jackson
@@ -81,7 +79,7 @@ public class JacksonMarshallerTest {
 	}
 
 	@Test
-	public void testMarshallFromROIBeanToJsonString() throws JsonProcessingException{
+	public void testMarshallFromROIBeanToJsonString() throws Exception{
 		String resultJSON = jackMarshall.marshal(roibean);
 		assertEquals(jsonroi, resultJSON);
 	}
@@ -102,7 +100,7 @@ public class JacksonMarshallerTest {
 	}
 
 	@Test
-	public void testMarshallFromFunctionBeanToJSonString() throws JsonProcessingException{
+	public void testMarshallFromFunctionBeanToJSonString() throws Exception{
 		String resultJSON = jackMarshall.marshal(functionbean);
 		assertEquals(jsonfunction, resultJSON);
 	}

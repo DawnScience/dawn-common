@@ -25,7 +25,7 @@ public interface IJSonMarshaller {
 	 * @return
 	 * @throws JsonProcessingException 
 	 */
-	public String marshal(Object obj) throws JsonProcessingException;
+	public String marshal(Object obj) throws Exception;
 
 	/**
 	 * Returns an object given a JSON String

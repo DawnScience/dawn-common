@@ -8,7 +8,6 @@
  */
 package org.dawnsci.persistence.internal;
 
-import org.dawb.common.services.ServiceManager;
 import org.dawnsci.persistence.json.JacksonMarshaller;
 import org.eclipse.dawnsci.analysis.api.persistence.IPersistenceService;
 import org.eclipse.dawnsci.analysis.api.persistence.IPersistentFile;
@@ -16,8 +15,6 @@ import org.eclipse.dawnsci.hdf5.HierarchicalDataFactory;
 import org.eclipse.dawnsci.hdf5.IHierarchicalDataFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
 
 /**
  * Implementation of IPersistenceService<br>
@@ -64,10 +61,10 @@ public class PersistenceServiceImpl implements IPersistenceService{
 	}
 
 	@Override
-	public String marshal(Object obj) {
+	public String marshal(Object obj) throws Exception{
 		try {
 			return new JacksonMarshaller().marshal(obj);
-		} catch (JsonProcessingException e) {
+		} catch (Exception e) {
 			logger.error("Error while marshalling object " + obj + " : " + e);
 			e.printStackTrace();
 			return null;
