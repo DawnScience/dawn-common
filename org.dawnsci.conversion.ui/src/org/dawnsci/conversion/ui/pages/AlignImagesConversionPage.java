@@ -15,7 +15,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.dawb.common.services.conversion.IConversionContext;
-import org.dawb.common.ui.alignment.AlignJob;
+import org.dawb.common.ui.alignment.AlignProgressJob;
 import org.dawb.common.ui.wizard.ResourceChoosePage;
 import org.dawb.common.util.io.FileUtils;
 import org.dawnsci.conversion.converters.AlignImagesConverter.ConversionAlignBean;
@@ -36,7 +36,7 @@ import org.eclipse.dawnsci.plotting.api.PlottingFactory;
 import org.eclipse.dawnsci.plotting.api.region.IRegion;
 import org.eclipse.dawnsci.plotting.api.region.IRegion.RegionType;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -80,7 +80,7 @@ public class AlignImagesConversionPage extends ResourceChoosePage
 	private AlignMethod alignState = AlignMethod.WITH_ROI;
 
 
-	private AlignJob alignJob;
+	private AlignProgressJob alignProgressJob;
 	private Button align;
 
 	private List<Button> radioButtons;
@@ -120,10 +120,6 @@ public class AlignImagesConversionPage extends ResourceChoosePage
 		bean.setAligned(aligned);
 		context.setUserObject(bean);
 
-		if (scaleProgress != null) {
-			scaleProgress.setMaximum(data.size());
-			scaleProgress.redraw();
-		}
 		return context;
 	}
 
@@ -146,10 +142,23 @@ public class AlignImagesConversionPage extends ResourceChoosePage
 					return Status.OK_STATUS;
 				}
 			};
+			loadDataJob.addJobChangeListener(new JobChangeAdapter() {
+				@Override
+				public void done(IJobChangeEvent event) {
+					Display.getDefault().syncExec(new Runnable() {
+						@Override
+						public void run() {
+							if (scaleProgress != null) {
+								scaleProgress.setMaximum(data.size());
+								scaleProgress.redraw();
+							}
+						}
+					});
+
+				}
+			});
 		}
 		loadDataJob.schedule();
-		while (loadDataJob.getState() == Job.RUNNING) {
-		}
 		return data;
 	}
 
@@ -264,11 +273,11 @@ public class AlignImagesConversionPage extends ResourceChoosePage
 				if (p != currentPosition) {
 					currentPosition = p;
 					if (showCorrected) {
-						if (aligned != null && aligned.size() > 0) {
+						if (aligned != null && aligned.size() > 0 && p < aligned.size()) {
 							plotSystem.updatePlot2D(aligned.get(p), null, null);
 						}
 					} else {
-						if (data != null && data.size() > 0)
+						if (data != null && data.size() > 0 && p < data.size())
 							plotSystem.updatePlot2D(data.get(p), null, null);
 					}
 				}
@@ -340,48 +349,48 @@ public class AlignImagesConversionPage extends ResourceChoosePage
 	};
 
 	private void align(final RectangularROI roi) {
-		try {
-			getWizard().getContainer().run(false, true, new IRunnableWithProgress() {
-				@Override
-				public void run(IProgressMonitor monitor) throws InvocationTargetException,
-						InterruptedException {
-					if (alignJob == null) {
-						alignJob = new AlignJob();
-						alignJob.addJobChangeListener(new JobChangeAdapter() {
-							@Override
-							public void done(IJobChangeEvent event) {
-								aligned = alignJob.getShiftedImages();
-								Display.getDefault().syncExec(new Runnable() {
-									@Override
-									public void run() {
-										sliderButtons.get(1).setEnabled(aligned != null);
-										sliderButtons.get(0).setSelection(false);
-										sliderButtons.get(1).setSelection(true);
-										showCorrected = true;
-									}
-								});
-							}
-						});
-					}
-					alignJob.setRectangularROI(roi);
-					alignJob.setMode(mode);
-					if (data == null) {
-//						data = loadData();
-					}
-					alignJob.setData(data);
-					alignJob.setAlignMethod(alignState);
-					if (alignJob.getState() == Job.RUNNING)
-						alignJob.cancel();
-					alignJob.schedule();
-				}
-			});
-		} catch (InvocationTargetException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		if (alignProgressJob == null) {
+			alignProgressJob = new AlignProgressJob();
+//			alignJob.addJobChangeListener(new JobChangeAdapter() {
+//				@Override
+//				public void done(IJobChangeEvent event) {
+//					aligned = alignJob.getShiftedImages();
+//					Display.getDefault().syncExec(new Runnable() {
+//						@Override
+//						public void run() {
+//							sliderButtons.get(1).setEnabled(aligned != null);
+//							sliderButtons.get(0).setSelection(false);
+//							sliderButtons.get(1).setSelection(true);
+//							showCorrected = true;
+//						}
+//					});
+//				}
+//			});
 		}
+		alignProgressJob.setRectangularROI(roi);
+		alignProgressJob.setMode(mode);
+		alignProgressJob.setData(data);
+		alignProgressJob.setAlignMethod(alignState);
+		ProgressMonitorDialog dia = new ProgressMonitorDialog(Display.getCurrent().getActiveShell());
+		dia.setCancelable(true);
+		try {
+			dia.run(true, true, alignProgressJob);
+		} catch (InvocationTargetException e1) {
+			MessageDialog
+					.openError(
+							Display.getCurrent().getActiveShell(),
+							"Alignment Error",
+							"An error occured during alignment: "
+									+ e1.getTargetException()
+											.getLocalizedMessage());
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		}
+		aligned = alignProgressJob.getShiftedImages();
+		sliderButtons.get(1).setEnabled(aligned != null);
+		sliderButtons.get(0).setSelection(false);
+		sliderButtons.get(1).setSelection(true);
+		showCorrected = true;
 	}
 
 	private IRegion getRegion(String regionName) {
