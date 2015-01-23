@@ -19,9 +19,13 @@ import org.dawb.common.ui.wizard.ResourceChoosePage;
 import org.dawb.common.util.io.FileUtils;
 import org.dawnsci.conversion.converters.AlignImagesConverter.ConversionAlignBean;
 import org.dawnsci.conversion.ui.IConversionWizardPage;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
-import org.eclipse.dawnsci.analysis.api.image.IImageTransform;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
 import org.eclipse.dawnsci.analysis.dataset.roi.PerimeterBoxROI;
 import org.eclipse.dawnsci.analysis.dataset.roi.RectangularROI;
@@ -65,16 +69,13 @@ public class AlignImagesConversionPage extends ResourceChoosePage
 
 	private IConversionContext context;
 	private IPlottingSystem plotSystem;
-	private Composite container;
 	private Combo alignMethodCombo;
 
 	private IDataset firstImage;
 	private List<IDataset> data;
 	private List<IDataset> shifted;
 
-	private static IImageTransform transformer;
-
-	private AlignMethod alignState;
+	private AlignMethod alignState = AlignMethod.WITH_ROI;
 
 
 	private AlignJob alignJob;
@@ -88,6 +89,8 @@ public class AlignImagesConversionPage extends ResourceChoosePage
 	private List<Button> sliderButtons;
 	private boolean showCorrected = false;
 
+	private Job loadDataJob;
+
 	public AlignImagesConversionPage() {
 		super("Convert image directory", null, null);
 		setDirectory(false);
@@ -96,14 +99,6 @@ public class AlignImagesConversionPage extends ResourceChoosePage
 		setOverwriteVisible(true);
 		setPathEditable(true);
 		setDescription("Returns an aligned stack of images given a stack of images");
-	}
-
-	/**
-	 * Injected by OSGI
-	 * @param it
-	 */
-	public static void setImageTransform(IImageTransform it) {
-		transformer = it;
 	}
 
 	@Override
@@ -116,24 +111,48 @@ public class AlignImagesConversionPage extends ResourceChoosePage
 
 		final ConversionAlignBean bean = new ConversionAlignBean();
 		
-		String filePath = getSelectedPaths()[0];
-		IDataHolder holder = null;
-		try {
-			holder = LoaderFactory.getData(filePath);
-			firstImage = holder.getDataset(0);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		String[] filePaths = getSelectedPaths();
+		if (data == null)
+			data = loadData(filePaths);
 
+		bean.setAligned(shifted);
 		context.setUserObject(bean);
 
+		if (sldProgress != null) {
+			sldProgress.setMaximum(data.size());
+			sldProgress.redraw();
+		}
 		return context;
+	}
+
+	private List<IDataset> loadData(final String[] filePaths) {
+		final List<IDataset> data = new ArrayList<IDataset>();
+		if (loadDataJob == null) {
+			loadDataJob = new Job("Loading image stack") {
+				@Override
+				protected IStatus run(IProgressMonitor monitor) {
+					for (int i = 0; i < filePaths.length; i++) {
+						IDataHolder holder = null;
+						try {
+							holder = LoaderFactory.getData(filePaths[i]);
+							data.add(holder.getDataset(0));
+						} catch (Exception e) {
+							logger.error("Failed to load dataset:" + e);
+							return Status.CANCEL_STATUS;
+						}
+					}
+					return Status.OK_STATUS;
+				}
+			};
+		}
+		loadDataJob.schedule();
+		while (loadDataJob.getState() == Job.RUNNING) {
+		}
+		return data;
 	}
 
 	@Override
 	protected void createContentAfterFileChoose(Composite container) {
-		this.container = container;
 		Composite controlComp = new Composite(container, SWT.NONE);
 		controlComp.setLayout(new GridLayout(2, false));
 		controlComp.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 4, 1));
@@ -159,7 +178,10 @@ public class AlignImagesConversionPage extends ResourceChoosePage
 				alignState = AlignMethod.getAlignMethod(alignMethodCombo.getSelectionIndex());
 				IRegion region = getRegion("align ROI");
 				if (region != null) {
-					region.setVisible(alignState == AlignMethod.WITH_ROI);
+					boolean withROI = alignState == AlignMethod.WITH_ROI;
+					region.setVisible(withROI);
+					radioButtons.get(0).setEnabled(withROI);
+					radioButtons.get(1).setEnabled(withROI);
 				}
 			}
 		});
@@ -170,7 +192,7 @@ public class AlignImagesConversionPage extends ResourceChoosePage
 		modeLabel.setText("Mode:");
 		final Composite modeComp = new Composite(controlComp, SWT.NONE);
 		modeComp.setLayout(new RowLayout());
-		modeComp.setToolTipText("Number of columns");
+		modeComp.setToolTipText("Number of columns used for image alignment with ROI");
 		Button b;
 		radioButtons = new ArrayList<Button>();
 		b = new Button(modeComp, SWT.RADIO);
@@ -186,16 +208,16 @@ public class AlignImagesConversionPage extends ResourceChoosePage
 		align = new Button(controlComp, SWT.NONE);
 		align.setText("Align");
 		align.setToolTipText("Run the alignment calculation with the corresponding alignment type chosen");
-		GridData gd = new GridData(SWT.LEFT, SWT.CENTER, true, false, 2, 1);
+		GridData gd = new GridData(SWT.CENTER, SWT.CENTER, true, false, 2, 1);
 		align.setLayoutData(gd);
 		align.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (alignState == AlignMethod.WITH_ROI) {
 					// if there is a ROI on the plotting system we can perform an align calculation
-					IRegion region = getRegion("");
+					IRegion region = getRegion("align ROI");
 					if (region != null && region.getROI() instanceof RectangularROI) {
-						align();
+						align((RectangularROI)region.getROI());
 					} else {
 						String[] dialogButtonLabel = { "OK" };
 						Image warning = new Image(Display.getCurrent(), getClass().getResourceAsStream(
@@ -205,7 +227,7 @@ public class AlignImagesConversionPage extends ResourceChoosePage
 						messageDialog.open();
 					}
 				} else if (alignState == AlignMethod.AFFINE_TRANSFORM) {
-					align();
+					align(null);
 				}
 			}
 		});
@@ -223,12 +245,12 @@ public class AlignImagesConversionPage extends ResourceChoosePage
 		b.setToolTipText("Show original stack of images");
 		b.addSelectionListener(sliderListener);
 		sliderButtons.add(b);
+		b.setSelection(true);
 		b = new Button(sliderGroup, SWT.RADIO);
 		b.setText("Aligned Data");
 		b.setToolTipText("Show aligned stack of images");
 		b.addSelectionListener(sliderListener);
 		sliderButtons.add(b);
-		b.setSelection(true);
 		
 		sldProgress = new Slider(sliderGroup, SWT.HORIZONTAL);
 		sldProgress.setPageIncrement(1);
@@ -241,16 +263,20 @@ public class AlignImagesConversionPage extends ResourceChoosePage
 					currentPosition = p;
 					if (showCorrected) {
 						if (shifted != null && shifted.size() > 0) {
-							plotSystem.updatePlot2D(shifted.get(0), null, null);
+							plotSystem.updatePlot2D(shifted.get(p), null, null);
 						}
 					} else {
 						if (data != null && data.size() > 0)
-							plotSystem.updatePlot2D(data.get(0), null, null);
+							plotSystem.updatePlot2D(data.get(p), null, null);
 					}
 				}
 			}
 		});
 		sldProgress.setLayoutData(new GridData(SWT.FILL, SWT.LEFT, true, false));
+		if (data != null) {
+			sldProgress.setMaximum(data.size());
+			sldProgress.redraw();
+		}
 
 		Composite plotComp = new Composite(container, SWT.NONE);
 		plotComp.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 4, 1));
@@ -299,22 +325,37 @@ public class AlignImagesConversionPage extends ResourceChoosePage
 			} else {
 				boolean showOriginal = sliderButtons.indexOf(btn) == 0;
 				if (showOriginal && data != null && data.size() > 0) {
-					plotSystem.updatePlot2D(data.get(0), null, null);
+					plotSystem.updatePlot2D(data.get(currentPosition), null, null);
 					showCorrected = false;
 				} else if (!showOriginal && shifted != null && shifted.size() > 0){
-					plotSystem.updatePlot2D(shifted.get(0), null, null);
+					plotSystem.updatePlot2D(shifted.get(currentPosition), null, null);
+					showCorrected = true;
+				} else if (!showOriginal && shifted == null) {
 					showCorrected = true;
 				}
-				sldProgress.setSelection(0);
+//				sldProgress.setSelection(0);
 			}
 		}
 	};
 
-	private void align() {
+	private void align(RectangularROI roi) {
 		if (alignJob == null) {
-			
+			alignJob = new AlignJob();
+			alignJob.addJobChangeListener(new JobChangeAdapter() {
+				@Override
+				public void done(IJobChangeEvent event) {
+					shifted = alignJob.getShiftedImages();
+					Display.getDefault().syncExec(new Runnable() {
+						@Override
+						public void run() {
+							sldProgress.setSelection(1);
+						}
+					});
+				}
+			});
 		}
-		alignJob.setMode(2);
+		alignJob.setRectangularROI(roi);
+		alignJob.setMode(mode);
 		if (data == null) {
 //			data = loadData();
 		}
