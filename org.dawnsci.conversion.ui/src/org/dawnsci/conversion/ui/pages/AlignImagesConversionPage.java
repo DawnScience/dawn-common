@@ -78,7 +78,7 @@ public class AlignImagesConversionPage extends ResourceChoosePage
 	private List<IDataset> aligned;
 
 	private AlignMethod alignState = AlignMethod.WITH_ROI;
-
+	private static final String ROI_NAME = "align ROI";
 
 	private AlignProgressJob alignProgressJob;
 	private Button align;
@@ -154,7 +154,6 @@ public class AlignImagesConversionPage extends ResourceChoosePage
 							}
 						}
 					});
-
 				}
 			});
 		}
@@ -187,7 +186,7 @@ public class AlignImagesConversionPage extends ResourceChoosePage
 			@Override
 			public void widgetSelected(SelectionEvent event) {
 				alignState = AlignMethod.getAlignMethod(alignMethodCombo.getSelectionIndex());
-				IRegion region = getRegion("align ROI");
+				IRegion region = getRegion(ROI_NAME);
 				if (region != null) {
 					boolean withROI = alignState == AlignMethod.WITH_ROI;
 					region.setVisible(withROI);
@@ -226,7 +225,7 @@ public class AlignImagesConversionPage extends ResourceChoosePage
 			public void widgetSelected(SelectionEvent e) {
 				if (alignState == AlignMethod.WITH_ROI) {
 					// if there is a ROI on the plotting system we can perform an align calculation
-					IRegion region = getRegion("align ROI");
+					IRegion region = getRegion(ROI_NAME);
 					if (region != null && region.getROI() instanceof RectangularROI) {
 						align((RectangularROI)region.getROI());
 					} else {
@@ -308,7 +307,7 @@ public class AlignImagesConversionPage extends ResourceChoosePage
 			
 			plotSystem.createPlot2D(firstImage, null, null);
 			plotSystem.setKeepAspect(true);
-			createRegion(firstImage, "align ROI");
+			createRegion(firstImage, ROI_NAME);
 		} catch (Exception e) {
 			logger.error("Error creating the plotting system:" + e.getMessage());
 			e.printStackTrace();
