@@ -44,12 +44,12 @@ public class ProcessConversion extends AbstractConversion {
 	
 	public ProcessConversion(IConversionContext context) {
 		super(context);
-		
+		context.setEchoMacro(false); // We do not tell the user about doing this conversion in macros.
 	}
 
-	protected void iterate(final ILazyDataset         lz, 
-            final String               nameFrag,
-            final IConversionContext   context) throws Exception {
+	protected void iterate( final ILazyDataset         lz, 
+				            final String               nameFrag,
+				            final IConversionContext   context) throws Exception {
 		
 		if (service == null) service = (IOperationService)ServiceManager.getService(IOperationService.class);
 		

@@ -410,4 +410,19 @@ public interface IConversionContext {
 	 * @param array
 	 */
 	public void setFilePaths(String... paths)  throws Exception;
+	
+	/**
+	 * Define if this context will send macro commands so that the
+	 * user can copy what we are doing.
+	 * @return
+	 */
+	public boolean isEchoMacro();
+	
+	/**
+	 * Define if this context will send macro commands so that the
+	 * user can copy what we are doing.
+	 * @param echoMacro
+	 */
+	public void setEchoMacro(boolean echoMacro);
+
 }

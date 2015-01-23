@@ -36,7 +36,7 @@ public class DocumentInserter implements IMacroEventListener, IPartListener {
 	public void init(ISourceViewer viewer, InsertionType type) {
 		this.viewer   = viewer;
 		this.type     = type;
-		this.job      = new DocumentInsertionJob(type, viewer);
+		this.job      = new DocumentInsertionJob(this, viewer);
 		
 		viewer.getTextWidget().addDisposeListener(new DisposeListener() {
 			@Override
@@ -138,5 +138,8 @@ public class DocumentInserter implements IMacroEventListener, IPartListener {
 	public void dispose() {
 		disconnect();
 		if (job!=null) job.stop();
+	}
+	public InsertionType getType() {
+		return type;
 	}
 }

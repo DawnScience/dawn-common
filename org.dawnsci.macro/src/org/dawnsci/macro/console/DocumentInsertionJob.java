@@ -24,12 +24,12 @@ public class DocumentInsertionJob extends Job {
 	
 	private ISourceViewer         viewer;
 	private BlockingDeque<String> queue;
-	private InsertionType  type;
+	private DocumentInserter      inserter;
 
-	public DocumentInsertionJob(InsertionType  type, ISourceViewer viewer) {
+	public DocumentInsertionJob(DocumentInserter  inserter, ISourceViewer viewer) {
 		
 		super("Document Insertion Job");
-		this.type   = type;
+		this.inserter   = inserter;
 		this.viewer = viewer;
 		setPriority(Job.INTERACTIVE);
 		setUser(false);
@@ -46,9 +46,12 @@ public class DocumentInsertionJob extends Job {
 		try {
 			while((cmd = queue.take())!=null) {
 				
+				if (!inserter.isConnected()) continue; 
+
 				if (mon.isCanceled()) return Status.CANCEL_STATUS;
 
 				if (!cmd.endsWith("\n")) cmd = cmd+"\n";
+				
 				
 				
 				checkSetup(cmd);
@@ -108,7 +111,7 @@ public class DocumentInsertionJob extends Job {
 		
 		
 		// Check numpy
-		if (type==InsertionType.PYTHON) {
+		if (inserter.getType()==InsertionType.PYTHON) {
 
 			checkAdd("# Turn py4j on under Window->Preferences->Py4j Default Server > 'Py4j active'", cmd, 150);
 			checkAdd("import numpy", cmd, 1200);

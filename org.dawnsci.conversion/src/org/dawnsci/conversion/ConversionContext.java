@@ -49,8 +49,15 @@ class ConversionContext implements IConversionContext {
 	// Monitoring
 	private IMonitor            monitor;
 	private int                 workSize=100;
+	private boolean             echoMacro = true;
 
 	
+	public boolean isEchoMacro() {
+		return echoMacro;
+	}
+	public void setEchoMacro(boolean echoMacro) {
+		this.echoMacro = echoMacro;
+	}
 	public ConversionScheme getConversionScheme() {
 		return conversionScheme;
 	}

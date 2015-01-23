@@ -118,6 +118,8 @@ public class ConversionServiceImpl implements IConversionService {
 	 */
 	private void sendMacroCommands(IConversionContext context) {
 		
+		if (!context.isEchoMacro()) return;
+		
 		IMacroService mservice = (IMacroService)Activator.getService(IMacroService.class);
 		if (mservice==null) return;
 		
