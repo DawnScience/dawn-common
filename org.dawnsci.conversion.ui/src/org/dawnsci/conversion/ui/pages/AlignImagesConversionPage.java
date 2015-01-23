@@ -9,6 +9,7 @@
 package org.dawnsci.conversion.ui.pages;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -35,6 +36,7 @@ import org.eclipse.dawnsci.plotting.api.PlottingFactory;
 import org.eclipse.dawnsci.plotting.api.region.IRegion;
 import org.eclipse.dawnsci.plotting.api.region.IRegion.RegionType;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -49,7 +51,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Slider;
+import org.eclipse.swt.widgets.Scale;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,7 +75,7 @@ public class AlignImagesConversionPage extends ResourceChoosePage
 
 	private IDataset firstImage;
 	private List<IDataset> data;
-	private List<IDataset> shifted;
+	private List<IDataset> aligned;
 
 	private AlignMethod alignState = AlignMethod.WITH_ROI;
 
@@ -84,7 +86,7 @@ public class AlignImagesConversionPage extends ResourceChoosePage
 	private List<Button> radioButtons;
 	private int mode = 4; // Should be 2 or four
 
-	private Slider sldProgress;
+	private Scale scaleProgress;
 	private int currentPosition;
 	private List<Button> sliderButtons;
 	private boolean showCorrected = false;
@@ -115,12 +117,12 @@ public class AlignImagesConversionPage extends ResourceChoosePage
 		if (data == null)
 			data = loadData(filePaths);
 
-		bean.setAligned(shifted);
+		bean.setAligned(aligned);
 		context.setUserObject(bean);
 
-		if (sldProgress != null) {
-			sldProgress.setMaximum(data.size());
-			sldProgress.redraw();
+		if (scaleProgress != null) {
+			scaleProgress.setMaximum(data.size());
+			scaleProgress.redraw();
 		}
 		return context;
 	}
@@ -251,19 +253,19 @@ public class AlignImagesConversionPage extends ResourceChoosePage
 		b.setToolTipText("Show aligned stack of images");
 		b.addSelectionListener(sliderListener);
 		sliderButtons.add(b);
+		sliderButtons.get(1).setEnabled(false);
 		
-		sldProgress = new Slider(sliderGroup, SWT.HORIZONTAL);
-		sldProgress.setPageIncrement(1);
-		sldProgress.setThumb(1);
-		sldProgress.addSelectionListener(new SelectionAdapter() {
+		scaleProgress = new Scale(sliderGroup, SWT.HORIZONTAL);
+		scaleProgress.setPageIncrement(1);
+		scaleProgress.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				int p = sldProgress.getSelection();
+				int p = scaleProgress.getSelection();
 				if (p != currentPosition) {
 					currentPosition = p;
 					if (showCorrected) {
-						if (shifted != null && shifted.size() > 0) {
-							plotSystem.updatePlot2D(shifted.get(p), null, null);
+						if (aligned != null && aligned.size() > 0) {
+							plotSystem.updatePlot2D(aligned.get(p), null, null);
 						}
 					} else {
 						if (data != null && data.size() > 0)
@@ -272,10 +274,10 @@ public class AlignImagesConversionPage extends ResourceChoosePage
 				}
 			}
 		});
-		sldProgress.setLayoutData(new GridData(SWT.FILL, SWT.LEFT, true, false));
+		scaleProgress.setLayoutData(new GridData(SWT.FILL, SWT.LEFT, true, false));
 		if (data != null) {
-			sldProgress.setMaximum(data.size());
-			sldProgress.redraw();
+			scaleProgress.setMaximum(data.size());
+			scaleProgress.redraw();
 		}
 
 		Composite plotComp = new Composite(container, SWT.NONE);
@@ -327,43 +329,59 @@ public class AlignImagesConversionPage extends ResourceChoosePage
 				if (showOriginal && data != null && data.size() > 0) {
 					plotSystem.updatePlot2D(data.get(currentPosition), null, null);
 					showCorrected = false;
-				} else if (!showOriginal && shifted != null && shifted.size() > 0){
-					plotSystem.updatePlot2D(shifted.get(currentPosition), null, null);
+				} else if (!showOriginal && aligned != null && aligned.size() > 0){
+					plotSystem.updatePlot2D(aligned.get(currentPosition), null, null);
 					showCorrected = true;
-				} else if (!showOriginal && shifted == null) {
+				} else if (!showOriginal && aligned == null) {
 					showCorrected = true;
 				}
-//				sldProgress.setSelection(0);
 			}
 		}
 	};
 
-	private void align(RectangularROI roi) {
-		if (alignJob == null) {
-			alignJob = new AlignJob();
-			alignJob.addJobChangeListener(new JobChangeAdapter() {
+	private void align(final RectangularROI roi) {
+		try {
+			getWizard().getContainer().run(false, true, new IRunnableWithProgress() {
 				@Override
-				public void done(IJobChangeEvent event) {
-					shifted = alignJob.getShiftedImages();
-					Display.getDefault().syncExec(new Runnable() {
-						@Override
-						public void run() {
-							sldProgress.setSelection(1);
-						}
-					});
+				public void run(IProgressMonitor monitor) throws InvocationTargetException,
+						InterruptedException {
+					if (alignJob == null) {
+						alignJob = new AlignJob();
+						alignJob.addJobChangeListener(new JobChangeAdapter() {
+							@Override
+							public void done(IJobChangeEvent event) {
+								aligned = alignJob.getShiftedImages();
+								Display.getDefault().syncExec(new Runnable() {
+									@Override
+									public void run() {
+										sliderButtons.get(1).setEnabled(aligned != null);
+										sliderButtons.get(0).setSelection(false);
+										sliderButtons.get(1).setSelection(true);
+										showCorrected = true;
+									}
+								});
+							}
+						});
+					}
+					alignJob.setRectangularROI(roi);
+					alignJob.setMode(mode);
+					if (data == null) {
+//						data = loadData();
+					}
+					alignJob.setData(data);
+					alignJob.setAlignMethod(alignState);
+					if (alignJob.getState() == Job.RUNNING)
+						alignJob.cancel();
+					alignJob.schedule();
 				}
 			});
+		} catch (InvocationTargetException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		alignJob.setRectangularROI(roi);
-		alignJob.setMode(mode);
-		if (data == null) {
-//			data = loadData();
-		}
-		alignJob.setData(data);
-		alignJob.setAlignMethod(alignState);
-		if (alignJob.getState() == Job.RUNNING)
-			alignJob.cancel();
-		alignJob.schedule();
 	}
 
 	private IRegion getRegion(String regionName) {
