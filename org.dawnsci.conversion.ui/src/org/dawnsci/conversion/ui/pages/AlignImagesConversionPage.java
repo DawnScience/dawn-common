@@ -95,7 +95,7 @@ public class AlignImagesConversionPage extends ResourceChoosePage
 
 	public AlignImagesConversionPage() {
 		super("Convert image directory", null, null);
-		setDirectory(false);
+		setDirectory(true);
 		setFileLabel("Aligned images output folder");
 		setNewFile(true);
 		setOverwriteVisible(true);
@@ -110,12 +110,17 @@ public class AlignImagesConversionPage extends ResourceChoosePage
 		context.setOutputPath(getAbsoluteFilePath());
 		final File dir = new File(getSourcePath(context)).getParentFile();
 		context.setWorkSize(dir.list().length);
-
+		
 		final ConversionAlignBean bean = new ConversionAlignBean();
 		
 		String[] filePaths = getSelectedPaths();
 		if (data == null)
 			data = loadData(filePaths);
+		String[] datasetNames = new String[aligned.size()];
+		for (int i = 0; i < aligned.size(); i++) {
+			datasetNames[i] = aligned.get(i).getName();
+		}
+		context.setDatasetNames(datasetNames);
 
 		bean.setAligned(aligned);
 		context.setUserObject(bean);
@@ -133,7 +138,13 @@ public class AlignImagesConversionPage extends ResourceChoosePage
 						IDataHolder holder = null;
 						try {
 							holder = LoaderFactory.getData(filePaths[i]);
-							data.add(holder.getDataset(0));
+							String[] tmp = filePaths[i].split(File.separator);
+							String filename = tmp[tmp.length - 1];
+							IDataset dataset = holder.getDataset(0);
+							if (dataset.getName() == null || dataset.getName().equals("")) {
+								dataset.setName(filename);
+							}
+							data.add(dataset);
 						} catch (Exception e) {
 							logger.error("Failed to load dataset:" + e);
 							return Status.CANCEL_STATUS;
@@ -299,7 +310,8 @@ public class AlignImagesConversionPage extends ResourceChoosePage
 		subComp.setLayout(new GridLayout(2, false));
 		
 		Label description = new Label(subComp, SWT.WRAP);
-		description.setText("Press 'Align' to register the stack of images loaded ");
+		description.setText("Press 'Align' to register the stack of images loaded then "
+				+ "press 'Finish' to save all aligned images in the output folder of your choice.");
 		description.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 		try {
@@ -420,7 +432,8 @@ public class AlignImagesConversionPage extends ResourceChoosePage
 		}
 
 		final File dir = new File(getSourcePath(context)).getParentFile();
-		setPath(FileUtils.getUnique(dir, "StitchedImage", "tif").getAbsolutePath());
+		String uniqueDir = FileUtils.createNewUniqueDir(dir, "Aligned_Images").getAbsolutePath();
+		setPath(uniqueDir);
 
 	}
 
@@ -432,14 +445,13 @@ public class AlignImagesConversionPage extends ResourceChoosePage
 	public void pathChanged() {
 		final String p = getAbsoluteFilePath();
 		if (p == null || p.length() == 0) {
-			setErrorMessage("Please select a file to export to.");
+			setErrorMessage("Please select a folder to export to.");
 			return;
 		}
 		final File path = new File(p);
 		if (path.exists()) {
-
-			if (!overwrite.getSelection()) {
-				setErrorMessage("The file " + path.getName()
+			if (overwrite != null && !overwrite.getSelection()) {
+				setErrorMessage("The folder " + path.getName()
 						+ " already exists.");
 				return;
 			}

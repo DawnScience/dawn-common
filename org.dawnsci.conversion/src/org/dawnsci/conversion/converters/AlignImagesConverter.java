@@ -18,6 +18,7 @@ import org.dawb.common.util.list.SortNatural;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
+import org.eclipse.dawnsci.analysis.api.monitor.IMonitor;
 import org.eclipse.dawnsci.analysis.dataset.impl.LazyDataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,8 +37,8 @@ import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 public class AlignImagesConverter extends AbstractImageConversion {
 
 	private static final Logger logger = LoggerFactory.getLogger(AlignImagesConverter.class);
-	private List<IDataset> imageStack = new ArrayList<IDataset>();
-	private List<IDataset> alignedImages = new ArrayList<IDataset>();
+	private List<IDataset> alignedImages;
+	private int idx = 0;
 
 	public AlignImagesConverter() {
 		super(null);
@@ -53,7 +54,7 @@ public class AlignImagesConverter extends AbstractImageConversion {
 		context.setLazyDataset(set);
 		context.addSliceDimension(0, "all");
 	}
-	
+
 	@Override
 	protected void convert(IDataset slice) throws Exception {
 
@@ -61,31 +62,36 @@ public class AlignImagesConverter extends AbstractImageConversion {
 			throw new Exception(getClass().getSimpleName() + " is cancelled");
 		}
 		ILazyDataset lazy = context.getLazyDataset();
-		imageStack.add(slice);
-		int stackSize = lazy.getShape()[0];
-		if (imageStack.size() == stackSize) {
-			String outputPath = context.getOutputPath();
-			ConversionAlignBean conversionBean = (ConversionAlignBean)context.getUserObject();
-			// TODO save aligned
-			alignedImages = conversionBean.getAligned();
-			
-			final File outputFile = new File(outputPath);
+		
+		String outputPath = context.getOutputPath();
+		ConversionAlignBean conversionBean = (ConversionAlignBean) context.getUserObject();
+		alignedImages = conversionBean.getAligned();
+		saveImage(alignedImages.get(idx), outputPath, context.getMonitor());
+		idx++;
+		if (idx == lazy.getShape()[0])
+			idx = 0;
+		if (context.getMonitor() != null)
+			context.getMonitor().worked(1);
+	}
 
-			if (!outputFile.getParentFile().exists())
-				outputFile.getParentFile().mkdirs();
+	private void saveImage(IDataset data, String outputPath, IMonitor monitor) throws Exception {
+		outputPath += File.separator + data.getName();
+		final File outputFile = new File(outputPath);
 
-			// JavaImageSaver likes 33 but users don't
-			int bits = getBits();
-			if (bits == 32 && getExtension().toLowerCase().startsWith("tif"))
-				bits = 33;
+		if (!outputFile.getParentFile().exists())
+			outputFile.getParentFile().mkdirs();
 
-			final JavaImageSaver saver = new JavaImageSaver(
-					outputFile.getAbsolutePath(), getExtension(), bits, true);
-			final DataHolder dh = new DataHolder();
-			dh.addDataset(alignedImages.get(0).getName(), alignedImages.get(0));
-			dh.setFilePath(outputFile.getAbsolutePath());
-			saver.saveFile(dh);
-		}
+		// JavaImageSaver likes 33 but users don't
+		int bits = getBits();
+		if (bits == 32 && getExtension().toLowerCase().startsWith("tif"))
+			bits = 33;
+		
+		final JavaImageSaver saver = new JavaImageSaver(
+				outputFile.getAbsolutePath(), getExtension(), bits, true);
+		final DataHolder dh = new DataHolder();
+		dh.addDataset(data.getName(), data);
+		dh.setFilePath(outputFile.getAbsolutePath());
+		saver.saveFile(dh);
 		if (context.getMonitor() != null)
 			context.getMonitor().worked(1);
 	}
