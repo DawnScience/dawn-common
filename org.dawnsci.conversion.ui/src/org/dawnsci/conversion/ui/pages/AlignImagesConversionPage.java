@@ -138,8 +138,8 @@ public class AlignImagesConversionPage extends ResourceChoosePage
 						IDataHolder holder = null;
 						try {
 							holder = LoaderFactory.getData(filePaths[i]);
-							String[] tmp = filePaths[i].split(File.separator);
-							String filename = tmp[tmp.length - 1];
+							File file = new File(filePaths[i]);
+							String filename = file.getName();
 							IDataset dataset = holder.getDataset(0);
 							if (dataset.getName() == null || dataset.getName().equals("")) {
 								dataset.setName(filename);
