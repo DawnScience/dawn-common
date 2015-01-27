@@ -432,7 +432,7 @@ public class AlignImagesConversionPage extends ResourceChoosePage
 		}
 
 		final File dir = new File(getSourcePath(context)).getParentFile();
-		String uniqueDir = FileUtils.createNewUniqueDir(dir, "Aligned_Images").getAbsolutePath();
+		String uniqueDir = FileUtils.getUnique(dir, "Aligned_Images", null).getAbsolutePath();
 		setPath(uniqueDir);
 
 	}

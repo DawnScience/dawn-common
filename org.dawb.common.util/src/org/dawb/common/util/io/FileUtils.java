@@ -121,10 +121,12 @@ public final class FileUtils {
 	 * @param dir
 	 * @param template
 	 * @param ext
+	 *        if null will return a unique directory name
 	 * @return a unique file.
 	 */
 	public static File getUnique(final File dir, final String template, final String ext) {
-		final String extension = ext != null ? (ext.startsWith(".")) ? ext : "." + ext : null;
+		String extension = ext != null ? (ext.startsWith(".")) ? ext : "." + ext : null;
+		extension = extension != null ? extension : "";
 		final File file = new File(dir, template + extension);
 		if (!file.exists()) {
 			return file;
