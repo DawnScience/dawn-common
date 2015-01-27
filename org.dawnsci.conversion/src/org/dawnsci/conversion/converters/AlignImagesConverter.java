@@ -62,8 +62,14 @@ public class AlignImagesConverter extends AbstractImageConversion {
 			throw new Exception(getClass().getSimpleName() + " is cancelled");
 		}
 		ILazyDataset lazy = context.getLazyDataset();
-		
+		// create saving name
+		List<String> dataNames = context.getDatasetNames();
 		String outputPath = context.getOutputPath();
+		File saveFile = new File(dataNames.get(idx));
+		String originalFileName = saveFile.getName();
+		originalFileName = originalFileName.split("\\.")[0];
+		outputPath += File.separator + "aligned_" + originalFileName;
+
 		ConversionAlignBean conversionBean = (ConversionAlignBean) context.getUserObject();
 		alignedImages = conversionBean.getAligned();
 		saveImage(alignedImages.get(idx), outputPath, context.getMonitor());
@@ -75,7 +81,6 @@ public class AlignImagesConverter extends AbstractImageConversion {
 	}
 
 	private void saveImage(IDataset data, String outputPath, IMonitor monitor) throws Exception {
-		outputPath += File.separator + data.getName();
 		final File outputFile = new File(outputPath);
 
 		if (!outputFile.getParentFile().exists())
@@ -85,7 +90,7 @@ public class AlignImagesConverter extends AbstractImageConversion {
 		int bits = getBits();
 		if (bits == 32 && getExtension().toLowerCase().startsWith("tif"))
 			bits = 33;
-		
+
 		final JavaImageSaver saver = new JavaImageSaver(
 				outputFile.getAbsolutePath(), getExtension(), bits, true);
 		final DataHolder dh = new DataHolder();

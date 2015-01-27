@@ -116,18 +116,16 @@ public class AlignImagesConversionPage extends ResourceChoosePage
 		String[] filePaths = getSelectedPaths();
 		if (data == null)
 			data = loadData(filePaths);
-		String[] datasetNames = new String[aligned.size()];
-		for (int i = 0; i < aligned.size(); i++) {
-			datasetNames[i] = aligned.get(i).getName();
-		}
-		context.setDatasetNames(datasetNames);
+		context.setDatasetNames(filePaths);
 
 		bean.setAligned(aligned);
+
 		context.setUserObject(bean);
 
 		return context;
 	}
 
+	
 	private List<IDataset> loadData(final String[] filePaths) {
 		final List<IDataset> data = new ArrayList<IDataset>();
 		if (loadDataJob == null) {
@@ -252,6 +250,8 @@ public class AlignImagesConversionPage extends ResourceChoosePage
 				} else if (alignState == AlignMethod.AFFINE_TRANSFORM) {
 					align(null);
 				}
+				setPageComplete(true);
+				getWizard().getContainer().updateButtons();
 			}
 		});
 
@@ -389,6 +389,11 @@ public class AlignImagesConversionPage extends ResourceChoosePage
 		sliderButtons.get(0).setSelection(false);
 		sliderButtons.get(1).setSelection(true);
 		showCorrected = true;
+	}
+
+	@Override
+	public boolean isPageComplete() {
+		return aligned != null;
 	}
 
 	private IRegion getRegion(String regionName) {
