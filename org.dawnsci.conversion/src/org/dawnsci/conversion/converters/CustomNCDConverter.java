@@ -246,7 +246,14 @@ public class CustomNCDConverter extends AbstractConversion  {
 				fullName = pathToFolder + File.separator + fileName + nameSuffix +ext;
 				monitorLabel = lz.getName();
 			}
-			matchPrecisions(data, axis);
+			
+			if (data.getDtype() > axis.getDtype()) {
+				axis = improveLessPreciseData(data, axis);
+			}
+			else if (data.getDtype() < axis.getDtype()) {
+				data = improveLessPreciseData(axis, data);
+			}
+			
 			exportASCII(axis, data, errors, fullName, header, headings);
 
 			if (context.getMonitor() != null) {
@@ -264,28 +271,16 @@ public class CustomNCDConverter extends AbstractConversion  {
 		}
 	}
 	
-	private void matchPrecisions(Dataset data, Dataset axis) {
-		if (data.getDtype() != axis.getDtype()) {
-			if ((data.getDtype() == Dataset.FLOAT32 || data.getDtype() == Dataset.FLOAT64) &&
-					(axis.getDtype() == Dataset.FLOAT32 || axis.getDtype() == Dataset.FLOAT64)) {
-				if (data.getDtype() == Dataset.FLOAT32 && axis.getDtype() == Dataset.FLOAT64) {
-					data.cast(Dataset.FLOAT64);
-				}
-				else {
-					axis.cast(Dataset.FLOAT64);
-				}
-			}
-			else if ((data.getDtype() >= Dataset.INT8 && data.getDtype() <= Dataset.INT64) &&
-					(axis.getDtype() >= Dataset.INT8 || axis.getDtype() <= Dataset.INT64)) {
-				if (data.getDtype() < axis.getDtype()) {
-					data.cast(axis.getDtype());
-				}
-				else {
-					axis.cast(data.getDtype());
-				}
-			}
+	private Dataset improveLessPreciseData(Dataset lessPreciseData, Dataset morePreciseData) {
+		if ((lessPreciseData.getDtype() == Dataset.FLOAT32 || lessPreciseData.getDtype() == Dataset.FLOAT64) &&
+				(morePreciseData.getDtype() == Dataset.FLOAT32 || morePreciseData.getDtype() == Dataset.FLOAT64)) {
+			lessPreciseData.cast(Dataset.FLOAT64);
 		}
-		
+		else if ((lessPreciseData.getDtype() >= Dataset.INT8 && lessPreciseData.getDtype() <= Dataset.INT64) &&
+				(morePreciseData.getDtype() >= Dataset.INT8 || morePreciseData.getDtype() <= Dataset.INT64)) {
+			lessPreciseData.cast(morePreciseData.getDtype());
+		}
+		return lessPreciseData;
 	}
 
 	private void exportASCII(IErrorDataset axis, Dataset data, IDataset errors, String fullName, String header, List<String> headings) throws ScanFileHolderException {
@@ -603,6 +598,7 @@ public class CustomNCDConverter extends AbstractConversion  {
 			List<AxesMetadata> axes = set.getMetadata(AxesMetadata.class);
 			for (AxesMetadata axis : axes) {
 				for (ILazyDataset a: axis.getAxes()) {
+					a.setShape(a.getShape()[0],1);
 					outputBean.axis = (Dataset) a;
 					if (outputBean.axis != null && outputBean.axis.getName().equals("q")) {
 						outputBean.axisUnits = "1/A";
