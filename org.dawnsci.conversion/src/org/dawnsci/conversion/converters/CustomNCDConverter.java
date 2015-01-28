@@ -42,9 +42,11 @@ import org.eclipse.dawnsci.analysis.api.dataset.IErrorDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.Slice;
 import org.eclipse.dawnsci.analysis.api.io.ScanFileHolderException;
+import org.eclipse.dawnsci.analysis.api.metadata.AxesMetadata;
 import org.eclipse.dawnsci.analysis.api.monitor.IMonitor;
 import org.eclipse.dawnsci.analysis.api.tree.Node;
 import org.eclipse.dawnsci.analysis.api.tree.Tree;
+import org.eclipse.dawnsci.analysis.dataset.impl.AggregateDataset;
 import org.eclipse.dawnsci.analysis.dataset.impl.Dataset;
 import org.eclipse.dawnsci.analysis.dataset.impl.DatasetUtils;
 import org.eclipse.dawnsci.analysis.dataset.impl.PositionIterator;
@@ -97,7 +99,7 @@ public class CustomNCDConverter extends AbstractConversion  {
 			exportFormat = SAS_FORMAT.ASCII;
 		}
 		
-		OutputBean bean = createBean(exportFormat);
+		OutputBean bean = createBean(exportFormat, lz);
 
 		if (exportFormat.equals(SAS_FORMAT.CANSAS)) {
 			exportCanSAS(lz, nameFrag, context, bean);
@@ -520,7 +522,7 @@ public class CustomNCDConverter extends AbstractConversion  {
 		return scanCommand;
 	}
 	
-	public OutputBean createBean(SAS_FORMAT exportFormat) throws Exception {
+	public OutputBean createBean(SAS_FORMAT exportFormat, ILazyDataset lz) throws Exception {
 		OutputBean outputBean = new OutputBean();
 		if (context.getSelectedConversionFile() != null) {
 			IHierarchicalDataFile hdf5Reader = null;
@@ -546,6 +548,25 @@ public class CustomNCDConverter extends AbstractConversion  {
 				outputBean.axis.setError(null);
 			}
 			outputBean.axisUnits = getAxisUnit(context.getAxisDatasetName(), context.getSelectedConversionFile());
+		}
+		else {
+			ILazyDataset set;
+			if (lz instanceof AggregateDataset) {
+				set = lz.getSlice(new Slice(0, 1));
+			}
+			else {
+				set = lz;
+			}
+			List<AxesMetadata> axes = set.getMetadata(AxesMetadata.class);
+			for (AxesMetadata axis : axes) {
+				for (ILazyDataset a: axis.getAxes()) {
+					outputBean.axis = (Dataset) a;
+					if (outputBean.axis.getName().equals("q")) {
+						outputBean.axisUnits = "1/A";
+					}
+				}
+			}
+			
 		}
 		return outputBean;
 	}
