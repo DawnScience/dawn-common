@@ -246,6 +246,7 @@ public class CustomNCDConverter extends AbstractConversion  {
 				fullName = pathToFolder + File.separator + fileName + nameSuffix +ext;
 				monitorLabel = lz.getName();
 			}
+			matchPrecisions(data, axis);
 			exportASCII(axis, data, errors, fullName, header, headings);
 
 			if (context.getMonitor() != null) {
@@ -263,6 +264,30 @@ public class CustomNCDConverter extends AbstractConversion  {
 		}
 	}
 	
+	private void matchPrecisions(Dataset data, Dataset axis) {
+		if (data.getDtype() != axis.getDtype()) {
+			if ((data.getDtype() == Dataset.FLOAT32 || data.getDtype() == Dataset.FLOAT64) &&
+					(axis.getDtype() == Dataset.FLOAT32 || axis.getDtype() == Dataset.FLOAT64)) {
+				if (data.getDtype() == Dataset.FLOAT32 && axis.getDtype() == Dataset.FLOAT64) {
+					data.cast(Dataset.FLOAT64);
+				}
+				else {
+					axis.cast(Dataset.FLOAT64);
+				}
+			}
+			else if ((data.getDtype() >= Dataset.INT8 && data.getDtype() <= Dataset.INT64) &&
+					(axis.getDtype() >= Dataset.INT8 || axis.getDtype() <= Dataset.INT64)) {
+				if (data.getDtype() < axis.getDtype()) {
+					data.cast(axis.getDtype());
+				}
+				else {
+					axis.cast(data.getDtype());
+				}
+			}
+		}
+		
+	}
+
 	private void exportASCII(IErrorDataset axis, Dataset data, IDataset errors, String fullName, String header, List<String> headings) throws ScanFileHolderException {
 		String dataName = data.getName();
 		IDataset[] columns = new IDataset[] {DatasetUtils.transpose(data, null)};
