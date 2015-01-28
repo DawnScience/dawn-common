@@ -27,6 +27,8 @@ import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
+import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
+import org.eclipse.dawnsci.analysis.api.dataset.Slice;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
 import org.eclipse.dawnsci.analysis.dataset.roi.PerimeterBoxROI;
 import org.eclipse.dawnsci.analysis.dataset.roi.RectangularROI;
@@ -116,7 +118,15 @@ public class AlignImagesConversionPage extends ResourceChoosePage
 		String[] filePaths = getSelectedPaths();
 		if (data == null)
 			data = loadData(filePaths);
-		context.setDatasetNames(filePaths);
+		if (filePaths.length > 1)	// if a list of image files has been selected or a directory
+			context.setDatasetNames(filePaths);
+		else {	// if a single file (a nexus stack for example)
+			List<String> names = new ArrayList<String>(data.size());
+			for (int i = 0; i < data.size(); i ++) {
+				names.add("image_" + i);
+			}
+			context.setDatasetNames(names);
+		}
 
 		bean.setAligned(aligned);
 
@@ -138,11 +148,20 @@ public class AlignImagesConversionPage extends ResourceChoosePage
 							holder = LoaderFactory.getData(filePaths[i]);
 							File file = new File(filePaths[i]);
 							String filename = file.getName();
-							IDataset dataset = holder.getDataset(0);
-							if (dataset.getName() == null || dataset.getName().equals("")) {
-								dataset.setName(filename);
+							ILazyDataset lazy = holder.getLazyDataset(0);
+							int[] shape = lazy.getShape();
+							if (shape[0] > 1 && lazy.getRank() == 3) { // 3d dataset
+								for (int j = 0; j < shape[0]; j++) {
+									IDataset dataset = lazy.getSlice(new Slice(j, shape[0], shape[1])).squeeze();
+									data.add(dataset);
+								}
+							} else {	// if each single image is loaded separately (2d)
+								IDataset dataset = lazy.getSlice(new Slice());
+								if (dataset.getName() == null || dataset.getName().equals("")) {
+									dataset.setName(filename);
+								}
+								data.add(dataset);
 							}
-							data.add(dataset);
 						} catch (Exception e) {
 							logger.error("Failed to load dataset:" + e);
 							return Status.CANCEL_STATUS;
@@ -182,7 +201,12 @@ public class AlignImagesConversionPage extends ResourceChoosePage
 		String filePath = getSelectedPaths()[0];
 		try {
 			IDataHolder holder = LoaderFactory.getData(filePath);
-			firstImage = holder.getDataset(0);
+			ILazyDataset lazy = holder.getLazyDataset(0);
+			int[] shape = lazy.getShape();
+			if (lazy.getRank() == 2)
+				firstImage = lazy.getSlice(new Slice());
+			else
+				firstImage = lazy.getSlice(new Slice(0, shape[0], shape[1])).squeeze();
 		} catch (Exception e) {
 			logger.error("Error loading file:" + e.getMessage());
 		}

@@ -67,7 +67,8 @@ public class AlignImagesConverter extends AbstractImageConversion {
 		String outputPath = context.getOutputPath();
 		File saveFile = new File(dataNames.get(idx));
 		String originalFileName = saveFile.getName();
-		originalFileName = originalFileName.split("\\.")[0];
+		if (originalFileName.contains("."))
+			originalFileName = originalFileName.split("\\.")[0];
 		outputPath += File.separator + "aligned_" + originalFileName;
 
 		ConversionAlignBean conversionBean = (ConversionAlignBean) context.getUserObject();
@@ -131,11 +132,16 @@ public class AlignImagesConverter extends AbstractImageConversion {
 				}
 			}
 		}
-		Collections.sort(paths, new SortNatural<String>(true));
-		ImageStackLoader loader = new ImageStackLoader(paths,
-				context.getMonitor());
-		lazyDataset = new LazyDataset("Folder Stack",
-				loader.getDtype(), loader.getShape(), loader);
+		if (paths.size() > 0) {
+			Collections.sort(paths, new SortNatural<String>(true));
+			ImageStackLoader loader = new ImageStackLoader(paths,
+					context.getMonitor());
+			lazyDataset = new LazyDataset("Folder Stack",
+					loader.getDtype(), loader.getShape(), loader);
+		} else {
+			lazyDataset = LoaderFactory.getData(regexs.get(0)).getLazyDataset(0);
+		}
+		
 		return lazyDataset;
 	}
 
