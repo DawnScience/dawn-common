@@ -213,9 +213,6 @@ public class CustomNCDConverter extends AbstractConversion  {
 				nameSuffix = nameStringFromSliceArray(iterDim, slices);
 			}
 			data.setName(nameFrag + nameStringFromSliceArray(iterDim, slices));
-			String pathToFolder = context.getOutputPath();
-			String fileName = buildFileName(context.getSelectedConversionFile().getAbsolutePath(),nameFrag);
-			String fullName = pathToFolder + File.separator + fileName + nameSuffix +ext;
 
 
 			//Check data suitable then concatenate axis with data
@@ -234,6 +231,21 @@ public class CustomNCDConverter extends AbstractConversion  {
 				headings = null;
 			}
 
+			String monitorLabel;
+			String fullName;
+			if (context.getSelectedConversionFile() != null) {
+				String pathToFolder = context.getOutputPath();
+				String fileName = buildFileName(context.getSelectedConversionFile().getAbsolutePath(),nameFrag);
+				monitorLabel = fileName;
+				fullName = pathToFolder + File.separator + fileName + nameSuffix +ext;
+			}
+			else {
+				//exportASCII without using filename
+				String pathToFolder = context.getOutputPath();
+				String fileName = buildFileNameGeneric(lz.getName(),nameFrag);
+				fullName = pathToFolder + File.separator + fileName + nameSuffix +ext;
+				monitorLabel = lz.getName();
+			}
 			exportASCII(axis, data, errors, fullName, header, headings);
 
 			if (context.getMonitor() != null) {
@@ -241,7 +253,7 @@ public class CustomNCDConverter extends AbstractConversion  {
 				if (mon.isCancelled()) {
 					return;
 				}
-				context.getMonitor().subTask(fileName + nameSuffix);
+				context.getMonitor().subTask(monitorLabel + nameSuffix);
 			}
 		}
 
@@ -497,8 +509,14 @@ public class CustomNCDConverter extends AbstractConversion  {
 	private String buildFileName(String pathToOriginal, String datasetName) {
 		
 		String name = new File(pathToOriginal).getName();
+		return buildFileNameGeneric(name, datasetName);
+	}
+	
+	private String buildFileNameGeneric(String name, String datasetName) {
 		int index = name.lastIndexOf('.');
-		name = name.substring(0, index);
+		if (index != -1) {
+			name = name.substring(0, index);
+		}
 		
 		if (datasetName.contains("processing")) {
 			String trimmed = datasetName.replaceAll("(.*_processing/)", "");
@@ -561,7 +579,7 @@ public class CustomNCDConverter extends AbstractConversion  {
 			for (AxesMetadata axis : axes) {
 				for (ILazyDataset a: axis.getAxes()) {
 					outputBean.axis = (Dataset) a;
-					if (outputBean.axis.getName().equals("q")) {
+					if (outputBean.axis != null && outputBean.axis.getName().equals("q")) {
 						outputBean.axisUnits = "1/A";
 					}
 				}
