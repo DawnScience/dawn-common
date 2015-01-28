@@ -62,6 +62,11 @@ import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 
 public class CustomNCDConverter extends AbstractConversion  {
 
+	private static final String ANGSTROM = "Angstrom";
+	private static final String DEGREES = "degrees";
+	private static final String INVERSE_ANGSTROM = "1/A";
+	private static final String INVERSE_NM = "1/nm";
+	
 	private static final Logger logger = LoggerFactory.getLogger(CustomNCDConverter.class);
 	private static final String DEFAULT_AXIS_NAME = "x";
 	private static final String DEFAULT_COLUMN_NAME = "Column";
@@ -512,13 +517,13 @@ public class CustomNCDConverter extends AbstractConversion  {
 				String angle = unitFormat.format(NonSI.DEGREE_ANGLE);
 				String dspace = unitFormat.format(NonSI.ANGSTROM);
 				if (units.equals(nanometer)) {
-					return "1/nm";
+					return INVERSE_NM;
 				} else if (units.equals(angstrom)) {
-					return "1/A";
+					return INVERSE_ANGSTROM;
 				} else if (units.equals(angle)) {
-					return "degrees";
+					return DEGREES;
 				} else if (units.equals(dspace)) {
-					return "Angstrom";
+					return ANGSTROM;
 				}
 			}
 		} catch (ScanFileHolderException e) {
@@ -602,8 +607,20 @@ public class CustomNCDConverter extends AbstractConversion  {
 					if (a != null) {
 						a.setShape(a.getShape()[1],1);
 						outputBean.axis = (Dataset) a;
-						if (outputBean.axis != null && outputBean.axis.getName().equals("q")) {
-							outputBean.axisUnits = "1/A";
+						if (outputBean.axis != null) {
+							if (outputBean.axis.getName().equals("q")) {
+								outputBean.axisUnits = INVERSE_ANGSTROM;
+							}
+							//TODO need to know other axes names to be able to set the units correctly!
+//							else if (outputBean.axis.getName().equals("nm")) {
+//								outputBean.axisUnits = INVERSE_NM;
+//							}
+//							else if (outputBean.axis.getName().equals("angle")) {
+//								outputBean.axisUnits = DEGREES;
+//							}
+//							else if (outputBean.axis.getName().equals("dspace")) {
+//								outputBean.axisUnits = ANGSTROM;
+//							}
 						}
 						break;
 					}
