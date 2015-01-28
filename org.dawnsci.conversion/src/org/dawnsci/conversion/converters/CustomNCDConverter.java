@@ -247,11 +247,11 @@ public class CustomNCDConverter extends AbstractConversion  {
 				monitorLabel = lz.getName();
 			}
 			
-			if (data.getDtype() > axis.getDtype()) {
-				axis = improveLessPreciseData(data, axis);
+			if (data.getDtype() < axis.getDtype()) {
+				data = improveLessPreciseData(data, axis);
 			}
-			else if (data.getDtype() < axis.getDtype()) {
-				data = improveLessPreciseData(axis, data);
+			else if (data.getDtype() > axis.getDtype()) {
+				axis = improveLessPreciseData(axis, data);
 			}
 			
 			exportASCII(axis, data, errors, fullName, header, headings);
@@ -272,15 +272,16 @@ public class CustomNCDConverter extends AbstractConversion  {
 	}
 	
 	private Dataset improveLessPreciseData(Dataset lessPreciseData, Dataset morePreciseData) {
+		Dataset toReturn = null;
 		if ((lessPreciseData.getDtype() == Dataset.FLOAT32 || lessPreciseData.getDtype() == Dataset.FLOAT64) &&
 				(morePreciseData.getDtype() == Dataset.FLOAT32 || morePreciseData.getDtype() == Dataset.FLOAT64)) {
-			lessPreciseData.cast(Dataset.FLOAT64);
+			toReturn = lessPreciseData.cast(Dataset.FLOAT64);
 		}
 		else if ((lessPreciseData.getDtype() >= Dataset.INT8 && lessPreciseData.getDtype() <= Dataset.INT64) &&
 				(morePreciseData.getDtype() >= Dataset.INT8 || morePreciseData.getDtype() <= Dataset.INT64)) {
-			lessPreciseData.cast(morePreciseData.getDtype());
+			toReturn = lessPreciseData.cast(morePreciseData.getDtype());
 		}
-		return lessPreciseData;
+		return toReturn;
 	}
 
 	private void exportASCII(IErrorDataset axis, Dataset data, IDataset errors, String fullName, String header, List<String> headings) throws ScanFileHolderException {
@@ -598,10 +599,13 @@ public class CustomNCDConverter extends AbstractConversion  {
 			List<AxesMetadata> axes = set.getMetadata(AxesMetadata.class);
 			for (AxesMetadata axis : axes) {
 				for (ILazyDataset a: axis.getAxes()) {
-					a.setShape(a.getShape()[0],1);
-					outputBean.axis = (Dataset) a;
-					if (outputBean.axis != null && outputBean.axis.getName().equals("q")) {
-						outputBean.axisUnits = "1/A";
+					if (a != null) {
+						a.setShape(a.getShape()[1],1);
+						outputBean.axis = (Dataset) a;
+						if (outputBean.axis != null && outputBean.axis.getName().equals("q")) {
+							outputBean.axisUnits = "1/A";
+						}
+						break;
 					}
 				}
 			}
