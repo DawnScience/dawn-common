@@ -121,7 +121,7 @@
       </conversion_page>
       <conversion_page
             conversion_page="org.dawnsci.conversion.ui.pages.AlignImagesConversionPage"
-            conversion_scheme="ALIGNED_FROM_IMAGEDIR"
+            conversion_scheme="ALIGNED_FROM_3D"
             id="org.dawnsci.conversion.ui.conversionAlignImages">
       </conversion_page>
    </extension>
