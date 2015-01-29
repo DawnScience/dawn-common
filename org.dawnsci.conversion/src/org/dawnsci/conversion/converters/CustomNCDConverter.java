@@ -247,7 +247,7 @@ public class CustomNCDConverter extends AbstractConversion  {
 			else {
 				//exportASCII without using filename
 				String pathToFolder = context.getOutputPath();
-				String fileName = buildFileNameGeneric(lz.getName(),nameFrag);
+				String fileName = buildFileNameGeneric(context.getDatasetNames().get(0),nameFrag); //we store info from the original file in dataset names
 				fullName = pathToFolder + File.separator + fileName + nameSuffix +ext;
 				monitorLabel = lz.getName();
 			}
