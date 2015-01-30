@@ -17,8 +17,8 @@ import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.util.list.SortNatural;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
+import org.eclipse.dawnsci.analysis.api.dataset.Slice;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
-import org.eclipse.dawnsci.analysis.api.monitor.IMonitor;
 import org.eclipse.dawnsci.analysis.dataset.impl.LazyDataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,7 +73,7 @@ public class AlignImagesConverter extends AbstractImageConversion {
 
 		ConversionAlignBean conversionBean = (ConversionAlignBean) context.getUserObject();
 		alignedImages = conversionBean.getAligned();
-		saveImage(alignedImages.get(idx), outputPath, context.getMonitor());
+		saveImage(alignedImages.get(idx), outputPath);
 		idx++;
 		if (idx == lazy.getShape()[0])
 			idx = 0;
@@ -81,7 +81,7 @@ public class AlignImagesConverter extends AbstractImageConversion {
 			context.getMonitor().worked(1);
 	}
 
-	private void saveImage(IDataset data, String outputPath, IMonitor monitor) throws Exception {
+	private void saveImage(IDataset data, String outputPath) throws Exception {
 		final File outputFile = new File(outputPath);
 
 		if (!outputFile.getParentFile().exists())
@@ -98,8 +98,6 @@ public class AlignImagesConverter extends AbstractImageConversion {
 		dh.addDataset(data.getName(), data);
 		dh.setFilePath(outputFile.getAbsolutePath());
 		saver.saveFile(dh);
-		if (context.getMonitor() != null)
-			context.getMonitor().worked(1);
 	}
 
 	private ILazyDataset getLazyDataset() throws Exception {
@@ -163,6 +161,38 @@ public class AlignImagesConverter extends AbstractImageConversion {
 	}
 
 	/**
+	 * 
+	 * @param data
+	 * @param filePaths
+	 * @return
+	 * @throws Exception
+	 */
+	public static List<IDataset> loadData(List<IDataset> data, String[] filePaths) throws Exception {
+		for (int i = 0; i < filePaths.length; i++) {
+			IDataHolder holder = null;
+			holder = LoaderFactory.getData(filePaths[i]);
+			File file = new File(filePaths[i]);
+			String filename = file.getName();
+			ILazyDataset lazy = holder.getLazyDataset(0);
+			int[] shape = lazy.getShape();
+			if (shape[0] > 1 && lazy.getRank() == 3) { // 3d dataset
+				for (int j = 0; j < shape[0]; j++) {
+					IDataset dataset = lazy.getSlice(
+							new Slice(j, shape[0], shape[1])).squeeze();
+					data.add(dataset);
+				}
+			} else { // if each single image is loaded separately (2d)
+				IDataset dataset = lazy.getSlice(new Slice());
+				if (dataset.getName() == null || dataset.getName().equals("")) {
+					dataset.setName(filename);
+				}
+				data.add(dataset);
+			}
+		}
+		return data;
+	}
+
+	/**
 	 * To be used as the user object to convey data about the align conversion.
 	 *
 	 */
@@ -199,6 +229,5 @@ public class AlignImagesConverter extends AbstractImageConversion {
 				return false;
 			return true;
 		}
-		
 	}
 }
