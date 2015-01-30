@@ -18,6 +18,7 @@ import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.ui.alignment.AlignProgressJob;
 import org.dawb.common.ui.wizard.ResourceChoosePage;
 import org.dawb.common.util.io.FileUtils;
+import org.dawnsci.conversion.converters.AlignImagesConverter;
 import org.dawnsci.conversion.converters.AlignImagesConverter.ConversionAlignBean;
 import org.dawnsci.conversion.ui.IConversionWizardPage;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -142,30 +143,11 @@ public class AlignImagesConversionPage extends ResourceChoosePage
 			loadDataJob = new Job("Loading image stack") {
 				@Override
 				protected IStatus run(IProgressMonitor monitor) {
-					for (int i = 0; i < filePaths.length; i++) {
-						IDataHolder holder = null;
-						try {
-							holder = LoaderFactory.getData(filePaths[i]);
-							File file = new File(filePaths[i]);
-							String filename = file.getName();
-							ILazyDataset lazy = holder.getLazyDataset(0);
-							int[] shape = lazy.getShape();
-							if (shape[0] > 1 && lazy.getRank() == 3) { // 3d dataset
-								for (int j = 0; j < shape[0]; j++) {
-									IDataset dataset = lazy.getSlice(new Slice(j, shape[0], shape[1])).squeeze();
-									data.add(dataset);
-								}
-							} else {	// if each single image is loaded separately (2d)
-								IDataset dataset = lazy.getSlice(new Slice());
-								if (dataset.getName() == null || dataset.getName().equals("")) {
-									dataset.setName(filename);
-								}
-								data.add(dataset);
-							}
-						} catch (Exception e) {
-							logger.error("Failed to load dataset:" + e);
-							return Status.CANCEL_STATUS;
-						}
+					try {
+						AlignImagesConverter.loadData(data, filePaths);
+					} catch (Exception e) {
+						logger.error("Failed to load dataset:" + e);
+						return Status.CANCEL_STATUS;
 					}
 					return Status.OK_STATUS;
 				}
