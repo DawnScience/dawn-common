@@ -11,11 +11,11 @@ package org.dawb.common.ui.alignment;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.dawb.common.ui.monitor.ProgressMonitorWrapper;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.image.IImageTransform;
 import org.eclipse.dawnsci.analysis.dataset.roi.RectangularROI;
-import org.eclipse.dawnsci.analysis.dataset.roi.RectangularROIList;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,7 +69,10 @@ public class AlignProgressJob implements IRunnableWithProgress {
 			return;
 		}
 		if (alignState == AlignMethod.WITH_ROI) {
-			alignWithROI(n, roi, monitor);
+			if (shifts ==  null)
+				shifts = new ArrayList<List<double[]>>();
+
+			shiftedImages = AlignImages.alignWithROI(data, shifts, roi, mode, new ProgressMonitorWrapper(monitor));
 		} else if (alignState == AlignMethod.AFFINE_TRANSFORM) {
 			// align with boofcv
 			try {
@@ -80,81 +83,6 @@ public class AlignProgressJob implements IRunnableWithProgress {
 			}
 		}
 
-		if (monitor != null)
-			monitor.worked(1);
-	}
-
-	private void alignWithROI(int n, RectangularROI roi, IProgressMonitor monitor) {
-		int nsets = n / mode;
-
-		if (roi == null)
-			return;
-		RectangularROIList rois = new RectangularROIList();
-		rois.add(roi);
-
-		if (monitor != null)
-			monitor.worked(1);
-
-		shifts = new ArrayList<List<double[]>>();
-		int index = 0;
-		int nr = rois.size();
-		if (nr > 0) {
-			if (nr < mode) { // clean up roi list
-				if (mode == 2) {
-					rois.add(rois.get(0));
-				} else {
-					switch (nr) {
-					case 1:
-						rois.add(rois.get(0));
-						rois.add(rois.get(0));
-						rois.add(rois.get(0));
-						break;
-					case 2:
-					case 3:
-						rois.add(2, rois.get(0));
-						rois.add(3, rois.get(1));
-						break;
-					}
-				}
-			}
-
-			IDataset[] tImages = new IDataset[nsets];
-			List<IDataset> shifted = new ArrayList<IDataset>(nsets);
-			boolean fromStart = false;
-			// align first images across columns:
-			// Example: [0,1,2]-[3,4,5]-[6,7,8]-[9,10,11] for 12 images on 4 columns
-			// with images 0,3,6,9 as the top images of each column.
-			List<double[]> topShifts = new ArrayList<double[]>();
-			IDataset[] topImages = new IDataset[mode];
-			List<IDataset> anchorList = new ArrayList<IDataset>();
-			for (int i = 0; i < mode; i++) {
-				topImages[i] = data.get(i * nsets);
-			}
-			// align top images
-			topShifts = AlignImages.align(topImages, anchorList, rois.get(0), true, null);
-
-			for (int p = 0; p < mode; p++) {
-				for (int i = 0; i < nsets; i++) {
-					tImages[i] = data.get(index++);
-				}
-				IDataset anchor = anchorList.get(p);
-				shifted.clear();
-				try {
-					// align rest of images
-					shifts.add(AlignImages.align(tImages, shifted, rois.get(p), true, topShifts.get(p)));
-					shifted.remove(0); // remove unshifted anchor
-					shiftedImages.add(anchor); // add shifted anchor
-					shiftedImages.addAll(shifted); // add aligned images
-				} catch (Exception e) {
-					logger.warn("Problem with alignment: " + e);
-					return;
-				}
-
-				fromStart = !fromStart;
-				if (monitor != null)
-					monitor.worked(1);
-			}
-		}
 		if (monitor != null)
 			monitor.worked(1);
 	}
