@@ -324,8 +324,8 @@ public class AlignImagesConversionPage extends ResourceChoosePage
 			plotSystem = PlottingFactory.createPlottingSystem();
 			plotSystem.createPlotPart(plotComp, "Preprocess", null, PlotType.IMAGE, null);
 			plotSystem.getPlotComposite().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-			
-			plotSystem.createPlot2D(firstImage, null, null);
+			if (firstImage != null)
+				plotSystem.createPlot2D(firstImage, null, null);
 			plotSystem.setKeepAspect(true);
 			createRegion(firstImage, ROI_NAME);
 		} catch (Exception e) {
