@@ -32,6 +32,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
@@ -529,6 +531,31 @@ public final class FileUtils {
 				dstChannel.close();
 			}
 		}
+	}
+
+	/**
+	 * 
+	 * @param sourcedir
+	 * @param destdir
+	 * @throws IOException
+	 */
+	public final static void copyDirectory(File sourcedir, File destdir) throws IOException {
+		org.apache.commons.io.FileUtils.copyDirectory(sourcedir, destdir);
+	}
+
+	/**
+	 * Returns a sorted list of files with given extension
+	 * 
+	 * @param dir
+	 * @param extensions
+	 * @param isRecursive
+	 * @return
+	 */
+	public final static List<File> listFiles(File dir, String[] extensions, boolean isRecursive) {
+		Collection<File> files = org.apache.commons.io.FileUtils.listFiles(dir, extensions, isRecursive);
+		List<File> listFiles = new ArrayList<File>(files);
+		Collections.sort(listFiles);
+		return listFiles;
 	}
 
 	/**
