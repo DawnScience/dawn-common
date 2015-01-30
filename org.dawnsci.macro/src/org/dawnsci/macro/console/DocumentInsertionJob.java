@@ -114,7 +114,7 @@ public class DocumentInsertionJob extends Job {
 		if (inserter.getType()==InsertionType.PYTHON) {
 
 			checkAdd("# Turn py4j on under Window->Preferences->Py4j Default Server > 'Py4j active'", cmd, 150);
-			checkAdd("import numpy", cmd, 1200);
+			checkAdd("import numpy", cmd, 2000);
 			
 		}
 			
