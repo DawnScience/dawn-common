@@ -19,8 +19,10 @@ import org.dawnsci.conversion.ui.Activator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -151,8 +153,15 @@ public final class ImageConvertPage extends AbstractSliceConversionPage {
 			public void expansionStateChanged(ExpansionEvent e) {
 				GridUtils.setVisible(advanced, !advanced.isVisible());
 				parent.layout(new Control[]{advanced, advancedComposite});
-				parent.layout();
-				parent.getParent().layout();
+				Composite comp = parent.getParent();
+				if (comp instanceof ScrolledComposite) {
+					Rectangle r = ((ScrolledComposite)comp).getClientArea();
+					((ScrolledComposite)comp).setMinSize(parent.computeSize(r.width, SWT.DEFAULT));
+					parent.layout();
+				} else {
+					parent.layout();
+					parent.getParent().layout();
+				}
 			}
 		};
 		advancedComposite.addExpansionListener(expansionListener);

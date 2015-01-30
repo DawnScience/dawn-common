@@ -35,11 +35,16 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
+import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.events.ControlAdapter;
+import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -107,12 +112,15 @@ public abstract class AbstractSliceConversionPage extends ResourceChoosePage {
 		multiFileMessage.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 4, 1));
 		multiFileMessage.setText("(Directory will contain exported files named after the data file.)");
 		GridUtils.setVisible(multiFileMessage, false);
-		
-		createAdvanced(container);
-		
+
 		Label sep = new Label(container, SWT.HORIZONTAL|SWT.SEPARATOR);
 		sep.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 4, 1));
-		
+
+		final ScrolledComposite scrollComposite = new ScrolledComposite(container, SWT.V_SCROLL);
+		scrollComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 4, 8));
+		final Composite contentComposite = new Composite(scrollComposite, SWT.NONE);
+		contentComposite.setLayout(new GridLayout(1, false));
+
 		try {
 			this.sliceComponent = SlicingFactory.createSliceSystem("org.dawb.workbench.views.h5GalleryView");
 		} catch (Exception e) {
@@ -122,13 +130,26 @@ public abstract class AbstractSliceConversionPage extends ResourceChoosePage {
 
 	    sliceComponent.setRangeMode(RangeMode.MULTI_RANGE);
 
-	    final Control slicer = sliceComponent.createPartControl(container);
-		GridData data = new GridData(SWT.FILL, SWT.FILL, true, true, 4, 1);
+	    final Control slicer = sliceComponent.createPartControl(contentComposite);
+		GridData data = new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1);
 		data.minimumHeight=560;
 		slicer.setLayoutData(data);
 		sliceComponent.setVisible(true);
 		sliceComponent.setSliceActionsEnabled(false);
 		
+		createAdvanced(contentComposite);
+
+		scrollComposite.setContent(contentComposite);
+		scrollComposite.setExpandHorizontal(true);
+		scrollComposite.setExpandVertical(true);
+		scrollComposite.addControlListener(new ControlAdapter() {
+			@Override
+			public void controlResized(ControlEvent e) {
+				Rectangle r = scrollComposite.getClientArea();
+				scrollComposite.setMinSize(contentComposite.computeSize(r.width, SWT.DEFAULT));
+			}
+		});
+
 		pathChanged();
 
 	}
