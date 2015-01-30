@@ -163,11 +163,15 @@ public class AlignImagesConverter extends AbstractImageConversion {
 	/**
 	 * 
 	 * @param data
+	 *            output of data loaded (Optional)
 	 * @param filePaths
-	 * @return
+	 *            file paths of files to be loaded
+	 * @return data loaded
 	 * @throws Exception
 	 */
 	public static List<IDataset> loadData(List<IDataset> data, String[] filePaths) throws Exception {
+		if (data == null)
+			data = new ArrayList<IDataset>(filePaths.length);
 		for (int i = 0; i < filePaths.length; i++) {
 			IDataHolder holder = null;
 			holder = LoaderFactory.getData(filePaths[i]);
