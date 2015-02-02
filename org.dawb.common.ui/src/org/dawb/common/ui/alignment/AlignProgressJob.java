@@ -66,7 +66,15 @@ public class AlignProgressJob implements IRunnableWithProgress {
 			return;
 		int n = data.size();
 		if (alignState == AlignMethod.WITH_ROI && n % mode != 0) {
-			String msg = "Missing file? Could not load multiple of " + mode + " images";
+			final String msg = "Missing file? Could not load multiple of " + mode + " images";
+			Display.getDefault().syncExec(new Runnable() {
+				@Override
+				public void run() {
+					MessageDialog.openError(Display.getDefault()
+							.getActiveShell(), "Alignment error",
+							msg);
+				}
+			});
 			logger.warn(msg);
 			return;
 		}
@@ -78,7 +86,6 @@ public class AlignProgressJob implements IRunnableWithProgress {
 						mode, new ProgressMonitorWrapper(monitor));
 			} else if (alignState == AlignMethod.AFFINE_TRANSFORM) {
 				// align with boofcv
-
 				shiftedImages = transformer.align(data);
 			}
 		} catch (final Exception e) {
