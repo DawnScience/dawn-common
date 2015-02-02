@@ -70,26 +70,27 @@ public class AlignProgressJob implements IRunnableWithProgress {
 			logger.warn(msg);
 			return;
 		}
-		if (alignState == AlignMethod.WITH_ROI) {
-			if (shifts ==  null)
-				shifts = new ArrayList<List<double[]>>();
+		try {
+			if (alignState == AlignMethod.WITH_ROI) {
+				if (shifts == null)
+					shifts = new ArrayList<List<double[]>>();
+				shiftedImages = AlignImages.alignWithROI(data, shifts, roi,
+						mode, new ProgressMonitorWrapper(monitor));
+			} else if (alignState == AlignMethod.AFFINE_TRANSFORM) {
+				// align with boofcv
 
-			shiftedImages = AlignImages.alignWithROI(data, shifts, roi, mode, new ProgressMonitorWrapper(monitor));
-		} else if (alignState == AlignMethod.AFFINE_TRANSFORM) {
-			// align with boofcv
-			try {
 				shiftedImages = transformer.align(data);
-			} catch (final Exception e) {
-				Display.getDefault().syncExec(new Runnable() {
-					@Override
-					public void run() {
-						MessageDialog.openError(Display.getDefault()
-								.getActiveShell(), "Alignment error",
-								"An error occured while aligning images:" + e);
-					}
-				});
-				logger.error("Error aligning images:", e);
 			}
+		} catch (final Exception e) {
+			Display.getDefault().syncExec(new Runnable() {
+				@Override
+				public void run() {
+					MessageDialog.openError(Display.getDefault()
+							.getActiveShell(), "Alignment error",
+							"An error occured while aligning images:" + e);
+				}
+			});
+			logger.error("Error aligning images:", e);
 		}
 
 		if (monitor != null)
