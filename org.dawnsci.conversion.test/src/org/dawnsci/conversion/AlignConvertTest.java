@@ -26,149 +26,149 @@ import org.dawnsci.conversion.converters.AlignImagesConverter;
 import org.dawnsci.conversion.converters.AlignImagesConverter.ConversionAlignBean;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import uk.ac.diamond.scisoft.analysis.image.AlignMethod;
 
 public class AlignConvertTest {
 
+	private File dir;
+	private File output;
+
+	@Before
+	public void before() {
+		dir = new File(System.getProperty("java.io.tmpdir"), "AlignTestFolder");
+		output = new File(dir.getAbsolutePath()+"/Aligned_images");
+		FileUtils.createNewUniqueDir(output);
+	}
+
 	@Test
 	public void testNexusStack() throws Exception {
 		System.out.println("starting align image conversion test from Nxs file");
-		doTestNexus("testNexusStackAlignment");
-	}
-
-	private void doTestNexus(String testname) throws Exception {
-
-		final File image = new File("testfiles/ImageStack.nxs");
-		
-		final File dir = new File(System.getProperty("java.io.tmpdir"), "AlignTest_" + testname);
-		try {
-			final File nf = new File(dir, "copy_imageStack.nxs");
-			nf.deleteOnExit();
-			FileUtils.copyNio(image, nf);
-			
-			IConversionService service = new ConversionServiceImpl();
-	
-			final IConversionContext context = service.open(nf.getAbsolutePath());
-			final File output = new File(dir.getAbsolutePath()+"/Aligned_images");
-			FileUtils.createNewUniqueDir(output);
-
-			String[] filePaths = new String[] {nf.getAbsolutePath()};
-			List<IDataset> data = loadData(filePaths);
-			List<String> names = new ArrayList<String>(data.size());
-			for (int i = 0; i < data.size(); i++) {
-				names.add("image_" + i);
-			}
-			context.setDatasetNames(names);
-			//disable macro
-			context.setEchoMacro(false);
-			context.setOutputPath(output.getAbsolutePath());
-			context.setConversionScheme(ConversionScheme.ALIGNED_FROM_3D);
-			
-			ConversionAlignBean bean = new ConversionAlignBean();
-			
-			List<IDataset> aligned = getAlignedImages(data);
-			bean.setAligned(aligned);
-			context.setUserObject(bean);
-
-			service.process(context);
-
-			String[] outputFilePaths = new String[aligned.size()];
-			for (int i = 0; i < outputFilePaths.length; i++) {
-				outputFilePaths[i] = output.getAbsolutePath() + "/aligned_" + names.get(i) + ".tiff";
-			}
-
-			//load saved data
-			List<IDataset> alignedSaved = loadData(outputFilePaths);
-
-			int num = 5;
-			int[] alignedShape = aligned.get(num).getShape();
-			int[] alignedSavedShape = alignedSaved.get(5).getShape();
-			if (!Arrays.equals(alignedShape, alignedSavedShape)) {
-				fail("Shape of aligned data in memory and aligned data saved is not "
-						+ "the same for dataset with name "
-						+ aligned.get(num).getName());
-			}
-			
-			if (aligned.get(num).getDouble(10, 10) != alignedSaved.get(num).getDouble(10, 10)) {
-				fail("Data at slice " + num + " is not the same for aligned dataset in memory and dataset saved.");
-			}
-
-		} finally {
-			FileUtils.recursiveDelete(dir);
-		}
+		doTestNexus();
 	}
 
 	@Test
 	public void testDir() throws Exception {
 		System.out.println("starting align image conversion test from directory with image files");
-		doTestDir("testImageDirStackAlignment");
+		doTestDir();
 	}
 
-	private void doTestDir(String testname) throws Exception {
+	@After
+	public void after() {
+		FileUtils.recursiveDelete(dir);
+	}
 
-		final File dir = new File("testfiles/27099_drifted_png");
-		
-		final File tmpdir = new File(System.getProperty("java.io.tmpdir"), "AlignTest_" + testname);
-		try {
-			FileUtils.copyDirectory(dir, tmpdir);
-			
-			IConversionService service = new ConversionServiceImpl();
-	
-			final IConversionContext context = service.open(tmpdir.getAbsolutePath());
-			final File output = new File(tmpdir.getAbsolutePath()+"/Aligned_images");
-			FileUtils.createNewUniqueDir(output);
+	private void doTestNexus() throws Exception {
 
-			List<File> files = FileUtils.listFiles(tmpdir, new String[]{"png"}, false);
-			String[] filePaths = new String[files.size()];
-			for (int i = 0; i < filePaths.length; i++) {
-				filePaths[i] = files.get(i).getAbsolutePath();
-			}
-			
-			List<IDataset> data = loadData(filePaths);
-			List<String> names = new ArrayList<String>(data.size());
-			for (int i = 0; i < data.size(); i++) {
-				names.add("image_" + i);
-			}
-			context.setDatasetNames(names);
-			context.setFilePaths(filePaths);
-			//disable macro
-			context.setEchoMacro(false);
-			context.setOutputPath(output.getAbsolutePath());
-			context.setConversionScheme(ConversionScheme.ALIGNED_FROM_3D);
-			
-			ConversionAlignBean bean = new ConversionAlignBean();
-			
-			List<IDataset> aligned = getAlignedImages(data);
-			bean.setAligned(aligned);
-			context.setUserObject(bean);
+		final File image = new File("testfiles/ImageStack.nxs");
 
-			service.process(context);
+		final File nf = new File(dir, "copy_imageStack.nxs");
+		nf.deleteOnExit();
+		FileUtils.copyNio(image, nf);
 
-			String[] outputFilePaths = new String[aligned.size()];
-			for (int i = 0; i < outputFilePaths.length; i++) {
-				outputFilePaths[i] = output.getAbsolutePath() + "/aligned_" + names.get(i) + ".tiff";
-			}
+		IConversionService service = new ConversionServiceImpl();
 
-			//load saved data
-			List<IDataset> alignedSaved = loadData(outputFilePaths);
+		final IConversionContext context = service.open(nf.getAbsolutePath());
 
-			int num = 5;
-			int[] alignedShape = aligned.get(num).getShape();
-			int[] alignedSavedShape = alignedSaved.get(5).getShape();
-			if (!Arrays.equals(alignedShape, alignedSavedShape)) {
-				fail("Shape of aligned data in memory and aligned data saved is not "
-						+ "the same for dataset with name "
-						+ aligned.get(num).getName());
-			}
-			
-			if (aligned.get(num).getDouble(10, 10) != alignedSaved.get(num).getDouble(10, 10)) {
-				fail("Data at slice " + num + " is not the same for aligned dataset in memory and dataset saved.");
-			}
+		String[] filePaths = new String[] { nf.getAbsolutePath() };
+		List<IDataset> data = loadData(filePaths);
+		List<String> names = new ArrayList<String>(data.size());
+		for (int i = 0; i < data.size(); i++) {
+			names.add("image_" + i);
+		}
+		context.setDatasetNames(names);
+		// disable macro
+		context.setEchoMacro(false);
+		context.setOutputPath(output.getAbsolutePath());
+		context.setConversionScheme(ConversionScheme.ALIGNED_FROM_3D);
 
-		} finally {
-			FileUtils.recursiveDelete(tmpdir);
+		ConversionAlignBean bean = new ConversionAlignBean();
+
+		List<IDataset> aligned = getAlignedImages(data);
+		bean.setAligned(aligned);
+		context.setUserObject(bean);
+
+		service.process(context);
+
+		String[] outputFilePaths = new String[aligned.size()];
+		for (int i = 0; i < outputFilePaths.length; i++) {
+			outputFilePaths[i] = output.getAbsolutePath() + "/aligned_" + names.get(i) + ".tiff";
+		}
+
+		// load saved data
+		List<IDataset> alignedSaved = loadData(outputFilePaths);
+
+		int num = 5;
+		int[] alignedShape = aligned.get(num).getShape();
+		int[] alignedSavedShape = alignedSaved.get(5).getShape();
+		if (!Arrays.equals(alignedShape, alignedSavedShape)) {
+			fail("Shape of aligned data in memory and aligned data saved is not " + "the same for dataset with name "
+					+ aligned.get(num).getName());
+		}
+
+		if (aligned.get(num).getDouble(10, 10) != alignedSaved.get(num).getDouble(10, 10)) {
+			fail("Data at slice " + num + " is not the same for aligned dataset in memory and dataset saved.");
+		}
+	}
+
+	private void doTestDir() throws Exception {
+
+		final File sourcedir = new File("testfiles/27099_drifted_png");
+		FileUtils.copyDirectory(sourcedir, dir);
+
+		IConversionService service = new ConversionServiceImpl();
+
+		final IConversionContext context = service.open(dir.getAbsolutePath());
+		final File output = new File(dir.getAbsolutePath() + "/Aligned_images");
+		FileUtils.createNewUniqueDir(output);
+
+		List<File> files = FileUtils.listFiles(dir, new String[] { "png" }, false);
+		String[] filePaths = new String[files.size()];
+		for (int i = 0; i < filePaths.length; i++) {
+			filePaths[i] = files.get(i).getAbsolutePath();
+		}
+
+		List<IDataset> data = loadData(filePaths);
+		List<String> names = new ArrayList<String>(data.size());
+		for (int i = 0; i < data.size(); i++) {
+			names.add("image_" + i);
+		}
+		context.setDatasetNames(names);
+		context.setFilePaths(filePaths);
+		// disable macro
+		context.setEchoMacro(false);
+		context.setOutputPath(output.getAbsolutePath());
+		context.setConversionScheme(ConversionScheme.ALIGNED_FROM_3D);
+
+		ConversionAlignBean bean = new ConversionAlignBean();
+
+		List<IDataset> aligned = getAlignedImages(data);
+		bean.setAligned(aligned);
+		context.setUserObject(bean);
+
+		service.process(context);
+
+		String[] outputFilePaths = new String[aligned.size()];
+		for (int i = 0; i < outputFilePaths.length; i++) {
+			outputFilePaths[i] = output.getAbsolutePath() + "/aligned_" + names.get(i) + ".tiff";
+		}
+
+		// load saved data
+		List<IDataset> alignedSaved = loadData(outputFilePaths);
+
+		int num = 5;
+		int[] alignedShape = aligned.get(num).getShape();
+		int[] alignedSavedShape = alignedSaved.get(5).getShape();
+		if (!Arrays.equals(alignedShape, alignedSavedShape)) {
+			fail("Shape of aligned data in memory and aligned data saved is not " + "the same for dataset with name "
+					+ aligned.get(num).getName());
+		}
+
+		if (aligned.get(num).getDouble(10, 10) != alignedSaved.get(num).getDouble(10, 10)) {
+			fail("Data at slice " + num + " is not the same for aligned dataset in memory and dataset saved.");
 		}
 	}
 
@@ -198,6 +198,4 @@ public class AlignConvertTest {
 		}
 		return alignProgressJob.getShiftedImages();
 	}
-
-	
 }
