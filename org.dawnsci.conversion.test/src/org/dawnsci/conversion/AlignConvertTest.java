@@ -34,7 +34,6 @@ public class AlignConvertTest {
 	private File dir;
 	private File output;
 	private IImageTransform transformer;
-	private List<IDataset> shiftedImages;
 
 	@Before
 	public void before() {
@@ -185,10 +184,11 @@ public class AlignConvertTest {
 		try {
 			if (transformer == null)
 				transformer = BoofCVImageTransformCreator.createTransformService();
-			shiftedImages = transformer.align(data);
+			List<IDataset> shiftedImages = transformer.align(data);
+			return shiftedImages;
 		} catch (Exception e) {
 			fail("An error occured by aligning datasets:" + e);
 		}
-		return shiftedImages;
+		return null;
 	}
 }
