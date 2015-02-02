@@ -12,7 +12,6 @@ package org.dawnsci.conversion;
 import static org.junit.Assert.fail;
 
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -20,22 +19,22 @@ import java.util.List;
 import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.services.conversion.IConversionContext.ConversionScheme;
 import org.dawb.common.services.conversion.IConversionService;
-import org.dawb.common.ui.alignment.AlignProgressJob;
 import org.dawb.common.util.io.FileUtils;
+import org.dawnsci.boofcv.BoofCVImageTransformCreator;
 import org.dawnsci.conversion.converters.AlignImagesConverter;
 import org.dawnsci.conversion.converters.AlignImagesConverter.ConversionAlignBean;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
-import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.dawnsci.analysis.api.image.IImageTransform;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import uk.ac.diamond.scisoft.analysis.image.AlignMethod;
 
 public class AlignConvertTest {
 
 	private File dir;
 	private File output;
+	private IImageTransform transformer;
+	private List<IDataset> shiftedImages;
 
 	@Before
 	public void before() {
@@ -183,19 +182,13 @@ public class AlignConvertTest {
 	}
 
 	private List<IDataset> getAlignedImages(List<IDataset> data) {
-		AlignProgressJob alignProgressJob = new AlignProgressJob();
-		alignProgressJob.setAlignMethod(AlignMethod.AFFINE_TRANSFORM);
-		alignProgressJob.setData(data);
-		
-		ProgressMonitorDialog alignProgress = new ProgressMonitorDialog(null);
-		alignProgress.setCancelable(true);
 		try {
-			alignProgress.run(true, true, alignProgressJob);
-		} catch (InvocationTargetException e1) {
-			fail("Error aligning images:" + e1);
-		} catch (InterruptedException e1) {
-			fail("Error aligning images:" + e1);
+			if (transformer == null)
+				transformer = BoofCVImageTransformCreator.createTransformService();
+			shiftedImages = transformer.align(data);
+		} catch (Exception e) {
+			fail("An error occured by aligning datasets:" + e);
 		}
-		return alignProgressJob.getShiftedImages();
+		return shiftedImages;
 	}
 }
