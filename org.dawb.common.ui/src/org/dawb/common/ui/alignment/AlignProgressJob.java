@@ -16,7 +16,9 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.image.IImageTransform;
 import org.eclipse.dawnsci.analysis.dataset.roi.RectangularROI;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.swt.widgets.Display;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,9 +79,16 @@ public class AlignProgressJob implements IRunnableWithProgress {
 			// align with boofcv
 			try {
 				shiftedImages = transformer.align(data);
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				logger.error("TODO put description of error here", e);
+			} catch (final Exception e) {
+				Display.getDefault().syncExec(new Runnable() {
+					@Override
+					public void run() {
+						MessageDialog.openError(Display.getDefault()
+								.getActiveShell(), "Alignment error",
+								"An error occured while aligning images:" + e);
+					}
+				});
+				logger.error("Error aligning images:", e);
 			}
 		}
 
