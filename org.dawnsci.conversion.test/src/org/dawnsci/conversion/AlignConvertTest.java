@@ -14,6 +14,8 @@ import static org.junit.Assert.fail;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.dawb.common.services.conversion.IConversionContext;
@@ -115,7 +117,7 @@ public class AlignConvertTest {
 	private void doTestDir() throws Exception {
 
 		final File sourcedir = new File("testfiles/27099_drifted_png");
-		FileUtils.copyDirectory(sourcedir, dir);
+		org.apache.commons.io.FileUtils.copyDirectory(sourcedir, dir);
 
 		IConversionService service = new ConversionServiceImpl();
 
@@ -123,7 +125,7 @@ public class AlignConvertTest {
 		final File output = new File(dir.getAbsolutePath() + "/Aligned_images");
 		FileUtils.createNewUniqueDir(output);
 
-		List<File> files = FileUtils.listFiles(dir, new String[] { "png" }, false);
+		List<File> files = listFiles(dir, new String[] { "png" }, false);
 		String[] filePaths = new String[files.size()];
 		for (int i = 0; i < filePaths.length; i++) {
 			filePaths[i] = files.get(i).getAbsolutePath();
@@ -168,6 +170,13 @@ public class AlignConvertTest {
 		if (aligned.get(num).getDouble(10, 10) != alignedSaved.get(num).getDouble(10, 10)) {
 			fail("Data at slice " + num + " is not the same for aligned dataset in memory and dataset saved.");
 		}
+	}
+
+	private List<File> listFiles(File dir, String[] extensions, boolean isRecursive) {
+		Collection<File> files = org.apache.commons.io.FileUtils.listFiles(dir, extensions, isRecursive);
+		List<File> listFiles = new ArrayList<File>(files);
+		Collections.sort(listFiles);
+		return listFiles;
 	}
 
 	private List<IDataset> loadData(String[] filePaths) {
