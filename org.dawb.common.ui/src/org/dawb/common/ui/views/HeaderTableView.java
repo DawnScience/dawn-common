@@ -299,9 +299,9 @@ public class HeaderTableView extends ViewPart implements ISelectionListener, IPa
 		} else {
 			ISliceSystem slicer = (ISliceSystem)part.getAdapter(ISliceSystem.class);
 			if (slicer == null) {
-				final IAdaptable page = part instanceof IAdaptable ? (IAdaptable) part
+				final IAdaptable page = part.getAdapter(Page.class) instanceof IAdaptable ? (IAdaptable) part
 						.getAdapter(Page.class) : null;
-				if (page != null)
+			if (page != null)
 					slicer = (ISliceSystem) page.getAdapter(ISliceSystem.class);
 			}
 			if (slicer!=null) {
