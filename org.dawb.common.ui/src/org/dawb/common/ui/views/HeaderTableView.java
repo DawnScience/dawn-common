@@ -12,7 +12,6 @@
 package org.dawb.common.ui.views;
 
 import java.io.File;
-import java.util.Collection;
 
 import org.dawb.common.ui.util.EclipseUtils;
 import org.dawb.common.ui.util.GridUtils;
@@ -300,8 +299,10 @@ public class HeaderTableView extends ViewPart implements ISelectionListener, IPa
 		} else {
 			ISliceSystem slicer = (ISliceSystem)part.getAdapter(ISliceSystem.class);
 			if (slicer == null) {
-				final IAdaptable page = (IAdaptable)part.getAdapter(Page.class);
-				if (page!=null) slicer = (ISliceSystem)page.getAdapter(ISliceSystem.class);
+				final IAdaptable page = part instanceof IAdaptable ? (IAdaptable) part
+						.getAdapter(Page.class) : null;
+				if (page != null)
+					slicer = (ISliceSystem) page.getAdapter(ISliceSystem.class);
 			}
 			if (slicer!=null) {
 				IMetadata md = slicer.getSliceMetadata();
