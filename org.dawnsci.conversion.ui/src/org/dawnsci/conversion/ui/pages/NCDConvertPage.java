@@ -311,7 +311,7 @@ public class NCDConvertPage extends ResourceChoosePage implements
                     
                     while (iter.hasNext()) {
                     	String str = iter.next();
-                    	if (!(str.endsWith("/data") && (str.contains("_result") || str.contains("_processing")))) {
+                    	if (!(str.endsWith("/data") && (str.contains("result") || str.contains("_processing")))) {
                     		iter.remove();
                     	}
                     }
