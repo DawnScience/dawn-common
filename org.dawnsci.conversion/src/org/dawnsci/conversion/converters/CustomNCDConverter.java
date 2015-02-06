@@ -252,11 +252,13 @@ public class CustomNCDConverter extends AbstractConversion  {
 				monitorLabel = lz.getName();
 			}
 			
-			if (data.getDtype() < axis.getDtype()) {
-				data = improveLessPreciseData(data, axis);
-			}
-			else if (data.getDtype() > axis.getDtype()) {
-				axis = improveLessPreciseData(axis, data);
+			if (axis != null) {
+				if (data.getDtype() < axis.getDtype()) {
+					data = improveLessPreciseData(data, axis);
+				}
+				else if (data.getDtype() > axis.getDtype()) {
+					axis = improveLessPreciseData(axis, data);
+				}
 			}
 			
 			exportASCII(axis, data, errors, fullName, header, headings);
@@ -606,9 +608,9 @@ public class CustomNCDConverter extends AbstractConversion  {
 				for (ILazyDataset a: axis.getAxes()) {
 					if (a != null) {
 						a.setShape(a.getShape()[1],1);
-						outputBean.axis = (Dataset) a;
-						if (outputBean.axis != null) {
-							if (outputBean.axis.getName().equals("q")) {
+						if (a != null) {
+							if (a.getName().equals("q")) {
+								outputBean.axis = (Dataset) a;
 								outputBean.axisUnits = INVERSE_ANGSTROM;
 							}
 							//TODO need to know other axes names to be able to set the units correctly!
