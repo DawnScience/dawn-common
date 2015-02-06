@@ -613,16 +613,20 @@ public class CustomNCDConverter extends AbstractConversion  {
 								outputBean.axis = (Dataset) a;
 								outputBean.axisUnits = INVERSE_ANGSTROM;
 							}
-							//TODO need to know other axes names to be able to set the units correctly!
-//							else if (outputBean.axis.getName().equals("nm")) {
-//								outputBean.axisUnits = INVERSE_NM;
-//							}
-//							else if (outputBean.axis.getName().equals("angle")) {
-//								outputBean.axisUnits = DEGREES;
-//							}
-//							else if (outputBean.axis.getName().equals("dspace")) {
-//								outputBean.axisUnits = ANGSTROM;
-//							}
+							else if (a.getName().equals("d-spacing")) {
+								outputBean.axis = (Dataset) a;
+								outputBean.axisUnits = INVERSE_ANGSTROM;
+							}
+							else if (a.getName().equals("angle")) {
+								outputBean.axis = (Dataset) a;
+								outputBean.axisUnits = DEGREES;
+							}
+							else if (a.getName().equals("2theta")) {
+								outputBean.axis = (Dataset) a;
+							}
+							else if (a.getName().equals("pixel")) {
+								outputBean.axis = (Dataset) a;
+							}
 						}
 						break;
 					}
