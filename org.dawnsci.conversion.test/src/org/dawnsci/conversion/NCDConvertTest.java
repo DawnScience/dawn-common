@@ -170,13 +170,16 @@ public class NCDConvertTest {
 		IConversionService service = new ConversionServiceImpl();
 		
 		// Determine path to test file
-		final String path = getTestFilePath("results_i22-118040_Pilatus2M_010513_125108.nxs");
-		final String path1 = getTestFilePath("results_i22-102527_Pilatus2M_280313_112434.nxs");
-		final String path2 = getTestFilePath("results_i22-114346_Pilatus2M_220313_090939.nxs");
+		final String resultName = "results_i22-118040_Pilatus2M_010513_125108";
+		final String resultName2 = "results_i22-102527_Pilatus2M_280313_112434";
+		final String resultName3 = "results_i22-114346_Pilatus2M_220313_090939";
+		final String path = getTestFilePath(resultName+".nxs");
+		final String path1 = getTestFilePath(resultName2+".nxs");
+		final String path2 = getTestFilePath(resultName3+".nxs");
 		Map<String, String> unitMap = new HashMap<String, String>();
-		unitMap.put(path , "q(1/A)");
-		unitMap.put(path1, "q(1/nm)");
-		unitMap.put(path2, "q(1/A)");
+		unitMap.put(resultName , "q(1/A)");
+		unitMap.put(resultName2, "q(1/nm)");
+		unitMap.put(resultName3, "q(1/A)");
 		
 		final IConversionContext context = service.open(path);
 		///TODO fix in interface
