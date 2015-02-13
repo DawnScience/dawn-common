@@ -49,6 +49,7 @@
 				<fileset dir="${workspace.loc}/tp/plugins">
 					<include name="*.jar" />
 					<exclude name="*.source_*" />
+					<exclude name="org.apache.batik*" />  <!-- org.apache.batik.pdf has it's own copy of org.apache.commons.io so exclude it -->
 					<exclude name="org.eclipse.swt.*" />  <!--AVIImageConvertTest uses SWT, so exclude jars for non-mathching platforms. Xvfb also required. -->
 				</fileset>
 				<fileset dir="${workspace.loc}/tp/plugins">
