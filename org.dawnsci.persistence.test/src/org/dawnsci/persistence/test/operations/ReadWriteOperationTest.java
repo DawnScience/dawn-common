@@ -54,17 +54,17 @@ public class ReadWriteOperationTest {
 		PersistJsonOperationHelper.setOperationService(service);
 		
 		pservice = new PersistenceServiceImpl();
+		
+		/*FunctionFactory has been set up as an OSGI service so need to register
+		 *function before it is called (or make this a JUnit PluginTest.
+		 */
+		FunctionFactory.registerFunction(Polynomial.class);
 	}
 	
 	@Test
 	public void testFunctionSimple() throws Exception {
 		
 		final IOperation functionOp = service.findFirst("function");
-		
-		/*FunctionFactory has been set up as an OSGI service so need to register
-		 *function before it is called (or make this a JUnit PluginTest.
-		 */
-		FunctionFactory.registerFunction(Polynomial.class);
 		
 		// y(x) = a_0 x^n + a_1 x^(n-1) + a_2 x^(n-2) + ... + a_(n-1) x + a_n
 		final IFunction poly = FunctionFactory.getFunction("Polynomial", 3/*x^2*/, 5.3/*x*/, 9.4/*m*/);
