@@ -92,4 +92,21 @@ public class NumberUtils {
 		return t >= Math.abs(c - w);
 	}
 
+	/**
+	 * Attempts to remove an leading '0' characters from the start of a string
+	 * @param index
+	 * @return
+	 */
+	public static String removeLeadingZeros(String index) {
+
+        StringBuilder buf = new StringBuilder();
+        boolean removingZeros = true;
+        for (int i = 0; i < index.length(); i++) {
+			if (removingZeros && index.charAt(i)=='0') continue;
+			removingZeros = false;
+			buf.append(index.charAt(i));
+		}
+        return buf.toString();
+	}
+
 }
