@@ -133,7 +133,14 @@ public interface IDataReductionToolPage extends IToolPage {
 		}
 		
 		public void appendData(IDataset more, String group) throws Exception {
+			
 			if (slice == null) {
+				H5Utils.appendDataset(file, group, more);
+				return;
+			}
+			
+			int dataRank = more.squeeze().getRank();
+			if (dataRank == 0) { // Just adding one number!
 				H5Utils.appendDataset(file, group, more);
 				return;
 			}
@@ -149,7 +156,6 @@ public interface IDataReductionToolPage extends IToolPage {
 				}
 				
 			}
-			int dataRank = more.squeeze().getRank();
 			
 			//Make new slice array to deal with new dimensions
 			List<Slice> sliceList = new ArrayList<Slice>();
