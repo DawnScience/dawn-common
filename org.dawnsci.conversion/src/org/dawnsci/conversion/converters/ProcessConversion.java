@@ -10,6 +10,7 @@ package org.dawnsci.conversion.converters;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Map;
 
@@ -64,6 +65,8 @@ public class ProcessConversion extends AbstractConversion {
 		if (axesNames != null) {
 			
 			AxesMetadataImpl axMeta = null;
+			int rank = lz.getRank();
+			int[] shape = lz.getShape();
 			
 			try {
 				axMeta = new AxesMetadataImpl(lz.getRank());
@@ -72,13 +75,59 @@ public class ProcessConversion extends AbstractConversion {
 					IDataHolder dataHolder = LoaderFactory.getData(context.getSelectedConversionFile().getAbsolutePath());
 					ILazyDataset lazyDataset = dataHolder.getLazyDataset(axesName);
 					
-					if ( lazyDataset != null && (lazyDataset.getName() == null || lazyDataset.getName().isEmpty())) {
-						lazyDataset.setName(axesName);
+					if (lazyDataset!= null) {
+
+						if (lazyDataset.getName() == null || lazyDataset.getName().isEmpty()) {
+							lazyDataset.setName(axesName);
+						}
+
+						int axRank = lazyDataset.getRank();
+						if (axRank == rank || axRank == 1)	{
+							axMeta.setAxis(key-1, lazyDataset);
+						} else {
+
+							int[] axShape = lazyDataset.getShape();
+							int[] newShape = new int[rank];
+							Arrays.fill(newShape, 1);
+
+							int[] idx = new int[axRank];
+							int max = rank;
+
+							for (int i = axRank-1; i >= 0; i--) {
+
+								int id = axShape[i];
+								boolean found = false;
+
+								for (int j = max -1 ; i >= 0; i--) {
+
+									if (id == shape[j]) {
+										found = true;
+										idx[i] = j;
+										max = j;
+										break;
+									}
+
+								}
+
+								if (!found) {
+									throw new IllegalArgumentException("Axes shape not compatible!");
+								}
+							}
+
+							for (int i = 0; i < axRank; i++) {
+								newShape[idx[i]] = axShape[i];
+							}
+
+							lazyDataset = lazyDataset.getSliceView();
+							lazyDataset.setShape(newShape);
+						}
+						axMeta.setAxis(key-1, lazyDataset);
 					}
-					
-					axMeta.setAxis(key-1, lazyDataset);
+					else {
+						axMeta.setAxis(key-1, new ILazyDataset[1]);
+					}
 				}
-				
+
 				lz.setMetadata(axMeta);
 			} catch (Exception e) {
 				//no axes metadata
