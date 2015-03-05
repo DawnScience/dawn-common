@@ -1,17 +1,33 @@
 package org.dawnsci.macro.console;
 
 import org.dawb.common.ui.util.EclipseUtils;
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.dawnsci.macro.api.IMacroEventListener;
 import org.eclipse.dawnsci.macro.api.IMacroService;
 import org.eclipse.dawnsci.macro.api.MacroEventObject;
 import org.eclipse.dawnsci.plotting.api.IPlottingSystem;
+import org.eclipse.jface.dialogs.ErrorDialog;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IPartListener;
+import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.commands.ICommandService;
+import org.eclipse.ui.dialogs.PreferencesUtil;
+import org.eclipse.ui.preferences.ScopedPreferenceStore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Class to link any IDocument to recording macros.
@@ -20,6 +36,8 @@ import org.eclipse.ui.IWorkbenchPart;
  *
  */
 public class DocumentInserter implements IMacroEventListener, IPartListener {
+	
+	private static Logger logger = LoggerFactory.getLogger(DocumentInserter.class);
 
 	private static IMacroService mservice;
 	public static void setMacroService(IMacroService s) {
@@ -83,6 +101,10 @@ public class DocumentInserter implements IMacroEventListener, IPartListener {
 
 	private boolean isConnected = false;
 	public void connect() {
+		
+		boolean ok = checkPy4jServer();
+		if (!ok) return;
+		
 		mservice.addMacroListener(this);
 		isConnected = true;
 		EclipseUtils.getPage().addPartListener(this);
@@ -103,6 +125,40 @@ public class DocumentInserter implements IMacroEventListener, IPartListener {
 			connect();
 		}
 	}
+	
+	/**
+	 * User friendly stuff to remind them how to set up py4j
+	 * @return
+	 */
+	private boolean checkPy4jServer() {
+		
+        final IPreferenceStore pref = new ScopedPreferenceStore(InstanceScope.INSTANCE, "net.sf.py4j.defaultserver");
+        boolean isActive = pref.getBoolean("PREF_PY4J_ACTIVE");
+		boolean override = Boolean.getBoolean("PREF_PY4J_ACTIVE"); // They can override the default using -DPREF_PY4J_ACTIVE=...
+        if (!isActive && !override) {
+        	boolean yes = MessageDialog.openQuestion(Display.getDefault().getActiveShell(), "Cannot connect to DAWN",
+        			       "The macro server is not going. Would you like to turn it on now and restart DAWN?\n\n"+
+        			       "Choosing yes, will restart the workbench.");
+        	if (yes) {
+        		pref.setValue("PREF_PY4J_ACTIVE", true);
+        		try {
+        			ICommandService service = (ICommandService) PlatformUI.getWorkbench().getService(ICommandService.class);
+        			service.getCommand(IWorkbenchCommandConstants.FILE_RESTART).executeWithChecks(new ExecutionEvent());
+        		} catch (Exception ne) {
+        			logger.error("Cannot restart", ne);
+        			ErrorDialog.openError(Display.getDefault().getActiveShell(), "Restart Failed", "The restart failed, please do so manually.",
+        					new Status(IStatus.ERROR, "org.dawnsci.macro", "Failed restart", ne));
+        		}
+        	}
+        }
+
+        // Recheck
+        isActive = pref.getBoolean("PREF_PY4J_ACTIVE");
+		override = Boolean.getBoolean("PREF_PY4J_ACTIVE"); // They can override the default using -DPREF_PY4J_ACTIVE=...
+
+        return isActive || override;
+	}
+	
 	@Override
 	public void partActivated(IWorkbenchPart part) {
         try {
