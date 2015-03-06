@@ -23,13 +23,14 @@ import org.dawb.common.services.conversion.IConversionContext.ConversionScheme;
 import org.dawb.common.services.conversion.IConversionService;
 import org.dawb.common.util.io.FileUtils;
 import org.dawnsci.boofcv.BoofCVImageTransformCreator;
-import org.dawnsci.conversion.converters.AlignImagesConverter;
 import org.dawnsci.conversion.converters.AlignImagesConverter.ConversionAlignBean;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.image.IImageTransform;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import uk.ac.diamond.scisoft.analysis.io.Utils;
 
 public class AlignConvertTest {
 
@@ -182,7 +183,7 @@ public class AlignConvertTest {
 	private List<IDataset> loadData(String[] filePaths) {
 		final List<IDataset> data = new ArrayList<IDataset>();
 		try {
-			AlignImagesConverter.loadData(data, filePaths);
+			Utils.loadData(data, filePaths);
 		} catch (Exception e) {
 			fail("Failed to load image stack in Nexus file:" + e);
 		}
