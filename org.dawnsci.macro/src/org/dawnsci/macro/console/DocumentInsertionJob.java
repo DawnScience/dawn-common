@@ -6,12 +6,14 @@ import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
 
 import org.dawb.common.ui.util.EclipseUtils;
+import org.dawnsci.macro.Activator;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.dawnsci.plotting.api.IPlottingSystem;
 import org.eclipse.dawnsci.plotting.api.PlottingFactory;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.source.ISourceViewer;
@@ -25,6 +27,11 @@ public class DocumentInsertionJob extends Job {
 	private ISourceViewer         viewer;
 	private BlockingDeque<String> queue;
 	private DocumentInserter      inserter;
+	private IPreferenceStore store;
+	
+	private static final String defaultPause = " org.dawnsci.macro.console.defaultPause";
+	private static final String numpyPause   = " org.dawnsci.macro.console.numpyPause";
+	private static final String plottingPause= " org.dawnsci.macro.console.plottingPause";
 
 	public DocumentInsertionJob(DocumentInserter  inserter, ISourceViewer viewer) {
 		
@@ -37,6 +44,11 @@ public class DocumentInsertionJob extends Job {
 		
 		this.queue = new LinkedBlockingDeque<String>();
 		schedule();
+		
+		this.store = Activator.getPlugin().getPreferenceStore();
+		store.setDefault(defaultPause,  500);
+		store.setDefault(plottingPause, 600);
+		store.setDefault(numpyPause,    2000);
 	}
 
 	@Override
@@ -84,7 +96,7 @@ public class DocumentInsertionJob extends Job {
 					try {
 			            // We must deal with pydev sending the command
 						// Currently we assume that commands greater than 200ms are not common.
-						Thread.sleep(200);
+						Thread.sleep(store.getLong(defaultPause));
 					} catch (InterruptedException e) {
 						continue;
 					}
@@ -113,8 +125,8 @@ public class DocumentInsertionJob extends Job {
 		// Check numpy
 		if (inserter.getType()==InsertionType.PYTHON) {
 
-			checkAdd("# Turn py4j on under Window->Preferences->Py4j Default Server > 'Py4j active'", cmd, 300);
-			checkAdd("import numpy", cmd, 2000);
+			checkAdd("# Turn py4j on under Window->Preferences->Py4j Default Server > 'Py4j active'", cmd, store.getLong(defaultPause));
+			checkAdd("import numpy", cmd, store.getLong(numpyPause));
 			
 		}
 			
@@ -151,7 +163,7 @@ public class DocumentInsertionJob extends Job {
 			});
 			if (inserted.size()==1 && inserted.get(0)) {
 				try {
-					Thread.sleep(250); // Load system - how longs a piece of string?
+					Thread.sleep(store.getLong(plottingPause)); // Load system - how longs a piece of string?
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
