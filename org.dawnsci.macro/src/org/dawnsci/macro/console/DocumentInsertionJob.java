@@ -46,7 +46,7 @@ public class DocumentInsertionJob extends Job {
 		schedule();
 		
 		this.store = Activator.getPlugin().getPreferenceStore();
-		store.setDefault(defaultPause,  500);
+		store.setDefault(defaultPause,  350);
 		store.setDefault(plottingPause, 600);
 		store.setDefault(numpyPause,    2000);
 	}
