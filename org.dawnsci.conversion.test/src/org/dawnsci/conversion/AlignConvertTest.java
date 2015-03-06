@@ -185,7 +185,7 @@ public class AlignConvertTest {
 		try {
 			Utils.loadData(data, filePaths);
 		} catch (Exception e) {
-			fail("Failed to load image stack in Nexus file:" + e);
+			fail("Failed to load image stack:" + e);
 		}
 		return data;
 	}
