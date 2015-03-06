@@ -17,7 +17,6 @@ import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.util.list.SortNatural;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
-import org.eclipse.dawnsci.analysis.api.dataset.Slice;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
 import org.eclipse.dawnsci.analysis.dataset.impl.LazyDataset;
 import org.slf4j.Logger;
@@ -158,42 +157,6 @@ public class AlignImagesConverter extends AbstractImageConversion {
 		if (context.getUserObject() == null)
 			return 33;
 		return ((ConversionInfoBean) context.getUserObject()).getBits();
-	}
-
-	/**
-	 * 
-	 * @param data
-	 *            output of data loaded (Optional)
-	 * @param filePaths
-	 *            file paths of files to be loaded
-	 * @return data loaded
-	 * @throws Exception
-	 */
-	public static List<IDataset> loadData(List<IDataset> data, String[] filePaths) throws Exception {
-		if (data == null)
-			data = new ArrayList<IDataset>(filePaths.length);
-		for (int i = 0; i < filePaths.length; i++) {
-			IDataHolder holder = null;
-			holder = LoaderFactory.getData(filePaths[i]);
-			File file = new File(filePaths[i]);
-			String filename = file.getName();
-			ILazyDataset lazy = holder.getLazyDataset(0);
-			int[] shape = lazy.getShape();
-			if (shape[0] > 1 && lazy.getRank() == 3) { // 3d dataset
-				for (int j = 0; j < shape[0]; j++) {
-					IDataset dataset = lazy.getSlice(
-							new Slice(j, shape[0], shape[1])).squeeze();
-					data.add(dataset);
-				}
-			} else { // if each single image is loaded separately (2d)
-				IDataset dataset = lazy.getSlice(new Slice());
-				if (dataset.getName() == null || dataset.getName().equals("")) {
-					dataset.setName(filename);
-				}
-				data.add(dataset);
-			}
-		}
-		return data;
 	}
 
 	/**

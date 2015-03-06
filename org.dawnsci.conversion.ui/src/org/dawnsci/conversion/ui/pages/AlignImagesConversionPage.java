@@ -18,7 +18,6 @@ import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.ui.alignment.AlignProgressJob;
 import org.dawb.common.ui.wizard.ResourceChoosePage;
 import org.dawb.common.util.io.FileUtils;
-import org.dawnsci.conversion.converters.AlignImagesConverter;
 import org.dawnsci.conversion.converters.AlignImagesConverter.ConversionAlignBean;
 import org.dawnsci.conversion.ui.IConversionWizardPage;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -60,6 +59,7 @@ import org.slf4j.LoggerFactory;
 
 import uk.ac.diamond.scisoft.analysis.image.AlignMethod;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
+import uk.ac.diamond.scisoft.analysis.io.Utils;
 
 /**
  * 
@@ -144,7 +144,7 @@ public class AlignImagesConversionPage extends ResourceChoosePage
 				@Override
 				protected IStatus run(IProgressMonitor monitor) {
 					try {
-						AlignImagesConverter.loadData(data, filePaths);
+						Utils.loadData(data, filePaths);
 					} catch (Exception e) {
 						logger.error("Failed to load dataset:" + e);
 						return Status.CANCEL_STATUS;
