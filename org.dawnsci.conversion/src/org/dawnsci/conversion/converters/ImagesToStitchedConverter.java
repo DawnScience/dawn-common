@@ -19,8 +19,8 @@ import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
 import org.eclipse.dawnsci.analysis.api.image.IImageStitchingProcess;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
+import org.eclipse.dawnsci.analysis.api.roi.IROI;
 import org.eclipse.dawnsci.analysis.dataset.impl.LazyDataset;
-import org.eclipse.dawnsci.plotting.api.region.IRegion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,9 +85,9 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 			double fieldOfView = conversionBean.getFieldOfView();
 			List<double[]> translations = conversionBean.getTranslations();
 			IDataset stitched = null;
-			IRegion region = conversionBean.getRoi();
-			if (region != null) {
-				stitched = stitcher.stitch(imageStack, rows, columns, angle, fieldOfView, translations, region.getROI(), useFeatureAssociation, isInputDatFile);
+			IROI roi = conversionBean.getRoi();
+			if (roi != null) {
+				stitched = stitcher.stitch(imageStack, rows, columns, angle, fieldOfView, translations, roi, useFeatureAssociation, isInputDatFile);
 			} else {
 				stitched = stitcher.stitch(imageStack, rows, columns, angle);
 			}
@@ -180,7 +180,7 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 		private boolean featureAssociated;
 		private boolean isInputDatFile = false;
 		private List<double[]> translations;
-		private IRegion region;
+		private IROI roi;
 
 		public int getRows() {
 			return rows;
@@ -200,11 +200,11 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 		public void setAngle(double angle) {
 			this.angle = angle;
 		}
-		public void setRoi(IRegion region) {
-			this.region = region;
+		public void setRoi(IROI roi) {
+			this.roi = roi;
 		}
-		public IRegion getRoi() {
-			return region;
+		public IROI getRoi() {
+			return roi;
 		}
 		public void setFieldOfView(double fieldOfView) {
 			this.fieldOfView = fieldOfView;
@@ -243,7 +243,7 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 			result = prime * result + (int) (temp ^ (temp >>> 32));
 			result = prime * result + (isInputDatFile ? 1231 : 1237);
 			result = prime * result
-					+ ((region == null) ? 0 : region.hashCode());
+					+ ((roi == null) ? 0 : roi.hashCode());
 			result = prime * result + rows;
 			result = prime * result
 					+ ((translations == null) ? 0 : translations.hashCode());
@@ -270,10 +270,10 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 				return false;
 			if (isInputDatFile != other.isInputDatFile)
 				return false;
-			if (region == null) {
-				if (other.region != null)
+			if (roi == null) {
+				if (other.roi != null)
 					return false;
-			} else if (!region.equals(other.region))
+			} else if (!roi.equals(other.roi))
 				return false;
 			if (rows != other.rows)
 				return false;

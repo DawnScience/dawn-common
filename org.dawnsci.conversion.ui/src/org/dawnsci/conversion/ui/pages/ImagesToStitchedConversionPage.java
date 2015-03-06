@@ -105,7 +105,7 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 		Number fov = (Number) fovText.getValue();
 		bean.setFieldOfView(fov.doubleValue());
 		if (hasCropping)
-			bean.setRoi(plotSystem.getRegion("Cropping"));
+			bean.setRoi(plotSystem.getRegion("Cropping").getROI());
 		bean.setFeatureAssociated(hasFeatureAssociated);
 		bean.setInputDatFile(datFileLoaded);
 		Number xTrans = (Number) xTranslationText.getValue();
