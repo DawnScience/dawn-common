@@ -23,6 +23,8 @@ import org.dawb.common.services.conversion.IConversionContext.ConversionScheme;
 import org.dawb.common.services.conversion.IConversionService;
 import org.dawb.common.util.io.FileUtils;
 import org.dawnsci.boofcv.BoofCVImageStitchingProcessCreator;
+import org.dawnsci.boofcv.stitching.BoofCVImageStitchingImpl;
+import org.dawnsci.conversion.converters.ImagesToStitchedConverter;
 import org.dawnsci.conversion.converters.ImagesToStitchedConverter.ConversionStitchedBean;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.image.IImageStitchingProcess;
@@ -52,6 +54,7 @@ public class StitchingConvertTest {
 	@Test
 	public void testDir() throws Exception {
 		System.out.println("starting stitching image conversion test from directory with image files");
+		ImagesToStitchedConverter.setImageSticher(new BoofCVImageStitchingImpl());
 		doTestDir();
 	}
 

@@ -26,7 +26,8 @@ Export-Package: boofcv.abst.filter,
  boofcv.struct,
  boofcv.struct.image,
  org.dawnsci.boofcv,
- org.dawnsci.boofcv.converter
+ org.dawnsci.boofcv.converter,
+ org.dawnsci.boofcv.stitching
 Import-Package: org.dawb.common.services,
  org.slf4j;version="1.7.6"
 Service-Component: OSGI-INF/*.xml
