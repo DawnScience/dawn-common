@@ -34,13 +34,17 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
+import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
@@ -114,6 +118,34 @@ public class HeaderTableView extends ViewPart implements ISelectionListener, IPa
 		key.getColumn().setText("Key");
 		key.getColumn().setWidth(200);
 		key.setLabelProvider(new HeaderColumnLabelProvider(0));
+		key.getColumn().addSelectionListener(new SelectionAdapter() {
+
+			public void widgetSelected(SelectionEvent e) {
+				int dir = table.getTable().getSortDirection();
+				dir = (dir==SWT.UP||dir==SWT.NONE) ? SWT.DOWN : SWT.UP;
+				table.getTable().setSortDirection(dir);
+				table.getTable().setSortColumn(key.getColumn());		
+				table.refresh();
+			}		
+		});
+		
+		table.setSorter(new ViewerSorter() {
+			public int compare(Viewer viewer, Object e1, Object e2) {
+				String val1 = (String) e1;
+				val1 = val1!=null? val1.toLowerCase() : "";
+				String val2 = (String) e2;
+				val2 = val2!=null? val2.toLowerCase() : "";
+
+				int dir = table.getTable().getSortDirection();
+				if (dir==SWT.UP) {
+					return val2.compareTo(val1);
+				} else if (dir==SWT.DOWN) {
+					return val1.compareTo(val2);
+				}
+				return val1.compareTo(val2);
+			}
+
+		});
 		
 		final TableViewerColumn value = new TableViewerColumn(table, SWT.NONE, 1);
 		value.getColumn().setText("Value");
