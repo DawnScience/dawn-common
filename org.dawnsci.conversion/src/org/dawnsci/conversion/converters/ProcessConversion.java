@@ -60,16 +60,18 @@ public class ProcessConversion extends AbstractConversion {
 		
 		IProcessingConversionInfo info = (IProcessingConversionInfo) userObject;
 		final Map<Integer, String> sliceDimensions = context.getSliceDimensions();
+		//take a local view of the lazy dataset, since we are messing with its metadata
+		ILazyDataset localLazy = lz.getSliceView();
+		int[] shape = localLazy.getShape();
 		
 		Map<Integer, String> axesNames = context.getAxesNames();
 		if (axesNames != null) {
 			
 			AxesMetadataImpl axMeta = null;
-			int rank = lz.getRank();
-			int[] shape = lz.getShape();
+			int rank = localLazy.getRank();
 			
 			try {
-				axMeta = new AxesMetadataImpl(lz.getRank());
+				axMeta = new AxesMetadataImpl(localLazy.getRank());
 				for (Integer key : axesNames.keySet()) {
 					String axesName = axesNames.get(key);
 					IDataHolder dataHolder = LoaderFactory.getData(context.getSelectedConversionFile().getAbsolutePath());
@@ -128,20 +130,20 @@ public class ProcessConversion extends AbstractConversion {
 					}
 				}
 
-				lz.setMetadata(axMeta);
+				localLazy.setMetadata(axMeta);
 			} catch (Exception e) {
 				//no axes metadata
 				e.printStackTrace();
 			}
 		}
 		
-		Slice[] init = Slicer.getSliceArrayFromSliceDimensions(sliceDimensions,lz.getShape());
-		int[] dataDims = Slicer.getDataDimensions(lz.getShape(), sliceDimensions);
+		Slice[] init = Slicer.getSliceArrayFromSliceDimensions(sliceDimensions,shape);
+		int[] dataDims = Slicer.getDataDimensions(shape, sliceDimensions);
 		
-		OriginMetadataImpl om = new OriginMetadataImpl(lz, init, dataDims, context.getSelectedConversionFile().getAbsolutePath(), context.getDatasetNames().get(0));
-		lz.setMetadata(om);
+		OriginMetadataImpl om = new OriginMetadataImpl(localLazy, init, dataDims, context.getSelectedConversionFile().getAbsolutePath(), context.getDatasetNames().get(0));
+		localLazy.setMetadata(om);
 		IOperationContext cc = service.createContext();
-		cc.setData(lz);
+		cc.setData(localLazy);
 		cc.setSlicing(sliceDimensions);
 		
 		String name = getFileNameNoExtension(context.getSelectedConversionFile());
@@ -153,8 +155,8 @@ public class ProcessConversion extends AbstractConversion {
 		File fh = new File(outputFolder);
 		fh.mkdir();
 		
-		SourceInformation si = new SourceInformation(context.getSelectedConversionFile().getAbsolutePath(), context.getDatasetNames().get(0), lz);
-		lz.setMetadata(new SliceFromSeriesMetadata(si));
+		SourceInformation si = new SourceInformation(context.getSelectedConversionFile().getAbsolutePath(), context.getDatasetNames().get(0), localLazy);
+		localLazy.setMetadata(new SliceFromSeriesMetadata(si));
 		//TODO output path
 		
 		// If we need to keep the original data, sort it out here.
