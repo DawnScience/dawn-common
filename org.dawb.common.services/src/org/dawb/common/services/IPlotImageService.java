@@ -8,6 +8,7 @@
  */ 
 package org.dawb.common.services;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
@@ -32,6 +33,22 @@ public interface IPlotImageService extends IFileIconService{
 	 * @return
 	 */
 	public Image createImage(final File f, final int width, int height);
+
+	/**
+	 * Create a square image from a specified file, f of given side size, size in pixels.
+	 * @param f
+	 * @param size
+	 * @return
+	 */
+	public Image createImage(final BufferedImage image);
+
+	/**
+	 * Create a square image from a specified file, f of given side size, size in pixels.
+	 * @param f
+	 * @param size
+	 * @return
+	 */
+	public IDataset createDataset(final BufferedImage image);
 
 	/**
 	 * Get a thumbnail Dataset of square shape.
