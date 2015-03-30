@@ -11,12 +11,12 @@ package org.dawnsci.conversion;
 import java.awt.Dimension;
 import java.io.File;
 
-import org.dawb.common.services.IPlotImageService;
 import org.dawb.common.services.ServiceManager;
 import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.services.conversion.IConversionContext.ConversionScheme;
 import org.dawb.common.services.conversion.IConversionService;
 import org.dawb.common.ui.image.PaletteFactory;
+import org.dawnsci.conversion.converters.AVIImageConverter;
 import org.dawnsci.conversion.converters.ConversionInfoBean;
 import org.dawnsci.plotting.histogram.service.PaletteService;
 import org.dawnsci.plotting.services.ImageService;
@@ -27,6 +27,7 @@ import org.eclipse.dawnsci.plotting.api.histogram.IPaletteService;
 import org.eclipse.dawnsci.plotting.api.histogram.ImageServiceBean;
 import org.eclipse.dawnsci.plotting.api.histogram.ImageServiceBean.HistoType;
 import org.eclipse.dawnsci.plotting.api.histogram.ImageServiceBean.ImageOrigin;
+import org.eclipse.dawnsci.plotting.api.image.IPlotImageService;
 import org.junit.Test;
 import org.monte.media.avi.AVIReader;
 
@@ -41,8 +42,8 @@ public class AVIImageConvertTest {
 		IConversionService service = new ConversionServiceImpl();
 		
 		// Not sure of this will work...
-		ServiceManager.setService(IImageService.class,       new ImageService());
-		ServiceManager.setService(IPlotImageService.class,   new PlotImageService());
+		AVIImageConverter.setImageService(new ImageService());
+		AVIImageConverter.setPlotImageService(new PlotImageService());
 		ServiceManager.setService(IPaletteService.class,     new PaletteService());
 		
 		// Determine path to test file

@@ -18,9 +18,6 @@ import java.util.List;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
 
-import org.dawb.common.services.IPlotImageService;
-import org.dawb.common.services.PlotImageData;
-import org.dawb.common.services.ServiceManager;
 import org.dawb.common.ui.preferences.ViewConstants;
 import org.dawb.common.util.object.ObjectUtils;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -31,6 +28,8 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.dataset.impl.Dataset;
 import org.eclipse.dawnsci.plotting.api.histogram.ImageServiceBean;
+import org.eclipse.dawnsci.plotting.api.image.IPlotImageService;
+import org.eclipse.dawnsci.plotting.api.image.PlotImageData;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
@@ -68,6 +67,12 @@ import org.slf4j.LoggerFactory;
  */
 public class GalleryDelegate implements SelectionListener {
 	
+	// OSGi injected
+	private static IPlotImageService pservice;
+	public void setPlotImageService(IPlotImageService service) {
+		pservice = service;
+	}
+	
 	private static final Logger logger = LoggerFactory.getLogger(GalleryDelegate.class);
 
 	private Composite                parent;
@@ -90,8 +95,16 @@ public class GalleryDelegate implements SelectionListener {
 
 	private String groupLabel;
 
-	
+	/**
+	 * Does nothing so that OSGi can connect
+	 */
 	public GalleryDelegate() {
+	}
+	
+	/**
+	 * Please call this directly after creation to create the queue and start the thread.
+	 */
+	public void init() {
 		this.queue = new LinkedBlockingDeque<ImageItem>(Integer.MAX_VALUE);
 		createImageThread();
 	}
@@ -328,10 +341,10 @@ public class GalleryDelegate implements SelectionListener {
 							final String path = info.getPath(ii.getIndex());
 							image = new Image(Display.getDefault(), new BufferedInputStream(new FileInputStream(new File(path))));
 						} else {
-							final IPlotImageService service = (IPlotImageService)ServiceManager.getService(IPlotImageService.class);	            		
+							@SuppressWarnings("deprecation")
 							final PlotImageData id = new PlotImageData(set, size, size);
 							if (getLockedHistogram()!=null) id.setImageServiceBean(lockedHistogram);
-							image = service.getImage(id);
+							image = pservice.getImage(id);
 						}
 
 						Display.getDefault().asyncExec(new Runnable() {

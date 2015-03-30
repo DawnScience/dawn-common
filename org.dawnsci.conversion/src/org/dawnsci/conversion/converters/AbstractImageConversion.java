@@ -32,6 +32,10 @@ public abstract class AbstractImageConversion extends AbstractConversion {
 
 	int imageCounter = 0;
 	
+	AbstractImageConversion() {
+		// OSGi
+	}
+	
 	public AbstractImageConversion(IConversionContext context) {
 		super(context);
 	}

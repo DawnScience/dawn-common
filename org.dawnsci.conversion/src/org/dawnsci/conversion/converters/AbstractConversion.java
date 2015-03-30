@@ -44,6 +44,10 @@ public abstract class AbstractConversion {
 	
 	protected IConversionContext context;
 
+	AbstractConversion() {
+		// OSGi
+	}
+	
 	public AbstractConversion(IConversionContext context) {
 		this.context = context;
 	}

@@ -76,6 +76,7 @@ public class H5GalleryView extends ViewPart implements MouseListener, SelectionL
 	
 	public H5GalleryView() {
 		this.galleryDelegate = new GalleryDelegate();
+		galleryDelegate.init();
 	}
 
 	/**

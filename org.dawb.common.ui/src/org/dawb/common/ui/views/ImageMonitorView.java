@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
 
-import org.dawb.common.services.IPlotImageService;
 import org.dawb.common.services.ServiceManager;
 import org.dawb.common.ui.Activator;
 import org.dawb.common.ui.menu.CheckableActionGroup;
@@ -34,6 +33,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.dawnsci.plotting.api.image.IPlotImageService;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IToolBarManager;

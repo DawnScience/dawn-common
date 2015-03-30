@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="true" name="Gallery Delegate Injector">
+   <implementation class="org.dawb.common.ui.views.GalleryDelegate"/>
+   <reference bind="setPlotImageService" cardinality="1..1" interface="org.eclipse.dawnsci.plotting.api.image.IPlotImageService" name="IPlotImageService" policy="dynamic"/>ce>
+</scr:component>

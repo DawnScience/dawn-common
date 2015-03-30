@@ -21,9 +21,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
-import org.dawb.common.services.IPlotImageService;
-import org.dawb.common.services.PlotImageData;
-import org.dawb.common.services.PlotImageData.PlotImageType;
 import org.dawb.common.services.ServiceManager;
 import org.dawb.common.services.conversion.IConversionContext;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
@@ -31,6 +28,9 @@ import org.eclipse.dawnsci.plotting.api.IPlottingSystem;
 import org.eclipse.dawnsci.plotting.api.PlotType;
 import org.eclipse.dawnsci.plotting.api.PlottingFactory;
 import org.eclipse.dawnsci.plotting.api.histogram.IImageService;
+import org.eclipse.dawnsci.plotting.api.image.IPlotImageService;
+import org.eclipse.dawnsci.plotting.api.image.PlotImageData;
+import org.eclipse.dawnsci.plotting.api.image.PlotImageData.PlotImageType;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Point;
@@ -52,8 +52,18 @@ public class AVIImageConverter extends AbstractImageConversion {
 	
 	private static final Logger logger = LoggerFactory.getLogger(AVIImageConverter.class);
 
-	private IImageService        imageService;
-	private IPlotImageService    thumbService;
+	private static IImageService        imageService;
+	public static void setImageService(IImageService service) {
+		imageService = service;
+	}
+	private static IPlotImageService    thumbService;
+	public static void setPlotImageService(IPlotImageService service) {
+		thumbService = service;
+	}
+	
+	public AVIImageConverter() {
+		// OSGi
+	}
 
 	/**
 	 * dir where we put the temporary images which we will later write to video.
@@ -86,12 +96,7 @@ public class AVIImageConverter extends AbstractImageConversion {
 		if (sliceType==null) throw new Exception("A slice type must be set for the video!");
 		if (!(sliceType instanceof PlotType)) throw new Exception("The video export currently does not work with slice "+sliceType);
 		
-		
 		avi.getParentFile().mkdirs();
-				
-		this.imageService = (IImageService)ServiceManager.getService(IImageService.class);
-		this.thumbService = (IPlotImageService)ServiceManager.getService(IPlotImageService.class);	            		
-
 	}
 
 	private File       selected=null;
