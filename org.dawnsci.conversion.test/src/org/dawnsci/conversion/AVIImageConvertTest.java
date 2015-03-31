@@ -42,9 +42,10 @@ public class AVIImageConvertTest {
 		IConversionService service = new ConversionServiceImpl();
 		
 		// Not sure of this will work...
+		ServiceManager.setService(IPaletteService.class,     new PaletteService());
+		ServiceManager.setService(IImageService.class,       new ImageService());
 		AVIImageConverter.setImageService(new ImageService());
 		AVIImageConverter.setPlotImageService(new PlotImageService());
-		ServiceManager.setService(IPaletteService.class,     new PaletteService());
 		
 		// Determine path to test file
 		final String path = getTestFilePath("export.h5");
