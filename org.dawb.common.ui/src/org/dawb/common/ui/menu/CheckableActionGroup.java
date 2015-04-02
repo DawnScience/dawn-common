@@ -27,7 +27,6 @@ public class CheckableActionGroup implements IPropertyChangeListener {
 	private Collection<IAction> actions = new ArrayList<IAction>(7);
 	
 	public void add(IAction action) {
-		if (action.getStyle() != IAction.AS_CHECK_BOX) throw new RuntimeException("Only check actions are supported!");
 		action.addPropertyChangeListener(this);
 		actions.add(action);
 	}
