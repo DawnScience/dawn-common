@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.dawnsci.boofcv.converter.ConvertIDataset;
+import org.dawnsci.boofcv.util.Utils;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.image.IImageFilterService;
 
@@ -49,7 +50,7 @@ public class BoofCVImageFilterImpl implements IImageFilterService {
 
 	@Override
 	public IDataset filterGaussianBlur(IDataset input, double sigma, int radius) {
-		int[] shape = getShape(input);
+		int[] shape = Utils.getShape(input);
 		ImageFloat32 converted = ConvertIDataset.convertFrom(input, ImageFloat32.class, 1);
 		ImageFloat32 blurred = new ImageFloat32(shape[1], shape[0]);
 		BlurImageOps.gaussian(converted, blurred, sigma, radius, null);
@@ -58,7 +59,7 @@ public class BoofCVImageFilterImpl implements IImageFilterService {
 
 	@Override
 	public List<IDataset> filterDerivativeSobel(IDataset input) {
-		int[] shape = getShape(input);
+		int[] shape = Utils.getShape(input);
 
 		ImageSingleBand<?> converted = ConvertIDataset.convertFrom(input, ImageUInt8.class, 1);
 
@@ -79,7 +80,7 @@ public class BoofCVImageFilterImpl implements IImageFilterService {
 
 	@Override
 	public IDataset filterThreshold(IDataset input, float threshold, boolean down, boolean isBinary) {
-		int[] shape = getShape(input);
+		int[] shape = Utils.getShape(input);
 
 		ImageFloat32 converted = ConvertIDataset.convertFrom(input, ImageFloat32.class, 1);
 		ImageUInt8 binary = new ImageUInt8(shape[1], shape[0]);
@@ -119,7 +120,7 @@ public class BoofCVImageFilterImpl implements IImageFilterService {
 
 	@Override
 	public IDataset filterContour(IDataset input, int rule, int colorExternal, int colorInternal) throws Exception {
-		int[] shape = getShape(input);
+		int[] shape = Utils.getShape(input);
 		
 		ImageFloat32 converted = ConvertIDataset.convertFrom(input, ImageFloat32.class, 1);
 
@@ -142,13 +143,6 @@ public class BoofCVImageFilterImpl implements IImageFilterService {
 		List<Contour> contours = BinaryImageOps.contour(binary, contourRule, null);
 
 		return ConvertIDataset.contourImageToIDataset(contours, colorExternal, colorInternal, shape[1], shape[0]);
-	}
-
-	private int[] getShape(IDataset input) {
-		int[] shape = input.getShape();
-		if (shape.length != 2)
-			throw new IllegalArgumentException("The input data must be of dimension 2");
-		return shape;
 	}
 
 	@Override
