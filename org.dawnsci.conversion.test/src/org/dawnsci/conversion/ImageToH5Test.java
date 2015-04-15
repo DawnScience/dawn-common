@@ -16,14 +16,21 @@ import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.services.conversion.IConversionContext.ConversionScheme;
 import org.dawb.common.services.conversion.IConversionService;
 import org.dawb.common.util.io.FileUtils;
+import org.dawnsci.conversion.converters.util.LocalServiceManager;
 import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.fail;
-import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
+import uk.ac.diamond.scisoft.analysis.osgi.LoaderServiceImpl;
 
 public class ImageToH5Test {
 
+	@Before
+	public void before() {
+		LocalServiceManager.setLoaderService(new LoaderServiceImpl());
+	}
+	
 	@Test
 	public void testImageSimple() throws Exception {
 		
@@ -78,7 +85,7 @@ public class ImageToH5Test {
 				fail("Image stack was not written to "+output.getName());
 			}
 
-			final ILazyDataset set = LoaderFactory.getData(output.getAbsolutePath(), null).getLazyDataset(0);
+			final ILazyDataset set = LocalServiceManager.getLoaderService().getData(output.getAbsolutePath(), null).getLazyDataset(0);
 			if (!Arrays.equals(set.getShape(), shape)) {
 				fail("Dataset written with shape "+Arrays.toString(set.getShape())+", but expected shape was "+Arrays.toString(shape));
 			}

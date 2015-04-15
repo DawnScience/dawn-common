@@ -22,15 +22,22 @@ import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.services.conversion.IConversionService;
 import org.dawb.common.services.conversion.IConversionContext.ConversionScheme;
 import org.dawnsci.conversion.converters.AsciiConvert1D;
+import org.dawnsci.conversion.converters.util.LocalServiceManager;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
+import org.junit.Before;
 import org.junit.Test;
 
-import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
+import uk.ac.diamond.scisoft.analysis.osgi.LoaderServiceImpl;
 
 
 public class AsciiConvertTest {
 
 	private String testfile = "MoKedge_1_15.nxs";
+	
+	@Before
+	public void before() {
+		LocalServiceManager.setLoaderService(new LoaderServiceImpl());
+	}
 	
 	@Test
 	public void testAsciiSimple() throws Exception {
@@ -49,7 +56,7 @@ public class AsciiConvertTest {
         
         service.process(context);
         
-        final IDataHolder   dh    = LoaderFactory.getData(tmp.getAbsolutePath());
+        final IDataHolder   dh    = LocalServiceManager.getLoaderService().getData(tmp.getAbsolutePath(),null);
         final List<String> names = Arrays.asList("/entry1/counterTimer01/Energy","/entry1/counterTimer01/I0","/entry1/counterTimer01/lnI0It","/entry1/counterTimer01/It");
         for (String name : names) {
             if (dh.getDataset(name)==null) throw new Exception("Missing dataset "+name);
@@ -85,7 +92,7 @@ public class AsciiConvertTest {
         service.process(context);
         
         // Check rename worked
-        final IDataHolder   dh    = LoaderFactory.getData(tmp.getAbsolutePath());
+        final IDataHolder   dh    = LocalServiceManager.getLoaderService().getData(tmp.getAbsolutePath(),null);
         final List<String> names = Arrays.asList("Energy","I0","lnI0It","It");
         for (String name : names) {
             if (dh.getDataset(name)==null) throw new Exception("Missing dataset "+name);

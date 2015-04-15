@@ -26,6 +26,7 @@ import org.dawnsci.boofcv.BoofCVImageStitchingProcessCreator;
 import org.dawnsci.boofcv.stitching.BoofCVImageStitchingImpl;
 import org.dawnsci.conversion.converters.ImagesToStitchedConverter;
 import org.dawnsci.conversion.converters.ImagesToStitchedConverter.ConversionStitchedBean;
+import org.dawnsci.conversion.converters.util.LocalServiceManager;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.image.IImageStitchingProcess;
 import org.eclipse.dawnsci.analysis.api.roi.IROI;
@@ -35,6 +36,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import uk.ac.diamond.scisoft.analysis.io.Utils;
+import uk.ac.diamond.scisoft.analysis.osgi.LoaderServiceImpl;
 
 public class StitchingConvertTest {
 
@@ -49,6 +51,7 @@ public class StitchingConvertTest {
 		output = new File(dir.getAbsolutePath()+"/stitchedImage");
 		stitchedFileName = "image.tif";
 		FileUtils.createNewUniqueDir(output);
+		LocalServiceManager.setLoaderService(new LoaderServiceImpl());
 	}
 
 	@Test

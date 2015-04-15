@@ -19,16 +19,24 @@ import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.services.conversion.IConversionContext.ConversionScheme;
 import org.dawb.common.services.conversion.IConversionService;
 import org.dawnsci.conversion.converters.Convert1DtoND.Convert1DInfoBean;
+import org.dawnsci.conversion.converters.util.LocalServiceManager;
 import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
+import org.junit.Before;
 import org.junit.Test;
 
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
+import uk.ac.diamond.scisoft.analysis.osgi.LoaderServiceImpl;
 
 public class Convert1DtoNDTest {
 	
 	private String testfile = "MoKedge_1_15.nxs";
 	private String nonNexusTest = "HyperOut.dat";
+	
+	@Before
+	public void before() {
+		LocalServiceManager.setLoaderService(new LoaderServiceImpl());
+	}
 	
 	@Test
 	public void test1DSimple() throws Exception {
@@ -51,7 +59,7 @@ public class Convert1DtoNDTest {
         
         service.process(context);
         
-        final IDataHolder   dh    = LoaderFactory.getData(tmp.getAbsolutePath());
+        final IDataHolder   dh    = LocalServiceManager.getLoaderService().getData(tmp.getAbsolutePath(),null);
         final List<String> names = Arrays.asList("/entry1/counterTimer01/I0","/entry1/counterTimer01/lnI0It","/entry1/counterTimer01/It");
         for (String name : names) {
             ILazyDataset ds = dh.getLazyDataset(name);
@@ -89,7 +97,7 @@ public class Convert1DtoNDTest {
         
         service.process(context);
         
-        final IDataHolder   dh    = LoaderFactory.getData(tmp.getAbsolutePath());
+        final IDataHolder   dh    = LocalServiceManager.getLoaderService().getData(tmp.getAbsolutePath(),null);
         final List<String> names = Arrays.asList("/entry1/counterTimer01/I0","/entry1/counterTimer01/lnI0It","/entry1/counterTimer01/It");
         for (String name : names) {
             ILazyDataset ds = dh.getLazyDataset(name);

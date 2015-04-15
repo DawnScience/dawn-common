@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.util.list.SortNatural;
+import org.dawnsci.conversion.converters.util.LocalServiceManager;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
 import org.eclipse.dawnsci.analysis.api.monitor.IMonitor;
@@ -25,7 +26,6 @@ import org.eclipse.dawnsci.hdf5.IHierarchicalDataFile;
 import org.eclipse.dawnsci.hdf5.Nexus;
 
 import uk.ac.diamond.scisoft.analysis.io.ImageStackLoader;
-import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 
 /**
  * This converter converts a directory of images to a stack in HDF5
@@ -82,7 +82,7 @@ public class ImagesToHDFConverter extends AbstractConversion{
 			final List<File>   files = expand(regex);
 			for (File file : files) {
 				try {
-					ILazyDataset data = LoaderFactory.getData(file.getAbsolutePath(), context.getMonitor()).getLazyDataset(0);
+					ILazyDataset data = LocalServiceManager.getLoaderService().getData(file.getAbsolutePath(), context.getMonitor()).getLazyDataset(0);
 					if (data.getRank()==2) paths.add(file.getAbsolutePath());
 				} catch (Exception ignored) {
 					continue;

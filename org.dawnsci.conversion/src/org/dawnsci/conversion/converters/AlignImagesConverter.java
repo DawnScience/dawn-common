@@ -15,6 +15,7 @@ import java.util.List;
 
 import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.util.list.SortNatural;
+import org.dawnsci.conversion.converters.util.LocalServiceManager;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
@@ -25,7 +26,6 @@ import org.slf4j.LoggerFactory;
 import uk.ac.diamond.scisoft.analysis.io.DataHolder;
 import uk.ac.diamond.scisoft.analysis.io.ImageStackLoader;
 import uk.ac.diamond.scisoft.analysis.io.JavaImageSaver;
-import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 
 /**
  * Aligns a stack or directory of images
@@ -106,7 +106,7 @@ public class AlignImagesConverter extends AbstractImageConversion {
 		ILazyDataset lazyDataset = null;
 		// if dat file: try to parse it and populate the list of all images paths 
 		if (regexs.size() == 1 && regexs.get(0).endsWith(".dat")) {
-			IDataHolder holder = LoaderFactory.getData(regexs.get(0));
+			IDataHolder holder = LocalServiceManager.getLoaderService().getData(regexs.get(0),null);
 			String[] names = holder.getNames();
 			for (String name : names) {
 				lazyDataset = holder.getLazyDataset(name);
@@ -118,7 +118,7 @@ public class AlignImagesConverter extends AbstractImageConversion {
 			final List<File> files = expand(regex);
 			for (File file : files) {
 				try {
-					ILazyDataset data = LoaderFactory.getData(
+					ILazyDataset data = LocalServiceManager.getLoaderService().getData(
 							file.getAbsolutePath(), context.getMonitor())
 							.getLazyDataset(0);
 					if (data.getRank() == 2)
@@ -136,7 +136,7 @@ public class AlignImagesConverter extends AbstractImageConversion {
 			lazyDataset = new LazyDataset("Folder Stack",
 					loader.getDtype(), loader.getShape(), loader);
 		} else {
-			lazyDataset = LoaderFactory.getData(regexs.get(0)).getLazyDataset(0);
+			lazyDataset = LocalServiceManager.getLoaderService().getData(regexs.get(0),null).getLazyDataset(0);
 		}
 		
 		return lazyDataset;

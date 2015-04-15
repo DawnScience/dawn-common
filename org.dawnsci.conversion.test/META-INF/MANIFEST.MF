@@ -13,3 +13,4 @@ Require-Bundle: org.junit;bundle-version="[4.10.0,5.0.0)",
  org.dawnsci.plotting.histogram;bundle-version="1.1.0",
  org.dawnsci.boofcv;bundle-version="1.0.0",
  org.apache.commons.io;bundle-version="2.4.0"
+Import-Package: uk.ac.diamond.scisoft.analysis.osgi

@@ -18,6 +18,7 @@ import org.dawb.common.services.conversion.IConversionService;
 import org.dawb.common.ui.image.PaletteFactory;
 import org.dawnsci.conversion.converters.AVIImageConverter;
 import org.dawnsci.conversion.converters.ConversionInfoBean;
+import org.dawnsci.conversion.converters.util.LocalServiceManager;
 import org.dawnsci.plotting.histogram.service.PaletteService;
 import org.dawnsci.plotting.services.ImageService;
 import org.dawnsci.plotting.services.PlotImageService;
@@ -28,13 +29,19 @@ import org.eclipse.dawnsci.plotting.api.histogram.ImageServiceBean;
 import org.eclipse.dawnsci.plotting.api.histogram.ImageServiceBean.HistoType;
 import org.eclipse.dawnsci.plotting.api.histogram.ImageServiceBean.ImageOrigin;
 import org.eclipse.dawnsci.plotting.api.image.IPlotImageService;
+import org.junit.Before;
 import org.junit.Test;
 import org.monte.media.avi.AVIReader;
 
 import uk.ac.diamond.scisoft.analysis.dataset.function.DownsampleMode;
+import uk.ac.diamond.scisoft.analysis.osgi.LoaderServiceImpl;
 
 public class AVIImageConvertTest {
 
+	@Before
+	public void before() {
+		LocalServiceManager.setLoaderService(new LoaderServiceImpl());
+	}
 	
 	@Test
 	public void testAVISimple() throws Exception {

@@ -24,6 +24,7 @@ import org.dawb.common.services.conversion.IConversionService;
 import org.dawb.common.util.io.FileUtils;
 import org.dawnsci.boofcv.BoofCVImageTransformCreator;
 import org.dawnsci.conversion.converters.AlignImagesConverter.ConversionAlignBean;
+import org.dawnsci.conversion.converters.util.LocalServiceManager;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.image.IImageTransform;
 import org.junit.After;
@@ -31,6 +32,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import uk.ac.diamond.scisoft.analysis.io.Utils;
+import uk.ac.diamond.scisoft.analysis.osgi.LoaderServiceImpl;
 
 public class AlignConvertTest {
 
@@ -43,6 +45,7 @@ public class AlignConvertTest {
 		dir = new File(System.getProperty("java.io.tmpdir"), "AlignTestFolder");
 		output = new File(dir.getAbsolutePath()+"/Aligned_images");
 		FileUtils.createNewUniqueDir(output);
+		LocalServiceManager.setLoaderService(new LoaderServiceImpl());
 	}
 
 	@Test

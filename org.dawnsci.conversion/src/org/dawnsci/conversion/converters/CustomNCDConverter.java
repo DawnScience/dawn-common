@@ -37,6 +37,7 @@ import org.cansas.cansas1d.SASsampleType;
 import org.cansas.cansas1d.SASsourceType;
 import org.cansas.cansas1d.SAStransmissionSpectrumType;
 import org.dawb.common.services.conversion.IConversionContext;
+import org.dawnsci.conversion.converters.util.LocalServiceManager;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.IErrorDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
@@ -491,7 +492,7 @@ public class CustomNCDConverter extends AbstractConversion  {
 		
 		Dataset data = null;
 		try {
-			data = DatasetUtils.convertToDataset(LoaderFactory.getDataSet(path.getAbsolutePath(), datasetName, null));
+			data = DatasetUtils.convertToDataset(LocalServiceManager.getLoaderService().getDataset(path.getAbsolutePath(), datasetName, null));
 			//expand so the concatenation works later
 			data.setShape(data.getShape()[0],1);
 			data.setName(getAxisDatasetName(datasetName));

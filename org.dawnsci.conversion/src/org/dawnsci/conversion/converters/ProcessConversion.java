@@ -18,6 +18,7 @@ import org.dawb.common.services.ServiceManager;
 import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.services.conversion.IProcessingConversionInfo;
 import org.dawb.common.services.conversion.ProcessingOutputType;
+import org.dawnsci.conversion.converters.util.LocalServiceManager;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
@@ -30,7 +31,6 @@ import org.eclipse.dawnsci.analysis.dataset.slicer.SourceInformation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 import uk.ac.diamond.scisoft.analysis.utils.FileUtils;
 
 public class ProcessConversion extends AbstractConversion {
@@ -51,8 +51,8 @@ public class ProcessConversion extends AbstractConversion {
 				            final String               nameFrag,
 				            final IConversionContext   context) throws Exception {
 		
-		if (service == null) service = (IOperationService)ServiceManager.getService(IOperationService.class);
-		if (lservice == null) lservice = (ILoaderService)ServiceManager.getService(ILoaderService.class);
+		if (service == null) service = LocalServiceManager.getOperationService();
+		if (lservice == null) lservice = LocalServiceManager.getLoaderService();
 		
 		Object userObject = context.getUserObject();
 		
@@ -110,7 +110,7 @@ public class ProcessConversion extends AbstractConversion {
 		if (lazyDataset != null) return lazyDataset;
 		
 
-		final IDataHolder   dh = LoaderFactory.getData(path.getAbsolutePath());
+		final IDataHolder   dh = LocalServiceManager.getLoaderService().getData(path.getAbsolutePath(),null);
 		context.setSelectedH5Path(dsPath);
 		if (context.getMonitor()!=null) {
 			context.getMonitor().subTask("Process '"+path.getAbsolutePath());

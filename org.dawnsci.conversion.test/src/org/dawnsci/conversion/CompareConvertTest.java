@@ -18,14 +18,22 @@ import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.services.conversion.IConversionContext.ConversionScheme;
 import org.dawb.common.services.conversion.IConversionService;
 import org.dawb.common.util.io.FileUtils;
+import org.dawnsci.conversion.converters.util.LocalServiceManager;
 import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
+import org.junit.Before;
 import org.junit.Test;
 
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
+import uk.ac.diamond.scisoft.analysis.osgi.LoaderServiceImpl;
 
 public class CompareConvertTest {
 
+	@Before
+	public void before() {
+		LocalServiceManager.setLoaderService(new LoaderServiceImpl());
+	}
+	
 	@Test
 	public void testDataSimple() throws Exception {
 		
@@ -60,7 +68,7 @@ public class CompareConvertTest {
 	
 			service.process(context);
 			
-			final IDataHolder holder = LoaderFactory.getData(output.getAbsolutePath());
+			final IDataHolder holder = LocalServiceManager.getLoaderService().getData(output.getAbsolutePath(),null);
 
 			ILazyDataset set = holder.getLazyDataset("/entry1/instrument/cold_head_temp/cold_head_temp");
 			final int[] shape = new int[]{size, 436};

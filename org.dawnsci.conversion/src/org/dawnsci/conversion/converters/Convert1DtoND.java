@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.dawb.common.services.conversion.IConversionContext;
+import org.dawnsci.conversion.converters.util.LocalServiceManager;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
 import org.eclipse.dawnsci.analysis.dataset.impl.AggregateDataset;
@@ -25,8 +26,6 @@ import org.eclipse.dawnsci.hdf5.IHierarchicalDataFile;
 import org.eclipse.dawnsci.hdf5.Nexus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 
 public class Convert1DtoND extends AbstractConversion {
 	
@@ -72,7 +71,7 @@ public class Convert1DtoND extends AbstractConversion {
 			String axisName = context.getAxisDatasetName();
 			
 			if (axisName != null) {
-				axis = LoaderFactory.getDataSet(context.getFilePaths().get(0), axisName, null);
+				axis = LocalServiceManager.getLoaderService().getDataset(context.getFilePaths().get(0),axisName,null);
 				axisLength = axis.getShape()[0];
 				
 			}

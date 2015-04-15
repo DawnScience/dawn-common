@@ -14,15 +14,21 @@ import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.services.conversion.IConversionContext.ConversionScheme;
 import org.dawb.common.services.conversion.IConversionService;
 import org.dawnsci.conversion.converters.ConversionInfoBean;
+import org.dawnsci.conversion.converters.util.LocalServiceManager;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
+import org.junit.Before;
 import org.junit.Test;
 
-import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
+import uk.ac.diamond.scisoft.analysis.osgi.LoaderServiceImpl;
 
 
 public class ImageConvertTest {
 
+	@Before
+	public void before() {
+		LocalServiceManager.setLoaderService(new LoaderServiceImpl());
+	}
 	
 	@Test
 	public void testTiffSimple() throws Exception {
@@ -50,7 +56,7 @@ public class ImageConvertTest {
         final File[] fa = dir.listFiles();
         for (File file : fa) {
         	file.deleteOnExit();
-        	final IDataHolder holder = LoaderFactory.getData(file.getAbsolutePath());
+        	final IDataHolder holder = LocalServiceManager.getLoaderService().getData(file.getAbsolutePath(),null);
         	final IDataset   set    = holder.getDataset(0);
         	if (set.getShape()[0]!=2048 || set.getShape()[1]!=2048) {
         		throw new Exception("Incorrect shape of exported dataset!");
@@ -108,7 +114,7 @@ public class ImageConvertTest {
         	
         	if (!file.getName().startsWith("Export")) throw new Exception("Alternative name did not work!");
         	
-        	final IDataHolder holder = LoaderFactory.getData(file.getAbsolutePath());
+        	final IDataHolder holder = LocalServiceManager.getLoaderService().getData(file.getAbsolutePath(),null);
         	final IDataset   set    = holder.getDataset(0);
         	if (set.getShape()[0]!=2048 || set.getShape()[1]!=2048) {
         		throw new Exception("Incorrect shape of exported dataset!");

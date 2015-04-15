@@ -19,12 +19,19 @@ import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.services.conversion.IConversionContext.ConversionScheme;
 import org.dawb.common.services.conversion.IConversionService;
 import org.dawnsci.conversion.converters.CustomNCDConverter.SAS_FORMAT;
+import org.dawnsci.conversion.converters.util.LocalServiceManager;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
+import org.junit.Before;
 import org.junit.Test;
 
-import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
+import uk.ac.diamond.scisoft.analysis.osgi.LoaderServiceImpl;
 
 public class NCDConvertTest {
+	
+	@Before
+	public void before() {
+		LocalServiceManager.setLoaderService(new LoaderServiceImpl());
+	}
 	
 	@Test
 	public void testNCDSimple() throws Exception {
@@ -52,7 +59,7 @@ public class NCDConvertTest {
         final File[] fa = dir.listFiles();
         for (File file : fa) {
         	file.deleteOnExit();
-        	final IDataHolder   dh    = LoaderFactory.getData(file.getAbsolutePath());
+        	final IDataHolder   dh    = LocalServiceManager.getLoaderService().getData(file.getAbsolutePath(),null);
             String[] names = dh.getNames();
             assertEquals(61, names.length);
             assertEquals("q(1/nm)",names[0]);
@@ -85,7 +92,7 @@ public class NCDConvertTest {
         final File[] fa = dir.listFiles();
         for (File file : fa) {
         	file.deleteOnExit();
-        	final IDataHolder   dh    = LoaderFactory.getData(file.getAbsolutePath());
+        	final IDataHolder   dh    = LocalServiceManager.getLoaderService().getData(file.getAbsolutePath(),null);
             String[] names = dh.getNames();
             assertEquals(60, names.length);
             assertEquals("Column_0",names[0]);
@@ -121,7 +128,7 @@ public class NCDConvertTest {
         assertEquals(12, fa.length);
         for (File file : fa) {
         	file.deleteOnExit();
-        	final IDataHolder   dh    = LoaderFactory.getData(file.getAbsolutePath());
+        	final IDataHolder   dh    = LocalServiceManager.getLoaderService().getData(file.getAbsolutePath(),null);
             String[] names = dh.getNames();
             assertEquals(3, names.length);
             assertEquals("q(1/A)",names[0]);
@@ -156,7 +163,7 @@ public class NCDConvertTest {
         assertEquals(2, fa.length);
         for (File file : fa) {
         	file.deleteOnExit();
-        	final IDataHolder   dh    = LoaderFactory.getData(file.getAbsolutePath());
+        	final IDataHolder   dh    = LocalServiceManager.getLoaderService().getData(file.getAbsolutePath(),null);
             String[] names = dh.getNames();
             assertEquals(2, names.length);
             assertEquals("q(1/A)",names[0]);
@@ -207,7 +214,7 @@ public class NCDConvertTest {
 			for (String pathName : unitMap.keySet()) {
 				if (file.getName().contains(pathName)) {
 					file.deleteOnExit();
-					final IDataHolder dh = LoaderFactory.getData(file.getAbsolutePath());
+					final IDataHolder dh = LocalServiceManager.getLoaderService().getData(file.getAbsolutePath(),null);
 					String[] names = dh.getNames();
 					String unitName = unitMap.get(pathName);
 					assertEquals(unitName, names[0]);

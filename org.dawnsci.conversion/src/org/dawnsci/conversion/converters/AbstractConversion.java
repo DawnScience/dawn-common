@@ -16,10 +16,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.dawb.common.services.conversion.IConversionContext;
+import org.dawnsci.conversion.converters.util.LocalServiceManager;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.Slice;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
+import org.eclipse.dawnsci.analysis.api.monitor.IMonitor;
 import org.eclipse.dawnsci.analysis.dataset.impl.ByteDataset;
 import org.eclipse.dawnsci.analysis.dataset.impl.Dataset;
 import org.eclipse.dawnsci.analysis.dataset.impl.DatasetUtils;
@@ -30,8 +32,6 @@ import org.eclipse.dawnsci.analysis.dataset.impl.LongDataset;
 import org.eclipse.dawnsci.analysis.dataset.impl.ShortDataset;
 import org.eclipse.dawnsci.analysis.dataset.slicer.SliceVisitor;
 import org.eclipse.dawnsci.analysis.dataset.slicer.Slicer;
-
-import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 
 /**
  * AbstractConversion details converting from hdf/nexus to other
@@ -129,11 +129,11 @@ public abstract class AbstractConversion {
 		if (lazy != null)
 			return lazy;
 
-		final IDataHolder   dh = LoaderFactory.getData(path.getAbsolutePath());
+		final IDataHolder   dh = LocalServiceManager.getLoaderService().getData(path.getAbsolutePath(), null);
 		context.setSelectedH5Path(dsPath);
 		if (context.getSliceDimensions()==null) {
 			// Because the data might be lazy and unloadable. We want to load all the data now.
-			IDataset data = LoaderFactory.getDataSet(path.getAbsolutePath(), dsPath, null);
+			IDataset data = LocalServiceManager.getLoaderService().getDataset(path.getAbsolutePath(),dsPath,(IMonitor)null);
 			data.setName(dsPath);
 			convert(data);
 			return null;
@@ -302,7 +302,7 @@ public abstract class AbstractConversion {
 	public List<String> getDataNames(File ioFile) throws Exception {
 
 		if (ioFile.isDirectory()) return Collections.emptyList();
-		final IDataHolder   dh    = LoaderFactory.getData(ioFile.getAbsolutePath());
+		final IDataHolder   dh    = LocalServiceManager.getLoaderService().getData(ioFile.getAbsolutePath(),null);
 		
 		if (dh == null || dh.getNames() == null) return Collections.emptyList();
 		return Arrays.asList(dh.getNames());
