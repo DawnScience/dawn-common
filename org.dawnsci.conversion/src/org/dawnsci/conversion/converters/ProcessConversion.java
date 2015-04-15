@@ -20,14 +20,12 @@ import org.dawb.common.services.conversion.IProcessingConversionInfo;
 import org.dawb.common.services.conversion.ProcessingOutputType;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
-import org.eclipse.dawnsci.analysis.api.dataset.Slice;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
+import org.eclipse.dawnsci.analysis.api.io.ILoaderService;
+import org.eclipse.dawnsci.analysis.api.metadata.AxesMetadata;
 import org.eclipse.dawnsci.analysis.api.processing.IOperationContext;
 import org.eclipse.dawnsci.analysis.api.processing.IOperationService;
-import org.eclipse.dawnsci.analysis.dataset.metadata.AxesMetadataImpl;
-import org.eclipse.dawnsci.analysis.dataset.metadata.OriginMetadataImpl;
 import org.eclipse.dawnsci.analysis.dataset.slicer.SliceFromSeriesMetadata;
-import org.eclipse.dawnsci.analysis.dataset.slicer.Slicer;
 import org.eclipse.dawnsci.analysis.dataset.slicer.SourceInformation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +38,7 @@ public class ProcessConversion extends AbstractConversion {
 	private final static Logger logger = LoggerFactory.getLogger(ProcessConversion.class);
 
 	IOperationService service;
+	ILoaderService lservice;
 	private final static String PROCESSED = "_processed";
 	private final static String EXT= ".nxs";
 	
@@ -53,6 +52,7 @@ public class ProcessConversion extends AbstractConversion {
 				            final IConversionContext   context) throws Exception {
 		
 		if (service == null) service = (IOperationService)ServiceManager.getService(IOperationService.class);
+		if (lservice == null) lservice = (ILoaderService)ServiceManager.getService(ILoaderService.class);
 		
 		Object userObject = context.getUserObject();
 		
@@ -62,86 +62,14 @@ public class ProcessConversion extends AbstractConversion {
 		final Map<Integer, String> sliceDimensions = context.getSliceDimensions();
 		//take a local view of the lazy dataset, since we are messing with its metadata
 		ILazyDataset localLazy = lz.getSliceView();
-		int[] shape = localLazy.getShape();
 		
 		Map<Integer, String> axesNames = context.getAxesNames();
-		if (axesNames != null) {
-			
-			AxesMetadataImpl axMeta = null;
-			int rank = localLazy.getRank();
-			
-			try {
-				axMeta = new AxesMetadataImpl(localLazy.getRank());
-				for (Integer key : axesNames.keySet()) {
-					String axesName = axesNames.get(key);
-					IDataHolder dataHolder = LoaderFactory.getData(context.getSelectedConversionFile().getAbsolutePath());
-					ILazyDataset lazyDataset = dataHolder.getLazyDataset(axesName);
-					
-					if (lazyDataset!= null) {
+		AxesMetadata axm = lservice.getAxesMetadata(localLazy, context.getSelectedConversionFile().getAbsolutePath(), axesNames);
 
-						if (lazyDataset.getName() == null || lazyDataset.getName().isEmpty()) {
-							lazyDataset.setName(axesName);
-						}
-
-						int axRank = lazyDataset.getRank();
-						if (axRank == rank || axRank == 1)	{
-							axMeta.setAxis(key-1, lazyDataset);
-						} else {
-
-							int[] axShape = lazyDataset.getShape();
-							int[] newShape = new int[rank];
-							Arrays.fill(newShape, 1);
-
-							int[] idx = new int[axRank];
-							int max = rank;
-
-							for (int i = axRank-1; i >= 0; i--) {
-
-								int id = axShape[i];
-								boolean found = false;
-
-								for (int j = max -1 ; i >= 0; i--) {
-
-									if (id == shape[j]) {
-										found = true;
-										idx[i] = j;
-										max = j;
-										break;
-									}
-
-								}
-
-								if (!found) {
-									throw new IllegalArgumentException("Axes shape not compatible!");
-								}
-							}
-
-							for (int i = 0; i < axRank; i++) {
-								newShape[idx[i]] = axShape[i];
-							}
-
-							lazyDataset = lazyDataset.getSliceView();
-							lazyDataset.setShape(newShape);
-						}
-						axMeta.setAxis(key-1, lazyDataset);
-					}
-					else {
-						axMeta.setAxis(key-1, new ILazyDataset[1]);
-					}
-				}
-
-				localLazy.setMetadata(axMeta);
-			} catch (Exception e) {
-				//no axes metadata
-				e.printStackTrace();
-			}
-		}
+		SourceInformation si = new SourceInformation(context.getSelectedConversionFile().getAbsolutePath(), context.getDatasetNames().get(0), localLazy);
+		localLazy.setMetadata(new SliceFromSeriesMetadata(si));
+		localLazy.setMetadata(axm);
 		
-		Slice[] init = Slicer.getSliceArrayFromSliceDimensions(sliceDimensions,shape);
-		int[] dataDims = Slicer.getDataDimensions(shape, sliceDimensions);
-		
-		OriginMetadataImpl om = new OriginMetadataImpl(localLazy, init, dataDims, context.getSelectedConversionFile().getAbsolutePath(), context.getDatasetNames().get(0));
-		localLazy.setMetadata(om);
 		IOperationContext cc = service.createContext();
 		cc.setData(localLazy);
 		cc.setSlicing(sliceDimensions);
@@ -155,8 +83,6 @@ public class ProcessConversion extends AbstractConversion {
 		File fh = new File(outputFolder);
 		fh.mkdir();
 		
-		SourceInformation si = new SourceInformation(context.getSelectedConversionFile().getAbsolutePath(), context.getDatasetNames().get(0), localLazy);
-		localLazy.setMetadata(new SliceFromSeriesMetadata(si));
 		//TODO output path
 		
 		// If we need to keep the original data, sort it out here.
