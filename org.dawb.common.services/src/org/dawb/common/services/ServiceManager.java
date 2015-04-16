@@ -17,6 +17,7 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.dawnsci.analysis.api.image.IImageFilterService;
 import org.eclipse.dawnsci.analysis.api.image.IImageStitchingProcess;
+import org.eclipse.dawnsci.analysis.api.image.IImageThreshold;
 import org.eclipse.dawnsci.analysis.api.image.IImageTransform;
 import org.eclipse.dawnsci.analysis.api.io.ILoaderService;
 import org.eclipse.dawnsci.analysis.api.persistence.IPersistenceService;
@@ -46,6 +47,7 @@ public class ServiceManager {
 		OFFLINE_SERVICES.add(IPersistenceService.class);
 		OFFLINE_SERVICES.add(IImageFilterService.class);
 		OFFLINE_SERVICES.add(IImageTransform.class);
+		OFFLINE_SERVICES.add(IImageThreshold.class);
 		OFFLINE_SERVICES.add(IImageStitchingProcess.class);
 		OFFLINE_SERVICES.add(IOperationService.class);
 	}
