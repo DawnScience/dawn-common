@@ -6,24 +6,22 @@ import org.dawnsci.boofcv.BoofCVImageThresholdServiceCreator;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.image.IImageThreshold;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 
 public class ImageThresholdTest {
 
-	private IImageThreshold service;
-	private IDataHolder holder;
-	private String dataname = "image-01";
-	private IDataset data;
+	private static IImageThreshold service;
+	private static IDataHolder holder;
+	private static IDataset data;
 
-	@Before
-	public void before() throws Exception {
-		if (service == null)
-			service = BoofCVImageThresholdServiceCreator.createFilterService();
+	@BeforeClass
+	public static void beforeClass() throws Exception {
+		service = BoofCVImageThresholdServiceCreator.createFilterService();
 		holder = LoaderFactory.getData("resources/particles01.jpg", null);
-		data = holder.getDataset(dataname);
+		data = holder.getDataset("image-01");
 	}
 
 	@Test
