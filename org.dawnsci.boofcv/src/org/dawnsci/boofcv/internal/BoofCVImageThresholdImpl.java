@@ -6,7 +6,7 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package org.dawnsci.boofcv.threshold;
+package org.dawnsci.boofcv.internal;
 
 import org.dawnsci.boofcv.converter.ConvertIDataset;
 import org.dawnsci.boofcv.util.Utils;
@@ -27,13 +27,13 @@ import boofcv.struct.image.ImageUInt8;
  * @author Baha El Kassaby
  *
  */
-public class ImageThresholdImpl implements IImageThreshold {
+public class BoofCVImageThresholdImpl implements IImageThreshold {
 
 	static {
 		System.out.println("Starting BoofCV image threshold service.");
 	}
 
-	public ImageThresholdImpl() {
+	public BoofCVImageThresholdImpl() {
 		// Important do nothing here, OSGI may start the service more than once.
 	}
 

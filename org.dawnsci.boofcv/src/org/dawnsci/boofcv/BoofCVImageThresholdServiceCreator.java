@@ -8,7 +8,7 @@
  */
 package org.dawnsci.boofcv;
 
-import org.dawnsci.boofcv.threshold.ImageThresholdImpl;
+import org.dawnsci.boofcv.internal.BoofCVImageThresholdImpl;
 import org.eclipse.dawnsci.analysis.api.image.IImageThreshold;
 
 /**
@@ -28,6 +28,6 @@ public class BoofCVImageThresholdServiceCreator {
 	 * @return
 	 */
 	public static IImageThreshold createFilterService(){
-		return new ImageThresholdImpl();
+		return new BoofCVImageThresholdImpl();
 	}
 }
