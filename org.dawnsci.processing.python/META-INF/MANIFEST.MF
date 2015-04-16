@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Python
+Bundle-SymbolicName: org.dawnsci.processing.python;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: uk.ac.diamond.scisoft.analysis.processing.python.Activator
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.dawnsci.analysis.api;bundle-version="1.0.0",
+ org.eclipse.dawnsci.analysis.dataset;bundle-version="1.0.0",
+ org.dawnsci.python.rpc,
+ org.python.pydev.core;bundle-version="3.6.0",
+ uk.ac.diamond.scisoft.analysis.xmlrpc;bundle-version="1.0.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-ActivationPolicy: lazy
