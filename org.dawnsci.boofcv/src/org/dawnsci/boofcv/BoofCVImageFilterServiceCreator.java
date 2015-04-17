@@ -13,6 +13,7 @@ import org.eclipse.dawnsci.analysis.api.image.IImageFilterService;
 
 /**
  * Class used to test the BoofCVImageFilterImpl
+ * Also used in scisoftpy/jython/jyimage.py
  * @author wqk87977
  *
  * @internal only use in unit tests.
