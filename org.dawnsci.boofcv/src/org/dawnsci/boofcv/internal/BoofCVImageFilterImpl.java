@@ -18,6 +18,7 @@ import org.eclipse.dawnsci.analysis.api.image.IImageFilterService;
 
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.Contour;
+import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.alg.filter.binary.ThresholdImageOps;
 import boofcv.alg.filter.blur.BlurImageOps;
 import boofcv.alg.filter.blur.GBlurImageOps;
@@ -35,7 +36,7 @@ import boofcv.struct.image.ImageUInt8;
  * 
  * This class is internal and not supposed to be used out of this bundle.
  * 
- * @author wqk87977
+ * @author Baha El Kassaby
  *
  */
 public class BoofCVImageFilterImpl implements IImageFilterService {
@@ -76,20 +77,6 @@ public class BoofCVImageFilterImpl implements IImageFilterService {
 		output.add(ConvertIDataset.convertTo(derivY, false));
 
 		return output;
-	}
-
-	@Override
-	public IDataset filterThreshold(IDataset input, float threshold, boolean down, boolean isBinary) {
-		int[] shape = Utils.getShape(input);
-
-		ImageFloat32 converted = ConvertIDataset.convertFrom(input, ImageFloat32.class, 1);
-		ImageUInt8 binary = new ImageUInt8(shape[1], shape[0]);
-
-		// create a binary image by thresholding
-		ThresholdImageOps.threshold(converted, binary, threshold, down);
-
-		//convert back to IDataset
-		return ConvertIDataset.convertTo(binary, isBinary);
 	}
 
 	@Override
@@ -169,5 +156,87 @@ public class BoofCVImageFilterImpl implements IImageFilterService {
 	public IDataset filterMax(IDataset input, int radius) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	// Thresholding filters
+	enum ThresholdType {
+		GLOBAL,
+		MEAN,
+		OTSU,
+		ENTROPY,
+		SQUARE,
+		GAUSSIAN,
+		SAUVOLA;
+	}
+
+	private IDataset threshold(ThresholdType type, IDataset input, float threshold, int radius, boolean down, boolean isBinary) {
+		int[] shape = Utils.getShape(input);
+
+		ImageFloat32 converted = ConvertIDataset.convertFrom(input, ImageFloat32.class, 1);
+		ImageUInt8 binary = new ImageUInt8(shape[1], shape[0]);
+
+		switch (type) {
+		case GLOBAL:
+			// create a binary image by thresholding
+			ThresholdImageOps.threshold(converted, binary, threshold, down);
+			break;
+		case MEAN:
+			GThresholdImageOps.threshold(converted, binary, ImageStatistics.mean(converted), down);
+			break;
+		case OTSU:
+			GThresholdImageOps.threshold(converted, binary, GThresholdImageOps.computeOtsu(converted, 0, 256), down);
+			break;
+		case ENTROPY:
+			GThresholdImageOps.threshold(converted, binary, GThresholdImageOps.computeEntropy(converted, 0, 256), down);
+			break;
+		case SQUARE:
+			GThresholdImageOps.adaptiveSquare(converted, binary, radius, 0, down, null, null);
+			break;
+		case GAUSSIAN:
+			GThresholdImageOps.adaptiveGaussian(converted, binary, radius, 0, down, null, null);
+			break;
+		case SAUVOLA:
+			GThresholdImageOps.adaptiveSauvola(converted, binary, radius, 0.30f, down);
+			break;
+		default:
+			break;
+		}
+		//convert back to IDataset
+		return ConvertIDataset.convertTo(binary, isBinary);
+	}
+
+	@Override
+	public IDataset globalThreshold(IDataset input, float threshold, boolean down, boolean isBinary) {
+		return threshold(ThresholdType.GLOBAL, input, threshold, 0, down, isBinary);
+	}
+
+	@Override
+	public IDataset globalMeanThreshold(IDataset input, boolean down, boolean isBinary) {
+		return threshold(ThresholdType.MEAN, input, 0, 0, down, isBinary);
+	}
+
+	@Override
+	public IDataset globalOtsuThreshold(IDataset input, boolean down, boolean isBinary) {
+		return threshold(ThresholdType.OTSU, input, 0, 0, down, isBinary);
+	}
+
+	@Override
+	public IDataset globalEntropyThreshold(IDataset input, boolean down, boolean isBinary) {
+		return threshold(ThresholdType.ENTROPY, input, 0, 0, down, isBinary);
+	}
+
+	@Override
+	public IDataset adaptiveSquareThreshold(IDataset input, int radius, boolean down, boolean isBinary) {
+		return threshold(ThresholdType.SQUARE, input, 0, radius, down, isBinary);
+	}
+
+	@Override
+	public IDataset adaptiveGaussianThreshold(IDataset input, int radius, boolean down, boolean isBinary) {
+		return threshold(ThresholdType.GAUSSIAN, input, 0, radius, down, isBinary);
+	}
+
+	@Override
+	public IDataset adaptiveSauvolaThreshold(IDataset input, int radius, boolean down, boolean isBinary) {
+		return threshold(ThresholdType.SAUVOLA, input, 0, radius, down, isBinary);
 	}
 }

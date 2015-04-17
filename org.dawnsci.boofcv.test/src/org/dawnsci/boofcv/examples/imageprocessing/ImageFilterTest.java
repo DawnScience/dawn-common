@@ -11,14 +11,12 @@ package org.dawnsci.boofcv.examples.imageprocessing;
 
 import java.util.List;
 
-import org.dawb.common.services.ServiceManager;
 import org.dawnsci.boofcv.BoofCVImageFilterServiceCreator;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.image.IImageFilterService;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
@@ -30,14 +28,10 @@ public class ImageFilterTest {
 	private IDataHolder holder;
 	private IDataset data;
 
-	@BeforeClass
-	public static void beforeClass() {
-		ServiceManager.setService(IImageFilterService.class, BoofCVImageFilterServiceCreator.createFilterService());
-	}
-
 	@Before
 	public void before() throws Exception {
-		service = (IImageFilterService) ServiceManager.getService(IImageFilterService.class);
+		if (service == null)
+			service = BoofCVImageFilterServiceCreator.createFilterService();
 		holder = LoaderFactory.getData("resources/particles01.jpg", null);
 		data = holder.getDataset(dataname);
 	}
@@ -56,7 +50,7 @@ public class ImageFilterTest {
 
 	@Test
 	public void filterThreshold() {
-		IDataset thresholded = service.filterThreshold(data, 100, true, false);
+		IDataset thresholded = service.globalThreshold(data, 100, true, false);
 		Assert.assertEquals("Value of first item is not the expected one", 0, thresholded.getDouble(0), 0);
 	}
 
@@ -77,5 +71,47 @@ public class ImageFilterTest {
 	public void filterContour() throws Exception {
 		IDataset contoured = service.filterContour(data, 8, 0xFFFFFF, 0xFF2020);
 		Assert.assertEquals("Value of item is not the expected one", 8224.0, contoured.getDouble(551, 384), 0);
+	}
+
+	@Test
+	public void testFirstValueOfThreshold() {
+		IDataset thresholded = service.globalThreshold(data, 20, true, true);
+		Assert.assertEquals("Value of first item is not the expected one", false, thresholded.getBoolean(0));
+	}
+
+	@Test
+	public void testFirstValueOfMeanThreshold() {
+		IDataset thresholded = service.globalMeanThreshold(data, true, true);
+		Assert.assertEquals("Value of first item is not the expected one", false, thresholded.getBoolean(0));
+	}
+
+	@Test
+	public void testFirstValueOfOtsuThreshold() {
+		IDataset thresholded = service.globalOtsuThreshold(data, true, true);
+		Assert.assertEquals("Value of first item is not the expected one", false, thresholded.getBoolean(0));
+	}
+
+	@Test
+	public void testFirstValueOfEntropyThreshold() {
+		IDataset thresholded = service.globalEntropyThreshold(data, true, true);
+		Assert.assertEquals("Value of first item is not the expected one", false, thresholded.getBoolean(0));
+	}
+
+	@Test
+	public void testFirstValueOfAdaptiveSquareThreshold() {
+		IDataset thresholded = service.adaptiveSquareThreshold(data, 15, true, true);
+		Assert.assertEquals("Value of first item is not the expected one", false, thresholded.getBoolean(0));
+	}
+
+	@Test
+	public void testFirstValueOfAdaptiveGaussianThreshold() {
+		IDataset thresholded = service.adaptiveGaussianThreshold(data, 15, true, true);
+		Assert.assertEquals("Value of first item is not the expected one", false, thresholded.getBoolean(0));
+	}
+
+	@Test
+	public void testFirstValueOfAdaptiveSauvolaThreshold() {
+		IDataset thresholded = service.adaptiveSauvolaThreshold(data, 15, true, true);
+		Assert.assertEquals("Value of first item is not the expected one", false, thresholded.getBoolean(0));
 	}
 }
