@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="Conversion Local Services Manager">
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="true" name="Conversion Local Services Manager">
    <implementation class="org.dawnsci.conversion.converters.util.LocalServiceManager"/>
    <reference bind="setLoaderService" cardinality="1..1" interface="org.eclipse.dawnsci.analysis.api.io.ILoaderService" name="ILoaderService" policy="static"/>
    <reference bind="setOperationService" cardinality="1..1" interface="org.eclipse.dawnsci.analysis.api.processing.IOperationService" name="IOperationService" policy="static"/>
