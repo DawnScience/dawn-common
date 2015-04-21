@@ -12,7 +12,7 @@ import static org.junit.Assert.*;
 
 import java.util.Collection;
 
-import org.dawb.common.services.expressions.IExpressionEngine;
+import org.eclipse.dawnsci.analysis.api.expressions.IExpressionEngine;
 import org.junit.Test;
 
 public class ExpressionEngineImplTest {

@@ -8,8 +8,8 @@
  */
 package org.dawnsci.jexl.internal;
 
-import org.dawb.common.services.expressions.IExpressionEngine;
-import org.dawb.common.services.expressions.IExpressionService;
+import org.eclipse.dawnsci.analysis.api.expressions.IExpressionEngine;
+import org.eclipse.dawnsci.analysis.api.expressions.IExpressionService;
 
 public class ExpressionServiceImpl implements IExpressionService {
 

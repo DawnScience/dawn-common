@@ -2,6 +2,6 @@
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="true" name="Expression Service">
    <implementation class="org.dawnsci.jexl.internal.ExpressionServiceImpl"/>
    <service>
-      <provide interface="org.dawb.common.services.expressions.IExpressionService"/>
+      <provide interface="org.eclipse.dawnsci.analysis.api.expressions.IExpressionService"/>
    </service>
 </scr:component>
