@@ -9,6 +9,7 @@
 
 package org.dawb.common.services.conversion;
 
+import org.eclipse.dawnsci.analysis.api.processing.ExecutionType;
 import org.eclipse.dawnsci.analysis.api.processing.IExecutionVisitor;
 import org.eclipse.dawnsci.analysis.api.processing.IOperation;
 
@@ -19,5 +20,7 @@ public interface IProcessingConversionInfo {
 	IOperation[] getOperationSeries();
 	
 	ProcessingOutputType getProcessingOutputType();
+	
+	ExecutionType getExecutionType();
 	
 }

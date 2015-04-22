@@ -24,6 +24,7 @@ import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
 import org.eclipse.dawnsci.analysis.api.io.ILoaderService;
 import org.eclipse.dawnsci.analysis.api.metadata.AxesMetadata;
+import org.eclipse.dawnsci.analysis.api.processing.ExecutionType;
 import org.eclipse.dawnsci.analysis.api.processing.IOperationContext;
 import org.eclipse.dawnsci.analysis.api.processing.IOperationService;
 import org.eclipse.dawnsci.analysis.dataset.slicer.SliceFromSeriesMetadata;
@@ -99,6 +100,7 @@ public class ProcessConversion extends AbstractConversion {
 		cc.setMonitor(context.getMonitor());
 		cc.setVisitor(info.getExecutionVisitor(full));
 		cc.setSeries(info.getOperationSeries());
+		cc.setExecutionType(info.getExecutionType());
 		service.execute(cc);
 	}
 	
