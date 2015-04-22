@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 Diamond Light Source Ltd.
+ * Copyright (c) 2011-2015 Diamond Light Source Ltd.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -16,9 +16,9 @@ import org.dawnsci.boofcv.util.Utils;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.image.IImageFilterService;
 import org.eclipse.dawnsci.analysis.api.image.ImageThresholdType;
+import org.eclipse.dawnsci.analysis.dataset.impl.BooleanDataset;
 
 import boofcv.alg.filter.binary.BinaryImageOps;
-import boofcv.alg.filter.binary.Contour;
 import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.alg.filter.binary.ThresholdImageOps;
 import boofcv.alg.filter.blur.BlurImageOps;
@@ -29,6 +29,7 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.BorderType;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
 
@@ -107,18 +108,13 @@ public class BoofCVImageFilterImpl implements IImageFilterService {
 	}
 
 	@Override
-	public IDataset filterContour(IDataset input, int rule, int colorExternal, int colorInternal) throws Exception {
+	public IDataset extractBlob(IDataset input, int rule) throws Exception {
+		if (!(input instanceof BooleanDataset))
+			throw new IllegalArgumentException("The input dataset should be a binary image.");
 		int[] shape = Utils.getShape(input);
-		
-		ImageFloat32 converted = ConvertIDataset.convertFrom(input, ImageFloat32.class, 1);
 
-		// the mean pixel value is often a reasonable threshold when creating a binary image
-		double mean = ImageStatistics.mean(converted);
-
-		ImageUInt8 binary = new ImageUInt8(shape[1], shape[0]);
-		// create a binary image by thresholding
-		ThresholdImageOps.threshold(converted, binary, (float) mean, true);
-
+		// convert
+		ImageUInt8 binary = ConvertIDataset.convertFrom(input, ImageUInt8.class, 1);
 		// Detect blobs inside the image using a rule
 		ConnectRule[] rules = ConnectRule.values();
 		ConnectRule contourRule = null;
@@ -128,9 +124,12 @@ public class BoofCVImageFilterImpl implements IImageFilterService {
 		}
 		if (contourRule == null)
 			throw new Exception("Rule parameter can be 4 or 8 only");
-		List<Contour> contours = BinaryImageOps.contour(binary, contourRule, null);
 
-		return ConvertIDataset.contourImageToIDataset(contours, colorExternal, colorInternal, shape[1], shape[0]);
+		ImageSInt32 label = new ImageSInt32(shape[1], shape[0]);
+		BinaryImageOps.contour(binary, contourRule, label);
+
+		return ConvertIDataset.convertTo(label, false);
+//		return ConvertIDataset.contourImageToIDataset(contours, colorExternal, colorInternal, shape[1], shape[0]);
 	}
 
 	@Override
