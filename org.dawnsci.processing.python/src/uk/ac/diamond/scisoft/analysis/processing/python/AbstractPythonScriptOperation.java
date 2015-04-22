@@ -1,6 +1,5 @@
 package uk.ac.diamond.scisoft.analysis.processing.python;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.dawnsci.python.rpc.AnalysisRpcPythonPyDevService;
@@ -52,8 +51,5 @@ public abstract class AbstractPythonScriptOperation<T extends PythonScriptModel>
 			throw new OperationException(this, "Could not run " + model.getFilePath());
 		}
 	}
-
-
-
 
 }
