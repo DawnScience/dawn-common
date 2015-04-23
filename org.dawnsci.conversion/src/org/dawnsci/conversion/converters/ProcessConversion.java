@@ -101,6 +101,7 @@ public class ProcessConversion extends AbstractConversion {
 		cc.setVisitor(info.getExecutionVisitor(full));
 		cc.setSeries(info.getOperationSeries());
 		cc.setExecutionType(info.getExecutionType());
+		cc.setPoolSize(info.getPoolSize());
 		service.execute(cc);
 	}
 	

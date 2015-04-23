@@ -23,4 +23,6 @@ public interface IProcessingConversionInfo {
 	
 	ExecutionType getExecutionType();
 	
+	int getPoolSize();
+	
 }
