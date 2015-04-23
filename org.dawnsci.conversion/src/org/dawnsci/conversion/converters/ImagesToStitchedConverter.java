@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2014 Diamond Light Source Ltd.
+ * Copyright (c) 2011, 2015 Diamond Light Source Ltd.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -19,9 +19,12 @@ import org.dawnsci.conversion.converters.util.LocalServiceManager;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
 import org.eclipse.dawnsci.analysis.api.image.IImageStitchingProcess;
+import org.eclipse.dawnsci.analysis.api.image.IImageTransform;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
 import org.eclipse.dawnsci.analysis.api.roi.IROI;
+import org.eclipse.dawnsci.analysis.dataset.impl.Image;
 import org.eclipse.dawnsci.analysis.dataset.impl.LazyDataset;
+import org.eclipse.dawnsci.analysis.dataset.roi.EllipticalROI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,6 +44,7 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 	private List<IDataset> imageStack = new ArrayList<IDataset>();
 
 	private static IImageStitchingProcess stitcher;
+	private static IImageTransform transformer;
 
 	public ImagesToStitchedConverter() {
 		super(null);
@@ -65,32 +69,45 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 		stitcher = s;
 	}
 
+	/**
+	 * OSGI Calls this
+	 * @param s
+	 */
+	public static void setImageTransform(IImageTransform its) {
+		transformer = its;
+	}
+
 	@Override
 	protected void convert(IDataset slice) throws Exception {
 
 		if (context.getMonitor() != null && context.getMonitor().isCancelled()) {
 			throw new Exception(getClass().getSimpleName() + " is cancelled");
 		}
+		ConversionStitchedBean conversionBean = (ConversionStitchedBean)context.getUserObject();
 		ILazyDataset lazy = context.getLazyDataset();
-		imageStack.add(slice);
+		// Rotate each image by angle degrees
+		double angle = conversionBean.getAngle();
+		IDataset rotated = transformer.rotate(slice, angle);
+		// crop each image given an elliptical roi
+		IROI roi = conversionBean.getRoi();
+		if (roi != null) {
+			IDataset cropped = Image.maxRectangleFromEllipticalImage(rotated, (EllipticalROI)roi);;
+			imageStack.add(cropped);
+		} else {
+			imageStack.add(rotated);
+		}
 		int stackSize = lazy.getShape()[0];
 		if (imageStack.size() == stackSize) {
 			String outputPath = context.getOutputPath();
-			ConversionStitchedBean conversionBean = (ConversionStitchedBean)context.getUserObject();
 			int rows = conversionBean.getRows();
 			int columns = conversionBean.getColumns();
-			double angle = conversionBean.getAngle();
 			boolean useFeatureAssociation = conversionBean.isFeatureAssociated();
 			boolean isInputDatFile = conversionBean.isInputDatFile();
 			double fieldOfView = conversionBean.getFieldOfView();
 			List<double[]> translations = conversionBean.getTranslations();
-			IDataset stitched = null;
-			IROI roi = conversionBean.getRoi();
-			if (roi != null) {
-				stitched = stitcher.stitch(imageStack, rows, columns, angle, fieldOfView, translations, roi, useFeatureAssociation, isInputDatFile);
-			} else {
-				stitched = stitcher.stitch(imageStack, rows, columns, angle);
-			}
+			// stitch the stack of images
+			IDataset stitched = stitcher.stitch(imageStack, rows, columns, fieldOfView, translations, useFeatureAssociation, isInputDatFile);
+
 			stitched.setName("stitched");
 			final File outputFile = new File(outputPath);
 

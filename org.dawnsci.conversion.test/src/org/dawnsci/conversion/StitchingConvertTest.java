@@ -93,7 +93,7 @@ public class StitchingConvertTest {
 		// region to select on the test images
 		EllipticalROI roi = new EllipticalROI(234.978, 236.209, 0, 264.615, 247.385);
 		// perform stitching in memory
-		IDataset stitched = getStichedImage(data, roi);
+		IDataset stitched = getStichedImage(data);
 
 		bean.setRoi(roi);
 		bean.setAngle(45);
@@ -142,11 +142,11 @@ public class StitchingConvertTest {
 		return data;
 	}
 
-	private IDataset getStichedImage(List<IDataset> data, IROI roi) {
+	private IDataset getStichedImage(List<IDataset> data) {
 		try {
 			if (sticher == null)
 				sticher = BoofCVImageStitchingProcessCreator.createStitchingProcess();
-			IDataset shiftedImages = sticher.stitch(data, 4, 4, 45, 50, roi);
+			IDataset shiftedImages = sticher.stitch(data, 4, 4, 50);
 			return shiftedImages;
 		} catch (Exception e) {
 			fail("An error occured while stitching images:" + e);

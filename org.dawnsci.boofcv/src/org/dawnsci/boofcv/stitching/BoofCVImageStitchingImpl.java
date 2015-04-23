@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2014 Diamond Light Source Ltd.
+ * Copyright (c) 2011, 2015 Diamond Light Source Ltd.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -15,9 +15,7 @@ import org.dawnsci.boofcv.converter.ConvertIDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.image.IImageStitchingProcess;
 import org.eclipse.dawnsci.analysis.api.metadata.PeemMetadata;
-import org.eclipse.dawnsci.analysis.api.roi.IROI;
 import org.eclipse.dawnsci.analysis.dataset.metadata.PeemMetadataImpl;
-import org.eclipse.dawnsci.analysis.dataset.roi.EllipticalROI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,8 +23,6 @@ import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.feature.detect.interest.ConfigFastHessian;
-import boofcv.alg.distort.DistortImageOps;
-import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.struct.image.ImageFloat32;
@@ -46,10 +42,6 @@ public class BoofCVImageStitchingImpl implements IImageStitchingProcess {
 		System.out.println("Starting BoofCV image Stitching service.");
 	}
 
-	/**
-	 * Region of Interest used for cropping
-	 */
-	private IROI roi;
 	private static final Logger logger = LoggerFactory.getLogger(BoofCVImageStitchingImpl.class);
 
 	public BoofCVImageStitchingImpl() {
@@ -62,27 +54,21 @@ public class BoofCVImageStitchingImpl implements IImageStitchingProcess {
 	}
 
 	@Override
-	public IDataset stitch(List<IDataset> input, int rows, int columns, double angle) {
+	public IDataset stitch(List<IDataset> input, int rows, int columns) {
 		List<double[]> translations = new ArrayList<double[]>();
 		translations.add(new double[] {25, 25});
-		return stitch(input, rows, columns, angle, 50, translations, false, true);
+		return stitch(input, rows, columns, 50, translations, false, true);
 	}
 
 	@Override
-	public IDataset stitch(List<IDataset> input, int rows, int columns, double angle, double fieldOfView, IROI roi) {
-		this.roi = roi;
+	public IDataset stitch(List<IDataset> input, int rows, int columns, double fieldOfView) {
 		List<double[]> translations = new ArrayList<double[]>();
 		translations.add(new double[] {25, 25});
-		return stitch(input, rows, columns, angle, fieldOfView, translations, true, true);
+		return stitch(input, rows, columns, fieldOfView, translations, true, true);
 	}
 
 	@Override
-	public IDataset stitch(List<IDataset> input, int rows, int columns, double angle, double fieldOfView, List<double[]> translations, IROI roi, boolean ...stitchingOptions) {
-		this.roi = roi;
-		return stitch(input, rows, columns, angle, fieldOfView, translations, true, stitchingOptions);
-	}
-
-	public IDataset stitch(List<IDataset> input, int rows, int columns, double angle, double fieldOfView, List<double[]> translations, boolean hasCropping, boolean ...stitchingOptions) {
+	public IDataset stitch(List<IDataset> input, int rows, int columns, double fieldOfView, List<double[]> translations, boolean ...stitchingOptions) {
 		boolean hasFeatureAssociation = false, isDatFileInput = false;
 		double[][][] trans = null;
 		IDataset[][] images = ImagePreprocessing.listToArray(input, rows, columns);
@@ -98,22 +84,6 @@ public class BoofCVImageStitchingImpl implements IImageStitchingProcess {
 			inputImages.add(new ArrayList<ImageAndMetadata>());
 			for (int j = 0; j < images[0].length; j++) {
 				ImageFloat32 image = ConvertIDataset.convertFrom(images[i][j], ImageFloat32.class, 1);
-				int width = 0, height = 0;
-				if (hasCropping) {
-					width = image.width;
-					height = image.height;
-				} else {
-					// calculate resulting bounding box
-					width = (int) (image.width
-							* Math.cos(Math.toRadians(angle)) + image.height
-							* Math.sin(Math.toRadians(angle)));
-					height = (int) (image.height
-							* Math.cos(Math.toRadians(angle)) + image.width
-							* Math.sin(Math.toRadians(angle)));
-				}
-				ImageFloat32 rotated = new ImageFloat32(height, width);
-
-				DistortImageOps.rotate(image, rotated, TypeInterpolate.BILINEAR, (float)Math.toRadians(angle));
 				// set metadata
 				PeemMetadata md = null;
 				try {
@@ -125,17 +95,11 @@ public class BoofCVImageStitchingImpl implements IImageStitchingProcess {
 				// set default values if no metadata (scaling = width/fieldofview? 512/50)
 				if (md == null) {
 					if (isDatFileInput)
-						md = new PeemMetadataImpl(trans[i][j], image.width / fieldOfView, fieldOfView, angle);
+						md = new PeemMetadataImpl(trans[i][j], image.width / fieldOfView, fieldOfView);
 					else
-						md = new PeemMetadataImpl(translations.get(0), image.width / fieldOfView, fieldOfView, angle);
+						md = new PeemMetadataImpl(translations.get(0), image.width / fieldOfView, fieldOfView);
 				}
-				ImageAndMetadata imageAndMd = null;
-				if (hasCropping && roi instanceof EllipticalROI) {
-					ImageFloat32 cropped = ImagePreprocessing.maxRectangleFromEllipticalImage(rotated, (EllipticalROI)roi);
-					imageAndMd = new ImageAndMetadata(cropped, md);
-				} else {
-					imageAndMd = new ImageAndMetadata(rotated, md);
-				}
+				ImageAndMetadata imageAndMd = new ImageAndMetadata(image, md);
 				inputImages.get(i).add(imageAndMd);
 			}
 		}
