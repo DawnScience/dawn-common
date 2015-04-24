@@ -30,6 +30,8 @@ import org.dawnsci.conversion.converters.util.LocalServiceManager;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.image.IImageStitchingProcess;
 import org.eclipse.dawnsci.analysis.api.image.IImageTransform;
+import org.eclipse.dawnsci.analysis.api.roi.IROI;
+import org.eclipse.dawnsci.analysis.dataset.impl.Image;
 import org.eclipse.dawnsci.analysis.dataset.roi.EllipticalROI;
 import org.junit.After;
 import org.junit.Before;
@@ -45,6 +47,11 @@ public class StitchingConvertTest {
 	private String stitchedFileName;
 	private IImageStitchingProcess sticher;
 	private IImageTransform transformer;
+	private final int rows = 4;
+	private final int columns = 4;
+	private final double fieldOfView = 50;
+	private final double angle = 45;
+	List<double[]> translations = new ArrayList<double[]>();
 
 	@Before
 	public void before() {
@@ -72,7 +79,6 @@ public class StitchingConvertTest {
 	}
 
 	private void doTestDir() throws Exception {
-
 		final File sourcedir = new File("testfiles/imagesToStitch");
 		org.apache.commons.io.FileUtils.copyDirectory(sourcedir, dir);
 
@@ -97,18 +103,19 @@ public class StitchingConvertTest {
 
 		// region to select on the test images
 		EllipticalROI roi = new EllipticalROI(234.978, 236.209, 0, 264.615, 247.385);
+		// create translations
+		for (int i = 0; i < data.size(); i ++)
+			translations.add(new double[] {25, 25});
 		// perform stitching in memory
-		IDataset stitched = getStichedImage(data);
+		IDataset stitched = getStichedImage(data, roi);
 
 		bean.setRoi(roi);
-		bean.setAngle(45);
-		bean.setColumns(4);
-		bean.setRows(4);
-		bean.setFieldOfView(50);
+		bean.setAngle(angle);
+		bean.setColumns(columns);
+		bean.setRows(rows);
+		bean.setFieldOfView(fieldOfView);
 		bean.setFeatureAssociated(true);
 		bean.setInputDatFile(false);
-		List<double[]> translations = new ArrayList<double[]>();
-		translations.add(new double[] {25, 25});
 		bean.setTranslations(translations);
 
 		context.setUserObject(bean);
@@ -147,11 +154,18 @@ public class StitchingConvertTest {
 		return data;
 	}
 
-	private IDataset getStichedImage(List<IDataset> data) {
+	private IDataset getStichedImage(List<IDataset> data, IROI roi) {
 		try {
 			if (sticher == null)
 				sticher = BoofCVImageStitchingProcessCreator.createStitchingProcess();
-			IDataset shiftedImages = sticher.stitch(data, 4, 4, 50);
+			List<IDataset> rotatedCroppedData = new ArrayList<IDataset>();
+			for (IDataset im : data) {
+				IDataset rotated = transformer.rotate(im, angle);
+				// crop each image given an elliptical roi
+				IDataset cropped = Image.maxRectangleFromEllipticalImage(rotated, (EllipticalROI)roi);
+				rotatedCroppedData.add(cropped);
+			}
+			IDataset shiftedImages = sticher.stitch(rotatedCroppedData, rows, columns, fieldOfView, translations, true, false);
 			return shiftedImages;
 		} catch (Exception e) {
 			fail("An error occured while stitching images:" + e);

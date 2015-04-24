@@ -91,7 +91,7 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 		// crop each image given an elliptical roi
 		IROI roi = conversionBean.getRoi();
 		if (roi != null) {
-			IDataset cropped = Image.maxRectangleFromEllipticalImage(rotated, (EllipticalROI)roi);;
+			IDataset cropped = Image.maxRectangleFromEllipticalImage(rotated, (EllipticalROI)roi);
 			imageStack.add(cropped);
 		} else {
 			imageStack.add(rotated);
