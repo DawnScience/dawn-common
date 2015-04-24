@@ -171,7 +171,7 @@ public class ReadWriteOperationTest {
 		String path = "pathvalue";
 		String dsname = "dsname";
 		
-		SliceInformation si = new SliceInformation(null, null, new SliceND(shape,slices), shape, dataDims, 100*100, 200);
+		SliceInformation si = new SliceInformation(null, null, new SliceND(shape,slices), dataDims, 100*100, 200);
 		SourceInformation so = new SourceInformation(path, dsname, null);
 		SliceFromSeriesMetadata ssm = new SliceFromSeriesMetadata(so,si);
 
