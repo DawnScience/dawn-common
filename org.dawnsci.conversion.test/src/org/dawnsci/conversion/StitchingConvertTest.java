@@ -23,13 +23,13 @@ import org.dawb.common.services.conversion.IConversionContext.ConversionScheme;
 import org.dawb.common.services.conversion.IConversionService;
 import org.dawb.common.util.io.FileUtils;
 import org.dawnsci.boofcv.BoofCVImageStitchingProcessCreator;
-import org.dawnsci.boofcv.stitching.BoofCVImageStitchingImpl;
+import org.dawnsci.boofcv.BoofCVImageTransformCreator;
 import org.dawnsci.conversion.converters.ImagesToStitchedConverter;
 import org.dawnsci.conversion.converters.ImagesToStitchedConverter.ConversionStitchedBean;
 import org.dawnsci.conversion.converters.util.LocalServiceManager;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.image.IImageStitchingProcess;
-import org.eclipse.dawnsci.analysis.api.roi.IROI;
+import org.eclipse.dawnsci.analysis.api.image.IImageTransform;
 import org.eclipse.dawnsci.analysis.dataset.roi.EllipticalROI;
 import org.junit.After;
 import org.junit.Before;
@@ -44,6 +44,7 @@ public class StitchingConvertTest {
 	private File output;
 	private String stitchedFileName;
 	private IImageStitchingProcess sticher;
+	private IImageTransform transformer;
 
 	@Before
 	public void before() {
@@ -52,12 +53,16 @@ public class StitchingConvertTest {
 		stitchedFileName = "image.tif";
 		FileUtils.createNewUniqueDir(output);
 		LocalServiceManager.setLoaderService(new LoaderServiceImpl());
+
+		sticher = BoofCVImageStitchingProcessCreator.createStitchingProcess();
+		transformer = BoofCVImageTransformCreator.createTransformService();
+		ImagesToStitchedConverter.setImageSticher(sticher);
+		ImagesToStitchedConverter.setImageTransform(transformer);
 	}
 
 	@Test
 	public void testDir() throws Exception {
 		System.out.println("starting stitching image conversion test from directory with image files");
-		ImagesToStitchedConverter.setImageSticher(new BoofCVImageStitchingImpl());
 		doTestDir();
 	}
 
@@ -113,9 +118,9 @@ public class StitchingConvertTest {
 		// load stitched saved data
 		IDataset stitchedSaved = loadData(new String[] {output.getAbsolutePath() + File.separator + stitchedFileName}).get(0);
 
-		int[] alignedShape = stitched.getShape();
-		int[] alignedSavedShape = stitchedSaved.getShape();
-		if (!Arrays.equals(alignedShape, alignedSavedShape)) {
+		int[] stitchedShape = stitched.getShape();
+		int[] stitchedSavedShape = stitchedSaved.getShape();
+		if (!Arrays.equals(stitchedShape, stitchedSavedShape)) {
 			fail("Shape of stitched data in memory and stitched data saved is not the same for dataset with name "
 					+ stitched.getName());
 		}
