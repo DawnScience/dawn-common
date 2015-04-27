@@ -9,6 +9,7 @@
 package org.dawnsci.conversion.ui;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -29,11 +30,14 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Text;
@@ -255,6 +259,25 @@ public class ConversionChoicePage extends ResourceChoosePage implements IConvers
 		}
 
 	}
+	
+	private Image lastImage;
+	/**
+	 * If there is an image in this directory called <enum_name>.png
+	 * we return it here.
+	 * 
+	 * @return
+	 */
+	public Image getImage(ConversionScheme scheme) {
+		InputStream in = getClass().getResourceAsStream(scheme.toString()+".png");
+		if (in==null) return null;
+		
+		if (lastImage!=null) lastImage.dispose();
+		
+		final ImageData id = new ImageData(in);
+		this.lastImage = new Image(Display.getDefault(), id);
+		return lastImage;
+	}
+
 
 	protected void pathChanged()  {
 		final String filePath = getAbsoluteFilePath();
@@ -266,7 +289,7 @@ public class ConversionChoicePage extends ResourceChoosePage implements IConvers
 		
 		if (chosenConversion!=null) {
 			
-			infoDiagram.setImage(chosenConversion.getImage());
+			infoDiagram.setImage(getImage(chosenConversion));
 			infoText.setText(chosenConversion.getDescription());
 			
 			if (chosenConversion.isNexusOnly()) {
