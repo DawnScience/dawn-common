@@ -21,6 +21,7 @@ import ncsa.hdf.object.h5.H5ScalarDS;
 import org.dawb.common.services.conversion.IConversionContext;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
+import org.eclipse.dawnsci.hdf5.H5Utils;
 import org.eclipse.dawnsci.hdf5.HierarchicalDataFactory;
 import org.eclipse.dawnsci.hdf5.IHierarchicalDataFile;
 import org.eclipse.dawnsci.hdf5.nexus.IFindInNexus;
@@ -122,7 +123,7 @@ public class CustomTomoConverter extends AbstractConversion {
 			
 			file = HierarchicalDataFactory.getReader(path.getAbsolutePath());
 			Dataset dataset = (Dataset)file.getData(bean.tomoPath + KEY_LOCATION);
-			return getSet(dataset.getData(),dataset.getDims(),dataset);
+			return H5Utils.getSet(dataset.getData(),dataset.getDims(),dataset);
 			
 		} catch (Exception e) {
 			e.printStackTrace();

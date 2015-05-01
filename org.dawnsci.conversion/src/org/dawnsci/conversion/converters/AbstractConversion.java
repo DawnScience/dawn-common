@@ -22,14 +22,6 @@ import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.Slice;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
 import org.eclipse.dawnsci.analysis.api.monitor.IMonitor;
-import org.eclipse.dawnsci.analysis.dataset.impl.ByteDataset;
-import org.eclipse.dawnsci.analysis.dataset.impl.Dataset;
-import org.eclipse.dawnsci.analysis.dataset.impl.DatasetUtils;
-import org.eclipse.dawnsci.analysis.dataset.impl.DoubleDataset;
-import org.eclipse.dawnsci.analysis.dataset.impl.FloatDataset;
-import org.eclipse.dawnsci.analysis.dataset.impl.IntegerDataset;
-import org.eclipse.dawnsci.analysis.dataset.impl.LongDataset;
-import org.eclipse.dawnsci.analysis.dataset.impl.ShortDataset;
 import org.eclipse.dawnsci.analysis.dataset.slicer.SliceVisitor;
 import org.eclipse.dawnsci.analysis.dataset.slicer.Slicer;
 
@@ -203,67 +195,6 @@ public abstract class AbstractConversion {
 			}
 			
 		});
-	}
-	
-	/**
-	 * Used when dims are not the same as the entire set, for instance when doing a slice.
-	 * @param val
-	 * @param longShape
-	 * @param set
-	 * @return
-	 * @throws Exception
-	 */
-	public static IDataset getSet(final Object  val, final long[] longShape, final ncsa.hdf.object.Dataset set) throws Exception {
-
-		final int[] intShape  = getInt(longShape);
-         
-		Dataset ret = null;
-        if (val instanceof byte[]) {
-        	ret = new ByteDataset((byte[])val, intShape);
-        } else if (val instanceof short[]) {
-        	ret = new ShortDataset((short[])val, intShape);
-        } else if (val instanceof int[]) {
-        	ret = new IntegerDataset((int[])val, intShape);
-        } else if (val instanceof long[]) {
-        	ret = new LongDataset((long[])val, intShape);
-        } else if (val instanceof float[]) {
-        	ret = new FloatDataset((float[])val, intShape);
-        } else if (val instanceof double[]) {
-        	ret = new DoubleDataset((double[])val, intShape);
-        } else {
-        	throw new Exception("Cannot deal with data type "+set.getDatatype().getDatatypeDescription());
-        }
-        
-		if (set.getDatatype().isUnsigned()) {
-			switch (ret.getDtype()) {
-			case Dataset.INT32:
-				ret = new LongDataset(ret);
-				DatasetUtils.unwrapUnsigned(ret, 32);
-				break;
-			case Dataset.INT16:
-				ret = new IntegerDataset(ret);
-				DatasetUtils.unwrapUnsigned(ret, 16);
-				break;
-			case Dataset.INT8:
-				ret = new ShortDataset(ret);
-				DatasetUtils.unwrapUnsigned(ret, 8);
-				break;
-			}
-		}
-
-        return ret;
-       
-	}
-
-	/**
-	 * Get a int[] from a long[]
-	 * @param longShape
-	 * @return
-	 */
-	public static int[] getInt(long[] longShape) {
-		final int[] intShape  = new int[longShape.length];
-		for (int i = 0; i < intShape.length; i++) intShape[i] = (int)longShape[i];
-		return intShape;
 	}
 
 	public List<String> getData(File path, String datasetName) throws Exception {
