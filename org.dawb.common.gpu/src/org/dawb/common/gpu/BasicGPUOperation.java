@@ -21,6 +21,8 @@ import com.amd.aparapi.Range;
 /**
  * Operation which supports basic operators.
  * 
+ * This operation is not used at the moment.
+ * 
  * @author Matthew Gerring
  *
  */
