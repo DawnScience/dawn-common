@@ -119,7 +119,7 @@ public class CustomNCDConverter extends AbstractConversion  {
 		
 		//Set up position iterator (final 2 dimensions saved in a single file
 		int[] stop = lz.getShape();
-		boolean hasErrors = (lz.getError() != null ? true : false);
+		boolean hasErrors = hasErrors(lz);
 		int iterDim;
 		int[] cutAxes;
 		if (stop.length == 1 || exportFormat.equals(SAS_FORMAT.ATSAS) || exportFormat.equals(SAS_FORMAT.TOPAZ)) {
@@ -277,6 +277,13 @@ public class CustomNCDConverter extends AbstractConversion  {
 			IMonitor mon = context.getMonitor();
 			mon.worked(1);
 		}
+	}
+	
+	private boolean hasErrors(ILazyDataset lz) {
+		if (lz instanceof AggregateDataset) {
+			return lz.getSlice(new Slice(0)).getError() != null ? true : false;
+		}
+		return lz.getError() != null ? true : false;
 	}
 	
 	private Dataset improveLessPreciseData(Dataset lessPreciseData, Dataset morePreciseData) {
