@@ -22,6 +22,7 @@ import org.dawnsci.plotting.services.PlotImageService;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionService;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext.ConversionScheme;
+import org.eclipse.dawnsci.analysis.api.downsample.DownsampleMode;
 import org.eclipse.dawnsci.plotting.api.histogram.HistogramBound;
 import org.eclipse.dawnsci.plotting.api.histogram.IImageService;
 import org.eclipse.dawnsci.plotting.api.histogram.IPaletteService;
@@ -33,7 +34,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.monte.media.avi.AVIReader;
 
-import uk.ac.diamond.scisoft.analysis.dataset.function.DownsampleMode;
 import uk.ac.diamond.scisoft.analysis.osgi.LoaderServiceImpl;
 
 public class AVIImageConvertTest {

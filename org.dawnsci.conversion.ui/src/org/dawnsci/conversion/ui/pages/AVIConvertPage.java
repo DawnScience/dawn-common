@@ -15,6 +15,7 @@ import org.dawb.common.services.ISystemService;
 import org.dawb.common.ui.util.GridUtils;
 import org.dawnsci.conversion.converters.ConversionInfoBean;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
+import org.eclipse.dawnsci.analysis.api.downsample.DownsampleMode;
 import org.eclipse.dawnsci.plotting.api.IPlottingSystem;
 import org.eclipse.dawnsci.plotting.api.PlotType;
 import org.eclipse.dawnsci.plotting.api.trace.IImageTrace;
@@ -38,8 +39,6 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.events.ExpansionAdapter;
 import org.eclipse.ui.forms.events.ExpansionEvent;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
-
-import uk.ac.diamond.scisoft.analysis.dataset.function.DownsampleMode;
 
 /**
  * Page for exporting slice to video.

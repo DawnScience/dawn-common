@@ -1,9 +1,8 @@
 package org.dawnsci.conversion.converters;
 
+import org.eclipse.dawnsci.analysis.api.downsample.DownsampleMode;
 import org.eclipse.dawnsci.plotting.api.PlotType;
 import org.eclipse.dawnsci.plotting.api.histogram.ImageServiceBean;
-
-import uk.ac.diamond.scisoft.analysis.dataset.function.DownsampleMode;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
