@@ -12,10 +12,10 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.ui.util.GridUtils;
 import org.dawnsci.conversion.converters.ConversionInfoBean;
 import org.dawnsci.conversion.ui.Activator;
+import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.CLabel;

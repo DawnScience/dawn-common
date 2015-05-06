@@ -10,12 +10,12 @@ package org.dawnsci.conversion.ui.pages;
 
 import java.io.File;
 
-import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.ui.wizard.ResourceChoosePage;
 import org.dawb.common.util.io.FileUtils;
 import org.dawnsci.common.widgets.decorator.RegexDecorator;
 import org.dawnsci.conversion.ui.IConversionWizardPage;
 import org.dawnsci.io.h5.H5Loader;
+import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;

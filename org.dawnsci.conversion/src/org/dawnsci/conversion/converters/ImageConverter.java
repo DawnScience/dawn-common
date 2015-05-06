@@ -10,7 +10,7 @@ package org.dawnsci.conversion.converters;
 
 import java.io.File;
 
-import org.dawb.common.services.conversion.IConversionContext;
+import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 
 import uk.ac.diamond.scisoft.analysis.io.DataHolder;

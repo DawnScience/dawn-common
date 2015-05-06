@@ -8,7 +8,7 @@
  */
 package org.dawnsci.conversion.ui;
 
-import org.dawb.common.services.conversion.IConversionContext;
+import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
 import org.eclipse.jface.wizard.IWizardPage;
 
 public interface IConversionWizardPage extends IWizardPage {

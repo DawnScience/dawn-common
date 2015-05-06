@@ -11,10 +11,10 @@ package org.dawnsci.conversion.ui.pages;
 import java.io.File;
 import java.util.Arrays;
 
-import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.ui.util.GridUtils;
 import org.dawb.common.util.io.FileUtils;
 import org.dawnsci.conversion.converters.CompareConverter;
+import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
 import org.eclipse.jface.preference.JFacePreferences;
 import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.JFaceResources;

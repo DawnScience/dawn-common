@@ -53,7 +53,7 @@ Export-Package: org.dawb.common.ui,
  org.dawb.common.ui.wizard,
  org.dawb.common.ui.wizard.persistence
 Import-Package: org.dawb.common.services,
- org.dawb.common.services.conversion,
+ org.eclipse.dawnsci.analysis.api.conversion,
  org.eclipse.draw2d,
  org.eclipse.draw2d.geometry,
  org.eclipse.gmf.runtime.common.ui.util,

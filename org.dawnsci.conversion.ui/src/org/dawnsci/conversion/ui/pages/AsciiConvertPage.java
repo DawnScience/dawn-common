@@ -11,9 +11,9 @@ package org.dawnsci.conversion.ui.pages;
 import java.io.File;
 import java.util.Arrays;
 
-import org.dawb.common.services.conversion.IConversionContext;
 import org.dawb.common.ui.util.GridUtils;
 import org.dawnsci.conversion.converters.AsciiConvert1D;
+import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;

@@ -1,6 +1,6 @@
 package org.dawnsci.conversion.ui;
 
-import org.dawb.common.services.conversion.IConversionService;
+import org.eclipse.dawnsci.analysis.api.conversion.IConversionService;
 
 /**
  * This class is used to inject the conversion service using OSGI and retrieve in ConvertWizard

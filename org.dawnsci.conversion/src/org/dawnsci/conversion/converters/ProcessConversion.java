@@ -15,10 +15,10 @@ import java.util.Date;
 import java.util.Map;
 
 import org.dawb.common.services.ServiceManager;
-import org.dawb.common.services.conversion.IConversionContext;
-import org.dawb.common.services.conversion.IProcessingConversionInfo;
-import org.dawb.common.services.conversion.ProcessingOutputType;
 import org.dawnsci.conversion.converters.util.LocalServiceManager;
+import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
+import org.eclipse.dawnsci.analysis.api.conversion.IProcessingConversionInfo;
+import org.eclipse.dawnsci.analysis.api.conversion.ProcessingOutputType;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;

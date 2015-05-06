@@ -8,7 +8,7 @@
  */
 package org.dawnsci.conversion.converters;
 
-import org.dawb.common.services.conversion.IConversionContext;
+import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 
 public class VisitorConversion extends AbstractConversion {
