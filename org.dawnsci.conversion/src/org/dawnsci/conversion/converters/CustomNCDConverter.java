@@ -253,14 +253,10 @@ public class CustomNCDConverter extends AbstractConversion  {
 				monitorLabel = lz.getName();
 			}
 			
-			if (axis != null) {
-				if (data.getDtype() < axis.getDtype()) {
-					data = improveLessPreciseData(data, axis);
-				}
-				else if (data.getDtype() > axis.getDtype()) {
-					axis = improveLessPreciseData(axis, data);
-				}
-			}
+			Dataset[] fixed = fixDtypes(axis, data, errors);
+			axis = fixed[0];
+			data = fixed[1];
+			errors = fixed[2];
 			
 			exportASCII(axis, data, errors, fullName, header, headings);
 
@@ -286,17 +282,31 @@ public class CustomNCDConverter extends AbstractConversion  {
 		return lz.getError() != null ? true : false;
 	}
 	
-	private Dataset improveLessPreciseData(Dataset lessPreciseData, Dataset morePreciseData) {
-		Dataset toReturn = null;
-		if ((lessPreciseData.getDtype() == Dataset.FLOAT32 || lessPreciseData.getDtype() == Dataset.FLOAT64) &&
-				(morePreciseData.getDtype() == Dataset.FLOAT32 || morePreciseData.getDtype() == Dataset.FLOAT64)) {
-			toReturn = lessPreciseData.cast(Dataset.FLOAT64);
+	private Dataset[] fixDtypes(Dataset axis, Dataset data, Dataset errors) {
+		int dataDtype = data.getDtype();
+		int axisDtype = 0;
+		if (axis != null) {
+			axisDtype = axis.getDtype();
 		}
-		else if ((lessPreciseData.getDtype() >= Dataset.INT8 && lessPreciseData.getDtype() <= Dataset.INT64) &&
-				(morePreciseData.getDtype() >= Dataset.INT8 || morePreciseData.getDtype() <= Dataset.INT64)) {
-			toReturn = lessPreciseData.cast(morePreciseData.getDtype());
+		int errorsDtype = 0;
+		if (errors != null) {
+			errorsDtype = errors.getDtype();
 		}
-		return toReturn;
+		int largestDtype = Math.max(Math.max(dataDtype, axisDtype), errorsDtype);
+		if (data.getDtype() < largestDtype) {
+			data = improveLessPreciseData(data, largestDtype);
+		}
+		if (axis != null && axis.getDtype() < largestDtype) {
+			axis = improveLessPreciseData(axis, largestDtype);
+		}
+		if (errors != null && errors.getDtype() < largestDtype) {
+			errors = improveLessPreciseData(errors, largestDtype);
+		}
+		return new Dataset[]{axis, data, errors};
+	}
+	
+	private Dataset improveLessPreciseData(Dataset lessPreciseData, int dType) {
+		return lessPreciseData.cast(dType);
 	}
 
 	private void exportASCII(IErrorDataset axis, Dataset data, IDataset errors, String fullName, String header, List<String> headings) throws ScanFileHolderException {
@@ -564,16 +574,24 @@ public class CustomNCDConverter extends AbstractConversion  {
 	
 	private String getTitleNodeString(IHierarchicalDataFile hdf5Reader) throws Exception {
 		ncsa.hdf.object.Dataset titleData = (ncsa.hdf.object.Dataset) hdf5Reader.getData(DEFAULT_TITLE_NODE);
-		String[] str = (String[]) titleData.getData();
-		String title = str[0];
-		return title;
+		String[] str = null;
+		if (titleData != null) {
+			str = (String[]) titleData.getData();
+			String title = str[0];
+			return title;
+		}
+		return "";
 	}
 	
 	private String getCommandNodeString(IHierarchicalDataFile hdf5Reader) throws Exception {
 		ncsa.hdf.object.Dataset scanCommandData = (ncsa.hdf.object.Dataset) hdf5Reader.getData(DEFAULT_SCAN_COMMAND_NODE);
-		String[] str = (String[])scanCommandData.getData();
-		String scanCommand = str[0];
-		return scanCommand;
+		String[] str = null;
+		if (scanCommandData != null) {
+			str = (String[])scanCommandData.getData();
+			String scanCommand = str[0];
+			return scanCommand;
+		}
+		return "";
 	}
 	
 	public OutputBean createBean(SAS_FORMAT exportFormat, ILazyDataset lz) throws Exception {
