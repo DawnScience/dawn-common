@@ -633,7 +633,7 @@ public class CustomNCDConverter extends AbstractConversion  {
 			for (AxesMetadata axis : axes) {
 				for (ILazyDataset a: axis.getAxes()) {
 					if (a != null) {
-						a.setShape(a.getShape()[1],1);
+						a = ((Dataset) a).transpose();
 						if (a != null) {
 							if (a.getName().equals("q")) {
 								outputBean.axis = (Dataset) a;
