@@ -472,7 +472,7 @@ public class CustomNCDConverter extends AbstractConversion  {
 
 		JAXBContext jc = JAXBContext.newInstance(CANSAS_JAXB_CONTEXT);
 		Marshaller m = jc.createMarshaller();
-		m.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, "http://www.cansas.org/formats/1.1/cansas1d.xsd");		
+		m.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, "urn:cansas1d:1.1 http://www.cansas.org/formats/1.1/cansas1d.xsd");		
 		m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 		m.marshal(jabxSASroot, new FileOutputStream(fullName));
 
