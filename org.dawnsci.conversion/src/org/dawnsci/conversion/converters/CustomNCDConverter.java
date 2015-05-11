@@ -392,7 +392,13 @@ public class CustomNCDConverter extends AbstractConversion  {
 		}
 		
 		String pathToFolder = context.getOutputPath();
-		String fileName = buildFileName(context.getSelectedConversionFile().getAbsolutePath(),nameFrag);
+		String fileName;
+		if (context.getSelectedConversionFile() != null) {
+			fileName = buildFileName(context.getSelectedConversionFile().getAbsolutePath(),nameFrag);
+		}
+		else {
+			fileName = buildFileNameGeneric("dataset", nameFrag);
+		}
 		String fullName = pathToFolder + File.separator + fileName + ".xml";
 
 		//Iterate over lazy dataset and save
