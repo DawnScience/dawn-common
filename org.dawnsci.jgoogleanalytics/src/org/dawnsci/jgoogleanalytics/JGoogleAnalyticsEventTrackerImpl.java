@@ -12,9 +12,9 @@ import org.slf4j.LoggerFactory;
  * @author Baha El Kassaby
  * 
  */
-public class AnalyticsTracker implements EventTracker {
+public class JGoogleAnalyticsEventTrackerImpl implements EventTracker {
 
-	public static final Logger logger = LoggerFactory.getLogger(AnalyticsTracker.class);
+	public static final Logger logger = LoggerFactory.getLogger(JGoogleAnalyticsEventTrackerImpl.class);
 
 	static {
 		System.out.println("Starting JGoogleAnalytics Event tracker service.");
@@ -23,7 +23,7 @@ public class AnalyticsTracker implements EventTracker {
 	private JGoogleAnalyticsTracker tracker;
 	private FocusPoint focusPoint;
 
-	public AnalyticsTracker() {
+	public JGoogleAnalyticsEventTrackerImpl() {
 		// Important do nothing here, OSGI may start the service more than once.
 	}
 
