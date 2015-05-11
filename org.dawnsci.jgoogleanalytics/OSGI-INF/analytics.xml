@@ -2,6 +2,6 @@
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="false" name="JAnalytics tracker service">
    <implementation class="org.dawnsci.jgoogleanalytics.AnalyticsTracker"/>
    <service>
-      <provide interface="org.eclipse.dawnsci.analysis.api.IAnalyticsTracker"/>
+      <provide interface="org.eclipse.dawnsci.analysis.api.EventTracker"/>
    </service>
 </scr:component>

@@ -1,7 +1,7 @@
 package org.dawnsci.jgoogleanalytics;
 
 import org.dawb.common.util.eclipse.BundleUtils;
-import org.eclipse.dawnsci.analysis.api.IAnalyticsTracker;
+import org.eclipse.dawnsci.analysis.api.EventTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,12 +12,12 @@ import org.slf4j.LoggerFactory;
  * @author Baha El Kassaby
  * 
  */
-public class AnalyticsTracker implements IAnalyticsTracker {
+public class AnalyticsTracker implements EventTracker {
 
 	public static final Logger logger = LoggerFactory.getLogger(AnalyticsTracker.class);
 
 	static {
-		System.out.println("Starting Analytics service.");
+		System.out.println("Starting JGoogleAnalytics Event tracker service.");
 	}
 
 	private JGoogleAnalyticsTracker tracker;
@@ -47,7 +47,7 @@ public class AnalyticsTracker implements IAnalyticsTracker {
 	}
 
 	@Override
-	public void track(String name, boolean isAsynchronous) throws Exception {
+	public void track(String name) throws Exception {
 		if (focusPoint != null) {
 			String currentName = focusPoint.getName();
 			if (!currentName.equals(name)) {
@@ -63,9 +63,6 @@ public class AnalyticsTracker implements IAnalyticsTracker {
 
 		if (focusPoint == null)
 			throw new Exception("A unique name must be set");
-		if(isAsynchronous)
-			tracker.trackAsynchronously(focusPoint);
-		else
-			tracker.trackSynchronously(focusPoint);
+		tracker.trackAsynchronously(focusPoint);
 	}
 }
