@@ -48,6 +48,8 @@ public class JGoogleAnalyticsEventTrackerImpl implements EventTracker {
 
 	@Override
 	public void track(String name) throws Exception {
+		// replace all spaces by underscores
+		name = name.trim().replaceAll("\\s+", "_");
 		if (focusPoint != null) {
 			String currentName = focusPoint.getName();
 			if (!currentName.equals(name)) {
@@ -64,5 +66,10 @@ public class JGoogleAnalyticsEventTrackerImpl implements EventTracker {
 		if (focusPoint == null)
 			throw new Exception("A unique name must be set");
 		tracker.trackAsynchronously(focusPoint);
+	}
+
+	@Override
+	public void track(String id, String label) throws Exception {
+		track(label + "[" + id + "]");
 	}
 }
