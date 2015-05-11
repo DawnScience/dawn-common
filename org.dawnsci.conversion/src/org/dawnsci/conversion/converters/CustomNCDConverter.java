@@ -466,6 +466,7 @@ public class CustomNCDConverter extends AbstractConversion  {
 				sasEntry.getSASnote().add(selFilePath);
 			}
 
+			sasRoot.setVersion("1.1");
 			sasRoot.getSASentry().add(sasEntry);
 		}
 		JAXBElement<SASrootType> jabxSASroot = of.createSASroot(sasRoot);
