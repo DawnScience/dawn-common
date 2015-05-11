@@ -55,7 +55,7 @@ public class FocusPoint {
 			FocusPoint focusPoint) {
 		FocusPoint parentFocuPoint = focusPoint.getParentFocusPoint();
 
-		if (parentFocuPoint != null) {
+		if (parentFocuPoint != null && parentFocuPoint.getName() != null) {
 			getContentURI(contentURIBuffer, parentFocuPoint);
 		}
 		contentURIBuffer.append(URI_SEPARATOR);
@@ -73,7 +73,7 @@ public class FocusPoint {
 	private void getContentTitle(StringBuffer titleBuffer, FocusPoint focusPoint) {
 		FocusPoint parentFocusPoint = focusPoint.getParentFocusPoint();
 
-		if (parentFocusPoint != null) {
+		if (parentFocusPoint != null && parentFocusPoint.getName() != null) {
 			getContentTitle(titleBuffer, parentFocusPoint);
 			titleBuffer.append(TITLE_SEPARATOR);
 		}
