@@ -53,7 +53,7 @@ public class HTTPGetMethod {
 			urlConnection.setRequestMethod(GET_METHOD_NAME);
 			urlConnection.setRequestProperty("User-agent", uaName + " ("
 					+ osString + ")");
-
+			urlConnection.setConnectTimeout(5000);
 			urlConnection.connect();
 			int responseCode = getResponseCode(urlConnection);
 			if (responseCode != HttpURLConnection.HTTP_OK) {
