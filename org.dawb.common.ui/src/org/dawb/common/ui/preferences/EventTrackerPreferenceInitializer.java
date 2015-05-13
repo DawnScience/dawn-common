@@ -18,6 +18,10 @@ public class EventTrackerPreferenceInitializer extends AbstractPreferenceInitial
 	@Override
 	public void initializeDefaultPreferences() {
 		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
-		store.setDefault(BasePlottingConstants.IS_TRACKER_ENABLED, true);
+		String defaultValue = System.getProperty(BasePlottingConstants.IS_TRACKER_ENABLED);
+		boolean def = Boolean.valueOf(defaultValue);
+		if (defaultValue == null)
+			def = true;
+		store.setDefault(BasePlottingConstants.IS_TRACKER_ENABLED, def);
 	}
 }
