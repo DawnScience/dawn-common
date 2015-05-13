@@ -370,11 +370,20 @@
             id="org.dawb.common.ui.views.tangoPreferences"
             name="Configuration">
       </page>
+      <page
+            category="uk.ac.diamond.scisoft.analysis.rcp.preferences.root"
+            class="org.dawb.common.ui.preferences.EventTrackerPreferencePage"
+            id="org.dawb.common.ui.eventTrackingPreferences"
+            name="Usage event tracking">
+      </page>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
       <initializer
             class="org.dawb.common.ui.preferences.CommonUIPreferenceInitializer">
+      </initializer>
+      <initializer
+            class="org.dawb.common.ui.preferences.EventTrackerPreferenceInitializer">
       </initializer>
    </extension>
    <extension
