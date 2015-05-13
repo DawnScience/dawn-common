@@ -248,7 +248,7 @@ public class CustomNCDConverter extends AbstractConversion  {
 			else {
 				//exportASCII without using filename
 				String pathToFolder = context.getOutputPath();
-				String fileName = buildFileNameGeneric("dataset", nameFrag);
+				String fileName = buildFileNameGeneric(context.getDatasetNames().get(0), nameFrag);
 				fullName = pathToFolder + File.separator + fileName + nameSuffix +ext;
 				monitorLabel = lz.getName();
 			}
@@ -397,7 +397,7 @@ public class CustomNCDConverter extends AbstractConversion  {
 			fileName = buildFileName(context.getSelectedConversionFile().getAbsolutePath(),nameFrag);
 		}
 		else {
-			fileName = buildFileNameGeneric("dataset", nameFrag);
+			fileName = buildFileNameGeneric(context.getDatasetNames().get(0), nameFrag);
 		}
 		String fullName = pathToFolder + File.separator + fileName + ".xml";
 
