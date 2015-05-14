@@ -251,6 +251,8 @@ public class CustomNCDConverter extends AbstractConversion  {
 				monitorLabel = lz.getName();
 			}
 			
+			checkWhetherFileExists(fullName);
+			
 			Dataset[] fixed = fixDtypes(axis, data, errors);
 			axis = fixed[0];
 			data = fixed[1];
@@ -273,6 +275,19 @@ public class CustomNCDConverter extends AbstractConversion  {
 		}
 	}
 	
+
+	/**
+	 * Check whether a file exists and throw an exception to prevent overwriting an existing one.
+	 * 
+	 * @param fullName
+	 * @throws Exception
+	 */
+	private void checkWhetherFileExists(String fullName) throws Exception {
+		if (new File(fullName).exists()) {
+			throw new Exception("File " + fullName + " already exists.");
+		}
+	}
+
 	private boolean hasErrors(ILazyDataset lz) {
 		return lz.getError() != null ? true : false;
 	}
@@ -395,6 +410,8 @@ public class CustomNCDConverter extends AbstractConversion  {
 			fileName = buildFileNameGeneric(context.getDatasetNames().get(0), nameFrag);
 		}
 		String fullName = pathToFolder + File.separator + fileName + ".xml";
+
+		checkWhetherFileExists(fullName);
 
 		//Iterate over lazy dataset and save
 		while (iterator.hasNext()) {
