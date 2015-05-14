@@ -47,7 +47,6 @@ import org.eclipse.dawnsci.analysis.api.metadata.AxesMetadata;
 import org.eclipse.dawnsci.analysis.api.monitor.IMonitor;
 import org.eclipse.dawnsci.analysis.api.tree.Node;
 import org.eclipse.dawnsci.analysis.api.tree.Tree;
-import org.eclipse.dawnsci.analysis.dataset.impl.AggregateDataset;
 import org.eclipse.dawnsci.analysis.dataset.impl.Dataset;
 import org.eclipse.dawnsci.analysis.dataset.impl.DatasetUtils;
 import org.eclipse.dawnsci.analysis.dataset.impl.PositionIterator;
@@ -59,7 +58,6 @@ import org.slf4j.LoggerFactory;
 import uk.ac.diamond.scisoft.analysis.io.ASCIIDataWithHeadingSaver;
 import uk.ac.diamond.scisoft.analysis.io.DataHolder;
 import uk.ac.diamond.scisoft.analysis.io.HDF5Loader;
-import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 
 public class CustomNCDConverter extends AbstractConversion  {
 
@@ -276,9 +274,6 @@ public class CustomNCDConverter extends AbstractConversion  {
 	}
 	
 	private boolean hasErrors(ILazyDataset lz) {
-		if (lz instanceof AggregateDataset) {
-			return lz.getSlice(new Slice(0)).getError() != null ? true : false;
-		}
 		return lz.getError() != null ? true : false;
 	}
 	
@@ -580,6 +575,7 @@ public class CustomNCDConverter extends AbstractConversion  {
 	}
 	
 	private String getTitleNodeString(IHierarchicalDataFile hdf5Reader) throws Exception {
+		@SuppressWarnings("deprecation")
 		ncsa.hdf.object.Dataset titleData = (ncsa.hdf.object.Dataset) hdf5Reader.getData(DEFAULT_TITLE_NODE);
 		String[] str = null;
 		if (titleData != null) {
@@ -591,6 +587,7 @@ public class CustomNCDConverter extends AbstractConversion  {
 	}
 	
 	private String getCommandNodeString(IHierarchicalDataFile hdf5Reader) throws Exception {
+		@SuppressWarnings("deprecation")
 		ncsa.hdf.object.Dataset scanCommandData = (ncsa.hdf.object.Dataset) hdf5Reader.getData(DEFAULT_SCAN_COMMAND_NODE);
 		String[] str = null;
 		if (scanCommandData != null) {
@@ -629,14 +626,7 @@ public class CustomNCDConverter extends AbstractConversion  {
 			outputBean.axisUnits = getAxisUnit(context.getAxisDatasetName(), context.getSelectedConversionFile());
 		}
 		else {
-			ILazyDataset set;
-			if (lz instanceof AggregateDataset) {
-				set = lz.getSlice(new Slice(0, 1));
-			}
-			else {
-				set = lz;
-			}
-			List<AxesMetadata> axes = set.getMetadata(AxesMetadata.class);
+			List<AxesMetadata> axes = lz.getMetadata(AxesMetadata.class);
 			for (AxesMetadata axis : axes) {
 				for (ILazyDataset a: axis.getAxes()) {
 					if (a != null) {
