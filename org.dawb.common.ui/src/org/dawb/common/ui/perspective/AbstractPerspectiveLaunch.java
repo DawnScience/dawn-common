@@ -45,7 +45,7 @@ public abstract class AbstractPerspectiveLaunch implements IWorkbenchWindowActio
 					perspectiveName = per.getLabel();
 				EventTracker tracker = EventTrackerServiceLoader.getService();
 				if (tracker != null)
-					tracker.track("Perspective/" + perspectiveName);
+					tracker.trackPerspectiveEvent(perspectiveName);
 			} catch (WorkbenchException e) {
 				e.printStackTrace();
 			} catch (Exception e) {
