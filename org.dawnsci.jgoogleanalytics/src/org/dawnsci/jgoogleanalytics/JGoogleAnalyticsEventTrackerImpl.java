@@ -16,6 +16,9 @@ public class JGoogleAnalyticsEventTrackerImpl implements EventTracker {
 
 	public static final Logger logger = LoggerFactory.getLogger(JGoogleAnalyticsEventTrackerImpl.class);
 
+	private static final String APP_NAME = "DAWN";
+	public static final String GOOGLE_TRACK_CODE = "UA-48311061-3";
+
 	static {
 		System.out.println("Starting JGoogleAnalytics Event tracker service.");
 	}
@@ -29,7 +32,7 @@ public class JGoogleAnalyticsEventTrackerImpl implements EventTracker {
 
 	//thread lazy initialisation of the instance without explicit synchronisation
 	private static class TrackerLoader {
-		static JGoogleAnalyticsTracker ANALYTICS_INSTANCE = new JGoogleAnalyticsTracker("DAWN", BundleUtils.getDawnVersion(), "UA-48311061-3");
+		static JGoogleAnalyticsTracker ANALYTICS_INSTANCE = new JGoogleAnalyticsTracker(APP_NAME, BundleUtils.getDawnVersion(), GOOGLE_TRACK_CODE);
 	}
 
 	private static class LoggerLoader {
@@ -71,5 +74,20 @@ public class JGoogleAnalyticsEventTrackerImpl implements EventTracker {
 	@Override
 	public void track(String id, String label) throws Exception {
 		track(label + "[" + id + "]");
+	}
+
+	@Override
+	public void trackToolEvent(String name) throws Exception {
+		track(APP_NAME + "/" + BundleUtils.getDawnVersion() + "/Tool/" + name);
+	}
+
+	@Override
+	public void trackPerspectiveEvent(String name) throws Exception {
+		track(APP_NAME + "/" + BundleUtils.getDawnVersion() + "/Perspective/" + name);
+	}
+
+	@Override
+	public void trackActionEvent(String name) throws Exception {
+		track(APP_NAME + "/" + BundleUtils.getDawnVersion() + "/Action/" + name);
 	}
 }
