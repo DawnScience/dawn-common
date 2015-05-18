@@ -65,14 +65,8 @@ public class JGoogleAnalyticsEventTrackerImpl implements EventTracker {
 				focusPoint = new FocusPoint(name);
 			}
 			if (tracker == null) {
-				if (version == null)
-					version = BundleUtils.getDawnVersion();
-				if (version != null) {
-					// get only the first 5 characters of the version ie 1.9.0
-					version = version.substring(0, 5);
-				}
 				String code = store.getString(BasePlottingConstants.ANALYTICS_TRACK_CODE);
-				tracker = new JGoogleAnalyticsTracker(APP_NAME, version, code);
+				tracker = new JGoogleAnalyticsTracker(APP_NAME, getVersion(), code);
 			}
 			if (tracker.getLoggingAdapter() == null)
 				tracker.setLoggingAdapter(LoggerLoader.LOGGING_INSTANCE);
@@ -92,20 +86,28 @@ public class JGoogleAnalyticsEventTrackerImpl implements EventTracker {
 	public void trackToolEvent(String name) throws Exception {
 		if (version == null)
 			version = BundleUtils.getDawnVersion();
-		track(APP_NAME + "/" + version + "/Tool/" + name);
+		track(APP_NAME + "/" + getVersion() + "/Tool/" + name);
 	}
 
 	@Override
 	public void trackPerspectiveEvent(String name) throws Exception {
 		if (version == null)
 			version = BundleUtils.getDawnVersion();
-		track(APP_NAME + "/" + version + "/Perspective/" + name);
+		track(APP_NAME + "/" + getVersion() + "/Perspective/" + name);
 	}
 
 	@Override
 	public void trackActionEvent(String name) throws Exception {
+		track(APP_NAME + "/" + getVersion() + "/Action/" + name);
+	}
+
+	private String getVersion() {
 		if (version == null)
 			version = BundleUtils.getDawnVersion();
-		track(APP_NAME + "/" + version + "/Action/" + name);
+		if (version != null) {
+			// get only the first 5 characters of the version ie 1.9.0
+			version = version.substring(0, 5);
+		}
+		return version;
 	}
 }
