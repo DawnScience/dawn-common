@@ -1,7 +1,10 @@
 package org.dawnsci.jgoogleanalytics;
 
 import org.dawb.common.util.eclipse.BundleUtils;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.dawnsci.analysis.api.EventTracker;
+import org.eclipse.dawnsci.plotting.api.preferences.BasePlottingConstants;
+import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,7 +20,6 @@ public class JGoogleAnalyticsEventTrackerImpl implements EventTracker {
 	public static final Logger logger = LoggerFactory.getLogger(JGoogleAnalyticsEventTrackerImpl.class);
 
 	private static final String APP_NAME = "DAWN";
-	public static final String GOOGLE_TRACK_CODE = "UA-48311061-3";
 
 	static {
 		System.out.println("Starting JGoogleAnalytics Event tracker service.");
@@ -28,11 +30,6 @@ public class JGoogleAnalyticsEventTrackerImpl implements EventTracker {
 
 	public JGoogleAnalyticsEventTrackerImpl() {
 		// Important do nothing here, OSGI may start the service more than once.
-	}
-
-	//thread lazy initialisation of the instance without explicit synchronisation
-	private static class TrackerLoader {
-		static JGoogleAnalyticsTracker ANALYTICS_INSTANCE = new JGoogleAnalyticsTracker(APP_NAME, BundleUtils.getDawnVersion(), GOOGLE_TRACK_CODE);
 	}
 
 	private static class LoggerLoader {
@@ -51,24 +48,32 @@ public class JGoogleAnalyticsEventTrackerImpl implements EventTracker {
 
 	@Override
 	public void track(String name) throws Exception {
-		// replace all spaces by underscores
-		name = name.trim().replaceAll("\\s+", "_");
-		if (focusPoint != null) {
-			String currentName = focusPoint.getName();
-			if (!currentName.equals(name)) {
+		ScopedPreferenceStore store = new ScopedPreferenceStore(InstanceScope.INSTANCE, "org.dawb.common.ui");
+		String sIsEnabled = store.getString(BasePlottingConstants.IS_TRACKER_ENABLED);
+		boolean isTrackingEnabled = Boolean.valueOf(sIsEnabled);
+		if (isTrackingEnabled) {
+			// replace all spaces by underscores
+			name = name.trim().replaceAll("\\s+", "_");
+			if (focusPoint != null) {
+				String currentName = focusPoint.getName();
+				if (!currentName.equals(name)) {
+					focusPoint = new FocusPoint(name);
+				}
+			} else {
 				focusPoint = new FocusPoint(name);
 			}
-		} else {
-			focusPoint = new FocusPoint(name);
-		}
-		if (tracker == null)
-			tracker = TrackerLoader.ANALYTICS_INSTANCE;
-		if (tracker.getLoggingAdapter() == null)
-			tracker.setLoggingAdapter(LoggerLoader.LOGGING_INSTANCE);
+			if (tracker == null) {
+				String version = BundleUtils.getDawnVersion();
+				String code = store.getString(BasePlottingConstants.ANALYTICS_TRACK_CODE);
+				tracker = new JGoogleAnalyticsTracker(APP_NAME, version, code);
+			}
+			if (tracker.getLoggingAdapter() == null)
+				tracker.setLoggingAdapter(LoggerLoader.LOGGING_INSTANCE);
 
-		if (focusPoint == null)
-			throw new Exception("A unique name must be set");
-		tracker.trackAsynchronously(focusPoint);
+			if (focusPoint == null)
+				throw new Exception("A unique name must be set");
+			tracker.trackAsynchronously(focusPoint);
+		}
 	}
 
 	@Override
