@@ -21,6 +21,8 @@ public class JGoogleAnalyticsEventTrackerImpl implements EventTracker {
 
 	private static final String APP_NAME = "DAWN";
 
+	private String version;
+
 	static {
 		System.out.println("Starting JGoogleAnalytics Event tracker service.");
 	}
@@ -63,7 +65,8 @@ public class JGoogleAnalyticsEventTrackerImpl implements EventTracker {
 				focusPoint = new FocusPoint(name);
 			}
 			if (tracker == null) {
-				String version = BundleUtils.getDawnVersion();
+				if (version == null)
+					version = BundleUtils.getDawnVersion();
 				if (version != null) {
 					// get only the first 5 characters of the version ie 1.9.0
 					version = version.substring(0, 5);
@@ -87,16 +90,22 @@ public class JGoogleAnalyticsEventTrackerImpl implements EventTracker {
 
 	@Override
 	public void trackToolEvent(String name) throws Exception {
-		track(APP_NAME + "/" + BundleUtils.getDawnVersion() + "/Tool/" + name);
+		if (version == null)
+			version = BundleUtils.getDawnVersion();
+		track(APP_NAME + "/" + version + "/Tool/" + name);
 	}
 
 	@Override
 	public void trackPerspectiveEvent(String name) throws Exception {
-		track(APP_NAME + "/" + BundleUtils.getDawnVersion() + "/Perspective/" + name);
+		if (version == null)
+			version = BundleUtils.getDawnVersion();
+		track(APP_NAME + "/" + version + "/Perspective/" + name);
 	}
 
 	@Override
 	public void trackActionEvent(String name) throws Exception {
-		track(APP_NAME + "/" + BundleUtils.getDawnVersion() + "/Action/" + name);
+		if (version == null)
+			version = BundleUtils.getDawnVersion();
+		track(APP_NAME + "/" + version + "/Action/" + name);
 	}
 }
