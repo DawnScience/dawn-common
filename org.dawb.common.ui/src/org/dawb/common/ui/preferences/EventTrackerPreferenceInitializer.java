@@ -24,8 +24,8 @@ public class EventTrackerPreferenceInitializer extends AbstractPreferenceInitial
 		store.setDefault(BasePlottingConstants.IS_TRACKER_ENABLED, def);
 		System.setProperty(BasePlottingConstants.IS_TRACKER_ENABLED, String.valueOf(def));
 		// set analytics tracking code
-		store.setDefault(BasePlottingConstants.ANALYTICS_TRACK_CODE, "UA-48311061-3");
-		System.setProperty(BasePlottingConstants.ANALYTICS_TRACK_CODE, "UA-48311061-3");
+		store.setDefault(BasePlottingConstants.ANALYTICS_TRACK_CODE, "UA-48311061-4");
+		System.setProperty(BasePlottingConstants.ANALYTICS_TRACK_CODE, "UA-48311061-4");
 	}
 
 }
