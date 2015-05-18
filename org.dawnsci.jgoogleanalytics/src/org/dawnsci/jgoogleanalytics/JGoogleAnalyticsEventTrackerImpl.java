@@ -64,6 +64,10 @@ public class JGoogleAnalyticsEventTrackerImpl implements EventTracker {
 			}
 			if (tracker == null) {
 				String version = BundleUtils.getDawnVersion();
+				if (version != null) {
+					// get only the first 5 characters of the version ie 1.9.0
+					version = version.substring(0, 5);
+				}
 				String code = store.getString(BasePlottingConstants.ANALYTICS_TRACK_CODE);
 				tracker = new JGoogleAnalyticsTracker(APP_NAME, version, code);
 			}
