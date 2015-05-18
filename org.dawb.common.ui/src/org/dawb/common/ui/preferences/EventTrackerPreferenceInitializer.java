@@ -18,11 +18,9 @@ public class EventTrackerPreferenceInitializer extends AbstractPreferenceInitial
 	@Override
 	public void initializeDefaultPreferences() {
 		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
-		// set enable/disable tracking
+		// set enable/disable tracking, if no system property is set then it will be set to false
 		String defaultValue = System.getProperty(BasePlottingConstants.IS_TRACKER_ENABLED);
 		boolean def = Boolean.valueOf(defaultValue);
-		if (defaultValue == null)
-			def = true;
 		store.setDefault(BasePlottingConstants.IS_TRACKER_ENABLED, def);
 		System.setProperty(BasePlottingConstants.IS_TRACKER_ENABLED, String.valueOf(def));
 		// set analytics tracking code
