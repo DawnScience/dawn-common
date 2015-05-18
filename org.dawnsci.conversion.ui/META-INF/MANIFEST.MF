@@ -21,7 +21,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.emf.common.ui,
  uk.ac.diamond.org.mihalis.opal;bundle-version="0.9.5",
  org.eclipse.dawnsci.plotting.api;bundle-version="1.2.0"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Import-Package: org.dawb.common.ui.monitor,
  org.dawb.common.ui.util,
