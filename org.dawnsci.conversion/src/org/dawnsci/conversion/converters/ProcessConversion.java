@@ -10,7 +10,6 @@ package org.dawnsci.conversion.converters;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.Map;
 
@@ -24,7 +23,9 @@ import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
 import org.eclipse.dawnsci.analysis.api.io.ILoaderService;
 import org.eclipse.dawnsci.analysis.api.metadata.AxesMetadata;
+import org.eclipse.dawnsci.analysis.api.processing.Atomic;
 import org.eclipse.dawnsci.analysis.api.processing.ExecutionType;
+import org.eclipse.dawnsci.analysis.api.processing.IOperation;
 import org.eclipse.dawnsci.analysis.api.processing.IOperationContext;
 import org.eclipse.dawnsci.analysis.api.processing.IOperationService;
 import org.eclipse.dawnsci.analysis.dataset.slicer.SliceFromSeriesMetadata;
@@ -96,11 +97,27 @@ public class ProcessConversion extends AbstractConversion {
 			logger.debug("Copy ran in: " +(System.currentTimeMillis()-start)/1000. + " s : Thread" +Thread.currentThread().toString());
 		}
 		
-		// Run
+		boolean parallel = true;
+		IOperation[] operationSeries = info.getOperationSeries();
+		for (IOperation op : operationSeries) {
+			Atomic atomic = op.getClass().getAnnotation(Atomic.class);
+			if (atomic == null) {
+				parallel = false;
+				break;
+			}
+		}
+		
+		ExecutionType executionType = info.getExecutionType();
+		
+		if (executionType == ExecutionType.SERIES && info.isTryParallel() && parallel) {
+			executionType = ExecutionType.PARALLEL;
+			logger.info("Switching to parallel runner!");
+		}
+		
 		cc.setMonitor(context.getMonitor());
 		cc.setVisitor(info.getExecutionVisitor(full));
 		cc.setSeries(info.getOperationSeries());
-		cc.setExecutionType(info.getExecutionType());
+		cc.setExecutionType(executionType);
 		cc.setPoolSize(info.getPoolSize());
 		service.execute(cc);
 	}
