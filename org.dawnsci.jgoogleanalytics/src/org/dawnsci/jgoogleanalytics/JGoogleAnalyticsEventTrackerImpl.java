@@ -86,19 +86,19 @@ public class JGoogleAnalyticsEventTrackerImpl implements EventTracker {
 	public void trackToolEvent(String name) throws Exception {
 		if (version == null)
 			version = BundleUtils.getDawnVersion();
-		track(APP_NAME + "/" + getVersion() + "/Tool/" + name);
+		track("Tool/" + name);
 	}
 
 	@Override
 	public void trackPerspectiveEvent(String name) throws Exception {
 		if (version == null)
 			version = BundleUtils.getDawnVersion();
-		track(APP_NAME + "/" + getVersion() + "/Perspective/" + name);
+		track("Perspective/" + name);
 	}
 
 	@Override
 	public void trackActionEvent(String name) throws Exception {
-		track(APP_NAME + "/" + getVersion() + "/Action/" + name);
+		track("Action/" + name);
 	}
 
 	private String getVersion() {
