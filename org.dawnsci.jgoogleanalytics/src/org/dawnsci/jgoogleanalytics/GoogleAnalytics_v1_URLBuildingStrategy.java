@@ -14,7 +14,7 @@ public class GoogleAnalytics_v1_URLBuildingStrategy implements
 		URLBuildingStrategy {
 	private FocusPoint appFocusPoint;
 	private String googleAnalyticsTrackingCode;
-	private String refererURL = "http://www.dawnsci.org";
+	private String refererURL = "http://dawnsci.org";
 
 	private static final String TRACKING_URL_Prefix = "http://www.google-analytics.com/__utm.gif";
 
