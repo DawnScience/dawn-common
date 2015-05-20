@@ -56,6 +56,11 @@ public class JGoogleAnalyticsEventTrackerImpl implements EventTracker {
 		if (isTrackingEnabled) {
 			// replace all spaces by underscores
 			name = name.trim().replaceAll("\\s+", "_");
+			// get beamline name if any otherwise replace by ext/
+			String beamline = System.getenv("BEAMLINE");
+			if (beamline.isEmpty())
+				beamline = "ext";
+			name = beamline + '/' + name;
 			if (focusPoint != null) {
 				String currentName = focusPoint.getName();
 				if (!currentName.equals(name)) {
