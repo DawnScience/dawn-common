@@ -21,6 +21,8 @@ public class JGoogleAnalyticsEventTrackerImpl implements EventTracker {
 
 	private static final String APP_NAME = "DAWN";
 
+	private boolean isTrackingEnabled = Boolean.valueOf(System.getProperty(BasePlottingConstants.IS_TRACKER_ENABLED));
+
 	private String version;
 
 	static {
@@ -51,8 +53,9 @@ public class JGoogleAnalyticsEventTrackerImpl implements EventTracker {
 	@Override
 	public void track(String name) throws Exception {
 		ScopedPreferenceStore store = new ScopedPreferenceStore(InstanceScope.INSTANCE, "org.dawb.common.ui");
-		String sIsEnabled = store.getString(BasePlottingConstants.IS_TRACKER_ENABLED);
-		boolean isTrackingEnabled = Boolean.valueOf(sIsEnabled);
+		
+		isTrackingEnabled = Boolean.valueOf(System.getProperty(BasePlottingConstants.IS_TRACKER_ENABLED));
+
 		if (isTrackingEnabled) {
 			// replace all spaces by underscores
 			name = name.trim().replaceAll("\\s+", "_");

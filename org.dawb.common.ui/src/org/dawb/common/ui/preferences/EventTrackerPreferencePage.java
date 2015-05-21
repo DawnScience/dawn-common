@@ -28,10 +28,6 @@ public class EventTrackerPreferencePage extends FieldEditorPreferencePage implem
 					System.setProperty(
 							BasePlottingConstants.IS_TRACKER_ENABLED,
 							String.valueOf((Boolean) event.getNewValue()));
-				} else if (event.getProperty() == BasePlottingConstants.ANALYTICS_TRACK_CODE) {
-					System.setProperty(
-							BasePlottingConstants.ANALYTICS_TRACK_CODE,
-							(String) event.getNewValue());
 				}
 			}
 		};
