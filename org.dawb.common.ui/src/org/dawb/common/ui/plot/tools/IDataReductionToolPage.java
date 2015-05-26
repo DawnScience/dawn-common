@@ -139,11 +139,7 @@ public interface IDataReductionToolPage extends IToolPage {
 				return;
 			}
 			
-			int dataRank = more.squeeze().getRank();
-			if (dataRank == 0) { // Just adding one number!
-				H5Utils.appendDataset(file, group, more);
-				return;
-			}
+			int dataRank = more.getSliceView().squeeze().getRank();
 			
 			//determine if dataset different rank to slice
 			List<Integer> dimList = new ArrayList<Integer>();
@@ -160,6 +156,8 @@ public interface IDataReductionToolPage extends IToolPage {
 			//Make new slice array to deal with new dimensions
 			List<Slice> sliceList = new ArrayList<Slice>();
 			List<Integer> totalDimList = new ArrayList<Integer>();
+			List<Integer> sliceShape =  new ArrayList<Integer>();
+			
 			int padCounter = 0;
 			int counter = 0;
 			for (Slice s: slice) {
@@ -168,7 +166,9 @@ public interface IDataReductionToolPage extends IToolPage {
 					
 					if (padCounter < dataRank) {
 						sliceList.add(new Slice(0,more.getShape()[padCounter],1));
-						totalDimList.add(more.getShape()[padCounter]);
+						int dShape = more.getShape()[padCounter];
+						totalDimList.add(dShape);
+						sliceShape.add(dShape);
 						padCounter++;
 					} else {
 						continue;
@@ -178,6 +178,7 @@ public interface IDataReductionToolPage extends IToolPage {
 				}else {
 					sliceList.add(s);
 					totalDimList.add(shape[counter]);
+					sliceShape.add(1);
 				}
 				
 				counter++;
@@ -188,6 +189,11 @@ public interface IDataReductionToolPage extends IToolPage {
 			
 			long[] newShape = new long[totalDimList.size()];
 			for (int i = 0; i < newShape.length; i++) newShape[i] = totalDimList.get(i);
+			
+			//update dataset rank to match output
+			int[] s = new int[newShape.length];
+			for (int i = 0; i < sliceShape.size(); i++) s[i] = sliceShape.get(i);
+			more.setShape(s);
 			
 			H5Utils.insertDataset(file, group, more, sliceOut, newShape);
 			
