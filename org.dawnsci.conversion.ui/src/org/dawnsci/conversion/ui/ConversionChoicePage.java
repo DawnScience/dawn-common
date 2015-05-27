@@ -293,22 +293,9 @@ public class ConversionChoicePage extends ResourceChoosePage implements IConvers
 			infoText.setText(chosenConversion.getDescription());
 			
 			if (chosenConversion.isNexusOnly()) {
-	
-				if (getSelectedFiles()!=null && getSelectedFiles().size()>1 && multiFileSelection) {		
-					for (String path : getSelectedFiles()) {
-						if (!isH5(path)) {
-							setErrorMessage("The conversion '"+chosenConversion.getUiLabel()+"' supports nexus/hdf5 files only. The file '"+((new File(path).getName())+"' is not a nexus/hdf5 file."));
-							setPageComplete(false);
-							return;
-						}				
-					}
-				} else {
-					if (!isH5(filePath)) {
-						setErrorMessage("The conversion '"+chosenConversion.getUiLabel()+"' supports nexus/hdf5 files only.");
-						setPageComplete(false);
-						return;
-					}
-				}
+				if (!checkH5(filePath, true)) return; // Must be h5 source
+			} else if (!chosenConversion.isNexusSourceAllowed()) {
+				if (!checkH5(filePath, false)) return;
 			}
 			
 			infoText.getParent().getParent().layout();
@@ -373,6 +360,27 @@ public class ConversionChoicePage extends ResourceChoosePage implements IConvers
 	}
 
 	
+	private boolean checkH5(String filePath, boolean isH5) {
+		
+		String seg  = isH5 ? "" : "non-";
+		if (getSelectedFiles()!=null && getSelectedFiles().size()>1 && multiFileSelection) {		
+			for (String path : getSelectedFiles()) {
+				if (isH5 == !isH5(path)) {
+					setErrorMessage("The conversion '"+chosenConversion.getUiLabel()+"' supports "+seg+"nexus/hdf5 files only. The file '"+((new File(path).getName())+"' is not."));
+					setPageComplete(false);
+					return false;
+				}				
+			}
+		} else {
+			if (isH5 == !isH5(filePath)) {
+				setErrorMessage("The conversion '"+chosenConversion.getUiLabel()+"' supports "+seg+"nexus/hdf5 files only.");
+				setPageComplete(false);
+				return false;
+			}
+		}
+		return true;
+	}
+
 	@Override
 	public IConversionContext getContext() {
 		IConversionContext context;
