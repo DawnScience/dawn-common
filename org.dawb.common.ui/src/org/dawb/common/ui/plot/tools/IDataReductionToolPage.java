@@ -195,6 +195,11 @@ public interface IDataReductionToolPage extends IToolPage {
 			for (int i = 0; i < sliceShape.size(); i++) s[i] = sliceShape.get(i);
 			more.setShape(s);
 			
+			if (more.getRank() == 0 && newShape.length == 0) {
+				more.setShape(new int[]{1});
+				newShape = new long[]{1};
+			}
+			
 			H5Utils.insertDataset(file, group, more, sliceOut, newShape);
 			
 			return;
