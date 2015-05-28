@@ -11,6 +11,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.dawnsci.plotting.api.IPlottingSystem;
 import org.eclipse.dawnsci.plotting.api.PlottingFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -19,6 +20,7 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.python.pydev.debug.newconsole.prefs.InteractiveConsolePrefs;
 import org.python.pydev.shared_interactive_console.console.ui.internal.ScriptConsoleViewer;
 
@@ -129,6 +131,21 @@ public class DocumentInsertionJob extends Job {
 			checkAdd("import numpy", cmd, store.getLong(numpyPause));
 			
 		}
+		
+		// Check that port is assigned correctly
+		if (!isDefault("PREF_DEFAULT_PORT")) {
+			checkAdd("import py4j", cmd, store.getLong(plottingPause));
+			final ScopedPreferenceStore store = new ScopedPreferenceStore(InstanceScope.INSTANCE, "net.sf.py4j.defaultserver");
+			int port = store.getInt("PREF_DEFAULT_PORT");
+			checkAdd("py4j.java_gateway.DEFAULT_PORT="+port, cmd, store.getLong(defaultPause));
+		}
+
+		if (!isDefault("PREF_DEFAULT_CALLBACK_PORT")) {
+			checkAdd("import py4j", cmd, store.getLong(defaultPause));
+			final ScopedPreferenceStore store = new ScopedPreferenceStore(InstanceScope.INSTANCE, "net.sf.py4j.defaultserver");
+			int port = store.getInt("PREF_DEFAULT_CALLBACK_PORT");
+			checkAdd("py4j.java_gateway.DEFAULT_PYTHON_PROXY_PORT="+port, cmd, store.getLong(defaultPause));
+		}
 			
 		if (cmd.indexOf("ps = dnp.plot.getPlottingSystem(")<0) {
 			final List<Boolean> inserted = new ArrayList<Boolean>(1);
@@ -169,6 +186,13 @@ public class DocumentInsertionJob extends Job {
 				}
 			}
 		}
+	}
+
+	private boolean isDefault(String preference) {
+		final ScopedPreferenceStore store = new ScopedPreferenceStore(InstanceScope.INSTANCE, "net.sf.py4j.defaultserver");
+		final int def = store.getDefaultInt(preference);
+		final int val = store.getInt(preference);
+		return val==def;
 	}
 
 	private void checkAdd(final String toAdd, String cmd, long time) {
