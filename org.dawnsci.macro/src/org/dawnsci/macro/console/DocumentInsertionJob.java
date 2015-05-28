@@ -137,14 +137,14 @@ public class DocumentInsertionJob extends Job {
 			checkAdd("import py4j", cmd, store.getLong(plottingPause));
 			final ScopedPreferenceStore store = new ScopedPreferenceStore(InstanceScope.INSTANCE, "net.sf.py4j.defaultserver");
 			int port = store.getInt("PREF_DEFAULT_PORT");
-			checkAdd("py4j.java_gateway.DEFAULT_PORT="+port, cmd, store.getLong(defaultPause));
+			checkAdd("py4j.java_gateway.DEFAULT_PORT="+port, cmd, 1000);
 		}
 
 		if (!isDefault("PREF_DEFAULT_CALLBACK_PORT")) {
 			checkAdd("import py4j", cmd, store.getLong(defaultPause));
 			final ScopedPreferenceStore store = new ScopedPreferenceStore(InstanceScope.INSTANCE, "net.sf.py4j.defaultserver");
 			int port = store.getInt("PREF_DEFAULT_CALLBACK_PORT");
-			checkAdd("py4j.java_gateway.DEFAULT_PYTHON_PROXY_PORT="+port, cmd, store.getLong(defaultPause));
+			checkAdd("py4j.java_gateway.DEFAULT_PYTHON_PROXY_PORT="+port, cmd, 1000);
 		}
 			
 		if (cmd.indexOf("ps = dnp.plot.getPlottingSystem(")<0) {
