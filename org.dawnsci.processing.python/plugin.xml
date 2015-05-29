@@ -4,6 +4,7 @@
    <extension
          point="org.eclipse.dawnsci.analysis.api.operation">
       <operation
+            category="org.dawnsci.processing.python.scripting"
             class="uk.ac.diamond.scisoft.analysis.processing.python.PythonImageToImageOperation"
             icon="icons/python.png"
             id="uk.ac.diamond.scisoft.analysis.processing.python.PythonImageToImageOperation"
@@ -11,6 +12,7 @@
             name="Python Script - Image to Image">
       </operation>
       <operation
+            category="org.dawnsci.processing.python.scripting"
             class="uk.ac.diamond.scisoft.analysis.processing.python.PythonImageToXYOperation"
             icon="icons/python.png"
             id="uk.ac.diamond.scisoft.analysis.processing.python.PythonImageToXYOperation"
@@ -18,12 +20,17 @@
             name="Python Script - Image to XY">
       </operation>
       <operation
+            category="org.dawnsci.processing.python.scripting"
             class="uk.ac.diamond.scisoft.analysis.processing.python.PythonXYtoXYOperation"
             icon="icons/python.png"
             id="uk.ac.diamond.scisoft.analysis.processing.python.PythonXYtoXYOperation"
             model="uk.ac.diamond.scisoft.analysis.processing.python.PythonScriptModel"
             name="Python Script - XY to XY">
       </operation>
+      <category
+            id="org.dawnsci.processing.python.scripting"
+            name="Scripting">
+      </category>
    </extension>
 
 </plugin>
