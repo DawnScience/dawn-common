@@ -126,10 +126,8 @@ public class DocumentInsertionJob extends Job {
 		
 		// Check numpy
 		if (inserter.getType()==InsertionType.PYTHON) {
-
 			checkAdd("# Turn py4j on under Window->Preferences->Py4j Default Server > 'Py4j active'", cmd, store.getLong(defaultPause));
 			checkAdd("import numpy", cmd, store.getLong(numpyPause));
-			
 		}
 		
 		// Check that port is assigned correctly
