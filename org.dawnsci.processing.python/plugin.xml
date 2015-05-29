@@ -5,18 +5,21 @@
          point="org.eclipse.dawnsci.analysis.api.operation">
       <operation
             class="uk.ac.diamond.scisoft.analysis.processing.python.PythonImageToImageOperation"
+            icon="icons/python.png"
             id="uk.ac.diamond.scisoft.analysis.processing.python.PythonImageToImageOperation"
             model="uk.ac.diamond.scisoft.analysis.processing.python.PythonScriptModel"
             name="Python Script - Image to Image">
       </operation>
       <operation
             class="uk.ac.diamond.scisoft.analysis.processing.python.PythonImageToXYOperation"
+            icon="icons/python.png"
             id="uk.ac.diamond.scisoft.analysis.processing.python.PythonImageToXYOperation"
             model="uk.ac.diamond.scisoft.analysis.processing.python.PythonScriptModel"
             name="Python Script - Image to XY">
       </operation>
       <operation
             class="uk.ac.diamond.scisoft.analysis.processing.python.PythonXYtoXYOperation"
+            icon="icons/python.png"
             id="uk.ac.diamond.scisoft.analysis.processing.python.PythonXYtoXYOperation"
             model="uk.ac.diamond.scisoft.analysis.processing.python.PythonScriptModel"
             name="Python Script - XY to XY">
