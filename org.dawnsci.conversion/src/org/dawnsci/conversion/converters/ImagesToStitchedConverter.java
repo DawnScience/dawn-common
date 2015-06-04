@@ -24,7 +24,6 @@ import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
 import org.eclipse.dawnsci.analysis.api.roi.IROI;
 import org.eclipse.dawnsci.analysis.dataset.impl.Image;
 import org.eclipse.dawnsci.analysis.dataset.impl.LazyDataset;
-import org.eclipse.dawnsci.analysis.dataset.roi.EllipticalROI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -91,7 +90,7 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 		// crop each image given an elliptical roi
 		IROI roi = conversionBean.getRoi();
 		if (roi != null) {
-			IDataset cropped = Image.maxRectangleFromEllipticalImage(rotated, (EllipticalROI)roi);
+			IDataset cropped = Image.maxRectangleFromEllipticalImage(rotated, roi);
 			imageStack.add(cropped);
 		} else {
 			imageStack.add(rotated);

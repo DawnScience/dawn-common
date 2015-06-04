@@ -23,7 +23,7 @@ import org.eclipse.dawnsci.analysis.api.dataset.Slice;
 import org.eclipse.dawnsci.analysis.api.image.IImageTransform;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
 import org.eclipse.dawnsci.analysis.api.metadata.IMetadata;
-import org.eclipse.dawnsci.analysis.dataset.roi.EllipticalROI;
+import org.eclipse.dawnsci.analysis.dataset.roi.CircularROI;
 import org.eclipse.dawnsci.plotting.api.IPlottingSystem;
 import org.eclipse.dawnsci.plotting.api.PlotType;
 import org.eclipse.dawnsci.plotting.api.PlottingFactory;
@@ -398,31 +398,27 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 			IRegion region = plotSystem.getRegion(regionName);
 			if (region == null) {
 				region = plotSystem
-						.createRegion(regionName, RegionType.ELLIPSE);
+						.createRegion(regionName, RegionType.CIRCLE);
 				double width, height;
-				EllipticalROI eroi = null;
+				CircularROI croi = null;
 				if (data != null) {
 					width = data.getShape()[0];
 					height = data.getShape()[1];
-					double bufferX = width / 100;
-					double bufferY = height / 100;
 					double centreX = width / 2;
 					double centreY = height / 2;
 					if (width >= height) {
-						eroi = new EllipticalROI((width - bufferX) / 2,
-								(height - bufferY) / 2, 0, centreX, centreY);
+						croi = new CircularROI(width / 2, centreX, centreY);
 					} else {
-						eroi = new EllipticalROI((height - bufferY) / 2,
-								(width - bufferX) / 2, 0, centreX, centreY);
+						croi = new CircularROI(height / 2, centreX, centreY);
 					}
-					eroi.setName(regionName);
-					eroi.setPlot(true);
-					region.setROI(eroi);
+					croi.setName(regionName);
+					croi.setPlot(true);
+					region.setROI(croi);
 					region.setUserRegion(true);
 					region.setMobile(true);
 					plotSystem.addRegion(region);
 				} else {
-					logger.error("Could not create Elliptical region");
+					logger.error("Could not create Circular region");
 				}
 			}
 		} catch (Exception e) {

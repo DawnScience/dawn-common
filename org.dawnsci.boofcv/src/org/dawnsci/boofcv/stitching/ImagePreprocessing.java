@@ -107,7 +107,7 @@ public class ImagePreprocessing {
 	 * @return Ordered array of Dataset
 	 * @throws Exception
 	 */
-	public static double[][][] transToArraysInMicrons(List<double[]> input, int rows, int columns) {
+	public static double[][][] transToArraysInMicrons(List<double[]> input, int rows, int columns, double scaling) {
 		double[][][] images = new double[rows][columns][2];
 		for (int i = 0; i < rows; i++) {
 			for(int j = 0; j < columns; j++) {
@@ -121,5 +121,24 @@ public class ImagePreprocessing {
 			}
 		}
 		return images;
+	}
+
+	/**
+	 * convert all translations from mm values to pixel values given a scaling
+	 * value
+	 * 
+	 * @param translations
+	 * @param scaling
+	 *            in micron/pixel
+	 * @return
+	 */
+	public static List<double[]> convertToPixel(List<double[]> translations, double scaling) {
+		List<double[]> translates = translations;
+		for (int i = 0; i < translations.size(); i ++) {
+			for (int j = 0; j < translations.get(0).length; j++) {
+				translates.get(i)[j] = translations.get(i)[j] / scaling;
+			}
+		}
+		return translates;
 	}
 }

@@ -41,7 +41,7 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 	private TranslationObject test;
 
 	// factor to convert between microns and pixels
-	private double micronsToPixels = 512/50;
+	private double micronsToPixels;
 
 	/**
 	 * Creates a FullStitchingObject
