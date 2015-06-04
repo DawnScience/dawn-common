@@ -22,6 +22,7 @@ import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.Slice;
 import org.eclipse.dawnsci.analysis.api.image.IImageTransform;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
+import org.eclipse.dawnsci.analysis.api.metadata.IMetadata;
 import org.eclipse.dawnsci.analysis.dataset.roi.EllipticalROI;
 import org.eclipse.dawnsci.plotting.api.IPlottingSystem;
 import org.eclipse.dawnsci.plotting.api.PlotType;
@@ -47,6 +48,7 @@ import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.ac.diamond.scisoft.analysis.image.FOVAngleMapping;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 
 /**
@@ -164,16 +166,30 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 		String filePath = getSelectedPaths()[0];
 		if (filePath.endsWith(".dat"))
 			datFileLoaded = true;
-		int rowNum = 3, columnNum = 3;
+		double angle = 0, fov = 0;
+		int rowNum = 0, columnNum = 0;
 		try {
 			IDataHolder holder = LoaderFactory.getData(filePath);
 			if (datFileLoaded) {
+				//load metadatavalues
+				IMetadata meta = holder.getMetadata();
+				double theta = Double.valueOf((String) meta.getMetaValue("theta"));
+				fov = Double.valueOf((String) meta.getMetaValue("FOV"));
+				angle = FOVAngleMapping.getAngle(fov, theta);
+				// load images
 				ILazyDataset lazy = holder.getLazyDataset("uv_image");
 				int[] shape = lazy.getShape();
 				firstImage = lazy.getSlice(new Slice(0, shape[0], shape[1]));
 				firstImage.squeeze();
-				rowNum = (int)Math.sqrt(shape[0]);
-				columnNum = shape[0] / rowNum;
+				// load translations
+				IDataset psx = holder.getDataset("psx");
+				IDataset psy = holder.getDataset("psy");
+				int[] columnRows = getColumnAndRowNumber(psx, psy);
+				rowNum = columnRows[1];
+				columnNum = columnRows[0];
+				
+//				rowNum = (int)Math.sqrt(shape[0]);
+//				columnNum = shape[0] / rowNum;
 			} else {
 				firstImage = holder.getDataset(0);
 			}
@@ -189,15 +205,13 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 		rowsSpinner.setSelection(rowNum);
 		rowsSpinner.setToolTipText("Number of rows for the resulting stitched image");
 		rowsSpinner.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-		rowsSpinner.setEnabled(!datFileLoaded);
 
 		final Label labelAngle = new Label(controlComp, SWT.NONE);
 		labelAngle.setText("Rotation angle");
 		labelAngle.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
 		angleSpinner = new Spinner(controlComp, SWT.BORDER);
-		angleSpinner.setDigits(1);
+//		angleSpinner.setDigits(1);
 		angleSpinner.setToolTipText("Rotates the original image by n degrees");
-		angleSpinner.setSelection(0);
 		angleSpinner.setMaximum(3600);
 		GridData gridData = new GridData(SWT.FILL, SWT.CENTER, true, false); 
 		gridData.widthHint = 50;
@@ -222,6 +236,8 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 				}
 			}
 		});
+		angleSpinner.setSelection((int)angle);
+
 
 		final Label xTranslationLabel = new Label(controlComp, SWT.NONE);
 		xTranslationLabel.setText("X translation");
@@ -230,7 +246,7 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 		NumberFormatter formatter = new NumberFormatter("-##0.0");
 		formatter.setFixedLengths(false, true);
 		xTranslationText.setFormatter(formatter);
-		xTranslationText.getControl().setToolTipText("Expected translation in microns in the X direction");
+		xTranslationText.getControl().setToolTipText("Expected translation in pixels in the X direction");
 		xTranslationText.setValue(new Double(25));
 		xTranslationText.getControl().setEnabled(!hasFeatureAssociated);
 		gridData = new GridData(SWT.FILL, SWT.CENTER, true, false); 
@@ -249,7 +265,6 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 		columnsSpinner.setSelection(columnNum);
 		columnsSpinner.setToolTipText("Number of columns for the resulting stitched image");
 		columnsSpinner.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-		columnsSpinner.setEnabled(!datFileLoaded);
 
 		final Label labelFOV = new Label(controlComp, SWT.NONE);
 		labelFOV.setText("Field of view");
@@ -259,7 +274,7 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 		formatter.setFixedLengths(false, true);
 		fovText.setFormatter(formatter);
 		fovText.getControl().setToolTipText("Field of view in microns");
-		fovText.setValue(new Double(50));
+		fovText.setValue(fov);
 		gridData = new GridData(SWT.FILL, SWT.CENTER, true, false); 
 		gridData.widthHint = 50;
 		fovText.getControl().setLayoutData(gridData);
@@ -271,7 +286,7 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 		formatter = new NumberFormatter("-##0.0");
 		formatter.setFixedLengths(false, true);
 		yTranslationText.setFormatter(formatter);
-		yTranslationText.getControl().setToolTipText("Expected translation in microns in the y direction");
+		yTranslationText.getControl().setToolTipText("Expected translation in pixels in the y direction");
 		yTranslationText.setValue(new Double(25));
 		yTranslationText.getControl().setEnabled(!hasFeatureAssociated);
 		gridData = new GridData(SWT.FILL, SWT.CENTER, true, false); 
@@ -340,8 +355,11 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 			plotSystem = PlottingFactory.createPlottingSystem();
 			plotSystem.createPlotPart(plotComp, "Preprocess", null, PlotType.IMAGE, null);
 			plotSystem.getPlotComposite().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-			if (firstImage != null && firstImage.getRank() == 2)
+			if (firstImage != null && firstImage.getRank() == 2) {
+				if (angle != 0)
+					firstImage = transformer.rotate(firstImage, angle);
 				plotSystem.createPlot2D(firstImage, null, null);
+			}
 			plotSystem.setKeepAspect(true);
 			createRegion(firstImage);
 		} catch (Exception e) {
@@ -351,6 +369,21 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 		plotExpandComp.setClient(plotComp);
 		plotExpandComp.addExpansionListener(createExpansionAdapter());
 		plotExpandComp.setExpanded(hasCropping);
+	}
+
+	private int[] getColumnAndRowNumber(IDataset psx, IDataset psy) {
+		int columns = 0, rows = 0, yIndex = 0;
+		double currentXValue = psx.getDouble(0), currentYValue = psy.getDouble(0);
+		while (yIndex < psy.getSize() && psy.getDouble(yIndex) == currentYValue) {
+			columns = 0;
+			while (psx.getDouble(columns) == currentXValue) {
+				currentXValue = psx.getDouble(columns);
+				columns++;
+			}
+			yIndex += columns;
+			rows++;
+		}
+		return new int[] { columns, rows};
 	}
 
 	private double getSpinnerAngle() {
