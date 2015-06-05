@@ -115,7 +115,6 @@ public class StitchingConvertTest {
 		bean.setRows(rows);
 		bean.setFieldOfView(fieldOfView);
 		bean.setFeatureAssociated(true);
-		bean.setInputDatFile(false);
 		bean.setTranslations(translations);
 
 		context.setUserObject(bean);
@@ -162,10 +161,10 @@ public class StitchingConvertTest {
 			for (IDataset im : data) {
 				IDataset rotated = transformer.rotate(im, angle);
 				// crop each image given an elliptical roi
-				IDataset cropped = Image.maxRectangleFromEllipticalImage(rotated, (EllipticalROI)roi);
+				IDataset cropped = Image.maxRectangleFromEllipticalImage(rotated, roi);
 				rotatedCroppedData.add(cropped);
 			}
-			IDataset shiftedImages = sticher.stitch(rotatedCroppedData, rows, columns, fieldOfView, translations, true, false);
+			IDataset shiftedImages = sticher.stitch(rotatedCroppedData, rows, columns, fieldOfView, translations, true);
 			return shiftedImages;
 		} catch (Exception e) {
 			fail("An error occured while stitching images:" + e);

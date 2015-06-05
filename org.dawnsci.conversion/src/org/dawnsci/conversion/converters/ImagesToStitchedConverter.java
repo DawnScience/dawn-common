@@ -101,11 +101,10 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 			int rows = conversionBean.getRows();
 			int columns = conversionBean.getColumns();
 			boolean useFeatureAssociation = conversionBean.isFeatureAssociated();
-			boolean isInputDatFile = conversionBean.isInputDatFile();
 			double fieldOfView = conversionBean.getFieldOfView();
 			List<double[]> translations = conversionBean.getTranslations();
 			// stitch the stack of images
-			IDataset stitched = stitcher.stitch(imageStack, rows, columns, fieldOfView, translations, useFeatureAssociation, isInputDatFile);
+			IDataset stitched = stitcher.stitch(imageStack, rows, columns, fieldOfView, translations, useFeatureAssociation);
 
 			stitched.setName("stitched");
 			final File outputFile = new File(outputPath);
@@ -194,7 +193,6 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 		private double angle = 49;
 		private double fieldOfView = 50;
 		private boolean featureAssociated;
-		private boolean isInputDatFile = false;
 		private List<double[]> translations;
 		private IROI roi;
 
@@ -234,12 +232,6 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 		public void setFeatureAssociated(boolean featureAssociated) {
 			this.featureAssociated = featureAssociated;
 		}
-		public boolean isInputDatFile() {
-			return isInputDatFile;
-		}
-		public void setInputDatFile(boolean isInputDatFile) {
-			this.isInputDatFile = isInputDatFile;
-		}
 		public void setTranslations(List<double[]> translations) {
 			this.translations = translations;
 		}
@@ -257,7 +249,6 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 			result = prime * result + (featureAssociated ? 1231 : 1237);
 			temp = Double.doubleToLongBits(fieldOfView);
 			result = prime * result + (int) (temp ^ (temp >>> 32));
-			result = prime * result + (isInputDatFile ? 1231 : 1237);
 			result = prime * result
 					+ ((roi == null) ? 0 : roi.hashCode());
 			result = prime * result + rows;
@@ -283,8 +274,6 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 				return false;
 			if (Double.doubleToLongBits(fieldOfView) != Double
 					.doubleToLongBits(other.fieldOfView))
-				return false;
-			if (isInputDatFile != other.isInputDatFile)
 				return false;
 			if (roi == null) {
 				if (other.roi != null)

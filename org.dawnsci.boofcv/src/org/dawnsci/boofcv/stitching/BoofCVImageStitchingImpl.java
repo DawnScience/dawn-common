@@ -57,30 +57,19 @@ public class BoofCVImageStitchingImpl implements IImageStitchingProcess {
 	public IDataset stitch(List<IDataset> input, int rows, int columns) {
 		List<double[]> translations = new ArrayList<double[]>();
 		translations.add(new double[] {25, 25});
-		return stitch(input, rows, columns, 50, translations, false, true);
+		return stitch(input, rows, columns, 50, translations, false);
 	}
 
 	@Override
 	public IDataset stitch(List<IDataset> input, int rows, int columns, double fieldOfView) {
 		List<double[]> translations = new ArrayList<double[]>();
 		translations.add(new double[] {25, 25});
-		return stitch(input, rows, columns, fieldOfView, translations, true, true);
+		return stitch(input, rows, columns, fieldOfView, translations, true);
 	}
 
 	@Override
-	public IDataset stitch(List<IDataset> input, int rows, int columns, double fieldOfView, List<double[]> translations, boolean ...stitchingOptions) {
-		boolean hasFeatureAssociation = false, isDatFileInput = false;
-		double[][][] trans = null;
+	public IDataset stitch(List<IDataset> input, int rows, int columns, double fieldOfView, List<double[]> translations, boolean hasFeatureAssociation) {
 		IDataset[][] images = ImagePreprocessing.listToArray(input, rows, columns);
-		// dat file Flag is set
-		if (stitchingOptions.length > 1)
-			isDatFileInput = stitchingOptions[1];
-		hasFeatureAssociation = stitchingOptions[0];
-		if (isDatFileInput) {
-			int width = images[0][0].getShape()[0];
-//			trans = ImagePreprocessing.transToArraysInMicrons(translations, rows, columns, width / fieldOfView);
-			ImagePreprocessing.convertToPixel(translations, fieldOfView/width);
-		}
 		List<List<ImageAndMetadata>> inputImages = new ArrayList<List<ImageAndMetadata>>();
 
 		for (int i = 0; i < images.length; i++) {
@@ -97,10 +86,7 @@ public class BoofCVImageStitchingImpl implements IImageStitchingProcess {
 				}
 				// set default values if no metadata (scaling = width/fieldofview? 512/50)
 				if (md == null) {
-//					if (isDatFileInput)
-//						md = new PeemMetadataImpl(trans[i][j], image.width / fieldOfView, fieldOfView);
-//					else
-						md = new PeemMetadataImpl(translations.get(0), image.width / fieldOfView, fieldOfView);
+					md = new PeemMetadataImpl(translations.get(0), image.width / fieldOfView, fieldOfView);
 				}
 				ImageAndMetadata imageAndMd = new ImageAndMetadata(image, md);
 				inputImages.get(i).add(imageAndMd);

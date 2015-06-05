@@ -109,7 +109,6 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 		if (hasCropping)
 			bean.setRoi(plotSystem.getRegion("Cropping").getROI());
 		bean.setFeatureAssociated(hasFeatureAssociated);
-		bean.setInputDatFile(datFileLoaded);
 		Number xTrans = (Number) xTranslationText.getValue();
 		Number yTrans = (Number) yTranslationText.getValue();
 		
@@ -133,12 +132,13 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 			int[] shape = lazyDataset.getShape();
 			firstImage = lazyDataset.getSlice(new Slice(0, shape[0], shape[1]));
 			firstImage.squeeze();
-			
+			// TODO check with Francesco the value of psy ?
 			IDataset psxData = holder.getDataset("psx");
-			IDataset psyData = holder.getDataset("psy");
+			IDataset psyData = holder.getDataset("psx");
 			for (int i = 0; i < lazyDataset.getShape()[0]; i++) {
-				double posX = psxData.getDouble(i);
-				double posY = psyData.getDouble(i);
+				double scaling = ((fov.doubleValue() ) / (firstImage.getShape()[0]));
+				double posX = (psxData.getDouble(i) / scaling);
+				double posY = (psyData.getDouble(i) / scaling);
 				translations.add(new double[]{posX, posY});
 			}
 		} else {
@@ -219,7 +219,6 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 		angleSpinner.addModifyListener(new ModifyListener() {
 			@Override
 			public void modifyText(ModifyEvent e) {
-//				createImageTransformer();
 				try {
 					Object val = getSpinnerAngle();
 					IDataset rotated = null;
@@ -348,7 +347,7 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 		
 		Label description = new Label(subComp, SWT.WRAP);
 		description.setText("Press 'Rotate' to select the region on the rotated image then select an "
-				+ "elliptical region which will be used to generate a rectangular sub-image.");
+				+ "circular region which will be used to generate a rectangular sub-image.");
 		description.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 		try {
