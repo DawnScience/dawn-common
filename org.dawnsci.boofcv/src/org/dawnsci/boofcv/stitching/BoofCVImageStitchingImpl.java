@@ -70,10 +70,9 @@ public class BoofCVImageStitchingImpl implements IImageStitchingProcess {
 	@Override
 	public IDataset stitch(List<IDataset> input, int rows, int columns, double fieldOfView, List<double[]> translations, boolean hasFeatureAssociation) {
 		IDataset[][] images = ImagePreprocessing.listToArray(input, rows, columns);
-		List<List<ImageAndMetadata>> inputImages = new ArrayList<List<ImageAndMetadata>>();
-
+		List<List<ImageSingleBand<?>>> inputImages = new ArrayList<List<ImageSingleBand<?>>>();
 		for (int i = 0; i < images.length; i++) {
-			inputImages.add(new ArrayList<ImageAndMetadata>());
+			inputImages.add(new ArrayList<ImageSingleBand<?>>());
 			for (int j = 0; j < images[0].length; j++) {
 				ImageFloat32 image = ConvertIDataset.convertFrom(images[i][j], ImageFloat32.class, 1);
 				// set metadata
@@ -85,25 +84,24 @@ public class BoofCVImageStitchingImpl implements IImageStitchingProcess {
 					e.printStackTrace();
 				}
 				// set default values if no metadata (scaling = width/fieldofview? 512/50)
-				if (md == null) {
-					md = new PeemMetadataImpl(translations.get(0), image.width / fieldOfView, fieldOfView);
-				}
-				ImageAndMetadata imageAndMd = new ImageAndMetadata(image, md);
-				inputImages.get(i).add(imageAndMd);
+//				if (md == null) {
+//					md = new PeemMetadataImpl(translations.get(j), image.width / fieldOfView, fieldOfView);
+//				}
+				inputImages.get(i).add(image);
 			}
 		}
 		Class<ImageFloat32> imageType = ImageFloat32.class;
-		DetectDescribePoint detDesc = FactoryDetectDescribe.surfStable(
+		DetectDescribePoint<?, ?> detDesc = FactoryDetectDescribe.surfStable(
 				new ConfigFastHessian(1, 2, 200, 1, 9, 4, 4), null,null, imageType);
-		ScoreAssociation scorer = FactoryAssociation.defaultScore(detDesc.getDescriptionType());
-		AssociateDescription associate = FactoryAssociation.greedy(scorer, Double.MAX_VALUE, true);
+		ScoreAssociation<?> scorer = FactoryAssociation.defaultScore(detDesc.getDescriptionType());
+		AssociateDescription<?> associate = FactoryAssociation.greedy(scorer, Double.MAX_VALUE, true);
 
 		FullStitchingObject stitchObj = new FullStitchingObject(detDesc, associate, imageType);
-		stitchObj.setConversion(inputImages.get(0).get(0).getImage(), fieldOfView);
+		stitchObj.setConversion(inputImages.get(0).get(0), fieldOfView);
 		if (hasFeatureAssociation) {
-			stitchObj.translationArray(inputImages);
+			stitchObj.translationArray(inputImages, translations);
 		} else {
-			stitchObj.theoreticalTranslation(inputImages);
+			stitchObj.theoreticalTranslation(columns, rows, translations);
 		}
 		ImageSingleBand<?> result = stitchObj.stitch(inputImages);
 		return ConvertIDataset.convertTo(result, true);
