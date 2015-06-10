@@ -151,25 +151,27 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 	 *            The expected translation in microns in the y direction
 	 *            relating successive images in a column
 	 */
-	public void translationArrayHomography(List<List<ImageAndMetadata>> images) {
+	public void translationArrayHomography(List<List<ImageSingleBand<?>>> images, List<double[]> motorTranslations) {
 		// temporarily stores the transforms
 		Homography2D_F64 transform;
 
 		// stores the translations
 		translations = new double[images.size()][images.get(0).size()][2];
 
+		int idx = 0;
 		for (int x = 0; x < translations.length; x++) {
 			for (int y = 0; y < translations[0].length; y++) {
-				double xtrans = images.get(x).get(y).getMetadata().getXYMotorPosition()[0];
-				double ytrans = images.get(x).get(y).getMetadata().getXYMotorPosition()[1];
+				double xtrans = motorTranslations.get(idx)[0];
+				double ytrans = motorTranslations.get(idx)[1];
+
 				if (y == 0) {
 					// translation of first image is 0
 					if (x == 0) {
 					}
 					// translation of all images in the first column is calculated using the above image
 					else {
-						test.associate(images.get(x - 1).get(y).getImage(),
-								images.get(x).get(y).getImage(), 0, ytrans);
+						test.associate(images.get(x - 1).get(y),
+								images.get(x).get(y), 0, ytrans);
 						transform = test.homographyTransform();
 						// only the translation of the transform is used
 						translations[x][y][0] = transform.a13;
@@ -182,8 +184,8 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 				}
 				// translation of all images other images is calculated using the image to the left
 				else {
-					test.associate(images.get(x).get(y - 1).getImage(), images
-							.get(x).get(y).getImage(), xtrans, 0);
+					test.associate(images.get(x).get(y - 1), images
+							.get(x).get(y), xtrans, 0);
 					transform = test.homographyTransform();
 					// only the translation of the transform is used
 					translations[x][y][0] = transform.a13;
@@ -193,6 +195,7 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 					translations[x][y][0] += translations[x][y - 1][0];
 					translations[x][y][1] += translations[x][y-1][1];
 				}
+				idx++;
 			}
 		}
 	}
@@ -215,25 +218,27 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 	 *            The expected translation in microns in the y direction
 	 *            relating successive images in a column
 	 */
-	public void translationArraySpecial(List<List<ImageAndMetadata>> images) {
+	public void translationArraySpecial(List<List<ImageSingleBand<?>>> images, List<double[]> motorTranslations) {
 		// temporarily stores the transforms
 		Se2_F64 transform;
 
 		// stores the translations
 		translations = new double[images.size()][images.get(0).size()][2];
 
+		int idx = 0;
 		for (int x = 0; x < translations.length; x++) {
 			for (int y = 0; y < translations[0].length; y++) {
-				double xtrans = images.get(x).get(y).getMetadata().getXYMotorPosition()[0];
-				double ytrans = images.get(x).get(y).getMetadata().getXYMotorPosition()[1];
+				double xtrans = motorTranslations.get(idx)[0];
+				double ytrans = motorTranslations.get(idx)[1];
+
 				if (y == 0) {
 					// translation of first image is 0
 					if (x == 0) {
 					}
 					// translation of all images in the first column is calculated using the above image
 					else {
-						test.associate(images.get(x - 1).get(y).getImage(),
-								images.get(x).get(y).getImage(), 0, ytrans);
+						test.associate(images.get(x - 1).get(y),
+								images.get(x).get(y), 0, ytrans);
 						transform = test.specialTransform();
 						// only the translation of the transform is used
 						translations[x][y][0] = transform.getX();
@@ -246,8 +251,8 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 				}
 				// translation of all images other images is calculated using the image to the left
 				else {
-					test.associate(images.get(x).get(y - 1).getImage(), images
-							.get(x).get(y).getImage(), xtrans, 0);
+					test.associate(images.get(x).get(y - 1), images
+							.get(x).get(y), xtrans, 0);
 					transform = test.specialTransform();
 					// only the translation of the transform is used
 					translations[x][y][0] = transform.getX();
@@ -256,6 +261,7 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 					translations[x][y][0] += translations[x][y-1][0];
 					translations[x][y][1] += translations[x][y-1][1];
 				}
+				idx++;
 			}
 		}
 	}
@@ -273,9 +279,9 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 	 *            The expected translation in microns in the y direction
 	 *            relating successive images in a column
 	 */
-	public void theoreticalTranslation(int columns, int rows, List<double[]> motorTranslations) {
+	public void theoreticalTranslation(int rows, int columns, List<double[]> motorTranslations) {
 		// stores the translations
-		translations = new double[columns][rows][2];
+		translations = new double[rows][columns][2];
 		// calculates the translations of each image relative to the first image
 		int idx = 0;
 		for (int x = 0; x < translations.length; x++) {

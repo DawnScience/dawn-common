@@ -15,7 +15,6 @@ import org.dawnsci.boofcv.converter.ConvertIDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.image.IImageStitchingProcess;
 import org.eclipse.dawnsci.analysis.api.metadata.PeemMetadata;
-import org.eclipse.dawnsci.analysis.dataset.metadata.PeemMetadataImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,18 +74,6 @@ public class BoofCVImageStitchingImpl implements IImageStitchingProcess {
 			inputImages.add(new ArrayList<ImageSingleBand<?>>());
 			for (int j = 0; j < images[0].length; j++) {
 				ImageFloat32 image = ConvertIDataset.convertFrom(images[i][j], ImageFloat32.class, 1);
-				// set metadata
-				PeemMetadata md = null;
-				try {
-					md = (PeemMetadata)images[i][j].getMetadata(PeemMetadata.class);
-				} catch (Exception e) {
-					logger.error("Error getting metadata:" + e.getMessage());
-					e.printStackTrace();
-				}
-				// set default values if no metadata (scaling = width/fieldofview? 512/50)
-//				if (md == null) {
-//					md = new PeemMetadataImpl(translations.get(j), image.width / fieldOfView, fieldOfView);
-//				}
 				inputImages.get(i).add(image);
 			}
 		}
