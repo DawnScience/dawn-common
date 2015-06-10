@@ -174,11 +174,17 @@ public class BoofCVImageFilterImpl implements IImageFilterService {
 			break;
 		case GLOBAL_OTSU:
 			Number min = input.min(true), max = input.max(true);
-			GThresholdImageOps.threshold(converted, binary, GThresholdImageOps.computeOtsu(converted, min.intValue(), max.intValue()+1), down);
+			int multiplier = multiply(converted, max.doubleValue(), min.doubleValue());
+			int iMin = min.intValue() * multiplier;
+			int iMax = max.intValue() * multiplier;
+			GThresholdImageOps.threshold(converted, binary, GThresholdImageOps.computeOtsu(converted, iMin, iMax+1), down);
 			break;
 		case GLOBAL_ENTROPY:
 			min = input.min(true); max = input.max(true);
-			GThresholdImageOps.threshold(converted, binary, GThresholdImageOps.computeEntropy(converted, min.intValue(), max.intValue()+1), down);
+			multiplier = multiply(converted, max.doubleValue(), min.doubleValue());
+			iMin = min.intValue() * multiplier;
+			iMax = max.intValue() * multiplier;
+			GThresholdImageOps.threshold(converted, binary, GThresholdImageOps.computeEntropy(converted, iMin, iMax+1), down);
 			break;
 		case ADAPTIVE_SQUARE:
 			GThresholdImageOps.adaptiveSquare(converted, binary, radius, 0, down, null, null);
@@ -194,6 +200,33 @@ public class BoofCVImageFilterImpl implements IImageFilterService {
 		}
 		//convert back to IDataset
 		return ConvertIDataset.convertTo(binary, isBinary);
+	}
+
+	/**
+	 * If the min and max values are between 0 and 1 then we multiply the
+	 * dataset by the needed multiplier
+	 * 
+	 * @param image
+	 * @param maxValue
+	 * @param minValue
+	 * @return
+	 */
+	private int multiply(ImageFloat32 image, double maxValue, double minValue) {
+		int multiplier = 1;
+		if ((minValue < 1 && maxValue <= 1) || ((maxValue - minValue <= 1))) {
+			String minformat = String.format("%6.3e", minValue);
+			int mindigit = Math.abs(Integer.valueOf(minformat.split("e")[1]));
+			String maxformat = String.format("%6.3e", maxValue);
+			int maxdigit = Math.abs(Integer.valueOf(maxformat.split("e")[1]));
+			int max = maxdigit > mindigit ? maxdigit : mindigit;
+			for (int i = 0; i < max; i++)
+				multiplier *= 10;
+			float[] data = image.data;
+			for (int i = 0; i < data.length; i++) {
+				data[i] *= multiplier;
+			}
+		}
+		return multiplier;
 	}
 
 	@Override
