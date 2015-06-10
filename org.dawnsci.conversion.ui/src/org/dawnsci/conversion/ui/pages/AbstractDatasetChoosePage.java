@@ -16,6 +16,7 @@ import org.dawb.common.ui.util.GridUtils;
 import org.dawb.common.ui.wizard.ResourceChoosePage;
 import org.dawnsci.conversion.ui.Activator;
 import org.dawnsci.conversion.ui.IConversionWizardPage;
+import org.dawnsci.conversion.ui.LoaderServiceHolder;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
 import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
@@ -46,8 +47,6 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
 import org.slf4j.LoggerFactory;
-
-import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 
 public abstract class AbstractDatasetChoosePage extends ResourceChoosePage implements IConversionWizardPage{
 	
@@ -203,7 +202,7 @@ public abstract class AbstractDatasetChoosePage extends ResourceChoosePage imple
 					final String source = getSourcePath(context);
 					if (source==null || "".equals(source)) return;
 					// Attempt to use meta data, save memory
-					IDataHolder holder = LoaderFactory.getData(source, new ProgressMonitorWrapper(monitor));
+					IDataHolder holder = LoaderServiceHolder.getLoaderService().getData(source, new ProgressMonitorWrapper(monitor));
 					final List<String> names = SliceUtils.getSlicableNames(holder, getMinimumDataSize());
 					setDataNames(names.toArray(new String[names.size()]), null, holder);
 					return;

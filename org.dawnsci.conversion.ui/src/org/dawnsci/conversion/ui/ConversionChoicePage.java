@@ -44,8 +44,6 @@ import org.eclipse.swt.widgets.Text;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
-
 public class ConversionChoicePage extends ResourceChoosePage implements IConversionWizardPage {
 	
 	private static final Logger logger = LoggerFactory.getLogger(ConversionChoicePage.class);
@@ -318,7 +316,7 @@ public class ConversionChoicePage extends ResourceChoosePage implements IConvers
 				if (getSelectedFiles()!=null && getSelectedFiles().size()>1) {		
 					for (String path : getSelectedFiles()) {
 						try {
-							holder = LoaderFactory.getData(path, new IMonitor.Stub());
+							holder = LoaderServiceHolder.getLoaderService().getData(path, new IMonitor.Stub());
 						    if (holder==null) continue;
 						    if (holder.size()<1) continue;
 						    break;
@@ -327,7 +325,7 @@ public class ConversionChoicePage extends ResourceChoosePage implements IConvers
 						}
 					}
 				} else {
-					holder = LoaderFactory.getData(filePath, new IMonitor.Stub());
+					holder = LoaderServiceHolder.getLoaderService().getData(filePath, new IMonitor.Stub());
 				}
 				boolean foundRequiredRank = false;
 				for (int i = 0; i < holder.size(); i++) {

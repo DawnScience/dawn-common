@@ -19,6 +19,7 @@ import org.dawb.common.ui.wizard.ResourceChoosePage;
 import org.dawb.common.util.io.FileUtils;
 import org.dawnsci.conversion.converters.AlignImagesConverter.ConversionAlignBean;
 import org.dawnsci.conversion.ui.IConversionWizardPage;
+import org.dawnsci.conversion.ui.LoaderServiceHolder;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -30,6 +31,7 @@ import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.Slice;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
+import org.eclipse.dawnsci.analysis.api.monitor.IMonitor;
 import org.eclipse.dawnsci.analysis.dataset.roi.PerimeterBoxROI;
 import org.eclipse.dawnsci.analysis.dataset.roi.RectangularROI;
 import org.eclipse.dawnsci.plotting.api.IPlottingSystem;
@@ -58,7 +60,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.ac.diamond.scisoft.analysis.image.AlignMethod;
-import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 import uk.ac.diamond.scisoft.analysis.io.Utils;
 
 /**
@@ -182,7 +183,7 @@ public class AlignImagesConversionPage extends ResourceChoosePage
 			return;
 		String filePath = getSelectedPaths()[0];
 		try {
-			IDataHolder holder = LoaderFactory.getData(filePath);
+			IDataHolder holder = LoaderServiceHolder.getLoaderService().getData(filePath, new IMonitor.Stub());
 			ILazyDataset lazy = holder.getLazyDataset(0);
 			int[] shape = lazy.getShape();
 			if (lazy.getRank() == 2)

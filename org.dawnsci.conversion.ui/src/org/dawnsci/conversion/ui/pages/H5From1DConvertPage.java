@@ -22,6 +22,7 @@ import org.dawb.common.ui.wizard.ResourceChoosePage;
 import org.dawnsci.conversion.converters.Convert1DtoND.Convert1DInfoBean;
 import org.dawnsci.conversion.ui.Activator;
 import org.dawnsci.conversion.ui.IConversionWizardPage;
+import org.dawnsci.conversion.ui.LoaderServiceHolder;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
 import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
@@ -55,8 +56,6 @@ import org.eclipse.ui.forms.events.ExpansionAdapter;
 import org.eclipse.ui.forms.events.ExpansionEvent;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.mihalis.opal.checkBoxGroup.CheckBoxGroup;
-
-import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 
 public class H5From1DConvertPage extends ResourceChoosePage implements
 IConversionWizardPage {
@@ -254,7 +253,7 @@ IConversionWizardPage {
 					final String source = getSourcePath(context);
 					if (source==null || "".equals(source)) return;
 					// Attempt to use meta data, save memory
-					final IMetadata    meta = LoaderFactory.getMetadata(source, new ProgressMonitorWrapper(monitor));
+					final IMetadata    meta = LoaderServiceHolder.getLoaderService().getMetadata(source, new ProgressMonitorWrapper(monitor));
 					if (meta != null) {
 						final Collection<String> names = meta.getDataNames();
 						if (names !=null) {
@@ -263,7 +262,7 @@ IConversionWizardPage {
 						}
 					}
 
-					IDataHolder holder = LoaderFactory.getData(source, new ProgressMonitorWrapper(monitor));
+					IDataHolder holder = LoaderServiceHolder.getLoaderService().getData(source, new ProgressMonitorWrapper(monitor));
 					final List<String> names = new ArrayList<String>(holder.toLazyMap().keySet());
 					Collections.sort(names);
 					setDataNames(names.toArray(new String[names.size()]), null, holder);

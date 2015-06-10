@@ -21,6 +21,7 @@ import org.dawnsci.common.widgets.radio.RadioGroupWidget;
 import org.dawnsci.conversion.converters.CustomNCDConverter.SAS_FORMAT;
 import org.dawnsci.conversion.ui.Activator;
 import org.dawnsci.conversion.ui.IConversionWizardPage;
+import org.dawnsci.conversion.ui.LoaderServiceHolder;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
@@ -39,8 +40,6 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 
 public class NCDConvertPage extends ResourceChoosePage implements
 		IConversionWizardPage {
@@ -285,7 +284,7 @@ public class NCDConvertPage extends ResourceChoosePage implements
 		
 		IDataset ds = null;
 		try {
-			ds = LoaderFactory.getDataSet(source, datasetName, null);
+			ds = LoaderServiceHolder.getLoaderService().getDataset(source, datasetName, null);
 		} catch (Exception e) {
 			logger.error("Failed to read dataset {}", datasetName, e);
 		}

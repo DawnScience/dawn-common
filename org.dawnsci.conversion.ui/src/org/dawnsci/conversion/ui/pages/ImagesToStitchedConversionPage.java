@@ -16,6 +16,7 @@ import org.dawb.common.ui.wizard.ResourceChoosePage;
 import org.dawb.common.util.io.FileUtils;
 import org.dawnsci.conversion.converters.ImagesToStitchedConverter.ConversionStitchedBean;
 import org.dawnsci.conversion.ui.IConversionWizardPage;
+import org.dawnsci.conversion.ui.LoaderServiceHolder;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
@@ -23,6 +24,7 @@ import org.eclipse.dawnsci.analysis.api.dataset.Slice;
 import org.eclipse.dawnsci.analysis.api.image.IImageTransform;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
 import org.eclipse.dawnsci.analysis.api.metadata.IMetadata;
+import org.eclipse.dawnsci.analysis.api.monitor.IMonitor;
 import org.eclipse.dawnsci.analysis.dataset.roi.CircularROI;
 import org.eclipse.dawnsci.plotting.api.IPlottingSystem;
 import org.eclipse.dawnsci.plotting.api.PlotType;
@@ -49,7 +51,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.ac.diamond.scisoft.analysis.image.FOVAngleMapping;
-import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 
 /**
  * 
@@ -115,7 +116,7 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 		String filePath = getSelectedPaths()[0];
 		IDataHolder holder = null;
 		try {
-			holder = LoaderFactory.getData(filePath);
+			holder = LoaderServiceHolder.getLoaderService().getData(filePath, new IMonitor.Stub());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -169,7 +170,7 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 		double angle = 0, fov = 0;
 		int rowNum = 0, columnNum = 0;
 		try {
-			IDataHolder holder = LoaderFactory.getData(filePath);
+			IDataHolder holder = LoaderServiceHolder.getLoaderService().getData(filePath, new IMonitor.Stub());
 			if (datFileLoaded) {
 				//load metadatavalues
 				IMetadata meta = holder.getMetadata();
