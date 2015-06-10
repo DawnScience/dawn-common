@@ -50,7 +50,7 @@ import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.ac.diamond.scisoft.analysis.image.FOVAngleMapping;
+import uk.ac.diamond.scisoft.analysis.image.ImagePeemUtils;
 
 /**
  * 
@@ -133,15 +133,9 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 			int[] shape = lazyDataset.getShape();
 			firstImage = lazyDataset.getSlice(new Slice(0, shape[0], shape[1]));
 			firstImage.squeeze();
-			// TODO check with Francesco the value of psy ?
 			IDataset psxData = holder.getDataset("psx");
-			IDataset psyData = holder.getDataset("psx");
-			for (int i = 0; i < lazyDataset.getShape()[0]; i++) {
-				double scaling = ((fov.doubleValue() ) / (firstImage.getShape()[0]));
-				double posX = (psxData.getDouble(i) / scaling);
-				double posY = (psyData.getDouble(i) / scaling);
-				translations.add(new double[]{posX, posY});
-			}
+			IDataset psyData = holder.getDataset("psy");
+			translations = ImagePeemUtils.getMotorTranslations(psxData, psyData);
 		} else {
 			firstImage = holder.getDataset(0);
 			translations.add(new double[] { xTrans.doubleValue(),
@@ -176,7 +170,7 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 				IMetadata meta = holder.getMetadata();
 				double theta = Double.valueOf((String) meta.getMetaValue("theta"));
 				fov = Double.valueOf((String) meta.getMetaValue("FOV"));
-				angle = FOVAngleMapping.getAngle(fov, theta);
+				angle = ImagePeemUtils.getAngleFromFOV(fov, theta);
 				// load images
 				ILazyDataset lazy = holder.getLazyDataset("uv_image");
 				int[] shape = lazy.getShape();
@@ -185,7 +179,7 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 				// load translations
 				IDataset psx = holder.getDataset("psx");
 				IDataset psy = holder.getDataset("psy");
-				int[] columnRows = getColumnAndRowNumber(psx, psy);
+				int[] columnRows = ImagePeemUtils.getColumnAndRowNumber(psx, psy);
 				rowNum = columnRows[1];
 				columnNum = columnRows[0];
 				
@@ -214,6 +208,7 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 //		angleSpinner.setDigits(1);
 		angleSpinner.setToolTipText("Rotates the original image by n degrees");
 		angleSpinner.setMaximum(3600);
+		angleSpinner.setMinimum(-3600);
 		GridData gridData = new GridData(SWT.FILL, SWT.CENTER, true, false); 
 		gridData.widthHint = 50;
 		angleSpinner.setLayoutData(gridData);
@@ -316,8 +311,7 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 		featureButton.setText("Use feature association");
 		featureButton
 				.setToolTipText("If selected, automatic feature association will "
-						+ "be done. If not, only the motor positions and angle of "
-						+ "images will be taken into account.");
+						+ "be used for stitching. If not, a mosaic image using x/y translations is created.");
 		featureButton.setSelection(hasFeatureAssociated);
 		featureButton.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, true, false, 4, 1));
 		featureButton.addSelectionListener(new SelectionAdapter() {
@@ -369,21 +363,6 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 		plotExpandComp.setClient(plotComp);
 		plotExpandComp.addExpansionListener(createExpansionAdapter());
 		plotExpandComp.setExpanded(hasCropping);
-	}
-
-	private int[] getColumnAndRowNumber(IDataset psx, IDataset psy) {
-		int columns = 0, rows = 0, yIndex = 0;
-		double currentXValue = psx.getDouble(0), currentYValue = psy.getDouble(0);
-		while (yIndex < psy.getSize() && psy.getDouble(yIndex) == currentYValue) {
-			columns = 0;
-			while (psx.getDouble(columns) == currentXValue) {
-				currentXValue = psx.getDouble(columns);
-				columns++;
-			}
-			yIndex += columns;
-			rows++;
-		}
-		return new int[] { columns, rows};
 	}
 
 	private double getSpinnerAngle() {
