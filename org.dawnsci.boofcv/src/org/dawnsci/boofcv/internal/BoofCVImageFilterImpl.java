@@ -148,21 +148,13 @@ public class BoofCVImageFilterImpl implements IImageFilterService {
 
 	@Override
 	public IDataset filterMin(IDataset input, int radius) {
-		try {
-			throw new Exception("This filter has not been implemented yet.");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public IDataset filterMax(IDataset input, int radius) {
-		try {
-			throw new Exception("This filter has not been implemented yet.");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -185,10 +177,7 @@ public class BoofCVImageFilterImpl implements IImageFilterService {
 			int multiplier = multiply(converted, max.doubleValue(), min.doubleValue());
 			int iMin = min.intValue() * multiplier;
 			int iMax = max.intValue() * multiplier;
-			double thresh = ((double)Multi_OtsuThreshold.multiOtsuThreshold(converted)) / 100;
-			GThresholdImageOps.threshold(converted, binary, thresh, down);
-//			GThresholdImageOps.threshold(converted, binary, GThresholdImageOps.computeOtsu(converted, iMin, iMax+1), down);
-
+			GThresholdImageOps.threshold(converted, binary, GThresholdImageOps.computeOtsu(converted, iMin, iMax+1), down);
 			break;
 		case GLOBAL_ENTROPY:
 			min = input.min(true); max = input.max(true);
