@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.dawb.common.ui.Activator;
+import org.dawb.common.ui.ServiceLoader;
 import org.dawb.common.ui.monitor.ProgressMonitorWrapper;
 import org.dawb.common.ui.util.EclipseUtils;
 import org.dawb.common.ui.util.GridUtils;
@@ -34,6 +35,7 @@ import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionVisitor;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext.ConversionScheme;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
+import org.eclipse.dawnsci.analysis.api.io.ILoaderService;
 import org.eclipse.dawnsci.analysis.api.metadata.IMetadata;
 import org.eclipse.dawnsci.analysis.dataset.impl.AbstractDataset;
 import org.eclipse.dawnsci.plotting.api.expressions.IExpressionObject;
@@ -62,8 +64,6 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 
 /**
  * A page with a field for choosing an external file.
@@ -464,7 +464,8 @@ public class ResourceChoosePage extends WizardPage {
 
 		final ConversionScheme scheme = context.getConversionScheme();
 		IConversionVisitor     visitor= context.getConversionVisitor();
-		final IMetadata        meta   = LoaderFactory.getMetadata(source, new ProgressMonitorWrapper(monitor));
+		ILoaderService loader = ServiceLoader.getLoaderService();
+		final IMetadata        meta   = loader.getMetadata(source, new ProgressMonitorWrapper(monitor));
         final List<String>     names  = new ArrayList<String>(7);
         if (meta!=null) for (String name : meta.getDataShapes().keySet()) {
 			int[] shape = meta.getDataShapes().get(name);
@@ -481,7 +482,7 @@ public class ResourceChoosePage extends WizardPage {
        
         // Add names from image stacks.
         // Check not added ignored ranks from earlier
-		final IDataHolder  dataHolder = LoaderFactory.getData(source, true, true, new ProgressMonitorWrapper(monitor));
+		final IDataHolder  dataHolder = loader.getData(source, new ProgressMonitorWrapper(monitor));
         if (dataHolder!=null) for (String name : dataHolder.getNames()) {
 			if (!names.contains(name)) {
 				if (meta == null || !meta.getDataShapes().keySet().contains(name)) {

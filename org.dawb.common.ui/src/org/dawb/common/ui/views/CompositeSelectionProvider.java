@@ -8,7 +8,6 @@
  */
 package org.dawb.common.ui.views;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 

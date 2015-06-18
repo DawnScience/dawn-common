@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.dawb.common.services.ServiceManager;
+import org.dawb.common.ui.ServiceLoader;
 import org.dawb.common.ui.monitor.ProgressMonitorWrapper;
 import org.dawb.common.ui.util.EclipseUtils;
 import org.dawb.common.ui.wizard.CheckWizardPage;
@@ -123,7 +123,7 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
     		IPersistentFile     pf=null;
     		
     		PERSIST_BLOCK: try {
-        		IPersistenceService service = (IPersistenceService)ServiceManager.getService(IPersistenceService.class);
+        		IPersistenceService service = ServiceLoader.getPersistenceService();
         		file = new File(page.getAbsoluteFilePath());
         		if (!file.exists()) break PERSIST_BLOCK;
     		    pf    = service.getPersistentFile(file.getAbsolutePath());
@@ -213,7 +213,7 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
 					 
 					 IPersistentFile file = null;
 					 try {
-						 IPersistenceService service = (IPersistenceService)ServiceManager.getService(IPersistenceService.class);
+						 IPersistenceService service = ServiceLoader.getPersistenceService();
 						 
 						 final File ioFile = new File(finalFile.getLocation().toOSString());
 						 if (ioFile.exists()) ioFile.delete();

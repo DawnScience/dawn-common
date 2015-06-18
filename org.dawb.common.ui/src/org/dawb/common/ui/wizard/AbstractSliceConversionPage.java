@@ -17,11 +17,13 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.dawb.common.ui.Activator;
+import org.dawb.common.ui.ServiceLoader;
 import org.dawb.common.ui.util.GridUtils;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
 import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
+import org.eclipse.dawnsci.analysis.api.io.ILoaderService;
 import org.eclipse.dawnsci.analysis.api.monitor.IMonitor;
 import org.eclipse.dawnsci.analysis.dataset.slicer.Slicer;
 import org.eclipse.dawnsci.plotting.api.expressions.IExpressionObject;
@@ -51,8 +53,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.slf4j.LoggerFactory;
-
-import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 
 public abstract class AbstractSliceConversionPage extends ResourceChoosePage {
 
@@ -235,7 +235,9 @@ public abstract class AbstractSliceConversionPage extends ResourceChoosePage {
 				final SliceSource source = new SliceSource(getExpression().getVariableManager(), lz, datasetName, context.getFilePaths().get(0), isExpression);
 				sliceComponent.setData(source);
 			} else {
-				IDataHolder dh = LoaderFactory.getData(context.getFilePaths().get(0), true, true, new IMonitor.Stub());
+				ILoaderService loader = ServiceLoader.getLoaderService();
+				IDataHolder dh = loader.getData(context.getFilePaths().get(0), new IMonitor.Stub());
+//				IDataHolder ds = LoaderFactory.getData(context.getFilePaths().get(0), true, true, new IMonitor.Stub());
 				lz = dh.getLazyDataset(datasetName);
 				isExpression = false;
 				

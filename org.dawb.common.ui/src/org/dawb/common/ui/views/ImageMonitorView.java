@@ -17,6 +17,7 @@ import java.util.concurrent.LinkedBlockingDeque;
 
 import org.dawb.common.services.ServiceManager;
 import org.dawb.common.ui.Activator;
+import org.dawb.common.ui.ServiceLoader;
 import org.dawb.common.ui.menu.CheckableActionGroup;
 import org.dawb.common.ui.preferences.ViewConstants;
 import org.dawb.common.ui.util.EclipseUtils;
@@ -33,6 +34,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.dawnsci.analysis.api.io.ILoaderService;
 import org.eclipse.dawnsci.plotting.api.image.IPlotImageService;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
@@ -89,7 +91,6 @@ import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 
 
 public class ImageMonitorView extends ViewPart implements MouseListener, SelectionListener {
@@ -500,7 +501,8 @@ public class ImageMonitorView extends ViewPart implements MouseListener, Selecti
 				if (ImageFileUtils.isImage(name))      return true;
 				
 				final String ext = FileUtils.getFileExtension(pathname);
-				if (LoaderFactory.getSupportedExtensions().contains(ext)) return true;
+				ILoaderService loader = ServiceLoader.getLoaderService();
+				if (loader.getSupportedExtensions().contains(ext)) return true;
 				return false;
 
 			}

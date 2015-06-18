@@ -1,6 +1,6 @@
 package org.dawb.common.ui.perspective;
 
-import org.dawb.common.ui.EventTrackerServiceLoader;
+import org.dawb.common.ui.ServiceLoader;
 import org.eclipse.dawnsci.analysis.api.EventTracker;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
@@ -37,7 +37,7 @@ public abstract class AbstractPerspectiveLaunch implements IWorkbenchWindowActio
 			String perspectiveName = "NA";
 			if (per != null)
 				perspectiveName = per.getLabel();
-			EventTracker tracker = EventTrackerServiceLoader.getService();
+			EventTracker tracker = ServiceLoader.getEventTrackerService();
 			if (tracker != null)
 				tracker.trackPerspectiveEvent(perspectiveName);
 		} catch (WorkbenchException e) {

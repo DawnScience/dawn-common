@@ -341,7 +341,6 @@ public class GalleryDelegate implements SelectionListener {
 							final String path = info.getPath(ii.getIndex());
 							image = new Image(Display.getDefault(), new BufferedInputStream(new FileInputStream(new File(path))));
 						} else {
-							@SuppressWarnings("deprecation")
 							final PlotImageData id = new PlotImageData(set, size, size);
 							if (getLockedHistogram()!=null) id.setImageServiceBean(lockedHistogram);
 							image = pservice.getImage(id);

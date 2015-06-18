@@ -14,8 +14,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.dawb.common.services.ServiceManager;
 import org.dawb.common.ui.Activator;
+import org.dawb.common.ui.ServiceLoader;
 import org.dawb.common.ui.monitor.ProgressMonitorWrapper;
 import org.dawb.common.ui.util.EclipseUtils;
 import org.dawb.common.ui.wizard.CheckWizardPage;
@@ -56,7 +56,6 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 
 import uk.ac.diamond.scisoft.analysis.diffraction.DiffractionMetadataUtils;
-import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 
 /**
  * 
@@ -129,7 +128,7 @@ public class PersistenceImportWizard extends AbstractPersistenceWizard implement
 						IPersistentFile     pf=null;
 
 						try {
-							IPersistenceService service = (IPersistenceService)ServiceManager.getService(IPersistenceService.class);
+							IPersistenceService service = ServiceLoader.getPersistenceService();
 							pf    = service.getPersistentFile(file.getAbsolutePath());
 
 							if (pf.containsMask()) {
@@ -237,8 +236,8 @@ public class PersistenceImportWizard extends AbstractPersistenceWizard implement
 	}
 
 	protected void createFit2DMask(String filePath, IPlottingSystem system, IProgressMonitor monitor) throws Exception {
-		
-		final IDataHolder     holder = LoaderFactory.getData(filePath, new ProgressMonitorWrapper(monitor));
+		ILoaderService loader = ServiceLoader.getLoaderService();
+		final IDataHolder     holder = loader.getData(filePath, new ProgressMonitorWrapper(monitor));
 		final Dataset mask   = DatasetUtils.cast(holder.getDataset(0), Dataset.BOOL);
 		final ITrace          trace  = system.getTraces().iterator().next();
 		
@@ -256,7 +255,7 @@ public class PersistenceImportWizard extends AbstractPersistenceWizard implement
 		 
 		IPersistentFile file = null;
 		try {
-			IPersistenceService service = (IPersistenceService)ServiceManager.getService(IPersistenceService.class);
+			IPersistenceService service = ServiceLoader.getPersistenceService();
 			file    = service.getPersistentFile(filePath);
 
 			final IMonitor mon = new ProgressMonitorWrapper(monitor);
