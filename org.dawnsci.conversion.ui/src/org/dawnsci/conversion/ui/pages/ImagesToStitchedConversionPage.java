@@ -17,6 +17,7 @@ import org.dawb.common.util.io.FileUtils;
 import org.dawnsci.conversion.converters.ImagesToStitchedConverter.ConversionStitchedBean;
 import org.dawnsci.conversion.ui.IConversionWizardPage;
 import org.dawnsci.conversion.ui.LoaderServiceHolder;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
@@ -25,12 +26,16 @@ import org.eclipse.dawnsci.analysis.api.image.IImageTransform;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
 import org.eclipse.dawnsci.analysis.api.metadata.IMetadata;
 import org.eclipse.dawnsci.analysis.api.monitor.IMonitor;
+import org.eclipse.dawnsci.analysis.api.roi.IROI;
 import org.eclipse.dawnsci.analysis.dataset.roi.CircularROI;
 import org.eclipse.dawnsci.plotting.api.IPlottingSystem;
 import org.eclipse.dawnsci.plotting.api.PlotType;
 import org.eclipse.dawnsci.plotting.api.PlottingFactory;
+import org.eclipse.dawnsci.plotting.api.region.IROIListener;
 import org.eclipse.dawnsci.plotting.api.region.IRegion;
+import org.eclipse.dawnsci.plotting.api.region.ROIEvent;
 import org.eclipse.dawnsci.plotting.api.region.IRegion.RegionType;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.nebula.widgets.formattedtext.FormattedText;
 import org.eclipse.nebula.widgets.formattedtext.NumberFormatter;
 import org.eclipse.swt.SWT;
@@ -47,6 +52,7 @@ import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.ui.forms.events.ExpansionAdapter;
 import org.eclipse.ui.forms.events.ExpansionEvent;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
+import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,6 +87,14 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 	private boolean datFileLoaded = false;
 
 	private static IImageTransform transformer;
+	
+	private IROIListener roiListener;
+
+	private IRegion region;
+
+	private IPreferenceStore store;
+	private static final String DELIMETER = ";";
+	private static final String REGION_FOR_STITCHING = "org.dawnsci.conversion.ui.region.for.stitching";
 
 	public ImagesToStitchedConversionPage() {
 		super("Convert image directory", null, null);
@@ -90,6 +104,22 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 		setOverwriteVisible(true);
 		setPathEditable(true);
 		setDescription("Returns a stitched image given a stack of images");
+
+		store = new ScopedPreferenceStore(InstanceScope.INSTANCE, "org.dawb.common.ui");
+		this.roiListener = new IROIListener.Stub() {
+			@Override
+			public void roiChanged(ROIEvent evt) {
+				IROI roi = evt.getROI();
+				if (roi instanceof CircularROI) {
+					double[] centre = ((CircularROI) roi).getCentre();
+					double radius = ((CircularROI) roi).getRadius();
+					String roiString = String.valueOf(centre[0]) + DELIMETER
+							+ String.valueOf(centre[1]) + DELIMETER
+							+ String.valueOf(radius);
+					store.setValue(REGION_FOR_STITCHING, roiString);
+				}
+			}
+		};
 	}
 
 	@Override
@@ -374,21 +404,24 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 	private void createRegion(IDataset data) {
 		String regionName = "Cropping";
 		try {
-			IRegion region = plotSystem.getRegion(regionName);
+			region = plotSystem.getRegion(regionName);
 			if (region == null) {
 				region = plotSystem
 						.createRegion(regionName, RegionType.CIRCLE);
+				region.setLineWidth(10);
 				double width, height;
-				CircularROI croi = null;
+				CircularROI croi = getROIFromPreference();
 				if (data != null) {
 					width = data.getShape()[0];
 					height = data.getShape()[1];
 					double centreX = width / 2;
 					double centreY = height / 2;
-					if (width >= height) {
-						croi = new CircularROI(width / 2, centreX, centreY);
-					} else {
-						croi = new CircularROI(height / 2, centreX, centreY);
+					if (croi == null) {
+						if (width >= height) {
+							croi = new CircularROI(width / 2, centreX, centreY);
+						} else {
+							croi = new CircularROI(height / 2, centreX, centreY);
+						}
 					}
 					croi.setName(regionName);
 					croi.setPlot(true);
@@ -399,10 +432,24 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 				} else {
 					logger.error("Could not create Circular region");
 				}
+				region.addROIListener(roiListener);
 			}
 		} catch (Exception e) {
 			logger.error("Cannot create region for perimeter PlotView!");
 		}
+	}
+
+	private CircularROI getROIFromPreference() {
+		CircularROI croi = null;
+		String roiString = store.getString(REGION_FOR_STITCHING);
+		if(!roiString.equals("")) {
+			String[] svalues = roiString.split(DELIMETER);
+			double[] centre = new double[] {Double.valueOf(svalues[0]), Double.valueOf(svalues[1])};
+			double radius = Double.valueOf(svalues[2]);
+			croi = new CircularROI(radius, centre[0], centre[1]);
+		}
+		
+		return croi;
 	}
 
 	/**
@@ -412,16 +459,6 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 	public static void setImageTransform(IImageTransform it) {
 		transformer = it;
 	}
-	
-//	private void createImageTransformer() {
-//		if (transformer == null) {
-//			try {
-//				transformer = (IImageTransform) ServiceManager.getService(IImageTransform.class);
-//			} catch (Exception e) {
-//				logger.error("Error getting transform service :" + e);
-//			}
-//		}
-//	}
 
 	private ExpansionAdapter createExpansionAdapter() {
 		return new ExpansionAdapter() {
@@ -475,5 +512,11 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 			}
 		}
 		setErrorMessage(null);
+	}
+
+	@Override
+	public void dispose() {
+		if (region != null)
+			region.removeROIListener(roiListener);
 	}
 }
