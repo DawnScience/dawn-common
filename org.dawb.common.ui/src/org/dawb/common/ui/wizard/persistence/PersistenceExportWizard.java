@@ -20,15 +20,18 @@ import org.dawb.common.services.ServiceManager;
 import org.dawb.common.ui.monitor.ProgressMonitorWrapper;
 import org.dawb.common.ui.util.EclipseUtils;
 import org.dawb.common.ui.wizard.CheckWizardPage;
-import org.dawb.common.ui.wizard.NewFileChoosePage;
+import org.dawb.common.ui.wizard.PlotDataConversionPage;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.fitting.functions.IFunction;
@@ -50,7 +53,6 @@ import org.eclipse.dawnsci.plotting.api.trace.ITrace;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
@@ -62,7 +64,8 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
 	
 	public static final String ID = "org.dawnsci.plotting.exportMask";
 	
-	private NewFileChoosePage  fcp;
+	PlotDataConversionPage page;
+
 	private CheckWizardPage options;
 	
 	private static IPath  containerFullPath;
@@ -73,10 +76,9 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
 		setWindowTitle("Export");
 		setNeedsProgressMonitor(true);
 		
-		this.fcp = new NewFileChoosePage("Export Location", new StructuredSelection());
-		fcp.setDescription("Please choose the location of the file to export. (This file will be a nexus HDF5 file.)");
-		fcp.setFileExtension("nxs");
-		addPage(fcp);
+		this.page = new PlotDataConversionPage();
+		page.setDescription("Please choose the location of the file to export. (This file will be a nexus HDF5 file.)");
+		addPage(page);
 		
 		this.options = new CheckWizardPage("Export Options", createDefaultOptions());
 		Map<String,String> stringOptions = new HashMap<String, String>(1);
@@ -103,13 +105,13 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
 			}
 		}
 		
-		if (containerFullPath!=null) fcp.setContainerFullPath(containerFullPath);
-		if (staticFileName!=null)    fcp.setFileName(staticFileName);
+		if (containerFullPath!=null) page.setPath(containerFullPath.toString());
+		if (staticFileName!=null)    page.setFileLabel(staticFileName);
 	}
 
     public boolean canFinish() {
-    	if (fcp.isPageComplete() && getContainer().getCurrentPage()==fcp) {
-    		options.setDescription("Please choose the things to save in '"+fcp.getFileName()+"'.");
+    	if (page.isPageComplete() && getContainer().getCurrentPage()==page) {
+    		options.setDescription("Please choose the things to save in '"+page.getPath()+"'.");
     		options.setOptionEnabled(PersistWizardConstants.ORIGINAL_DATA,   false);
     		options.setOptionEnabled(PersistWizardConstants.IMAGE_HIST,      false);
     		options.setOptionEnabled(PersistWizardConstants.MASK,            false);
@@ -122,7 +124,7 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
     		
     		PERSIST_BLOCK: try {
         		IPersistenceService service = (IPersistenceService)ServiceManager.getService(IPersistenceService.class);
-        		file = fcp.getFile();
+        		file = new File(page.getAbsoluteFilePath());
         		if (!file.exists()) break PERSIST_BLOCK;
     		    pf    = service.getPersistentFile(file.getAbsolutePath());
     		    final List<String>  names = pf.getMaskNames(null);
@@ -194,8 +196,11 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
 		
 		 IFile file = null;
 		 try {
-			 file   = fcp.createNewFile();
-			 			 
+			 IWorkspace workspace= ResourcesPlugin.getWorkspace();
+			 File afile = new File(page.getAbsoluteFilePath());
+			 IPath location= Path.fromOSString(afile.getAbsolutePath());
+			 file= workspace.getRoot().getFileForLocation(location); 
+			 			 			 
 			 final IWorkbenchPart  part   = EclipseUtils.getPage().getActivePart();
 			 final IPlottingSystem system = getPlottingSystem();
 			 final IFunctionService funcService = (IFunctionService)part.getAdapter(IFunctionService.class);
@@ -324,8 +329,8 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
 			 }
 		 }
 		 
-		 containerFullPath = fcp.getContainerFullPath();
-		 staticFileName    = fcp.getFileName();
+		 containerFullPath = Path.fromOSString(page.getAbsoluteFilePath());
+		 staticFileName    = page.getFileLabel();
 		 
 		 return true;
 	}
