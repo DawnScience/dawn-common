@@ -203,11 +203,6 @@ public class CustomNCDConverter extends AbstractConversion  {
 			Dataset data = DatasetUtils.convertToDataset(lz.getSlice(slices));
 			data = data.squeeze();
 
-			Dataset errors = null;
-			if (hasErrors) {
-				errors = DatasetUtils.cast(data.getError(), data.getDtype());
-			}
-
 			String nameSuffix = "";
 			String ext = ASCII_EXT;
 			if (exportFormat.equals(SAS_FORMAT.TOPAZ)) ext = TOPAZ_EXT;
@@ -222,9 +217,11 @@ public class CustomNCDConverter extends AbstractConversion  {
 			//Check data suitable then concatenate axis with data
 			if (data.getRank() == 1) {
 				data.setShape(1,data.getShape()[0]);
-				if (hasErrors) {
-					errors.setShape(1,errors.getShape()[0]);
-				}
+			}
+
+			Dataset errors = null;
+			if (hasErrors) {
+				errors = DatasetUtils.cast(data.getError(), data.getDtype());
 			}
 
 			String header = sb.toString();
