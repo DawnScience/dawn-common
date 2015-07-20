@@ -64,15 +64,15 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 	/**
 	 * Sets the factor to convert between microns and pixels
 	 * 
-	 * @param image
-	 *            A cropped image, from which we get a number of pixels
+	 * @param shape
+	 *            shape of image (width) in pixels
 	 * @param fieldOfView
 	 *            The field of view of the uncropped image, from which we get
 	 *            the corresponding number of microns
 	 */
-	public void setConversion(T image, double fieldOfView) {
+	public void setConversion(int[] shape, double fieldOfView) {
 		// calculates the number of pixels per micron
-		test.setConversion(image, fieldOfView);
+		test.setConversion(shape, fieldOfView);
 //		micronsToPixels = image.getWidth()
 //				/ (fieldOfView * Math.cos(Math.PI / 4));
 	}

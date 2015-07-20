@@ -67,6 +67,14 @@ public class BoofCVImageStitchingImpl implements IImageStitchingProcess {
 
 	@Override
 	public IDataset stitch(List<IDataset> input, int rows, int columns, double fieldOfView, List<double[]> translations, boolean hasFeatureAssociation) {
+		int[] shape = input.get(0).getShape();
+		return stitch(input, rows, columns, fieldOfView, translations, hasFeatureAssociation, shape);
+	}
+
+	@Override
+	public IDataset stitch(List<IDataset> input, int rows, int columns,
+			double fieldOfView, List<double[]> translations,
+			boolean hasFeatureAssociation, int[] originalShape) {
 		IDataset[][] images = ImagePreprocessing.listToArray(input, rows, columns);
 		List<List<ImageSingleBand<?>>> inputImages = new ArrayList<List<ImageSingleBand<?>>>();
 		for (int i = 0; i < images.length; i++) {
@@ -83,7 +91,7 @@ public class BoofCVImageStitchingImpl implements IImageStitchingProcess {
 		AssociateDescription<?> associate = FactoryAssociation.greedy(scorer, Double.MAX_VALUE, true);
 
 		FullStitchingObject stitchObj = new FullStitchingObject(detDesc, associate, imageType);
-		stitchObj.setConversion(inputImages.get(0).get(0), fieldOfView);
+		stitchObj.setConversion(originalShape, fieldOfView);
 		if (hasFeatureAssociation) {
 			stitchObj.translationArray(inputImages, translations);
 		} else {
