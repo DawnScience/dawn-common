@@ -41,7 +41,7 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 	private TranslationObject test;
 
 	// factor to convert between microns and pixels
-	private double micronsToPixels;
+//	private double micronsToPixels;
 
 	/**
 	 * Creates a FullStitchingObject
@@ -72,8 +72,9 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 	 */
 	public void setConversion(T image, double fieldOfView) {
 		// calculates the number of pixels per micron
-		micronsToPixels = image.getWidth()
-				/ (fieldOfView * Math.cos(Math.PI / 4));
+		test.setConversion(image, fieldOfView);
+//		micronsToPixels = image.getWidth()
+//				/ (fieldOfView * Math.cos(Math.PI / 4));
 	}
 
 	/**
@@ -290,6 +291,7 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 				double ytrans = motorTranslations.get(idx)[1];
 
 				// convert the translations from microns into pixels
+				double micronsToPixels = test.getConversion();
 				xtrans = micronsToPixels * xtrans;
 				ytrans = micronsToPixels * ytrans;
 

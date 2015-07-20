@@ -14,7 +14,6 @@ import java.util.List;
 import org.dawnsci.boofcv.converter.ConvertIDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.image.IImageStitchingProcess;
-import org.eclipse.dawnsci.analysis.api.metadata.PeemMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

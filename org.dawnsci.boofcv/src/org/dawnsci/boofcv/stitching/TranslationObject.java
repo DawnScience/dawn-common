@@ -69,7 +69,7 @@ public class TranslationObject<T extends ImageSingleBand<?>, TD extends TupleDes
 	private List<AssociatedPair> pairs;
 
 	// factor to convert between microns and pixels
-	private double micronsToPixels = 512/50;
+	private double micronsToPixels;
 
 	/**
 	 * Creates the TranslationObject
@@ -101,6 +101,10 @@ public class TranslationObject<T extends ImageSingleBand<?>, TD extends TupleDes
 		// calculates the number of pixels per micron
 		micronsToPixels = image.getWidth()
 				/ (fieldOfView * Math.cos(Math.PI / 4));
+	}
+
+	public double getConversion() {
+		return micronsToPixels;
 	}
 
 	/**
