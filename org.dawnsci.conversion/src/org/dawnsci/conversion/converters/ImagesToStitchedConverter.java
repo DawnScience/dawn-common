@@ -21,6 +21,7 @@ import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
 import org.eclipse.dawnsci.analysis.api.image.IImageStitchingProcess;
 import org.eclipse.dawnsci.analysis.api.image.IImageTransform;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
+import org.eclipse.dawnsci.analysis.api.monitor.IMonitor;
 import org.eclipse.dawnsci.analysis.api.roi.IROI;
 import org.eclipse.dawnsci.analysis.dataset.impl.Image;
 import org.eclipse.dawnsci.analysis.dataset.impl.LazyDataset;
@@ -59,7 +60,7 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 		context.setLazyDataset(set);
 		context.addSliceDimension(0, "all");
 	}
-	
+
 	/**
 	 * OSGI Calls this
 	 * @param s
@@ -104,7 +105,7 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 			double fieldOfView = conversionBean.getFieldOfView();
 			List<double[]> translations = conversionBean.getTranslations();
 			// stitch the stack of images
-			IDataset stitched = stitcher.stitch(imageStack, rows, columns, fieldOfView, translations, useFeatureAssociation);
+			IDataset stitched = stitcher.stitch(imageStack, rows, columns, fieldOfView, translations, useFeatureAssociation, new IMonitor.Stub());
 
 			stitched.setName("stitched");
 			final File outputFile = new File(outputPath);

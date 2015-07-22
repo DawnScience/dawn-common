@@ -14,6 +14,7 @@ import java.util.List;
 import org.dawnsci.boofcv.converter.ConvertIDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.image.IImageStitchingProcess;
+import org.eclipse.dawnsci.analysis.api.monitor.IMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,34 +48,34 @@ public class BoofCVImageStitchingImpl implements IImageStitchingProcess {
 	}
 
 	@Override
-	public IDataset stitch(List<IDataset> input) {
-		return stitch(input, 1, 6, 49);
+	public IDataset stitch(List<IDataset> input, IMonitor monitor) {
+		return stitch(input, 1, 6, 49, monitor);
 	}
 
 	@Override
-	public IDataset stitch(List<IDataset> input, int rows, int columns) {
+	public IDataset stitch(List<IDataset> input, int rows, int columns, IMonitor monitor) {
 		List<double[]> translations = new ArrayList<double[]>();
 		translations.add(new double[] {25, 25});
-		return stitch(input, rows, columns, 50, translations, false);
+		return stitch(input, rows, columns, 50, translations, false, monitor);
 	}
 
 	@Override
-	public IDataset stitch(List<IDataset> input, int rows, int columns, double fieldOfView) {
+	public IDataset stitch(List<IDataset> input, int rows, int columns, double fieldOfView, IMonitor monitor) {
 		List<double[]> translations = new ArrayList<double[]>();
 		translations.add(new double[] {25, 25});
-		return stitch(input, rows, columns, fieldOfView, translations, true);
+		return stitch(input, rows, columns, fieldOfView, translations, true, monitor);
 	}
 
 	@Override
-	public IDataset stitch(List<IDataset> input, int rows, int columns, double fieldOfView, List<double[]> translations, boolean hasFeatureAssociation) {
+	public IDataset stitch(List<IDataset> input, int rows, int columns, double fieldOfView, List<double[]> translations, boolean hasFeatureAssociation, IMonitor monitor) {
 		int[] shape = input.get(0).getShape();
-		return stitch(input, rows, columns, fieldOfView, translations, hasFeatureAssociation, shape);
+		return stitch(input, rows, columns, fieldOfView, translations, hasFeatureAssociation, shape, monitor);
 	}
 
 	@Override
 	public IDataset stitch(List<IDataset> input, int rows, int columns,
 			double fieldOfView, List<double[]> translations,
-			boolean hasFeatureAssociation, int[] originalShape) {
+			boolean hasFeatureAssociation, int[] originalShape, IMonitor monitor) {
 		IDataset[][] images = ImagePreprocessing.listToArray(input, rows, columns);
 		List<List<ImageSingleBand<?>>> inputImages = new ArrayList<List<ImageSingleBand<?>>>();
 		for (int i = 0; i < images.length; i++) {
@@ -82,6 +83,8 @@ public class BoofCVImageStitchingImpl implements IImageStitchingProcess {
 			for (int j = 0; j < images[0].length; j++) {
 				ImageFloat32 image = ConvertIDataset.convertFrom(images[i][j], ImageFloat32.class, 1);
 				inputImages.get(i).add(image);
+				if (monitor.isCancelled())
+					return null;
 			}
 		}
 		Class<ImageFloat32> imageType = ImageFloat32.class;
@@ -93,11 +96,11 @@ public class BoofCVImageStitchingImpl implements IImageStitchingProcess {
 		FullStitchingObject stitchObj = new FullStitchingObject(detDesc, associate, imageType);
 		stitchObj.setConversion(originalShape, fieldOfView);
 		if (hasFeatureAssociation) {
-			stitchObj.translationArray(inputImages, translations);
+			stitchObj.translationArray(inputImages, translations, monitor);
 		} else {
-			stitchObj.theoreticalTranslation(columns, rows, translations);
+			stitchObj.theoreticalTranslation(columns, rows, translations, monitor);
 		}
-		ImageSingleBand<?> result = stitchObj.stitch(inputImages);
+		ImageSingleBand<?> result = stitchObj.stitch(inputImages, monitor);
 		return ConvertIDataset.convertTo(result, true);
 	}
 }

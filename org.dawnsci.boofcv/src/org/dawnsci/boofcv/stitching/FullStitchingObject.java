@@ -13,6 +13,8 @@ import georegression.struct.se.Se2_F64;
 
 import java.util.List;
 
+import org.eclipse.dawnsci.analysis.api.monitor.IMonitor;
+
 import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.struct.feature.TupleDesc;
@@ -94,8 +96,10 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 	 * @param ytrans
 	 *            The expected translation in microns in the y direction
 	 *            relating successive images in a column
+	 * @param monitor
+	 *            To monitor progress
 	 */
-	public void translationArray(List<List<ImageSingleBand<?>>> images, List<double[]> motorTranslations) {
+	public void translationArray(List<List<ImageSingleBand<?>>> images, List<double[]> motorTranslations, IMonitor monitor) {
 
 		// stores the translations
 		translations = new double[images.size()][images.get(0).size()][2];
@@ -130,6 +134,9 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 					translations[x][y][0] += translations[x][y-1][0];
 					translations[x][y][1] += translations[x][y-1][1];
 				}
+				if (monitor.isCancelled())
+					return;
+				monitor.worked(1);
 			}
 		}
 	}
@@ -151,8 +158,10 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 	 * @param ytrans
 	 *            The expected translation in microns in the y direction
 	 *            relating successive images in a column
+	 * @param monitor
+	 *            To monitor progress
 	 */
-	public void translationArrayHomography(List<List<ImageSingleBand<?>>> images, List<double[]> motorTranslations) {
+	public void translationArrayHomography(List<List<ImageSingleBand<?>>> images, List<double[]> motorTranslations, IMonitor monitor) {
 		// temporarily stores the transforms
 		Homography2D_F64 transform;
 
@@ -197,6 +206,9 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 					translations[x][y][1] += translations[x][y-1][1];
 				}
 				idx++;
+				if (monitor.isCancelled())
+					return;
+				monitor.worked(1);
 			}
 		}
 	}
@@ -218,8 +230,10 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 	 * @param ytrans
 	 *            The expected translation in microns in the y direction
 	 *            relating successive images in a column
+	 * @param monitor
+	 *            To monitor progress
 	 */
-	public void translationArraySpecial(List<List<ImageSingleBand<?>>> images, List<double[]> motorTranslations) {
+	public void translationArraySpecial(List<List<ImageSingleBand<?>>> images, List<double[]> motorTranslations, IMonitor monitor) {
 		// temporarily stores the transforms
 		Se2_F64 transform;
 
@@ -263,6 +277,9 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 					translations[x][y][1] += translations[x][y-1][1];
 				}
 				idx++;
+				if (monitor.isCancelled())
+					return;
+				monitor.worked(1);
 			}
 		}
 	}
@@ -279,8 +296,10 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 	 * @param ytrans
 	 *            The expected translation in microns in the y direction
 	 *            relating successive images in a column
+	 * @param monitor
+	 *            To monitor progress
 	 */
-	public void theoreticalTranslation(int rows, int columns, List<double[]> motorTranslations) {
+	public void theoreticalTranslation(int rows, int columns, List<double[]> motorTranslations, IMonitor monitor) {
 		// stores the translations
 		translations = new double[rows][columns][2];
 		// calculates the translations of each image relative to the first image
@@ -298,6 +317,9 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 				translations[x][y][0] = -xtrans*y;
 				translations[x][y][1] = -ytrans*x;
 				idx++;
+				if (monitor.isCancelled())
+					return;
+				monitor.worked(1);
 			}
 		}
 	}
@@ -336,9 +358,11 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 	 * 
 	 * @param images
 	 *            The list of images to be stitched
+	 * @param monitor
+	 *            monitor progress
 	 * @return The new image with all the images stitched to it
 	 */
-	public ImageSingleBand<?> stitch(List<List<ImageSingleBand<?>>> images) {
+	public ImageSingleBand<?> stitch(List<List<ImageSingleBand<?>>> images, IMonitor monitor) {
 		// define an origin to be the top-corner of the first image such that
 		// all the translations can be given relative to this image
 		double[] origin = new double[2];
@@ -350,7 +374,7 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 			for (int j = 0; j < images.get(0).size(); j++) {
 				if (i != 0 || j != 0) {
 					StitchingObject<?> stitcher = new StitchingObject<>(translations[i][j]);
-					result = stitcher.stitch(result, images.get(i).get(j), origin);
+					result = stitcher.stitch(result, images.get(i).get(j), origin, monitor);
 				}
 			}
 		}

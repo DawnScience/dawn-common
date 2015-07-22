@@ -168,8 +168,8 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 			translations = ImagePeemUtils.getMotorTranslations(psxData, psyData);
 		} else {
 			firstImage = holder.getDataset(0);
-			translations.add(new double[] { xTrans.doubleValue(),
-					yTrans.doubleValue() });
+			translations.add(new double[] { xTrans.floatValue(),
+					yTrans.floatValue() });
 		}
 
 		bean.setTranslations(translations);
@@ -198,8 +198,8 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 			if (datFileLoaded) {
 				//load metadatavalues
 				IMetadata meta = holder.getMetadata();
-				double theta = Double.valueOf((String) meta.getMetaValue("theta"));
-				fov = Double.valueOf((String) meta.getMetaValue("FOV"));
+				double theta = Double.valueOf((String) meta.getMetaValue("phi"));
+				fov = Double.valueOf((String) meta.getMetaValue("leem_fov"));
 				angle = ImagePeemUtils.getAngleFromFOV(fov, theta);
 				// load images
 				ILazyDataset lazy = holder.getLazyDataset("uv_image");
@@ -212,9 +212,6 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 				int[] columnRows = ImagePeemUtils.getColumnAndRowNumber(psx, psy);
 				rowNum = columnRows[1];
 				columnNum = columnRows[0];
-				
-//				rowNum = (int)Math.sqrt(shape[0]);
-//				columnNum = shape[0] / rowNum;
 			} else {
 				firstImage = holder.getDataset(0);
 			}

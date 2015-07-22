@@ -8,6 +8,7 @@ import org.dawnsci.boofcv.examples.util.ImageLoaderJob;
 import org.dawnsci.boofcv.examples.util.Utils;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.image.IImageStitchingProcess;
+import org.eclipse.dawnsci.analysis.api.monitor.IMonitor;
 import org.junit.Test;
 
 public class ImageStitchingTest {
@@ -20,7 +21,7 @@ public class ImageStitchingTest {
 		List<IDataset> data = loadData(filenames);
 
 		IImageStitchingProcess stitcher = BoofCVImageStitchingProcessCreator.createStitchingProcess();
-		IDataset stitched = stitcher.stitch(data);
+		IDataset stitched = stitcher.stitch(data, new IMonitor.Stub());
 		ExampleImageStitching.showStitchedImage(stitched);
 	}
 
