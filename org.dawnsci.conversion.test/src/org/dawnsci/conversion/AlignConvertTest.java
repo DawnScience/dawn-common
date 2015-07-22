@@ -27,6 +27,7 @@ import org.eclipse.dawnsci.analysis.api.conversion.IConversionService;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext.ConversionScheme;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.image.IImageTransform;
+import org.eclipse.dawnsci.analysis.api.monitor.IMonitor;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -197,7 +198,7 @@ public class AlignConvertTest {
 		try {
 			if (transformer == null)
 				transformer = BoofCVImageTransformCreator.createTransformService();
-			List<IDataset> shiftedImages = transformer.align(data);
+			List<IDataset> shiftedImages = transformer.align(data, new IMonitor.Stub());
 			return shiftedImages;
 		} catch (Exception e) {
 			fail("An error occured by aligning datasets:" + e);

@@ -15,6 +15,7 @@ import org.dawb.common.ui.monitor.ProgressMonitorWrapper;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.image.IImageTransform;
+import org.eclipse.dawnsci.analysis.api.monitor.IMonitor;
 import org.eclipse.dawnsci.analysis.dataset.roi.RectangularROI;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -65,6 +66,8 @@ public class AlignProgressJob implements IRunnableWithProgress {
 		if (data == null)
 			return;
 		int n = data.size();
+		if (monitor != null)
+			monitor.beginTask("Aligning images...", n);
 		if (alignState == AlignMethod.WITH_ROI && n % mode != 0) {
 			final String msg = "Missing file? Could not load multiple of " + mode + " images";
 			Display.getDefault().syncExec(new Runnable() {
@@ -78,15 +81,15 @@ public class AlignProgressJob implements IRunnableWithProgress {
 			logger.warn(msg);
 			return;
 		}
+		final IMonitor mon = new ProgressMonitorWrapper(monitor);
 		try {
 			if (alignState == AlignMethod.WITH_ROI) {
 				if (shifts == null)
 					shifts = new ArrayList<List<double[]>>();
-				shiftedImages = AlignImages.alignWithROI(data, shifts, roi,
-						mode, new ProgressMonitorWrapper(monitor));
+				shiftedImages = AlignImages.alignWithROI(data, shifts, roi, mode, mon);
 			} else if (alignState == AlignMethod.AFFINE_TRANSFORM) {
 				// align with boofcv
-				shiftedImages = transformer.align(data);
+				shiftedImages = transformer.align(data, mon);
 			}
 		} catch (final Exception e) {
 			Display.getDefault().syncExec(new Runnable() {
@@ -99,9 +102,9 @@ public class AlignProgressJob implements IRunnableWithProgress {
 			});
 			logger.error("Error aligning images:", e);
 		}
-
-		if (monitor != null)
-			monitor.worked(1);
+		if (monitor != null) {
+			monitor.done();
+		}
 	}
 
 	/**

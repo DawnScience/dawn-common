@@ -15,6 +15,7 @@ import org.dawnsci.boofcv.converter.ConvertIDataset;
 import org.dawnsci.boofcv.registration.ImageHessianRegistration;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.image.IImageTransform;
+import org.eclipse.dawnsci.analysis.api.monitor.IMonitor;
 
 import boofcv.alg.distort.DistortImageOps;
 import boofcv.alg.interpolate.TypeInterpolate;
@@ -68,7 +69,7 @@ public class BoofCVImageTransformImpl<T extends ImageSingleBand<?>, TD extends T
 	}
 
 	@Override
-	public List<IDataset> align(List<IDataset> images) throws Exception {
+	public List<IDataset> align(List<IDataset> images, IMonitor monitor) throws Exception {
 		List<IDataset> alignedList = new ArrayList<IDataset>();
 		ImageFloat32 imageA = ConvertIDataset.convertFrom(images.get(0), ImageFloat32.class, 1);
 		alignedList.add(images.get(0));
@@ -83,6 +84,11 @@ public class BoofCVImageTransformImpl<T extends ImageSingleBand<?>, TD extends T
 			IDataset alignedData = ConvertIDataset.convertTo(aligned, true);
 			alignedData.setName(images.get(i).getName());
 			alignedList.add(alignedData);
+			if(monitor != null) {
+				if (monitor.isCancelled())
+					return alignedList;
+				monitor.worked(1);
+			}
 		}
 		return alignedList;
 	}
