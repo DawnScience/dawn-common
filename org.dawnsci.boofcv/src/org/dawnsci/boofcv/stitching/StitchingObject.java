@@ -176,11 +176,9 @@ public class StitchingObject<T extends ImageSingleBand<?>> {
 	 *            specified relative to an origin, the coordinates of the origin
 	 *            should be specified here. Note, the first image will be
 	 *            stitched at the origin.
-	 * @param monitor
-	 *            monitor progress
 	 * @return The new image with both images stitched to it
 	 */
-	public ImageSingleBand<?> stitch(ImageSingleBand<?> imageA, ImageSingleBand<?> imageB, double[] origin, IMonitor monitor) {
+	public ImageSingleBand<?> stitch(ImageSingleBand<?> imageA, ImageSingleBand<?> imageB, double[] origin) {
 		// update the translation such that it is relative to the given origin
 		fromAtoB.set(fromAtoB.a11, fromAtoB.a12, fromAtoB.a13 - origin[0],
 				fromAtoB.a21, fromAtoB.a22, fromAtoB.a23 - origin[1],
@@ -255,9 +253,6 @@ public class StitchingObject<T extends ImageSingleBand<?>> {
 			model.set(fromWorkToB);
 			distort.apply((ImageFloat32)imageB, (ImageFloat32) work, 0, 0, outputWidth, outputHeight);
 		}
-		if (monitor.isCancelled())
-			return work;
-		monitor.worked(1);
 		return work;
 	}
 }

@@ -374,7 +374,12 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 			for (int j = 0; j < images.get(0).size(); j++) {
 				if (i != 0 || j != 0) {
 					StitchingObject<?> stitcher = new StitchingObject<>(translations[i][j]);
-					result = stitcher.stitch(result, images.get(i).get(j), origin, monitor);
+					result = stitcher.stitch(result, images.get(i).get(j), origin);
+				}
+				if (monitor != null) {
+					if (monitor.isCancelled())
+						return result;
+					monitor.worked(1);
 				}
 			}
 		}
