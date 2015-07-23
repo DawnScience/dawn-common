@@ -53,10 +53,12 @@ public class JexlGeneralFunctions {
 	}
 
 	public static Dataset mean(final Dataset data,final int axis) {
+		data.squeeze();
 		return data.mean(axis);
 	}
 	
 	public static Dataset sum(final Dataset data,final int axis) {
+		data.squeeze();
 		return data.sum(axis);
 	}
 	
@@ -67,30 +69,37 @@ public class JexlGeneralFunctions {
 	}
 	
 	public static Dataset stdDev(final Dataset data, final int axis) {
+		data.squeeze();
 		return data.stdDeviation(axis);
 	}
 	
 	public static Dataset max (final Dataset data, final int axis) {
+		data.squeeze();
 		return data.max(axis);
 	}
 	
 	public static Dataset min(final Dataset data, final int axis) {
+		data.squeeze();
 		return data.min(axis);
 	}
 	
 	public static Dataset peakToPeak(final Dataset data, final int axis) {
+		data.squeeze();
 		return data.peakToPeak(axis);
 	}
 	
 	public static Dataset product(final Dataset data, final int axis) {
+		data.squeeze();
 		return data.product(axis);
 	}
 	
 	public static Dataset rootMeanSquare(Dataset data, int axis) {
+		data.squeeze();
 		return data.rootMeanSquare(axis);
 	}
 	
 	public static Dataset median(Dataset data, int axis) {
+		data.squeeze();
 		return Stats.median(data,axis);
 	}
 	
