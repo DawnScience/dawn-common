@@ -8,8 +8,6 @@
  */
 package org.dawnsci.boofcv.stitching;
 
-import org.eclipse.dawnsci.analysis.api.monitor.IMonitor;
-
 import georegression.struct.homography.Homography2D_F64;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.PixelTransformHomography_F32;
