@@ -77,7 +77,7 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 	private FormattedText xTranslationText;
 	private FormattedText yTranslationText;
 	private boolean hasCropping = true;
-	private boolean hasFeatureAssociated = true;
+	private boolean hasFeatureAssociated;
 	private ExpandableComposite plotExpandComp;
 	private IPlottingSystem plotSystem;
 	private Composite container;
@@ -168,11 +168,13 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 			firstImage.squeeze();
 			IDataset psxData = holder.getDataset("psx");
 			IDataset psyData = holder.getDataset("psy");
-			translations = ImagePeemUtils.getMotorTranslations(psxData, psyData);
+			if (!hasFeatureAssociated)
+				translations = ImagePeemUtils.getMotorTranslations(psxData, psyData);
+			else
+				translations.add(new double[] { xTrans.floatValue(), yTrans.floatValue() });
 		} else {
 			firstImage = holder.getDataset(0);
-			translations.add(new double[] { xTrans.floatValue(),
-					yTrans.floatValue() });
+			translations.add(new double[] { xTrans.floatValue(), yTrans.floatValue() });
 		}
 
 		bean.setTranslations(translations);
@@ -277,11 +279,10 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 		xTranslationText.setFormatter(formatter);
 		xTranslationText.getControl().setToolTipText("Expected translation in pixels in the X direction");
 		xTranslationText.setValue(new Double(25));
-		xTranslationText.getControl().setEnabled(!hasFeatureAssociated);
+		xTranslationText.getControl().setEnabled(hasFeatureAssociated);
 		gridData = new GridData(SWT.FILL, SWT.CENTER, true, false); 
 		gridData.widthHint = 30;
 		xTranslationText.getControl().setLayoutData(gridData);
-		xTranslationText.getControl().setEnabled(!datFileLoaded);
 
 		new Label(controlComp, SWT.NONE);
 		new Label(controlComp, SWT.NONE);
@@ -317,11 +318,10 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 		yTranslationText.setFormatter(formatter);
 		yTranslationText.getControl().setToolTipText("Expected translation in pixels in the y direction");
 		yTranslationText.setValue(new Double(25));
-		yTranslationText.getControl().setEnabled(!hasFeatureAssociated);
+		yTranslationText.getControl().setEnabled(hasFeatureAssociated);
 		gridData = new GridData(SWT.FILL, SWT.CENTER, true, false); 
 		gridData.widthHint = 30;
 		yTranslationText.getControl().setLayoutData(gridData);
-		yTranslationText.getControl().setEnabled(!datFileLoaded);
 
 		new Label(controlComp, SWT.NONE);
 		new Label(controlComp, SWT.NONE);
@@ -352,10 +352,8 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				hasFeatureAssociated = featureButton.getSelection();
-				if (!datFileLoaded) {
-					xTranslationText.getControl().setEnabled(!hasFeatureAssociated);
-					yTranslationText.getControl().setEnabled(!hasFeatureAssociated);
-				}
+				xTranslationText.getControl().setEnabled(hasFeatureAssociated);
+				yTranslationText.getControl().setEnabled(hasFeatureAssociated);
 			}
 		});
 
