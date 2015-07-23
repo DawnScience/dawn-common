@@ -214,11 +214,14 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
 					 IPersistentFile file = null;
 					 try {
 						 IPersistenceService service = ServiceLoader.getPersistenceService();
-						 
-						 final File ioFile = new File(finalFile.getLocation().toOSString());
+						 String savePath;
+						 if(finalFile != null)
+							 savePath = finalFile.getLocation().toOSString();
+						 else
+							 savePath = page.getAbsoluteFilePath();
+						 final File ioFile = new File(savePath);
 						 if (ioFile.exists()) ioFile.delete();
-						 
-						 file    = service.createPersistentFile(finalFile.getLocation().toOSString());
+						 file    = service.createPersistentFile(savePath);
 						 
 						 final int length = getTotalWork(options, system, funcService);
 						 monitor.beginTask("Export", length);
@@ -323,7 +326,8 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
 		     return true;
 		 } finally {
 			 try {
-				 file.getParent().refreshLocal(IResource.DEPTH_ONE, new NullProgressMonitor());
+				 if (file != null)
+					 file.getParent().refreshLocal(IResource.DEPTH_ONE, new NullProgressMonitor());
 			 } catch (CoreException e) {
 				 logger.error("Cannot refresh dir "+file, e);
 			 }
