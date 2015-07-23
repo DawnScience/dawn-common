@@ -137,8 +137,11 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 		bean.setAngle(angle);
 		Number fov = (Number) fovText.getValue();
 		bean.setFieldOfView(fov.doubleValue());
-		if (hasCropping)
-			bean.setRoi(plotSystem.getRegion("Cropping").getROI());
+		if (hasCropping) {
+			IRegion region = plotSystem.getRegion("Cropping");
+			if (region != null)
+				bean.setRoi(region.getROI());
+		}
 		bean.setFeatureAssociated(hasFeatureAssociated);
 		Number xTrans = (Number) xTranslationText.getValue();
 		Number yTrans = (Number) yTranslationText.getValue();
@@ -191,15 +194,19 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 		String filePath = getSelectedPaths()[0];
 		if (filePath.endsWith(".dat"))
 			datFileLoaded = true;
-		double angle = 0, fov = 0;
+		double angle = 0, fov = 0, theta = 0;
 		int rowNum = 0, columnNum = 0;
 		try {
 			IDataHolder holder = LoaderServiceHolder.getLoaderService().getData(filePath, new IMonitor.Stub());
 			if (datFileLoaded) {
 				//load metadatavalues
 				IMetadata meta = holder.getMetadata();
-				double theta = Double.valueOf((String) meta.getMetaValue("phi"));
-				fov = Double.valueOf((String) meta.getMetaValue("leem_fov"));
+				String thetaVal = (String) meta.getMetaValue("phi");
+				if (thetaVal != null)
+					theta = Double.valueOf(thetaVal);
+				String fovVal = (String) meta.getMetaValue("leem_fov");
+				if (fovVal != null)
+					fov = Double.valueOf(fovVal);
 				angle = ImagePeemUtils.getAngleFromFOV(fov, theta);
 				// load images
 				ILazyDataset lazy = holder.getLazyDataset("uv_image");
