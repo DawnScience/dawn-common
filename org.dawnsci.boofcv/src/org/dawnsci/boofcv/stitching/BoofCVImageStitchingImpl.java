@@ -83,7 +83,7 @@ public class BoofCVImageStitchingImpl implements IImageStitchingProcess {
 			for (int j = 0; j < images[0].length; j++) {
 				ImageFloat32 image = ConvertIDataset.convertFrom(images[i][j], ImageFloat32.class, 1);
 				inputImages.get(i).add(image);
-				if (monitor.isCancelled())
+				if (monitor != null && monitor.isCancelled())
 					return null;
 			}
 		}

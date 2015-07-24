@@ -134,9 +134,11 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 					translations[x][y][0] += translations[x][y-1][0];
 					translations[x][y][1] += translations[x][y-1][1];
 				}
-				if (monitor.isCancelled())
-					return;
-				monitor.worked(1);
+				if (monitor != null) {
+					if (monitor.isCancelled())
+						return;
+					monitor.worked(1);
+				}
 			}
 		}
 	}
@@ -206,9 +208,11 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 					translations[x][y][1] += translations[x][y-1][1];
 				}
 				idx++;
-				if (monitor.isCancelled())
-					return;
-				monitor.worked(1);
+				if (monitor != null) {
+					if (monitor.isCancelled())
+						return;
+					monitor.worked(1);
+				}
 			}
 		}
 	}
@@ -277,9 +281,11 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 					translations[x][y][1] += translations[x][y-1][1];
 				}
 				idx++;
-				if (monitor.isCancelled())
-					return;
-				monitor.worked(1);
+				if (monitor != null) {
+					if (monitor.isCancelled())
+						return;
+					monitor.worked(1);
+				}
 			}
 		}
 	}
@@ -317,9 +323,11 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 				translations[x][y][0] = -xtrans*y;
 				translations[x][y][1] = -ytrans*x;
 				idx++;
-				if (monitor.isCancelled())
-					return;
-				monitor.worked(1);
+				if (monitor != null) {
+					if (monitor.isCancelled())
+						return;
+					monitor.worked(1);
+				}
 			}
 		}
 	}
