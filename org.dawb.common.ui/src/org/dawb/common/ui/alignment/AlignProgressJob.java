@@ -37,8 +37,8 @@ public class AlignProgressJob implements IRunnableWithProgress {
 	private List<IDataset> data;
 	private int mode;
 
-	private List<List<double[]>> shifts = null;
-	private List<IDataset> shiftedImages = new ArrayList<IDataset>();
+	private List<List<double[]>> shifts;
+	private List<IDataset> shiftedImages;
 
 	private AlignMethod alignState;
 
@@ -60,7 +60,7 @@ public class AlignProgressJob implements IRunnableWithProgress {
 
 	@Override
 	public void run(IProgressMonitor monitor) {
-		if (!shiftedImages.isEmpty())
+		if (shiftedImages != null && !shiftedImages.isEmpty())
 			shiftedImages.clear();
 
 		if (data == null)
@@ -86,6 +86,8 @@ public class AlignProgressJob implements IRunnableWithProgress {
 			if (alignState == AlignMethod.WITH_ROI) {
 				if (shifts == null)
 					shifts = new ArrayList<List<double[]>>();
+				if (!shifts.isEmpty())
+					shifts.clear();
 				shiftedImages = AlignImages.alignWithROI(data, shifts, roi, mode, mon);
 			} else if (alignState == AlignMethod.AFFINE_TRANSFORM) {
 				// align with boofcv
@@ -152,6 +154,10 @@ public class AlignProgressJob implements IRunnableWithProgress {
 
 	public void setAlignMethod(AlignMethod alignState) {
 		this.alignState = alignState;
+	}
+
+	public void setShiftedImages(List<IDataset> shiftedImages) {
+		this.shiftedImages = shiftedImages;
 	}
 
 }
