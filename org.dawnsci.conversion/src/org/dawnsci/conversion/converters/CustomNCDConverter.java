@@ -644,25 +644,26 @@ public class CustomNCDConverter extends AbstractConversion  {
 			for (AxesMetadata axis : axes) {
 				for (ILazyDataset a: axis.getAxes()) {
 					if (a != null) {
-						a = ((Dataset) a).transpose();
-						if (a != null) {
-							if (a.getName().equals("q")) {
-								outputBean.axis = (Dataset) a;
+						Dataset aDataset = (Dataset) a.getSlice();
+						aDataset = aDataset.transpose();
+						if (aDataset != null) {
+							if (aDataset.getName().equals("q")) {
+								outputBean.axis = aDataset;
 								outputBean.axisUnits = INVERSE_ANGSTROM;
 							}
-							else if (a.getName().equals("d-spacing")) {
-								outputBean.axis = (Dataset) a;
+							else if (aDataset.getName().equals("d-spacing")) {
+								outputBean.axis = aDataset;
 								outputBean.axisUnits = INVERSE_ANGSTROM;
 							}
-							else if (a.getName().equals("angle")) {
-								outputBean.axis = (Dataset) a;
+							else if (aDataset.getName().equals("angle")) {
+								outputBean.axis = aDataset;
 								outputBean.axisUnits = DEGREES;
 							}
-							else if (a.getName().equals("2theta")) {
-								outputBean.axis = (Dataset) a;
+							else if (aDataset.getName().equals("2theta")) {
+								outputBean.axis = aDataset;
 							}
-							else if (a.getName().equals("pixel")) {
-								outputBean.axis = (Dataset) a;
+							else if (aDataset.getName().equals("pixel")) {
+								outputBean.axis = aDataset;
 							}
 						}
 						break;
