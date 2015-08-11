@@ -45,6 +45,8 @@ public class PlotDataConversionWizard extends Wizard implements IExportWizard {
 	private PlotDataConversionPage        conversionPage;
 	private IPlottingSystem               system;
 	private String                        filePath;
+
+	private boolean hasBrowseToExternalOnly;
 	
 	private static final Logger logger = LoggerFactory.getLogger(PlotDataConversionWizard.class);
 	
@@ -92,6 +94,7 @@ public class PlotDataConversionWizard extends Wizard implements IExportWizard {
 		} else {
 		    conversionPage.setPath(System.getProperty("user.home") +File.separator+ "plotdata."+ visitor.getExtension());
 		}
+		conversionPage.setBrowseToExternalOnly(hasBrowseToExternalOnly);
 		
 		addPage(conversionPage);
 	
@@ -184,5 +187,17 @@ public class PlotDataConversionWizard extends Wizard implements IExportWizard {
 	public void setFilePath(String filePath) {
 		this.filePath = filePath;
 		if (conversionPage!=null && filePath!=null) conversionPage.setPath(filePath);
+	}
+
+	/**
+	 * Set after conversion page has been created
+	 * If set to true, the conversion page will only have an external file dialog. False by default
+	 * with the conversion to a project location and an external location.
+	 * 
+	 * @param hasBrowseToExternalOnly
+	 */
+	public void setBrowseToExternalOnly(boolean hasBrowseToExternalOnly) {
+		this.hasBrowseToExternalOnly = hasBrowseToExternalOnly;
+		if (conversionPage != null) conversionPage.setBrowseToExternalOnly(hasBrowseToExternalOnly);
 	}
 }

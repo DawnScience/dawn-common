@@ -88,6 +88,9 @@ public class ResourceChoosePage extends WizardPage {
 	private Button   resourceButton;
 	private Button   fileButton;
 	protected Button overwrite;
+
+	private boolean hasBrowseToExternalOnly = false;
+
 	/**
 	 * 
 	 * @param pageName
@@ -155,17 +158,22 @@ public class ResourceChoosePage extends WizardPage {
 			}
 		});
 
-		this.resourceButton = new Button(container, SWT.PUSH);
-		resourceButton.setImage(Activator.getImageDescriptor("icons/Project-data.png").createImage());
-		resourceButton.setToolTipText("Browse to "+(isDirectory()?"folder":"file")+" inside a project");
-		resourceButton.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				handleResourceBrowse();
-			}
-		});
-		resourceButton.setEnabled(buttonsEnabled);
-		
+		if (!hasBrowseToExternalOnly) {
+			this.resourceButton = new Button(container, SWT.PUSH);
+			resourceButton.setImage(Activator.getImageDescriptor(
+					"icons/Project-data.png").createImage());
+			resourceButton.setToolTipText("Browse to "
+							+ (isDirectory() ? "folder" : "file")
+							+ " inside a project");
+			resourceButton.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(SelectionEvent e) {
+					handleResourceBrowse();
+				}
+			});
+			resourceButton.setEnabled(buttonsEnabled);
+		}
+
 		this.fileButton = new Button(container, SWT.PUSH);
 		fileButton.setImage(Activator.getImageDescriptor("icons/folder.png").createImage());
 		fileButton.setToolTipText("Browse to an external "+(isDirectory()?"folder":"file")+".");
@@ -175,7 +183,8 @@ public class ResourceChoosePage extends WizardPage {
 				handleFileBrowse();
 			}
 		});
-		resourceButton.setEnabled(buttonsEnabled);
+		if (!hasBrowseToExternalOnly)
+			resourceButton.setEnabled(buttonsEnabled);
 		
 		if (!isDirectory() && overwriteVisible) {
 			final Label filler = new Label(container, SWT.NONE);
@@ -555,7 +564,8 @@ public class ResourceChoosePage extends WizardPage {
 	public void setFileChoosingEnabled(boolean enabled) {
 		GridUtils.setVisible(txtLabel,       enabled);
 		GridUtils.setVisible(txtPath,        enabled);
-		GridUtils.setVisible(resourceButton, enabled);
+		if (!hasBrowseToExternalOnly)
+			GridUtils.setVisible(resourceButton, enabled);
 		GridUtils.setVisible(fileButton,     enabled);
 		txtLabel.getParent().layout();
 	}
@@ -581,5 +591,9 @@ public class ResourceChoosePage extends WizardPage {
 
 	public void setOverwrite(boolean isOverwrite) {
 		this.isOverwrite = isOverwrite;
+	}
+
+	public void setBrowseToExternalOnly(boolean hasBrowseToExternalOnly) {
+		this.hasBrowseToExternalOnly = hasBrowseToExternalOnly;
 	}
 }
