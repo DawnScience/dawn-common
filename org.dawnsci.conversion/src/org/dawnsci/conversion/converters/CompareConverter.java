@@ -81,7 +81,6 @@ public class CompareConverter extends AbstractConversion{
 	
  	@Override
 	protected void convert(IDataset slice) throws Exception {
-		
  		final String datasetPath = slice.getName(); // Slice must be named the same as the path it will write to
 		
  		final String name  = datasetPath.substring(datasetPath.lastIndexOf('/')+1);
@@ -136,6 +135,7 @@ public class CompareConverter extends AbstractConversion{
 	
 	public void close(IConversionContext context) throws Exception{
 		hFile.close();
+		super.close(context);
 	}
 
 	

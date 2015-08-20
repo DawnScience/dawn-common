@@ -14,12 +14,11 @@ import java.util.Collections;
 import java.util.List;
 
 import org.dawb.common.util.list.SortNatural;
+import org.dawnsci.conversion.ServiceLoader;
 import org.dawnsci.conversion.converters.util.LocalServiceManager;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
-import org.eclipse.dawnsci.analysis.api.image.IImageStitchingProcess;
-import org.eclipse.dawnsci.analysis.api.image.IImageTransform;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
 import org.eclipse.dawnsci.analysis.api.roi.IROI;
 import org.eclipse.dawnsci.analysis.dataset.impl.Image;
@@ -42,9 +41,6 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 	private static final Logger logger = LoggerFactory.getLogger(ImagesToStitchedConverter.class);
 	private List<IDataset> imageStack = new ArrayList<IDataset>();
 
-	private static IImageStitchingProcess stitcher;
-	private static IImageTransform transformer;
-
 	public ImagesToStitchedConverter() {
 		super(null);
 	}
@@ -60,25 +56,8 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 		context.addSliceDimension(0, "all");
 	}
 
-	/**
-	 * OSGI Calls this
-	 * @param s
-	 */
-	public static void setImageSticher(IImageStitchingProcess s) {
-		stitcher = s;
-	}
-
-	/**
-	 * OSGI Calls this
-	 * @param s
-	 */
-	public static void setImageTransform(IImageTransform its) {
-		transformer = its;
-	}
-
 	@Override
 	protected void convert(IDataset slice) throws Exception {
-
 		if (context.getMonitor() != null && context.getMonitor().isCancelled()) {
 			throw new Exception(getClass().getSimpleName() + " is cancelled");
 		}
@@ -86,7 +65,7 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 		ILazyDataset lazy = context.getLazyDataset();
 		// Rotate each image by angle degrees
 		double angle = conversionBean.getAngle();
-		IDataset rotated = transformer.rotate(slice, angle);
+		IDataset rotated = ServiceLoader.getImageTransform().rotate(slice, angle);
 		// crop each image given an elliptical roi
 		IROI roi = conversionBean.getRoi();
 		if (roi != null) {
@@ -104,7 +83,7 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 			double fieldOfView = conversionBean.getFieldOfView();
 			List<double[]> translations = conversionBean.getTranslations();
 			// stitch the stack of images
-			IDataset stitched = stitcher.stitch(imageStack, rows, columns, fieldOfView, translations, useFeatureAssociation, context.getMonitor());
+			IDataset stitched = ServiceLoader.getImageStitcher().stitch(imageStack, rows, columns, fieldOfView, translations, useFeatureAssociation, context.getMonitor());
 
 			stitched.setName("stitched");
 			final File outputFile = new File(outputPath);
@@ -164,11 +143,6 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 		lazyDataset = new LazyDataset("Folder Stack",
 				loader.getDtype(), loader.getShape(), loader);
 		return lazyDataset;
-	}
-
-	@Override
-	public void close(IConversionContext context) {
-
 	}
 
 	protected String getExtension() {

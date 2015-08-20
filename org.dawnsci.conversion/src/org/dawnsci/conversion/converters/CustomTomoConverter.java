@@ -73,7 +73,6 @@ public class CustomTomoConverter extends AbstractConversion {
 	
 	@Override
 	protected void convert(IDataset slice) throws Exception {
-		
 		if (context.getMonitor()!=null && context.getMonitor().isCancelled()) {
 			throw new Exception(getClass().getSimpleName()+" is cancelled");
 		}

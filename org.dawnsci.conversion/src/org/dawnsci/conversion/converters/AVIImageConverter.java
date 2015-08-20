@@ -111,7 +111,6 @@ public class AVIImageConverter extends AbstractImageConversion {
 	 */
 	@Override
 	protected synchronized void convert(IDataset slice) throws Exception {
-		
 		if (getSliceType() == PlotType.SURFACE) {
 			final String plotName = context.getSelectedConversionFile().getName();
 			final IPlottingSystem system = PlottingFactory.getPlottingSystem(plotName);
@@ -232,13 +231,14 @@ public class AVIImageConverter extends AbstractImageConversion {
 	
 
 	@Override
-	public void close(IConversionContext context) throws IOException {
+	public void close(IConversionContext context) throws Exception {
         if (out!=null) out.close();
         if (plotDisposable!=null && getSliceType()!=PlotType.SURFACE)  {
         	// Surfaces use the live plotter and are not disposable.
         	plotDisposable.dispose();
         }
         plotImageData = null;
+        super.close(context);
 	}
 
 }

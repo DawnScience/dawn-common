@@ -53,14 +53,13 @@ public class Convert1DtoND extends AbstractConversion {
 
 	@Override
 	protected void convert(IDataset slice) throws Exception {
-		
 		if (!dataMap.containsKey(slice.getName()))dataMap.put(slice.getName(), new ArrayList<ILazyDataset>());
 		dataMap.get(slice.getName()).add(slice);
 
 	}
 	
 	@Override
-	public void close(IConversionContext context) {
+	public void close(IConversionContext context) throws Exception {
 
 		IHierarchicalDataFile file = null;
 		try {
@@ -132,6 +131,7 @@ public class Convert1DtoND extends AbstractConversion {
 					logger.error("Problem writing to h5 file :" + e1.getMessage() +" and inner: " + e.getMessage());
 				}
 		}
+		super.close(context);
 	}
 	
 	private void saveAxis(IHierarchicalDataFile file,String entry, Dataset out, String[] paths) throws Exception {

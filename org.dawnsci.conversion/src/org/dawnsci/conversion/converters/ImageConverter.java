@@ -37,7 +37,7 @@ public class ImageConverter extends AbstractImageConversion {
 
 	@Override
 	protected void convert(IDataset slice) throws Exception {
-		
+
 		if (context.getMonitor()!=null && context.getMonitor().isCancelled()) {
 			throw new Exception(getClass().getSimpleName()+" is cancelled");
 		}
@@ -71,7 +71,8 @@ public class ImageConverter extends AbstractImageConversion {
 	}
 	@Override
 	public void close(IConversionContext context) {
-        
+		// track conversion event
+		trackConversion();
 	}
 
 	protected String getExtension() {

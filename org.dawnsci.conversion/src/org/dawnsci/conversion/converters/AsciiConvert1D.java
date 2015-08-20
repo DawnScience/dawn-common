@@ -62,6 +62,7 @@ public class AsciiConvert1D extends AbstractConversion {
 	@Override
 	public void close(IConversionContext context) throws Exception {
 		writeFile(selected, context);
+		super.close(context);
 	}
 	
 	private void writeFile(File selectedConversionFile, IConversionContext context) throws Exception {

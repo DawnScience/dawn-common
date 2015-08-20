@@ -15,8 +15,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.dawnsci.conversion.ServiceLoader;
 import org.dawnsci.conversion.converters.util.LocalServiceManager;
+import org.eclipse.dawnsci.analysis.api.EventTracker;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
+import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext.ConversionScheme;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.Slice;
@@ -81,10 +84,13 @@ public abstract class AbstractConversion {
 	
 	/**
 	 * Override this method to provide things which should happen after the processing.
+	 * Call super() in the override if the conversion needs to be tracked for analytics purposes.
+	 * 
 	 * @param context
 	 */
 	public void close(IConversionContext context) throws Exception{
-		
+		// track conversion event
+		trackConversion();
 	}
 	
 	protected IConversionContext getContext() {
@@ -275,4 +281,19 @@ public abstract class AbstractConversion {
 		return posExt == -1 ? fileName : fileName.substring(0, posExt);
 	}
 
+	/**
+	 * Tracks the conversion tool usage by recording an entry into the google analytics 
+	 * for the corresponding conversion scheme event.
+	 */
+	protected void trackConversion() {
+		ConversionScheme scheme = context.getConversionScheme();
+		try {
+			EventTracker tracker = ServiceLoader.getEventTracker();
+			String conversionName = scheme.name().toLowerCase();
+			if (tracker != null)
+				tracker.trackConversionEvent(conversionName);
+		} catch(Exception e) {
+			
+		}
+	}
 }

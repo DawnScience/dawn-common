@@ -105,8 +105,7 @@ public class ImagesToHDFConverter extends AbstractConversion{
     private boolean first = true;
 	@Override
 	protected void convert(IDataset slice) throws Exception {
-		
-        final String datasetPath = context.getDatasetNames().get(0);
+		final String datasetPath = context.getDatasetNames().get(0);
 		
 		String d = hFile.appendDataset(name, slice, group);
 		if (first) {
@@ -129,6 +128,7 @@ public class ImagesToHDFConverter extends AbstractConversion{
 	
 	public void close(IConversionContext context) throws Exception{
 		hFile.close();
+		super.close(context);
 	}
 
 }

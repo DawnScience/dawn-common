@@ -56,7 +56,6 @@ public class AlignImagesConverter extends AbstractImageConversion {
 
 	@Override
 	protected void convert(IDataset slice) throws Exception {
-
 		if (context.getMonitor() != null && context.getMonitor().isCancelled()) {
 			throw new Exception(getClass().getSimpleName() + " is cancelled");
 		}
@@ -140,11 +139,6 @@ public class AlignImagesConverter extends AbstractImageConversion {
 		}
 		
 		return lazyDataset;
-	}
-
-	@Override
-	public void close(IConversionContext context) {
-
 	}
 
 	protected String getExtension() {
