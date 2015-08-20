@@ -21,7 +21,6 @@ import java.util.List;
 import org.dawb.common.util.io.FileUtils;
 import org.dawnsci.boofcv.BoofCVImageStitchingProcessCreator;
 import org.dawnsci.boofcv.BoofCVImageTransformCreator;
-import org.dawnsci.conversion.converters.ImagesToStitchedConverter;
 import org.dawnsci.conversion.converters.ImagesToStitchedConverter.ConversionStitchedBean;
 import org.dawnsci.conversion.converters.util.LocalServiceManager;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
@@ -64,8 +63,8 @@ public class StitchingConvertTest {
 
 		sticher = BoofCVImageStitchingProcessCreator.createStitchingProcess();
 		transformer = BoofCVImageTransformCreator.createTransformService();
-		ImagesToStitchedConverter.setImageSticher(sticher);
-		ImagesToStitchedConverter.setImageTransform(transformer);
+		ServiceLoader.setImageStitcher(sticher);
+		ServiceLoader.setImageTransform(transformer);
 	}
 
 	@Test
