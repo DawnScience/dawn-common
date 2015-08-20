@@ -109,6 +109,11 @@ public class JGoogleAnalyticsEventTrackerImpl implements EventTracker {
 		track("Action/" + name);
 	}
 
+	@Override
+	public void trackConversionEvent(String name) throws Exception {
+		track("Conversion/" + name);
+	}
+
 	private String getVersion() {
 		if (version == null)
 			version = BundleUtils.getDawnVersion();
@@ -118,4 +123,5 @@ public class JGoogleAnalyticsEventTrackerImpl implements EventTracker {
 		}
 		return version;
 	}
+
 }
