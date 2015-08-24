@@ -49,10 +49,12 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.draw2d.IFigure;
+import org.eclipse.draw2d.SWTGraphics;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.gmf.runtime.draw2d.ui.render.awt.internal.svg.export.GraphicsSVG;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.ImageLoader;
@@ -256,8 +258,12 @@ public class PlotExportPrintUtil {
 	 *          IFigure used to export to svg
 	 * @throws Exception
 	 */
-	public synchronized static void saveGraph(String filename, String fileType, Image image, final IFigure printableFigure) 
+	public synchronized static void saveGraph(String filename, String fileType, final IFigure printableFigure) 
 			throws Exception {
+		Image im = new Image(Display.getDefault(), printableFigure.getSize().width, printableFigure.getSize().height);
+		GC gc = new GC(im);
+		SWTGraphics graphics = new SWTGraphics(gc);
+		printableFigure.paint(graphics);
 		// test for all possible file types
 		if (!Arrays.asList(FILE_FORMATS).contains(fileType.toLowerCase())
 				&& !Arrays.asList(FILE_TYPES).contains(fileType))
@@ -274,12 +280,12 @@ public class PlotExportPrintUtil {
 			if (!lname.endsWith(".png") && !lname.endsWith(".jpg") && !lname.endsWith(".jpeg"))
 				filename = filename + ".png";
 			ImageLoader loader = new ImageLoader();
-			loader.data = new ImageData[] { image.getImageData() };
+			loader.data = new ImageData[] { im.getImageData() };
 			loader.save(filename, SWT.IMAGE_PNG);
 		} else if (fileType.equals(FILE_TYPES[1])) {
 			if (!lname.endsWith(".ps") && !lname.endsWith(".eps"))
 				filename = filename + ".ps";
-			savePostScript(new File(filename), image);
+			savePostScript(new File(filename), im);
 		} else if (fileType.equals(FILE_TYPES[2])) {
 			if (!lname.endsWith(".svg"))
 				filename = filename + ".svg";
