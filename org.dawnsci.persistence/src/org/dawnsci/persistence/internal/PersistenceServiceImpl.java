@@ -16,6 +16,8 @@ import org.eclipse.dawnsci.hdf5.IHierarchicalDataFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 /**
  * Implementation of IPersistenceService<br>
  * 
@@ -58,6 +60,11 @@ public class PersistenceServiceImpl implements IPersistenceService{
 	@Override
 	public Object unmarshal(String json) throws Exception {
 		return new JacksonMarshaller().unmarshal(json);
+	}
+	
+	@Override
+	public <T extends Object> T unmarshal(String json, Class<T> clazz) throws Exception {
+		return new ObjectMapper().readValue(json, clazz);
 	}
 
 	@Override
