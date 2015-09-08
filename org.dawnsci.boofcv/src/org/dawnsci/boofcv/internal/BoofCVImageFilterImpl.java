@@ -8,14 +8,12 @@
  */
 package org.dawnsci.boofcv.internal;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.dawnsci.boofcv.converter.ConvertIDataset;
 import org.dawnsci.boofcv.util.Utils;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.image.IImageFilterService;
 import org.eclipse.dawnsci.analysis.api.image.ImageThresholdType;
+import org.eclipse.dawnsci.analysis.dataset.impl.AbstractDataset;
 import org.eclipse.dawnsci.analysis.dataset.impl.BooleanDataset;
 
 import boofcv.alg.filter.binary.BinaryImageOps;
@@ -28,10 +26,12 @@ import boofcv.alg.misc.ImageStatistics;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.BorderType;
 import boofcv.struct.ConnectRule;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.MultiSpectral;
 
 /**
  * Implementation of IImageFilterService<br>
@@ -54,31 +54,42 @@ public class BoofCVImageFilterImpl implements IImageFilterService {
 	@Override
 	public IDataset filterGaussianBlur(IDataset input, double sigma, int radius) {
 		int[] shape = Utils.getShape(input);
-		ImageFloat32 converted = ConvertIDataset.convertFrom(input, ImageFloat32.class, 1);
-		ImageFloat32 blurred = new ImageFloat32(shape[1], shape[0]);
-		BlurImageOps.gaussian(converted, blurred, sigma, radius, null);
-		return ConvertIDataset.convertTo(blurred, false);
+		int type = AbstractDataset.getDType(input);
+		if (type == AbstractDataset.RGB) {
+			ImageBase<?> rgbConverted = ConvertIDataset.convertFrom(input, ImageFloat32.class, 3);
+			MultiSpectral<ImageFloat32> blurred = new MultiSpectral(ImageFloat32.class, 3);
+			ImageFloat32 rBlurred = new ImageFloat32(shape[1], shape[0]);
+			ImageFloat32 gBlurred = new ImageFloat32(shape[1], shape[0]);
+			ImageFloat32 bBlurred = new ImageFloat32(shape[1], shape[0]);
+			blurred.setBands(new ImageFloat32[] {rBlurred, gBlurred, bBlurred});
+			BlurImageOps.gaussian((ImageFloat32) ((MultiSpectral<?>)rgbConverted).getBand(0), rBlurred, sigma, radius, null);
+			BlurImageOps.gaussian((ImageFloat32) ((MultiSpectral<?>)rgbConverted).getBand(1), gBlurred, sigma, radius, null);
+			BlurImageOps.gaussian((ImageFloat32) ((MultiSpectral<?>)rgbConverted).getBand(2), bBlurred, sigma, radius, null);
+			return ConvertIDataset.convertTo(blurred, false);
+		} else {
+			ImageFloat32 converted = ConvertIDataset.convertFrom(input, ImageFloat32.class, 1);
+			ImageFloat32 blurred = new ImageFloat32(shape[1], shape[0]);
+			BlurImageOps.gaussian(converted, blurred, sigma, radius, null);
+			return ConvertIDataset.convertTo(blurred, false);
+		}
 	}
 
 	@Override
-	public List<IDataset> filterDerivativeSobel(IDataset input) {
+	public IDataset filterDerivativeSobel(IDataset input, boolean isXaxis) {
 		int[] shape = Utils.getShape(input);
 
 		ImageSingleBand<?> converted = ConvertIDataset.convertFrom(input, ImageUInt8.class, 1);
-
 		Class<? extends ImageSingleBand<?>> derivType = GImageDerivativeOps.getDerivativeType(ImageUInt8.class);
 		ImageSingleBand<?> derivX = GeneralizedImageOps.createSingleBand(derivType, shape[1], shape[0]);
 		ImageSingleBand<?> derivY = GeneralizedImageOps.createSingleBand(derivType, shape[1], shape[0]);
-
 		// Calculate image's derivative
 		GImageDerivativeOps.sobel(converted, derivX, derivY, BorderType.EXTENDED);
 
-		//convert back to IDataset
-		List<IDataset> output = new ArrayList<IDataset>(2);
-		output.add(ConvertIDataset.convertTo(derivX, false));
-		output.add(ConvertIDataset.convertTo(derivY, false));
-
-		return output;
+		// convert back to IDataset
+		if (isXaxis)
+			return ConvertIDataset.convertTo(derivX, false);
+		else
+			return ConvertIDataset.convertTo(derivY, false);
 	}
 
 	@Override
@@ -129,21 +140,50 @@ public class BoofCVImageFilterImpl implements IImageFilterService {
 		BinaryImageOps.contour(binary, contourRule, label);
 
 		return ConvertIDataset.convertTo(label, false);
-//		return ConvertIDataset.contourImageToIDataset(contours, colorExternal, colorInternal, shape[1], shape[0]);
 	}
 
 	@Override
 	public IDataset filterMedian(IDataset input, int radius) {
-		ImageFloat32 converted = ConvertIDataset.convertFrom(input, ImageFloat32.class, 1);
-		ImageFloat32 median = GBlurImageOps.median(converted, null, radius);
-		return ConvertIDataset.convertTo(median, false);
+		int[] shape = Utils.getShape(input);
+		int type = AbstractDataset.getDType(input);
+		if (type == AbstractDataset.RGB) {
+			ImageBase<?> rgbConverted = ConvertIDataset.convertFrom(input, ImageFloat32.class, 3);
+			MultiSpectral<ImageFloat32> median = new MultiSpectral(ImageFloat32.class, 3);
+			ImageFloat32 rMedian = new ImageFloat32(shape[1], shape[0]);
+			ImageFloat32 gMedian = new ImageFloat32(shape[1], shape[0]);
+			ImageFloat32 bMedian = new ImageFloat32(shape[1], shape[0]);
+			median.setBands(new ImageFloat32[] {rMedian, gMedian, bMedian});
+			BlurImageOps.median((ImageFloat32) ((MultiSpectral<?>)rgbConverted).getBand(0), rMedian, radius);
+			BlurImageOps.median((ImageFloat32) ((MultiSpectral<?>)rgbConverted).getBand(1), gMedian, radius);
+			BlurImageOps.median((ImageFloat32) ((MultiSpectral<?>)rgbConverted).getBand(2), bMedian, radius);
+			return ConvertIDataset.convertTo(median, false);
+		} else {
+			ImageFloat32 converted = ConvertIDataset.convertFrom(input, ImageFloat32.class, 1);
+			ImageFloat32 median = GBlurImageOps.median(converted, null, radius);
+			return ConvertIDataset.convertTo(median, false);
+		}
 	}
 
 	@Override
 	public IDataset filterMean(IDataset input, int radius) {
-		ImageFloat32 converted = ConvertIDataset.convertFrom(input, ImageFloat32.class, 1);
-		ImageFloat32 mean = GBlurImageOps.mean(converted, null, radius, null);
-		return ConvertIDataset.convertTo(mean, false);
+		int[] shape = Utils.getShape(input);
+		int type = AbstractDataset.getDType(input);
+		if (type == AbstractDataset.RGB) {
+			ImageBase<?> rgbConverted = ConvertIDataset.convertFrom(input, ImageFloat32.class, 3);
+			MultiSpectral<ImageFloat32> mean = new MultiSpectral(ImageFloat32.class, 3);
+			ImageFloat32 rMean = new ImageFloat32(shape[1], shape[0]);
+			ImageFloat32 gMean = new ImageFloat32(shape[1], shape[0]);
+			ImageFloat32 bMean = new ImageFloat32(shape[1], shape[0]);
+			mean.setBands(new ImageFloat32[] {rMean, gMean, bMean});
+			BlurImageOps.mean((ImageFloat32) ((MultiSpectral<?>)rgbConverted).getBand(0), rMean, radius, null);
+			BlurImageOps.mean((ImageFloat32) ((MultiSpectral<?>)rgbConverted).getBand(1), gMean, radius, null);
+			BlurImageOps.mean((ImageFloat32) ((MultiSpectral<?>)rgbConverted).getBand(2), bMean, radius, null);
+			return ConvertIDataset.convertTo(mean, false);
+		} else {
+			ImageFloat32 converted = ConvertIDataset.convertFrom(input, ImageFloat32.class, 1);
+			ImageFloat32 mean = GBlurImageOps.mean(converted, null, radius, null);
+			return ConvertIDataset.convertTo(mean, false);
+		}
 	}
 
 	@Override

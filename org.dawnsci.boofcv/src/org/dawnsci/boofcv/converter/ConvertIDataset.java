@@ -136,35 +136,40 @@ public class ConvertIDataset {
 				msrc = new MultiSpectral(ImageUInt8.class, width, height, elements);
 				for (int i = 0; i < elements; i++) {
 					msrc.bands[i] = new ImageUInt8(width, height);
-					((ImageUInt8)msrc.bands[i]).data = cbd.getData();
+					ByteDataset d = cbd.getElements(i);
+					((ImageUInt8)msrc.bands[i]).data = d.getData();
 				}
 			} else if (cd instanceof CompoundShortDataset) {
 				CompoundShortDataset csd = (CompoundShortDataset) cd;
 				msrc = new MultiSpectral(ImageUInt16.class, width, height, elements);
 				for (int i = 0; i < elements; i++) {
 					msrc.bands[i] = new ImageUInt16(width, height);
-					((ImageUInt16)msrc.bands[i]).data = csd.getData();
+					ShortDataset d = csd.getElements(i);
+					((ImageUInt16)msrc.bands[i]).data = d.getData();
 				}
 			} else if (cd instanceof CompoundIntegerDataset) {
 				CompoundIntegerDataset cid = (CompoundIntegerDataset) cd;
 				msrc = new MultiSpectral(ImageSInt32.class, width, height, elements);
 				for (int i = 0; i < elements; i++) {
 					msrc.bands[i] = new ImageSInt32(width, height);
-					((ImageSInt32)msrc.bands[i]).data = cid.getData();
+					IntegerDataset d = cid.getElements(i);
+					((ImageSInt32)msrc.bands[i]).data = d.getData();
 				}
 			} else if (cd instanceof CompoundFloatDataset) {
 				CompoundFloatDataset cfd = (CompoundFloatDataset) cd;
 				msrc = new MultiSpectral(ImageFloat32.class, width, height, elements);
 				for (int i = 0; i < elements; i++) {
 					msrc.bands[i] = new ImageFloat32(width, height);
-					((ImageFloat32)msrc.bands[i]).data = cfd.getData();
+					FloatDataset d = cfd.getElements(i);
+					((ImageFloat32)msrc.bands[i]).data = d.getData();
 				}
 			} else if (cd instanceof CompoundDoubleDataset) {
 				CompoundDoubleDataset cdd = (CompoundDoubleDataset) cd;
 				msrc = new MultiSpectral(ImageFloat64.class, width, height, elements);
 				for (int i = 0; i < elements; i++) {
 					msrc.bands[i] = new ImageFloat32(width, height);
-					((ImageFloat64)msrc.bands[i]).data = cdd.getData();
+					DoubleDataset d = cdd.getElements(i);
+					((ImageFloat64)msrc.bands[i]).data = d.getData();
 				}
 			}
 			if (elements == 1)
@@ -232,6 +237,10 @@ public class ConvertIDataset {
 			Dataset[] datasets = new Dataset[n];
 			for (int i = 0; i < n; i++) {
 				datasets[i] = (Dataset) convertTo(msrc.getBand(i), isBinary);
+			}
+			if (n == 3) {
+				RGBDataset rgb = new RGBDataset(datasets[0], datasets[1], datasets[2]);
+				return rgb;
 			}
 			return DatasetUtils.createCompoundDataset(datasets);
 		}
