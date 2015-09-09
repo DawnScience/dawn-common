@@ -38,8 +38,8 @@ public class ImageFilterTest {
 
 	@Test
 	public void filterDerivativeSobel() {
-		List<IDataset> derivatives = service.filterDerivativeSobel(data);
-		Assert.assertEquals("Value of first item is not the expected one", -9, derivatives.get(0).getDouble(0), 0);
+		IDataset derivativeX = service.filterDerivativeSobel(data, true);
+		Assert.assertEquals("Value of first item is not the expected one", -9, derivativeX.getDouble(0), 0);
 	}
 
 	@Test
