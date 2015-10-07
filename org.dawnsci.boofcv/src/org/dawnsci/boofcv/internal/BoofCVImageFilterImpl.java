@@ -57,7 +57,7 @@ public class BoofCVImageFilterImpl implements IImageFilterService {
 		int type = AbstractDataset.getDType(input);
 		if (type == AbstractDataset.RGB) {
 			ImageBase<?> rgbConverted = ConvertIDataset.convertFrom(input, ImageFloat32.class, 3);
-			MultiSpectral<ImageFloat32> blurred = new MultiSpectral(ImageFloat32.class, 3);
+			MultiSpectral<ImageFloat32> blurred = new MultiSpectral<ImageFloat32>(ImageFloat32.class, 3);
 			ImageFloat32 rBlurred = new ImageFloat32(shape[1], shape[0]);
 			ImageFloat32 gBlurred = new ImageFloat32(shape[1], shape[0]);
 			ImageFloat32 bBlurred = new ImageFloat32(shape[1], shape[0]);
@@ -148,7 +148,7 @@ public class BoofCVImageFilterImpl implements IImageFilterService {
 		int type = AbstractDataset.getDType(input);
 		if (type == AbstractDataset.RGB) {
 			ImageBase<?> rgbConverted = ConvertIDataset.convertFrom(input, ImageFloat32.class, 3);
-			MultiSpectral<ImageFloat32> median = new MultiSpectral(ImageFloat32.class, 3);
+			MultiSpectral<ImageFloat32> median = new MultiSpectral<ImageFloat32>(ImageFloat32.class, 3);
 			ImageFloat32 rMedian = new ImageFloat32(shape[1], shape[0]);
 			ImageFloat32 gMedian = new ImageFloat32(shape[1], shape[0]);
 			ImageFloat32 bMedian = new ImageFloat32(shape[1], shape[0]);
@@ -170,7 +170,7 @@ public class BoofCVImageFilterImpl implements IImageFilterService {
 		int type = AbstractDataset.getDType(input);
 		if (type == AbstractDataset.RGB) {
 			ImageBase<?> rgbConverted = ConvertIDataset.convertFrom(input, ImageFloat32.class, 3);
-			MultiSpectral<ImageFloat32> mean = new MultiSpectral(ImageFloat32.class, 3);
+			MultiSpectral<ImageFloat32> mean = new MultiSpectral<ImageFloat32>(ImageFloat32.class, 3);
 			ImageFloat32 rMean = new ImageFloat32(shape[1], shape[0]);
 			ImageFloat32 gMean = new ImageFloat32(shape[1], shape[0]);
 			ImageFloat32 bMean = new ImageFloat32(shape[1], shape[0]);
