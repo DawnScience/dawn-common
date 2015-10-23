@@ -52,7 +52,7 @@ public class CursorUtils {
 		double xCoordinate = xAxis.getPositionValue(me.x);
 		double yCoordinate = yAxis.getPositionValue(me.y);
 		String intensityText = null;
-		if (imageTrace!=null) {
+		if (imageTrace!=null && !imageTrace.hasTrueAxes()) {
 			xCoordinate = Math.floor(xCoordinate);
 			yCoordinate = Math.floor(yCoordinate);
 			IDataset image = imageTrace.getData();
