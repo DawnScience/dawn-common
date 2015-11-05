@@ -273,48 +273,35 @@ public class ExpressionEngineImpl implements IExpressionEngine{
 		callable = script.callable(context);
 
 		final ExecutorService service = Executors.newCachedThreadPool();
-		final IMonitor monitor = mon == null ? new IMonitor.Stub() : mon;
+		//final IMonitor monitor = mon == null ? new IMonitor.Stub() : mon;
 
+		service.submit( new Runnable() {			
+			@Override
+			public void run() {
+				String exp = expression.getExpression();
+				try {
 
-		if (job == null) {
-			job = new Thread("Expression Calculation") {
+					Future<Object> future = service.submit(callable);
 
-				@Override
-				public void run() {
-					String exp = expression.getExpression();
-					try {
-						
-						Future<Object> future = service.submit(callable);
-
-						while (!future.isDone() && !monitor.isCancelled()) {
-							Thread.sleep(100);
-						}
-
-						if (future.isDone()) {
-							Object result = future.get();
-							ExpressionEngineEvent event = new ExpressionEngineEvent(ExpressionEngineImpl.this, result, exp);
-							fireExpressionListeners(event);
-							return;
-						}
-
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (Exception e) {
-						ExpressionEngineEvent event = new ExpressionEngineEvent(ExpressionEngineImpl.this, e, exp);
-						fireExpressionListeners(event);
-					}
-					
-					ExpressionEngineEvent event = new ExpressionEngineEvent(ExpressionEngineImpl.this, null, exp);
+					Object result = future.get();
+					ExpressionEngineEvent event = new ExpressionEngineEvent(ExpressionEngineImpl.this, result, exp);
 					fireExpressionListeners(event);
-
 					return;
-				}
-				
-			};
 
-		}
-		job.start();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (Exception e) {
+					ExpressionEngineEvent event = new ExpressionEngineEvent(ExpressionEngineImpl.this, e, exp);
+					fireExpressionListeners(event);
+				}
+				ExpressionEngineEvent event = new ExpressionEngineEvent(ExpressionEngineImpl.this, null, exp);
+				fireExpressionListeners(event);
+
+				return;
+
+			}
+		});		
 	}
 
 	private void fireExpressionListeners(ExpressionEngineEvent event) {
