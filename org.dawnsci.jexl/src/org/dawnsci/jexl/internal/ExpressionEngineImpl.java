@@ -41,7 +41,6 @@ public class ExpressionEngineImpl implements IExpressionEngine{
 	private Expression expression;
 	private MapContext context;
 	private HashSet<IExpressionEngineListener> expressionListeners;
-	private Thread job;
 	private Callable<Object> callable;
 	
 	public ExpressionEngineImpl() {
