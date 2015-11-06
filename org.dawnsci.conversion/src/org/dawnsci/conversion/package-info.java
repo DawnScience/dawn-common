@@ -7,6 +7,7 @@
  * 4. Edit Activator to no longer hard code adding of the service.
  * 5. In service add static block to print that it is started.
  * 6. Ensure that no work is done in the constructor.
+ * 7. Ensure bundle is lazy loaded.
  */
 package org.dawnsci.conversion;
 
