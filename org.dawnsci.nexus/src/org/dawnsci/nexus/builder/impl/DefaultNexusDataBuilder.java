@@ -10,7 +10,7 @@
  *    Matthew Dickie - initial API and implementation and/or initial documentation
  *******************************************************************************/
 
-package org.dawnsci.nexus.model.impl;
+package org.dawnsci.nexus.builder.impl;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -28,11 +28,15 @@ import org.eclipse.dawnsci.analysis.tree.TreeFactory;
 import org.eclipse.dawnsci.hdf5.nexus.NexusException;
 import org.eclipse.dawnsci.nexus.NXdata;
 import org.eclipse.dawnsci.nexus.NXobject;
+import org.eclipse.dawnsci.nexus.builder.NexusDataBuilder;
+import org.eclipse.dawnsci.nexus.builder.NexusObjectProvider;
 import org.eclipse.dawnsci.nexus.impl.NXdataImpl;
-import org.eclipse.dawnsci.nexus.model.api.NexusObjectProvider;
-import org.eclipse.dawnsci.nexus.model.api.NexusDataModel;
 
-public class DefaultNexusDataModel implements NexusDataModel {
+/**
+ * Default implementation of {@link NexusDataBuilder}.
+ *
+ */
+public class DefaultNexusDataBuilder implements NexusDataBuilder {
 
 	private static final String NO_DEFAULT_AXIS_PLACEHOLDER = ".";
 
@@ -51,34 +55,58 @@ public class DefaultNexusDataModel implements NexusDataModel {
 
 	private StringDataset dimensionDefaultAxisNames = null;
 	
-	private final DefaultNexusEntryModel entryModel;
+	private final DefaultNexusEntryBuilder entryModel;
 
-	public DefaultNexusDataModel(DefaultNexusEntryModel entryModel,
+	/**
+	 * Create a new {@link DefaultNexusDataBuilder}. This constructor should only be
+	 * called by {@link DefaultNexusEntryBuilder}.
+	 * @param entryModel parent entry model
+	 * @param nxData {@link NXdata} object to wrap
+	 */
+	protected DefaultNexusDataBuilder(DefaultNexusEntryBuilder entryModel,
 			final NXdataImpl nxData) {
 		this.entryModel = entryModel;
 		this.nxData = nxData;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.dawnsci.nexus.builder.NexusDataBuilder#getNexusData()
+	 */
 	@Override
 	public NXdata getNexusData() {
 		return nxData;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.dawnsci.nexus.model.api.NexusDataModel#setDataDevice(org.eclipse.dawnsci.nexus.model.api.NexusObjectProvider)
+	 */
 	@Override
-	public void setDataDevice(NexusObjectProvider<? extends NXobject> baseClassProvider) throws NexusException {
+	public void setDataDevice(NexusObjectProvider<? extends NXobject> nexusObjectProvider) throws NexusException {
+		setDataDevice(nexusObjectProvider, nexusObjectProvider.getName());
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.dawnsci.nexus.model.api.NexusDataModel#setDataDevice(org.eclipse.dawnsci.nexus.model.api.NexusObjectProvider, java.lang.String)
+	 */
+	@Override
+	public void setDataDevice(
+			NexusObjectProvider<? extends NXobject> nexusObjectProvider,
+			String dataFieldName) throws NexusException {
 		if (dimensionDefaultAxisNames != null) {
 			throw new IllegalStateException("Data device already set");
 		}
 
+		// get the data field from the nexus object
 		// data node name is 'data' for NXdetector, 'value' for NXpositioner, etc.
-		final DataNode dataNode = getDataNode(baseClassProvider, null);
+		final DataNode dataNode = getDataNode(nexusObjectProvider, null);
 
-		// TODO what should data node be called,
-		final String deviceName = baseClassProvider.getName();
-		nxData.addDataNode(deviceName, dataNode);
+		if (dataFieldName == null) {
+			dataFieldName = nexusObjectProvider.getName();
+		}
+		nxData.addDataNode(dataFieldName, dataNode);
 
 		// add 'signal' attribute giving name of default data field
-		final Attribute signalAttribute = TreeFactory.createAttribute(ATTR_NAME_SIGNAL, deviceName, false);
+		final Attribute signalAttribute = TreeFactory.createAttribute(ATTR_NAME_SIGNAL, dataFieldName, false);
 		nxData.addAttribute(signalAttribute);
 
 		rank = dataNode.getDataset().getRank();
@@ -91,23 +119,34 @@ public class DefaultNexusDataModel implements NexusDataModel {
 		axesIndices = new HashMap<>();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.dawnsci.nexus.model.api.NexusDataModel#addAxisDevice(int, org.eclipse.dawnsci.nexus.model.api.NexusObjectProvider, boolean)
+	 */
 	@Override
-	public void addAxisDevice(int dimensionIndex, NexusObjectProvider<? extends NXobject> baseClassProvider,
+	public void addAxisDevice(int dimensionIndex, NexusObjectProvider<? extends NXobject> nexusObjectProvider,
 			boolean makeDefault) throws NexusException {
-		addAxisDevice(dimensionIndex, baseClassProvider, makeDefault, null);
+		addAxisDevice(dimensionIndex, nexusObjectProvider, makeDefault, null);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.dawnsci.nexus.model.api.NexusDataModel#addAxisDevice(int, org.eclipse.dawnsci.nexus.model.api.NexusObjectProvider, boolean, java.lang.String)
+	 */
 	@Override
 	public void addAxisDevice(int dimensionIndex,
-			NexusObjectProvider<? extends NXobject> nexusDeviceAdapter,
-			boolean makeDefault, String dataNodeName) throws NexusException {
+			NexusObjectProvider<? extends NXobject> nexusObjectProvider,
+			boolean makeDefault, String fieldName) throws NexusException {
 		if (dimensionIndex < 0 || dimensionIndex >= rank) {
 			throw new IllegalArgumentException(MessageFormat.format("Axis index must be between {0} and {1}, was {2}", 0, rank, dimensionIndex));
 		}
 
 		// data node name is 'data' for NXdetector, 'value' for NXpositioner, etc.
-		final DataNode dataNode = getDataNode(nexusDeviceAdapter, dataNodeName);
-		String name = nexusDeviceAdapter.getName();
+		final DataNode dataNode = getDataNode(nexusObjectProvider, fieldName);
+		String name;
+		if (fieldName == null) {
+			name = nexusObjectProvider.getName();
+		} else {
+			name = fieldName;
+		}
 
 		// add new data node with name of axis device
 		nxData.addDataNode(name, dataNode);
@@ -134,16 +173,16 @@ public class DefaultNexusDataModel implements NexusDataModel {
 		nxData.addAttribute(axisIndicesAttribute);
 	}
 
-	private DataNode getDataNode(NexusObjectProvider<? extends NXobject> baseClassProvider,
-			String dataNodeName) throws NexusException {
-		final NXobject deviceBaseClassInstance = entryModel.getNexusBaseClassInstance(baseClassProvider);
-		if (dataNodeName == null) {
-			dataNodeName = baseClassProvider.getDefaultDataNodeName();
+	private DataNode getDataNode(NexusObjectProvider<? extends NXobject> nexusObjectProvider,
+			String fieldName) throws NexusException {
+		final NXobject deviceBaseClassInstance = entryModel.getNexusObject(nexusObjectProvider);
+		if (fieldName == null) {
+			fieldName = nexusObjectProvider.getDefaultDataFieldName();
 		}
-		final DataNode dataNode = deviceBaseClassInstance.getDataNode(dataNodeName);
+		final DataNode dataNode = deviceBaseClassInstance.getDataNode(fieldName);
 		if (dataNode == null) {
 			throw new IllegalArgumentException(MessageFormat.format("No such data node for group {0}: {1}",
-					deviceBaseClassInstance.getNXclass().getSimpleName(), dataNodeName));
+					deviceBaseClassInstance.getNXclass().getSimpleName(), fieldName));
 		}
 
 		return dataNode;

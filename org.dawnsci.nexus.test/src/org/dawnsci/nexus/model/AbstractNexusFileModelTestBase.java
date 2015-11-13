@@ -13,82 +13,79 @@
 package org.dawnsci.nexus.model;
 
 import static junit.framework.Assert.assertEquals;
+import static org.dawnsci.nexus.NexusTestUtils.assertNexusTreesEqual;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.List;
 
-import org.dawnsci.nexus.model.impl.DefaultNexusFileModel;
+import org.dawnsci.nexus.NexusTestUtils;
+import org.dawnsci.nexus.builder.impl.DefaultNexusFileBuilder;
 import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
 import org.eclipse.dawnsci.analysis.api.tree.TreeFile;
 import org.eclipse.dawnsci.hdf5.nexus.NexusException;
 import org.eclipse.dawnsci.nexus.NXobject;
 import org.eclipse.dawnsci.nexus.NexusUtils;
+import org.eclipse.dawnsci.nexus.builder.NexusEntryBuilder;
+import org.eclipse.dawnsci.nexus.builder.NexusFileBuilder;
+import org.eclipse.dawnsci.nexus.builder.NexusEntryModification;
 import org.eclipse.dawnsci.nexus.impl.NXobjectImpl;
-import org.eclipse.dawnsci.nexus.model.api.NexusDataModel;
-import org.eclipse.dawnsci.nexus.model.api.NexusEntryModel;
-import org.eclipse.dawnsci.nexus.model.api.NexusFileModel;
-import org.eclipse.dawnsci.nexus.model.api.NexusTreeModification;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import uk.ac.diamond.scisoft.analysis.TestUtils;
 
 public abstract class AbstractNexusFileModelTestBase {
+	
+	public static final String TEST_FILE_FOLDER = "testfiles/dawnsci/data/nexus/";
 
 	private static String testScratchDirectoryName;
 	
 	private String filePath;
-
-	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
-		testScratchDirectoryName = TestUtils.generateDirectorynameFromClassname(AbstractNexusFileModelTestBase.class.getCanonicalName());
-		TestUtils.makeScratchDirectory(testScratchDirectoryName);
-	}
 	
+	private String comparisonFilePath;
+
 	@Before
-	public void setUp() {
+	public void setUp() throws Exception {
+		testScratchDirectoryName = TestUtils.generateDirectorynameFromClassname(getClass().getCanonicalName());
+		TestUtils.makeScratchDirectory(testScratchDirectoryName);
 		filePath = testScratchDirectoryName + getFilename();
+		comparisonFilePath = TEST_FILE_FOLDER + getFilename();
 	}
 	
 	protected abstract String getFilename();
-
+	
 	@Test
 	public void testBuildNexusFile() throws Exception {
-		final NexusFileModel nexusFileModel = new DefaultNexusFileModel(filePath);
-		final NexusEntryModel nexusEntryModel = nexusFileModel.newEntry();
-		nexusEntryModel.addDefaultGroups();
-		List<NexusTreeModification> treeModifications = getNexusTreeModifications();
-		nexusEntryModel.addNexusTreeModifications(treeModifications);
-		configureEntryModel(nexusEntryModel);
+		final NexusFileBuilder fileModel = new DefaultNexusFileBuilder(filePath);
+		final NexusEntryBuilder entryModel = fileModel.newEntry();
+		entryModel.addDefaultGroups();
+		List<NexusEntryModification> treeModifications = getNexusTreeModifications();
+		entryModel.modifyEntry(treeModifications);
+		configureEntryModel(entryModel);
 		
-		NexusDataModel dataModel = nexusEntryModel.createDefaultData();
-		configureDataModel(dataModel);
+		addDataModel(entryModel);
+		addApplicationDefinitions(entryModel);
 		
-		addApplicationDefinitions(nexusEntryModel);
+		// save the nexus file
+		fileModel.saveFile();
 		
-		final TreeFile nexusTree = nexusFileModel.getNexusTree();
-		validateNexusTree(nexusTree, false);
-		
-		nexusFileModel.saveFile();
-		
-		TreeFile reloadedNexusTree = NexusUtils.loadNexusFile(filePath, true);
-		validateNexusTree(reloadedNexusTree, true);
+		// compare with file in repository
+		final TreeFile nexusTree = fileModel.getNexusTree();
+		TreeFile comparisonNexusTree = NexusUtils.loadNexusFile(comparisonFilePath, true);
+		assertNexusTreesEqual(nexusTree, comparisonNexusTree);
 	}
 	
-	protected void configureEntryModel(NexusEntryModel nexusEntryModel) throws NexusException {
+	protected void configureEntryModel(NexusEntryBuilder nexusEntryModel) throws NexusException {
 		// do nothing, subclasses may override
 	}
 	
-	protected void addApplicationDefinitions(NexusEntryModel nexusEntryModel) throws NexusException {
+	protected void addApplicationDefinitions(NexusEntryBuilder nexusEntryModel) throws NexusException {
 		// do nothing, subclasses may override
 	}
 	
-	protected abstract List<NexusTreeModification> getNexusTreeModifications();
+	protected abstract List<NexusEntryModification> getNexusTreeModifications();
 	
-	protected abstract void configureDataModel(NexusDataModel dataModel) throws NexusException;
-	
-	protected abstract void validateNexusTree(final TreeFile nexusTree, boolean loadedFromDisk);
+	protected abstract void addDataModel(NexusEntryBuilder entryModel) throws NexusException;
 	
 	protected void assertNumChildNodes(NXobject parentNode, int numGroupNodes, int numDataNodes) {
 		assertEquals(numGroupNodes, parentNode.getNumberOfGroupNodes());

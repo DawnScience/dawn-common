@@ -1,11 +1,17 @@
-package org.dawnsci.nexus.model.impl;
+package org.dawnsci.nexus.builder.impl;
 
 import org.eclipse.dawnsci.nexus.NXuser;
 import org.eclipse.dawnsci.nexus.NexusBaseClass;
+import org.eclipse.dawnsci.nexus.builder.NexusEntryBuilder;
 import org.eclipse.dawnsci.nexus.impl.NXuserImpl;
 import org.eclipse.dawnsci.nexus.impl.NexusNodeFactory;
 
-public class NexusUser extends AbstractNexusBaseClassProvider<NXuser> {
+/**
+ * Represents a nexus user. An object of this type can be added to
+ * a {@link NexusEntryBuilder} using the {@link NexusEntryBuilder#add(org.eclipse.dawnsci.nexus.builder.NexusObjectProvider)
+ * method to add a user to the nexus entry.
+ */
+public class NexusUser extends AbstractNexusObjectProvider<NXuser> {
 	
 	private static final String FIELD_NAME_USERNAME = "username";
 
@@ -28,20 +34,29 @@ public class NexusUser extends AbstractNexusBaseClassProvider<NXuser> {
 	private String facilityUserId = null;
 	
 	/**
-	 * Create a new {@link NexusUser} with the given name in the parent group.
+	 * Creates a new {@link NexusUser} with the given name in the parent group.
 	 * @param name
 	 */
 	public NexusUser(String groupName) {
 		super(groupName, NexusBaseClass.NX_USER);
 	}
 	
+	/**
+	 * Creates a new {@link NexusUser} with the given name in the parent group,
+	 * and with a 'name' field with the given name.
+	 * @param groupName group name
+	 * @param name name
+	 */
 	public NexusUser(String groupName, String name) {
 		super(groupName, NexusBaseClass.NX_USER);
 		setName(name);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.dawnsci.nexus.builder.impl.AbstractNexusObjectProvider#doCreateNexusObject(org.eclipse.dawnsci.nexus.impl.NexusNodeFactory)
+	 */
 	@Override
-	protected NXuser doCreateNexusBaseClassInstance(NexusNodeFactory nodeFactory) {
+	protected NXuser doCreateNexusObject(NexusNodeFactory nodeFactory) {
 		NXuserImpl user = nodeFactory.createNXuser();
 		
 		if (name != null) {

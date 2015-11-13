@@ -10,7 +10,7 @@
  *    Matthew Dickie - initial API and implementation and/or initial documentation
  *******************************************************************************/
 
-package org.dawnsci.nexus.model.impl;
+package org.dawnsci.nexus.builder.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -19,6 +19,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.dawnsci.nexus.builder.appdef.impl.ApplicationDefinitionFactory;
 import org.eclipse.dawnsci.analysis.api.tree.DataNode;
 import org.eclipse.dawnsci.analysis.api.tree.NodeLink;
 import org.eclipse.dawnsci.hdf5.nexus.NexusException;
@@ -26,26 +27,26 @@ import org.eclipse.dawnsci.nexus.NXentry;
 import org.eclipse.dawnsci.nexus.NXobject;
 import org.eclipse.dawnsci.nexus.NexusApplicationDefinition;
 import org.eclipse.dawnsci.nexus.NexusBaseClass;
+import org.eclipse.dawnsci.nexus.builder.CustomNexusEntryModification;
+import org.eclipse.dawnsci.nexus.builder.NexusDataBuilder;
+import org.eclipse.dawnsci.nexus.builder.NexusEntryBuilder;
+import org.eclipse.dawnsci.nexus.builder.NexusMetadataProvider;
+import org.eclipse.dawnsci.nexus.builder.NexusObjectProvider;
+import org.eclipse.dawnsci.nexus.builder.NexusEntryModification;
+import org.eclipse.dawnsci.nexus.builder.NexusMetadataProvider.MetadataEntry;
+import org.eclipse.dawnsci.nexus.builder.appdef.NexusApplicationBuilder;
 import org.eclipse.dawnsci.nexus.impl.NXdataImpl;
 import org.eclipse.dawnsci.nexus.impl.NXentryImpl;
 import org.eclipse.dawnsci.nexus.impl.NXinstrumentImpl;
 import org.eclipse.dawnsci.nexus.impl.NXobjectImpl;
 import org.eclipse.dawnsci.nexus.impl.NXsampleImpl;
 import org.eclipse.dawnsci.nexus.impl.NexusNodeFactory;
-import org.eclipse.dawnsci.nexus.model.api.CustomNexusTreeModification;
-import org.eclipse.dawnsci.nexus.model.api.NexusApplicationDefinitionModel;
-import org.eclipse.dawnsci.nexus.model.api.NexusObjectProvider;
-import org.eclipse.dawnsci.nexus.model.api.NexusDataModel;
-import org.eclipse.dawnsci.nexus.model.api.NexusEntryModel;
-import org.eclipse.dawnsci.nexus.model.api.NexusMetadataProvider;
-import org.eclipse.dawnsci.nexus.model.api.NexusMetadataProvider.MetadataEntry;
-import org.eclipse.dawnsci.nexus.model.api.NexusTreeModification;
+import org.eclipse.dawnsci.nexus.validation.NexusValidationException;
 
 /**
- * Default implementation of {@link NexusEntryModel}
- *
+ * Default implementation of {@link NexusEntryBuilder}
  */
-public class DefaultNexusEntryModel implements NexusEntryModel {
+public class DefaultNexusEntryBuilder implements NexusEntryBuilder {
 	
 	private final NexusNodeFactory nexusNodeFactory;
 
@@ -57,71 +58,104 @@ public class DefaultNexusEntryModel implements NexusEntryModel {
 	
 	private List<NXobject> defaultGroups = null;
 	
-	private Map<NexusObjectProvider<?>, NXobject> deviceBaseClassInstanceMap = new HashMap<>();
+	private Map<NexusObjectProvider<?>, NXobject> nexusObjectByProviderMap = new HashMap<>();
 	
-	public DefaultNexusEntryModel(final NexusNodeFactory nexusNodeFactory, final NXentryImpl nxEntry) {
+	private List<NexusApplicationBuilder> appDefs = new ArrayList<>();
+	
+	/**
+	 * Creates a new {@link DefaultNexusEntryBuilder}. This constructor should only be called
+	 * by {@link DefaultNexusFileBuilder}.
+	 * @param nexusNodeFactory node factory
+	 * @param nxEntry entry to wrap
+	 */
+	protected DefaultNexusEntryBuilder(final NexusNodeFactory nexusNodeFactory, final NXentryImpl nxEntry) {
 		this.nexusNodeFactory = nexusNodeFactory;
 		this.nxEntry = nxEntry;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.dawnsci.nexus.builder.NexusEntryBuilder#add(org.eclipse.dawnsci.nexus.builder.NexusObjectProvider)
+	 */
 	@Override
-	public <N extends NXobject> N addNexusObject(NexusObjectProvider<N> nexusAdapter) throws NexusException {
+	public <N extends NXobject> N add(NexusObjectProvider<N> nexusAdapter) throws NexusException {
 		N baseClassInstance = nexusAdapter.createNexusObject(nexusNodeFactory);
 		addGroupToNexusTree(nexusAdapter, baseClassInstance);
-		deviceBaseClassInstanceMap.put(nexusAdapter, baseClassInstance);
+		nexusObjectByProviderMap.put(nexusAdapter, baseClassInstance);
 
 		return baseClassInstance;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.dawnsci.nexus.builder.NexusEntryBuilder#getNxEntry()
+	 */
 	@Override
 	public NXentry getNxEntry() {
 		return nxEntry;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.dawnsci.nexus.builder.NexusEntryBuilder#getNodeFactory()
+	 */
 	public NexusNodeFactory getNodeFactory() {
 		return nexusNodeFactory;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.dawnsci.nexus.builder.NexusEntryBuilder#createDefaultData()
+	 */
 	@Override
-	public NexusDataModel createDefaultData() {
+	public NexusDataBuilder createDefaultData() {
 		NXdataImpl nxData = nexusNodeFactory.createNXdata();
 		nxEntry.setData(nxData);
-		return new DefaultNexusDataModel(this, nxData);
+		return new DefaultNexusDataBuilder(this, nxData);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.dawnsci.nexus.builder.NexusEntryBuilder#newData(java.lang.String)
+	 */
 	@Override
-	public NexusDataModel newData(final String name) {
+	public NexusDataBuilder newData(final String name) {
 		NXdataImpl nxData = nexusNodeFactory.createNXdata();
 		nxEntry.setData(name, nxData);
-		return new DefaultNexusDataModel(this, nxData);
+		return new DefaultNexusDataBuilder(this, nxData);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.dawnsci.nexus.builder.NexusEntryBuilder#newApplication(org.eclipse.dawnsci.nexus.NexusApplicationDefinition)
+	 */
 	@Override
-	public NexusApplicationDefinitionModel newApplicationDefinition(NexusApplicationDefinition appDef) {
-		return ApplicationDefinitionFactory.getApplicationDefinitionFactory().newApplicationDefinitionModel(this, appDef);
+	public NexusApplicationBuilder newApplication(NexusApplicationDefinition appDef) throws NexusException {
+		NexusApplicationBuilder appDefModel = ApplicationDefinitionFactory.getApplicationDefinitionFactory().newApplicationDefinitionModel(this, appDef);
+		appDefs.add(appDefModel);
+		
+		return appDefModel;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.dawnsci.nexus.builder.NexusEntryBuilder#add(java.util.Collection)
+	 */
 	@Override
-	public List<NXobject> addNexusObjects(Collection<NexusObjectProvider<?>> nexusAdapters) throws NexusException {
+	public List<NXobject> add(Collection<NexusObjectProvider<?>> nexusAdapters) throws NexusException {
 		List<NXobject> nexusObjects = new ArrayList<NXobject>(nexusAdapters.size());
 		for (NexusObjectProvider<?> nexusAdapter : nexusAdapters) {
-			NXobject nexusObject = addNexusObject(nexusAdapter);
+			NXobject nexusObject = add(nexusAdapter);
 			nexusObjects.add(nexusObject);
 		}
 		
 		return nexusObjects;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.dawnsci.nexus.builder.NexusEntryBuilder#modifyEntry(org.eclipse.dawnsci.nexus.builder.CustomNexusEntryModification)
+	 */
 	@Override
-	public void modifyEntry(CustomNexusTreeModification modification) {
+	public void modifyEntry(CustomNexusEntryModification modification) {
 		modification.modifyEntry(nxEntry);
 	}
 
-	@Override
-	public void modifyTree(CustomNexusTreeModification modification) {
-		modification.modifyEntry(nxEntry);
-	}
-	
+	/* (non-Javadoc)
+	 * @see org.eclipse.dawnsci.nexus.builder.NexusEntryBuilder#addMetadata(org.eclipse.dawnsci.nexus.builder.NexusMetadataProvider)
+	 */
 	@Override
 	public void addMetadata(NexusMetadataProvider metadataProvider) throws NexusException {
 		final NexusBaseClass category = metadataProvider.getCategory();
@@ -139,32 +173,44 @@ public class DefaultNexusEntryModel implements NexusEntryModel {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.dawnsci.nexus.builder.NexusEntryBuilder#modifyEntry(org.eclipse.dawnsci.nexus.builder.NexusEntryModification)
+	 */
 	@Override
-	public void addNexusTreeModification(NexusTreeModification modification) throws NexusException {
+	public void modifyEntry(NexusEntryModification modification) throws NexusException {
 		if (modification instanceof NexusObjectProvider) {
-			addNexusObject((NexusObjectProvider<?>) modification);
+			add((NexusObjectProvider<?>) modification);
 		} else if (modification instanceof NexusMetadataProvider) {
 			addMetadata((NexusMetadataProvider) modification);
-		} else if (modification instanceof CustomNexusTreeModification) {
-			modifyTree((CustomNexusTreeModification) modification);
+		} else if (modification instanceof CustomNexusEntryModification) {
+			modifyEntry((CustomNexusEntryModification) modification);
 		} else {
 			throw new IllegalArgumentException("Unknown modification type: " + modification.getClass());
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.dawnsci.nexus.builder.NexusEntryBuilder#modifyEntry(java.util.Collection)
+	 */
 	@Override
-	public void addNexusTreeModifications(
-			Collection<NexusTreeModification> modifications) throws NexusException {
-		for (NexusTreeModification modification : modifications) {
-			addNexusTreeModification(modification);
+	public void modifyEntry(
+			Collection<NexusEntryModification> modifications) throws NexusException {
+		for (NexusEntryModification modification : modifications) {
+			modifyEntry(modification);
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.dawnsci.nexus.builder.NexusEntryBuilder#setInstrumentName(java.lang.String)
+	 */
 	@Override
 	public void setInstrumentName(String instrumentName) {
 		nxInstrument.setNameScalar(instrumentName);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.dawnsci.nexus.builder.NexusEntryBuilder#getDataNode(java.lang.String)
+	 */
 	@Override
 	public DataNode getDataNode(String relativePath) throws NexusException {
 		NodeLink nodeLink = nxEntry.findNodeLink(relativePath);
@@ -178,17 +224,6 @@ public class DefaultNexusEntryModel implements NexusEntryModel {
 		return (DataNode) nodeLink.getDestination();
 	}
 
-	protected <N extends NXobject> N getNexusBaseClassInstance(NexusObjectProvider<N> nexusObjectProvider)
-			throws NexusException {
-		@SuppressWarnings("unchecked")
-		N baseClassInstance = (N) deviceBaseClassInstanceMap.get(nexusObjectProvider);
-		if (baseClassInstance == null) {
-			throw new NexusException("No NeXus base class instance for given device.");
-		}
-		
-		return baseClassInstance;
-	}
-	
 	/**
 	 * Adds the default groups for the entry. Subclasses may override as appropriate.
 	 * @return
@@ -208,6 +243,34 @@ public class DefaultNexusEntryModel implements NexusEntryModel {
 		nxEntry.setSample(nxSample);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.dawnsci.nexus.builder.NexusEntryBuilder#validate()
+	 */
+	@Override
+	public void validate() throws NexusValidationException {
+		for (NexusApplicationBuilder appDef : appDefs) {
+			appDef.validate();
+		}
+	}
+
+	/**
+	 * Returns the nexus object for the given provider, assuming that the
+	 * nexus object has already been added to this entry.
+	 * @param nexusObjectProvider
+	 * @return nexus object
+	 * @throws NexusException
+	 */
+	protected <N extends NXobject> N getNexusObject(NexusObjectProvider<N> nexusObjectProvider)
+			throws NexusException {
+		@SuppressWarnings("unchecked")
+		N baseClassInstance = (N) nexusObjectByProviderMap.get(nexusObjectProvider);
+		if (baseClassInstance == null) {
+			throw new NexusException("No NeXus base class instance for given device.");
+		}
+		
+		return baseClassInstance;
+	}
+	
 	/**
 	 * Adds the new nexus object instance to the first skeleton class instance that it
 	 * can be added to, unless category is specified, in which case it is added to the first
@@ -250,6 +313,10 @@ public class DefaultNexusEntryModel implements NexusEntryModel {
 	}
 	
 	private NXobject findGroupForCategory(NexusBaseClass category) throws NexusException {
+		if (category == NexusBaseClass.NX_ENTRY) {
+			return nxEntry;
+		}
+		
 		for (NXobject group : defaultGroups) {
 			if (category == group.getNexusBaseClass()) {
 				return group;

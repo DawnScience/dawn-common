@@ -12,63 +12,60 @@
 
 package org.dawnsci.nexus.model;
 
-import static org.junit.Assert.assertNotNull;
-
 import java.util.ArrayList;
 import java.util.List;
 
-import org.dawnsci.nexus.model.impl.AbstractNexusBaseClassProvider;
-import org.dawnsci.nexus.model.impl.MapBasedMetadataProvider;
-import org.dawnsci.nexus.model.impl.NexusUser;
-import org.dawnsci.nexus.model.impl.TomoApplicationDefinitionModel;
+import org.dawnsci.nexus.builder.appdef.impl.TomoApplicationBuilder;
+import org.dawnsci.nexus.builder.impl.AbstractNexusObjectProvider;
+import org.dawnsci.nexus.builder.impl.MapBasedMetadataProvider;
+import org.dawnsci.nexus.builder.impl.NexusUser;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
-import org.eclipse.dawnsci.analysis.api.tree.TreeFile;
 import org.eclipse.dawnsci.analysis.dataset.impl.Dataset;
 import org.eclipse.dawnsci.analysis.dataset.impl.IntegerDataset;
 import org.eclipse.dawnsci.hdf5.nexus.NexusException;
 import org.eclipse.dawnsci.nexus.NXcollection;
 import org.eclipse.dawnsci.nexus.NXdetector;
-import org.eclipse.dawnsci.nexus.NXentry;
 import org.eclipse.dawnsci.nexus.NXpositioner;
-import org.eclipse.dawnsci.nexus.NXroot;
 import org.eclipse.dawnsci.nexus.NXsource;
 import org.eclipse.dawnsci.nexus.NexusApplicationDefinition;
 import org.eclipse.dawnsci.nexus.NexusBaseClass;
+import org.eclipse.dawnsci.nexus.builder.NexusDataBuilder;
+import org.eclipse.dawnsci.nexus.builder.NexusEntryBuilder;
+import org.eclipse.dawnsci.nexus.builder.NexusEntryModification;
 import org.eclipse.dawnsci.nexus.impl.NXcollectionImpl;
 import org.eclipse.dawnsci.nexus.impl.NXdetectorImpl;
+import org.eclipse.dawnsci.nexus.impl.NXentryImpl;
+import org.eclipse.dawnsci.nexus.impl.NXpositionerImpl;
 import org.eclipse.dawnsci.nexus.impl.NXsourceImpl;
 import org.eclipse.dawnsci.nexus.impl.NexusNodeFactory;
-import org.eclipse.dawnsci.nexus.model.api.NexusDataModel;
-import org.eclipse.dawnsci.nexus.model.api.NexusEntryModel;
-import org.eclipse.dawnsci.nexus.model.api.NexusTreeModification;
 
 
 public class ComplexNexusFileModelTest extends AbstractNexusFileModelTestBase {
 	
-	private static class SimplePositioner extends AbstractNexusBaseClassProvider<NXpositioner> {
+	private static class SimplePositioner extends AbstractNexusObjectProvider<NXpositioner> {
 
 		public SimplePositioner(final String name) {
-			super(name, NexusBaseClass.NX_POSITIONER, name, NexusBaseClass.NX_INSTRUMENT);
+			super(name, NexusBaseClass.NX_POSITIONER, NXpositionerImpl.NX_VALUE, NexusBaseClass.NX_INSTRUMENT);
 		}
 		
 		@Override
-		public NXpositioner doCreateNexusBaseClassInstance(
+		public NXpositioner doCreateNexusObject(
 				NexusNodeFactory nodeFactory) {
 			NXpositioner positioner = nodeFactory.createNXpositioner();
-			positioner.initializeLazyDataset(name, 1, Dataset.FLOAT64);
+			positioner.initializeLazyDataset(NXpositionerImpl.NX_VALUE, 1, Dataset.FLOAT64);
 			
 			return positioner;
 		}
 
 	}
 	
-	private static final class TomoScanDevicePositioner extends AbstractNexusBaseClassProvider<NXpositioner> {
+	private static final class TomoScanDevicePositioner extends AbstractNexusObjectProvider<NXpositioner> {
 
 		public TomoScanDevicePositioner() {
 			super("tomoScanDevice", NexusBaseClass.NX_POSITIONER, "ss1_rot");
 		}
 		@Override
-		public NXpositioner doCreateNexusBaseClassInstance(
+		public NXpositioner doCreateNexusObject(
 				NexusNodeFactory nodeFactory) {
 			NXpositioner positioner = nodeFactory.createNXpositioner();
 			positioner.initializeLazyDataset("imageNumber", 1, Dataset.FLOAT64);
@@ -82,14 +79,14 @@ public class ComplexNexusFileModelTest extends AbstractNexusFileModelTestBase {
 
 	}
 	
-	private static class TestDetector extends AbstractNexusBaseClassProvider<NXdetector> {
+	private static class TestDetector extends AbstractNexusObjectProvider<NXdetector> {
 		
 		public TestDetector() {
 			super("pc01_hw_hdf", NexusBaseClass.NX_DETECTOR);
 		}
 		
 		@Override
-		public NXdetector doCreateNexusBaseClassInstance(NexusNodeFactory nodeFactory) {
+		public NXdetector doCreateNexusObject(NexusNodeFactory nodeFactory) {
 			final NXdetectorImpl detector = nodeFactory.createNXdetector();
 			
 			detector.initializeLazyDataset(NXdetectorImpl.NX_DATA, 3, Dataset.INT16);
@@ -99,21 +96,23 @@ public class ComplexNexusFileModelTest extends AbstractNexusFileModelTestBase {
 			IDataset regionSize = new IntegerDataset(new int[] { 2560, 2160 }, 1, 2);
 			detector.setField("region_size", regionSize);
 			detector.initializeLazyDataset("start_time", 1, Dataset.FLOAT64);
-			detector.initializeLazyDataset("time_ms", 1, Dataset.INT64); // actually unsigned int 32 in original nexus file
+			detector.initializeLazyDataset("time_ms", 1, Dataset.INT64); // unsigned int 32 in original nexus file
+			// image_key required by NXtomo application definition
+			detector.initializeLazyDataset("image_key", 1, Dataset.INT32);
 			
 			return detector;
 		}
 
 	}
 	
-	private static class TestSource extends AbstractNexusBaseClassProvider<NXsource> {
+	private static class TestSource extends AbstractNexusObjectProvider<NXsource> {
 
 		public TestSource() {
 			super("source", NexusBaseClass.NX_SOURCE);
 		}
 
 		@Override
-		protected NXsource doCreateNexusBaseClassInstance(NexusNodeFactory nodeFactory) {
+		protected NXsource doCreateNexusObject(NexusNodeFactory nodeFactory) {
 			final NXsourceImpl source = nodeFactory.createNXsource();
 			source.setCurrentScalar(-1.0);
 			source.setEnergyScalar(-1.0);
@@ -130,14 +129,14 @@ public class ComplexNexusFileModelTest extends AbstractNexusFileModelTestBase {
 	 * In the real world the before_scan collection is used by GDA to store additional data it needs.
 	 * In a real world system this provider could fetch the details from the scan.
 	 */
-	private static class BeforeScan extends AbstractNexusBaseClassProvider<NXcollection> {
+	private static class BeforeScan extends AbstractNexusObjectProvider<NXcollection> {
 
 		public BeforeScan() {
 			super("before_scan", NexusBaseClass.NX_COLLECTION);
 		}
 
 		@Override
-		protected NXcollection doCreateNexusBaseClassInstance(
+		protected NXcollection doCreateNexusObject(
 				NexusNodeFactory nodeFactory) {
 			NXcollectionImpl beforeScan = nodeFactory.createNXcollection();
 			
@@ -200,7 +199,7 @@ public class ComplexNexusFileModelTest extends AbstractNexusFileModelTestBase {
 	private MapBasedMetadataProvider scanData;
 
 	@Override
-	protected List<NexusTreeModification> getNexusTreeModifications() {
+	protected List<NexusEntryModification> getNexusTreeModifications() {
 		beforeScan = new BeforeScan();
 		actualTimePositioner = new SimplePositioner("actualTime");
 		beamOkPositioner = new SimplePositioner("beakok");
@@ -212,15 +211,15 @@ public class ComplexNexusFileModelTest extends AbstractNexusFileModelTestBase {
 		user.setUsername("myusername");
 		
 		scanData = new MapBasedMetadataProvider();
-		scanData.addMetadata("entry_identifier", 24737);
-		scanData.addMetadata("experiment_identifier", "nt9396-1");
-		scanData.addMetadata("program_name", "GDA 8.36.0");
-		scanData.addMetadata("scan_command", "scan tomoScanDevice Start: -88.200000 Stop: 91.800000 Step: 2.000000 Darks every:0 imagesPerDark:5 Flats every:0 imagesPerFlat:5 InBeamPosition:11.150000 OutOfBeamPosition:5.000000 numImages 111  actualTime ionc_i pco1_hw_hdf 0.1 beamok");
-		scanData.addMetadata("scan_dimensions", 111);
-		scanData.addMetadata("scan_identifier", "a3d668c0-e3c4-4ed9-b127-4a202b2b6bac");
-		scanData.addMetadata("title", "AKingUVA_7050wSSwire_InSitu_95RH_2MMgCl2_p4ul_p4h");
+		scanData.addMetadataEntry("entry_identifier", "24737");
+		scanData.addMetadataEntry("experiment_identifier", "nt9396-1");
+		scanData.addMetadataEntry("program_name", "GDA 8.36.0");
+		scanData.addMetadataEntry("scan_command", "scan tomoScanDevice Start: -88.200000 Stop: 91.800000 Step: 2.000000 Darks every:0 imagesPerDark:5 Flats every:0 imagesPerFlat:5 InBeamPosition:11.150000 OutOfBeamPosition:5.000000 numImages 111  actualTime ionc_i pco1_hw_hdf 0.1 beamok");
+		scanData.addMetadataEntry("scan_dimensions", 111);
+		scanData.addMetadataEntry("scan_identifier", "a3d668c0-e3c4-4ed9-b127-4a202b2b6bac");
+		scanData.addMetadataEntry("title", "AKingUVA_7050wSSwire_InSitu_95RH_2MMgCl2_p4ul_p4h");
 		
-		List<NexusTreeModification> nexusObjects = new ArrayList<>();
+		List<NexusEntryModification> nexusObjects = new ArrayList<>();
 		nexusObjects.add(beforeScan);
 		nexusObjects.add(scanData);
 		nexusObjects.add(actualTimePositioner);
@@ -235,13 +234,14 @@ public class ComplexNexusFileModelTest extends AbstractNexusFileModelTestBase {
 	}
 	
 	@Override
-	protected void configureEntryModel(NexusEntryModel nexusEntryModel) {
+	protected void configureEntryModel(NexusEntryBuilder nexusEntryModel) {
 		nexusEntryModel.setInstrumentName("i13");
 	}
 
 	@Override
-	protected void configureDataModel(NexusDataModel dataModel) throws NexusException {
-		dataModel.setDataDevice(testDetector);
+	protected void addDataModel(NexusEntryBuilder entryModel) throws NexusException {
+		NexusDataBuilder dataModel = entryModel.newData(testDetector.getName());
+		dataModel.setDataDevice(testDetector, "data");
 		dataModel.addAxisDevice(0, tomoScanDevicePositioner, true);
 		dataModel.addAxisDevice(0, actualTimePositioner, false);
 		dataModel.addAxisDevice(0, beamOkPositioner, false);
@@ -259,36 +259,21 @@ public class ComplexNexusFileModelTest extends AbstractNexusFileModelTestBase {
 		dataModel.addAxisDevice(0, tomoScanDevicePositioner, false);
 	}
 	
-	protected void addApplicationDefinitions(NexusEntryModel nexusEntryModel) throws NexusException {
-		TomoApplicationDefinitionModel appDefModel =
-				(TomoApplicationDefinitionModel) nexusEntryModel.newApplicationDefinition(NexusApplicationDefinition.NX_TOMO);
+	protected void addApplicationDefinitions(NexusEntryBuilder nexusEntryModel) throws NexusException {
+		TomoApplicationBuilder appDefModel =
+				(TomoApplicationBuilder) nexusEntryModel.newApplication(NexusApplicationDefinition.NX_TOMO);
 		appDefModel.addDefaultGroups();
+		appDefModel.setTitle(nexusEntryModel.getDataNode(NXentryImpl.NX_TITLE));
+		appDefModel.setControl(ioncIPositioner);
 		appDefModel.setSource(testSource);
 		appDefModel.setDetector(testDetector);
 		appDefModel.setSampleName("test sample");
-		appDefModel.setRotationAnglePositioner(tomoScanDevicePositioner);
+		appDefModel.setRotationAngle(tomoScanDevicePositioner);
 		appDefModel.setXTranslation(nexusEntryModel.getDataNode("before_scan/sample_stage/ss1_samplex"));
 		appDefModel.setYTranslation(nexusEntryModel.getDataNode("before_scan/sample_stage/ss1_sampley"));
 		appDefModel.setZTranslation(nexusEntryModel.getDataNode("before_scan/sample_stage/ss1_samplez"));
+		
+		appDefModel.newData(); 
 	}
-
-	@Override
-	protected void validateNexusTree(TreeFile nexusTree, boolean loadedFromDisk) {
-		final NXroot rootNode = (NXroot) nexusTree.getGroupNode();
-		assertNotNull(rootNode);
-		assertNumChildNodes(rootNode, 1, 0);
-		
-		NXentry entry = rootNode.getEntry("entry1");
-		assertNotNull(entry);
-		assertNumChildNodes(entry, 6, 7);
-		
-		NXcollection beforeScan = entry.getChild("before_scan", NXcollection.class);
-//		validateBeforeScan(beforeScan);
-		
-		
-		// TODO: validate tree by loading previously written file from disk?
-		
-	}
-	
 
 }
