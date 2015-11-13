@@ -139,7 +139,13 @@ public interface IDataReductionToolPage extends IToolPage {
 				return;
 			}
 			
-			int dataRank = more.getSliceView().squeeze().getRank();
+			int dataRank = 1;
+			if (more.getSize() != 1) {
+				dataRank = more.getSliceView().squeeze().getRank();
+			} else {
+				more.setShape(new int[]{1});
+			}
+			
 			
 			//determine if dataset different rank to slice
 			List<Integer> dimList = new ArrayList<Integer>();
