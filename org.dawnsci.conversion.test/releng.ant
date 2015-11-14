@@ -45,18 +45,10 @@
 				<pathelement location="${workspace.git.loc}/dawn-common.git/org.dawnsci.boofcv/jars/*" />
 				<pathelement location="${workspace.git.loc}/dawn-ui.git/org.dawnsci.plotting.services/bin" />
 				<pathelement location="${workspace.git.loc}/dawn-ui.git/org.dawnsci.plotting.histogram/bin" />
-				<path refid="tp.slf4j.path" />  <!--ensure that required org.slf4j.LoggerFactory appears first in classpath -->
-				<path refid="tp.jcl-over-slf4j.path" />  <!--ensure that matching imp appears first in classpath -->
-				<fileset dir="${workspace.loc}/tp/plugins">
-					<include name="*.jar" />
-					<exclude name="*.source_*" />
-					<exclude name="org.apache.batik*" />  <!-- org.apache.batik.pdf has it's own copy of org.apache.commons.io so exclude it -->
-					<exclude name="org.eclipse.swt.*" />  <!--AVIImageConvertTest uses SWT, so exclude jars for non-mathching platforms. Xvfb also required. -->
-				</fileset>
-				<fileset dir="${workspace.loc}/tp/plugins">
-					<include name="org.eclipse.swt.*.${eclipse.os}.${eclipse.arch}_*.jar" />
-					<exclude name="*.source_*" />
-				</fileset>
+				<path refid="tp.slf4j.path" />  <!-- ensure that required org.slf4j.LoggerFactory appears first in classpath -->
+				<path refid="tp.jcl-over-slf4j.path" />  <!-- ensure that matching imp appears first in classpath -->
+				<path refid="tp.swt.path" />  <!-- ensure that correct platform appears first in classpath -->
+				<path refid="tp.path" />  <!-- target platform -->
 			</classpath>
 			<batchtest todir="@{report.dir}">
 				<fileset dir="${plugin.basedir}/src">
