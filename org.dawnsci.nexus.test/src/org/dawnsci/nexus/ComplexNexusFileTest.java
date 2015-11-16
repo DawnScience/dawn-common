@@ -50,7 +50,7 @@ import org.junit.Before;
 
 public class ComplexNexusFileTest extends AbstractNexusFileTestBase {
 
-	private static final String FILE_NAME = "complex.nx5";
+	private static final String FILE_NAME = "complex.nxs";
 
 	private Map<String, Object> testData;
 

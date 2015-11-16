@@ -15,7 +15,7 @@ import org.eclipse.dawnsci.nexus.impl.NXrootImpl;
  */
 public class SimpleNexusFileTest extends AbstractNexusFileTestBase {
 
-	private static final String FILE_NAME = "verysimple.nx5";
+	private static final String FILE_NAME = "verysimple.nxs";
 
 	@Override
 	protected NXrootImpl createNXroot() {
