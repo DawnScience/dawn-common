@@ -29,14 +29,10 @@ public abstract class AbstractNexusFileTestBase {
 
 	private String filePath;
 
-	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
-		testScratchDirectoryName = TestUtils.generateDirectorynameFromClassname(AbstractNexusFileTestBase.class.getCanonicalName());
-		TestUtils.makeScratchDirectory(testScratchDirectoryName);
-	}
-
 	@Before
-	public void setUp() {
+	public void setUp() throws Exception {
+		testScratchDirectoryName = TestUtils.generateDirectorynameFromClassname(getClass().getCanonicalName());
+		TestUtils.makeScratchDirectory(testScratchDirectoryName);
 		nexusNodeFactory = new NexusNodeFactory();
 		filePath = testScratchDirectoryName + getFilename();
 	}
