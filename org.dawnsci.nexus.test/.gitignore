@@ -18,6 +18,7 @@ cachedir/
 .springBeans
 /bin/
 /classes/
+/test-scratch/
 /src/corba/
 
 ### JUnit testing ###
