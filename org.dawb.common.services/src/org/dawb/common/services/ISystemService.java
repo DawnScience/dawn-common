@@ -15,7 +15,7 @@ package org.dawb.common.services;
  * NOTE A programmer can decide not to register a plotting system by providing no (null)
  * part to the createPlotPart(...) method @see IPlottingSystem.
  * 
- * The parameterised class which this service refers to is usually IPlottingSystem,
+ * The parameterised class which this service refers to is usually IPlottingSystem<Composite>,
  * however this interface cannot see that interface because we are in the services
  * plugin which must have no dependencies.
  * 
@@ -26,8 +26,8 @@ package org.dawb.common.services;
  * To get the service do:
  * 
  * <code>
- * 		final ISystemService<IPlottingSystem> service = (ISystemService<IPlottingSystem>)PlatformUI.getWorkbench().getService(ISystemService.class);
- *      final IPlottingSystem system = service.getPlottingSystem("Plot 1");
+ * 		final ISystemService<IPlottingSystem<Composite>> service = (ISystemService<IPlottingSystem<Composite>>)PlatformUI.getWorkbench().getService(ISystemService.class);
+ *      final IPlottingSystem<Composite> system = service.getPlottingSystem("Plot 1");
  *      // We now have the plotter for plot 1 and can do things, for instance from SDAPlotter...
  *      // For this to work 'Plot 1' in this case would also need to be a view using PlottingFactory to 
  *      // provide its plotting.
@@ -39,7 +39,7 @@ package org.dawb.common.services;
 public interface ISystemService<T> {
 
 	/**
-	 * Get an IPlottingSystem for a given part name.
+	 * Get an IPlottingSystem<Composite> for a given part name.
 	 * @param name
 	 * @return
 	 */

@@ -19,6 +19,7 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.python.pydev.debug.newconsole.prefs.InteractiveConsolePrefs;
@@ -153,8 +154,8 @@ public class DocumentInsertionJob extends Job {
 	                if (document.get().indexOf("ps = dnp.plot.getPlottingSystem(")<0) {
 						try {
 							// We see if the active part might be a plotting system and take this name
-							IPlottingSystem active = (IPlottingSystem)EclipseUtils.getPage().getActivePart().getAdapter(IPlottingSystem.class);
-							if (active==null) active = (IPlottingSystem)EclipseUtils.getPage().getActiveEditor().getAdapter(IPlottingSystem.class);
+							IPlottingSystem<?> active = (IPlottingSystem<?>)EclipseUtils.getPage().getActivePart().getAdapter(IPlottingSystem.class);
+							if (active==null) active = (IPlottingSystem<?>)EclipseUtils.getPage().getActiveEditor().getAdapter(IPlottingSystem.class);
 							if (active==null) active = PlottingFactory.getPlottingSystems()!=null
 									                 ? PlottingFactory.getPlottingSystems()[0]
 									                 : null;

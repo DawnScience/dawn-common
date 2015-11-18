@@ -22,6 +22,7 @@ import org.eclipse.dawnsci.plotting.api.IPlottingSystem;
 import org.eclipse.dawnsci.plotting.api.PlotType;
 import org.eclipse.dawnsci.plotting.api.trace.ILineTrace;
 import org.eclipse.dawnsci.plotting.api.trace.ITrace;
+import org.eclipse.swt.widgets.Composite;
 
 import uk.ac.diamond.scisoft.analysis.io.ASCIIDataHolderSaver;
 import uk.ac.diamond.scisoft.analysis.io.ASCIIDataWithHeadingSaver;
@@ -33,7 +34,7 @@ import uk.ac.diamond.scisoft.analysis.io.DataHolder;
  */
 public class Plot1DConversionVisitor extends AbstractPlotConversionVisitor {
 	
-	public Plot1DConversionVisitor(IPlottingSystem system) {
+	public Plot1DConversionVisitor(IPlottingSystem<?> system) {
 		super(system);
 		if (system.getPlotType() != PlotType.XY) {
 			throw new IllegalArgumentException("Not a 1D plotting system");

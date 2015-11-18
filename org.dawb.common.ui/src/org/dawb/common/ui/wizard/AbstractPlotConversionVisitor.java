@@ -14,12 +14,13 @@ import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionVisitor;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.plotting.api.IPlottingSystem;
+import org.eclipse.swt.widgets.Composite;
 
 public abstract class AbstractPlotConversionVisitor implements IConversionVisitor {
 
-	protected IPlottingSystem system;
+	protected IPlottingSystem<?> system;
 	
-	public AbstractPlotConversionVisitor(IPlottingSystem system) {
+	public AbstractPlotConversionVisitor(IPlottingSystem<?> system) {
 		this.system = system;
 	}
 

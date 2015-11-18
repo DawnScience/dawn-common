@@ -145,14 +145,14 @@ public class H5GalleryView extends ViewPart implements MouseListener, SelectionL
 		final Action lockHistogram = new Action("Lock colour map, also known as histogram, to current plot", IAction.AS_CHECK_BOX) {
 			public void run() {
 				if (isChecked()) {
-					IPlottingSystem sys = (IPlottingSystem)EclipseUtils.getPage().getActivePart().getAdapter(IPlottingSystem.class);
+					IPlottingSystem<Composite> sys = (IPlottingSystem<Composite>)EclipseUtils.getPage().getActivePart().getAdapter(IPlottingSystem.class);
 					if (sys == null && EclipseUtils.getPage().getActiveEditor()!=null) {
-						sys = (IPlottingSystem)EclipseUtils.getPage().getActiveEditor().getAdapter(IPlottingSystem.class);
+						sys = (IPlottingSystem<Composite>)EclipseUtils.getPage().getActiveEditor().getAdapter(IPlottingSystem.class);
 					}
 					if (sys == null) {
 						for (IViewReference vr : EclipseUtils.getPage().getViewReferences()) {
 							final IWorkbenchPart view = vr.getPart(false);
-							if (view!=null) sys = (IPlottingSystem)view.getAdapter(IPlottingSystem.class);
+							if (view!=null) sys = (IPlottingSystem<Composite>)view.getAdapter(IPlottingSystem.class);
 						}
 					}
 					if (sys == null) {
@@ -242,7 +242,7 @@ public class H5GalleryView extends ViewPart implements MouseListener, SelectionL
 			if (items.length<=1) return;
 			
 			List<IDataset> ys = galleryDelegate.getSelectionData(items);
-			final IPlottingSystem system = (IPlottingSystem)part.getAdapter(IPlottingSystem.class);
+			final IPlottingSystem<Composite> system = (IPlottingSystem<Composite>)part.getAdapter(IPlottingSystem.class);
 			system.clear();
 
 			if (ys.get(0).getShape().length==1) {

@@ -18,6 +18,7 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IWorkbenchCommandConstants;
@@ -162,7 +163,7 @@ public class DocumentInserter implements IMacroEventListener, IPartListener {
 	@Override
 	public void partActivated(IWorkbenchPart part) {
         try {
-        	IPlottingSystem sys = (IPlottingSystem)part.getAdapter(IPlottingSystem.class);
+        	IPlottingSystem<Composite> sys = (IPlottingSystem<Composite>)part.getAdapter(IPlottingSystem.class);
         	if (sys!=null && mservice!=null) {
     			mservice.publish(new MacroEventObject(sys));
     		}

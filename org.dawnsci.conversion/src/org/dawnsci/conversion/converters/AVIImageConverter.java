@@ -19,7 +19,6 @@ import static org.monte.media.VideoFormatKeys.WidthKey;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
 
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
@@ -33,6 +32,7 @@ import org.eclipse.dawnsci.plotting.api.image.PlotImageData.PlotImageType;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.services.IDisposable;
 import org.monte.media.Format;
 import org.monte.media.FormatKeys.MediaType;
@@ -113,7 +113,7 @@ public class AVIImageConverter extends AbstractImageConversion {
 	protected synchronized void convert(IDataset slice) throws Exception {
 		if (getSliceType() == PlotType.SURFACE) {
 			final String plotName = context.getSelectedConversionFile().getName();
-			final IPlottingSystem system = PlottingFactory.getPlottingSystem(plotName);
+			final IPlottingSystem<Composite> system = PlottingFactory.getPlottingSystem(plotName);
 			if (system==null) throw new Exception("\nTo export videos to surfaces, please do the following things:\n\n1. Ensure that you are in 'Data Browsing' perspective.\n2. Open the file, and plot an initial surface.\n3. This orientation is then used for the surface orientation during export.\n4. Remember to set the window as desired.\n5. Rerun the conversion, this plot will be used.");
 		}
 

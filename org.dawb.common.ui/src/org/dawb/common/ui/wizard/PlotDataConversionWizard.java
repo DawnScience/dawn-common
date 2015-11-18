@@ -27,6 +27,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IExportWizard;
@@ -43,7 +44,7 @@ public class PlotDataConversionWizard extends Wizard implements IExportWizard {
 	private IConversionContext            context;
 	private AbstractPlotConversionVisitor visitor;
 	private PlotDataConversionPage        conversionPage;
-	private IPlottingSystem               system;
+	private IPlottingSystem<?>            system;
 	private String                        filePath;
 
 	private boolean hasBrowseToExternalOnly;
@@ -156,25 +157,25 @@ public class PlotDataConversionWizard extends Wizard implements IExportWizard {
 		return true;
 	}
 	
-	public void setPlottingSystem(IPlottingSystem system) {
+	public void setPlottingSystem(IPlottingSystem<?> system) {
 		this.system = system;
 	}
 	
-	private IPlottingSystem getPlottingSystem() {
+	private IPlottingSystem<Composite> getPlottingSystem() {
 		
 		// Perhaps the plotting system is on a dialog
 		final Shell[] shells = Display.getDefault().getShells();
 		if (shells!=null) for (Shell shell : shells) {
 			final Object o = shell.getData();
 			if (o!=null && o instanceof IAdaptable) {
-				IPlottingSystem s = (IPlottingSystem)((IAdaptable)o).getAdapter(IPlottingSystem.class);
+				IPlottingSystem<Composite> s = (IPlottingSystem<Composite>)((IAdaptable)o).getAdapter(IPlottingSystem.class);
 				if (s!=null) return s;
 			} 
 		}
 		
 		final IWorkbenchPart  part   = EclipseUtils.getPage().getActivePart();
 		if (part!=null) {
-			return (IPlottingSystem)part.getAdapter(IPlottingSystem.class);
+			return (IPlottingSystem<Composite>)part.getAdapter(IPlottingSystem.class);
 		}
 		
 		return null;

@@ -19,6 +19,7 @@ import org.eclipse.dawnsci.plotting.api.IPlottingSystem;
 import org.eclipse.dawnsci.plotting.api.PlotType;
 import org.eclipse.dawnsci.plotting.api.trace.IImageTrace;
 import org.eclipse.dawnsci.plotting.api.trace.ITrace;
+import org.eclipse.swt.widgets.Composite;
 
 import uk.ac.diamond.scisoft.analysis.io.DataHolder;
 import uk.ac.diamond.scisoft.analysis.io.JavaImageSaver;
@@ -29,7 +30,7 @@ import uk.ac.diamond.scisoft.analysis.io.JavaImageSaver;
  */
 public class Plot2DConversionVisitor extends AbstractPlotConversionVisitor {
 
-	public Plot2DConversionVisitor(IPlottingSystem system) {
+	public Plot2DConversionVisitor(IPlottingSystem<?> system) {
 		super(system);
 		if (system.getPlotType() != PlotType.IMAGE) {
 			throw new IllegalArgumentException("Not a 2D plotting system");

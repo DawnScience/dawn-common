@@ -138,7 +138,7 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
     			if (pf!=null) pf.close();
     		}
 
-    		final IPlottingSystem  system   = getPlottingSystem();
+    		final IPlottingSystem<Composite>  system   = getPlottingSystem();
     		if (system!=null) {
     			if (system != null) {
     				ITrace trace  = system.getTraces().iterator().next();
@@ -202,7 +202,7 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
 			 file= workspace.getRoot().getFileForLocation(location); 
 			 			 			 
 			 final IWorkbenchPart  part   = EclipseUtils.getPage().getActivePart();
-			 final IPlottingSystem system = getPlottingSystem();
+			 final IPlottingSystem<Composite> system = getPlottingSystem();
 			 final IFunctionService funcService = (IFunctionService)part.getAdapter(IFunctionService.class);
 
 			 final IFile finalFile = file;
@@ -339,7 +339,7 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
 		 return true;
 	}
 
-	private int getTotalWork(CheckWizardPage options, IPlottingSystem system,  final IFunctionService funcService) {
+	private int getTotalWork(CheckWizardPage options, IPlottingSystem<Composite> system,  final IFunctionService funcService) {
 
 		try {
 			int ret = 1;
@@ -392,7 +392,7 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
 		}
 	}
 
-	private IPlottingSystem getPlottingSystem() {
+	private IPlottingSystem<Composite> getPlottingSystem() {
 		
 		
 		// Perhaps the plotting system is on a dialog
@@ -400,7 +400,7 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
 		if (shells!=null) for (Shell shell : shells) {
 			final Object o = shell.getData();
 			if (o!=null && o instanceof IAdaptable) {
-				IPlottingSystem s = (IPlottingSystem)((IAdaptable)o).getAdapter(IPlottingSystem.class);
+				IPlottingSystem<Composite> s = (IPlottingSystem<Composite>)((IAdaptable)o).getAdapter(IPlottingSystem.class);
 				if (s!=null) return s;
 			} 
 		}
@@ -411,9 +411,9 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
 			//First test if part is a tool page which might have its own plotting system
 			Object ob = part.getAdapter(IToolPageSystem.class);
 			
-			if (ob != null && ob instanceof IPlottingSystem) return (IPlottingSystem)ob;
+			if (ob != null && ob instanceof IPlottingSystem) return (IPlottingSystem<Composite>)ob;
 			
-			return (IPlottingSystem)part.getAdapter(IPlottingSystem.class);
+			return (IPlottingSystem<Composite>)part.getAdapter(IPlottingSystem.class);
 		}
 		
 		return null;

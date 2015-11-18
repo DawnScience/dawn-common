@@ -20,7 +20,7 @@ public class PartUtils {
 	 * @param part
 	 * @return plotting system (may return null)
 	 */
-	public static IPlottingSystem getPlottingSystem(IWorkbenchPart part) {
+	public static IPlottingSystem<?> getPlottingSystem(IWorkbenchPart part) {
 		
 		if (part instanceof MultiPageEditorPart) {
 			MultiPageEditorPart mpp = (MultiPageEditorPart) part;
@@ -33,6 +33,6 @@ public class PartUtils {
 			}
 		}
 
-		return (IPlottingSystem)part.getAdapter(IPlottingSystem.class);
+		return (IPlottingSystem<?>)part.getAdapter(IPlottingSystem.class);
 	}
 }

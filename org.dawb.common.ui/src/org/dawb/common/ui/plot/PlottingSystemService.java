@@ -21,13 +21,13 @@ import org.eclipse.ui.services.IServiceLocator;
  * @author Matthew Gerring
  *
  */
-public class PlottingSystemService extends AbstractServiceFactory implements ISystemService<IPlottingSystem> {
+public class PlottingSystemService extends AbstractServiceFactory implements ISystemService<IPlottingSystem<?>> {
 
 	
-	private Map<String,IPlottingSystem> systems;
+	private Map<String,IPlottingSystem<?>> systems;
 	
 	public PlottingSystemService() {
-		systems = new Hashtable<String,IPlottingSystem>(11);
+		systems = new Hashtable<String,IPlottingSystem<?>>(11);
 	}
 	
 	@Override
@@ -39,17 +39,17 @@ public class PlottingSystemService extends AbstractServiceFactory implements ISy
 	}
 
 	@Override
-	public IPlottingSystem getSystem(String partName) {
+	public IPlottingSystem<?> getSystem(String partName) {
 		return systems.get(partName);
 	}
 
 	@Override
-	public IPlottingSystem putSystem(String partName, IPlottingSystem plottingSystem) {
+	public IPlottingSystem<?> putSystem(String partName, IPlottingSystem<?> plottingSystem) {
 		return systems.put(partName, plottingSystem);
 	}
 
 	@Override
-	public IPlottingSystem removeSystem(String partName) {
+	public IPlottingSystem<?> removeSystem(String partName) {
 		return systems.remove(partName);
 	}
 

@@ -269,11 +269,11 @@ public final class AVIConvertPage extends AbstractSliceConversionPage {
 		bean.setAlwaysShowTitle(alwaysShowTitle);
 		
 		if (useCurrentColours) {
-			ISystemService<IPlottingSystem> service = (ISystemService<IPlottingSystem>)PlatformUI.getWorkbench().getService(ISystemService.class);
+			ISystemService<IPlottingSystem<Composite>> service = (ISystemService<IPlottingSystem<Composite>>)PlatformUI.getWorkbench().getService(ISystemService.class);
 			if (service!=null) {
 				// If we have a plotting system for the input file, use that.
 				final File file = new File(context.getFilePaths().get(0));
-				IPlottingSystem system = service.getSystem(file.getName());
+				IPlottingSystem<Composite> system = service.getSystem(file.getName());
 				if (system!=null) {
 					IImageTrace image = getImageTrace(system);
 					if (image!=null) bean.setImageServiceBean(image.getImageServiceBean());
@@ -285,11 +285,11 @@ public final class AVIConvertPage extends AbstractSliceConversionPage {
 		
 		return context;
 	}
-	private IImageTrace getImageTrace(IPlottingSystem system) {
+	private IImageTrace getImageTrace(IPlottingSystem<Composite> system) {
 		final ITrace trace = getTrace(system);
 		return trace instanceof IImageTrace ? (IImageTrace)trace : null;
 	}
-	private ITrace getTrace(IPlottingSystem system) {
+	private ITrace getTrace(IPlottingSystem<Composite> system) {
 		if (system == null) return null;
 
 		final Collection<ITrace> traces = system.getTraces();
