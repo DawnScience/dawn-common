@@ -74,7 +74,7 @@ public class AlignImagesConversionPage extends ResourceChoosePage
 	private static final Logger logger = LoggerFactory.getLogger(AlignImagesConversionPage.class);
 
 	private IConversionContext context;
-	private IPlottingSystem plotSystem;
+	private IPlottingSystem<Composite> plotSystem;
 	private Combo alignMethodCombo;
 
 	private IDataset firstImage;

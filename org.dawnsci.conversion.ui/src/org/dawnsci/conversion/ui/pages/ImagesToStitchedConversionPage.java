@@ -79,7 +79,7 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 	private boolean hasCropping = true;
 	private boolean hasFeatureAssociated;
 	private ExpandableComposite plotExpandComp;
-	private IPlottingSystem plotSystem;
+	private IPlottingSystem<Composite> plotSystem;
 	private Composite container;
 
 	private IDataset firstImage;
