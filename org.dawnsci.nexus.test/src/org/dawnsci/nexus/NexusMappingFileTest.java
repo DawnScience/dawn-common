@@ -31,6 +31,15 @@ public class NexusMappingFileTest extends AbstractNexusFileTestBase {
 
 	private static final String FILE_NAME = "mapping.nxs";
 
+	private static int T_SHAPE = 5;
+	private static int X_SHAPE = 10;
+	private static int Y_SHAPE = 12;
+	private static int X_PIXEL_SHAPE = 6;
+	private static int Y_PIXEL_SHAPE = 8;
+	private static int ENERGY_SHAPE = 24;
+	private static int MICRO_X_SHAPE = 64;
+	private static int MICRO_Y_SHAPE = 48;
+	
 	private NXrootImpl root;
 
 	private GroupNode userCache = null;
@@ -119,28 +128,28 @@ public class NexusMappingFileTest extends AbstractNexusFileTestBase {
 		NXtransformationsImpl transforms = nexusNodeFactory.createNXtransformations();
 
 		DataNode t_stage = nexusNodeFactory.createDataNode();
-		t_stage.setDataset(DatasetFactory.ones(new int[] {10, 20, 180}, Dataset.INT16));
+		t_stage.setDataset(DatasetFactory.ones(new int[] {X_SHAPE, Y_SHAPE, T_SHAPE}, Dataset.INT16));
 		transforms.addDataNode("t_stage", t_stage);
 		transforms.setAttribute("t_stage", "depends_on", "x_stage");
 		transforms.setAttribute("t_stage", "transformation_type", "rotation");
 
 		DataNode x_stage = nexusNodeFactory.createDataNode();
-		x_stage.setDataset(DatasetFactory.ones(new int[] {10, 20, 180}, Dataset.INT16));
+		x_stage.setDataset(DatasetFactory.ones(new int[] {X_SHAPE, Y_SHAPE, T_SHAPE}, Dataset.INT16));
 		transforms.addDataNode("x_stage", x_stage);
 		transforms.setAttribute("x_stage", "depends_on", "y_stage");
 		transforms.setAttribute("x_stage", "transformation_type", "translation");
 
 		DataNode y_stage = nexusNodeFactory.createDataNode();
-		y_stage.setDataset(DatasetFactory.ones(new int[] {10, 20, 180}, Dataset.INT16));
+		y_stage.setDataset(DatasetFactory.ones(new int[] {X_SHAPE, Y_SHAPE, T_SHAPE}, Dataset.INT16));
 		transforms.addDataNode("y_stage", y_stage);
 		transforms.setAttribute("y_stage", "depends_on", ".");
 		transforms.setAttribute("y_stage", "transformation_type", "translation");
 
 		sample.addNode("transformations", transforms);
 
-		sample.setDataset("t_stage_set", DatasetFactory.createRange(180, Dataset.INT16));
-		sample.setDataset("x_stage_set", DatasetFactory.createRange(10, Dataset.INT16));
-		sample.setDataset("y_stage_set", DatasetFactory.createRange(20, Dataset.INT16));
+		sample.setDataset("t_stage_set", DatasetFactory.createRange(T_SHAPE, Dataset.INT16));
+		sample.setDataset("x_stage_set", DatasetFactory.createRange(X_SHAPE, Dataset.INT16));
+		sample.setDataset("y_stage_set", DatasetFactory.createRange(Y_SHAPE, Dataset.INT16));
 
 		entry.setSample(sample);
 	}
@@ -159,7 +168,7 @@ public class NexusMappingFileTest extends AbstractNexusFileTestBase {
 
 	private void addItMonitor(NXinstrument instrument) {
 		NXmonitorImpl monitor = nexusNodeFactory.createNXmonitor();
-		monitor.setDataset("data", DatasetFactory.ones(new int[] {10, 20, 180}, Dataset.INT16));
+		monitor.setDataset("data", DatasetFactory.ones(new int[] {X_SHAPE, Y_SHAPE, T_SHAPE}, Dataset.INT16));
 		addMonitorArmTransform(monitor);
 		instrument.addGroupNode("It", monitor);
 	}
@@ -168,7 +177,7 @@ public class NexusMappingFileTest extends AbstractNexusFileTestBase {
 		if (monitorArmTransformCache == null) {
 			NXtransformationsImpl transforms = nexusNodeFactory.createNXtransformations();
 			DataNode monitor_arm = nexusNodeFactory.createDataNode();
-			monitor_arm.setDataset(DatasetFactory.ones(new int[] {10, 20, 180}, Dataset.INT16));
+			monitor_arm.setDataset(DatasetFactory.ones(new int[] {X_SHAPE, Y_SHAPE, T_SHAPE}, Dataset.INT16));
 			transforms.addDataNode("monitor_arm", monitor_arm);
 			transforms.setAttribute("monitor_arm", "depends_on", ".");
 			transforms.setAttribute("monitor_arm", "transformation_type", "translation");
@@ -181,14 +190,14 @@ public class NexusMappingFileTest extends AbstractNexusFileTestBase {
 
 	private void addI0Monitor(NXinstrument instrument) {
 		NXmonitorImpl monitor = nexusNodeFactory.createNXmonitor();
-		monitor.setDataset("data", DatasetFactory.ones(new int[] {10, 20, 180}, Dataset.INT16));
+		monitor.setDataset("data", DatasetFactory.ones(new int[] {X_SHAPE, Y_SHAPE, T_SHAPE}, Dataset.INT16));
 		addMonitorArmTransform(monitor);
 		instrument.addGroupNode("I0", monitor);
 	}
 
 	private void addTransmissionMonitor(NXinstrument instrument) {
 		NXmonitorImpl monitor = nexusNodeFactory.createNXmonitor();
-		monitor.setDataset("data", DatasetFactory.ones(new int[] {10, 20, 180}, Dataset.INT16));
+		monitor.setDataset("data", DatasetFactory.ones(new int[] {X_SHAPE, Y_SHAPE, T_SHAPE}, Dataset.INT16));
 		addMonitorArmTransform(monitor);
 		instrument.addGroupNode("trans", monitor);
 	}
@@ -201,7 +210,7 @@ public class NexusMappingFileTest extends AbstractNexusFileTestBase {
 		detector.setY_pixel_sizeScalar(1);
 		detector.setAttribute(NXdetectorImpl.NX_Y_PIXEL_SIZE, "units", "um");
 
-		detector.setDataset("data", DatasetFactory.ones(new int[] {10, 20, 180, 32, 32}, Dataset.INT16));
+		detector.setDataset("data", DatasetFactory.ones(new int[] {X_SHAPE, Y_SHAPE, T_SHAPE, X_PIXEL_SHAPE, Y_PIXEL_SHAPE}, Dataset.INT16));
 		detector.setAttribute("data", "interpretation", "image");
 
 		addDetectorArmTransform(detector);
@@ -215,10 +224,10 @@ public class NexusMappingFileTest extends AbstractNexusFileTestBase {
 		detector.setAttribute(null, "axes", DatasetFactory.createFromObject(new String[] {".", ".", ".", "energy"}));
 		detector.setAttribute(null, "energy_indices", "3");
 
-		detector.setDataset("data", DatasetFactory.ones(new int[] {10, 20, 180, 1024}, Dataset.INT16));
+		detector.setDataset("data", DatasetFactory.ones(new int[] {X_SHAPE, Y_SHAPE, T_SHAPE, ENERGY_SHAPE}, Dataset.INT16));
 		detector.setAttribute("data", "interpretation", "spectrum");
 
-		detector.setDataset("energy", DatasetFactory.createRange(1024, Dataset.INT16));
+		detector.setDataset("energy", DatasetFactory.createRange(ENERGY_SHAPE, Dataset.INT16));
 		detector.setAttribute("energy", "units", "keV");
 
 		addDetectorArmTransform(detector);
@@ -230,7 +239,7 @@ public class NexusMappingFileTest extends AbstractNexusFileTestBase {
 		if (detectorArmTransformCache == null) {
 			NXtransformationsImpl transforms = nexusNodeFactory.createNXtransformations();
 			DataNode detector_arm = nexusNodeFactory.createDataNode();
-			detector_arm.setDataset(DatasetFactory.ones(new int[] {10, 20, 180}, Dataset.INT16));
+			detector_arm.setDataset(DatasetFactory.ones(new int[] {X_SHAPE, Y_SHAPE, T_SHAPE}, Dataset.INT16));
 			transforms.addDataNode("detector_arm", detector_arm);
 			transforms.setAttribute("detector_arm", "depends_on", ".");
 			transforms.setAttribute("detector_arm", "transformation_type", "translation");
@@ -279,16 +288,18 @@ public class NexusMappingFileTest extends AbstractNexusFileTestBase {
 		if (microDataCache == null) {
 			NXdataImpl data = nexusNodeFactory.createNXdata();
 
-			data.setDataset("data", DatasetFactory.ones(new int[] {4, 1024, 2048}, Dataset.INT16));
 			data.setAttribute(null, "signal", "data");	
-			data.setAttribute(null, "axes", DatasetFactory.createFromObject(new String[] {"depth", "image_x", "image_y"}));
+			data.setAttribute(null, "axes", DatasetFactory.createFromObject(new String[] {".", "image_x", "image_y"}));
 			data.setAttribute(null, "image_x_indices", "1");
 			data.setAttribute(null, "image_y_indices", "2");
 
-			data.setDataset("image_x", DatasetFactory.createRange(1024, Dataset.INT16));
+			data.setDataset("data", DatasetFactory.ones(new int[] {4, MICRO_X_SHAPE, MICRO_Y_SHAPE}, Dataset.INT16));
+			data.setAttribute("data", "interpretation", "rgba-image");	
+			
+			data.setDataset("image_x", DatasetFactory.createRange(MICRO_X_SHAPE, Dataset.INT16));
 			data.setAttribute("image_x", "units", "mm");
 
-			data.setDataset("image_y", DatasetFactory.createRange(2048, Dataset.INT16));
+			data.setDataset("image_y", DatasetFactory.createRange(MICRO_Y_SHAPE, Dataset.INT16));
 			data.setAttribute("image_y", "units", "mm");
 
 			entry.setData(data);
