@@ -35,7 +35,21 @@ public abstract class AbstractNexusObjectProvider<N extends NXobject> implements
 	
 	protected final String dataNodeName;
 	
-	protected final NexusBaseClass category;
+	protected NexusBaseClass category;
+	
+	private boolean useDeviceNameAsAxisName = false;
+	
+	private String axisName = null;
+	
+	public AbstractNexusObjectProvider(NexusBaseClass nexusBaseClass) {
+		this(getDefaultName(nexusBaseClass), nexusBaseClass);
+	}
+	
+	private static String getDefaultName(NexusBaseClass nexusBaseClass) {
+		// the default name is the base class name without the initial 'NX',
+		// e.g. for 'NXpositioner' the default name is 'positioner'
+		return nexusBaseClass.toString().substring(2);
+	}
 	
 	/**
 	 * Creates a new {@link AbstractNexusObjectProvider} for given name and base class type
@@ -119,13 +133,44 @@ public abstract class AbstractNexusObjectProvider<N extends NXobject> implements
 	public String getDefaultDataFieldName() {
 		return dataNodeName;
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.dawnsci.nexus.builder.NexusObjectProvider#getDefaultAxisName()
+	 */
+	public String getDefaultAxisName() {
+		if (axisName != null) {
+			return axisName;
+		}
+		
+		if (useDeviceNameAsAxisName) {
+			return getName();
+		}
+		
+		return getDefaultDataFieldName();
+	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.dawnsci.nexus.builder.NexusObjectProvider#getDeviceCategory()
+	 * @see org.eclipse.dawnsci.nexus.builder.NexusObjectProvider#getCategory()
 	 */
 	@Override
-	public NexusBaseClass getDeviceCategory() {
+	public NexusBaseClass getCategory() {
 		return category;
+	}
+	
+	public AbstractNexusObjectProvider<N> setCategory(NexusBaseClass category) {
+		this.category = category;
+		return this;
+	}
+	
+	public AbstractNexusObjectProvider<N> useDeviceNameAsAxisName(boolean useDeviceNameAsAxisName) {
+		this.useDeviceNameAsAxisName = useDeviceNameAsAxisName;
+		this.axisName = null;
+		return this;
+	}
+	
+	public AbstractNexusObjectProvider<N> setAxisName(String axisName) {
+		this.axisName = axisName;
+		return this;
 	}
 
 }

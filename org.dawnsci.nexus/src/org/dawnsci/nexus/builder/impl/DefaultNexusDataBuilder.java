@@ -13,16 +13,10 @@
 package org.dawnsci.nexus.builder.impl;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
 
-import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.tree.Attribute;
 import org.eclipse.dawnsci.analysis.api.tree.DataNode;
-import org.eclipse.dawnsci.analysis.dataset.impl.DatasetFactory;
+import org.eclipse.dawnsci.analysis.dataset.impl.IntegerDataset;
 import org.eclipse.dawnsci.analysis.dataset.impl.StringDataset;
 import org.eclipse.dawnsci.analysis.tree.TreeFactory;
 import org.eclipse.dawnsci.hdf5.nexus.NexusException;
@@ -36,26 +30,11 @@ import org.eclipse.dawnsci.nexus.impl.NXdataImpl;
  * Default implementation of {@link NexusDataBuilder}.
  *
  */
-public class DefaultNexusDataBuilder implements NexusDataBuilder {
+public class DefaultNexusDataBuilder extends AbstractNexusDataBuilder implements NexusDataBuilder {
 
-	private static final String NO_DEFAULT_AXIS_PLACEHOLDER = ".";
-
-	private static final String ATTR_NAME_SIGNAL = "signal";
-
-	private static final String ATTR_NAME_AXES = "axes";
-
-	private static final String INDICES_SUFFIX = "_indices";
-
-	private final NXdata nxData;
-
-	private int rank = -1;
-
-	// TODO use multiset from guava?
-	private Map<String, Set<Integer>> axesIndices = null;
+	private DataNode defaultDataNode;
 
 	private StringDataset dimensionDefaultAxisNames = null;
-	
-	private final DefaultNexusEntryBuilder entryModel;
 
 	/**
 	 * Create a new {@link DefaultNexusDataBuilder}. This constructor should only be
@@ -65,24 +44,15 @@ public class DefaultNexusDataBuilder implements NexusDataBuilder {
 	 */
 	protected DefaultNexusDataBuilder(DefaultNexusEntryBuilder entryModel,
 			final NXdataImpl nxData) {
-		this.entryModel = entryModel;
-		this.nxData = nxData;
+		super(entryModel, nxData);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.dawnsci.nexus.builder.NexusDataBuilder#getNexusData()
 	 */
 	@Override
-	public NXdata getNexusData() {
+	public NXdataImpl getNxData() {
 		return nxData;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.dawnsci.nexus.model.api.NexusDataModel#setDataDevice(org.eclipse.dawnsci.nexus.model.api.NexusObjectProvider)
-	 */
-	@Override
-	public void setDataDevice(NexusObjectProvider<? extends NXobject> nexusObjectProvider) throws NexusException {
-		setDataDevice(nexusObjectProvider, nexusObjectProvider.getName());
 	}
 
 	/* (non-Javadoc)
@@ -96,96 +66,84 @@ public class DefaultNexusDataBuilder implements NexusDataBuilder {
 			throw new IllegalStateException("Data device already set");
 		}
 
-		// get the data field from the nexus object
+		// get the data field from the nexus object add add it to the NXdata group
 		// data node name is 'data' for NXdetector, 'value' for NXpositioner, etc.
-		final DataNode dataNode = getDataNode(nexusObjectProvider, null);
+		defaultDataNode = getDataNode(nexusObjectProvider, null);
 
 		if (dataFieldName == null) {
 			dataFieldName = nexusObjectProvider.getName();
 		}
-		nxData.addDataNode(dataFieldName, dataNode);
+		nxData.addDataNode(dataFieldName, defaultDataNode);
 
 		// add 'signal' attribute giving name of default data field
 		final Attribute signalAttribute = TreeFactory.createAttribute(ATTR_NAME_SIGNAL, dataFieldName, false);
 		nxData.addAttribute(signalAttribute);
 
-		rank = dataNode.getDataset().getRank();
-		dimensionDefaultAxisNames = new StringDataset(rank);
+		// create the 'axes' attribute of the NXgroup and set each axis name to "."
+		dimensionDefaultAxisNames = new StringDataset(defaultDataNode.getDataset().getRank());
 		dimensionDefaultAxisNames.fill(NO_DEFAULT_AXIS_PLACEHOLDER);
-
 		final Attribute axesAttribute = TreeFactory.createAttribute(ATTR_NAME_AXES, dimensionDefaultAxisNames, false);
 		nxData.addAttribute(axesAttribute);
-
-		axesIndices = new HashMap<>();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.dawnsci.nexus.model.api.NexusDataModel#addAxisDevice(int, org.eclipse.dawnsci.nexus.model.api.NexusObjectProvider, boolean)
-	 */
-	@Override
-	public void addAxisDevice(int dimensionIndex, NexusObjectProvider<? extends NXobject> nexusObjectProvider,
-			boolean makeDefault) throws NexusException {
-		addAxisDevice(dimensionIndex, nexusObjectProvider, makeDefault, null);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.dawnsci.nexus.model.api.NexusDataModel#addAxisDevice(int, org.eclipse.dawnsci.nexus.model.api.NexusObjectProvider, boolean, java.lang.String)
-	 */
-	@Override
-	public void addAxisDevice(int dimensionIndex,
-			NexusObjectProvider<? extends NXobject> nexusObjectProvider,
-			boolean makeDefault, String fieldName) throws NexusException {
-		if (dimensionIndex < 0 || dimensionIndex >= rank) {
-			throw new IllegalArgumentException(MessageFormat.format("Axis index must be between {0} and {1}, was {2}", 0, rank, dimensionIndex));
+	protected void addAxisDevice(NexusObjectProvider<? extends NXobject> nexusObjectProvider,
+			String sourceFieldName, String destinationFieldName, int[] dimensionMappings, Integer primaryAxisForDimensionIndex)
+			throws NexusException {
+		if (defaultDataNode == null) {
+			throw new IllegalStateException("The default dataset must exist before an axis can be added.");
+		}
+		
+		// check that the dimension index is one of the dimensions of the default dataset
+		final int rank = defaultDataNode.getDataset().getRank();
+		final Integer defaultDataAxisIndex = primaryAxisForDimensionIndex;
+		if (defaultDataAxisIndex != null &&
+				(defaultDataAxisIndex < 0 || defaultDataAxisIndex >= rank)) {
+			throw new IllegalArgumentException(MessageFormat.format("Axis index must be between {0} and {1}, was {2}.", 0, rank, defaultDataAxisIndex));
 		}
 
-		// data node name is 'data' for NXdetector, 'value' for NXpositioner, etc.
-		final DataNode dataNode = getDataNode(nexusObjectProvider, fieldName);
-		String name;
-		if (fieldName == null) {
-			name = nexusObjectProvider.getName();
+		// if the sourceFieldName and/or destinationFieldName are null, use the
+		// default values from the nexus object provider
+		if (sourceFieldName == null) {
+			sourceFieldName = nexusObjectProvider.getDefaultDataFieldName();
+			if (destinationFieldName == null) {
+				destinationFieldName = nexusObjectProvider.getDefaultAxisName();
+			}
 		} else {
-			name = fieldName;
+			if (destinationFieldName == null) {
+				destinationFieldName = sourceFieldName;
+			}
 		}
-
-		// add new data node with name of axis device
-		nxData.addDataNode(name, dataNode);
-
-		if (makeDefault) {
-			// update the dataset holding the values for the 'axes' attribute
-			dimensionDefaultAxisNames.set(name, dimensionIndex);
+		
+		// get the data node to add
+		final DataNode dataNode = getDataNode(nexusObjectProvider, sourceFieldName);
+		
+		// get the dimension mappings and validate them
+		if (dimensionMappings.length != dataNode.getDataset().getRank()) {
+			throw new IllegalArgumentException("The number of dimension mappings must equal the rank of the dataset for the field: " + sourceFieldName);
 		}
-
-		updateAxisIndicesAttribute(name, dimensionIndex);
-	}
-
-	private void updateAxisIndicesAttribute(final String axisName, final int dimensionIndex) {
-		Set<Integer> indices = axesIndices.get(axisName);
-		if (indices == null) {
-			indices = new TreeSet<Integer>();
+		for (int dimensionMapping : dimensionMappings) {
+			if (dimensionMapping < 0 || dimensionMapping >= rank) {
+				throw new IllegalArgumentException(MessageFormat.format("Dimension mapping must be between {0} and {1}, was {2}.", 0, rank, dimensionMapping));
+			}
 		}
-		indices.add(dimensionIndex);
-
-		final String attrName = axisName + INDICES_SUFFIX;
-
-		final IDataset indicesDataset = DatasetFactory.createFromList(new ArrayList<Integer>(indices));
+	
+		// add new data node to the NXdata group
+		nxData.addDataNode(destinationFieldName, dataNode);
+	
+		// if this is the primary device for an axis then update the
+		// dataset holding the values for the 'axes' attribute
+		if (defaultDataAxisIndex != null) {
+			dimensionDefaultAxisNames.set(destinationFieldName, defaultDataAxisIndex);
+		}
+	
+		// create the {axisname}_indices attribute of the NXdata group for this axis device
+		final String attrName = destinationFieldName + ATTR_SUFFIX_INDICES;
+		final IntegerDataset indicesDataset = new IntegerDataset(dimensionMappings.length);
+		for (int i = 0; i < dimensionMappings.length; i++) {
+			indicesDataset.setItem(dimensionMappings[i], i);
+		}
 		final Attribute axisIndicesAttribute = TreeFactory.createAttribute(attrName, indicesDataset, false);
 		nxData.addAttribute(axisIndicesAttribute);
-	}
-
-	private DataNode getDataNode(NexusObjectProvider<? extends NXobject> nexusObjectProvider,
-			String fieldName) throws NexusException {
-		final NXobject deviceBaseClassInstance = entryModel.getNexusObject(nexusObjectProvider);
-		if (fieldName == null) {
-			fieldName = nexusObjectProvider.getDefaultDataFieldName();
-		}
-		final DataNode dataNode = deviceBaseClassInstance.getDataNode(fieldName);
-		if (dataNode == null) {
-			throw new IllegalArgumentException(MessageFormat.format("No such data node for group {0}: {1}",
-					deviceBaseClassInstance.getNXclass().getSimpleName(), fieldName));
-		}
-
-		return dataNode;
 	}
 
 }

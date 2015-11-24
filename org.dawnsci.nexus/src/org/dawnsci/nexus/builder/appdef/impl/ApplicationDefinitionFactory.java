@@ -60,7 +60,7 @@ public class ApplicationDefinitionFactory implements NexusApplicationFactory{
 			throw new NexusException("Unsupported application definition: " + appDef);
 		}
 
-		final NXentryImpl nxEntry = (NXentryImpl) entryModel.getNxEntry();
+		final NXentryImpl nxEntry = (NXentryImpl) entryModel.getNXentry();
 		final String appDefName = appDef.name();
 		final String subentryName = appDefName.substring(appDefName.indexOf('_') + 1).toLowerCase() + APPDEF_SUBENTRY_SUFFIX;
 		if (nxEntry.containsGroupNode(subentryName)) {

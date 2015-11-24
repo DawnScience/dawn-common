@@ -22,7 +22,8 @@ import org.eclipse.dawnsci.nexus.builder.NexusMetadataProvider;
 
 /**
  * A implementation of {@link NexusMetadataProvider} that uses an internal {@link Map}.
- *
+ * The methods {@link #addMetadataEntry(String, Object)} and {@link #setCategory(NexusBaseClass)}
+ * return this object, so that they can be chained.
  */
 public class MapBasedMetadataProvider implements NexusMetadataProvider {
 	
@@ -49,18 +50,22 @@ public class MapBasedMetadataProvider implements NexusMetadataProvider {
 	 * Adds a metadata entry with the given name and value
 	 * @param name name
 	 * @param value value
+	 * @return this object, for convenience
 	 */
-	public void addMetadataEntry(String name, Object value) {
+	public MapBasedMetadataProvider addMetadataEntry(String name, Object value) {
 		metadataMap.put(name, value);
+		return this;
 	}
 	
 	/**
 	 * Sets the category of this metadata provider. This metadata entries will
 	 * be added as fields to the group of this type within the nexus tree.
 	 * @param category category, an enumeration value from {@link NexusBaseClass}.
+	 * @return this object, for convenience
 	 */
-	public void setCategory(NexusBaseClass category) {
+	public MapBasedMetadataProvider setCategory(NexusBaseClass category) {
 		this.category = category;
+		return this;
 	}
 
 	/* (non-Javadoc)

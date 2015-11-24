@@ -23,17 +23,16 @@ import org.dawnsci.nexus.builder.appdef.impl.ApplicationDefinitionFactory;
 import org.eclipse.dawnsci.analysis.api.tree.DataNode;
 import org.eclipse.dawnsci.analysis.api.tree.NodeLink;
 import org.eclipse.dawnsci.hdf5.nexus.NexusException;
-import org.eclipse.dawnsci.nexus.NXentry;
 import org.eclipse.dawnsci.nexus.NXobject;
 import org.eclipse.dawnsci.nexus.NexusApplicationDefinition;
 import org.eclipse.dawnsci.nexus.NexusBaseClass;
 import org.eclipse.dawnsci.nexus.builder.CustomNexusEntryModification;
 import org.eclipse.dawnsci.nexus.builder.NexusDataBuilder;
 import org.eclipse.dawnsci.nexus.builder.NexusEntryBuilder;
-import org.eclipse.dawnsci.nexus.builder.NexusMetadataProvider;
-import org.eclipse.dawnsci.nexus.builder.NexusObjectProvider;
 import org.eclipse.dawnsci.nexus.builder.NexusEntryModification;
+import org.eclipse.dawnsci.nexus.builder.NexusMetadataProvider;
 import org.eclipse.dawnsci.nexus.builder.NexusMetadataProvider.MetadataEntry;
+import org.eclipse.dawnsci.nexus.builder.NexusObjectProvider;
 import org.eclipse.dawnsci.nexus.builder.appdef.NexusApplicationBuilder;
 import org.eclipse.dawnsci.nexus.impl.NXdataImpl;
 import org.eclipse.dawnsci.nexus.impl.NXentryImpl;
@@ -89,7 +88,7 @@ public class DefaultNexusEntryBuilder implements NexusEntryBuilder {
 	 * @see org.eclipse.dawnsci.nexus.builder.NexusEntryBuilder#getNxEntry()
 	 */
 	@Override
-	public NXentry getNxEntry() {
+	public NXentryImpl getNXentry() {
 		return nxEntry;
 	}
 
@@ -291,7 +290,7 @@ public class DefaultNexusEntryBuilder implements NexusEntryBuilder {
 		} else {
 			// normal case
 			final String name = adapter.getName();
-			NexusBaseClass category = adapter.getDeviceCategory();
+			NexusBaseClass category = adapter.getCategory();
 			
 			NXobject parentGroup = null;
 			if (category != null) {

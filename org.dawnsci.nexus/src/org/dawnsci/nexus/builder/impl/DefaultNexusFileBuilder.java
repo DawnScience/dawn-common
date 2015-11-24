@@ -35,7 +35,7 @@ public class DefaultNexusFileBuilder implements NexusFileBuilder {
 
 	private final TreeFile treeFile;
 
-	private final NXrootImpl root;
+	private final NXrootImpl nxRoot;
 	
 	private Map<String, NexusEntryBuilder> entries = new HashMap<>();
 
@@ -45,11 +45,11 @@ public class DefaultNexusFileBuilder implements NexusFileBuilder {
 	 */
 	public DefaultNexusFileBuilder(final String filePath) {
 		treeFile = nexusNodeFactory.createTreeFile(filePath);
-		root = nexusNodeFactory.createNXroot();
+		nxRoot = nexusNodeFactory.createNXroot();
 		
 		// TODO: do we need to set any attributes on root?
-		root.setAttributeFile_name(filePath);
-		treeFile.setGroupNode(root);
+		nxRoot.setAttributeFile_name(filePath);
+		treeFile.setGroupNode(nxRoot);
 	}
 
 	/* (non-Javadoc)
@@ -80,8 +80,8 @@ public class DefaultNexusFileBuilder implements NexusFileBuilder {
 	 * @see org.eclipse.dawnsci.nexus.builder.NexusFileBuilder#getNxRoot()
 	 */
 	@Override
-	public NXroot getNxRoot() {
-		return root;
+	public NXrootImpl getNXroot() {
+		return nxRoot;
 	}
 
 	/* (non-Javadoc)
@@ -102,7 +102,7 @@ public class DefaultNexusFileBuilder implements NexusFileBuilder {
 		}
 		
 		final NXentryImpl entry = nexusNodeFactory.createNXentry();
-		root.setEntry(entryName, entry);
+		nxRoot.setEntry(entryName, entry);
 
 		NexusEntryBuilder entryModel = new DefaultNexusEntryBuilder(nexusNodeFactory, entry);
 		entries.put(entryName, entryModel);

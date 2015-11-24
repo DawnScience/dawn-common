@@ -10,7 +10,7 @@
  *    Matthew Dickie - initial API and implementation and/or initial documentation
  *******************************************************************************/
 
-package org.dawnsci.nexus.model;
+package org.dawnsci.nexus.builder.impl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +30,7 @@ import org.eclipse.dawnsci.nexus.impl.NXbeamImpl;
 import org.eclipse.dawnsci.nexus.impl.NXdetectorImpl;
 import org.eclipse.dawnsci.nexus.impl.NexusNodeFactory;
 
-public class SimpleNexusFileModelTest extends AbstractNexusFileModelTestBase {
+public class SimpleNexusFileBuilderTest extends AbstractNexusFileBuilderTestBase {
 
 	private static class TestDetector extends AbstractNexusObjectProvider<NXdetector> {
 

@@ -10,7 +10,7 @@
  *    Matthew Dickie - initial API and implementation and/or initial documentation
  *******************************************************************************/
 
-package org.dawnsci.nexus.model;
+package org.dawnsci.nexus.builder.impl;
 
 import static junit.framework.Assert.assertEquals;
 import static org.dawnsci.nexus.NexusTestUtils.assertNexusTreesEqual;
@@ -34,7 +34,7 @@ import org.junit.Test;
 
 import uk.ac.diamond.scisoft.analysis.TestUtils;
 
-public abstract class AbstractNexusFileModelTestBase {
+public abstract class AbstractNexusFileBuilderTestBase {
 	
 	public static final String TEST_FILE_FOLDER = "testfiles/dawnsci/data/nexus/";
 
