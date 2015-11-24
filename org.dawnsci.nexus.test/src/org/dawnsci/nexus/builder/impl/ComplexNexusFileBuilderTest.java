@@ -10,15 +10,12 @@
  *    Matthew Dickie - initial API and implementation and/or initial documentation
  *******************************************************************************/
 
-package org.dawnsci.nexus.model;
+package org.dawnsci.nexus.builder.impl;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.dawnsci.nexus.builder.appdef.impl.TomoApplicationBuilder;
-import org.dawnsci.nexus.builder.impl.AbstractNexusObjectProvider;
-import org.dawnsci.nexus.builder.impl.MapBasedMetadataProvider;
-import org.dawnsci.nexus.builder.impl.NexusUser;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.dataset.impl.Dataset;
 import org.eclipse.dawnsci.analysis.dataset.impl.IntegerDataset;
@@ -40,12 +37,13 @@ import org.eclipse.dawnsci.nexus.impl.NXsourceImpl;
 import org.eclipse.dawnsci.nexus.impl.NexusNodeFactory;
 
 
-public class ComplexNexusFileModelTest extends AbstractNexusFileModelTestBase {
+public class ComplexNexusFileBuilderTest extends AbstractNexusFileBuilderTestBase {
 	
 	private static class SimplePositioner extends AbstractNexusObjectProvider<NXpositioner> {
 
 		public SimplePositioner(final String name) {
 			super(name, NexusBaseClass.NX_POSITIONER, NXpositionerImpl.NX_VALUE, NexusBaseClass.NX_INSTRUMENT);
+			useDeviceNameAsAxisName(true);
 		}
 		
 		@Override
@@ -64,6 +62,7 @@ public class ComplexNexusFileModelTest extends AbstractNexusFileModelTestBase {
 		public TomoScanDevicePositioner() {
 			super("tomoScanDevice", NexusBaseClass.NX_POSITIONER, "ss1_rot");
 		}
+		
 		@Override
 		public NXpositioner doCreateNexusObject(
 				NexusNodeFactory nodeFactory) {
@@ -242,21 +241,18 @@ public class ComplexNexusFileModelTest extends AbstractNexusFileModelTestBase {
 	protected void addDataModel(NexusEntryBuilder entryModel) throws NexusException {
 		NexusDataBuilder dataModel = entryModel.newData(testDetector.getName());
 		dataModel.setDataDevice(testDetector, "data");
-		dataModel.addAxisDevice(0, tomoScanDevicePositioner, true);
-		dataModel.addAxisDevice(0, actualTimePositioner, false);
-		dataModel.addAxisDevice(0, beamOkPositioner, false);
-		dataModel.addAxisDevice(0, testDetector, false, "count_time");
 		
-		dataModel.addAxisDevice(0, tomoScanDevicePositioner, false, "imageNumber");
-		dataModel.addAxisDevice(0, tomoScanDevicePositioner, false, "image_key");
-		dataModel.addAxisDevice(0, ioncIPositioner, false);
-		
-		dataModel.addAxisDevice(0, tomoScanDevicePositioner, false, "ss1_X");
-		dataModel.addAxisDevice(0, tomoScanDevicePositioner, false, "tomography_shutter");
+		String[] tomoScanDeviceSourceFields = { "ss1_rot", "imageNumber",
+				"image_key", "ss1_X", "tomography_shutter" };
+		dataModel.addAxisDevice(tomoScanDevicePositioner, tomoScanDeviceSourceFields,
+				new int[] { 0 }, "ss1_rot", 0);
 
-		dataModel.addAxisDevice(0, testDetector, false, "start_time");
-		dataModel.addAxisDevice(0, testDetector, false, "time_ms");
-		dataModel.addAxisDevice(0, tomoScanDevicePositioner, false);
+		dataModel.addAxisDevice(actualTimePositioner, new int[] { 0 });
+		dataModel.addAxisDevice(beamOkPositioner, new int[] { 0 });
+		dataModel.addAxisDevice(ioncIPositioner, new int[] { 0 });
+
+		String[] detectorSourceFields = { "count_time", "start_time", "time_ms" }; 
+		dataModel.addAxisDevice(testDetector, detectorSourceFields, new int[] { 0 });
 	}
 	
 	protected void addApplicationDefinitions(NexusEntryBuilder nexusEntryModel) throws NexusException {

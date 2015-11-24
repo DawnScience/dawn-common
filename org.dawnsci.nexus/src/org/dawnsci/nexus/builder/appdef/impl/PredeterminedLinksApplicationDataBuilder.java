@@ -12,6 +12,7 @@
 
 package org.dawnsci.nexus.builder.appdef.impl;
 
+import org.dawnsci.nexus.builder.impl.AbstractNexusDataBuilder;
 import org.eclipse.dawnsci.analysis.api.tree.DataNode;
 import org.eclipse.dawnsci.hdf5.nexus.NexusException;
 import org.eclipse.dawnsci.nexus.NXdata;
@@ -20,6 +21,7 @@ import org.eclipse.dawnsci.nexus.NXsubentry;
 import org.eclipse.dawnsci.nexus.builder.NexusDataBuilder;
 import org.eclipse.dawnsci.nexus.builder.NexusObjectProvider;
 import org.eclipse.dawnsci.nexus.builder.appdef.NexusApplicationBuilder;
+import org.eclipse.dawnsci.nexus.impl.NXdataImpl;
 
 /**
  * A data builder, wrapping an {@link NXdata} base class instance, within an application definition where
@@ -32,17 +34,15 @@ import org.eclipse.dawnsci.nexus.builder.appdef.NexusApplicationBuilder;
  * when its {@link NexusApplicationBuilder#newData()} method is invoked. It should then add
  * the appropriate links using the {@link #addLink(String, String)} method of this class.
  */
-public class PredeterminedLinksApplicationDataBuilder implements NexusDataBuilder {
-
-	private final NXdata nxData;
+public class PredeterminedLinksApplicationDataBuilder extends AbstractNexusDataBuilder implements NexusDataBuilder {
 
 	/**
 	 * Creates a new {@link PredeterminedLinksApplicationDataBuilder} wrapping the given
-	 * {@link NXdata}.
-	 * @param nxData {@link NXdata} to wrap.
+	 * {@link NXdataImpl}.
+	 * @param nxData {@link NXdataImpl} to wrap.
 	 */
-	public PredeterminedLinksApplicationDataBuilder(NXdata nxData) {
-		this.nxData = nxData;
+	public PredeterminedLinksApplicationDataBuilder(NXdataImpl nxData) {
+		super(null, nxData);
 	}
 
 	/**
@@ -55,29 +55,6 @@ public class PredeterminedLinksApplicationDataBuilder implements NexusDataBuilde
 		nxData.addDataNode(name, dataNode);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.dawnsci.nexus.builder.NexusDataBuilder#getNexusData()
-	 */
-	@Override
-	public NXdata getNexusData() {
-		return nxData;
-	}
-
-	/**
-	 * Not supported for this implementation of {@link NexusDataBuilder}. Instead use
-	 * {@link #addLink(String, DataNode)} to populate this object
-	 * @throws UnsupportedOperationException always 
-	 */
-	@Override
-	public void setDataDevice(NexusObjectProvider<? extends NXobject> nexusDeviceAdapter) {
-		throw new UnsupportedOperationException("No additional objects are required for this data model");
-	}
-
-	/**
-	 * Not supported for this implementation of {@link NexusDataBuilder}. Instead use
-	 * {@link #addLink(String, DataNode)} to populate this object
-	 * @throws UnsupportedOperationException always 
-	 */
 	@Override
 	public void setDataDevice(
 			NexusObjectProvider<? extends NXobject> nexusObjectProvider,
@@ -86,25 +63,13 @@ public class PredeterminedLinksApplicationDataBuilder implements NexusDataBuilde
 		throw new UnsupportedOperationException("No additional objects are required for this data model");
 	}
 
-	/**
-	 * Not supported for this implementation of {@link NexusDataBuilder}. Instead use
-	 * {@link #addLink(String, DataNode)} to populate this object
-	 * @throws UnsupportedOperationException always 
-	 */
 	@Override
-	public void addAxisDevice(int dimensionIndex, NexusObjectProvider<? extends NXobject> nexusDeviceAdapter, boolean makeDefault) {
-		throw new UnsupportedOperationException("No additional objects are required for this data model");
-	}
-
-	/**
-	 * Not supported for this implementation of {@link NexusDataBuilder}. Instead use
-	 * {@link #addLink(String, DataNode)} to populate this object
-	 * @throws UnsupportedOperationException always 
-	 */
-	@Override
-	public void addAxisDevice(int dimensionIndex,
-			NexusObjectProvider<? extends NXobject> nexusDeviceAdapter,
-			boolean makeDefault, String dataNodeName) throws NexusException {
+	protected void addAxisDevice(
+			NexusObjectProvider<? extends NXobject> nexusObjectProvider,
+			String sourceFieldName, String destinationFieldName,
+			int[] dimensionMappings, Integer primaryAxisForDimensionIndex)
+			throws NexusException {
+		// this data model already has all the information it needs to be fully populated
 		throw new UnsupportedOperationException("No additional objects are required for this data model");
 	}
 
