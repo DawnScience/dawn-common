@@ -29,6 +29,7 @@ import org.eclipse.dawnsci.analysis.api.processing.IOperation;
 import org.eclipse.dawnsci.analysis.api.processing.IOperationContext;
 import org.eclipse.dawnsci.analysis.api.processing.IOperationService;
 import org.eclipse.dawnsci.analysis.dataset.slicer.SliceFromSeriesMetadata;
+import org.eclipse.dawnsci.analysis.dataset.slicer.Slicer;
 import org.eclipse.dawnsci.analysis.dataset.slicer.SourceInformation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,7 +75,8 @@ public class ProcessConversion extends AbstractConversion {
 		
 		IOperationContext cc = service.createContext();
 		cc.setData(localLazy);
-		cc.setSlicing(sliceDimensions);
+		cc.setSlicing(Slicer.getSliceNDFromSliceDimensions(context.getSliceDimensions(), localLazy.getShape()));
+		cc.setDataDimensions(Slicer.getDataDimensions(localLazy.getShape(), context.getSliceDimensions()));
 		
 		String name = getFileNameNoExtension(context.getSelectedConversionFile());
 		String outputFolder = context.getOutputPath();

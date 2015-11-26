@@ -23,8 +23,10 @@ import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext.Conversion
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.Slice;
+import org.eclipse.dawnsci.analysis.api.dataset.SliceND;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
 import org.eclipse.dawnsci.analysis.api.monitor.IMonitor;
+import org.eclipse.dawnsci.analysis.dataset.slicer.SliceViewIterator;
 import org.eclipse.dawnsci.analysis.dataset.slicer.SliceVisitor;
 import org.eclipse.dawnsci.analysis.dataset.slicer.Slicer;
 
@@ -183,15 +185,19 @@ public abstract class AbstractConversion {
 		                           final IConversionContext   context) throws Exception {
 		
 		final Map<Integer, String> dims = context.getSliceDimensions();
-
-		Slicer.visitAll(lz, dims, nameFrag, new SliceVisitor() {
+		
+		SliceND slice = Slicer.getSliceNDFromSliceDimensions(dims, lz.getShape());
+		int[] axes = Slicer.getDataDimensions(lz.getShape(), dims);
+		final SliceViewIterator it = new SliceViewIterator(lz, slice, axes);
+		
+		Slicer.visit(it, new SliceVisitor() {
 
 			@Override
-			public void visit(IDataset slice, Slice[] slices, int[] shape) throws Exception {
+			public void visit(IDataset slice) throws Exception {
 				//no longer squeeze in slicer
 				slice.squeeze();
-				context.setSelectedSlice(slices);
-				context.setSelectedShape(shape);
+				context.setSelectedSlice(it.getSliceND().convertToSlice());
+				context.setSelectedShape(it.getShape());
 				convert(slice);
 			}
 
