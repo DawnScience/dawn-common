@@ -238,7 +238,7 @@ public class ComplexNexusFileBuilderTest extends AbstractNexusFileBuilderTestBas
 	}
 
 	@Override
-	protected void addDataModel(NexusEntryBuilder entryModel) throws NexusException {
+	protected void addDataBuilder(NexusEntryBuilder entryModel) throws NexusException {
 		NexusDataBuilder dataModel = entryModel.newData(testDetector.getName());
 		dataModel.setDataDevice(testDetector, "data");
 		

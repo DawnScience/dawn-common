@@ -79,7 +79,7 @@ public class SimpleNexusFileBuilderTest extends AbstractNexusFileBuilderTestBase
 		return FILE_NAME;
 	}
 	
-	protected void addDataModel(NexusEntryBuilder entryModel) throws NexusException {
+	protected void addDataBuilder(NexusEntryBuilder entryModel) throws NexusException {
 		NexusDataBuilder dataModel = entryModel.createDefaultData();
 		dataModel.setDataDevice(detector);
 	}

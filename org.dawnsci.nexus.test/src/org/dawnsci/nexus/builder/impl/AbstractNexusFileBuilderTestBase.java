@@ -56,21 +56,21 @@ public abstract class AbstractNexusFileBuilderTestBase {
 	
 	@Test
 	public void testBuildNexusFile() throws Exception {
-		final NexusFileBuilder fileModel = new DefaultNexusFileBuilder(filePath);
-		final NexusEntryBuilder entryModel = fileModel.newEntry();
-		entryModel.addDefaultGroups();
+		final NexusFileBuilder fileBuilder = new DefaultNexusFileBuilder(filePath);
+		final NexusEntryBuilder entryBuilder = fileBuilder.newEntry();
+		entryBuilder.addDefaultGroups();
 		List<NexusEntryModification> treeModifications = getNexusTreeModifications();
-		entryModel.modifyEntry(treeModifications);
-		configureEntryModel(entryModel);
+		entryBuilder.modifyEntry(treeModifications);
+		configureEntryModel(entryBuilder);
 		
-		addDataModel(entryModel);
-		addApplicationDefinitions(entryModel);
+		addDataBuilder(entryBuilder);
+		addApplicationDefinitions(entryBuilder);
 		
 		// save the nexus file
-		fileModel.saveFile();
+		fileBuilder.saveFile();
 		
 		// compare with file in repository
-		final TreeFile nexusTree = fileModel.getNexusTree();
+		final TreeFile nexusTree = fileBuilder.getNexusTree();
 		TreeFile comparisonNexusTree = NexusUtils.loadNexusFile(comparisonFilePath, true);
 		assertNexusTreesEqual(nexusTree, comparisonNexusTree);
 	}
@@ -85,7 +85,7 @@ public abstract class AbstractNexusFileBuilderTestBase {
 	
 	protected abstract List<NexusEntryModification> getNexusTreeModifications();
 	
-	protected abstract void addDataModel(NexusEntryBuilder entryModel) throws NexusException;
+	protected abstract void addDataBuilder(NexusEntryBuilder entryBuilder) throws NexusException;
 	
 	protected void assertNumChildNodes(NXobject parentNode, int numGroupNodes, int numDataNodes) {
 		assertEquals(numGroupNodes, parentNode.getNumberOfGroupNodes());
