@@ -60,6 +60,12 @@ public abstract class AbstractNexusDataBuilder implements NexusDataBuilder {
 
 	@Override
 	public void addAxisDevice(NexusObjectProvider<? extends NXobject> nexusObjectProvider,
+			String sourceFieldName, String destinationFieldName, int[] dimensionMappings) throws NexusException {
+		addAxisDevice(nexusObjectProvider, sourceFieldName, destinationFieldName, dimensionMappings, null);
+	}
+	
+	@Override
+	public void addAxisDevice(NexusObjectProvider<? extends NXobject> nexusObjectProvider,
 			String sourceFieldName, String destinationFieldName, int[] dimensionMappings, int primaryAxisForDimensionIndex) throws NexusException {
 		addAxisDevice(nexusObjectProvider, sourceFieldName, destinationFieldName, dimensionMappings, Integer.valueOf(primaryAxisForDimensionIndex));
 	}
@@ -110,19 +116,17 @@ public abstract class AbstractNexusDataBuilder implements NexusDataBuilder {
 	
 	protected DataNode getDataNode(NexusObjectProvider<? extends NXobject> nexusObjectProvider,
 			String fieldName) throws NexusException {
-		final NXobject deviceBaseClassInstance = entryModel.getNexusObject(nexusObjectProvider);
+		final NXobject nexusObject = nexusObjectProvider.getNexusObject(entryModel.getNodeFactory(), true);
 		if (fieldName == null) {
 			fieldName = nexusObjectProvider.getDefaultDataFieldName();
 		}
-		final DataNode dataNode = deviceBaseClassInstance.getDataNode(fieldName);
+		final DataNode dataNode = nexusObject.getDataNode(fieldName);
 		if (dataNode == null) {
 			throw new IllegalArgumentException(MessageFormat.format("No such data node for group {0}: {1}",
-					deviceBaseClassInstance.getNXclass().getSimpleName(), fieldName));
+					nexusObject.getNXclass().getSimpleName(), fieldName));
 		}
 	
 		return dataNode;
 	}
-	
-	
 
 }

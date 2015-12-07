@@ -14,12 +14,10 @@ package org.dawnsci.nexus.builder.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
-import org.dawnsci.nexus.builder.appdef.impl.ApplicationDefinitionFactory;
+import org.dawnsci.nexus.builder.appdef.impl.DefaultApplicationFactory;
 import org.eclipse.dawnsci.analysis.api.tree.DataNode;
 import org.eclipse.dawnsci.analysis.api.tree.NodeLink;
 import org.eclipse.dawnsci.hdf5.nexus.NexusException;
@@ -47,6 +45,8 @@ import org.eclipse.dawnsci.nexus.validation.NexusValidationException;
  */
 public class DefaultNexusEntryBuilder implements NexusEntryBuilder {
 	
+	private static final String APPDEF_SUBENTRY_SUFFIX = "_entry";
+	
 	private final NexusNodeFactory nexusNodeFactory;
 
 	private NXentryImpl nxEntry = null;
@@ -57,9 +57,7 @@ public class DefaultNexusEntryBuilder implements NexusEntryBuilder {
 	
 	private List<NXobject> defaultGroups = null;
 	
-	private Map<NexusObjectProvider<?>, NXobject> nexusObjectByProviderMap = new HashMap<>();
-	
-	private List<NexusApplicationBuilder> appDefs = new ArrayList<>();
+	private List<NexusApplicationBuilder> applications = new ArrayList<>();
 	
 	/**
 	 * Creates a new {@link DefaultNexusEntryBuilder}. This constructor should only be called
@@ -79,7 +77,6 @@ public class DefaultNexusEntryBuilder implements NexusEntryBuilder {
 	public <N extends NXobject> N add(NexusObjectProvider<N> nexusAdapter) throws NexusException {
 		N baseClassInstance = nexusAdapter.createNexusObject(nexusNodeFactory);
 		addGroupToNexusTree(nexusAdapter, baseClassInstance);
-		nexusObjectByProviderMap.put(nexusAdapter, baseClassInstance);
 
 		return baseClassInstance;
 	}
@@ -123,18 +120,32 @@ public class DefaultNexusEntryBuilder implements NexusEntryBuilder {
 	 * @see org.eclipse.dawnsci.nexus.builder.NexusEntryBuilder#newApplication(org.eclipse.dawnsci.nexus.NexusApplicationDefinition)
 	 */
 	@Override
-	public NexusApplicationBuilder newApplication(NexusApplicationDefinition appDef) throws NexusException {
-		NexusApplicationBuilder appDefModel = ApplicationDefinitionFactory.getApplicationDefinitionFactory().newApplicationDefinitionModel(this, appDef);
-		appDefs.add(appDefModel);
+	public NexusApplicationBuilder newApplication(NexusApplicationDefinition applicationDefinition) throws NexusException {
+		final String appDefName = applicationDefinition.name();
+		final String subentryName = appDefName.substring(appDefName.indexOf('_') + 1).toLowerCase() + APPDEF_SUBENTRY_SUFFIX;
 		
-		return appDefModel;
+		return newApplication(subentryName, applicationDefinition);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.dawnsci.nexus.builder.NexusEntryBuilder#newApplication(java.lang.String, org.eclipse.dawnsci.nexus.NexusApplicationDefinition)
+	 */
+	@Override
+	public NexusApplicationBuilder newApplication(String subentryName,
+			NexusApplicationDefinition applicationDefinition)
+			throws NexusException {
+		NexusApplicationBuilder appBuilder = DefaultApplicationFactory.getApplicationDefinitionFactory().newApplicationDefinitionModel(
+				this, applicationDefinition, subentryName);
+		applications.add(appBuilder);
+		
+		return appBuilder;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.dawnsci.nexus.builder.NexusEntryBuilder#add(java.util.Collection)
 	 */
 	@Override
-	public List<NXobject> add(Collection<NexusObjectProvider<?>> nexusAdapters) throws NexusException {
+	public List<NXobject> addAll(Collection<? extends NexusObjectProvider<?>> nexusAdapters) throws NexusException {
 		List<NXobject> nexusObjects = new ArrayList<NXobject>(nexusAdapters.size());
 		for (NexusObjectProvider<?> nexusAdapter : nexusAdapters) {
 			NXobject nexusObject = add(nexusAdapter);
@@ -247,29 +258,11 @@ public class DefaultNexusEntryBuilder implements NexusEntryBuilder {
 	 */
 	@Override
 	public void validate() throws NexusValidationException {
-		for (NexusApplicationBuilder appDef : appDefs) {
+		for (NexusApplicationBuilder appDef : applications) {
 			appDef.validate();
 		}
 	}
 
-	/**
-	 * Returns the nexus object for the given provider, assuming that the
-	 * nexus object has already been added to this entry.
-	 * @param nexusObjectProvider
-	 * @return nexus object
-	 * @throws NexusException
-	 */
-	protected <N extends NXobject> N getNexusObject(NexusObjectProvider<N> nexusObjectProvider)
-			throws NexusException {
-		@SuppressWarnings("unchecked")
-		N baseClassInstance = (N) nexusObjectByProviderMap.get(nexusObjectProvider);
-		if (baseClassInstance == null) {
-			throw new NexusException("No NeXus base class instance for given device.");
-		}
-		
-		return baseClassInstance;
-	}
-	
 	/**
 	 * Adds the new nexus object instance to the first skeleton class instance that it
 	 * can be added to, unless category is specified, in which case it is added to the first
@@ -324,5 +317,7 @@ public class DefaultNexusEntryBuilder implements NexusEntryBuilder {
 		
 		throw new NexusException("No group found for category " + category); 
 	}
+	
+	
 
 }

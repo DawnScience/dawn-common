@@ -25,13 +25,11 @@ import org.eclipse.dawnsci.nexus.impl.NexusNodeFactory;
  * Factory class for application definition subentries.
  *
  */
-public class ApplicationDefinitionFactory implements NexusApplicationFactory{
+public class DefaultApplicationFactory implements NexusApplicationFactory {
 	
-	private static final String APPDEF_SUBENTRY_SUFFIX = "_entry";
-	
-	private static final ApplicationDefinitionFactory INSTANCE = new ApplicationDefinitionFactory();
+	private static final DefaultApplicationFactory INSTANCE = new DefaultApplicationFactory();
 
-	private ApplicationDefinitionFactory() {
+	private DefaultApplicationFactory() {
 		// private constructor to prevent external instantiation
 	}
 	
@@ -39,7 +37,7 @@ public class ApplicationDefinitionFactory implements NexusApplicationFactory{
 	 * Returns the singleton instance of this class.
 	 * @return singleton instance of this class
 	 */
-	public static ApplicationDefinitionFactory getApplicationDefinitionFactory() {
+	public static DefaultApplicationFactory getApplicationDefinitionFactory() {
 		return INSTANCE;
 	}
 
@@ -48,7 +46,7 @@ public class ApplicationDefinitionFactory implements NexusApplicationFactory{
 	 */
 	@Override
 	public NexusApplicationBuilder newApplicationDefinitionModel(NexusEntryBuilder entryModel,
-			NexusApplicationDefinition appDef) throws NexusException {
+			NexusApplicationDefinition appDef, String subentryName) throws NexusException {
 		NexusNodeFactory nodeFactory = entryModel.getNodeFactory();
 		NXsubentryImpl nxSubentry = nodeFactory.createNXsubentry();
 		NexusApplicationBuilder appDefModel = null;
@@ -61,13 +59,12 @@ public class ApplicationDefinitionFactory implements NexusApplicationFactory{
 		}
 
 		final NXentryImpl nxEntry = (NXentryImpl) entryModel.getNXentry();
-		final String appDefName = appDef.name();
-		final String subentryName = appDefName.substring(appDefName.indexOf('_') + 1).toLowerCase() + APPDEF_SUBENTRY_SUFFIX;
 		if (nxEntry.containsGroupNode(subentryName)) {
 			throw new NexusException("A subentry with the name " + subentryName + " already exists in this entry.");
 		}
+		
 		nxEntry.setSubentry(subentryName, nxSubentry);
-
+		
 		return appDefModel;
 	}
 

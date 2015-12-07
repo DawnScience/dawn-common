@@ -90,7 +90,24 @@ public abstract class AbstractNexusObjectProvider<N extends NXobject> implements
 	 */
 	@Override
 	public final N createNexusObject(NexusNodeFactory nodeFactory) {
+		if (nexusObject != null) {
+			throw new IllegalStateException("The nexus object for this provider already exists");
+		}
+		
 		this.nexusObject = doCreateNexusObject(nodeFactory); 
+		return nexusObject;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.dawnsci.nexus.builder.NexusObjectProvider#getNexusObject(org.eclipse.dawnsci.nexus.impl.NexusNodeFactory, boolean)
+	 */
+	@Override
+	public N getNexusObject(NexusNodeFactory nodeFactory,
+			boolean createIfNecessary) {
+		if (nexusObject == null && createIfNecessary) {
+			this.nexusObject = doCreateNexusObject(nodeFactory);
+		}
+		
 		return nexusObject;
 	}
 	

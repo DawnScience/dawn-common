@@ -65,7 +65,7 @@ public abstract class AbstractNexusApplicationBuilder implements
 	 * @see org.eclipse.dawnsci.nexus.builder.appdef.NexusApplicationBuilder#getNXsubentry()
 	 */
 	@Override
-	public NXsubentry getNXsubentry() {
+	public NXsubentryImpl getNXsubentry() {
 		return subentry;
 	}
 	

@@ -100,7 +100,7 @@ public class TomoApplicationBuilder extends AbstractNexusApplicationBuilder impl
 	 * @param source
 	 */
 	public void setSource(NexusObjectProvider<NXsource> source) {
-		instrument.setSource(source.createNexusObject(getNexusNodeFactory()));
+		instrument.setSource(source.getNexusObject(getNexusNodeFactory(), true));
 	}
 
 	/**
@@ -108,7 +108,7 @@ public class TomoApplicationBuilder extends AbstractNexusApplicationBuilder impl
 	 * @param detector
 	 */
 	public void setDetector(NexusObjectProvider<NXdetector> detector) {
-		instrument.setDetector(detector.createNexusObject(getNexusNodeFactory()));
+		instrument.setDetector(detector.getNexusObject(getNexusNodeFactory(), true));
 	}
 	
 	/**
@@ -117,7 +117,7 @@ public class TomoApplicationBuilder extends AbstractNexusApplicationBuilder impl
 	 * @throws NexusException
 	 */
 	public void setSample(NexusObjectProvider<NXsample> sample) throws NexusException {
-		this.sample = (NXsampleImpl) sample.getNexusObject(); 
+		this.sample = (NXsampleImpl) sample.getNexusObject(getNexusNodeFactory(), true);
 		subentry.setSample(this.sample);
 	}
 
@@ -137,6 +137,15 @@ public class TomoApplicationBuilder extends AbstractNexusApplicationBuilder impl
 	public void setRotationAngle(NexusObjectProvider<NXpositioner> rotationAnglePositioner) throws NexusException {
 		final DataNode rotationAngleDataNode = getDataNode(rotationAnglePositioner);
 		sample.addDataNode(NXsampleImpl.NX_ROTATION_ANGLE, rotationAngleDataNode);
+	}
+
+	/**
+	 * Sets the rotation angle
+	 * @param rotationAnglePositioner rotation angle data node
+	 * @throws NexusException
+	 */
+	public void setRotationAngle(DataNode rotationAngle) throws NexusException {
+		sample.addDataNode(NXsampleImpl.NX_ROTATION_ANGLE, rotationAngle);
 	}
 
 	/**
@@ -256,13 +265,13 @@ public class TomoApplicationBuilder extends AbstractNexusApplicationBuilder impl
 		dataBuilder.addLink("image_key", getDataNode("instrument/detector/image_key"));
 	}
 
-	private <N extends NXobject> DataNode getDataNode(NexusObjectProvider<N> baseClassProvider) throws NexusException {
-		final N nexusObject = baseClassProvider.createNexusObject(getNexusNodeFactory());
-		final String dataNodeName = baseClassProvider.getDefaultDataFieldName();
+	private <N extends NXobject> DataNode getDataNode(NexusObjectProvider<N> nexusObjectProvider) throws NexusException {
+		final N nexusObject = nexusObjectProvider.getNexusObject(getNexusNodeFactory(), true);
+		final String dataNodeName = nexusObjectProvider.getDefaultDataFieldName();
 		final DataNode dataNode = nexusObject.getDataNode(dataNodeName);
 		if (dataNode == null) {
 			throw new NexusException(MessageFormat.format("No such data node for {0} with name ''{1}''",
-					baseClassProvider.getClass().getSimpleName(), dataNodeName));
+					nexusObjectProvider.getClass().getSimpleName(), dataNodeName));
 		}
 		
 		return dataNode;
