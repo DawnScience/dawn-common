@@ -93,4 +93,18 @@ public class BoofCVImageTransformImpl<T extends ImageSingleBand<?>, TD extends T
 		return alignedList;
 	}
 
+	@Override
+	public IDataset affineTransform(IDataset image, double a11, double a12,
+			double a21, double a22, double dx, double dy) {
+		ImageFloat32 converted = ConvertIDataset.convertFrom(image, ImageFloat32.class, 1);
+		ImageFloat32 result = new ImageFloat32(image.getShape()[0], image.getShape()[1]);
+
+		// TypeInterpolate can be BICUBIC, BILINEAR, NEAREST_NEIGHBOR, POLYNOMIAL4
+		DistortImageOps.affine(converted, result, TypeInterpolate.BILINEAR, a11, a12,
+				a21, a22, dx, dy);
+
+		return ConvertIDataset.convertTo(result, true);
+
+	}
+
 }
