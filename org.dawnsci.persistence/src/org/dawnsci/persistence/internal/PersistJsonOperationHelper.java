@@ -30,7 +30,7 @@ import org.eclipse.dawnsci.analysis.dataset.impl.Dataset;
 import org.eclipse.dawnsci.analysis.dataset.impl.DatasetFactory;
 import org.eclipse.dawnsci.analysis.dataset.impl.DatasetUtils;
 import org.eclipse.dawnsci.analysis.dataset.metadata.OriginMetadataImpl;
-import org.eclipse.dawnsci.analysis.dataset.operations.AbstractOperation;
+import org.eclipse.dawnsci.analysis.dataset.operations.AbstractOperationBase;
 import org.eclipse.dawnsci.analysis.dataset.slicer.SliceFromSeriesMetadata;
 import org.eclipse.dawnsci.hdf5.IHierarchicalDataFile;
 import org.eclipse.dawnsci.hdf5.Nexus;
@@ -104,7 +104,7 @@ public class PersistJsonOperationHelper {
 			}
 			
 			IOperation op = service.create(sid);
-			Class modelType = ((AbstractOperation)op).getModelClass();
+			Class modelType = ((AbstractOperationBase)op).getModelClass();
 			if (mapper == null) mapper = new ObjectMapper();
 			
 			try {
