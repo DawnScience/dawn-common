@@ -9,8 +9,6 @@
 
 package org.dawnsci.boofcv.examples.imageprocessing;
 
-import java.util.List;
-
 import org.dawnsci.boofcv.BoofCVImageFilterServiceCreator;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.image.IImageFilterService;
@@ -45,7 +43,7 @@ public class ImageFilterTest {
 	@Test
 	public void filterGaussianBlur() {
 		IDataset blurred = service.filterGaussianBlur(data, -1, 10);
-		Assert.assertEquals("Value of first item is not the expected one", 67.10220336914062, blurred.getDouble(0), 0);
+		Assert.assertEquals("Value of first item is not the expected one", 67.0, blurred.getDouble(0), 0);
 	}
 
 	@Test
@@ -69,8 +67,9 @@ public class ImageFilterTest {
 
 	@Test
 	public void filterContour() throws Exception {
-		IDataset contoured = service.extractBlob(data, 8);
-		Assert.assertEquals("Value of item is not the expected one", 8224.0, contoured.getDouble(551, 384), 0);
+		IDataset thresholded = service.globalThreshold(data, 100, true, true);
+		IDataset contoured = service.extractBlob(thresholded, 8);
+		Assert.assertEquals("Value of item is not the expected one", 727, contoured.getDouble(479, 637), 0);
 	}
 
 	@Test
