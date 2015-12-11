@@ -9,6 +9,8 @@
 package org.dawnsci.boofcv.internal;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.dawnsci.boofcv.converter.ConvertIDataset;
@@ -22,6 +24,8 @@ import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
+
+import org.apache.commons.math3.util.Pair;
 
 /**
  * Implementation of IImageTransform<br>
@@ -94,17 +98,42 @@ public class BoofCVImageTransformImpl<T extends ImageSingleBand<?>, TD extends T
 	}
 
 	@Override
-	public IDataset affineTransform(IDataset image, double a11, double a12,
-			double a21, double a22, double dx, double dy) {
-		ImageFloat32 converted = ConvertIDataset.convertFrom(image, ImageFloat32.class, 1);
-		ImageFloat32 result = new ImageFloat32(image.getShape()[0], image.getShape()[1]);
+	public IDataset affineTransform(IDataset data, double a11, double a12, double a21, double a22, double dx, double dy, boolean keepShape) throws Exception {
+		if (data.getShape().length != 2)
+			throw new Exception("Data shape is not 2D");
+		ImageFloat32 image = ConvertIDataset.convertFrom(data, ImageFloat32.class, 1);
+		
+		// IDataset uses row major ordering, but ImageFloat32 uses column major
+		// this is why the the affine transform parameters will be exchanged in what follows next...
+		
+		int width = 0, height = 0;
+		if (keepShape) {
+			width = image.width;
+			height = image.height;
+		} else {
+			// calculate resulting bounding box
+			Pair<Double, Double> coords00 = affineTransformation(0, 0, a22, a21, a12, a11, dy, dx);
+			Pair<Double, Double> coords10 = affineTransformation(0, image.height, a22, a21, a12, a11, dy, dx);
+			Pair<Double, Double> coords01 = affineTransformation(image.width, 0, a22, a21, a12, a11, dy, dx);
+			Pair<Double, Double> coords11 = affineTransformation(image.width, image.height, a22, a21, a12, a11, dy, dx);
+			
+			List<Double> coordsx = Arrays.asList(coords00.getFirst(), coords10.getFirst(), coords01.getFirst(), coords11.getFirst());
+			List<Double> coordsy = Arrays.asList(coords00.getSecond(), coords10.getSecond(), coords01.getSecond(), coords11.getSecond());
+			
+			double maxx = Collections.max(coordsx);
+			double maxy = Collections.max(coordsy);
+			
+			height = (int) (maxy);
+			width = (int) (maxx);
+		}
+		
+		ImageFloat32 transformed = new ImageFloat32(width, height);
 
-		// TypeInterpolate can be BICUBIC, BILINEAR, NEAREST_NEIGHBOR, POLYNOMIAL4
-		DistortImageOps.affine(converted, result, TypeInterpolate.BILINEAR, a11, a12,
-				a21, a22, dx, dy);
-
-		return ConvertIDataset.convertTo(result, true);
-
+		DistortImageOps.affine(image, transformed, TypeInterpolate.BILINEAR, a22, a21, a12, a11, dy, dx);
+		return ConvertIDataset.convertTo(transformed, true);
 	}
 
+	private static Pair<Double, Double> affineTransformation(double x, double y, double a11, double a12, double a21, double a22, double dx, double dy) {
+		return new Pair<Double, Double>(x*a11 + y*a12 + dx, x*a21 + y*a22 + dy);
+	}
 }
