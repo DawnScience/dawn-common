@@ -15,7 +15,6 @@ package org.dawnsci.nexus.builder.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.dawnsci.nexus.builder.impl.AbstractNexusObjectProvider;
 import org.eclipse.dawnsci.analysis.dataset.impl.Dataset;
 import org.eclipse.dawnsci.analysis.dataset.impl.DatasetFactory;
 import org.eclipse.dawnsci.analysis.dataset.impl.StringDataset;
@@ -31,7 +30,7 @@ import org.eclipse.dawnsci.nexus.impl.NXdetectorImpl;
 import org.eclipse.dawnsci.nexus.impl.NexusNodeFactory;
 
 public class SimpleNexusFileBuilderTest extends AbstractNexusFileBuilderTestBase {
-
+	
 	private static class TestDetector extends AbstractNexusObjectProvider<NXdetector> {
 
 		public TestDetector() {
@@ -93,6 +92,11 @@ public class SimpleNexusFileBuilderTest extends AbstractNexusFileBuilderTestBase
 		modifications.add(beam);
 		
 		return modifications;
+	}
+
+	@Override
+	protected String getTestClassName() {
+		return SimpleNexusFileBuilderTest.class.getCanonicalName();
 	}
 	
 }

@@ -5,10 +5,6 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.sameInstance;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.powermock.api.mockito.PowerMockito.whenNew;
 
 import org.dawnsci.nexus.builder.impl.AbstractNexusObjectProvider;
 import org.dawnsci.nexus.builder.impl.DefaultNexusFileBuilder;
@@ -36,15 +32,10 @@ import org.eclipse.dawnsci.nexus.impl.NXsampleImpl;
 import org.eclipse.dawnsci.nexus.impl.NXsourceImpl;
 import org.eclipse.dawnsci.nexus.impl.NXsubentryImpl;
 import org.eclipse.dawnsci.nexus.impl.NexusNodeFactory;
-import org.eclipse.dawnsci.nexus.validation.NXtomoValidator;
+import org.eclipse.dawnsci.nexus.validation.NexusValidationException;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(TomoApplicationBuilder.class)
 public class TomoApplicationBuilderTest {
 
 	public static class TestPositioner extends AbstractNexusObjectProvider<NXpositioner> {
@@ -289,22 +280,17 @@ public class TomoApplicationBuilderTest {
 		tomoBuilder.newData();
 
 		assertThat(subentry.getData().getDataNode(NXdataImpl.NX_DATA),
-				is(sameInstance(detector.getDataNode(NXdetectorImpl.NX_DATA))));
+				is(sameInstance((DataNode) detector.getDataNode(NXdetectorImpl.NX_DATA))));
 		assertThat(subentry.getData().getDataNode(NXsampleImpl.NX_ROTATION_ANGLE),
-				is(sameInstance(sample.getDataNode(NXsampleImpl.NX_ROTATION_ANGLE))));
+				is(sameInstance((DataNode) sample.getDataNode(NXsampleImpl.NX_ROTATION_ANGLE))));
 		assertThat(subentry.getData().getDataNode("image_key"),
-				is(sameInstance(detector.getDataNode("image_key")))); 
+				is(sameInstance((DataNode) detector.getDataNode("image_key")))); 
 	}
 	
-	@Test
+	@Test(expected = NexusValidationException.class)
 	public void testValidate() throws Exception {
-		NXtomoValidator tomoValidator = mock(NXtomoValidator.class);
-		whenNew(NXtomoValidator.class).withAnyArguments().thenReturn(tomoValidator);
-		
+		// an empty subentry will fail validation
 		tomoBuilder.validate();
-		
-		verify(tomoValidator).validate(subentry);
-		verifyNoMoreInteractions(tomoValidator);
 	}
 
 }

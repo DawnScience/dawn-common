@@ -272,4 +272,9 @@ public class ComplexNexusFileBuilderTest extends AbstractNexusFileBuilderTestBas
 		appDefModel.newData(); 
 	}
 
+	@Override
+	protected String getTestClassName() {
+		return ComplexNexusFileBuilderTest.class.getCanonicalName();
+	}
+
 }

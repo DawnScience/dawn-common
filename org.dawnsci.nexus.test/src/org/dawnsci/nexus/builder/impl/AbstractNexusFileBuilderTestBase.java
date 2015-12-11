@@ -12,22 +12,21 @@
 
 package org.dawnsci.nexus.builder.impl;
 
-import static junit.framework.Assert.assertEquals;
 import static org.dawnsci.nexus.NexusTestUtils.assertNexusTreesEqual;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.List;
 
-import org.dawnsci.nexus.NexusTestUtils;
-import org.dawnsci.nexus.builder.impl.DefaultNexusFileBuilder;
 import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
 import org.eclipse.dawnsci.analysis.api.tree.TreeFile;
 import org.eclipse.dawnsci.nexus.NXobject;
 import org.eclipse.dawnsci.nexus.NexusException;
 import org.eclipse.dawnsci.nexus.NexusUtils;
+import org.eclipse.dawnsci.nexus.builder.NexusBuilderFactory;
 import org.eclipse.dawnsci.nexus.builder.NexusEntryBuilder;
-import org.eclipse.dawnsci.nexus.builder.NexusFileBuilder;
 import org.eclipse.dawnsci.nexus.builder.NexusEntryModification;
+import org.eclipse.dawnsci.nexus.builder.NexusFileBuilder;
 import org.eclipse.dawnsci.nexus.impl.NXobjectImpl;
 import org.junit.Before;
 import org.junit.Test;
@@ -43,20 +42,43 @@ public abstract class AbstractNexusFileBuilderTestBase {
 	private String filePath;
 	
 	private String comparisonFilePath;
-
+	
+	private boolean pluginTest = false;
+	
 	@Before
 	public void setUp() throws Exception {
-		testScratchDirectoryName = TestUtils.generateDirectorynameFromClassname(getClass().getCanonicalName());
+		final String testClassName = getTestClassName();
+		testScratchDirectoryName = TestUtils.generateDirectorynameFromClassname(testClassName);
 		TestUtils.makeScratchDirectory(testScratchDirectoryName);
 		filePath = testScratchDirectoryName + getFilename();
 		comparisonFilePath = TEST_FILE_FOLDER + getFilename();
 	}
 	
+	protected abstract String getTestClassName();
+	
+	public void setPluginTest(boolean pluginTest) {
+		this.pluginTest = pluginTest;
+	}
+	
+	public boolean isPluginTest() {
+		return pluginTest;
+	}
+	
 	protected abstract String getFilename();
+	
+	protected NexusBuilderFactory getNexusBuilderFactory() {
+		return new DefaultNexusBuilderFactory();
+	}
+	
+	protected void checkNexusBuilderFactory(NexusBuilderFactory nexusBuilderFactory) {
+		// do nothing, subclasses may override
+	}
 	
 	@Test
 	public void testBuildNexusFile() throws Exception {
-		final NexusFileBuilder fileBuilder = new DefaultNexusFileBuilder(filePath);
+		final NexusBuilderFactory nexusBuilderFactory = getNexusBuilderFactory();
+		checkNexusBuilderFactory(nexusBuilderFactory);
+		final NexusFileBuilder fileBuilder = nexusBuilderFactory.newNexusFileBuilder(filePath);
 		final NexusEntryBuilder entryBuilder = fileBuilder.newEntry();
 		entryBuilder.addDefaultGroups();
 		List<NexusEntryModification> treeModifications = getNexusTreeModifications();

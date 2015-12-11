@@ -11,13 +11,9 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.powermock.api.mockito.PowerMockito.whenNew;
 
 import java.util.Arrays;
 
-import org.dawnsci.nexus.builder.appdef.impl.DefaultApplicationFactory;
 import org.dawnsci.nexus.builder.appdef.impl.TomoApplicationBuilder;
 import org.eclipse.dawnsci.nexus.NXdetector;
 import org.eclipse.dawnsci.nexus.NXentry;
@@ -38,15 +34,11 @@ import org.eclipse.dawnsci.nexus.impl.NXentryImpl;
 import org.eclipse.dawnsci.nexus.impl.NXinstrumentImpl;
 import org.eclipse.dawnsci.nexus.impl.NXpositionerImpl;
 import org.eclipse.dawnsci.nexus.impl.NexusNodeFactory;
+import org.eclipse.dawnsci.nexus.validation.NexusValidationException;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(DefaultApplicationFactory.class)
 public class DefaultNexusEntryBuilderTest {
 	
 	public static class TestPositioner extends AbstractNexusObjectProvider<NXpositioner> {
@@ -91,6 +83,16 @@ public class DefaultNexusEntryBuilderTest {
 		}
 		
 	}
+	
+	private CustomNexusEntryModification customModification = new CustomNexusEntryModification() {
+		
+		@Override
+		public void modifyEntry(NXentryImpl entry) {
+			entry.setField("foo", "bar");
+		}
+		
+	};
+
 
 	private NexusEntryBuilder entryBuilder;
 	
@@ -238,7 +240,7 @@ public class DefaultNexusEntryBuilderTest {
 		assertThat(nxEntry.getNumberOfDataNodes(), is(6));
 		assertThat(nxEntry.getEntry_identifierScalar(), is(equalTo("12345")));
 		assertThat(nxEntry.getExperiment_identifierScalar(), is(equalTo("myexperiment")));
-		assertThat(nxEntry.getProgram_name(), is(equalTo("GDA 8.36.0")));
+		assertThat(nxEntry.getProgram_nameScalar(), is(equalTo("GDA 8.36.0")));
 		assertThat(nxEntry.getString("scan_command"), is(equalTo("scan foo bar etc")));
 		assertThat(nxEntry.getString("scan_identifier"), is(equalTo("a3d668c0-e3c4-4ed9-b127-4a202b2b6bac")));
 		assertThat(nxEntry.getTitleScalar(), is(equalTo("Test Scan")));
@@ -246,12 +248,11 @@ public class DefaultNexusEntryBuilderTest {
 	
 	@Test
 	public void testModifyEntry() throws Exception {
-		CustomNexusEntryModification customModification = Mockito.mock(CustomNexusEntryModification.class);
+		assertThat(nxEntry.getDataNode("foo"), is(nullValue()));
 		
 		entryBuilder.modifyEntry(customModification);
 		
-		verify(customModification).modifyEntry(entryBuilder.getNXentry());
-		verifyNoMoreInteractions(customModification);
+		assertThat(nxEntry.getDataNode("foo").getString(), is(equalTo("bar"))); 
 	}
 	
 	@Test
@@ -289,12 +290,11 @@ public class DefaultNexusEntryBuilderTest {
 	
 	@Test
 	public void testModifyEntry_customModification() throws Exception {
-		CustomNexusEntryModification customModification = Mockito.mock(CustomNexusEntryModification.class);
+		assertThat(nxEntry.getDataNode("foo"), is(nullValue()));
 		
 		entryBuilder.modifyEntry((NexusEntryModification) customModification);
 		
-		verify(customModification).modifyEntry(entryBuilder.getNXentry());
-		verifyNoMoreInteractions(customModification);
+		assertThat(nxEntry.getDataNode("foo").getString(), is(equalTo("bar"))); 
 	}
 	
 	@Test
@@ -303,12 +303,12 @@ public class DefaultNexusEntryBuilderTest {
 		assertThat(nxEntry.getNumberOfGroupNodes(), is(2));
 		NXinstrument instrument = nxEntry.getInstrument();
 		assertThat(instrument.getNumberOfGroupNodes(), is(0));
+		assertThat(nxEntry.getDataNode("foo"), is(nullValue()));
 		
 		TestPositioner positionerProvider = new TestPositioner();
 		MapBasedMetadataProvider metadata = new MapBasedMetadataProvider();
 		metadata.addMetadataEntry(NX_ENTRY_IDENTIFIER, "12345");
 		metadata.addMetadataEntry(NXentryImpl.NX_TITLE, "Test Scan");
-		CustomNexusEntryModification customModification = Mockito.mock(CustomNexusEntryModification.class);
 
 		entryBuilder.modifyEntry(Arrays.asList(positionerProvider, metadata, customModification));
 		
@@ -317,8 +317,6 @@ public class DefaultNexusEntryBuilderTest {
 		assertThat(instrument.getPositioner(), is(sameInstance(positionerProvider.getNexusObject())));
 		assertThat(nxEntry.getEntry_identifierScalar(), is(equalTo("12345")));
 		assertThat(nxEntry.getTitleScalar(), is(equalTo("Test Scan")));
-		verify(customModification).modifyEntry(entryBuilder.getNXentry());
-		verifyNoMoreInteractions(customModification);
 	}
 	
 	@Test
@@ -413,19 +411,17 @@ public class DefaultNexusEntryBuilderTest {
 		entryBuilder.getDataNode("groupnode");
 	}
 	
-	@Test
+	@Test(expected = NexusValidationException.class)
 	public void testValidate() throws Exception {
-		TomoApplicationBuilder subentry1 = Mockito.mock(TomoApplicationBuilder.class);
-		TomoApplicationBuilder subentry2 = Mockito.mock(TomoApplicationBuilder.class);
-		
-		whenNew(TomoApplicationBuilder.class).withAnyArguments().thenReturn(subentry1, subentry2);
+		// Note: this method used to use Mockito to validate that each subentry was validated,
+		// however the plugin dependency on mockito appears to prevent plugin tests from running
 		entryBuilder.newApplication("subentry1", NexusApplicationDefinition.NX_TOMO);
 		entryBuilder.newApplication("subentry2", NexusApplicationDefinition.NX_TOMO);
 		entryBuilder.validate();
 		
-		verify(subentry1).validate();
-		verify(subentry2).validate();
-		verifyNoMoreInteractions(subentry1, subentry2);
+//		verify(subentry1).validate();
+//		verify(subentry2).validate();
+//		verifyNoMoreInteractions(subentry1, subentry2);
 	}
 
 }
