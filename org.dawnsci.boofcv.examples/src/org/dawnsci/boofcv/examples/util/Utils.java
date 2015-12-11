@@ -10,19 +10,23 @@ package org.dawnsci.boofcv.examples.util;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.dawb.common.ui.util.EclipseUtils;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
-import org.eclipse.dawnsci.analysis.api.io.IFileLoader;
+import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
+import org.eclipse.dawnsci.analysis.api.dataset.Slice;
 import org.eclipse.dawnsci.analysis.api.monitor.IMonitor;
+import org.eclipse.dawnsci.analysis.dataset.impl.LazyDataset;
+import org.eclipse.dawnsci.plotting.api.IPlottingSystem;
+import org.eclipse.dawnsci.plotting.api.PlottingFactory;
+import org.eclipse.dawnsci.plotting.api.trace.IImageTrace;
 import org.eclipse.ui.IWorkbenchPage;
 
 import uk.ac.diamond.scisoft.analysis.SDAPlotter;
-import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
+import uk.ac.diamond.scisoft.analysis.io.ImageStackLoader;
 
 public class Utils {
 
@@ -33,18 +37,24 @@ public class Utils {
 	 * @param img
 	 * @throws Throwable
 	 */
-	public static void showPlotView(final String viewID,
+	public static IDataset showPlotView(final String viewID,
 			final String plotName, final IDataset img) throws Throwable {
 		EclipseUtils.getPage().showView(viewID);
 		EclipseUtils.getPage().setPartState(
 				EclipseUtils.getPage().findViewReference(viewID),
 				IWorkbenchPage.STATE_MAXIMIZED);
+		IDataset data = null;
 		try {
 			SDAPlotter.imagePlot(plotName, img);
+			EclipseUtils.delay(1000);
+			IPlottingSystem<Object> system = PlottingFactory.getPlottingSystem(plotName);
+			IImageTrace trace = (IImageTrace)system.getTraces().iterator().next();
+			data = trace.getData();
+			return data;
 		} catch (Exception e) {
 			e.printStackTrace();
+			return data;
 		}
-		EclipseUtils.delay(1000);
 	}
 
 	/**
@@ -56,32 +66,19 @@ public class Utils {
 	 */
 	public static List<IDataset> getImageDatasets(List<String> names, IMonitor progressMonitorWrapper) {
 		List<IDataset> data = new ArrayList<IDataset>();
-		String[] tmp = names.get(0).split("\\.");
-		String extension = tmp[tmp.length - 1];
-		Class<? extends IFileLoader> loaderClass = LoaderFactory.getLoaderClass(extension);
 		try {
-			Constructor<?> constructor = loaderClass.getConstructor(String.class);
-			for (String n : names) {
-				IDataset a;
-				try {
-					IFileLoader l = (IFileLoader) constructor.newInstance(n);
-					a = l.loadFile(progressMonitorWrapper).getDataset(0);
-					if (n.contains("/")) {
-						String name = n.substring(n.lastIndexOf("/") + 1);
-						a.setName(name);
-					} else {
-						a.setName(n);
-					}
-					data.add(a);
-					System.out.println("Loaded :" + n);
-				} catch (Exception e) {
-					System.out.println("Could not load :" + n);
-				}
+			ImageStackLoader loader = new ImageStackLoader(names, progressMonitorWrapper);
+			ILazyDataset lazyStack = new LazyDataset("Folder Stack", loader.getDtype(), loader.getShape(), loader);
+			int[] shape = lazyStack.getShape();
+			for (int i = 0; i < shape[0]; i++) {
+				IDataset image = lazyStack.getSlice(new Slice(i, shape[0], shape[1])).squeeze();
+				data.add(image);
 			}
-		} catch (NoSuchMethodException e) {
-			System.out.println("Could not find constructor for loader");
+			return data;
+		} catch (Exception e1) {
+			System.out.println("Could not load image stack:" + e1.getMessage());
+			return null;
 		}
-		return data.size() > 0 ? data : null;
 	}
 
 	/**

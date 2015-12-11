@@ -5,8 +5,7 @@ import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 
 public class ExampleImageStitching {
 
-	public static void showStitchedImage(IDataset stitched) throws Throwable {
-		Utils.showPlotView("uk.ac.diamond.scisoft.analysis.rcp.plotView1", "Plot 1", stitched);
-		System.out.println("something has been plotted!");
+	public static IDataset showStitchedImage(IDataset stitched) throws Throwable {
+		return Utils.showPlotView("uk.ac.diamond.scisoft.analysis.rcp.plotView1", "Plot 1", stitched);
 	}
 }
