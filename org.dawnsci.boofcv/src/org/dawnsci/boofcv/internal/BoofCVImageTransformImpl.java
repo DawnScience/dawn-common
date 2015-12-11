@@ -98,6 +98,11 @@ public class BoofCVImageTransformImpl<T extends ImageSingleBand<?>, TD extends T
 	}
 
 	@Override
+	public IDataset affineTransform(IDataset data, double a11, double a12, double a21, double a22, double dx, double dy) throws Exception {
+		return affineTransform(data, a11, a12, a21, a22, dx, dy, false);
+	}
+
+	@Override
 	public IDataset affineTransform(IDataset data, double a11, double a12, double a21, double a22, double dx, double dy, boolean keepShape) throws Exception {
 		if (data.getShape().length != 2)
 			throw new Exception("Data shape is not 2D");
@@ -136,4 +141,5 @@ public class BoofCVImageTransformImpl<T extends ImageSingleBand<?>, TD extends T
 	private static Pair<Double, Double> affineTransformation(double x, double y, double a11, double a12, double a21, double a22, double dx, double dy) {
 		return new Pair<Double, Double>(x*a11 + y*a12 + dx, x*a21 + y*a22 + dy);
 	}
+	
 }
