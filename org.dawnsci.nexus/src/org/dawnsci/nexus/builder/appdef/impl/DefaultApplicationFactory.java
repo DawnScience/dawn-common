@@ -12,8 +12,8 @@
 
 package org.dawnsci.nexus.builder.appdef.impl;
 
-import org.eclipse.dawnsci.hdf5.nexus.NexusException;
 import org.eclipse.dawnsci.nexus.NexusApplicationDefinition;
+import org.eclipse.dawnsci.nexus.NexusException;
 import org.eclipse.dawnsci.nexus.builder.NexusEntryBuilder;
 import org.eclipse.dawnsci.nexus.builder.appdef.NexusApplicationBuilder;
 import org.eclipse.dawnsci.nexus.builder.appdef.NexusApplicationFactory;

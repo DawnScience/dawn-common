@@ -19,7 +19,6 @@ import java.util.Arrays;
 
 import org.dawnsci.nexus.builder.appdef.impl.DefaultApplicationFactory;
 import org.dawnsci.nexus.builder.appdef.impl.TomoApplicationBuilder;
-import org.eclipse.dawnsci.hdf5.nexus.NexusException;
 import org.eclipse.dawnsci.nexus.NXdetector;
 import org.eclipse.dawnsci.nexus.NXentry;
 import org.eclipse.dawnsci.nexus.NXinstrument;
@@ -28,6 +27,7 @@ import org.eclipse.dawnsci.nexus.NXsample;
 import org.eclipse.dawnsci.nexus.NXsource;
 import org.eclipse.dawnsci.nexus.NexusApplicationDefinition;
 import org.eclipse.dawnsci.nexus.NexusBaseClass;
+import org.eclipse.dawnsci.nexus.NexusException;
 import org.eclipse.dawnsci.nexus.builder.CustomNexusEntryModification;
 import org.eclipse.dawnsci.nexus.builder.NexusDataBuilder;
 import org.eclipse.dawnsci.nexus.builder.NexusEntryBuilder;
