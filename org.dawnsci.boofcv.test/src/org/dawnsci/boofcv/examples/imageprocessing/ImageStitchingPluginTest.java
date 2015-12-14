@@ -15,7 +15,7 @@ import org.eclipse.dawnsci.analysis.api.image.IImageTransform;
 import org.eclipse.dawnsci.analysis.api.monitor.IMonitor;
 import org.junit.Test;
 
-public class ImageStitchingTest {
+public class ImageStitchingPluginTest {
 
 	@Test
 	public void testImageStitchingProcess() throws Throwable {

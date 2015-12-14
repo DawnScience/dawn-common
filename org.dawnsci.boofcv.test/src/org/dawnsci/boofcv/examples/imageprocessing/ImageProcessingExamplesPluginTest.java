@@ -11,7 +11,7 @@ package org.dawnsci.boofcv.examples.imageprocessing;
 
 import org.junit.Test;
 
-public class ImageProcessingExamplesTest {
+public class ImageProcessingExamplesPluginTest {
 
 	@Test
 	public void testImageBinaryOperations() throws Throwable {
