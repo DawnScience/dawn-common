@@ -16,6 +16,7 @@ import org.junit.Test;
 
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageFloat64;
 import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageSInt8;
 import boofcv.struct.image.ImageUInt16;
@@ -72,5 +73,14 @@ public class IDatasetConverterTest {
 		result.setName(dataname);
 		Assert.assertTrue("Converted data is not the same rank as original", data.getRank() == result.getRank());
 		Assert.assertArrayEquals("Converted data is not the same shape as original", data.getShape(), result.getShape());
+	}
+
+	@Test
+	public void testFloat64Conversion() throws Throwable {
+		ImageFloat64 float64 = (ImageFloat64) ConvertIDataset.convertFrom(data, ImageFloat64.class, 1);
+		IDataset result1 = ConvertIDataset.convertTo(float64, false);
+		result1.setName(dataname);
+		Assert.assertTrue("Converted data is not the same rank as original", data.getRank() == result1.getRank());
+		Assert.assertArrayEquals("Converted data is not the same shape as original", data.getShape(), result1.getShape());
 	}
 }
