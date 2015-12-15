@@ -18,7 +18,7 @@ import org.eclipse.dawnsci.analysis.dataset.impl.Dataset;
 import org.eclipse.dawnsci.analysis.dataset.impl.PositionIterator;
 import org.eclipse.dawnsci.nexus.NXobject;
 
-public class NexusTestUtils {
+public class NexusAssert {
 
 	public static void assertNexusTreesEqual(final TreeFile tree1, final TreeFile tree2) throws Exception {
 		assertGroupNodesEqual(tree1.getGroupNode(), tree2.getGroupNode());

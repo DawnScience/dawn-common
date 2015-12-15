@@ -9,11 +9,15 @@
 
 package org.dawnsci.nexus;
 
+import static org.dawnsci.nexus.NexusAssert.assertNexusTreesEqual;
+
 import org.eclipse.dawnsci.analysis.api.tree.TreeFile;
 import org.eclipse.dawnsci.analysis.tree.impl.TreeFileImpl;
 import org.eclipse.dawnsci.nexus.NXroot;
+import org.eclipse.dawnsci.nexus.NexusFile;
 import org.eclipse.dawnsci.nexus.NexusUtils;
 import org.eclipse.dawnsci.nexus.impl.NexusNodeFactory;
+import org.eclipse.dawnsci.nexus.test.util.NexusTestUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -53,14 +57,14 @@ public abstract class AbstractNexusFileTestBase {
 
 		return treeFile;
 	}
-
+	
 	@Test
 	public void testNexusFile() throws Exception {
 		TreeFile originalNexusTree = createNexusTree();
-		NexusUtils.saveNexusFile(originalNexusTree);
+		NexusTestUtils.saveNexusFile(originalNexusTree);
 
-		TreeFile loadedTree = NexusUtils.loadNexusFile(filePath, true);
-		NexusTestUtils.assertNexusTreesEqual(originalNexusTree, loadedTree);
+		TreeFile loadedTree = NexusTestUtils.loadNexusFile(filePath, true);
+		assertNexusTreesEqual(originalNexusTree, loadedTree);
 	}
 
 }

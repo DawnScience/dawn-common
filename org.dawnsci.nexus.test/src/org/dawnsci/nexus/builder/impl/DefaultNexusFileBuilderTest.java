@@ -12,12 +12,12 @@ import org.eclipse.dawnsci.nexus.NXentry;
 import org.eclipse.dawnsci.nexus.NXroot;
 import org.eclipse.dawnsci.nexus.NexusApplicationDefinition;
 import org.eclipse.dawnsci.nexus.NexusException;
-import org.eclipse.dawnsci.nexus.NexusUtils;
 import org.eclipse.dawnsci.nexus.builder.NexusEntryBuilder;
 import org.eclipse.dawnsci.nexus.builder.NexusFileBuilder;
 import org.eclipse.dawnsci.nexus.impl.NXentryImpl;
 import org.eclipse.dawnsci.nexus.impl.NXrootImpl;
 import org.eclipse.dawnsci.nexus.impl.NexusNodeFactory;
+import org.eclipse.dawnsci.nexus.test.util.NexusTestUtils;
 import org.eclipse.dawnsci.nexus.validation.NexusValidationException;
 import org.hamcrest.Matchers;
 import org.junit.Before;
@@ -58,7 +58,7 @@ public class DefaultNexusFileBuilderTest {
 		
 		nexusFileBuilder.saveFile();
 		
-		TreeFile nexusFile = NexusUtils.loadNexusFile(filePath, true);
+		TreeFile nexusFile = NexusTestUtils.loadNexusFile(filePath, true);
 		assertThat(nexusFile, notNullValue());
 		NXroot root = (NXroot) nexusFile.getGroupNode();
 		assertThat(nexusFile.getGroupNode(), notNullValue());

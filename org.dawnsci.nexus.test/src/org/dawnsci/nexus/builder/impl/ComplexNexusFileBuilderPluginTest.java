@@ -4,7 +4,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThat;
 
-import org.dawnsci.nexus.test.NexusBuilderPluginTest;
+import org.dawnsci.nexus.NexusTestServiceHolder;
 import org.eclipse.dawnsci.nexus.builder.NexusBuilderFactory;
 
 public class ComplexNexusFileBuilderPluginTest extends
@@ -12,12 +12,12 @@ public class ComplexNexusFileBuilderPluginTest extends
 
 	@Override
 	protected NexusBuilderFactory getNexusBuilderFactory() {
-		return NexusBuilderPluginTest.getNexusBuilderFactory();
+		return NexusTestServiceHolder.getNexusBuilderFactory();
 	}
 	
 	@Override
 	protected void checkNexusBuilderFactory(NexusBuilderFactory nexusBuilderFactory) {
-		assertThat(nexusBuilderFactory, is(sameInstance(NexusBuilderPluginTest.getNexusBuilderFactory())));
+		assertThat(nexusBuilderFactory, is(sameInstance(NexusTestServiceHolder.getNexusBuilderFactory())));
 	}
 	
 	

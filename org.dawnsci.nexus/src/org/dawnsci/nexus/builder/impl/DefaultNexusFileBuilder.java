@@ -15,9 +15,11 @@ package org.dawnsci.nexus.builder.impl;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.dawnsci.nexus.ServiceHolder;
 import org.eclipse.dawnsci.analysis.api.tree.TreeFile;
+import org.eclipse.dawnsci.nexus.INexusFileFactory;
 import org.eclipse.dawnsci.nexus.NexusException;
-import org.eclipse.dawnsci.nexus.NexusUtils;
+import org.eclipse.dawnsci.nexus.NexusFile;
 import org.eclipse.dawnsci.nexus.builder.NexusEntryBuilder;
 import org.eclipse.dawnsci.nexus.builder.NexusFileBuilder;
 import org.eclipse.dawnsci.nexus.impl.NXentryImpl;
@@ -56,7 +58,12 @@ public class DefaultNexusFileBuilder implements NexusFileBuilder {
 	 */
 	@Override
 	public void saveFile() throws NexusException {
-		NexusUtils.saveNexusFile(treeFile);
+		final INexusFileFactory nexusFileFactory = ServiceHolder.getNexusFileFactory();
+		final String filename = treeFile.getFilename();
+		NexusFile nexusFile = nexusFileFactory.newNexusFile(filename);
+		nexusFile.createAndOpenToWrite();
+		nexusFile.addNode("/", treeFile.getGroupNode());
+		nexusFile.flush();
 	}
 
 	/* (non-Javadoc)

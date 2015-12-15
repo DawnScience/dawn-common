@@ -35,7 +35,6 @@ import org.eclipse.dawnsci.nexus.NXpositioner;
 import org.eclipse.dawnsci.nexus.NXroot;
 import org.eclipse.dawnsci.nexus.NexusBaseClass;
 import org.eclipse.dawnsci.nexus.NexusException;
-import org.eclipse.dawnsci.nexus.NexusUtils;
 import org.eclipse.dawnsci.nexus.builder.NexusDataBuilder;
 import org.eclipse.dawnsci.nexus.builder.NexusEntryBuilder;
 import org.eclipse.dawnsci.nexus.builder.NexusFileBuilder;
@@ -43,6 +42,7 @@ import org.eclipse.dawnsci.nexus.impl.NXdataImpl;
 import org.eclipse.dawnsci.nexus.impl.NXdetectorImpl;
 import org.eclipse.dawnsci.nexus.impl.NXpositionerImpl;
 import org.eclipse.dawnsci.nexus.impl.NexusNodeFactory;
+import org.eclipse.dawnsci.nexus.test.util.NexusTestUtils;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -281,7 +281,7 @@ public class MultipleThreadNexusFileWriteTest {
 	}
 	
 	private void checkFile(int numPositioners, int numSteps) throws NexusException {
-		TreeFile file = NexusUtils.loadNexusFile(filePath, true);
+		TreeFile file = NexusTestUtils.loadNexusFile(filePath, true);
 		NXroot root = (NXroot) file.getGroupNode();
 		NXentry entry = root.getEntry();
 		NXinstrument instrument = entry.getInstrument();

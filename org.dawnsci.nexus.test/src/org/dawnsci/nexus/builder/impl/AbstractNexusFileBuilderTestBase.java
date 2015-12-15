@@ -12,22 +12,25 @@
 
 package org.dawnsci.nexus.builder.impl;
 
-import static org.dawnsci.nexus.NexusTestUtils.assertNexusTreesEqual;
+import static org.dawnsci.nexus.NexusAssert.assertNexusTreesEqual;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.List;
 
+import org.dawnsci.nexus.ServiceHolder;
 import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
 import org.eclipse.dawnsci.analysis.api.tree.TreeFile;
+import org.eclipse.dawnsci.hdf5.nexus.NexusFileFactoryHDF5;
+import org.eclipse.dawnsci.nexus.INexusFileFactory;
 import org.eclipse.dawnsci.nexus.NXobject;
 import org.eclipse.dawnsci.nexus.NexusException;
-import org.eclipse.dawnsci.nexus.NexusUtils;
 import org.eclipse.dawnsci.nexus.builder.NexusBuilderFactory;
 import org.eclipse.dawnsci.nexus.builder.NexusEntryBuilder;
 import org.eclipse.dawnsci.nexus.builder.NexusEntryModification;
 import org.eclipse.dawnsci.nexus.builder.NexusFileBuilder;
 import org.eclipse.dawnsci.nexus.impl.NXobjectImpl;
+import org.eclipse.dawnsci.nexus.test.util.NexusTestUtils;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -45,15 +48,27 @@ public abstract class AbstractNexusFileBuilderTestBase {
 	
 	private boolean pluginTest = false;
 	
+	private NexusBuilderFactory nexusBuilderFactory = null;
+	
 	@Before
 	public void setUp() throws Exception {
+		nexusBuilderFactory = getNexusBuilderFactory();
 		final String testClassName = getTestClassName();
 		testScratchDirectoryName = TestUtils.generateDirectorynameFromClassname(testClassName);
 		TestUtils.makeScratchDirectory(testScratchDirectoryName);
 		filePath = testScratchDirectoryName + getFilename();
 		comparisonFilePath = TEST_FILE_FOLDER + getFilename();
+		ServiceHolder.setNexusFileFactory(new NexusFileFactoryHDF5());
 	}
 	
+	protected NexusBuilderFactory getNexusBuilderFactory() {
+		return new DefaultNexusBuilderFactory(); // overridden by plugin tests
+	}
+	
+	protected INexusFileFactory getNexusFileFactory() {
+		return new NexusFileFactoryHDF5(); // overridden by plugin tests
+	}
+
 	protected abstract String getTestClassName();
 	
 	public void setPluginTest(boolean pluginTest) {
@@ -66,17 +81,12 @@ public abstract class AbstractNexusFileBuilderTestBase {
 	
 	protected abstract String getFilename();
 	
-	protected NexusBuilderFactory getNexusBuilderFactory() {
-		return new DefaultNexusBuilderFactory();
-	}
-	
 	protected void checkNexusBuilderFactory(NexusBuilderFactory nexusBuilderFactory) {
 		// do nothing, subclasses may override
 	}
 	
 	@Test
 	public void testBuildNexusFile() throws Exception {
-		final NexusBuilderFactory nexusBuilderFactory = getNexusBuilderFactory();
 		checkNexusBuilderFactory(nexusBuilderFactory);
 		final NexusFileBuilder fileBuilder = nexusBuilderFactory.newNexusFileBuilder(filePath);
 		final NexusEntryBuilder entryBuilder = fileBuilder.newEntry();
@@ -93,7 +103,7 @@ public abstract class AbstractNexusFileBuilderTestBase {
 		
 		// compare with file in repository
 		final TreeFile nexusTree = fileBuilder.getNexusTree();
-		TreeFile comparisonNexusTree = NexusUtils.loadNexusFile(comparisonFilePath, true);
+		TreeFile comparisonNexusTree = NexusTestUtils.loadNexusFile(comparisonFilePath, true);
 		assertNexusTreesEqual(nexusTree, comparisonNexusTree);
 	}
 	
