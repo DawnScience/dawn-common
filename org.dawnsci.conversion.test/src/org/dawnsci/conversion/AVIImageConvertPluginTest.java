@@ -36,7 +36,7 @@ import org.monte.media.avi.AVIReader;
 
 import uk.ac.diamond.scisoft.analysis.osgi.LoaderServiceImpl;
 
-public class AVIImageConvertTest {
+public class AVIImageConvertPluginTest {
 
 	@Before
 	public void before() {
