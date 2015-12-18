@@ -44,9 +44,9 @@ import org.eclipse.dawnsci.nexus.validation.NexusValidationException;
  * Default implementation of {@link NexusEntryBuilder}
  */
 public class DefaultNexusEntryBuilder implements NexusEntryBuilder {
-	
+
 	private static final String APPDEF_SUBENTRY_SUFFIX = "_entry";
-	
+
 	private final NexusNodeFactory nexusNodeFactory;
 
 	private NXentryImpl nxEntry = null;
@@ -54,11 +54,11 @@ public class DefaultNexusEntryBuilder implements NexusEntryBuilder {
 	private NXinstrumentImpl nxInstrument = null;
 
 	private NXsampleImpl nxSample = null;
-	
+
 	private List<NXobject> defaultGroups = null;
-	
-	private List<NexusApplicationBuilder> applications = new ArrayList<>();
-	
+
+	private final List<NexusApplicationBuilder> applications = new ArrayList<>();
+
 	/**
 	 * Creates a new {@link DefaultNexusEntryBuilder}. This constructor should only be called
 	 * by {@link DefaultNexusFileBuilder}.
@@ -75,7 +75,7 @@ public class DefaultNexusEntryBuilder implements NexusEntryBuilder {
 	 */
 	@Override
 	public <N extends NXobject> N add(NexusObjectProvider<N> nexusAdapter) throws NexusException {
-		N baseClassInstance = nexusAdapter.createNexusObject(nexusNodeFactory);
+		final N baseClassInstance = nexusAdapter.createNexusObject(nexusNodeFactory);
 		addGroupToNexusTree(nexusAdapter, baseClassInstance);
 
 		return baseClassInstance;
@@ -92,6 +92,7 @@ public class DefaultNexusEntryBuilder implements NexusEntryBuilder {
 	/* (non-Javadoc)
 	 * @see org.eclipse.dawnsci.nexus.builder.NexusEntryBuilder#getNodeFactory()
 	 */
+	@Override
 	public NexusNodeFactory getNodeFactory() {
 		return nexusNodeFactory;
 	}
@@ -101,21 +102,21 @@ public class DefaultNexusEntryBuilder implements NexusEntryBuilder {
 	 */
 	@Override
 	public NexusDataBuilder createDefaultData() {
-		NXdataImpl nxData = nexusNodeFactory.createNXdata();
+		final NXdataImpl nxData = nexusNodeFactory.createNXdata();
 		nxEntry.setData(nxData);
 		return new DefaultNexusDataBuilder(this, nxData);
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.dawnsci.nexus.builder.NexusEntryBuilder#newData(java.lang.String)
 	 */
 	@Override
 	public NexusDataBuilder newData(final String name) {
-		NXdataImpl nxData = nexusNodeFactory.createNXdata();
+		final NXdataImpl nxData = nexusNodeFactory.createNXdata();
 		nxEntry.setData(name, nxData);
 		return new DefaultNexusDataBuilder(this, nxData);
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.dawnsci.nexus.builder.NexusEntryBuilder#newApplication(org.eclipse.dawnsci.nexus.NexusApplicationDefinition)
 	 */
@@ -123,7 +124,7 @@ public class DefaultNexusEntryBuilder implements NexusEntryBuilder {
 	public NexusApplicationBuilder newApplication(NexusApplicationDefinition applicationDefinition) throws NexusException {
 		final String appDefName = applicationDefinition.name();
 		final String subentryName = appDefName.substring(appDefName.indexOf('_') + 1).toLowerCase() + APPDEF_SUBENTRY_SUFFIX;
-		
+
 		return newApplication(subentryName, applicationDefinition);
 	}
 
@@ -134,10 +135,10 @@ public class DefaultNexusEntryBuilder implements NexusEntryBuilder {
 	public NexusApplicationBuilder newApplication(String subentryName,
 			NexusApplicationDefinition applicationDefinition)
 			throws NexusException {
-		NexusApplicationBuilder appBuilder = DefaultApplicationFactory.getApplicationDefinitionFactory().newApplicationDefinitionModel(
+		final NexusApplicationBuilder appBuilder = DefaultApplicationFactory.getApplicationDefinitionFactory().newApplicationDefinitionModel(
 				this, applicationDefinition, subentryName);
 		applications.add(appBuilder);
-		
+
 		return appBuilder;
 	}
 
@@ -146,12 +147,12 @@ public class DefaultNexusEntryBuilder implements NexusEntryBuilder {
 	 */
 	@Override
 	public List<NXobject> addAll(Collection<? extends NexusObjectProvider<?>> nexusAdapters) throws NexusException {
-		List<NXobject> nexusObjects = new ArrayList<NXobject>(nexusAdapters.size());
-		for (NexusObjectProvider<?> nexusAdapter : nexusAdapters) {
-			NXobject nexusObject = add(nexusAdapter);
+		final List<NXobject> nexusObjects = new ArrayList<NXobject>(nexusAdapters.size());
+		for (final NexusObjectProvider<?> nexusAdapter : nexusAdapters) {
+			final NXobject nexusObject = add(nexusAdapter);
 			nexusObjects.add(nexusObject);
 		}
-		
+
 		return nexusObjects;
 	}
 
@@ -175,8 +176,8 @@ public class DefaultNexusEntryBuilder implements NexusEntryBuilder {
 		} else {
 			group = findGroupForCategory(category);
 		}
-		
-		Iterator<MetadataEntry> metadataEntryIterator = metadataProvider.getMetadataEntries();
+
+		final Iterator<MetadataEntry> metadataEntryIterator = metadataProvider.getMetadataEntries();
 		while (metadataEntryIterator.hasNext()) {
 			final MetadataEntry entry = metadataEntryIterator.next();
 			((NXobjectImpl) group).setField(entry.getName(), entry.getValue());
@@ -205,7 +206,7 @@ public class DefaultNexusEntryBuilder implements NexusEntryBuilder {
 	@Override
 	public void modifyEntry(
 			Collection<NexusEntryModification> modifications) throws NexusException {
-		for (NexusEntryModification modification : modifications) {
+		for (final NexusEntryModification modification : modifications) {
 			modifyEntry(modification);
 		}
 	}
@@ -217,13 +218,13 @@ public class DefaultNexusEntryBuilder implements NexusEntryBuilder {
 	public void setInstrumentName(String instrumentName) {
 		nxInstrument.setNameScalar(instrumentName);
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.dawnsci.nexus.builder.NexusEntryBuilder#getDataNode(java.lang.String)
 	 */
 	@Override
 	public DataNode getDataNode(String relativePath) throws NexusException {
-		NodeLink nodeLink = nxEntry.findNodeLink(relativePath);
+		final NodeLink nodeLink = nxEntry.findNodeLink(relativePath);
 		if (nodeLink == null) {
 			throw new NexusException("Cannot find expected data node within the entry with relative path: " + relativePath);
 		}
@@ -238,16 +239,17 @@ public class DefaultNexusEntryBuilder implements NexusEntryBuilder {
 	 * Adds the default groups for the entry. Subclasses may override as appropriate.
 	 * @return
 	 */
+	@Override
 	public void addDefaultGroups() {
 		// TODO is this correct for all nexus trees we might want to create?
 		// how do we configure it? (or just let subclasses override if they want?)
 		defaultGroups = new ArrayList<>();
 		defaultGroups.add(nxEntry);
-		
+
 		nxInstrument = nexusNodeFactory.createNXinstrument();
 		defaultGroups.add(nxInstrument);
 		nxEntry.setInstrument(nxInstrument);
-	
+
 		nxSample = nexusNodeFactory.createNXsample();
 		defaultGroups.add(nxSample);
 		nxEntry.setSample(nxSample);
@@ -258,7 +260,7 @@ public class DefaultNexusEntryBuilder implements NexusEntryBuilder {
 	 */
 	@Override
 	public void validate() throws NexusValidationException {
-		for (NexusApplicationBuilder appDef : applications) {
+		for (final NexusApplicationBuilder appDef : applications) {
 			appDef.validate();
 		}
 	}
@@ -271,9 +273,13 @@ public class DefaultNexusEntryBuilder implements NexusEntryBuilder {
 	 * in which case this replaces the existing NXsample base class in the nexus tree.
 	 * @param adapter
 	 * @param nexusObject
-	 * @throws NexusException 
+	 * @throws NexusException
 	 */
 	protected <N extends NXobject> void addGroupToNexusTree(NexusObjectProvider<N> adapter, N nexusObject) throws NexusException {
+		if (defaultGroups == null) {
+			throw new IllegalStateException("There are no groups to add this element to. defaultGroups() must be invoked on this method before child groups can be added.");
+		}
+
 		if (nexusObject.getNexusBaseClass() == NexusBaseClass.NX_SAMPLE) {
 			// special case for NXsample
 			defaultGroups.remove(nxSample);
@@ -283,13 +289,13 @@ public class DefaultNexusEntryBuilder implements NexusEntryBuilder {
 		} else {
 			// normal case
 			final String name = adapter.getName();
-			NexusBaseClass category = adapter.getCategory();
-			
+			final NexusBaseClass category = adapter.getCategory();
+
 			NXobject parentGroup = null;
 			if (category != null) {
 				parentGroup = findGroupForCategory(category);
 			} else {
-				for (NXobject group : defaultGroups) {
+				for (final NXobject group : defaultGroups) {
 					if (group.canAddChild(nexusObject)) {
 						parentGroup = group;
 						break;
@@ -299,25 +305,25 @@ public class DefaultNexusEntryBuilder implements NexusEntryBuilder {
 					throw new NexusException("Cannot find a parent group that accepts a " + nexusObject.getNexusBaseClass());
 				}
 			}
-			
+
 			parentGroup.addGroupNode(name, nexusObject);
 		}
 	}
-	
+
 	private NXobject findGroupForCategory(NexusBaseClass category) throws NexusException {
 		if (category == NexusBaseClass.NX_ENTRY) {
 			return nxEntry;
 		}
-		
-		for (NXobject group : defaultGroups) {
+
+		for (final NXobject group : defaultGroups) {
 			if (category == group.getNexusBaseClass()) {
 				return group;
 			}
 		}
-		
-		throw new NexusException("No group found for category " + category); 
+
+		throw new NexusException("No group found for category " + category);
 	}
-	
-	
+
+
 
 }
