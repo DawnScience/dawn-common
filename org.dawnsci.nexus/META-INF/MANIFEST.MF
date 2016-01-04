@@ -4,8 +4,7 @@ Bundle-Name: Dawnsci Nexus Plug-in
 Bundle-SymbolicName: org.dawnsci.nexus
 Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
-Service-Component: OSGI-INF/*.xml,
- OSGI-INF/serviceHolder.xml
+Service-Component: OSGI-INF/*.xml
 Export-Package: org.dawnsci.nexus,
  org.dawnsci.nexus.builder.appdef.impl,
  org.dawnsci.nexus.builder.impl
