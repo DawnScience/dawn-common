@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Class to link any IDocument to recording macros.
  * 
- * @author fcp94556
+ * @author Matthew Gerring
  *
  */
 public class DocumentInserter implements IMacroEventListener, IPartListener {

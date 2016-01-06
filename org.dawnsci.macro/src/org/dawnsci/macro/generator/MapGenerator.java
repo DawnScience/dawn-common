@@ -10,7 +10,7 @@ import org.eclipse.dawnsci.macro.api.AbstractMacroGenerator;
 
 /**
  * Creates a python dictionary from whatever 
- * @author fcp94556
+ * @author Matthew Gerring
  *
  */
 public class MapGenerator extends AbstractMacroGenerator<Map> {

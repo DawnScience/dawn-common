@@ -23,7 +23,7 @@ import uk.ac.diamond.scisoft.analysis.rpc.flattening.IRootFlattener;
  * Generates the python to create regions in the scripting layer.
  * Uses the flattening service to create the correct commands.
  * 
- * @author fcp94556
+ * @author Matthew Gerring
  *
  */
 class RegionGenerator extends AbstractMacroGenerator<Object> {

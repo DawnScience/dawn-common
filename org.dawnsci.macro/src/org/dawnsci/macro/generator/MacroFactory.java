@@ -16,7 +16,7 @@ import org.eclipse.dawnsci.plotting.api.region.IRegion;
 /**
  * Class to provide automatic generation of macro content.
  * 
- * @author fcp94556
+ * @author Matthew Gerring
  *
  */
 public class MacroFactory {

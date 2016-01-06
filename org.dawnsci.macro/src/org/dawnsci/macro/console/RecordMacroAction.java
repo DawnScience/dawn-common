@@ -22,7 +22,7 @@ import org.python.pydev.editor.PyEdit;
  * 
  * This action exists once for all python file editors, which is how eclipse does it.
  * 
- * @author fcp94556
+ * @author Matthew Gerring
  *
  */
 public class RecordMacroAction extends AbstractHandler implements IEditorActionDelegate {

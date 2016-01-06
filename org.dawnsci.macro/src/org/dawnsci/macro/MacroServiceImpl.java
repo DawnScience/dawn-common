@@ -20,7 +20,7 @@ import py4j.reflection.MethodInvoker;
  * 
  * folder in the workspace of eclipse you are using to reset.
  * 
- * @author fcp94556
+ * @author Matthew Gerring
  *
  */
 public class MacroServiceImpl implements IMacroService {

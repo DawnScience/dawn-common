@@ -18,7 +18,7 @@ import uk.ac.diamond.scisoft.python.JythonInterpreterUtils;
  * 
  * @see IMacroRunner
  * 
- * @author fcp94556
+ * @author Matthew Gerring
  *
  */
 public class MacroRunnerImpl implements IMacroRunner {
