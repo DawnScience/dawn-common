@@ -15,6 +15,7 @@ import org.eclipse.dawnsci.nexus.NXdetector;
 import org.eclipse.dawnsci.nexus.NXpositioner;
 import org.eclipse.dawnsci.nexus.NexusBaseClass;
 import org.eclipse.dawnsci.nexus.NexusException;
+import org.eclipse.dawnsci.nexus.builder.AbstractNexusProvider;
 import org.eclipse.dawnsci.nexus.builder.NexusDataBuilder;
 import org.eclipse.dawnsci.nexus.builder.NexusEntryBuilder;
 import org.eclipse.dawnsci.nexus.builder.NexusFileBuilder;
@@ -32,7 +33,7 @@ import org.junit.Test;
  */
 public class DefaultNexusDataExamplesTest {
 	
-	public static class TestDetector extends AbstractNexusObjectProvider<NXdetector> {
+	public static class TestDetector extends AbstractNexusProvider<NXdetector> {
 	
 		private final int[] shape;
 		
@@ -55,7 +56,7 @@ public class DefaultNexusDataExamplesTest {
 		
 	}
 
-	public static class TestPositioner extends AbstractNexusObjectProvider<NXpositioner> {
+	public static class TestPositioner extends AbstractNexusProvider<NXpositioner> {
 		
 		private final int[] shape;
 		

@@ -6,7 +6,6 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.sameInstance;
 
-import org.dawnsci.nexus.builder.impl.AbstractNexusObjectProvider;
 import org.dawnsci.nexus.builder.impl.DefaultNexusFileBuilder;
 import org.eclipse.dawnsci.analysis.api.dataset.ILazyWriteableDataset;
 import org.eclipse.dawnsci.analysis.api.tree.DataNode;
@@ -20,6 +19,7 @@ import org.eclipse.dawnsci.nexus.NXsource;
 import org.eclipse.dawnsci.nexus.NexusApplicationDefinition;
 import org.eclipse.dawnsci.nexus.NexusBaseClass;
 import org.eclipse.dawnsci.nexus.NexusException;
+import org.eclipse.dawnsci.nexus.builder.AbstractNexusProvider;
 import org.eclipse.dawnsci.nexus.builder.NexusEntryBuilder;
 import org.eclipse.dawnsci.nexus.builder.NexusFileBuilder;
 import org.eclipse.dawnsci.nexus.builder.NexusObjectProvider;
@@ -38,7 +38,7 @@ import org.junit.Test;
 
 public class TomoApplicationBuilderTest {
 
-	public static class TestPositioner extends AbstractNexusObjectProvider<NXpositioner> {
+	public static class TestPositioner extends AbstractNexusProvider<NXpositioner> {
 		
 		public TestPositioner() {
 			super("positioner", NexusBaseClass.NX_POSITIONER, NXpositionerImpl.NX_VALUE);
@@ -91,7 +91,7 @@ public class TomoApplicationBuilderTest {
 	@Test
 	public void testSetSource() {
 		tomoBuilder.addDefaultGroups();
-		NexusObjectProvider<NXsource> sourceProvider = new AbstractNexusObjectProvider<NXsource>(NexusBaseClass.NX_SOURCE) {
+		NexusObjectProvider<NXsource> sourceProvider = new AbstractNexusProvider<NXsource>(NexusBaseClass.NX_SOURCE) {
 
 			@Override
 			protected NXsource doCreateNexusObject(NexusNodeFactory nodeFactory) {
@@ -113,7 +113,7 @@ public class TomoApplicationBuilderTest {
 	@Test
 	public void testSetDetector() {
 		tomoBuilder.addDefaultGroups();
-		NexusObjectProvider<NXdetector> detectorProvider = new AbstractNexusObjectProvider<NXdetector>(NexusBaseClass.NX_DETECTOR) {
+		NexusObjectProvider<NXdetector> detectorProvider = new AbstractNexusProvider<NXdetector>(NexusBaseClass.NX_DETECTOR) {
 
 			@Override
 			protected NXdetector doCreateNexusObject(
@@ -140,7 +140,7 @@ public class TomoApplicationBuilderTest {
 	@Test
 	public void testSetSample() throws NexusException {
 		tomoBuilder.addDefaultGroups();
-		NexusObjectProvider<NXsample> sampleProvider = new AbstractNexusObjectProvider<NXsample>(NexusBaseClass.NX_SAMPLE) {
+		NexusObjectProvider<NXsample> sampleProvider = new AbstractNexusProvider<NXsample>(NexusBaseClass.NX_SAMPLE) {
 
 			@Override
 			protected NXsample doCreateNexusObject(NexusNodeFactory nodeFactory) {

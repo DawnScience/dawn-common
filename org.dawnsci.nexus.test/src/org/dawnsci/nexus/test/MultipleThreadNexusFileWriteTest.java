@@ -16,7 +16,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
-import org.dawnsci.nexus.builder.impl.AbstractNexusObjectProvider;
 import org.dawnsci.nexus.builder.impl.DefaultNexusFileBuilder;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
@@ -35,6 +34,7 @@ import org.eclipse.dawnsci.nexus.NXpositioner;
 import org.eclipse.dawnsci.nexus.NXroot;
 import org.eclipse.dawnsci.nexus.NexusBaseClass;
 import org.eclipse.dawnsci.nexus.NexusException;
+import org.eclipse.dawnsci.nexus.builder.AbstractNexusProvider;
 import org.eclipse.dawnsci.nexus.builder.NexusDataBuilder;
 import org.eclipse.dawnsci.nexus.builder.NexusEntryBuilder;
 import org.eclipse.dawnsci.nexus.builder.NexusFileBuilder;
@@ -52,7 +52,7 @@ import uk.ac.diamond.scisoft.analysis.TestUtils;
 public class MultipleThreadNexusFileWriteTest {
 
 	private static abstract class AbstractTestDevice<N extends NXobject>
-		extends AbstractNexusObjectProvider<N>
+		extends AbstractNexusProvider<N>
 		implements Callable<Boolean> {
 
 		private int nextStepNumber = 0;

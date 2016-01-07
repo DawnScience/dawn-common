@@ -24,6 +24,7 @@ import org.eclipse.dawnsci.nexus.NXsource;
 import org.eclipse.dawnsci.nexus.NexusApplicationDefinition;
 import org.eclipse.dawnsci.nexus.NexusBaseClass;
 import org.eclipse.dawnsci.nexus.NexusException;
+import org.eclipse.dawnsci.nexus.builder.AbstractNexusProvider;
 import org.eclipse.dawnsci.nexus.builder.CustomNexusEntryModification;
 import org.eclipse.dawnsci.nexus.builder.NexusDataBuilder;
 import org.eclipse.dawnsci.nexus.builder.NexusEntryBuilder;
@@ -41,7 +42,7 @@ import org.junit.Test;
 
 public class DefaultNexusEntryBuilderTest {
 	
-	public static class TestPositioner extends AbstractNexusObjectProvider<NXpositioner> {
+	public static class TestPositioner extends AbstractNexusProvider<NXpositioner> {
 	
 		public TestPositioner() {
 			super("positioner", NexusBaseClass.NX_POSITIONER, NXpositionerImpl.NX_VALUE);
@@ -58,7 +59,7 @@ public class DefaultNexusEntryBuilderTest {
 
 	}
 	
-	public static class TestDetector extends AbstractNexusObjectProvider<NXdetector> {
+	public static class TestDetector extends AbstractNexusProvider<NXdetector> {
 
 		public TestDetector() {
 			super(NexusBaseClass.NX_DETECTOR);
@@ -71,7 +72,7 @@ public class DefaultNexusEntryBuilderTest {
 		
 	}
 	
-	public static class TestSource extends AbstractNexusObjectProvider<NXsource> {
+	public static class TestSource extends AbstractNexusProvider<NXsource> {
 		
 		public TestSource() {
 			super(NexusBaseClass.NX_SOURCE);
@@ -173,7 +174,7 @@ public class DefaultNexusEntryBuilderTest {
 	
 	@Test
 	public void testAdd_sample() throws NexusException {
-		NexusObjectProvider<NXsample> sampleProvider = new AbstractNexusObjectProvider<NXsample>(NexusBaseClass.NX_SAMPLE) {
+		NexusObjectProvider<NXsample> sampleProvider = new AbstractNexusProvider<NXsample>(NexusBaseClass.NX_SAMPLE) {
 
 			@Override
 			protected NXsample doCreateNexusObject(NexusNodeFactory nodeFactory) {

@@ -8,8 +8,8 @@ Service-Component: OSGI-INF/*.xml
 Export-Package: org.dawnsci.nexus,
  org.dawnsci.nexus.builder.appdef.impl,
  org.dawnsci.nexus.builder.impl
-Require-Bundle: org.eclipse.dawnsci.analysis.dataset;bundle-version="1.0.0",
- org.eclipse.dawnsci.analysis.api;bundle-version="1.0.0",
+Require-Bundle: org.eclipse.dawnsci.analysis.api;bundle-version="1.0.0",
+ org.eclipse.dawnsci.analysis.dataset;bundle-version="1.0.0",
  org.eclipse.dawnsci.analysis.tree;bundle-version="1.0.0",
  org.eclipse.dawnsci.nexus;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy

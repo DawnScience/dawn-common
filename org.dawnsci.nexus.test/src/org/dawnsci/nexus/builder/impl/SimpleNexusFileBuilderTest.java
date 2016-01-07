@@ -22,6 +22,7 @@ import org.eclipse.dawnsci.nexus.NXbeam;
 import org.eclipse.dawnsci.nexus.NXdetector;
 import org.eclipse.dawnsci.nexus.NexusBaseClass;
 import org.eclipse.dawnsci.nexus.NexusException;
+import org.eclipse.dawnsci.nexus.builder.AbstractNexusProvider;
 import org.eclipse.dawnsci.nexus.builder.NexusDataBuilder;
 import org.eclipse.dawnsci.nexus.builder.NexusEntryBuilder;
 import org.eclipse.dawnsci.nexus.builder.NexusEntryModification;
@@ -31,7 +32,7 @@ import org.eclipse.dawnsci.nexus.impl.NexusNodeFactory;
 
 public class SimpleNexusFileBuilderTest extends AbstractNexusFileBuilderTestBase {
 	
-	private static class TestDetector extends AbstractNexusObjectProvider<NXdetector> {
+	private static class TestDetector extends AbstractNexusProvider<NXdetector> {
 
 		public TestDetector() {
 			super("analyser", NexusBaseClass.NX_DETECTOR,
@@ -51,7 +52,7 @@ public class SimpleNexusFileBuilderTest extends AbstractNexusFileBuilderTestBase
 
 	}
 
-	private static class TestBeam extends AbstractNexusObjectProvider<NXbeam> {
+	private static class TestBeam extends AbstractNexusProvider<NXbeam> {
 
 		public TestBeam() {
 			super("beam", NexusBaseClass.NX_BEAM, null, NexusBaseClass.NX_SAMPLE);

@@ -26,6 +26,7 @@ import org.eclipse.dawnsci.nexus.NXsource;
 import org.eclipse.dawnsci.nexus.NexusApplicationDefinition;
 import org.eclipse.dawnsci.nexus.NexusBaseClass;
 import org.eclipse.dawnsci.nexus.NexusException;
+import org.eclipse.dawnsci.nexus.builder.AbstractNexusProvider;
 import org.eclipse.dawnsci.nexus.builder.NexusDataBuilder;
 import org.eclipse.dawnsci.nexus.builder.NexusEntryBuilder;
 import org.eclipse.dawnsci.nexus.builder.NexusEntryModification;
@@ -39,7 +40,7 @@ import org.eclipse.dawnsci.nexus.impl.NexusNodeFactory;
 
 public class ComplexNexusFileBuilderTest extends AbstractNexusFileBuilderTestBase {
 	
-	private static class SimplePositioner extends AbstractNexusObjectProvider<NXpositioner> {
+	private static class SimplePositioner extends AbstractNexusProvider<NXpositioner> {
 
 		public SimplePositioner(final String name) {
 			super(name, NexusBaseClass.NX_POSITIONER, NXpositionerImpl.NX_VALUE, NexusBaseClass.NX_INSTRUMENT);
@@ -57,7 +58,7 @@ public class ComplexNexusFileBuilderTest extends AbstractNexusFileBuilderTestBas
 
 	}
 	
-	private static final class TomoScanDevicePositioner extends AbstractNexusObjectProvider<NXpositioner> {
+	private static final class TomoScanDevicePositioner extends AbstractNexusProvider<NXpositioner> {
 
 		public TomoScanDevicePositioner() {
 			super("tomoScanDevice", NexusBaseClass.NX_POSITIONER, "ss1_rot");
@@ -78,7 +79,7 @@ public class ComplexNexusFileBuilderTest extends AbstractNexusFileBuilderTestBas
 
 	}
 	
-	private static class TestDetector extends AbstractNexusObjectProvider<NXdetector> {
+	private static class TestDetector extends AbstractNexusProvider<NXdetector> {
 		
 		public TestDetector() {
 			super("pc01_hw_hdf", NexusBaseClass.NX_DETECTOR);
@@ -104,7 +105,7 @@ public class ComplexNexusFileBuilderTest extends AbstractNexusFileBuilderTestBas
 
 	}
 	
-	private static class TestSource extends AbstractNexusObjectProvider<NXsource> {
+	private static class TestSource extends AbstractNexusProvider<NXsource> {
 
 		public TestSource() {
 			super("source", NexusBaseClass.NX_SOURCE);
@@ -128,7 +129,7 @@ public class ComplexNexusFileBuilderTest extends AbstractNexusFileBuilderTestBas
 	 * In the real world the before_scan collection is used by GDA to store additional data it needs.
 	 * In a real world system this provider could fetch the details from the scan.
 	 */
-	private static class BeforeScan extends AbstractNexusObjectProvider<NXcollection> {
+	private static class BeforeScan extends AbstractNexusProvider<NXcollection> {
 
 		public BeforeScan() {
 			super("before_scan", NexusBaseClass.NX_COLLECTION);

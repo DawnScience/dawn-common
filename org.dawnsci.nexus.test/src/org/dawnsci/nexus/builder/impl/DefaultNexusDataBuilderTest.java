@@ -13,6 +13,7 @@ import org.eclipse.dawnsci.nexus.NXdetector;
 import org.eclipse.dawnsci.nexus.NXpositioner;
 import org.eclipse.dawnsci.nexus.NexusBaseClass;
 import org.eclipse.dawnsci.nexus.NexusException;
+import org.eclipse.dawnsci.nexus.builder.AbstractNexusProvider;
 import org.eclipse.dawnsci.nexus.builder.NexusDataBuilder;
 import org.eclipse.dawnsci.nexus.builder.NexusEntryBuilder;
 import org.eclipse.dawnsci.nexus.builder.NexusFileBuilder;
@@ -25,7 +26,7 @@ import org.junit.Test;
 
 public class DefaultNexusDataBuilderTest {
 	
-	public static class TestPositioner extends AbstractNexusObjectProvider<NXpositioner> {
+	public static class TestPositioner extends AbstractNexusProvider<NXpositioner> {
 		
 		public TestPositioner() {
 			super("positioner", NexusBaseClass.NX_POSITIONER, NXpositionerImpl.NX_VALUE);
@@ -47,7 +48,7 @@ public class DefaultNexusDataBuilderTest {
 		
 	}
 	
-	public static class TestDetector extends AbstractNexusObjectProvider<NXdetector> {
+	public static class TestDetector extends AbstractNexusProvider<NXdetector> {
 
 		public TestDetector() {
 			super("testDetector", NexusBaseClass.NX_DETECTOR);
@@ -62,7 +63,7 @@ public class DefaultNexusDataBuilderTest {
 		
 	}
 	
-	public static class MultipleFieldTestPositioner extends AbstractNexusObjectProvider<NXpositioner> {
+	public static class MultipleFieldTestPositioner extends AbstractNexusProvider<NXpositioner> {
 		
 		public MultipleFieldTestPositioner() {
 			super("ss1", NexusBaseClass.NX_POSITIONER, NXpositionerImpl.NX_VALUE);

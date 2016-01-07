@@ -2,6 +2,7 @@ package org.dawnsci.nexus.builder.impl;
 
 import org.eclipse.dawnsci.nexus.NXuser;
 import org.eclipse.dawnsci.nexus.NexusBaseClass;
+import org.eclipse.dawnsci.nexus.builder.AbstractNexusProvider;
 import org.eclipse.dawnsci.nexus.builder.NexusEntryBuilder;
 import org.eclipse.dawnsci.nexus.impl.NXuserImpl;
 import org.eclipse.dawnsci.nexus.impl.NexusNodeFactory;
@@ -11,7 +12,7 @@ import org.eclipse.dawnsci.nexus.impl.NexusNodeFactory;
  * a {@link NexusEntryBuilder} using the {@link NexusEntryBuilder#add(org.eclipse.dawnsci.nexus.builder.NexusObjectProvider)
  * method to add a user to the nexus entry.
  */
-public class NexusUser extends AbstractNexusObjectProvider<NXuser> {
+public class NexusUser extends AbstractNexusProvider<NXuser> {
 	
 	private static final String FIELD_NAME_USERNAME = "username";
 
