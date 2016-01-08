@@ -16,6 +16,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
+import org.dawnsci.nexus.ServiceHolder;
 import org.dawnsci.nexus.builder.impl.DefaultNexusFileBuilder;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
@@ -26,6 +27,7 @@ import org.eclipse.dawnsci.analysis.dataset.impl.Dataset;
 import org.eclipse.dawnsci.analysis.dataset.impl.DatasetFactory;
 import org.eclipse.dawnsci.analysis.dataset.impl.IntegerDataset;
 import org.eclipse.dawnsci.hdf5.HDF5FileFactory;
+import org.eclipse.dawnsci.hdf5.nexus.NexusFileFactoryHDF5;
 import org.eclipse.dawnsci.nexus.NXdetector;
 import org.eclipse.dawnsci.nexus.NXentry;
 import org.eclipse.dawnsci.nexus.NXinstrument;
@@ -210,6 +212,7 @@ public class MultipleThreadNexusFileWriteTest {
 	public void setUp() throws Exception {
 		testScratchDirectoryName = TestUtils.generateDirectorynameFromClassname(getClass().getCanonicalName());
 		TestUtils.makeScratchDirectory(testScratchDirectoryName);
+		ServiceHolder.setNexusFileFactory(new NexusFileFactoryHDF5());
 		filePath = testScratchDirectoryName + FILE_NAME;
 	}
 
@@ -298,7 +301,7 @@ public class MultipleThreadNexusFileWriteTest {
 		createNexusFile(numPositioners);
 		initializeDevices(stepTime, numSteps);
 
-		final long timeout = (stepTime * numSteps) * 2;
+		final long timeout = (numSteps + 1) * stepTime * 2;
 		runThreads(numPositioners, numSteps, timeout);
 		checkFile(numPositioners, numSteps);
 		HDF5FileFactory.releaseFile(filePath, true);
@@ -315,7 +318,7 @@ public class MultipleThreadNexusFileWriteTest {
 
 	@Test
 	public void test20Positioners() throws Exception {
-		doTestNPositioners(1);
+		doTestNPositioners(20);
 	}
 
 	@Test
