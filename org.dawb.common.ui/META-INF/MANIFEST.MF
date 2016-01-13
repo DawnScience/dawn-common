@@ -19,10 +19,14 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.dawnsci.plotting.api;bundle-version="1.2.0",
  org.eclipse.nebula.jface;bundle-version="1.0.0",
  org.eclipse.dawnsci.slicing.api;bundle-version="1.0.0",
- org.eclipse.emf.common.ui,
- org.eclipse.gmf.runtime.draw2d.ui.render.awt,
  org.eclipse.dawnsci.macro.api;bundle-version="1.0.0",
- org.eclipse.richbeans.widgets;bundle-version="1.0.0"
+ org.eclipse.richbeans.widgets;bundle-version="1.0.0",
+ org.apache.batik.dom;bundle-version="1.6.0",
+ org.apache.batik.svggen;bundle-version="1.6.0",
+ org.apache.batik.ext.awt;bundle-version="1.6.0",
+ org.apache.batik.dom.svg;bundle-version="1.6.0",
+ org.apache.batik.util;bundle-version="1.6.0",
+ org.w3c.dom.svg;bundle-version="1.1.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Export-Package: org.dawb.common.ui,
@@ -58,9 +62,7 @@ Import-Package: org.dawb.common.services,
  org.eclipse.dawnsci.analysis.api.conversion,
  org.eclipse.draw2d,
  org.eclipse.draw2d.geometry,
- org.eclipse.gmf.runtime.common.ui.util,
- org.eclipse.gmf.runtime.draw2d.ui.figures,
- org.eclipse.gmf.runtime.draw2d.ui.render.awt.internal.svg.export,
+ org.eclipse.emf.common.ui.dialogs,
  org.slf4j;version="[1.7.6,1.7.7)"
 Bundle-ClassPath: .
 Service-Component: OSGI-INF/*.xml

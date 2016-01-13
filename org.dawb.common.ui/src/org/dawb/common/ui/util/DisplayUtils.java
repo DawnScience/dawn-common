@@ -11,6 +11,7 @@ package org.dawb.common.ui.util;
 
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.PlatformUI;
 
 public class DisplayUtils {
 
@@ -44,5 +45,13 @@ public class DisplayUtils {
 			else
 				runnable.run();
 		}
+	}
+	
+	public static Display getDisplay() {
+		Display display = Display.getCurrent();
+		if (display == null && PlatformUI.isWorkbenchRunning()) {
+			display = PlatformUI.getWorkbench().getDisplay();
+		}
+		return display != null ? display : Display.getDefault();
 	}
 }
