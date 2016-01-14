@@ -12,11 +12,9 @@ import org.eclipse.dawnsci.nexus.NXentry;
 import org.eclipse.dawnsci.nexus.NXroot;
 import org.eclipse.dawnsci.nexus.NexusApplicationDefinition;
 import org.eclipse.dawnsci.nexus.NexusException;
+import org.eclipse.dawnsci.nexus.NexusNodeFactory;
 import org.eclipse.dawnsci.nexus.builder.NexusEntryBuilder;
 import org.eclipse.dawnsci.nexus.builder.NexusFileBuilder;
-import org.eclipse.dawnsci.nexus.impl.NXentryImpl;
-import org.eclipse.dawnsci.nexus.impl.NXrootImpl;
-import org.eclipse.dawnsci.nexus.impl.NexusNodeFactory;
 import org.eclipse.dawnsci.nexus.test.util.NexusTestUtils;
 import org.eclipse.dawnsci.nexus.validation.NexusValidationException;
 import org.hamcrest.Matchers;
@@ -54,7 +52,7 @@ public class DefaultNexusFileBuilderTest {
 	@Ignore // TODO reinstate and figure out why this is throwing an exception
 	public void testSaveFile() throws NexusException {
 		NexusEntryBuilder nexusEntryBuilder = nexusFileBuilder.newEntry();
-		((NXentryImpl) nexusEntryBuilder.getNXentry()).setTitleScalar("test");
+		nexusEntryBuilder.getNXentry().setTitleScalar("test");
 		
 		nexusFileBuilder.saveFile();
 		
@@ -82,7 +80,7 @@ public class DefaultNexusFileBuilderTest {
 	
 	@Test
 	public void testGetNewEntry() throws Exception {
-		NXrootImpl nxRoot = nexusFileBuilder.getNXroot();
+		NXroot nxRoot = nexusFileBuilder.getNXroot();
 		assertThat(nxRoot.getChildren(NXentry.class).keySet(), empty());
 
 		NexusEntryBuilder entryBuilder = nexusFileBuilder.newEntry();
@@ -92,7 +90,7 @@ public class DefaultNexusFileBuilderTest {
 	
 	@Test
 	public void testGetNewEntry_name() throws Exception {
-		NXrootImpl nxRoot = nexusFileBuilder.getNXroot();
+		NXroot nxRoot = nexusFileBuilder.getNXroot();
 		assertThat(nxRoot.getChildren(NXentry.class).keySet(), empty());
 
 		NexusEntryBuilder entryBuilder = nexusFileBuilder.newEntry("myentry");

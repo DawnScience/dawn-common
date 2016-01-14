@@ -4,9 +4,9 @@ import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.dataset.impl.AbstractDataset;
 import org.eclipse.dawnsci.analysis.dataset.impl.DatasetFactory;
 import org.eclipse.dawnsci.analysis.dataset.impl.LongDataset;
-import org.eclipse.dawnsci.nexus.impl.NXdataImpl;
-import org.eclipse.dawnsci.nexus.impl.NXentryImpl;
-import org.eclipse.dawnsci.nexus.impl.NXrootImpl;
+import org.eclipse.dawnsci.nexus.NXdata;
+import org.eclipse.dawnsci.nexus.NXentry;
+import org.eclipse.dawnsci.nexus.NXroot;
 
 /**
  * Simple NeXus file test based on 'verysimple.nx5' example described in the
@@ -18,9 +18,9 @@ public class SimpleNexusFileTest extends AbstractNexusFileTestBase {
 	private static final String FILE_NAME = "verysimple.nxs";
 
 	@Override
-	protected NXrootImpl createNXroot() {
+	protected NXroot createNXroot() {
 		// create the root object of the nexus file
-		NXrootImpl root = nexusNodeFactory.createNXroot();
+		NXroot root = nexusNodeFactory.createNXroot();
 		root.setAttributeFile_name(FILE_NAME);
 		root.setAttributeFile_time("2014-09-08T09:07:11.939912");
 		root.setAttributeNeXus_version("4.3.0");
@@ -28,10 +28,10 @@ public class SimpleNexusFileTest extends AbstractNexusFileTestBase {
 		root.setAttribute(null, "h5py_version", "2.3.0");
 
 		// create the single entry object of the nexus file
-		NXentryImpl entry = nexusNodeFactory.createNXentry();
+		NXentry entry = nexusNodeFactory.createNXentry();
 		root.setEntry(entry);
 
-		NXdataImpl dataGroup = nexusNodeFactory.createNXdata();
+		NXdata dataGroup = nexusNodeFactory.createNXdata();
 		entry.setData(dataGroup);
 
 		long[] countsData = new long[] {

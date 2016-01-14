@@ -28,6 +28,7 @@ import org.eclipse.dawnsci.analysis.dataset.impl.DatasetFactory;
 import org.eclipse.dawnsci.analysis.dataset.impl.IntegerDataset;
 import org.eclipse.dawnsci.hdf5.HDF5FileFactory;
 import org.eclipse.dawnsci.hdf5.nexus.NexusFileFactoryHDF5;
+import org.eclipse.dawnsci.nexus.NXdata;
 import org.eclipse.dawnsci.nexus.NXdetector;
 import org.eclipse.dawnsci.nexus.NXentry;
 import org.eclipse.dawnsci.nexus.NXinstrument;
@@ -36,14 +37,11 @@ import org.eclipse.dawnsci.nexus.NXpositioner;
 import org.eclipse.dawnsci.nexus.NXroot;
 import org.eclipse.dawnsci.nexus.NexusBaseClass;
 import org.eclipse.dawnsci.nexus.NexusException;
+import org.eclipse.dawnsci.nexus.NexusNodeFactory;
 import org.eclipse.dawnsci.nexus.builder.AbstractNexusProvider;
 import org.eclipse.dawnsci.nexus.builder.NexusDataBuilder;
 import org.eclipse.dawnsci.nexus.builder.NexusEntryBuilder;
 import org.eclipse.dawnsci.nexus.builder.NexusFileBuilder;
-import org.eclipse.dawnsci.nexus.impl.NXdataImpl;
-import org.eclipse.dawnsci.nexus.impl.NXdetectorImpl;
-import org.eclipse.dawnsci.nexus.impl.NXpositionerImpl;
-import org.eclipse.dawnsci.nexus.impl.NexusNodeFactory;
 import org.eclipse.dawnsci.nexus.test.util.NexusTestUtils;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -116,16 +114,16 @@ public class MultipleThreadNexusFileWriteTest {
 		private final int numColumns;
 
 		public TestDetector(int rows, int columns) {
-			super("detector", NexusBaseClass.NX_DETECTOR, NXdataImpl.NX_DATA);
+			super("detector", NexusBaseClass.NX_DETECTOR, NXdata.NX_DATA);
 			this.numRows = rows;
 			this.numColumns = columns;
 		}
 
 		@Override
 		protected NXdetector doCreateNexusObject(NexusNodeFactory nodeFactory) {
-			final NXdetectorImpl detector = nodeFactory.createNXdetector();
+			final NXdetector detector = nodeFactory.createNXdetector();
 			final ILazyWriteableDataset dataset = detector.initializeLazyDataset(
-					NXdetectorImpl.NX_DATA, 3, Dataset.INT32);
+					NXdetector.NX_DATA, 3, Dataset.INT32);
 			dataset.setMaxShape(new int[] { ILazyWriteableDataset.UNLIMITED, numRows, numColumns });
 			return detector;
 		}
@@ -160,14 +158,14 @@ public class MultipleThreadNexusFileWriteTest {
 		private double[] testData;
 
 		public TestPositioner(String name) {
-			super(name, NexusBaseClass.NX_POSITIONER, NXpositionerImpl.NX_VALUE);
+			super(name, NexusBaseClass.NX_POSITIONER, NXpositioner.NX_VALUE);
 			useDeviceNameAsAxisName(true);
 		}
 
 		@Override
 		protected NXpositioner doCreateNexusObject(NexusNodeFactory nodeFactory) {
-			final NXpositionerImpl positioner = nodeFactory.createNXpositioner();
-			positioner.initializeLazyDataset(NXpositionerImpl.NX_VALUE, 1, Dataset.FLOAT64);
+			final NXpositioner positioner = nodeFactory.createNXpositioner();
+			positioner.initializeLazyDataset(NXpositioner.NX_VALUE, 1, Dataset.FLOAT64);
 			return positioner;
 		}
 
@@ -289,7 +287,7 @@ public class MultipleThreadNexusFileWriteTest {
 		}
 		final NXdetector detector = instrument.getDetector();
 		assertThat(detector, is(notNullValue()));
-		final DataNode detectorData = detector.getDataNode(NXdetectorImpl.NX_DATA);
+		final DataNode detectorData = detector.getDataNode(NXdetector.NX_DATA);
 		assertThat(detectorData, is(notNullValue()));
 		final ILazyDataset detectorDataset = detectorData.getDataset();
 		assertThat(detectorDataset, is(notNullValue()));

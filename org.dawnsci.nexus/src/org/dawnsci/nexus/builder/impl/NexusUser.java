@@ -2,10 +2,9 @@ package org.dawnsci.nexus.builder.impl;
 
 import org.eclipse.dawnsci.nexus.NXuser;
 import org.eclipse.dawnsci.nexus.NexusBaseClass;
+import org.eclipse.dawnsci.nexus.NexusNodeFactory;
 import org.eclipse.dawnsci.nexus.builder.AbstractNexusProvider;
 import org.eclipse.dawnsci.nexus.builder.NexusEntryBuilder;
-import org.eclipse.dawnsci.nexus.impl.NXuserImpl;
-import org.eclipse.dawnsci.nexus.impl.NexusNodeFactory;
 
 /**
  * Represents a nexus user. An object of this type can be added to
@@ -58,7 +57,7 @@ public class NexusUser extends AbstractNexusProvider<NXuser> {
 	 */
 	@Override
 	protected NXuser doCreateNexusObject(NexusNodeFactory nodeFactory) {
-		NXuserImpl user = nodeFactory.createNXuser();
+		NXuser user = nodeFactory.createNXuser();
 		
 		if (name != null) {
 			user.setNameScalar(name);

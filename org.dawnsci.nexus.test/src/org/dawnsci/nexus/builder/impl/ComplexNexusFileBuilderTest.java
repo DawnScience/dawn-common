@@ -21,21 +21,17 @@ import org.eclipse.dawnsci.analysis.dataset.impl.Dataset;
 import org.eclipse.dawnsci.analysis.dataset.impl.IntegerDataset;
 import org.eclipse.dawnsci.nexus.NXcollection;
 import org.eclipse.dawnsci.nexus.NXdetector;
+import org.eclipse.dawnsci.nexus.NXentry;
 import org.eclipse.dawnsci.nexus.NXpositioner;
 import org.eclipse.dawnsci.nexus.NXsource;
 import org.eclipse.dawnsci.nexus.NexusApplicationDefinition;
 import org.eclipse.dawnsci.nexus.NexusBaseClass;
 import org.eclipse.dawnsci.nexus.NexusException;
+import org.eclipse.dawnsci.nexus.NexusNodeFactory;
 import org.eclipse.dawnsci.nexus.builder.AbstractNexusProvider;
 import org.eclipse.dawnsci.nexus.builder.NexusDataBuilder;
 import org.eclipse.dawnsci.nexus.builder.NexusEntryBuilder;
 import org.eclipse.dawnsci.nexus.builder.NexusEntryModification;
-import org.eclipse.dawnsci.nexus.impl.NXcollectionImpl;
-import org.eclipse.dawnsci.nexus.impl.NXdetectorImpl;
-import org.eclipse.dawnsci.nexus.impl.NXentryImpl;
-import org.eclipse.dawnsci.nexus.impl.NXpositionerImpl;
-import org.eclipse.dawnsci.nexus.impl.NXsourceImpl;
-import org.eclipse.dawnsci.nexus.impl.NexusNodeFactory;
 
 
 public class ComplexNexusFileBuilderTest extends AbstractNexusFileBuilderTestBase {
@@ -43,7 +39,7 @@ public class ComplexNexusFileBuilderTest extends AbstractNexusFileBuilderTestBas
 	private static class SimplePositioner extends AbstractNexusProvider<NXpositioner> {
 
 		public SimplePositioner(final String name) {
-			super(name, NexusBaseClass.NX_POSITIONER, NXpositionerImpl.NX_VALUE, NexusBaseClass.NX_INSTRUMENT);
+			super(name, NexusBaseClass.NX_POSITIONER, NXpositioner.NX_VALUE, NexusBaseClass.NX_INSTRUMENT);
 			useDeviceNameAsAxisName(true);
 		}
 		
@@ -51,7 +47,7 @@ public class ComplexNexusFileBuilderTest extends AbstractNexusFileBuilderTestBas
 		public NXpositioner doCreateNexusObject(
 				NexusNodeFactory nodeFactory) {
 			NXpositioner positioner = nodeFactory.createNXpositioner();
-			positioner.initializeLazyDataset(NXpositionerImpl.NX_VALUE, 1, Dataset.FLOAT64);
+			positioner.initializeLazyDataset(NXpositioner.NX_VALUE, 1, Dataset.FLOAT64);
 			
 			return positioner;
 		}
@@ -87,10 +83,10 @@ public class ComplexNexusFileBuilderTest extends AbstractNexusFileBuilderTestBas
 		
 		@Override
 		public NXdetector doCreateNexusObject(NexusNodeFactory nodeFactory) {
-			final NXdetectorImpl detector = nodeFactory.createNXdetector();
+			final NXdetector detector = nodeFactory.createNXdetector();
 			
-			detector.initializeLazyDataset(NXdetectorImpl.NX_DATA, 3, Dataset.INT16);
-			detector.initializeLazyDataset(NXdetectorImpl.NX_COUNT_TIME, 1, Dataset.FLOAT64);
+			detector.initializeLazyDataset(NXdetector.NX_DATA, 3, Dataset.INT16);
+			detector.initializeLazyDataset(NXdetector.NX_COUNT_TIME, 1, Dataset.FLOAT64);
 			IDataset regionOrigin = new IntegerDataset(new int[] { 0, 0 }, 1, 2);
 			detector.setField("region_origin", regionOrigin);
 			IDataset regionSize = new IntegerDataset(new int[] { 2560, 2160 }, 1, 2);
@@ -113,7 +109,7 @@ public class ComplexNexusFileBuilderTest extends AbstractNexusFileBuilderTestBas
 
 		@Override
 		protected NXsource doCreateNexusObject(NexusNodeFactory nodeFactory) {
-			final NXsourceImpl source = nodeFactory.createNXsource();
+			final NXsource source = nodeFactory.createNXsource();
 			source.setCurrentScalar(-1.0);
 			source.setEnergyScalar(-1.0);
 			source.setNameScalar("DLS");
@@ -138,10 +134,10 @@ public class ComplexNexusFileBuilderTest extends AbstractNexusFileBuilderTestBas
 		@Override
 		protected NXcollection doCreateNexusObject(
 				NexusNodeFactory nodeFactory) {
-			NXcollectionImpl beforeScan = nodeFactory.createNXcollection();
+			NXcollection beforeScan = nodeFactory.createNXcollection();
 			
 			// Create cs1 collection: 
-			NXcollectionImpl cs1 = nodeFactory.createNXcollection();
+			NXcollection cs1 = nodeFactory.createNXcollection();
 			beforeScan.addGroupNode("cs1", cs1);
 			cs1.setAttribute(null, "metadata_type", "scannable");	
 			
@@ -155,7 +151,7 @@ public class ComplexNexusFileBuilderTest extends AbstractNexusFileBuilderTestBas
 			}
 			
 			// Create sample stage collection
-			NXcollectionImpl sampleStage = nodeFactory.createNXcollection();
+			NXcollection sampleStage = nodeFactory.createNXcollection();
 			beforeScan.addGroupNode("sample_stage", sampleStage);
 			String[] ss1FieldNames = new String[] { "ss1_X", "ss1_Y", "ss1_Z", "ss1_rot",
 					"ss1_samplex", "ss1_sampley", "ss1_samplez" };
@@ -260,7 +256,7 @@ public class ComplexNexusFileBuilderTest extends AbstractNexusFileBuilderTestBas
 		TomoApplicationBuilder appDefModel =
 				(TomoApplicationBuilder) nexusEntryModel.newApplication(NexusApplicationDefinition.NX_TOMO);
 		appDefModel.addDefaultGroups();
-		appDefModel.setTitle(nexusEntryModel.getDataNode(NXentryImpl.NX_TITLE));
+		appDefModel.setTitle(nexusEntryModel.getDataNode(NXentry.NX_TITLE));
 		appDefModel.setControl(ioncIPositioner);
 		appDefModel.setSource(testSource);
 		appDefModel.setDetector(testDetector);

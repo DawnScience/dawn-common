@@ -29,7 +29,6 @@ import org.eclipse.dawnsci.nexus.builder.NexusBuilderFactory;
 import org.eclipse.dawnsci.nexus.builder.NexusEntryBuilder;
 import org.eclipse.dawnsci.nexus.builder.NexusEntryModification;
 import org.eclipse.dawnsci.nexus.builder.NexusFileBuilder;
-import org.eclipse.dawnsci.nexus.impl.NXobjectImpl;
 import org.eclipse.dawnsci.nexus.test.util.NexusTestUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -124,7 +123,7 @@ public abstract class AbstractNexusFileBuilderTestBase {
 		assertEquals(numDataNodes, parentNode.getNumberOfDataNodes());
 	}
 
-	protected ILazyDataset getDataset(NXobjectImpl group, String name,
+	protected ILazyDataset getDataset(NXobject group, String name,
 			boolean loadedFromDisk) {
 		if (loadedFromDisk) {
 			return group.getDataset(name);
@@ -133,7 +132,7 @@ public abstract class AbstractNexusFileBuilderTestBase {
 		return group.getLazyWritableDataset(name);
 	}
 	
-	protected void checkWriteableDataset(NXobjectImpl group, String name,
+	protected void checkWriteableDataset(NXobject group, String name,
 			int expectedRank, Class<?> expectedElementClass, boolean loadedFromDisk) {
 		ILazyDataset dataset = getDataset(group, name, loadedFromDisk);
 		assertNotNull(dataset);

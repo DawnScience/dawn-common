@@ -24,7 +24,6 @@ import org.eclipse.dawnsci.nexus.NXobject;
 import org.eclipse.dawnsci.nexus.NexusException;
 import org.eclipse.dawnsci.nexus.builder.NexusDataBuilder;
 import org.eclipse.dawnsci.nexus.builder.NexusObjectProvider;
-import org.eclipse.dawnsci.nexus.impl.NXdataImpl;
 
 /**
  * Default implementation of {@link NexusDataBuilder}.
@@ -43,7 +42,7 @@ public class DefaultNexusDataBuilder extends AbstractNexusDataBuilder implements
 	 * @param nxData {@link NXdata} object to wrap
 	 */
 	protected DefaultNexusDataBuilder(DefaultNexusEntryBuilder entryModel,
-			final NXdataImpl nxData) {
+			final NXdata nxData) {
 		super(entryModel, nxData);
 	}
 
@@ -51,7 +50,7 @@ public class DefaultNexusDataBuilder extends AbstractNexusDataBuilder implements
 	 * @see org.eclipse.dawnsci.nexus.builder.NexusDataBuilder#getNexusData()
 	 */
 	@Override
-	public NXdataImpl getNxData() {
+	public NXdata getNxData() {
 		return nxData;
 	}
 

@@ -1,9 +1,9 @@
 package org.dawnsci.nexus.builder.impl;
 
+import static org.eclipse.dawnsci.nexus.NXentry.NX_ENTRY_IDENTIFIER;
+import static org.eclipse.dawnsci.nexus.NXentry.NX_EXPERIMENT_IDENTIFIER;
+import static org.eclipse.dawnsci.nexus.NXentry.NX_PROGRAM_NAME;
 import static org.eclipse.dawnsci.nexus.NexusBaseClass.NX_SAMPLE;
-import static org.eclipse.dawnsci.nexus.impl.NXentryImpl.NX_ENTRY_IDENTIFIER;
-import static org.eclipse.dawnsci.nexus.impl.NXentryImpl.NX_EXPERIMENT_IDENTIFIER;
-import static org.eclipse.dawnsci.nexus.impl.NXentryImpl.NX_PROGRAM_NAME;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
@@ -14,7 +14,6 @@ import static org.junit.Assert.assertThat;
 
 import java.util.Arrays;
 
-import org.dawnsci.nexus.builder.appdef.impl.TomoApplicationBuilder;
 import org.eclipse.dawnsci.nexus.NXdetector;
 import org.eclipse.dawnsci.nexus.NXentry;
 import org.eclipse.dawnsci.nexus.NXinstrument;
@@ -24,6 +23,7 @@ import org.eclipse.dawnsci.nexus.NXsource;
 import org.eclipse.dawnsci.nexus.NexusApplicationDefinition;
 import org.eclipse.dawnsci.nexus.NexusBaseClass;
 import org.eclipse.dawnsci.nexus.NexusException;
+import org.eclipse.dawnsci.nexus.NexusNodeFactory;
 import org.eclipse.dawnsci.nexus.builder.AbstractNexusProvider;
 import org.eclipse.dawnsci.nexus.builder.CustomNexusEntryModification;
 import org.eclipse.dawnsci.nexus.builder.NexusDataBuilder;
@@ -31,13 +31,8 @@ import org.eclipse.dawnsci.nexus.builder.NexusEntryBuilder;
 import org.eclipse.dawnsci.nexus.builder.NexusEntryModification;
 import org.eclipse.dawnsci.nexus.builder.NexusObjectProvider;
 import org.eclipse.dawnsci.nexus.builder.appdef.NexusApplicationBuilder;
-import org.eclipse.dawnsci.nexus.impl.NXentryImpl;
-import org.eclipse.dawnsci.nexus.impl.NXinstrumentImpl;
-import org.eclipse.dawnsci.nexus.impl.NXpositionerImpl;
-import org.eclipse.dawnsci.nexus.impl.NexusNodeFactory;
 import org.eclipse.dawnsci.nexus.validation.NexusValidationException;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class DefaultNexusEntryBuilderTest {
@@ -45,7 +40,7 @@ public class DefaultNexusEntryBuilderTest {
 	public static class TestPositioner extends AbstractNexusProvider<NXpositioner> {
 	
 		public TestPositioner() {
-			super("positioner", NexusBaseClass.NX_POSITIONER, NXpositionerImpl.NX_VALUE);
+			super("positioner", NexusBaseClass.NX_POSITIONER, NXpositioner.NX_VALUE);
 		}
 		
 		public TestPositioner(String name) {
@@ -88,7 +83,7 @@ public class DefaultNexusEntryBuilderTest {
 	private CustomNexusEntryModification customModification = new CustomNexusEntryModification() {
 		
 		@Override
-		public void modifyEntry(NXentryImpl entry) {
+		public void modifyEntry(NXentry entry) {
 			entry.setField("foo", "bar");
 		}
 		
@@ -97,7 +92,7 @@ public class DefaultNexusEntryBuilderTest {
 
 	private NexusEntryBuilder entryBuilder;
 	
-	private NXentryImpl nxEntry;
+	private NXentry nxEntry;
 	
 	@Before
 	public void setUp() throws Exception {
@@ -233,7 +228,7 @@ public class DefaultNexusEntryBuilderTest {
 		metadata.addMetadataEntry(NX_PROGRAM_NAME, "GDA 8.36.0");
 		metadata.addMetadataEntry("scan_command", "scan foo bar etc");
 		metadata.addMetadataEntry("scan_identifier", "a3d668c0-e3c4-4ed9-b127-4a202b2b6bac");
-		metadata.addMetadataEntry(NXentryImpl.NX_TITLE, "Test Scan");
+		metadata.addMetadataEntry(NXentry.NX_TITLE, "Test Scan");
 
 		entryBuilder.addMetadata(metadata);
 		
@@ -279,7 +274,7 @@ public class DefaultNexusEntryBuilderTest {
 		
 		MapBasedMetadataProvider metadata = new MapBasedMetadataProvider();
 		metadata.addMetadataEntry(NX_ENTRY_IDENTIFIER, "12345");
-		metadata.addMetadataEntry(NXentryImpl.NX_TITLE, "Test Scan");
+		metadata.addMetadataEntry(NXentry.NX_TITLE, "Test Scan");
 
 		entryBuilder.addMetadata(metadata);
 		
@@ -309,7 +304,7 @@ public class DefaultNexusEntryBuilderTest {
 		TestPositioner positionerProvider = new TestPositioner();
 		MapBasedMetadataProvider metadata = new MapBasedMetadataProvider();
 		metadata.addMetadataEntry(NX_ENTRY_IDENTIFIER, "12345");
-		metadata.addMetadataEntry(NXentryImpl.NX_TITLE, "Test Scan");
+		metadata.addMetadataEntry(NXentry.NX_TITLE, "Test Scan");
 
 		entryBuilder.modifyEntry(Arrays.asList(positionerProvider, metadata, customModification));
 		
@@ -396,7 +391,7 @@ public class DefaultNexusEntryBuilderTest {
 	public void testGetDataNode() throws Exception {
 		entryBuilder.addDefaultGroups();
 		nxEntry.setTitleScalar("My Entry");
-		((NXinstrumentImpl) nxEntry.getInstrument()).setNameScalar("My instrument");
+		nxEntry.getInstrument().setNameScalar("My instrument");
 		
 		assertThat(entryBuilder.getDataNode("title").getString(), is(equalTo("My Entry")));
 		assertThat(entryBuilder.getDataNode("instrument/name").getString(), is(equalTo("My instrument")));

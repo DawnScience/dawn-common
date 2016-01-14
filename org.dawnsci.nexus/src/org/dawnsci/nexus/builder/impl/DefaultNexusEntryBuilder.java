@@ -20,10 +20,15 @@ import java.util.List;
 import org.dawnsci.nexus.builder.appdef.impl.DefaultApplicationFactory;
 import org.eclipse.dawnsci.analysis.api.tree.DataNode;
 import org.eclipse.dawnsci.analysis.api.tree.NodeLink;
+import org.eclipse.dawnsci.nexus.NXdata;
+import org.eclipse.dawnsci.nexus.NXentry;
+import org.eclipse.dawnsci.nexus.NXinstrument;
 import org.eclipse.dawnsci.nexus.NXobject;
+import org.eclipse.dawnsci.nexus.NXsample;
 import org.eclipse.dawnsci.nexus.NexusApplicationDefinition;
 import org.eclipse.dawnsci.nexus.NexusBaseClass;
 import org.eclipse.dawnsci.nexus.NexusException;
+import org.eclipse.dawnsci.nexus.NexusNodeFactory;
 import org.eclipse.dawnsci.nexus.builder.CustomNexusEntryModification;
 import org.eclipse.dawnsci.nexus.builder.NexusDataBuilder;
 import org.eclipse.dawnsci.nexus.builder.NexusEntryBuilder;
@@ -32,12 +37,6 @@ import org.eclipse.dawnsci.nexus.builder.NexusMetadataProvider;
 import org.eclipse.dawnsci.nexus.builder.NexusMetadataProvider.MetadataEntry;
 import org.eclipse.dawnsci.nexus.builder.NexusObjectProvider;
 import org.eclipse.dawnsci.nexus.builder.appdef.NexusApplicationBuilder;
-import org.eclipse.dawnsci.nexus.impl.NXdataImpl;
-import org.eclipse.dawnsci.nexus.impl.NXentryImpl;
-import org.eclipse.dawnsci.nexus.impl.NXinstrumentImpl;
-import org.eclipse.dawnsci.nexus.impl.NXobjectImpl;
-import org.eclipse.dawnsci.nexus.impl.NXsampleImpl;
-import org.eclipse.dawnsci.nexus.impl.NexusNodeFactory;
 import org.eclipse.dawnsci.nexus.validation.NexusValidationException;
 
 /**
@@ -49,11 +48,11 @@ public class DefaultNexusEntryBuilder implements NexusEntryBuilder {
 
 	private final NexusNodeFactory nexusNodeFactory;
 
-	private NXentryImpl nxEntry = null;
+	private NXentry nxEntry = null;
 
-	private NXinstrumentImpl nxInstrument = null;
+	private NXinstrument nxInstrument = null;
 
-	private NXsampleImpl nxSample = null;
+	private NXsample nxSample = null;
 
 	private List<NXobject> defaultGroups = null;
 
@@ -65,7 +64,7 @@ public class DefaultNexusEntryBuilder implements NexusEntryBuilder {
 	 * @param nexusNodeFactory node factory
 	 * @param nxEntry entry to wrap
 	 */
-	protected DefaultNexusEntryBuilder(final NexusNodeFactory nexusNodeFactory, final NXentryImpl nxEntry) {
+	protected DefaultNexusEntryBuilder(final NexusNodeFactory nexusNodeFactory, final NXentry nxEntry) {
 		this.nexusNodeFactory = nexusNodeFactory;
 		this.nxEntry = nxEntry;
 	}
@@ -85,7 +84,7 @@ public class DefaultNexusEntryBuilder implements NexusEntryBuilder {
 	 * @see org.eclipse.dawnsci.nexus.builder.NexusEntryBuilder#getNxEntry()
 	 */
 	@Override
-	public NXentryImpl getNXentry() {
+	public NXentry getNXentry() {
 		return nxEntry;
 	}
 
@@ -102,7 +101,7 @@ public class DefaultNexusEntryBuilder implements NexusEntryBuilder {
 	 */
 	@Override
 	public NexusDataBuilder createDefaultData() {
-		final NXdataImpl nxData = nexusNodeFactory.createNXdata();
+		final NXdata nxData = nexusNodeFactory.createNXdata();
 		nxEntry.setData(nxData);
 		return new DefaultNexusDataBuilder(this, nxData);
 	}
@@ -112,7 +111,7 @@ public class DefaultNexusEntryBuilder implements NexusEntryBuilder {
 	 */
 	@Override
 	public NexusDataBuilder newData(final String name) {
-		final NXdataImpl nxData = nexusNodeFactory.createNXdata();
+		final NXdata nxData = nexusNodeFactory.createNXdata();
 		nxEntry.setData(name, nxData);
 		return new DefaultNexusDataBuilder(this, nxData);
 	}
@@ -180,7 +179,7 @@ public class DefaultNexusEntryBuilder implements NexusEntryBuilder {
 		final Iterator<MetadataEntry> metadataEntryIterator = metadataProvider.getMetadataEntries();
 		while (metadataEntryIterator.hasNext()) {
 			final MetadataEntry entry = metadataEntryIterator.next();
-			((NXobjectImpl) group).setField(entry.getName(), entry.getValue());
+			((NXobject) group).setField(entry.getName(), entry.getValue());
 		}
 	}
 
@@ -283,7 +282,7 @@ public class DefaultNexusEntryBuilder implements NexusEntryBuilder {
 		if (nexusObject.getNexusBaseClass() == NexusBaseClass.NX_SAMPLE) {
 			// special case for NXsample
 			defaultGroups.remove(nxSample);
-			nxSample = (NXsampleImpl) nexusObject;
+			nxSample = (NXsample) nexusObject;
 			defaultGroups.add(nexusObject);
 			nxEntry.setSample(nxSample);
 		} else {

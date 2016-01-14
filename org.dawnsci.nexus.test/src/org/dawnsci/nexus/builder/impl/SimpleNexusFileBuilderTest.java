@@ -22,13 +22,11 @@ import org.eclipse.dawnsci.nexus.NXbeam;
 import org.eclipse.dawnsci.nexus.NXdetector;
 import org.eclipse.dawnsci.nexus.NexusBaseClass;
 import org.eclipse.dawnsci.nexus.NexusException;
+import org.eclipse.dawnsci.nexus.NexusNodeFactory;
 import org.eclipse.dawnsci.nexus.builder.AbstractNexusProvider;
 import org.eclipse.dawnsci.nexus.builder.NexusDataBuilder;
 import org.eclipse.dawnsci.nexus.builder.NexusEntryBuilder;
 import org.eclipse.dawnsci.nexus.builder.NexusEntryModification;
-import org.eclipse.dawnsci.nexus.impl.NXbeamImpl;
-import org.eclipse.dawnsci.nexus.impl.NXdetectorImpl;
-import org.eclipse.dawnsci.nexus.impl.NexusNodeFactory;
 
 public class SimpleNexusFileBuilderTest extends AbstractNexusFileBuilderTestBase {
 	
@@ -36,15 +34,15 @@ public class SimpleNexusFileBuilderTest extends AbstractNexusFileBuilderTestBase
 
 		public TestDetector() {
 			super("analyser", NexusBaseClass.NX_DETECTOR,
-					NXdetectorImpl.NX_DATA);
+					NXdetector.NX_DATA);
 		}
 		
 		@Override
 		protected NXdetector doCreateNexusObject(NexusNodeFactory nodeFactory) {
-			final NXdetectorImpl nxDetector = nodeFactory.createNXdetector();
+			final NXdetector nxDetector = nodeFactory.createNXdetector();
 
 			nxDetector.setDescription(StringDataset.createFromObject("Test Detector"));
-			nxDetector.initializeLazyDataset(NXdetectorImpl.NX_DATA, 2, Dataset.FLOAT64);
+			nxDetector.initializeLazyDataset(NXdetector.NX_DATA, 2, Dataset.FLOAT64);
 			// could add more fields
 
 			return nxDetector;
@@ -60,7 +58,7 @@ public class SimpleNexusFileBuilderTest extends AbstractNexusFileBuilderTestBase
 		
 		@Override
 		protected NXbeam doCreateNexusObject(NexusNodeFactory nodeFactory) {
-			final NXbeamImpl beam = nodeFactory.createNXbeam();
+			final NXbeam beam = nodeFactory.createNXbeam();
 			beam.setIncident_wavelength(DatasetFactory.createFromObject(123.456));
 			beam.setFlux(DatasetFactory.createFromObject(12.34f));
 

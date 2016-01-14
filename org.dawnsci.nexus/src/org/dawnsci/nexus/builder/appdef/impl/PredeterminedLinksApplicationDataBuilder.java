@@ -21,7 +21,6 @@ import org.eclipse.dawnsci.nexus.NexusException;
 import org.eclipse.dawnsci.nexus.builder.NexusDataBuilder;
 import org.eclipse.dawnsci.nexus.builder.NexusObjectProvider;
 import org.eclipse.dawnsci.nexus.builder.appdef.NexusApplicationBuilder;
-import org.eclipse.dawnsci.nexus.impl.NXdataImpl;
 
 /**
  * A data builder, wrapping an {@link NXdata} base class instance, within an application definition where
@@ -38,10 +37,10 @@ public class PredeterminedLinksApplicationDataBuilder extends AbstractNexusDataB
 
 	/**
 	 * Creates a new {@link PredeterminedLinksApplicationDataBuilder} wrapping the given
-	 * {@link NXdataImpl}.
-	 * @param nxData {@link NXdataImpl} to wrap.
+	 * {@link NXdata}.
+	 * @param nxData {@link NXdata} to wrap.
 	 */
-	public PredeterminedLinksApplicationDataBuilder(NXdataImpl nxData) {
+	public PredeterminedLinksApplicationDataBuilder(NXdata nxData) {
 		super(null, nxData);
 	}
 

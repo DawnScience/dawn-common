@@ -14,12 +14,12 @@ package org.dawnsci.nexus.builder.appdef.impl;
 
 import org.eclipse.dawnsci.analysis.api.tree.DataNode;
 import org.eclipse.dawnsci.analysis.api.tree.NodeLink;
+import org.eclipse.dawnsci.nexus.NXsubentry;
 import org.eclipse.dawnsci.nexus.NexusApplicationDefinition;
 import org.eclipse.dawnsci.nexus.NexusException;
+import org.eclipse.dawnsci.nexus.NexusNodeFactory;
 import org.eclipse.dawnsci.nexus.builder.NexusEntryBuilder;
 import org.eclipse.dawnsci.nexus.builder.appdef.NexusApplicationBuilder;
-import org.eclipse.dawnsci.nexus.impl.NXsubentryImpl;
-import org.eclipse.dawnsci.nexus.impl.NexusNodeFactory;
 
 /**
  * Abstract superclass of NeXus application builders.
@@ -29,7 +29,7 @@ public abstract class AbstractNexusApplicationBuilder implements
 	
 	protected final NexusEntryBuilder nexusEntryModel;
 	
-	protected final NXsubentryImpl subentry;
+	protected final NXsubentry subentry;
 	
 	/**
 	 * Creates a new nexus application definition.
@@ -38,7 +38,7 @@ public abstract class AbstractNexusApplicationBuilder implements
 	 * @param subentry
 	 */
 	public AbstractNexusApplicationBuilder(final NexusApplicationDefinition appDef, 
-			final NexusEntryBuilder nexusEntryModel, final NXsubentryImpl subentry) {
+			final NexusEntryBuilder nexusEntryModel, final NXsubentry subentry) {
 		this.nexusEntryModel = nexusEntryModel;
 		this.subentry = subentry;
 
@@ -64,12 +64,13 @@ public abstract class AbstractNexusApplicationBuilder implements
 	 * @see org.eclipse.dawnsci.nexus.builder.appdef.NexusApplicationBuilder#getNXsubentry()
 	 */
 	@Override
-	public NXsubentryImpl getNXsubentry() {
+	public NXsubentry getNXsubentry() {
 		return subentry;
 	}
 	
 	/**
-	 * @return
+	 * Returns the {@link NexusNodeFactory}. This can be used to create nexus objects.
+	 * @return the nexus node factory
 	 */
 	protected NexusNodeFactory getNexusNodeFactory() {
 		return nexusEntryModel.getNodeFactory();

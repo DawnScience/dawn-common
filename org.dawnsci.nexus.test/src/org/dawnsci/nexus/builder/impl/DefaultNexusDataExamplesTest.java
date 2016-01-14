@@ -15,14 +15,11 @@ import org.eclipse.dawnsci.nexus.NXdetector;
 import org.eclipse.dawnsci.nexus.NXpositioner;
 import org.eclipse.dawnsci.nexus.NexusBaseClass;
 import org.eclipse.dawnsci.nexus.NexusException;
+import org.eclipse.dawnsci.nexus.NexusNodeFactory;
 import org.eclipse.dawnsci.nexus.builder.AbstractNexusProvider;
 import org.eclipse.dawnsci.nexus.builder.NexusDataBuilder;
 import org.eclipse.dawnsci.nexus.builder.NexusEntryBuilder;
 import org.eclipse.dawnsci.nexus.builder.NexusFileBuilder;
-import org.eclipse.dawnsci.nexus.impl.NXdataImpl;
-import org.eclipse.dawnsci.nexus.impl.NXdetectorImpl;
-import org.eclipse.dawnsci.nexus.impl.NXpositionerImpl;
-import org.eclipse.dawnsci.nexus.impl.NexusNodeFactory;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -49,7 +46,7 @@ public class DefaultNexusDataExamplesTest {
 		
 		@Override
 		protected NXdetector doCreateNexusObject(NexusNodeFactory nodeFactory) {
-			NXdetectorImpl detector = nodeFactory.createNXdetector();
+			NXdetector detector = nodeFactory.createNXdetector();
 			detector.setData(new FloatDataset(shape));
 			return detector;
 		}
@@ -61,14 +58,14 @@ public class DefaultNexusDataExamplesTest {
 		private final int[] shape;
 		
 		public TestPositioner(String name, int... shape) {
-			super(name, NexusBaseClass.NX_POSITIONER, NXpositionerImpl.NX_VALUE);
+			super(name, NexusBaseClass.NX_POSITIONER, NXpositioner.NX_VALUE);
 			useDeviceNameAsAxisName(true);
 			this.shape = shape;
 		}
 		
 		@Override
 		protected NXpositioner doCreateNexusObject(NexusNodeFactory nodeFactory) {
-			NXpositionerImpl positioner = nodeFactory.createNXpositioner();
+			NXpositioner positioner = nodeFactory.createNXpositioner();
 			positioner.setValue(new FloatDataset(shape));
 			return positioner;
 		}
@@ -77,7 +74,7 @@ public class DefaultNexusDataExamplesTest {
 	
 	private NexusDataBuilder dataBuilder;
 	
-	private NXdataImpl nxData;
+	private NXdata nxData;
 	
 	@Before
 	public void setUp() throws Exception {

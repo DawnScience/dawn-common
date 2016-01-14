@@ -9,18 +9,16 @@ import static org.junit.Assert.assertThat;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.tree.Attribute;
 import org.eclipse.dawnsci.analysis.dataset.impl.Dataset;
+import org.eclipse.dawnsci.nexus.NXdata;
 import org.eclipse.dawnsci.nexus.NXdetector;
 import org.eclipse.dawnsci.nexus.NXpositioner;
 import org.eclipse.dawnsci.nexus.NexusBaseClass;
 import org.eclipse.dawnsci.nexus.NexusException;
+import org.eclipse.dawnsci.nexus.NexusNodeFactory;
 import org.eclipse.dawnsci.nexus.builder.AbstractNexusProvider;
 import org.eclipse.dawnsci.nexus.builder.NexusDataBuilder;
 import org.eclipse.dawnsci.nexus.builder.NexusEntryBuilder;
 import org.eclipse.dawnsci.nexus.builder.NexusFileBuilder;
-import org.eclipse.dawnsci.nexus.impl.NXdataImpl;
-import org.eclipse.dawnsci.nexus.impl.NXdetectorImpl;
-import org.eclipse.dawnsci.nexus.impl.NXpositionerImpl;
-import org.eclipse.dawnsci.nexus.impl.NexusNodeFactory;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -29,7 +27,7 @@ public class DefaultNexusDataBuilderTest {
 	public static class TestPositioner extends AbstractNexusProvider<NXpositioner> {
 		
 		public TestPositioner() {
-			super("positioner", NexusBaseClass.NX_POSITIONER, NXpositionerImpl.NX_VALUE);
+			super("positioner", NexusBaseClass.NX_POSITIONER, NXpositioner.NX_VALUE);
 			useDeviceNameAsAxisName(true);
 		}
 		
@@ -40,8 +38,8 @@ public class DefaultNexusDataBuilderTest {
 		
 		@Override
 		protected NXpositioner doCreateNexusObject(NexusNodeFactory nodeFactory) {
-			NXpositionerImpl positioner = nodeFactory.createNXpositioner();
-			positioner.initializeLazyDataset(NXpositionerImpl.NX_VALUE, 1, Dataset.FLOAT64);
+			NXpositioner positioner = nodeFactory.createNXpositioner();
+			positioner.initializeLazyDataset(NXpositioner.NX_VALUE, 1, Dataset.FLOAT64);
 			positioner.initializeLazyDataset("source", 1, Dataset.FLOAT64);
 			return positioner;
 		}
@@ -56,8 +54,8 @@ public class DefaultNexusDataBuilderTest {
 		
 		@Override
 		protected NXdetector doCreateNexusObject(NexusNodeFactory nodeFactory) {
-			NXdetectorImpl detector = nodeFactory.createNXdetector();
-			detector.initializeLazyDataset(NXdetectorImpl.NX_DATA, 3, Dataset.FLOAT64);
+			NXdetector detector = nodeFactory.createNXdetector();
+			detector.initializeLazyDataset(NXdetector.NX_DATA, 3, Dataset.FLOAT64);
 			return detector;
 		}
 		
@@ -66,13 +64,13 @@ public class DefaultNexusDataBuilderTest {
 	public static class MultipleFieldTestPositioner extends AbstractNexusProvider<NXpositioner> {
 		
 		public MultipleFieldTestPositioner() {
-			super("ss1", NexusBaseClass.NX_POSITIONER, NXpositionerImpl.NX_VALUE);
+			super("ss1", NexusBaseClass.NX_POSITIONER, NXpositioner.NX_VALUE);
 			useDeviceNameAsAxisName(true);
 		}
 		
 		@Override
 		protected NXpositioner doCreateNexusObject(NexusNodeFactory nodeFactory) {
-			NXpositionerImpl positioner = nodeFactory.createNXpositioner();
+			NXpositioner positioner = nodeFactory.createNXpositioner();
 			positioner.initializeLazyDataset("field1", 1, Dataset.FLOAT64);
 			positioner.initializeLazyDataset("field2", 1, Dataset.FLOAT64);
 			positioner.initializeLazyDataset("field3", 1, Dataset.FLOAT64);
@@ -86,7 +84,7 @@ public class DefaultNexusDataBuilderTest {
 	
 	private NexusDataBuilder dataBuilder;
 	
-	private NXdataImpl nxData;
+	private NXdata nxData;
 	
 	@Before
 	public void setUp() throws Exception {
@@ -140,7 +138,7 @@ public class DefaultNexusDataBuilderTest {
 		assertThat(nxData.getAttribute("signal").getFirstElement(), is(equalTo("testDetector")));
 		assertAxes(".", ".", ".");
 		assertThat(nxData.getDataNode("testDetector"), is(sameInstance(
-				detector.getNexusObject().getDataNode(NXdetectorImpl.NX_DATA))));
+				detector.getNexusObject().getDataNode(NXdetector.NX_DATA))));
 	}
 	
 	@Test
@@ -160,7 +158,7 @@ public class DefaultNexusDataBuilderTest {
 		assertThat(nxData.getAttribute("signal").getFirstElement(), is(equalTo("foo")));
 		assertAxes(".", ".", ".");
 		assertThat(nxData.getDataNode("foo"), is(sameInstance(
-				detector.getNexusObject().getDataNode(NXdetectorImpl.NX_DATA))));
+				detector.getNexusObject().getDataNode(NXdetector.NX_DATA))));
 	}
 	
 	@Test
@@ -181,7 +179,7 @@ public class DefaultNexusDataBuilderTest {
 		assertAxes(".", ".", ".");
 		assertIndices("positioner", 0);
 		assertThat(nxData.getDataNode("positioner"), is(sameInstance(
-				positioner.getNexusObject().getDataNode(NXpositionerImpl.NX_VALUE))));
+				positioner.getNexusObject().getDataNode(NXpositioner.NX_VALUE))));
 	}
 	
 	@Test
@@ -202,7 +200,7 @@ public class DefaultNexusDataBuilderTest {
 		assertAxes("positioner", ".", ".");
 		assertIndices("positioner", 0);
 		assertThat(nxData.getDataNode("positioner"), is(sameInstance(
-				positioner.getNexusObject().getDataNode(NXpositionerImpl.NX_VALUE))));
+				positioner.getNexusObject().getDataNode(NXpositioner.NX_VALUE))));
 	}
 	
 	@Test

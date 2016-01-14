@@ -18,13 +18,13 @@ import java.util.Map;
 import org.dawnsci.nexus.ServiceHolder;
 import org.eclipse.dawnsci.analysis.api.tree.TreeFile;
 import org.eclipse.dawnsci.nexus.INexusFileFactory;
+import org.eclipse.dawnsci.nexus.NXentry;
+import org.eclipse.dawnsci.nexus.NXroot;
 import org.eclipse.dawnsci.nexus.NexusException;
 import org.eclipse.dawnsci.nexus.NexusFile;
+import org.eclipse.dawnsci.nexus.NexusNodeFactory;
 import org.eclipse.dawnsci.nexus.builder.NexusEntryBuilder;
 import org.eclipse.dawnsci.nexus.builder.NexusFileBuilder;
-import org.eclipse.dawnsci.nexus.impl.NXentryImpl;
-import org.eclipse.dawnsci.nexus.impl.NXrootImpl;
-import org.eclipse.dawnsci.nexus.impl.NexusNodeFactory;
 import org.eclipse.dawnsci.nexus.validation.NexusValidationException;
 
 /**
@@ -36,7 +36,7 @@ public class DefaultNexusFileBuilder implements NexusFileBuilder {
 
 	private final TreeFile treeFile;
 
-	private final NXrootImpl nxRoot;
+	private final NXroot nxRoot;
 	
 	private Map<String, NexusEntryBuilder> entries = new HashMap<>();
 
@@ -86,7 +86,7 @@ public class DefaultNexusFileBuilder implements NexusFileBuilder {
 	 * @see org.eclipse.dawnsci.nexus.builder.NexusFileBuilder#getNxRoot()
 	 */
 	@Override
-	public NXrootImpl getNXroot() {
+	public NXroot getNXroot() {
 		return nxRoot;
 	}
 
@@ -107,7 +107,7 @@ public class DefaultNexusFileBuilder implements NexusFileBuilder {
 			throw new NexusException("An entry with the name " + entryName + " already exists");
 		}
 		
-		final NXentryImpl entry = nexusNodeFactory.createNXentry();
+		final NXentry entry = nexusNodeFactory.createNXentry();
 		nxRoot.setEntry(entryName, entry);
 
 		NexusEntryBuilder entryModel = new DefaultNexusEntryBuilder(nexusNodeFactory, entry);

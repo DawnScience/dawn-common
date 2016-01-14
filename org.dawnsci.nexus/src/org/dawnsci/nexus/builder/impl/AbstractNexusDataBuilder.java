@@ -8,11 +8,10 @@ import org.eclipse.dawnsci.nexus.NXobject;
 import org.eclipse.dawnsci.nexus.NexusException;
 import org.eclipse.dawnsci.nexus.builder.NexusDataBuilder;
 import org.eclipse.dawnsci.nexus.builder.NexusObjectProvider;
-import org.eclipse.dawnsci.nexus.impl.NXdataImpl;
 
 public abstract class AbstractNexusDataBuilder implements NexusDataBuilder {
 
-	protected final NXdataImpl nxData;
+	protected final NXdata nxData;
 
 	protected final DefaultNexusEntryBuilder entryModel;
 
@@ -23,7 +22,7 @@ public abstract class AbstractNexusDataBuilder implements NexusDataBuilder {
 	 * @param nxData {@link NXdata} object to wrap
 	 */
 	protected AbstractNexusDataBuilder(DefaultNexusEntryBuilder entryModel,
-			final NXdataImpl nxData) {
+			final NXdata nxData) {
 		this.entryModel = entryModel;
 		this.nxData = nxData;
 	}
@@ -32,7 +31,7 @@ public abstract class AbstractNexusDataBuilder implements NexusDataBuilder {
 	 * @see org.eclipse.dawnsci.nexus.builder.NexusDataBuilder#getNexusData()
 	 */
 	@Override
-	public NXdataImpl getNxData() {
+	public NXdata getNxData() {
 		return nxData;
 	}
 

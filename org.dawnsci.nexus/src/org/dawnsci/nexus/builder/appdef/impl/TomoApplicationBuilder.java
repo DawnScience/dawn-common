@@ -15,24 +15,23 @@ package org.dawnsci.nexus.builder.appdef.impl;
 import java.text.MessageFormat;
 
 import org.eclipse.dawnsci.analysis.api.tree.DataNode;
+import org.eclipse.dawnsci.nexus.NXdata;
 import org.eclipse.dawnsci.nexus.NXdetector;
 import org.eclipse.dawnsci.nexus.NXentry;
+import org.eclipse.dawnsci.nexus.NXinstrument;
+import org.eclipse.dawnsci.nexus.NXmonitor;
 import org.eclipse.dawnsci.nexus.NXobject;
 import org.eclipse.dawnsci.nexus.NXpositioner;
 import org.eclipse.dawnsci.nexus.NXsample;
 import org.eclipse.dawnsci.nexus.NXsource;
+import org.eclipse.dawnsci.nexus.NXsubentry;
 import org.eclipse.dawnsci.nexus.NexusApplicationDefinition;
 import org.eclipse.dawnsci.nexus.NexusException;
+import org.eclipse.dawnsci.nexus.NexusNodeFactory;
 import org.eclipse.dawnsci.nexus.builder.NexusDataBuilder;
 import org.eclipse.dawnsci.nexus.builder.NexusEntryBuilder;
 import org.eclipse.dawnsci.nexus.builder.NexusObjectProvider;
 import org.eclipse.dawnsci.nexus.builder.appdef.NexusApplicationBuilder;
-import org.eclipse.dawnsci.nexus.impl.NXdataImpl;
-import org.eclipse.dawnsci.nexus.impl.NXinstrumentImpl;
-import org.eclipse.dawnsci.nexus.impl.NXmonitorImpl;
-import org.eclipse.dawnsci.nexus.impl.NXsampleImpl;
-import org.eclipse.dawnsci.nexus.impl.NXsubentryImpl;
-import org.eclipse.dawnsci.nexus.impl.NexusNodeFactory;
 import org.eclipse.dawnsci.nexus.validation.NXtomoValidator;
 import org.eclipse.dawnsci.nexus.validation.NexusValidationException;
 
@@ -56,9 +55,9 @@ public class TomoApplicationBuilder extends AbstractNexusApplicationBuilder impl
 	
 	private static final String NX_Z_TRANSLATION = "z_translation";
 	
-	private NXinstrumentImpl instrument = null;
+	private NXinstrument instrument = null;
 
-	private NXsampleImpl sample = null;
+	private NXsample sample = null;
 	
 	/**
 	 * Creates a new {@link TomoApplicationBuilder} within the {@link NXentry} for the
@@ -66,7 +65,7 @@ public class TomoApplicationBuilder extends AbstractNexusApplicationBuilder impl
 	 * @param nexusEntryBuilder
 	 * @param subentry
 	 */
-	public TomoApplicationBuilder(final NexusEntryBuilder nexusEntryBuilder, final NXsubentryImpl subentry) {
+	public TomoApplicationBuilder(final NexusEntryBuilder nexusEntryBuilder, final NXsubentry subentry) {
 		super(NexusApplicationDefinition.NX_TOMO, nexusEntryBuilder, subentry);
 	}
 
@@ -92,7 +91,7 @@ public class TomoApplicationBuilder extends AbstractNexusApplicationBuilder impl
 	 * @param title title data node to link to
 	 */
 	public void setTitle(DataNode title) {
-		subentry.addDataNode(NXsubentryImpl.NX_TITLE, title);
+		subentry.addDataNode(NXsubentry.NX_TITLE, title);
 	}
 
 	/**
@@ -117,7 +116,7 @@ public class TomoApplicationBuilder extends AbstractNexusApplicationBuilder impl
 	 * @throws NexusException
 	 */
 	public void setSample(NexusObjectProvider<NXsample> sample) throws NexusException {
-		this.sample = (NXsampleImpl) sample.getNexusObject(getNexusNodeFactory(), true);
+		this.sample = sample.getNexusObject(getNexusNodeFactory(), true);
 		subentry.setSample(this.sample);
 	}
 
@@ -136,7 +135,7 @@ public class TomoApplicationBuilder extends AbstractNexusApplicationBuilder impl
 	 */
 	public void setRotationAngle(NexusObjectProvider<NXpositioner> rotationAnglePositioner) throws NexusException {
 		final DataNode rotationAngleDataNode = getDataNode(rotationAnglePositioner);
-		sample.addDataNode(NXsampleImpl.NX_ROTATION_ANGLE, rotationAngleDataNode);
+		sample.addDataNode(NXsample.NX_ROTATION_ANGLE, rotationAngleDataNode);
 	}
 
 	/**
@@ -145,7 +144,7 @@ public class TomoApplicationBuilder extends AbstractNexusApplicationBuilder impl
 	 * @throws NexusException
 	 */
 	public void setRotationAngle(DataNode rotationAngle) throws NexusException {
-		sample.addDataNode(NXsampleImpl.NX_ROTATION_ANGLE, rotationAngle);
+		sample.addDataNode(NXsample.NX_ROTATION_ANGLE, rotationAngle);
 	}
 
 	/**
@@ -155,7 +154,7 @@ public class TomoApplicationBuilder extends AbstractNexusApplicationBuilder impl
 	 */
 	public void setXTranslation(NexusObjectProvider<NXpositioner> xPositioner) throws NexusException {
 		final DataNode xTranslation = getDataNode(xPositioner);
-		sample.addDataNode(NXsampleImpl.NX_X_TRANSLATION, xTranslation);
+		sample.addDataNode(NXsample.NX_X_TRANSLATION, xTranslation);
 	}
 	
 	/**
@@ -164,7 +163,7 @@ public class TomoApplicationBuilder extends AbstractNexusApplicationBuilder impl
 	 * @throws NexusException
 	 */
 	public void setXTranslation(DataNode xTranslation) throws NexusException {
-		sample.addDataNode(NXsampleImpl.NX_X_TRANSLATION, xTranslation); 
+		sample.addDataNode(NXsample.NX_X_TRANSLATION, xTranslation); 
 	}
 	
 	/**
@@ -211,11 +210,11 @@ public class TomoApplicationBuilder extends AbstractNexusApplicationBuilder impl
 	 * @throws NexusException
 	 */
 	public void setControl(NexusObjectProvider<NXpositioner> controlDevice) throws NexusException {
-		NXmonitorImpl control = getNexusNodeFactory().createNXmonitor();
+		NXmonitor control = getNexusNodeFactory().createNXmonitor();
 		subentry.setMonitor("control", control);
 		
 		DataNode dataNode = getDataNode(controlDevice);
-		control.addDataNode(NXmonitorImpl.NX_DATA, dataNode);  
+		control.addDataNode(NXmonitor.NX_DATA, dataNode);  
 	}
 
 	/* (non-Javadoc)
@@ -223,7 +222,7 @@ public class TomoApplicationBuilder extends AbstractNexusApplicationBuilder impl
 	 */
 	@Override
 	public NexusDataBuilder newData() throws NexusException {
-		NXdataImpl nxData = getNexusNodeFactory().createNXdata();
+		NXdata nxData = getNexusNodeFactory().createNXdata();
 		subentry.setData(nxData);
 
 		PredeterminedLinksApplicationDataBuilder dataModel = new PredeterminedLinksApplicationDataBuilder(nxData);

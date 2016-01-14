@@ -12,14 +12,14 @@
 
 package org.dawnsci.nexus.builder.appdef.impl;
 
+import org.eclipse.dawnsci.nexus.NXentry;
+import org.eclipse.dawnsci.nexus.NXsubentry;
 import org.eclipse.dawnsci.nexus.NexusApplicationDefinition;
 import org.eclipse.dawnsci.nexus.NexusException;
+import org.eclipse.dawnsci.nexus.NexusNodeFactory;
 import org.eclipse.dawnsci.nexus.builder.NexusEntryBuilder;
 import org.eclipse.dawnsci.nexus.builder.appdef.NexusApplicationBuilder;
 import org.eclipse.dawnsci.nexus.builder.appdef.NexusApplicationFactory;
-import org.eclipse.dawnsci.nexus.impl.NXentryImpl;
-import org.eclipse.dawnsci.nexus.impl.NXsubentryImpl;
-import org.eclipse.dawnsci.nexus.impl.NexusNodeFactory;
 
 /**
  * Factory class for application definition subentries.
@@ -48,7 +48,7 @@ public class DefaultApplicationFactory implements NexusApplicationFactory {
 	public NexusApplicationBuilder newApplicationDefinitionModel(NexusEntryBuilder entryModel,
 			NexusApplicationDefinition appDef, String subentryName) throws NexusException {
 		NexusNodeFactory nodeFactory = entryModel.getNodeFactory();
-		NXsubentryImpl nxSubentry = nodeFactory.createNXsubentry();
+		NXsubentry nxSubentry = nodeFactory.createNXsubentry();
 		NexusApplicationBuilder appDefModel = null;
 		switch (appDef) {
 		case NX_TOMO:
@@ -58,7 +58,7 @@ public class DefaultApplicationFactory implements NexusApplicationFactory {
 			throw new NexusException("Unsupported application definition: " + appDef);
 		}
 
-		final NXentryImpl nxEntry = (NXentryImpl) entryModel.getNXentry();
+		final NXentry nxEntry = entryModel.getNXentry();
 		if (nxEntry.containsGroupNode(subentryName)) {
 			throw new NexusException("A subentry with the name " + subentryName + " already exists in this entry.");
 		}

@@ -12,26 +12,22 @@ import org.eclipse.dawnsci.analysis.api.tree.DataNode;
 import org.eclipse.dawnsci.analysis.dataset.impl.Dataset;
 import org.eclipse.dawnsci.analysis.dataset.impl.DatasetFactory;
 import org.eclipse.dawnsci.analysis.dataset.impl.LazyWriteableDataset;
+import org.eclipse.dawnsci.nexus.NXdata;
 import org.eclipse.dawnsci.nexus.NXdetector;
+import org.eclipse.dawnsci.nexus.NXinstrument;
+import org.eclipse.dawnsci.nexus.NXmonitor;
 import org.eclipse.dawnsci.nexus.NXpositioner;
 import org.eclipse.dawnsci.nexus.NXsample;
 import org.eclipse.dawnsci.nexus.NXsource;
+import org.eclipse.dawnsci.nexus.NXsubentry;
 import org.eclipse.dawnsci.nexus.NexusApplicationDefinition;
 import org.eclipse.dawnsci.nexus.NexusBaseClass;
 import org.eclipse.dawnsci.nexus.NexusException;
+import org.eclipse.dawnsci.nexus.NexusNodeFactory;
 import org.eclipse.dawnsci.nexus.builder.AbstractNexusProvider;
 import org.eclipse.dawnsci.nexus.builder.NexusEntryBuilder;
 import org.eclipse.dawnsci.nexus.builder.NexusFileBuilder;
 import org.eclipse.dawnsci.nexus.builder.NexusObjectProvider;
-import org.eclipse.dawnsci.nexus.impl.NXdataImpl;
-import org.eclipse.dawnsci.nexus.impl.NXdetectorImpl;
-import org.eclipse.dawnsci.nexus.impl.NXinstrumentImpl;
-import org.eclipse.dawnsci.nexus.impl.NXmonitorImpl;
-import org.eclipse.dawnsci.nexus.impl.NXpositionerImpl;
-import org.eclipse.dawnsci.nexus.impl.NXsampleImpl;
-import org.eclipse.dawnsci.nexus.impl.NXsourceImpl;
-import org.eclipse.dawnsci.nexus.impl.NXsubentryImpl;
-import org.eclipse.dawnsci.nexus.impl.NexusNodeFactory;
 import org.eclipse.dawnsci.nexus.validation.NexusValidationException;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,7 +37,7 @@ public class TomoApplicationBuilderTest {
 	public static class TestPositioner extends AbstractNexusProvider<NXpositioner> {
 		
 		public TestPositioner() {
-			super("positioner", NexusBaseClass.NX_POSITIONER, NXpositionerImpl.NX_VALUE);
+			super("positioner", NexusBaseClass.NX_POSITIONER, NXpositioner.NX_VALUE);
 			useDeviceNameAsAxisName(true);
 		}
 		
@@ -52,8 +48,8 @@ public class TomoApplicationBuilderTest {
 		
 		@Override
 		protected NXpositioner doCreateNexusObject(NexusNodeFactory nodeFactory) {
-			NXpositionerImpl positioner = nodeFactory.createNXpositioner();
-			positioner.initializeLazyDataset(NXpositionerImpl.NX_VALUE, 1, Dataset.FLOAT64);
+			NXpositioner positioner = nodeFactory.createNXpositioner();
+			positioner.initializeLazyDataset(NXpositioner.NX_VALUE, 1, Dataset.FLOAT64);
 			return positioner;
 		}
 		
@@ -61,7 +57,7 @@ public class TomoApplicationBuilderTest {
 	
 	private TomoApplicationBuilder tomoBuilder;
 	
-	private NXsubentryImpl subentry;
+	private NXsubentry subentry;
 	
 	private NexusNodeFactory nodeFactory;
 	
@@ -95,7 +91,7 @@ public class TomoApplicationBuilderTest {
 
 			@Override
 			protected NXsource doCreateNexusObject(NexusNodeFactory nodeFactory) {
-				NXsourceImpl source = nodeFactory.createNXsource();
+				NXsource source = nodeFactory.createNXsource();
 				source.setTypeScalar("Synchotron X-Ray source");
 				source.setNameScalar("DLS");
 				source.setProbeScalar("x-ray");
@@ -118,8 +114,8 @@ public class TomoApplicationBuilderTest {
 			@Override
 			protected NXdetector doCreateNexusObject(
 					NexusNodeFactory nodeFactory) {
-				NXdetectorImpl detector = nodeFactory.createNXdetector();
-				detector.initializeLazyDataset(NXdetectorImpl.NX_DATA, 3, Dataset.FLOAT64);
+				NXdetector detector = nodeFactory.createNXdetector();
+				detector.initializeLazyDataset(NXdetector.NX_DATA, 3, Dataset.FLOAT64);
 				detector.initializeLazyDataset("image_key", 1, Dataset.INT16);
 				detector.setX_pixel_sizeScalar(1.5);
 				detector.setY_pixel_sizeScalar(2.5);
@@ -144,7 +140,7 @@ public class TomoApplicationBuilderTest {
 
 			@Override
 			protected NXsample doCreateNexusObject(NexusNodeFactory nodeFactory) {
-				NXsampleImpl sample = nodeFactory.createNXsample();
+				NXsample sample = nodeFactory.createNXsample();
 				sample.setNameScalar("my sample");
 				sample.setRotation_angleScalar(123.456);
 				sample.setX_translationScalar(23.432);
@@ -173,9 +169,9 @@ public class TomoApplicationBuilderTest {
 		tomoBuilder.addDefaultGroups();
 		TestPositioner rotationAnglePositioner = new TestPositioner();
 		tomoBuilder.setRotationAngle(rotationAnglePositioner);
-		assertThat(subentry.getSample().getDataNode(NXsampleImpl.NX_ROTATION_ANGLE),
+		assertThat(subentry.getSample().getDataNode(NXsample.NX_ROTATION_ANGLE),
 				is(sameInstance(rotationAnglePositioner.getNexusObject().getDataNode(
-						NXpositionerImpl.NX_VALUE))));
+						NXpositioner.NX_VALUE))));
 	}
 	
 	@Test
@@ -186,7 +182,7 @@ public class TomoApplicationBuilderTest {
 		rotationAngle.setDataset(dataset);
 		tomoBuilder.setRotationAngle(rotationAngle);
 
-		assertThat(subentry.getSample().getDataNode(NXsampleImpl.NX_ROTATION_ANGLE),
+		assertThat(subentry.getSample().getDataNode(NXsample.NX_ROTATION_ANGLE),
 				is(sameInstance(rotationAngle)));
 	}
 	
@@ -195,9 +191,9 @@ public class TomoApplicationBuilderTest {
 		tomoBuilder.addDefaultGroups();
 		TestPositioner xPositioner = new TestPositioner();
 		tomoBuilder.setXTranslation(xPositioner);
-		assertThat(subentry.getSample().getDataNode(NXsampleImpl.NX_X_TRANSLATION),
+		assertThat(subentry.getSample().getDataNode(NXsample.NX_X_TRANSLATION),
 				is(sameInstance(xPositioner.getNexusObject().getDataNode(
-						NXpositionerImpl.NX_VALUE))));
+						NXpositioner.NX_VALUE))));
 
 	}
 	
@@ -209,7 +205,7 @@ public class TomoApplicationBuilderTest {
 		xTranslation.setDataset(dataset);
 		tomoBuilder.setXTranslation(xTranslation);
 
-		assertThat(subentry.getSample().getDataNode(NXsampleImpl.NX_X_TRANSLATION),
+		assertThat(subentry.getSample().getDataNode(NXsample.NX_X_TRANSLATION),
 				is(sameInstance(xTranslation)));
 	}
 	
@@ -220,7 +216,7 @@ public class TomoApplicationBuilderTest {
 		tomoBuilder.setYTranslation(yPositioner);
 		assertThat(subentry.getSample().getDataNode("y_translation"),
 				is(sameInstance(yPositioner.getNexusObject().getDataNode(
-						NXpositionerImpl.NX_VALUE))));
+						NXpositioner.NX_VALUE))));
 	}
 	
 	@Test
@@ -242,7 +238,7 @@ public class TomoApplicationBuilderTest {
 		tomoBuilder.setZTranslation(zPositioner);
 		assertThat(subentry.getSample().getDataNode("z_translation"),
 				is(sameInstance(zPositioner.getNexusObject().getDataNode(
-						NXpositionerImpl.NX_VALUE))));
+						NXpositioner.NX_VALUE))));
 	}
 	
 	@Test
@@ -262,27 +258,27 @@ public class TomoApplicationBuilderTest {
 		tomoBuilder.addDefaultGroups();
 		TestPositioner control = new TestPositioner();
 		tomoBuilder.setControl(control);
-		assertThat(subentry.getMonitor("control").getDataNode(NXmonitorImpl.NX_DATA),
-				is(sameInstance(control.getNexusObject().getDataNode(NXpositionerImpl.NX_VALUE))));
+		assertThat(subentry.getMonitor("control").getDataNode(NXmonitor.NX_DATA),
+				is(sameInstance(control.getNexusObject().getDataNode(NXpositioner.NX_VALUE))));
 	}
 	
 	@Test
 	public void testSetNewData() throws NexusException {
 		tomoBuilder.addDefaultGroups();
-		NXinstrumentImpl instrument = (NXinstrumentImpl) subentry.getInstrument();
-		NXdetectorImpl detector = nodeFactory.createNXdetector();
+		NXinstrument instrument = subentry.getInstrument();
+		NXdetector detector = nodeFactory.createNXdetector();
 		instrument.setDetector(detector);
-		detector.initializeLazyDataset(NXdetectorImpl.NX_DATA, 3, Dataset.FLOAT64);
+		detector.initializeLazyDataset(NXdetector.NX_DATA, 3, Dataset.FLOAT64);
 		detector.initializeLazyDataset("image_key", 1, Dataset.INT16);
-		NXsampleImpl sample = (NXsampleImpl) subentry.getSample();
+		NXsample sample = subentry.getSample();
 		sample.setRotation_angleScalar(2.5);
 		
 		tomoBuilder.newData();
 
-		assertThat(subentry.getData().getDataNode(NXdataImpl.NX_DATA),
-				is(sameInstance((DataNode) detector.getDataNode(NXdetectorImpl.NX_DATA))));
-		assertThat(subentry.getData().getDataNode(NXsampleImpl.NX_ROTATION_ANGLE),
-				is(sameInstance((DataNode) sample.getDataNode(NXsampleImpl.NX_ROTATION_ANGLE))));
+		assertThat(subentry.getData().getDataNode(NXdata.NX_DATA),
+				is(sameInstance((DataNode) detector.getDataNode(NXdetector.NX_DATA))));
+		assertThat(subentry.getData().getDataNode(NXsample.NX_ROTATION_ANGLE),
+				is(sameInstance((DataNode) sample.getDataNode(NXsample.NX_ROTATION_ANGLE))));
 		assertThat(subentry.getData().getDataNode("image_key"),
 				is(sameInstance((DataNode) detector.getDataNode("image_key")))); 
 	}
