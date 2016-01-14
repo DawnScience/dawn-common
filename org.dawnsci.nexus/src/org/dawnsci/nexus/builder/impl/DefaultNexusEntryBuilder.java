@@ -284,6 +284,7 @@ public class DefaultNexusEntryBuilder implements NexusEntryBuilder {
 			defaultGroups.remove(nxSample);
 			nxSample = (NXsample) nexusObject;
 			defaultGroups.add(nexusObject);
+			nxEntry.removeGroupNode("sample");
 			nxEntry.setSample(nxSample);
 		} else {
 			// normal case

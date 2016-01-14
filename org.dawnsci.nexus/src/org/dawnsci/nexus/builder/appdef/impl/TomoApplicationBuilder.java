@@ -117,6 +117,9 @@ public class TomoApplicationBuilder extends AbstractNexusApplicationBuilder impl
 	 */
 	public void setSample(NexusObjectProvider<NXsample> sample) throws NexusException {
 		this.sample = sample.getNexusObject(getNexusNodeFactory(), true);
+		if (subentry.getSample() != null) {
+			subentry.removeGroupNode("sample");
+		}
 		subentry.setSample(this.sample);
 	}
 
