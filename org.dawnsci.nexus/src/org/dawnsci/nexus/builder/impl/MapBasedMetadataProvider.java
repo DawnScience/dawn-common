@@ -15,7 +15,6 @@ package org.dawnsci.nexus.builder.impl;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.eclipse.dawnsci.nexus.NexusBaseClass;
 import org.eclipse.dawnsci.nexus.builder.NexusMetadataProvider;
@@ -109,6 +108,11 @@ public class MapBasedMetadataProvider implements NexusMetadataProvider {
 		@Override
 		public MetadataEntry next() {
 			return new MapEntryBasedMetadataEntry(mapEntryIterator.next());
+		}
+
+		@Override
+		public void remove() {
+			throw new UnsupportedOperationException("remove");
 		}
 		
 	}
