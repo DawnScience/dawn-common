@@ -101,9 +101,9 @@ public abstract class AbstractNexusFileBuilderTestBase {
 		fileBuilder.saveFile();
 		
 		// compare with file in repository
-		final TreeFile nexusTree = fileBuilder.getNexusTree();
-		TreeFile comparisonNexusTree = NexusTestUtils.loadNexusFile(comparisonFilePath, true);
-		assertNexusTreesEqual(nexusTree, comparisonNexusTree);
+		final TreeFile actualNexusTree = fileBuilder.getNexusTree();
+		TreeFile expectedNexusTree = NexusTestUtils.loadNexusFile(comparisonFilePath, true);
+		assertNexusTreesEqual(expectedNexusTree, actualNexusTree);
 	}
 	
 	protected void configureEntryModel(NexusEntryBuilder nexusEntryModel) throws NexusException {

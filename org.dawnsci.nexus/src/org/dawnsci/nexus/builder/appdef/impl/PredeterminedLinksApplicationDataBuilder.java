@@ -18,6 +18,7 @@ import org.eclipse.dawnsci.nexus.NXdata;
 import org.eclipse.dawnsci.nexus.NXobject;
 import org.eclipse.dawnsci.nexus.NXsubentry;
 import org.eclipse.dawnsci.nexus.NexusException;
+import org.eclipse.dawnsci.nexus.builder.AxisDevice;
 import org.eclipse.dawnsci.nexus.builder.NexusDataBuilder;
 import org.eclipse.dawnsci.nexus.builder.NexusObjectProvider;
 import org.eclipse.dawnsci.nexus.builder.appdef.NexusApplicationBuilder;
@@ -54,6 +55,9 @@ public class PredeterminedLinksApplicationDataBuilder extends AbstractNexusDataB
 		nxData.addDataNode(name, dataNode);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.dawnsci.nexus.builder.NexusDataBuilder#setDataDevice(org.eclipse.dawnsci.nexus.builder.NexusObjectProvider, java.lang.String)
+	 */
 	@Override
 	public void setDataDevice(
 			NexusObjectProvider<? extends NXobject> nexusObjectProvider,
@@ -62,14 +66,15 @@ public class PredeterminedLinksApplicationDataBuilder extends AbstractNexusDataB
 		throw new UnsupportedOperationException("No additional objects are required for this data model");
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.dawnsci.nexus.builder.NexusDataBuilder#addAxisDevice(org.eclipse.dawnsci.nexus.builder.AxisDevice)
+	 */
 	@Override
-	protected void addAxisDevice(
-			NexusObjectProvider<? extends NXobject> nexusObjectProvider,
-			String sourceFieldName, String destinationFieldName,
-			int[] dimensionMappings, Integer primaryAxisForDimensionIndex)
+	public void addAxisDevice(AxisDevice<? extends NXobject> axisDevice)
 			throws NexusException {
 		// this data model already has all the information it needs to be fully populated
 		throw new UnsupportedOperationException("No additional objects are required for this data model");
 	}
+
 
 }

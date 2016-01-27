@@ -159,7 +159,6 @@ public class MultipleThreadNexusFileWriteTest {
 
 		public TestPositioner(String name) {
 			super(name, NexusBaseClass.NX_POSITIONER, NXpositioner.NX_VALUE);
-			useDeviceNameAsAxisName(true);
 		}
 
 		@Override

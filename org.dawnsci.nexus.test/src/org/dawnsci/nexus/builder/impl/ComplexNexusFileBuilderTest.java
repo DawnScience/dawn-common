@@ -29,6 +29,7 @@ import org.eclipse.dawnsci.nexus.NexusBaseClass;
 import org.eclipse.dawnsci.nexus.NexusException;
 import org.eclipse.dawnsci.nexus.NexusNodeFactory;
 import org.eclipse.dawnsci.nexus.builder.AbstractNexusProvider;
+import org.eclipse.dawnsci.nexus.builder.AxisDevice;
 import org.eclipse.dawnsci.nexus.builder.NexusDataBuilder;
 import org.eclipse.dawnsci.nexus.builder.NexusEntryBuilder;
 import org.eclipse.dawnsci.nexus.builder.NexusEntryModification;
@@ -39,8 +40,7 @@ public class ComplexNexusFileBuilderTest extends AbstractNexusFileBuilderTestBas
 	private static class SimplePositioner extends AbstractNexusProvider<NXpositioner> {
 
 		public SimplePositioner(final String name) {
-			super(name, NexusBaseClass.NX_POSITIONER, NXpositioner.NX_VALUE, NexusBaseClass.NX_INSTRUMENT);
-			useDeviceNameAsAxisName(true);
+			super(name, NexusBaseClass.NX_POSITIONER, NexusBaseClass.NX_INSTRUMENT, NXpositioner.NX_VALUE);
 		}
 		
 		@Override
@@ -58,6 +58,7 @@ public class ComplexNexusFileBuilderTest extends AbstractNexusFileBuilderTestBas
 
 		public TomoScanDevicePositioner() {
 			super("tomoScanDevice", NexusBaseClass.NX_POSITIONER, "ss1_rot");
+			setDataFieldNames("imageNumber", "image_key", "ss1_X", "ss1_rot", "tomography_shutter");
 		}
 		
 		@Override
@@ -239,17 +240,19 @@ public class ComplexNexusFileBuilderTest extends AbstractNexusFileBuilderTestBas
 		NexusDataBuilder dataModel = entryModel.newData(testDetector.getName());
 		dataModel.setDataDevice(testDetector, "data");
 		
-		String[] tomoScanDeviceSourceFields = { "ss1_rot", "imageNumber",
-				"image_key", "ss1_X", "tomography_shutter" };
-		dataModel.addAxisDevice(tomoScanDevicePositioner, tomoScanDeviceSourceFields,
-				new int[] { 0 }, "ss1_rot", 0);
+		AxisDevice<NXpositioner> positionerAxisDevice = new AxisDevice<>(
+				tomoScanDevicePositioner, 0, new int[] { 0 });
+		positionerAxisDevice.setUseDeviceName(false);
+		dataModel.addAxisDevice(positionerAxisDevice);
 
 		dataModel.addAxisDevice(actualTimePositioner, new int[] { 0 });
 		dataModel.addAxisDevice(beamOkPositioner, new int[] { 0 });
 		dataModel.addAxisDevice(ioncIPositioner, new int[] { 0 });
 
-		String[] detectorSourceFields = { "count_time", "start_time", "time_ms" }; 
-		dataModel.addAxisDevice(testDetector, detectorSourceFields, new int[] { 0 });
+		AxisDevice<NXdetector> detectorAxisDevice = new AxisDevice<>(testDetector, new int[] { 0 });
+		detectorAxisDevice.setSourceFields("count_time", "start_time", "time_ms");
+		detectorAxisDevice.setUseDeviceName(false);
+		dataModel.addAxisDevice(detectorAxisDevice);
 	}
 	
 	protected void addApplicationDefinitions(NexusEntryBuilder nexusEntryModel) throws NexusException {

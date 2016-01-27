@@ -33,8 +33,7 @@ public class SimpleNexusFileBuilderTest extends AbstractNexusFileBuilderTestBase
 	private static class TestDetector extends AbstractNexusProvider<NXdetector> {
 
 		public TestDetector() {
-			super("analyser", NexusBaseClass.NX_DETECTOR,
-					NXdetector.NX_DATA);
+			super("analyser", NexusBaseClass.NX_DETECTOR, NXdetector.NX_DATA);
 		}
 		
 		@Override
@@ -53,7 +52,7 @@ public class SimpleNexusFileBuilderTest extends AbstractNexusFileBuilderTestBase
 	private static class TestBeam extends AbstractNexusProvider<NXbeam> {
 
 		public TestBeam() {
-			super("beam", NexusBaseClass.NX_BEAM, null, NexusBaseClass.NX_SAMPLE);
+			super("beam", NexusBaseClass.NX_BEAM, NexusBaseClass.NX_SAMPLE, null);
 		}
 		
 		@Override

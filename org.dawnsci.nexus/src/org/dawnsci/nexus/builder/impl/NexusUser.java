@@ -35,7 +35,7 @@ public class NexusUser extends AbstractNexusProvider<NXuser> {
 	
 	/**
 	 * Creates a new {@link NexusUser} with the given name in the parent group.
-	 * @param name
+	 * @param groupName name within parent group
 	 */
 	public NexusUser(String groupName) {
 		super(groupName, NexusBaseClass.NX_USER);
@@ -44,8 +44,8 @@ public class NexusUser extends AbstractNexusProvider<NXuser> {
 	/**
 	 * Creates a new {@link NexusUser} with the given name in the parent group,
 	 * and with a 'name' field with the given name.
-	 * @param groupName group name
-	 * @param name name
+	 * @param groupName name within parent group
+	 * @param name name name of user
 	 */
 	public NexusUser(String groupName, String name) {
 		super(groupName, NexusBaseClass.NX_USER);

@@ -38,12 +38,10 @@ public class TomoApplicationBuilderTest {
 		
 		public TestPositioner() {
 			super("positioner", NexusBaseClass.NX_POSITIONER, NXpositioner.NX_VALUE);
-			useDeviceNameAsAxisName(true);
 		}
 		
 		public TestPositioner(String name) {
 			super(name, NexusBaseClass.NX_POSITIONER);
-			useDeviceNameAsAxisName(true);
 		}
 		
 		@Override

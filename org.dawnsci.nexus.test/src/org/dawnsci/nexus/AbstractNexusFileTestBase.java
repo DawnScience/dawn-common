@@ -57,11 +57,11 @@ public abstract class AbstractNexusFileTestBase {
 	
 	@Test
 	public void testNexusFile() throws Exception {
-		TreeFile originalNexusTree = createNexusTree();
-		NexusTestUtils.saveNexusFile(originalNexusTree);
+		TreeFile actualNexusTree = createNexusTree();
+		NexusTestUtils.saveNexusFile(actualNexusTree);
 
-		TreeFile loadedTree = NexusTestUtils.loadNexusFile(filePath, true);
-		assertNexusTreesEqual(originalNexusTree, loadedTree);
+		TreeFile expectedTree = NexusTestUtils.loadNexusFile(filePath, true);
+		assertNexusTreesEqual(expectedTree, actualNexusTree);
 	}
 
 }

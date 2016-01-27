@@ -20,3 +20,4 @@ Bundle-ActivationPolicy: lazy
 Import-Package: org.junit;version="4.10.0",
  org.junit.runner;version="4.10.0",
  org.junit.runners;version="4.10.0"
+Export-Package: org.dawnsci.nexus

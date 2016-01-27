@@ -110,8 +110,12 @@ public class MapBasedMetadataProvider implements NexusMetadataProvider {
 			return new MapEntryBasedMetadataEntry(mapEntryIterator.next());
 		}
 
+		/* (non-Javadoc)
+		 * @see java.util.Iterator#remove()
+		 */
 		@Override
 		public void remove() {
+			// remove() not supported.
 			throw new UnsupportedOperationException("remove");
 		}
 		
