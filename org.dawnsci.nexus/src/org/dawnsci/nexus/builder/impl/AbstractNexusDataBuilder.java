@@ -6,7 +6,7 @@ import org.eclipse.dawnsci.analysis.api.tree.DataNode;
 import org.eclipse.dawnsci.nexus.NXdata;
 import org.eclipse.dawnsci.nexus.NXobject;
 import org.eclipse.dawnsci.nexus.NexusException;
-import org.eclipse.dawnsci.nexus.builder.AxisDevice;
+import org.eclipse.dawnsci.nexus.builder.DataDevice;
 import org.eclipse.dawnsci.nexus.builder.NexusDataBuilder;
 import org.eclipse.dawnsci.nexus.builder.NexusObjectProvider;
 
@@ -28,6 +28,25 @@ public abstract class AbstractNexusDataBuilder implements NexusDataBuilder {
 		this.nxData = nxData;
 	}
 	
+	/**
+	 * Returns the data node with the given name
+	 * @param nexusObjectProvider nexus object provider
+	 * @param fieldName field name
+	 * @return 
+	 * @throws NexusException
+	 */
+	protected DataNode getDataNode(NexusObjectProvider<? extends NXobject> nexusObjectProvider,
+			String fieldName) throws NexusException {
+		final NXobject nexusObject = nexusObjectProvider.getNexusObject(entryModel.getNodeFactory(), true);
+		final DataNode dataNode = nexusObject.getDataNode(fieldName);
+		if (dataNode == null) {
+			throw new IllegalArgumentException(MessageFormat.format("No such data node for group {0}: {1}",
+					nexusObject.getNXclass().getSimpleName(), fieldName));
+		}
+	
+		return dataNode;
+	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.dawnsci.nexus.builder.NexusDataBuilder#getNexusData()
 	 */
@@ -36,53 +55,20 @@ public abstract class AbstractNexusDataBuilder implements NexusDataBuilder {
 		return nxData;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.dawnsci.nexus.model.api.NexusDataModel#setDataDevice(org.eclipse.dawnsci.nexus.model.api.NexusObjectProvider)
-	 */
 	@Override
-	public void setDataDevice(NexusObjectProvider<? extends NXobject> nexusObjectProvider) throws NexusException {
-		setDataDevice(nexusObjectProvider, nexusObjectProvider.getName());
-	}
-
-	@Override
-	public void addAxisDevice(NexusObjectProvider<? extends NXobject> nexusObjectProvider) throws NexusException {
-		addAxisDevice(new AxisDevice<>(nexusObjectProvider));
-	}
-
-	@Override
-	public void addAxisDevice(
-			NexusObjectProvider<? extends NXobject> nexusObjectProvider, int defaultAxisDimensionIndex) throws NexusException {
-		addAxisDevice(new AxisDevice<>(nexusObjectProvider, defaultAxisDimensionIndex));
-	}
-
-	@Override
-	public void addAxisDevice(
-			NexusObjectProvider<? extends NXobject> nexusObjectProvider,
-			int[] dimensionMappings) throws NexusException {
-		addAxisDevice(new AxisDevice<>(nexusObjectProvider, dimensionMappings));
-	}
-
-	@Override
-	public void addAxisDevice(
-			NexusObjectProvider<? extends NXobject> nexusObjectProvider,
-			int defaultAxisDimensionIndex, int[] dimensionMappings)
+	public void setPrimaryDevice(NexusObjectProvider<?> primaryDevice)
 			throws NexusException {
-		addAxisDevice(new AxisDevice<>(nexusObjectProvider, defaultAxisDimensionIndex, dimensionMappings));
+		setPrimaryDevice(new DataDevice<>(primaryDevice, false));
 	}
 
-	protected DataNode getDataNode(NexusObjectProvider<? extends NXobject> nexusObjectProvider,
-			String fieldName) throws NexusException {
-		final NXobject nexusObject = nexusObjectProvider.getNexusObject(entryModel.getNodeFactory(), true);
-		if (fieldName == null) {
-			fieldName = nexusObjectProvider.getDefaultDataFieldName();
-		}
-		final DataNode dataNode = nexusObject.getDataNode(fieldName);
-		if (dataNode == null) {
-			throw new IllegalArgumentException(MessageFormat.format("No such data node for group {0}: {1}",
-					nexusObject.getNXclass().getSimpleName(), fieldName));
-		}
-	
-		return dataNode;
+	@Override
+	public void addDataDevice(NexusObjectProvider<?> dataDevice) throws NexusException {
+		addDataDevice(new DataDevice<>(dataDevice, true));
+	}
+
+	@Override
+	public void addDataDevice(NexusObjectProvider<?> dataDevice, int defaultAxisDimension) throws NexusException {
+		addDataDevice(dataDevice, defaultAxisDimension, null);
 	}
 
 }

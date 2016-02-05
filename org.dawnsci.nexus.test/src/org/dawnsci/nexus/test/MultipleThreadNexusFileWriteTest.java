@@ -130,7 +130,7 @@ public class MultipleThreadNexusFileWriteTest {
 
 		@Override
 		protected void writeNewData(int stepNumber) throws Exception {
-			final ILazyWriteableDataset dataset = getDefaultDataset();
+			final ILazyWriteableDataset dataset = getDefaultWriteableDataset();
 
 			final int[] startPos = new int[] { stepNumber, 0, 0 };
 			final int[] stopPos = new int[] { stepNumber + 1, numRows, numColumns };
@@ -181,7 +181,7 @@ public class MultipleThreadNexusFileWriteTest {
 
 		@Override
 		protected void writeNewData(int stepNumber) throws Exception {
-			final ILazyWriteableDataset dataset = getDefaultDataset();
+			final ILazyWriteableDataset dataset = getDefaultWriteableDataset();
 
 			final int[] startPos = new int[] { stepNumber };
 			final int[] stopPos = new int[] { stepNumber + 1 };
@@ -226,14 +226,17 @@ public class MultipleThreadNexusFileWriteTest {
 		final NexusFileBuilder fileBuilder = new DefaultNexusFileBuilder(filePath);
 		final NexusEntryBuilder entryBuilder = fileBuilder.newEntry();
 		entryBuilder.addDefaultGroups();
-		positioners = createPositioners(numPositioners);
 		detector = new TestDetector(DETECTOR_ROWS, DETECTOR_COLUMNS);
-		entryBuilder.addAll(positioners);
+		positioners = createPositioners(numPositioners);
 		entryBuilder.add(detector);
+		entryBuilder.addAll(positioners);
 
 		final NexusDataBuilder dataBuilder = entryBuilder.createDefaultData();
-		// TODO add link for each positioner? need a main data source first?
-
+		dataBuilder.setPrimaryDevice(detector);
+		for (TestPositioner positioner : positioners) {
+			dataBuilder.addDataDevice(positioner);
+		}
+		
 		fileBuilder.saveFile();
 	}
 

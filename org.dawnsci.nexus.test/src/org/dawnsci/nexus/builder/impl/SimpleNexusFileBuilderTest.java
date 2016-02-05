@@ -24,6 +24,7 @@ import org.eclipse.dawnsci.nexus.NexusBaseClass;
 import org.eclipse.dawnsci.nexus.NexusException;
 import org.eclipse.dawnsci.nexus.NexusNodeFactory;
 import org.eclipse.dawnsci.nexus.builder.AbstractNexusProvider;
+import org.eclipse.dawnsci.nexus.builder.DataDevice;
 import org.eclipse.dawnsci.nexus.builder.NexusDataBuilder;
 import org.eclipse.dawnsci.nexus.builder.NexusEntryBuilder;
 import org.eclipse.dawnsci.nexus.builder.NexusEntryModification;
@@ -78,7 +79,7 @@ public class SimpleNexusFileBuilderTest extends AbstractNexusFileBuilderTestBase
 	
 	protected void addDataBuilder(NexusEntryBuilder entryModel) throws NexusException {
 		NexusDataBuilder dataModel = entryModel.createDefaultData();
-		dataModel.setDataDevice(detector);
+		dataModel.setPrimaryDevice(new DataDevice<>(detector, false));
 	}
 	
 	protected List<NexusEntryModification> getNexusTreeModifications() {

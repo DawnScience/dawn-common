@@ -15,10 +15,9 @@ package org.dawnsci.nexus.builder.appdef.impl;
 import org.dawnsci.nexus.builder.impl.AbstractNexusDataBuilder;
 import org.eclipse.dawnsci.analysis.api.tree.DataNode;
 import org.eclipse.dawnsci.nexus.NXdata;
-import org.eclipse.dawnsci.nexus.NXobject;
 import org.eclipse.dawnsci.nexus.NXsubentry;
 import org.eclipse.dawnsci.nexus.NexusException;
-import org.eclipse.dawnsci.nexus.builder.AxisDevice;
+import org.eclipse.dawnsci.nexus.builder.DataDevice;
 import org.eclipse.dawnsci.nexus.builder.NexusDataBuilder;
 import org.eclipse.dawnsci.nexus.builder.NexusObjectProvider;
 import org.eclipse.dawnsci.nexus.builder.appdef.NexusApplicationBuilder;
@@ -55,26 +54,26 @@ public class PredeterminedLinksApplicationDataBuilder extends AbstractNexusDataB
 		nxData.addDataNode(name, dataNode);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.dawnsci.nexus.builder.NexusDataBuilder#setDataDevice(org.eclipse.dawnsci.nexus.builder.NexusObjectProvider, java.lang.String)
-	 */
 	@Override
-	public void setDataDevice(
-			NexusObjectProvider<? extends NXobject> nexusObjectProvider,
-			String dataFieldName) throws NexusException {
-		// this data model already has all the information it needs to be fully populated
-		throw new UnsupportedOperationException("No additional objects are required for this data model");
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.dawnsci.nexus.builder.NexusDataBuilder#addAxisDevice(org.eclipse.dawnsci.nexus.builder.AxisDevice)
-	 */
-	@Override
-	public void addAxisDevice(AxisDevice<? extends NXobject> axisDevice)
+	public void setPrimaryDevice(DataDevice<?> primaryDeviceModel)
 			throws NexusException {
 		// this data model already has all the information it needs to be fully populated
 		throw new UnsupportedOperationException("No additional objects are required for this data model");
 	}
 
+	@Override
+	public void addDataDevice(NexusObjectProvider<?> dataDevice,
+			Integer defaultAxisDimension, int... dimensionMappings)
+			throws NexusException {
+		// this data model already has all the information it needs to be fully populated
+		throw new UnsupportedOperationException("No additional objects are required for this data model");
+	}
+
+	@Override
+	public void addDataDevice(DataDevice<?> dataDeviceModel)
+			throws NexusException {
+		// this data model already has all the information it needs to be fully populated
+		throw new UnsupportedOperationException("No additional objects are required for this data model");
+	}
 
 }

@@ -192,6 +192,15 @@ public class NexusAssert {
 			}
 		}
 	}
+	
+	public static void assertSignal(NXdata nxData, String expectedSignalFieldName) {
+		Attribute signalAttr = nxData.getAttribute("signal");
+		assertThat(signalAttr, is(notNullValue()));
+		assertThat(signalAttr.getRank(), is(1));
+		assertThat(signalAttr.getFirstElement(), is(equalTo(expectedSignalFieldName)));
+		assertThat(nxData.getDataNode(expectedSignalFieldName), is(notNullValue()));
+		
+	}
 
 	public static void assertAxes(NXdata nxData, String... expectedValues) {
 		Attribute axesAttr = nxData.getAttribute("axes");

@@ -29,7 +29,7 @@ import org.eclipse.dawnsci.nexus.NexusBaseClass;
 import org.eclipse.dawnsci.nexus.NexusException;
 import org.eclipse.dawnsci.nexus.NexusNodeFactory;
 import org.eclipse.dawnsci.nexus.builder.AbstractNexusProvider;
-import org.eclipse.dawnsci.nexus.builder.AxisDevice;
+import org.eclipse.dawnsci.nexus.builder.DataDevice;
 import org.eclipse.dawnsci.nexus.builder.NexusDataBuilder;
 import org.eclipse.dawnsci.nexus.builder.NexusEntryBuilder;
 import org.eclipse.dawnsci.nexus.builder.NexusEntryModification;
@@ -237,22 +237,17 @@ public class ComplexNexusFileBuilderTest extends AbstractNexusFileBuilderTestBas
 
 	@Override
 	protected void addDataBuilder(NexusEntryBuilder entryModel) throws NexusException {
-		NexusDataBuilder dataModel = entryModel.newData(testDetector.getName());
-		dataModel.setDataDevice(testDetector, "data");
-		
-		AxisDevice<NXpositioner> positionerAxisDevice = new AxisDevice<>(
-				tomoScanDevicePositioner, 0, new int[] { 0 });
-		positionerAxisDevice.setUseDeviceName(false);
-		dataModel.addAxisDevice(positionerAxisDevice);
+		NexusDataBuilder dataBuilder = entryModel.newData(testDetector.getName());
+		dataBuilder.setPrimaryDevice(testDetector);
+		dataBuilder.addDataDevice(new DataDevice<>(tomoScanDevicePositioner, false, 0, 0));
+		dataBuilder.addDataDevice(actualTimePositioner, null, 0);
+		dataBuilder.addDataDevice(beamOkPositioner, null, 0);
+		dataBuilder.addDataDevice(ioncIPositioner, null, 0);
 
-		dataModel.addAxisDevice(actualTimePositioner, new int[] { 0 });
-		dataModel.addAxisDevice(beamOkPositioner, new int[] { 0 });
-		dataModel.addAxisDevice(ioncIPositioner, new int[] { 0 });
-
-		AxisDevice<NXdetector> detectorAxisDevice = new AxisDevice<>(testDetector, new int[] { 0 });
+		DataDevice<NXdetector> detectorAxisDevice = new DataDevice<>(testDetector, null, 0);
 		detectorAxisDevice.setSourceFields("count_time", "start_time", "time_ms");
 		detectorAxisDevice.setUseDeviceName(false);
-		dataModel.addAxisDevice(detectorAxisDevice);
+		dataBuilder.addDataDevice(detectorAxisDevice);
 	}
 	
 	protected void addApplicationDefinitions(NexusEntryBuilder nexusEntryModel) throws NexusException {
