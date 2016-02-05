@@ -1,9 +1,16 @@
+/*-
+ * Copyright (c) 2014 Diamond Light Source Ltd.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ */
+
 package org.dawnsci.boofcv.examples.imageprocessing;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import junit.framework.Assert;
 
 import org.dawnsci.boofcv.BoofCVImageStitchingProcessCreator;
 import org.dawnsci.boofcv.BoofCVImageTransformCreator;
@@ -13,6 +20,7 @@ import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.image.IImageStitchingProcess;
 import org.eclipse.dawnsci.analysis.api.image.IImageTransform;
 import org.eclipse.dawnsci.analysis.api.monitor.IMonitor;
+import org.junit.Assert;
 import org.junit.Test;
 
 public class ImageStitchingPluginTest {

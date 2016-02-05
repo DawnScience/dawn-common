@@ -15,11 +15,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import junit.framework.Assert;
-
 import org.apache.commons.io.FileUtils;
 import org.dawb.common.util.eclipse.BundleUtils;
 import org.eclipse.core.runtime.CoreException;
+import org.junit.Assert;
 import org.junit.Test;
 
 import uk.ac.diamond.scisoft.analysis.rpc.AnalysisRpcException;
