@@ -28,7 +28,7 @@ public enum FunctionType {
 	CUBIC("Cubic"),
 //	CUBIC_SPLINE(CubicSpline.class),
 	FERMI("Fermi"),
-	FERMIGAUSS("Fermi convoluted with Gaussian"),
+	FERMI_GAUSSIAN("Fermi-Gaussian"),
 	GAUSSIAN("Gaussian"),
 //	GAUSSIAN_ND(GaussianND.class),
 	LORENTZIAN("Lorentzian"),
@@ -36,6 +36,9 @@ public enum FunctionType {
 	PEARSON_VII("Pearson VII"),
 	POLYNOMIAL("Polynomial"),
 	PSEUDO_VOIGT("Pseudo-Voigt"),
+	VOIGT("Voigt"),
+	FANO("Fano"),
+	FANO_GAUSSIAN("Fano-Gaussian"),
 	QUADRATIC("Quadratic"),
 //	STEP(Step.class),
 	STRAIGHT_LINE("Linear");
