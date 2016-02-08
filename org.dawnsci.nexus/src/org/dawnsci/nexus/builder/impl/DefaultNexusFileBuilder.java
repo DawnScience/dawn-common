@@ -60,12 +60,13 @@ public class DefaultNexusFileBuilder implements NexusFileBuilder {
 	public void saveFile() throws NexusException {
 		final INexusFileFactory nexusFileFactory = ServiceHolder.getNexusFileFactory();
 		final String filename = treeFile.getFilename();
-		NexusFile nexusFile = nexusFileFactory.newNexusFile(filename);
-		nexusFile.createAndOpenToWrite();
-		nexusFile.addNode("/", treeFile.getGroupNode());
-		nexusFile.flush();
+		try (NexusFile nexusFile = nexusFileFactory.newNexusFile(filename)) {
+			nexusFile.createAndOpenToWrite();
+			nexusFile.addNode("/", treeFile.getGroupNode());
+			nexusFile.flush();
+		}
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.dawnsci.nexus.builder.NexusFileBuilder#getNexusTree()
 	 */
