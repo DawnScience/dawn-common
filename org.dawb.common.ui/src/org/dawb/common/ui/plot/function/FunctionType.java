@@ -11,10 +11,6 @@ package org.dawb.common.ui.plot.function;
 import org.eclipse.dawnsci.analysis.api.fitting.functions.IFunction;
 
 import uk.ac.diamond.scisoft.analysis.fitting.functions.FunctionFactory;
-//import uk.ac.diamond.scisoft.analysis.fitting.functions.CubicSpline;
-//import uk.ac.diamond.scisoft.analysis.fitting.functions.GaussianND;
-//import uk.ac.diamond.scisoft.analysis.fitting.functions.Offset;
-//import uk.ac.diamond.scisoft.analysis.fitting.functions.Step;
 
 /**
  * These are the functions editable with the edit table and as such 
@@ -81,10 +77,10 @@ public enum FunctionType {
 	public static int getIndex(Class<? extends IFunction> class1) {
 		
 		try {
-			String name = FunctionFactory.getName(class1);
+			String name = class1.newInstance().getName();
 			final FunctionType[] ops = FunctionType.values();
 			for (FunctionType functionType : ops) {
-				if (functionType.functionName == name) return functionType.getIndex();
+				if (functionType.functionName.equals(name)) return functionType.getIndex();
 			}
 		} catch (Exception e) {
 			return -1;
