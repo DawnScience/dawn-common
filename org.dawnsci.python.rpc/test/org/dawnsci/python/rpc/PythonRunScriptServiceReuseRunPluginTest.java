@@ -13,7 +13,6 @@ import java.util.Map;
 
 import org.dawnsci.python.rpc.PythonRunScriptService;
 import org.eclipse.core.runtime.CoreException;
-import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 

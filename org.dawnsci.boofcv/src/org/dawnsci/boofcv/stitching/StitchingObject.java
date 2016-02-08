@@ -239,7 +239,7 @@ public class StitchingObject<T extends ImageSingleBand<?>> {
 			work = new ImageFloat32(outputWidth, outputHeight);
 			// used to render the results onto an image
 			PixelTransformHomography_F32 model = new PixelTransformHomography_F32();
-			ImplImageDistort_F32 distort = new ImplImageDistort_F32(
+			ImplImageDistort_F32<ImageFloat32> distort = new ImplImageDistort_F32<ImageFloat32>(
 					new ImplBilinearPixel_F32(), null);
 			distort.setModel(model);
 			// render first image
