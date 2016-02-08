@@ -91,7 +91,7 @@ public class Commandline implements Cloneable {
 
   private static final Logger LOG = LoggerFactory.getLogger(Commandline.class);
 
-  private Vector arguments = new Vector();
+  private Vector<Argument> arguments = new Vector<Argument>();
   private String executable = null;
   private File workingDir = null;
 
@@ -275,7 +275,7 @@ public class Commandline implements Cloneable {
    * <code>addValue</code> or the argument object.
    */
   public String[] getArguments() {
-    Vector result = new Vector(arguments.size() * 2);
+    Vector<String> result = new Vector<String>(arguments.size() * 2);
     for (int i = 0; i < arguments.size(); i++) {
       Argument arg = (Argument) arguments.elementAt(i);
       String[] s = arg.getParts();
@@ -353,7 +353,7 @@ public class Commandline implements Cloneable {
     final int inDoubleQuote = 2;
     int state = normal;
     StringTokenizer tok = new StringTokenizer(toProcess, "\"\' ", true);
-    Vector v = new Vector();
+    Vector<String> v = new Vector<String>();
     StringBuffer current = new StringBuffer();
 
     while (tok.hasMoreTokens()) {

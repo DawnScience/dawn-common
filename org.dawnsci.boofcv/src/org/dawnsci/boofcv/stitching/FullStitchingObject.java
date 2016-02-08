@@ -40,7 +40,7 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 	private double[][][] translations;
 
 	// used to calculate translation between images
-	private TranslationObject test;
+	private TranslationObject<T, TD> test;
 
 	// factor to convert between microns and pixels
 //	private double micronsToPixels;
@@ -99,7 +99,7 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 	 * @param monitor
 	 *            To monitor progress
 	 */
-	public void translationArray(List<List<ImageSingleBand<?>>> images, List<double[]> motorTranslations, IMonitor monitor) {
+	public void translationArray(List<List<T>> images, List<double[]> motorTranslations, IMonitor monitor) {
 
 		// stores the translations
 		translations = new double[images.size()][images.get(0).size()][2];
@@ -163,7 +163,7 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 	 * @param monitor
 	 *            To monitor progress
 	 */
-	public void translationArrayHomography(List<List<ImageSingleBand<?>>> images, List<double[]> motorTranslations, IMonitor monitor) {
+	public void translationArrayHomography(List<List<T>> images, List<double[]> motorTranslations, IMonitor monitor) {
 		// temporarily stores the transforms
 		Homography2D_F64 transform;
 
@@ -237,7 +237,7 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 	 * @param monitor
 	 *            To monitor progress
 	 */
-	public void translationArraySpecial(List<List<ImageSingleBand<?>>> images, List<double[]> motorTranslations, IMonitor monitor) {
+	public void translationArraySpecial(List<List<T>> images, List<double[]> motorTranslations, IMonitor monitor) {
 		// temporarily stores the transforms
 		Se2_F64 transform;
 
