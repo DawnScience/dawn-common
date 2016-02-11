@@ -60,12 +60,15 @@ public class DefaultNexusFileBuilder implements NexusFileBuilder {
 	public void saveFile() throws NexusException {
 		final INexusFileFactory nexusFileFactory = ServiceHolder.getNexusFileFactory();
 		final String filename = treeFile.getFilename();
-		NexusFile nexusFile = nexusFileFactory.newNexusFile(filename);
-		nexusFile.createAndOpenToWrite();
-		nexusFile.addNode("/", treeFile.getGroupNode());
-		nexusFile.flush();
+		// Create the nexus file, we enable SWMR mode so that the file can be read
+		// while data is being written to it (includes 5 second timeout for lazy writeable dataset
+		try (NexusFile nexusFile = nexusFileFactory.newNexusFile(filename, true)) {
+			nexusFile.createAndOpenToWrite();
+			nexusFile.addNode("/", treeFile.getGroupNode());
+			nexusFile.flush();
+		}
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.dawnsci.nexus.builder.NexusFileBuilder#getNexusTree()
 	 */
