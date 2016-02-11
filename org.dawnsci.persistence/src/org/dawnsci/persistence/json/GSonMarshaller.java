@@ -9,6 +9,7 @@
 package org.dawnsci.persistence.json;
 
 import org.dawnsci.persistence.json.function.FunctionBean;
+import org.eclipse.dawnsci.analysis.api.persistence.IJSonMarshaller;
 import org.eclipse.dawnsci.analysis.dataset.roi.json.CircularROIBean;
 import org.eclipse.dawnsci.analysis.dataset.roi.json.FreeDrawROIBean;
 import org.eclipse.dawnsci.analysis.dataset.roi.json.LinearROIBean;

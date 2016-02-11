@@ -15,6 +15,7 @@ import org.dawnsci.persistence.util.PersistenceUtils;
 import org.eclipse.dawnsci.analysis.api.fitting.functions.IFunction;
 import org.eclipse.dawnsci.analysis.api.fitting.functions.IOperator;
 import org.eclipse.dawnsci.analysis.api.fitting.functions.IParameter;
+import org.eclipse.dawnsci.analysis.api.persistence.IJSonMarshaller;
 import org.eclipse.dawnsci.analysis.api.roi.IROI;
 import org.eclipse.dawnsci.analysis.dataset.roi.CircularFitROI;
 import org.eclipse.dawnsci.analysis.dataset.roi.CircularROI;
