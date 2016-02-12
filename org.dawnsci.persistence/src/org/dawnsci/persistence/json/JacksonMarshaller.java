@@ -36,8 +36,6 @@ import org.eclipse.dawnsci.analysis.dataset.roi.SectorROI;
 import org.eclipse.dawnsci.analysis.dataset.roi.XAxisBoxROI;
 import org.eclipse.dawnsci.analysis.dataset.roi.YAxisBoxROI;
 import org.eclipse.dawnsci.analysis.dataset.roi.json.ROIBeanFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import uk.ac.diamond.scisoft.analysis.fitting.functions.Parameter;
 
@@ -54,7 +52,6 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 public class JacksonMarshaller implements IJSonMarshaller{
 
 	private ObjectMapper mapper;
-	private Logger logger = LoggerFactory.getLogger(JacksonMarshaller.class);
 
 	public JacksonMarshaller() {
 		mapper = new ObjectMapper();
