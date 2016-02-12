@@ -238,6 +238,7 @@ public class ComplexNexusFileTest extends AbstractNexusFileTestBase {
 			String units;
 			if (fieldName.contains("sample")) {
 				units = "um";
+				sampleStageCollection.setAttribute(fieldName, "target", "entry1/before_scan/sample_stage/" + fieldName);
 			} else if (fieldName.equals("ss1_rot")) {
 				units = "deg";
 			} else {
@@ -257,14 +258,14 @@ public class ComplexNexusFileTest extends AbstractNexusFileTestBase {
 		instrument.setPositioner("actualTime", actualTimePositioner);
 		actualTimePositioner.setDataset("actualTime", getTestData("actualTime"));
 		actualTimePositioner.setAttribute("actualTime", "local_name", "actualTime.actualTime");
-//		actualTimePositioner.setAttribute("actualTime", "target", "/entry1/instrument/actualTime/actualTime");
+		actualTimePositioner.setAttribute("actualTime", "target", "/entry1/instrument/actualTime/actualTime");
 
 		// beamok : NXpositioner
 		NXpositioner beamokPositioner = nexusNodeFactory.createNXpositioner();
 		instrument.setPositioner("beamok", beamokPositioner);
 		beamokPositioner.setDataset("beamok", getTestData("beamok"));
 		beamokPositioner.setAttribute("beamok", "local_name", "beamok.beamok");
-//		beamokPositioner.setAttribute("beamok", "target", "/entry1/instrument/beamok/beamok");
+		beamokPositioner.setAttribute("beamok", "target", "/entry1/instrument/beamok/beamok");
 
 		// icon_i : NXpositioner
 		NXpositioner ioncIPositioner = nexusNodeFactory.createNXpositioner();
@@ -272,7 +273,7 @@ public class ComplexNexusFileTest extends AbstractNexusFileTestBase {
 		// use a range for the dataset (not the actual data from the example file)
 		ioncIPositioner.setDataset("ionc_i", getTestData("ionc_i"));
 		ioncIPositioner.setAttribute("ionc_i", "local_name", "ionc_i.ionc_i");
-//		ioncIPositioner.setAttribute("ionc_i", "target", "/entry1/instrument/ionc_i/ionc_i");
+		ioncIPositioner.setAttribute("ionc_i", "target", "/entry1/instrument/ionc_i/ionc_i");
 
 		instrument.setName(DatasetFactory.createFromObject("i13"));
 
@@ -282,19 +283,24 @@ public class ComplexNexusFileTest extends AbstractNexusFileTestBase {
 
 		pco1HwHdfDectector.setDataset("count_time", getTestData("count_time"));
 		pco1HwHdfDectector.setAttribute("count_time", "local_name", "pc01_hw_hdf.count_time");
-//		pco1HwHdfDectector.setAttribute("count_time", "target", "/entry1/instrument/pco1_hw_hdf");
+		pco1HwHdfDectector.setAttribute("count_time", "target", "/entry1/instrument/pco1_hw_hdf");
 
 		pco1HwHdfDectector.setData(getTestData("data"));
+		pco1HwHdfDectector.setAttribute("data", "target", "/entry1/instrument/pco1_hw_hdf/data");
 
 		pco1HwHdfDectector.setDataset("region_origin", getTestData("region_origin"));
+		pco1HwHdfDectector.setAttribute("region_origin", "target", "/entry1/instrument/pco1_hw_hdf/region_origin");
 		pco1HwHdfDectector.setDataset("region_size", getTestData("region_size"));
+		pco1HwHdfDectector.setAttribute("region_size", "target", "/entry1/instrument/pco1_hw_hdf/region_size");
 
 		pco1HwHdfDectector.setDataset("start_time", getTestData("start_time"));
 		pco1HwHdfDectector.setAttribute("start_time", "start", "2014-01-31T00:13:45");
 		pco1HwHdfDectector.setAttribute("start_time", "units", "s");
+		pco1HwHdfDectector.setAttribute("start_time", "target", "/entry1/instrument/pco1_hw_hdf/start_time");
 
 		pco1HwHdfDectector.setDataset("time_ms", getTestData("time_ms"));
 		pco1HwHdfDectector.setAttribute("time_ms", "units", "ms");
+		pco1HwHdfDectector.setAttribute("time_ms", "target", "/entry1/instrument/pco1_hw_hdf/time_ms");
 
 		// source : NXsource
 		NXsource source = nexusNodeFactory.createNXsource();
@@ -315,24 +321,29 @@ public class ComplexNexusFileTest extends AbstractNexusFileTestBase {
 		tomoScanDevice.setDataset("imageNumber", getTestData("imageNumber"));
 		tomoScanDevice.setAttribute("imageNumber", "axis", "1");
 		tomoScanDevice.setAttribute("imageNumber", "local_name", "tomoScanDevice.imageNumber");
+		tomoScanDevice.setAttribute("imageNumber", "target", "/entry1/instrument/tomoScanDevice/imageNumber");
 
 		tomoScanDevice.setDataset("image_key", getTestData("image_key"));
 		tomoScanDevice.setAttribute("image_key", "axis", "1");
 		tomoScanDevice.setAttribute("image_key", "local_name", "tomoScanDevice.image_key");
+		tomoScanDevice.setAttribute("image_key", "target", "/entry1/instrument/tomoScanDevice/image_key");
 
 		tomoScanDevice.setDataset("ss1_X", getTestData("tomoScanDevice.ss1_X"));
 		tomoScanDevice.setAttribute("ss1_X", "axis", "1");
 		tomoScanDevice.setAttribute("ss1_X", "local_name", "tomoScanDevice.ss1_X");
+		tomoScanDevice.setAttribute("ss1_X", "target", "/entry1/instrument/tomoScanDevice/ss1_X");
 
 		tomoScanDevice.setDataset("ss1_rot", getTestData("tomoScanDevice.ss1_rot"));
 		tomoScanDevice.setAttribute("ss1_rot", "axis", "1");
 		tomoScanDevice.setAttribute("ss1_rot", "label", "1");
 		tomoScanDevice.setAttribute("ss1_rot", "local_name", "tomoScanDevice.ss1_rot");
 		tomoScanDevice.setAttribute("ss1_rot", "primary", "1");
+		tomoScanDevice.setAttribute("ss1_rot", "target", "/entry1/instrument/tomoScanDevice/ss1_rot");
 
 		tomoScanDevice.setDataset("tomography_shutter", getTestData("tomography_shutter"));
 		tomoScanDevice.setAttribute("tomography_shutter", "axis", "1");
 		tomoScanDevice.setAttribute("tomography_shutter", "local_name", "tomoScanDevice.tomography_shutter");
+		tomoScanDevice.setAttribute("tomography_shutter", "target", "/entry1/instrument/tomoScanDevice/tomography_shutter");
 
 		return instrument;
 	}
@@ -439,7 +450,10 @@ public class ComplexNexusFileTest extends AbstractNexusFileTestBase {
 		entry1.setField("scan_command", "scan tomoScanDevice Start: -88.200000 Stop: 91.800000 Step: 2.000000 Darks every:0 imagesPerDark:5 Flats every:0 imagesPerFlat:5 InBeamPosition:11.150000 OutOfBeamPosition:5.000000 numImages 111  actualTime ionc_i pco1_hw_hdf 0.1 beamok");
 		entry1.setField("scan_dimensions", 111);
 		entry1.setField("scan_identifier", "a3d668c0-e3c4-4ed9-b127-4a202b2b6bac");
+		entry1.setAttribute("scan_identifier", "target", "/entry1/scan_identifier");
+
 		entry1.setField("title", "AKingUVA_705wSSwire_InSitu_95RH_2MMgCI2_p4ul_p4h");
+		entry1.setAttribute("title", "target", "/entry1/title");
 
 		NXsubentry tomoEntry = createTomoEntry();
 		entry1.setSubentry("tomo_entry", tomoEntry);

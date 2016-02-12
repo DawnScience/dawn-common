@@ -113,7 +113,7 @@ public class DefaultNexusFileBuilder implements NexusFileBuilder {
 		final NXentry entry = nexusNodeFactory.createNXentry();
 		nxRoot.setEntry(entryName, entry);
 
-		NexusEntryBuilder entryModel = new DefaultNexusEntryBuilder(nexusNodeFactory, entry);
+		NexusEntryBuilder entryModel = new DefaultNexusEntryBuilder(nexusNodeFactory, entryName, entry);
 		entries.put(entryName, entryModel);
 		
 		return entryModel;

@@ -29,6 +29,7 @@ import org.eclipse.dawnsci.nexus.NexusBaseClass;
 import org.eclipse.dawnsci.nexus.NexusException;
 import org.eclipse.dawnsci.nexus.NexusNodeFactory;
 import org.eclipse.dawnsci.nexus.builder.AbstractNexusProvider;
+import org.eclipse.dawnsci.nexus.builder.CustomNexusEntryModification;
 import org.eclipse.dawnsci.nexus.builder.DataDevice;
 import org.eclipse.dawnsci.nexus.builder.NexusDataBuilder;
 import org.eclipse.dawnsci.nexus.builder.NexusEntryBuilder;
@@ -96,6 +97,7 @@ public class ComplexNexusFileBuilderTest extends AbstractNexusFileBuilderTestBas
 			detector.initializeLazyDataset("time_ms", 1, Dataset.INT64); // unsigned int 32 in original nexus file
 			// image_key required by NXtomo application definition
 			detector.initializeLazyDataset("image_key", 1, Dataset.INT32);
+			detector.setAttribute("image_key", "target", "/entry/instrument/pc01_hw_hdf/image_key");
 			
 			return detector;
 		}
@@ -163,6 +165,10 @@ public class ComplexNexusFileBuilderTest extends AbstractNexusFileBuilderTestBas
 				sampleStage.setAttribute(ss1FieldNames[i], "field_type", "input");
 				sampleStage.setAttribute(ss1FieldNames[i], "units", units[i]);
 				sampleStage.setAttribute(ss1FieldNames[i], "format", "%5.5g");
+				if (ss1FieldNames[i].contains("sample")) {
+					sampleStage.setAttribute(ss1FieldNames[i], "target",
+							"/entry/before_scan/sample_stage/" + ss1FieldValues[i]);
+				}
 			}
 			
 			return beforeScan;
@@ -216,6 +222,7 @@ public class ComplexNexusFileBuilderTest extends AbstractNexusFileBuilderTestBas
 		scanData.addMetadataEntry("scan_identifier", "a3d668c0-e3c4-4ed9-b127-4a202b2b6bac");
 		scanData.addMetadataEntry("title", "AKingUVA_7050wSSwire_InSitu_95RH_2MMgCl2_p4ul_p4h");
 		
+		
 		List<NexusEntryModification> nexusObjects = new ArrayList<>();
 		nexusObjects.add(beforeScan);
 		nexusObjects.add(scanData);
@@ -226,6 +233,13 @@ public class ComplexNexusFileBuilderTest extends AbstractNexusFileBuilderTestBas
 		nexusObjects.add(testSource);
 		nexusObjects.add(tomoScanDevicePositioner);
 		nexusObjects.add(user);
+		nexusObjects.add(new CustomNexusEntryModification() {
+			
+			@Override
+			public void modifyEntry(NXentry entry) {
+				entry.setAttribute("title", "target", "/entry/title");
+			}
+		});
 		
 		return nexusObjects;
 	}

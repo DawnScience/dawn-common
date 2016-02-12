@@ -1,8 +1,10 @@
 package org.dawnsci.nexus;
 
+import static org.eclipse.dawnsci.nexus.builder.NexusDataBuilder.ATTR_NAME_TARGET;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -16,12 +18,14 @@ import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
 import org.eclipse.dawnsci.analysis.api.tree.Attribute;
 import org.eclipse.dawnsci.analysis.api.tree.DataNode;
 import org.eclipse.dawnsci.analysis.api.tree.GroupNode;
+import org.eclipse.dawnsci.analysis.api.tree.NodeLink;
 import org.eclipse.dawnsci.analysis.api.tree.TreeFile;
 import org.eclipse.dawnsci.analysis.dataset.impl.AbstractDataset;
 import org.eclipse.dawnsci.analysis.dataset.impl.Dataset;
 import org.eclipse.dawnsci.analysis.dataset.impl.PositionIterator;
 import org.eclipse.dawnsci.nexus.NXdata;
 import org.eclipse.dawnsci.nexus.NXobject;
+import org.eclipse.dawnsci.nexus.NXroot;
 
 public class NexusAssert {
 
@@ -103,9 +107,9 @@ public class NexusAssert {
 		// check number of attributes same (i.e. actualDataNode has no additional attributes)
 		// additional attribute "target" is allowed. This is added when loading a file with >1 hard link to same node
 		int expectedNumAttributes = expectedDataNode.getNumberOfAttributes();
-		if (expectedDataNode.containsAttribute("target")) {
-			expectedNumAttributes--;
-		}
+//		if (expectedDataNode.containsAttribute("target")) {
+//			expectedNumAttributes--;
+//		}
 		assertEquals(expectedNumAttributes, actualDataNode.getNumberOfAttributes());
 
 		assertEquals(expectedDataNode.getTypeName(), actualDataNode.getTypeName());
@@ -229,6 +233,19 @@ public class NexusAssert {
 		for (int i = 0; i < indices.length; i++) {
 			assertThat(value.getInt(i), is(equalTo(indices[i])));
 		}
+	}
+	
+	public static void assertTarget(NXdata nxData, String destName, NXroot nxRoot, String targetPath) {
+		DataNode dataNode = nxData.getDataNode(destName);
+		assertThat(dataNode, is(notNullValue()));
+		Attribute targetAttr = dataNode.getAttribute(ATTR_NAME_TARGET);
+		assertThat(targetAttr, is(notNullValue()));
+		assertThat(targetAttr.getSize(), is(1));
+		assertThat(targetAttr.getFirstElement(), is(equalTo(targetPath)));
+		
+		NodeLink nodeLink = nxRoot.findNodeLink(targetPath);
+		assertTrue(nodeLink.isDestinationData());
+		assertThat(nodeLink.getDestination(), is(sameInstance(dataNode)));
 	}
 
 }

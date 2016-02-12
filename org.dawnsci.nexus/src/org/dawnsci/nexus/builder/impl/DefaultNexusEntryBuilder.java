@@ -48,7 +48,9 @@ public class DefaultNexusEntryBuilder implements NexusEntryBuilder {
 
 	private final NexusNodeFactory nexusNodeFactory;
 
-	private NXentry nxEntry = null;
+	private final String entryName;
+	
+	private final NXentry nxEntry;
 
 	private NXinstrument nxInstrument = null;
 
@@ -62,11 +64,13 @@ public class DefaultNexusEntryBuilder implements NexusEntryBuilder {
 	 * Creates a new {@link DefaultNexusEntryBuilder}. This constructor should only be called
 	 * by {@link DefaultNexusFileBuilder}.
 	 * @param nexusNodeFactory node factory
+	 * @param entryName TODO
 	 * @param nxEntry entry to wrap
 	 */
-	protected DefaultNexusEntryBuilder(final NexusNodeFactory nexusNodeFactory, final NXentry nxEntry) {
+	protected DefaultNexusEntryBuilder(final NexusNodeFactory nexusNodeFactory, String entryName, final NXentry nxEntry) {
 		this.nexusNodeFactory = nexusNodeFactory;
 		this.nxEntry = nxEntry;
+		this.entryName = entryName;
 	}
 
 	/* (non-Javadoc)
@@ -86,6 +90,14 @@ public class DefaultNexusEntryBuilder implements NexusEntryBuilder {
 	@Override
 	public NXentry getNXentry() {
 		return nxEntry;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.dawnsci.nexus.builder.NexusEntryBuilder#getEntryName()
+	 */
+	@Override
+	public String getEntryName() {
+		return entryName;
 	}
 
 	/* (non-Javadoc)
@@ -270,11 +282,11 @@ public class DefaultNexusEntryBuilder implements NexusEntryBuilder {
 	 * element of that category that it can be added to.
 	 * A special case is where the nexus object is of base class {@link NexusBaseClass#NX_SAMPLE},
 	 * in which case this replaces the existing NXsample base class in the nexus tree.
-	 * @param adapter
+	 * @param nexusObjectProvider
 	 * @param nexusObject
 	 * @throws NexusException
 	 */
-	protected <N extends NXobject> void addGroupToNexusTree(NexusObjectProvider<N> adapter, N nexusObject) throws NexusException {
+	protected <N extends NXobject> void addGroupToNexusTree(NexusObjectProvider<N> nexusObjectProvider, N nexusObject) throws NexusException {
 		if (defaultGroups == null) {
 			throw new IllegalStateException("There are no groups to add this element to. defaultGroups() must be invoked on this method before child groups can be added.");
 		}
@@ -288,8 +300,8 @@ public class DefaultNexusEntryBuilder implements NexusEntryBuilder {
 			nxEntry.setSample(nxSample);
 		} else {
 			// normal case
-			final String name = adapter.getName();
-			final NexusBaseClass category = adapter.getCategory();
+			final String name = nexusObjectProvider.getName();
+			final NexusBaseClass category = nexusObjectProvider.getCategory();
 
 			NXobject parentGroup = null;
 			if (category != null) {
