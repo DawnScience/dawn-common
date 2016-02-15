@@ -57,7 +57,7 @@ public class NexusAssert {
 		// check number of attributes same (i.e. actualGroup has no additional attributes)
 		// additional attribute "target" is allowed. This is added when loading a file with >1 hard link to same node
 		int expectedNumAttributes = expectedGroup.getNumberOfAttributes();
-		if (expectedGroup.containsAttribute("target")) {
+		if (expectedGroup.containsAttribute("target") && !actualGroup.containsAttribute("target")) {
 			expectedNumAttributes--;
 		}
 		assertEquals(expectedNumAttributes, actualGroup.getNumberOfAttributes());
@@ -105,11 +105,11 @@ public class NexusAssert {
 			}
 		}
 		// check number of attributes same (i.e. actualDataNode has no additional attributes)
-		// additional attribute "target" is allowed. This is added when loading a file with >1 hard link to same node
+		// additional attribute "target" is allowed, this is added automatically when saving the file
 		int expectedNumAttributes = expectedDataNode.getNumberOfAttributes();
-//		if (expectedDataNode.containsAttribute("target")) {
-//			expectedNumAttributes--;
-//		}
+		if (expectedDataNode.containsAttribute("target") && !actualDataNode.containsAttribute("target")) {
+			expectedNumAttributes--;
+		}
 		assertEquals(expectedNumAttributes, actualDataNode.getNumberOfAttributes());
 
 		assertEquals(expectedDataNode.getTypeName(), actualDataNode.getTypeName());
