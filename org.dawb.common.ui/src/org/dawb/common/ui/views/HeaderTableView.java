@@ -12,6 +12,7 @@
 package org.dawb.common.ui.views;
 
 import java.io.File;
+import java.io.Serializable;
 
 import org.dawb.common.ui.util.EclipseUtils;
 import org.dawb.common.ui.util.GridUtils;
@@ -427,12 +428,17 @@ public class HeaderTableView extends ViewPart implements ISelectionListener, IPa
 		
 		public String getText(final Object element) {
 			if (column==0) return element.toString();
-			if (column==1 && meta != null)
+			if (column==1 && meta != null) {
+				Serializable m = null;
 				try {
-					return meta.getMetaValue(element.toString()).toString();
+					m = meta.getMetaValue(element.toString());
+					if (m != null) {
+						return m.toString();
+					}
 				} catch (Exception ignored) {
 					// Null allowed
 				}
+			}
 			return "";
 		}
 	}
