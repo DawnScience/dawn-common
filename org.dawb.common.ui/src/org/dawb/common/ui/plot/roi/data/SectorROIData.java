@@ -11,7 +11,7 @@ package org.dawb.common.ui.plot.roi.data;
 
 import org.eclipse.dawnsci.analysis.dataset.impl.CompoundDataset;
 import org.eclipse.dawnsci.analysis.dataset.impl.Dataset;
-import org.eclipse.dawnsci.analysis.dataset.impl.DatasetUtils;
+import org.eclipse.dawnsci.analysis.dataset.impl.DatasetFactory;
 import org.eclipse.dawnsci.analysis.dataset.roi.SectorROI;
 
 import uk.ac.diamond.scisoft.analysis.axis.AxisValues;
@@ -66,19 +66,19 @@ public class SectorROIData extends ROIData {
 			xAxes[3] = new AxisValues();
 
 			Dataset axis;
-			axis = DatasetUtils.linSpace(sroi.getRadius(0), sroi.getRadius(1), profileData[0].getSize(), Dataset.FLOAT64);//profileData[0].getIndices().squeeze();
+			axis = DatasetFactory.createLinearSpace(sroi.getRadius(0), sroi.getRadius(1), profileData[0].getSize(), Dataset.FLOAT64);//profileData[0].getIndices().squeeze();
 			xAxes[0].setValues(axis);
 
 			if (sroi.getSymmetry() != SectorROI.FULL)
-				axis = DatasetUtils.linSpace(sroi.getAngleDegrees(0), sroi.getAngleDegrees(1), profileData[1].getSize(), Dataset.FLOAT64);
+				axis = DatasetFactory.createLinearSpace(sroi.getAngleDegrees(0), sroi.getAngleDegrees(1), profileData[1].getSize(), Dataset.FLOAT64);
 			else
-				axis = DatasetUtils.linSpace(sroi.getAngleDegrees(0), sroi.getAngleDegrees(0) + 360., profileData[1].getSize(), Dataset.FLOAT64);
+				axis = DatasetFactory.createLinearSpace(sroi.getAngleDegrees(0), sroi.getAngleDegrees(0) + 360., profileData[1].getSize(), Dataset.FLOAT64);
 			xAxes[1].setValues(axis);
 
 			if (sroi.hasSeparateRegions()) {
-				axis = DatasetUtils.linSpace(sroi.getRadius(0), sroi.getRadius(1), profileData[2].getSize(), Dataset.FLOAT64);//profileData[0].getIndices().squeeze();
+				axis = DatasetFactory.createLinearSpace(sroi.getRadius(0), sroi.getRadius(1), profileData[2].getSize(), Dataset.FLOAT64);//profileData[0].getIndices().squeeze();
 				xAxes[2].setValues(axis);
-				axis = DatasetUtils.linSpace(sroi.getAngleDegrees(0), sroi.getAngleDegrees(1), profileData[3].getSize(), Dataset.FLOAT64);
+				axis = DatasetFactory.createLinearSpace(sroi.getAngleDegrees(0), sroi.getAngleDegrees(1), profileData[3].getSize(), Dataset.FLOAT64);
 				xAxes[3].setValues(axis);
 			}
 		} else {

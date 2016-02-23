@@ -26,7 +26,6 @@ import org.eclipse.dawnsci.analysis.api.persistence.IPersistenceService;
 import org.eclipse.dawnsci.analysis.api.persistence.IPersistentFile;
 import org.eclipse.dawnsci.analysis.dataset.impl.Dataset;
 import org.eclipse.dawnsci.analysis.dataset.impl.DatasetFactory;
-import org.eclipse.dawnsci.analysis.dataset.impl.DatasetUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -61,7 +60,7 @@ public class ReadWritePowderCalibration {
 				
 				@Override
 				public IDataset getUsedDSpaceIndexValues() {
-					return DatasetUtils.linSpace(0, 3, 4, Dataset.INT16);
+					return DatasetFactory.createLinearSpace(0, 3, 4, Dataset.INT16);
 				}
 				
 				@Override
@@ -86,7 +85,7 @@ public class ReadWritePowderCalibration {
 				
 				@Override
 				public IDataset getCalibrantDSpaceValues() {
-					return DatasetUtils.linSpace(1, 4, 4, Dataset.INT16);
+					return DatasetFactory.createLinearSpace(1, 4, 4, Dataset.INT16);
 				}
 
 				@Override
