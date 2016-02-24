@@ -118,7 +118,7 @@ public class Convert1DtoND extends AbstractConversion {
 						if (i<(paths.length-1)) file.setNexusAttribute(entry, Nexus.ENTRY);
 					}
 				}
-				saveAxis(file, entry, (Dataset)axis, paths);
+				saveAxis(file, entry, axis, paths);
 			}
 			
 			
@@ -134,7 +134,7 @@ public class Convert1DtoND extends AbstractConversion {
 		super.close(context);
 	}
 	
-	private void saveAxis(IHierarchicalDataFile file,String entry, Dataset out, String[] paths) throws Exception {
+	private void saveAxis(IHierarchicalDataFile file,String entry, IDataset out, String[] paths) throws Exception {
 		
 		String name = paths[paths.length-1];
 		String d = file.createDataset(name, out, entry);
@@ -147,7 +147,7 @@ public class Convert1DtoND extends AbstractConversion {
 		
 		String name = paths[paths.length-1];
 		
-		Dataset first = ((Dataset)out.get(0).getSlice());
+		IDataset first = out.get(0).getSlice();
 		
 		String d = file.appendDataset(name, first, entry);
 		
@@ -157,7 +157,7 @@ public class Convert1DtoND extends AbstractConversion {
 		file.setAttribute(d, "original_name", key);				
 		
 		for (int i = 1; i < out.size(); i++) {
-			Dataset a = (Dataset)out.get(i).getSlice();
+			IDataset a = out.get(i).getSlice();
 			d = file.appendDataset(name, a, entry);
 		}
 	}
@@ -169,7 +169,7 @@ public class Convert1DtoND extends AbstractConversion {
 
 		String d = null;
 		
-		Dataset first = ((Dataset)out.get(0).getSlice());
+		IDataset first = out.get(0).getSlice();
 		
 		for (int i = 0; i < bean.slowAxis; i++) {
 			
@@ -178,7 +178,7 @@ public class Convert1DtoND extends AbstractConversion {
 			}
 			
 			ILazyDataset ds = new AggregateDataset(true, lz);
-			Dataset a = (Dataset)ds.getSlice();
+			IDataset a = ds.getSlice();
 			d = file.appendDataset(name, a, entry);
 			
 		}

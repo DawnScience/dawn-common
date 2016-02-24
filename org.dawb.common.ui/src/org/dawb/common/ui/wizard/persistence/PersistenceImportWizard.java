@@ -334,9 +334,9 @@ public class PersistenceImportWizard extends AbstractPersistenceWizard implement
 					public void run() {
 						if (lockedmeta != null) {
 							DiffractionMetadataUtils.copyNewOverOld(fileMeta, lockedmeta);
-						} else if (image.getData() != null && ((Dataset)image.getData()).getMetadata()!= null){
+						} else if (image.getData() != null && image.getData().getMetadata()!= null){
 							//Should only need to copy over here, not replace
-							IMetadata meta = ((Dataset)image.getData()).getMetadata();
+							IMetadata meta = image.getData().getMetadata();
 							if (meta instanceof IDiffractionMetadata) {
 								DiffractionMetadataUtils.copyNewOverOld(fileMeta, (IDiffractionMetadata)meta);
 							}

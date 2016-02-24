@@ -42,7 +42,6 @@ import org.eclipse.dawnsci.analysis.api.monitor.IMonitor;
 import org.eclipse.dawnsci.analysis.api.persistence.IPersistenceService;
 import org.eclipse.dawnsci.analysis.api.persistence.IPersistentFile;
 import org.eclipse.dawnsci.analysis.dataset.impl.BooleanDataset;
-import org.eclipse.dawnsci.analysis.dataset.impl.Dataset;
 import org.eclipse.dawnsci.plotting.api.IPlottingSystem;
 import org.eclipse.dawnsci.plotting.api.region.IRegion;
 import org.eclipse.dawnsci.plotting.api.tool.IToolPage;
@@ -166,7 +165,7 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
     				}
     				
     				if (trace!=null && trace instanceof IImageTrace && trace.getData() != null) {
-    					IMetadata meta = ((Dataset)trace.getData()).getMetadata();
+    					IMetadata meta = trace.getData().getMetadata();
     					if (meta != null && (meta instanceof IDiffractionMetadata)) {
     						options.setOptionEnabled(PersistWizardConstants.DIFF_META, true);
     					}
@@ -232,7 +231,7 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
 							 Collection<ITrace> traces  = system.getTraces();
 							 for (ITrace trace : traces) {
 								 monitor.worked(1);
-								 Dataset data = (Dataset)trace.getData();
+								 IDataset data = trace.getData();
 								 if (trace.getName()!=null) data.setName(trace.getName());
 								 file.setData(data);
 								 if (trace instanceof IImageTrace) {

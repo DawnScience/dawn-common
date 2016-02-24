@@ -208,7 +208,7 @@ public class ConvertIDataset {
 	 * @param isBinary if true will convert to a binary image
 	 * @return Converted image.
 	 */
-	public static <T extends ImageBase<?>> IDataset convertTo(T src, boolean isBinary) {
+	public static <T extends ImageBase<?>> Dataset convertTo(T src, boolean isBinary) {
 		if (src instanceof ImageUInt8 || src instanceof ImageSInt8) {
 			Dataset dst = new ByteDataset(((ImageInt8<?>) src).data, src.height, src.width);
 			if (isBinary) {
@@ -236,7 +236,7 @@ public class ConvertIDataset {
 			int n = msrc.getNumBands();
 			Dataset[] datasets = new Dataset[n];
 			for (int i = 0; i < n; i++) {
-				datasets[i] = (Dataset) convertTo(msrc.getBand(i), isBinary);
+				datasets[i] = convertTo(msrc.getBand(i), isBinary);
 			}
 			if (n == 3) {
 				RGBDataset rgb = new RGBDataset(datasets[0], datasets[1], datasets[2]);
@@ -258,7 +258,7 @@ public class ConvertIDataset {
 	 * @param out (Optional) storage for output image
 	 * @return Rendered contours
 	 */
-	public static IDataset contourImageToIDataset(List<Contour> contours,
+	public static Dataset contourImageToIDataset(List<Contour> contours,
 			int colorExternal, int colorInternal, int width, int height) {
 
 		RGBDataset out = new RGBDataset(width, height);

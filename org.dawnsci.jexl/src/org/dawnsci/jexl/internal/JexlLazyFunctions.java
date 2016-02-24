@@ -67,16 +67,16 @@ public class JexlLazyFunctions {
 								final int[] stop,
 								final int[] step) {
 		
-		return ((Dataset)data.getSlice(start, stop, step)).squeeze();
+		return data.getSlice(start, stop, step).squeeze();
 	}
 
-	public static Dataset slice(ILazyDataset data, String sliceString) {
+	public static IDataset slice(ILazyDataset data, String sliceString) {
 		
 		Slice[] slices = Slice.convertFromString(sliceString);
 
 		if (slices.length != data.getRank()) throw new IllegalArgumentException("Invalid string");
 
-		return ((Dataset)data.getSlice(slices)).squeeze();
+		return data.getSlice(slices).squeeze();
 	}
 
 }

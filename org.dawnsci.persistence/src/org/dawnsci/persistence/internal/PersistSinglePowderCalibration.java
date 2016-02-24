@@ -109,7 +109,7 @@ class PersistSinglePowderCalibration {
 		file.createStringDataset("author", DAWNCALIBRATIONID, note);
 		file.createStringDataset("description", info.getMethodDescription(), note);
 		
-		Dataset data = (Dataset)info.getUsedDSpaceIndexValues();
+		IDataset data = info.getUsedDSpaceIndexValues();
 		final String datasetd = file.createDataset("d_space_index",  data, note);
 		file.setNexusAttribute(datasetd, Nexus.SDS);
 		

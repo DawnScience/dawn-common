@@ -644,7 +644,7 @@ public class CustomNCDConverter extends AbstractConversion  {
 			for (AxesMetadata axis : axes) {
 				for (ILazyDataset a: axis.getAxes()) {
 					if (a != null) {
-						Dataset aDataset = (Dataset) a.getSlice();
+						Dataset aDataset = DatasetUtils.sliceAndConvertLazyDataset(a);
 						aDataset = aDataset.transpose();
 						if (aDataset != null) {
 							if (aDataset.getName().equals("q")) {

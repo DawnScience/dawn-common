@@ -110,7 +110,7 @@ public class Plot1DConversionVisitor extends AbstractPlotConversionVisitor {
 				if (ddtype == axdtype) {
 					dtype = ddtype;
 				} else if (ddtype > axdtype) {
-					data = DatasetUtils.cast((Dataset)data, ddtype);
+					data = DatasetUtils.cast(data, ddtype);
 					dtype = ddtype;
 				} else {
 					dtype = axdtype;
@@ -125,7 +125,7 @@ public class Plot1DConversionVisitor extends AbstractPlotConversionVisitor {
 			data = ((ILineTrace)trace).getData().getSliceView();
 			data.squeeze();
 			if (dtype != AbstractDataset.getDType(data)) {
-				data = DatasetUtils.cast((Dataset)data, dtype);
+				data = DatasetUtils.cast(data, dtype);
 			}
 
 			data.setShape(data.getShape()[0],1);

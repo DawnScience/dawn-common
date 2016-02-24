@@ -242,7 +242,7 @@ public class GalleryDelegate implements SelectionListener {
             try {
             	IDataset slice = info.getData(true, ii);
             	slice.setName(selectionDataLabel+" "+info.getItemName(item.getItemCount(), false));
-				ys.add((Dataset)slice);
+				ys.add(slice);
 			} catch (Exception e) {
 				logger.error("Cannot slice ", e);
 				continue;
