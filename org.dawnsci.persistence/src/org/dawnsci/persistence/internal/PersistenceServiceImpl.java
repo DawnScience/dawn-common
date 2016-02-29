@@ -11,6 +11,7 @@ package org.dawnsci.persistence.internal;
 import org.dawnsci.persistence.json.JacksonMarshaller;
 import org.eclipse.dawnsci.analysis.api.persistence.IPersistenceService;
 import org.eclipse.dawnsci.analysis.api.persistence.IPersistentFile;
+import org.eclipse.dawnsci.analysis.api.persistence.IPersistentNodeFactory;
 import org.eclipse.dawnsci.hdf5.HierarchicalDataFactory;
 import org.eclipse.dawnsci.hdf5.IHierarchicalDataFile;
 import org.slf4j.Logger;
@@ -76,5 +77,10 @@ public class PersistenceServiceImpl implements IPersistenceService{
 			e.printStackTrace();
 			return null;
 		}
+	}
+
+	@Override
+	public IPersistentNodeFactory getPersistentNodeFactory() {
+		return new PersistenceNodeFactory();
 	}
 }

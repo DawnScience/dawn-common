@@ -652,18 +652,21 @@ class PersistentFileImpl implements IPersistentFile {
 		
 	}
 	
+	@Deprecated
 	public void setOperations(IOperation<? extends IOperationModel, ? extends OperationData>... operations) throws Exception  {
 		if (file == null) file = HierarchicalDataFactory.getWriter(filePath);
 		PersistJsonOperationHelper helper = new PersistJsonOperationHelper();
 		helper.writeOperations(file, operations);
 	}
 	
+	@Deprecated
 	public IOperation<? extends IOperationModel, ? extends OperationData>[] getOperations() throws Exception  {
 		if (file == null) file = HierarchicalDataFactory.getReader(filePath);
-		PersistJsonOperationHelper helper = new PersistJsonOperationHelper();
-		return helper.readOperations(file);
+		PersistJsonOperationsNode helper = new PersistJsonOperationsNode();
+		return helper.readOperations(LoaderFactory.getData(filePath).getTree());
 	}
 	
+	@Deprecated
 	public void setOperationDataOrigin(OriginMetadata origin) throws Exception  {
 		if (origin == null) return;
 		if (file == null) file = HierarchicalDataFactory.getWriter(filePath);
@@ -671,6 +674,7 @@ class PersistentFileImpl implements IPersistentFile {
 		helper.writeOriginalDataInformation(file, origin);
 	}
 	
+	@Deprecated
 	public OriginMetadata getOperationDataOrigin() throws Exception {
 		return null;
 	}

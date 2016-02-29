@@ -8,9 +8,11 @@
  */
 package org.dawnsci.persistence.internal;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,12 +28,21 @@ import org.eclipse.dawnsci.analysis.api.processing.IOperationService;
 import org.eclipse.dawnsci.analysis.api.processing.OperationData;
 import org.eclipse.dawnsci.analysis.api.processing.model.IOperationModel;
 import org.eclipse.dawnsci.analysis.api.roi.IROI;
+import org.eclipse.dawnsci.analysis.api.tree.DataNode;
+import org.eclipse.dawnsci.analysis.api.tree.GroupNode;
+import org.eclipse.dawnsci.analysis.api.tree.Node;
+import org.eclipse.dawnsci.analysis.api.tree.NodeLink;
+import org.eclipse.dawnsci.analysis.api.tree.Tree;
 import org.eclipse.dawnsci.analysis.dataset.impl.Dataset;
 import org.eclipse.dawnsci.analysis.dataset.impl.DatasetFactory;
 import org.eclipse.dawnsci.analysis.dataset.impl.DatasetUtils;
 import org.eclipse.dawnsci.analysis.dataset.metadata.OriginMetadataImpl;
 import org.eclipse.dawnsci.analysis.dataset.operations.AbstractOperationBase;
+import org.eclipse.dawnsci.analysis.dataset.roi.ROIBase;
 import org.eclipse.dawnsci.analysis.dataset.slicer.SliceFromSeriesMetadata;
+import org.eclipse.dawnsci.analysis.tree.impl.AttributeImpl;
+import org.eclipse.dawnsci.analysis.tree.impl.DataNodeImpl;
+import org.eclipse.dawnsci.analysis.tree.impl.GroupNodeImpl;
 import org.eclipse.dawnsci.hdf5.IHierarchicalDataFile;
 import org.eclipse.dawnsci.hdf5.Nexus;
 import org.slf4j.Logger;
@@ -39,8 +50,17 @@ import org.slf4j.LoggerFactory;
 
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreType;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 
 /**
  * 
@@ -64,73 +84,8 @@ public class PersistJsonOperationHelper {
 	private final static String DATASETS = "datasets";
 	private final static String ORIGIN = "origin";
 	
-    // Encapsulation is good
-	private static IOperationService  service;
+	private ObjectMapper mapper;
 	
-	// OSGI Kindly fills this for us
-	public static void setOperationService(IOperationService s) {
-		service = s;
-	}
-	
-	private ObjectMapper       mapper;
-
-	
-	public IOperation<? extends IOperationModel, ? extends OperationData>[] readOperations(IHierarchicalDataFile file) throws Exception{
-		
-		List<IOperation> opList = new ArrayList<IOperation>();
-
-		String group = file.group(PersistenceConstants.PROCESS_ENTRY);
-		List<String> memberList = file.memberList(group);
-
-		int i = 0;
-		String[] name = new String[]{PersistenceConstants.PROCESS_ENTRY+SLASH+ Integer.toString(i)};
-
-		while (memberList.contains(name[0])){
-			IDataset data = LoaderFactory.getDataSet(file.getPath(), name[0] +SLASH + DATA, null);
-			IDataset id = LoaderFactory.getDataSet(file.getPath(), name[0] +SLASH + ID, null);
-			String json = data.getObject(0).toString();
-			String sid = id.getObject(0).toString();
-			
-			boolean p = false;
-			boolean s = false;
-			
-			try {
-				IDataset pass = LoaderFactory.getDataSet(file.getPath(), name[0] +SLASH + PASS, null);
-				IDataset save = LoaderFactory.getDataSet(file.getPath(), name[0] +SLASH + SAVE, null);
-				p = pass.getInt(0) == 0 ? false : true;
-				s = save.getInt(0) == 0 ? false : true;
-			} catch (Exception e) {
-				logger.error("Could not read pass/save nodes", e);
-			}
-			
-			IOperation op = service.create(sid);
-			Class modelType = ((AbstractOperationBase)op).getModelClass();
-			if (mapper == null) mapper = new ObjectMapper();
-			
-			try {
-			IOperationModel readValue = mapper.readValue(json, modelType);
-			op.setModel(readValue);
-			} catch (Exception e) {
-				logger.error("Could not read model values", e);
-				IOperationModel model  = (IOperationModel) modelType.newInstance();
-				op.setModel(model);
-			}
-			
-			op.setPassUnmodifiedData(p);
-			op.setStoreOutput(s);
-			
-			readSpecial(op.getModel(),file,name[0],REGIONS);
-			readSpecial(op.getModel(),file,name[0],FUNCTIONS);
-			readSpecial(op.getModel(),file,name[0],DATASETS);
-			
-			opList.add(op);
-
-			name[0] = PersistenceConstants.PROCESS_ENTRY +"/"+ Integer.toString(++i);
-
-		}
-
-		return opList.isEmpty() ? null : opList.toArray(new IOperation[opList.size()]);
-	}
 	
 	public void writeOperations(IHierarchicalDataFile file, IOperation<? extends IOperationModel, ? extends OperationData>... operations) throws Exception {
 		String entry = file.group(PersistenceConstants.ENTRY);
@@ -147,7 +102,6 @@ public class PersistJsonOperationHelper {
 		
 		String opId = op.getId();
 		String name = op.getName();
-		String modelJson = getModelJson(op.getModel());
 		IDataset boolTrue = DatasetFactory.ones(new int[] {1}, Dataset.INT);
 		IDataset boolFalse =  DatasetFactory.zeros(new int[] {1}, Dataset.INT);
 		
@@ -160,7 +114,6 @@ public class PersistJsonOperationHelper {
 		file.setNexusAttribute(note, Nexus.NOTE);
 		file.createStringDataset(NAME, name, note);
 		file.createStringDataset(ID, opId, note);
-		file.createStringDataset(DATA, modelJson, note);
 		file.createDataset(SAVE, save, note);
 		file.createDataset(PASS, pass, note);
 		
@@ -170,39 +123,21 @@ public class PersistJsonOperationHelper {
 		writeSpecialObjects(m,FUNCTIONS,file,note);
 		m = specialObjects.get(IDataset.class);
 		writeSpecialObjects(m,DATASETS,file,note);
+		
+		String modelJson = getModelJson(op.getModel());
+		file.createStringDataset(DATA, modelJson, note);
 
 	}
 	
 	public String getModelJson(IOperationModel model) throws Exception {
 		
-		if (mapper == null ) mapper = new ObjectMapper();
-		mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+		if (mapper == null ) mapper = getMapper();
+//		mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+//		mapper.setSerializationInclusion(Include.NON_NULL);
+		
 		return mapper.writeValueAsString(model);
 	}
 
-	private void readSpecial(IOperationModel model, IHierarchicalDataFile file, String name, String type) throws Exception {
-
-		List<String> memberList = file.memberList(name);
-
-		String specialCollection = name + SLASH+ type;
-
-		if (memberList.contains(specialCollection)) {
-			List<String> spec = file.memberList(specialCollection);
-			for (String s : spec) {
-				String rName = s.substring(s.lastIndexOf(SLASH)+1);
-				if (model.isModelField(rName)) {
-					IDataset ob = LoaderFactory.getDataSet(file.getPath(), s, null);
-					if (type.equals(DATASETS)) {
-						model.set(rName, ob);
-					} else {
-						IJSonMarshaller converter = new JacksonMarshaller();
-						model.set(rName, converter.unmarshal(ob.getString(0)));
-					}
-				}
-			}
-		};
-
-	}
 
 	/**
 	 * If this is changed, please update OperationModelMarshaller as well.
@@ -226,18 +161,21 @@ public class PersistJsonOperationHelper {
 			if (IROI.class.isAssignableFrom(class1)) {
 				try {
 					out.get(IROI.class).put(field.getName(), model.get(field.getName()));
+//					model.set(field.getName(), null);
 				} catch (Exception e) {
 					//Do nothing
 				}
 			} else if (IDataset.class.isAssignableFrom(class1)) {
 				try {
 					out.get(IDataset.class).put(field.getName(), model.get(field.getName()));
+//					model.set(field.getName(), null);
 				} catch (Exception e) {
 					//Do nothing
 				}
 			} else if (IFunction.class.isAssignableFrom(class1)) {
 				try {
 					out.get(IFunction.class).put(field.getName(), model.get(field.getName()));
+//					model.set(field.getName(), null);
 				} catch (Exception e) {
 					//Do nothing
 				}
@@ -280,15 +218,18 @@ public class PersistJsonOperationHelper {
 		
 	}
 	
-	public OriginMetadata readOriginalDataInformation(IHierarchicalDataFile file) throws Exception {
-		String path = file.getPath();
-		String group = file.group(PersistenceConstants.PROCESS_ENTRY + SLASH + ORIGIN);
-		String fp = LoaderFactory.getDataSet(path,  PersistenceConstants.PROCESS_ENTRY + SLASH + ORIGIN+ SLASH + "path", null).getString(0);
-		String dsn = LoaderFactory.getDataSet(path,  PersistenceConstants.PROCESS_ENTRY + SLASH + ORIGIN+ SLASH + "dataset", null).getString(0);
-		String ss = LoaderFactory.getDataSet(path,  PersistenceConstants.PROCESS_ENTRY + SLASH + ORIGIN+ SLASH + "sampling", null).getString(0);
-		IDataset dd = LoaderFactory.getDataSet(path,  PersistenceConstants.PROCESS_ENTRY + SLASH + ORIGIN + SLASH+ "data dimensions", null);
-		int[] dataDims = (int[])DatasetUtils.cast(dd, Dataset.INT32).getBuffer();
-		
-		return new OriginMetadataImpl(null, Slice.convertFromString(ss), dataDims, fp, dsn);
+	private ObjectMapper getMapper() {
+		mapper = new ObjectMapper();
+		mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+		mapper.addMixInAnnotations(IDataset.class, MixIn.class);
+		mapper.addMixInAnnotations(IROI.class, MixIn.class);
+		mapper.addMixInAnnotations(IFunction.class, MixIn.class);
+		return mapper;
 	}
+	
+	
+	@JsonIgnoreType abstract class MixIn{};
+	
+	
+
 }

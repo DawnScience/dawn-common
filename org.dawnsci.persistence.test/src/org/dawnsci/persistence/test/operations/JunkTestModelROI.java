@@ -10,17 +10,17 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class JunkTestModelROI extends AbstractOperationModel{
 
-	@JsonIgnore
+
 	private SectorROI roi = null;
-	@JsonIgnore
+
 	private IDataset data;
-	@JsonIgnore
+
 	private IFunction func;
-	@JsonIgnore
+
 	private IROI roi2 = null;
-	@JsonIgnore
+
 	private IDataset foo;
-	@JsonIgnore
+
 	private IFunction bar;
 	
 	private int xDim = 20;

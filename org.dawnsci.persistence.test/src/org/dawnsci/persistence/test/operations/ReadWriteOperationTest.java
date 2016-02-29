@@ -8,6 +8,7 @@ import java.lang.reflect.ParameterizedType;
 
 import org.dawb.common.services.ServiceManager;
 import org.dawnsci.persistence.internal.PersistJsonOperationHelper;
+import org.dawnsci.persistence.internal.PersistJsonOperationsNode;
 import org.dawnsci.persistence.internal.PersistenceServiceImpl;
 import org.eclipse.dawnsci.analysis.api.dataset.Slice;
 import org.eclipse.dawnsci.analysis.api.dataset.SliceND;
@@ -17,7 +18,9 @@ import org.eclipse.dawnsci.analysis.api.persistence.IPersistenceService;
 import org.eclipse.dawnsci.analysis.api.persistence.IPersistentFile;
 import org.eclipse.dawnsci.analysis.api.processing.IOperation;
 import org.eclipse.dawnsci.analysis.api.processing.IOperationService;
+import org.eclipse.dawnsci.analysis.api.processing.OperationData;
 import org.eclipse.dawnsci.analysis.api.processing.model.IOperationModel;
+import org.eclipse.dawnsci.analysis.api.tree.GroupNode;
 import org.eclipse.dawnsci.analysis.dataset.impl.Dataset;
 import org.eclipse.dawnsci.analysis.dataset.impl.DatasetFactory;
 import org.eclipse.dawnsci.analysis.dataset.roi.RectangularROI;
@@ -34,6 +37,7 @@ import uk.ac.diamond.scisoft.analysis.fitting.functions.FunctionFactory;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.Gaussian;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.Lorentzian;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.Polynomial;
+import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 import uk.ac.diamond.scisoft.analysis.processing.OperationServiceImpl;
 import uk.ac.diamond.scisoft.analysis.processing.operations.FunctionModel;
 
@@ -50,7 +54,7 @@ public class ReadWriteOperationTest {
 		service = (IOperationService)ServiceManager.getService(IOperationService.class);
 		service.createOperations(service.getClass().getClassLoader(), "org.dawnsci.persistence.test.operations");
 		service.createOperations(service.getClass().getClassLoader(), "uk.ac.diamond.scisoft.analysis.processing.operations");
-		PersistJsonOperationHelper.setOperationService(service);
+		PersistJsonOperationsNode.setOperationService(service);
 		
 		pservice = new PersistenceServiceImpl();
 		
@@ -117,7 +121,7 @@ public class ReadWriteOperationTest {
 
 		util.writeOperations(file, new IOperation[]{op2});
 
-		IOperation[] readOperations = util.readOperations(file);
+		IOperation[] readOperations = PersistJsonOperationsNode.readOperations(LoaderFactory.getData(tmp.getAbsolutePath()).getTree());
 
 		assertEquals(((JunkTestOperationModel)(readOperations[0].getModel())).getxDim(), 50);
 
@@ -140,7 +144,7 @@ public class ReadWriteOperationTest {
 		op2.setModel(model2);
 
 		PersistJsonOperationHelper util = new PersistJsonOperationHelper();
-		String modelJson = util.getModelJson(model2);
+//		String modelJson = util.getModelJson(model2);
 
 		final File tmp = File.createTempFile("Test", ".nxs");
 		tmp.deleteOnExit();
@@ -149,7 +153,42 @@ public class ReadWriteOperationTest {
 
 		util.writeOperations(file, new IOperation[]{op2});
 
-		IOperation[] readOperations = util.readOperations(file);
+		IOperation[] readOperations = PersistJsonOperationsNode.readOperations(LoaderFactory.getData(tmp.getAbsolutePath()).getTree());
+		JunkTestModelROI mo = (JunkTestModelROI)readOperations[0].getModel();
+		assertEquals(mo.getxDim(), 50);
+		assertTrue(mo.getRoi() != null);
+		assertTrue(mo.getBar() != null);
+		assertTrue(mo.getFoo() != null);
+		assertTrue(mo.getData() != null);
+		assertTrue(mo.getFunc() != null);
+		assertTrue(mo.getRoi2() != null);
+
+
+	}
+	
+	@Test
+	public void testWriteReadOperationRoiFuncDataNode() throws Exception {
+		
+		IOperation op2 = service.create("org.dawnsci.persistence.test.operations.JunkTestOperationROI");
+		Class modelType = (Class)((ParameterizedType)op2.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+		JunkTestModelROI model2  = (JunkTestModelROI) modelType.newInstance();
+
+		model2.setRoi(new SectorROI());
+		model2.setxDim(50);
+		model2.setBar(new Gaussian());
+		model2.setFoo(DatasetFactory.createRange(10, Dataset.INT32));
+		model2.setData(DatasetFactory.createRange(5, Dataset.INT32));
+		model2.setFunc(new Lorentzian());
+		model2.setRoi2(new RectangularROI());
+		op2.setModel(model2);
+
+//		String modelJson = util.getModelJson(model2);
+
+
+		GroupNode n = PersistJsonOperationsNode.writeOperationsToNode(op2);
+		
+		IOperation<? extends IOperationModel, ? extends OperationData>[] readOperations = PersistJsonOperationsNode.readOperations(n);
+		
 		JunkTestModelROI mo = (JunkTestModelROI)readOperations[0].getModel();
 		assertEquals(mo.getxDim(), 50);
 		assertTrue(mo.getRoi() != null);
@@ -177,6 +216,7 @@ public class ReadWriteOperationTest {
 
 		PersistJsonOperationHelper util = new PersistJsonOperationHelper();
 
+
 		final File tmp = File.createTempFile("Test", ".nxs");
 		tmp.deleteOnExit();
 		tmp.createNewFile();
@@ -184,7 +224,7 @@ public class ReadWriteOperationTest {
 
 		util.writeOriginalDataInformation(file, ssm);
 
-		OriginMetadata outOm = util.readOriginalDataInformation(file);
+		OriginMetadata outOm = PersistJsonOperationsNode.readOriginalDataInformation(file.getPath());
 		outOm.toString();	
 		
 	}
