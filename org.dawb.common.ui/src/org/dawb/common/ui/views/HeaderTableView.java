@@ -74,6 +74,7 @@ public class HeaderTableView extends ViewPart implements ISelectionListener, IPa
 	private boolean             requirePageUpdates;
 	private TableViewer         table;
 	private CLabel              fileNameLabel;
+	private String 			 	currentFilePath;
 	
 	public HeaderTableView() {
         this(true);
@@ -293,9 +294,14 @@ public class HeaderTableView extends ViewPart implements ISelectionListener, IPa
 	 * May be called to set the path from which to update the meta table.
 	 * @param filePath
 	 */
-	public void updatePath(final String filePath) {
+	public synchronized void updatePath(final String filePath) {
 		
 	    try {
+	    	
+	    	if (currentFilePath != null && currentFilePath.equals(filePath)) return;
+	    	
+	    	currentFilePath = filePath;
+	    	
 			getMetaData(filePath);
 			setFileName((new File(filePath)).getName());
 		} catch (InterruptedException e) {
