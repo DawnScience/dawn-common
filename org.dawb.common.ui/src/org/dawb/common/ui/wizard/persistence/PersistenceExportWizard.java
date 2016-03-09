@@ -41,7 +41,13 @@ import org.eclipse.dawnsci.analysis.api.metadata.IMetadata;
 import org.eclipse.dawnsci.analysis.api.monitor.IMonitor;
 import org.eclipse.dawnsci.analysis.api.persistence.IPersistenceService;
 import org.eclipse.dawnsci.analysis.api.persistence.IPersistentFile;
+import org.eclipse.dawnsci.analysis.api.persistence.IPersistentNodeFactory;
+import org.eclipse.dawnsci.analysis.api.tree.GroupNode;
 import org.eclipse.dawnsci.analysis.dataset.impl.BooleanDataset;
+import org.eclipse.dawnsci.hdf5.nexus.NexusFileFactoryHDF5;
+import org.eclipse.dawnsci.hdf5.nexus.NexusFileHDF5;
+import org.eclipse.dawnsci.nexus.NexusException;
+import org.eclipse.dawnsci.nexus.NexusFile;
 import org.eclipse.dawnsci.plotting.api.IPlottingSystem;
 import org.eclipse.dawnsci.plotting.api.region.IRegion;
 import org.eclipse.dawnsci.plotting.api.tool.IToolPage;
@@ -205,15 +211,17 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
 			 final IFunctionService funcService = (IFunctionService)part.getAdapter(IFunctionService.class);
 
 			 final IFile finalFile = file;
+			 
 			 getContainer().run(true, true, new IRunnableWithProgress() {
 
 				 @Override
 				 public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 					 
 					 IPersistentFile file = null;
+					 IPersistenceService service = null;
+					 String savePath = null;;
 					 try {
-						 IPersistenceService service = ServiceLoader.getPersistenceService();
-						 String savePath;
+						  service = ServiceLoader.getPersistenceService();
 						 if(finalFile != null)
 							 savePath = finalFile.getLocation().toOSString();
 						 else
@@ -282,15 +290,7 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
 							 }
 						 }
 						 
-						 if (options.is(PersistWizardConstants.DIFF_META)) {
-							 if (trace!=null && trace instanceof IImageTrace && trace.getData() != null) {
-								 IMetadata meta = trace.getData().getMetadata();
-								 if (meta == null || meta instanceof IDiffractionMetadata) {
-									 monitor.worked(1);
-									 file.setDiffractionMetadata((IDiffractionMetadata) meta);
-								 }
-							 }
-						 }
+						 
 
 						 if (options.is(PersistWizardConstants.FUNCTIONS)) {
 							 if (funcService != null) {
@@ -307,6 +307,31 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
 						 throw new InvocationTargetException(e);
 					 } finally {
 						 if (file!=null) file.close();
+						 NexusFile nexusFile = null;
+						 try {
+							 final ITrace trace = system.getTraces().iterator().next();
+							 if (options.is(PersistWizardConstants.DIFF_META)) {
+								 if (trace!=null && trace instanceof IImageTrace && trace.getData() != null) {
+									 IMetadata meta = trace.getData().getMetadata();
+									 if (meta == null || meta instanceof IDiffractionMetadata) {
+										 IPersistentNodeFactory pnf = service.getPersistentNodeFactory();
+										 GroupNode node = pnf.writePowderCalibrationToFile((IDiffractionMetadata)meta, null, null);
+										 nexusFile = NexusFileHDF5.openNexusFile(savePath);
+										 nexusFile.addNode("/entry",node);
+									 }
+								 }
+							 }
+						 }catch (Exception e) {
+							 
+						 } finally {
+							 if (nexusFile != null)
+								try {
+									nexusFile.close();
+								} catch (NexusException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+						 }
 					 }
 				 }
 			 });

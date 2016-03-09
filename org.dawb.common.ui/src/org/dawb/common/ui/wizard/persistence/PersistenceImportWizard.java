@@ -56,6 +56,8 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 
 import uk.ac.diamond.scisoft.analysis.diffraction.DiffractionMetadataUtils;
+import uk.ac.diamond.scisoft.analysis.io.NexusDiffractionCalibrationReader;
+import uk.ac.diamond.scisoft.analysis.io.NexusTreeUtils;
 
 /**
  * 
@@ -254,6 +256,7 @@ public class PersistenceImportWizard extends AbstractPersistenceWizard implement
 	protected void createDawnMask(final String filePath, final IPlottingSystem<Composite> system, final IProgressMonitor monitor, final IFunctionService funcService) throws Exception{
 		 
 		IPersistentFile file = null;
+		ITrace trace = null;
 		try {
 			IPersistenceService service = ServiceLoader.getPersistenceService();
 			file    = service.getPersistentFile(filePath);
@@ -261,7 +264,7 @@ public class PersistenceImportWizard extends AbstractPersistenceWizard implement
 			final IMonitor mon = new ProgressMonitorWrapper(monitor);
 
 			// Save things.
-			ITrace trace  = system.getTraces().iterator().next();
+			  trace = system.getTraces().iterator().next();
 			if (options.is(PersistWizardConstants.ORIGINAL_DATA)) {
 				// Not needed can open file directly
 			}
@@ -321,12 +324,28 @@ public class PersistenceImportWizard extends AbstractPersistenceWizard implement
 				}
 			}
 			
+			if (options.is(PersistWizardConstants.FUNCTIONS)) {
+				if (funcService != null) {
+					final Map<String, IFunction> functions = file.getFunctions(mon);
+					if (functions != null) {
+						Display.getDefault().syncExec(new Runnable() {
+							public void run() {
+								funcService.setFunctions(functions);
+							}
+						});
+					}
+				}
+			}
+
+		} finally {
+			if (file!=null) file.close();
+			
 			if (options.is(PersistWizardConstants.DIFF_META) && trace instanceof IImageTrace) {
 				//check loader service and overwrite if not null
 				//check image and overwrite if none in service
 				ILoaderService loaderService = (ILoaderService)PlatformUI.getWorkbench().getService(ILoaderService.class);
 
-				final IDiffractionMetadata fileMeta = file.getDiffractionMetadata(mon);
+				final IDiffractionMetadata fileMeta = NexusDiffractionCalibrationReader.getDiffractionMetadataFromNexus(filePath, null);
 
 				final IDiffractionMetadata lockedmeta = loaderService.getLockedDiffractionMetaData();
 				final IImageTrace image = (IImageTrace)trace;
@@ -345,21 +364,6 @@ public class PersistenceImportWizard extends AbstractPersistenceWizard implement
 				});
 			}
 			
-			if (options.is(PersistWizardConstants.FUNCTIONS)) {
-				if (funcService != null) {
-					final Map<String, IFunction> functions = file.getFunctions(mon);
-					if (functions != null) {
-						Display.getDefault().syncExec(new Runnable() {
-							public void run() {
-								funcService.setFunctions(functions);
-							}
-						});
-					}
-				}
-			}
-
-		} finally {
-			if (file!=null) file.close();
 		}
 		
 	}

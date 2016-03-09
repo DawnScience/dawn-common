@@ -375,26 +375,13 @@ class PersistentFileImpl implements IPersistentFile {
 
 	@Override
 	public void setDiffractionMetadata(IDiffractionMetadata metadata) throws Exception {
-		if (file == null) file = HierarchicalDataFactory.getWriter(filePath);
-
-		String parent = HierarchicalDataFileUtils.createParentEntry(file, PersistenceConstants.DIFFRACTIONMETADATA_ENTRY,Nexus.INST);
-		parent = file.group("detector", parent);
-		file.setNexusAttribute(parent, Nexus.DETECT);
-
-		DetectorProperties detprop = metadata.getDetector2DProperties();
-		PersistDiffractionMetadataUtils.writeDetectorProperties(file, parent, detprop);
-		DiffractionCrystalEnvironment crysenv = metadata.getDiffractionCrystalEnvironment();
-		PersistDiffractionMetadataUtils.writeWavelengthMono(file, file.getParent(parent), crysenv.getWavelength());
+		throw new RuntimeException("DO NOT SAVE METADATA THIS WAY!");
 
 	}
 
 	@Override
 	public IDiffractionMetadata getDiffractionMetadata(IMonitor mon) throws Exception {
-		//Reverse of the setMetadata.  Would be nice in the future to be able to use the
-		//LoaderFactory but work needs to be done on loading specific metadata from nexus
-		//files first
-		NexusDiffractionMetaReader nexusDiffReader = new NexusDiffractionMetaReader(filePath);
-		return nexusDiffReader.getDiffractionMetadataFromNexus(null);	
+		throw new RuntimeException("DO NOT READ METADATA THIS WAY!");
 	}
 
 	@Override
