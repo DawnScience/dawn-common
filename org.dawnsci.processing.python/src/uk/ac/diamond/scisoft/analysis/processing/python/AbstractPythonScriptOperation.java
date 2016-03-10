@@ -22,8 +22,7 @@ public abstract class AbstractPythonScriptOperation<T extends PythonScriptModel>
 			s = new AnalysisRpcPythonPyDevService(false);
 			pythonRunScriptService = new PythonRunScriptService(s);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new OperationException(this, "Could not create script service!");
 		}
 		
 	}
