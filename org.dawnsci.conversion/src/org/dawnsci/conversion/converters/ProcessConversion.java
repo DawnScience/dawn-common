@@ -66,7 +66,7 @@ public class ProcessConversion extends AbstractConversion {
 		ILazyDataset localLazy = lz.getSliceView();
 		
 		Map<Integer, String> axesNames = context.getAxesNames();
-		AxesMetadata axm = lservice.getAxesMetadata(localLazy, context.getSelectedConversionFile().getAbsolutePath(), axesNames);
+		AxesMetadata axm = lservice.getAxesMetadata(localLazy, context.getSelectedConversionFile().getAbsolutePath(), axesNames, false);
 
 		SourceInformation si = new SourceInformation(context.getSelectedConversionFile().getAbsolutePath(), context.getDatasetNames().get(0), localLazy);
 		localLazy.setMetadata(new SliceFromSeriesMetadata(si));
