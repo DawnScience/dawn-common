@@ -25,5 +25,5 @@ Import-Package: com.isencia.util.commandline;version="7.0.0",
  org.python.pydev.plugin;bundle-version="[3.6.0,3.6.1)",
  org.python.pydev.runners;bundle-version="[3.6.0,3.6.1)",
  org.python.pydev.ui.interpreters;bundle-version="[3.6.0,3.6.1)",
- org.slf4j;version="[1.7.6,1.7.7)"
+ org.slf4j;version="[1.7.2,2.0.0)"
 Export-Package: org.dawb.common.python
