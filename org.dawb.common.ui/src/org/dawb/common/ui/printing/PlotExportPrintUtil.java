@@ -70,7 +70,6 @@ import org.w3c.dom.Element;
  * 
  * @author Baha El Kassaby
  */
-@SuppressWarnings("restriction")
 public class PlotExportPrintUtil {
 
 	public static final String[] FILE_TYPES = new String[] { "PNG/JPEG File", "Postscript File", "SVG File" };
@@ -262,7 +261,12 @@ public class PlotExportPrintUtil {
 			throws Exception {
 		Image im = new Image(Display.getDefault(), printableFigure.getSize().width, printableFigure.getSize().height);
 		GC gc = new GC(im);
+		
+		// fill the region in the AWT image with the transparent color
 		SWTGraphics graphics = new SWTGraphics(gc);
+		// Needed because the clipping is not set with GTK2
+		graphics.setClip(new Rectangle(0, 0, im.getBounds().width, im.getBounds().height));
+
 		printableFigure.paint(graphics);
 		// test for all possible file types
 		if (!Arrays.asList(FILE_FORMATS).contains(fileType.toLowerCase())
