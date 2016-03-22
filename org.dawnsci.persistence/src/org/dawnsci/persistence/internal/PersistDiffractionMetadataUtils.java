@@ -13,10 +13,10 @@ import javax.vecmath.Matrix3d;
 import org.eclipse.dawnsci.analysis.api.diffraction.DetectorProperties;
 import org.eclipse.dawnsci.analysis.api.diffraction.IPowderCalibrationInfo;
 import org.eclipse.dawnsci.analysis.dataset.impl.Dataset;
-import org.eclipse.dawnsci.hdf5.HierarchicalDataFileUtils;
-import org.eclipse.dawnsci.hdf5.IHierarchicalDataFile;
-import org.eclipse.dawnsci.hdf5.Nexus;
-import org.eclipse.dawnsci.hdf5.nexus.NexusUtils;
+import org.eclipse.dawnsci.hdf.object.HierarchicalDataFileUtils;
+import org.eclipse.dawnsci.hdf.object.IHierarchicalDataFile;
+import org.eclipse.dawnsci.hdf.object.Nexus;
+import org.eclipse.dawnsci.hdf.object.nexus.NexusUtils;
 
 class PersistDiffractionMetadataUtils {
 	

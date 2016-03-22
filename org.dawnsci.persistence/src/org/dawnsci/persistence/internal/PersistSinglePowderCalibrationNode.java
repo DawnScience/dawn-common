@@ -8,8 +8,7 @@ import org.eclipse.dawnsci.analysis.api.tree.GroupNode;
 import org.eclipse.dawnsci.analysis.tree.TreeFactory;
 import org.eclipse.dawnsci.analysis.tree.impl.AttributeImpl;
 import org.eclipse.dawnsci.analysis.tree.impl.GroupNodeImpl;
-import org.eclipse.dawnsci.hdf5.Nexus;
-
+import org.eclipse.dawnsci.hdf.object.Nexus;
 
 import uk.ac.diamond.scisoft.analysis.io.NexusTreeUtils;
 

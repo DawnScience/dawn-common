@@ -41,7 +41,12 @@ public class ImageConverter extends AbstractImageConversion {
 		if (context.getMonitor()!=null && context.getMonitor().isCancelled()) {
 			throw new Exception(getClass().getSimpleName()+" is cancelled");
 		}
-		
+
+		slice = getDownsampled(slice);
+		if (slice.getRank() > 2) {
+			slice = slice.getSlice().squeeze(true);
+		}
+
 		try {
 			if (context.getMonitor()!=null) context.getMonitor().subTask(slice.getName());
 			
