@@ -95,7 +95,7 @@ public class H5LazyLoader implements ILazyLoader {
 			if (mon!=null) mon.worked(1);
 			file = HierarchicalDataFactory.getReader(path);
 			
-			final ncsa.hdf.object.Dataset set = (ncsa.hdf.object.Dataset)file.getData(fullPath);
+			final hdf.object.Dataset set = (hdf.object.Dataset)file.getData(fullPath);
 			if (set.getStartDims()==null) set.getMetadata();
 			
 			/**

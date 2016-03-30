@@ -590,7 +590,7 @@ public class CustomNCDConverter extends AbstractConversion  {
 	
 	private String getTitleNodeString(IHierarchicalDataFile hdf5Reader) throws Exception {
 		@SuppressWarnings("deprecation")
-		ncsa.hdf.object.Dataset titleData = (ncsa.hdf.object.Dataset) hdf5Reader.getData(DEFAULT_TITLE_NODE);
+		hdf.object.Dataset titleData = (hdf.object.Dataset) hdf5Reader.getData(DEFAULT_TITLE_NODE);
 		String[] str = null;
 		if (titleData != null) {
 			str = (String[]) titleData.getData();
@@ -602,7 +602,7 @@ public class CustomNCDConverter extends AbstractConversion  {
 	
 	private String getCommandNodeString(IHierarchicalDataFile hdf5Reader) throws Exception {
 		@SuppressWarnings("deprecation")
-		ncsa.hdf.object.Dataset scanCommandData = (ncsa.hdf.object.Dataset) hdf5Reader.getData(DEFAULT_SCAN_COMMAND_NODE);
+		hdf.object.Dataset scanCommandData = (hdf.object.Dataset) hdf5Reader.getData(DEFAULT_SCAN_COMMAND_NODE);
 		String[] str = null;
 		if (scanCommandData != null) {
 			str = (String[])scanCommandData.getData();

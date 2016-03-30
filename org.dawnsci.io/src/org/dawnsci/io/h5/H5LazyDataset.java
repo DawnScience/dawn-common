@@ -22,7 +22,7 @@ public class H5LazyDataset extends LazyDataset {
 	private static final long serialVersionUID = -4375441355891182709L;
 
 	public H5LazyDataset(final IHierarchicalDataFile file, String path) throws Exception {
-		this((ncsa.hdf.object.Dataset)file.getData(path));
+		this((hdf.object.Dataset)file.getData(path));
 	}
 	
 	/**
@@ -32,7 +32,7 @@ public class H5LazyDataset extends LazyDataset {
 	 * @param filePath
 	 * @throws Exception 
 	 */
-	public H5LazyDataset(final ncsa.hdf.object.Dataset set) throws Exception {
+	public H5LazyDataset(final hdf.object.Dataset set) throws Exception {
 		
 	    super(set.getFullName(), 
               H5Utils.getDataType(set.getDatatype()), 

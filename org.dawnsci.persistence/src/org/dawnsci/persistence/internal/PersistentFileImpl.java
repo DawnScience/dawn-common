@@ -15,9 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import ncsa.hdf.object.Group;
-import ncsa.hdf.object.HObject;
-
 import org.dawnsci.io.h5.H5LazyDataset;
 import org.dawnsci.persistence.json.JacksonMarshaller;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
@@ -50,8 +47,9 @@ import org.eclipse.dawnsci.hdf.object.Nexus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import hdf.object.Group;
+import hdf.object.HObject;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
-import uk.ac.diamond.scisoft.analysis.io.NexusDiffractionMetaReader;
 
 /**
  * Implementation of IPersistentFile<br>
@@ -245,7 +243,7 @@ class PersistentFileImpl implements IPersistentFile {
 		if (file == null)
 			file = HierarchicalDataFactory.getReader(filePath);
 		dataName = !dataName.equals("") ? dataName : "data";
-		ncsa.hdf.object.Dataset set = (ncsa.hdf.object.Dataset)file.getData(PersistenceConstants.DATA_ENTRY+"/"+dataName);
+		hdf.object.Dataset set = (hdf.object.Dataset)file.getData(PersistenceConstants.DATA_ENTRY+"/"+dataName);
 		set.getMetadata();
 		return new H5LazyDataset(set);
 	}
@@ -289,7 +287,7 @@ class PersistentFileImpl implements IPersistentFile {
 	public BooleanDataset getMask(String maskName, IMonitor mon) throws Exception {
 		if(file == null)
 			file = HierarchicalDataFactory.getReader(filePath);
-		ncsa.hdf.object.Dataset data = (ncsa.hdf.object.Dataset)file.getData(PersistenceConstants.MASK_ENTRY+"/"+maskName);
+		hdf.object.Dataset data = (hdf.object.Dataset)file.getData(PersistenceConstants.MASK_ENTRY+"/"+maskName);
 		if (data == null)
 			throw new Exception("The mask with the name " + maskName + " is null");
 		Object val = data.read();
@@ -311,7 +309,7 @@ class PersistentFileImpl implements IPersistentFile {
 		Iterator<String> it = names.iterator();
 		while (it.hasNext()) {
 			String name = (String) it.next();
-			ncsa.hdf.object.Dataset data = (ncsa.hdf.object.Dataset)file.getData(PersistenceConstants.MASK_ENTRY+"/"+name);
+			hdf.object.Dataset data = (hdf.object.Dataset)file.getData(PersistenceConstants.MASK_ENTRY+"/"+name);
 			Object val = data.read();
 			Dataset ret =  H5Utils.getSet(val,data);
 			BooleanDataset bd = (BooleanDataset) DatasetUtils.cast(ret, Dataset.BOOL);

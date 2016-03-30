@@ -13,11 +13,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import ncsa.hdf.object.Dataset;
-import ncsa.hdf.object.Datatype;
-import ncsa.hdf.object.HObject;
-import ncsa.hdf.object.h5.H5ScalarDS;
-
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
@@ -29,6 +24,10 @@ import org.eclipse.dawnsci.hdf.object.nexus.NexusUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import hdf.object.Dataset;
+import hdf.object.Datatype;
+import hdf.object.HObject;
+import hdf.object.h5.H5ScalarDS;
 import uk.ac.diamond.scisoft.analysis.io.DataHolder;
 import uk.ac.diamond.scisoft.analysis.io.JavaImageSaver;
 

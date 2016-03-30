@@ -111,7 +111,7 @@ public class H5Loader extends AbstractFileLoader {
 		IHierarchicalDataFile file = null;
 		try {
 			file = HierarchicalDataFactory.getReader(bean.getPath());
-			final ncsa.hdf.object.Dataset dataset = (ncsa.hdf.object.Dataset)file.getData(bean.getName());
+			final hdf.object.Dataset dataset = (hdf.object.Dataset)file.getData(bean.getName());
 			
 			if (dataset.getStartDims()==null) dataset.getMetadata();
   		    long[] start    = dataset.getStartDims(); // the off set of the selection
@@ -144,7 +144,7 @@ public class H5Loader extends AbstractFileLoader {
 		}
 	}
 
-	protected void resetDims(ncsa.hdf.object.Dataset dataset) {
+	protected void resetDims(hdf.object.Dataset dataset) {
 		long[] selected = dataset.getSelectedDims(); // the selected size of the dataet
 		long[] dims     = dataset.getDims();
 		if (dims==null||selected==null) return;
@@ -159,7 +159,7 @@ public class H5Loader extends AbstractFileLoader {
 		try {
 			file = HierarchicalDataFactory.getReader(path);
 			if (mon!=null) mon.worked(1);
-			final ncsa.hdf.object.Dataset set = (ncsa.hdf.object.Dataset)file.getData(fullPath);
+			final hdf.object.Dataset set = (hdf.object.Dataset)file.getData(fullPath);
 			if (mon!=null) mon.worked(1);
 			resetDims(set);
 			final Object  val = set.read(); // Dangerous if data large!
@@ -170,7 +170,7 @@ public class H5Loader extends AbstractFileLoader {
 			
 			final String errorPath = getErrorPath(fullPath);
 			if (errorPath!=null) {
-				final ncsa.hdf.object.Dataset errSet = (ncsa.hdf.object.Dataset)file.getData(errorPath);
+				final hdf.object.Dataset errSet = (hdf.object.Dataset)file.getData(errorPath);
 				if (errSet!=null) {
 					resetDims(errSet);
 					final Object  errVal = errSet.read(); // Dangerous if data large!
@@ -203,14 +203,14 @@ public class H5Loader extends AbstractFileLoader {
 			
 			if (ret.containsKey(fullPath)) continue;
 			
-			final ncsa.hdf.object.Dataset      set = (ncsa.hdf.object.Dataset)file.getData(fullPath);
+			final hdf.object.Dataset      set = (hdf.object.Dataset)file.getData(fullPath);
 			set.getMetadata();
 			final LazyDataset  lazy   = new H5LazyDataset(set);
 			ret.put(fullPath, lazy);
 			
 			final String errorPath = getErrorPath(fullPath);
 			if (fullPaths.contains(errorPath)) {
-				final ncsa.hdf.object.Dataset error = (ncsa.hdf.object.Dataset)file.getData(errorPath);
+				final hdf.object.Dataset error = (hdf.object.Dataset)file.getData(errorPath);
 				if (error!=null) {
 					error.getMetadata();
 					final LazyDataset errLazy = new H5LazyDataset(error);
