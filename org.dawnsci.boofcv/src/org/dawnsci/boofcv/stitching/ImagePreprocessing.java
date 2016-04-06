@@ -11,6 +11,7 @@ package org.dawnsci.boofcv.stitching;
 import java.util.List;
 
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
+import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
 import org.eclipse.dawnsci.analysis.dataset.impl.Dataset;
 import org.eclipse.dawnsci.analysis.dataset.roi.EllipticalROI;
 import org.eclipse.dawnsci.analysis.dataset.roi.RectangularROI;
@@ -97,6 +98,26 @@ public class ImagePreprocessing {
 			}
 		}
 		return images;
+	}
+
+	/**
+	 * 
+	 * @param input
+	 * @param rows
+	 * @param columns
+	 * @return Ordered array of Dataset
+	 * @throws Exception
+	 */
+	public static ILazyDataset listToArray(ILazyDataset input, int rows, int columns) {
+		ILazyDataset lazy = null;
+		IDataset[][] images = new Dataset[rows][columns];
+		for (int i = 0; i < rows; i++) {
+			for(int j = 0; j < columns; j++) {
+//				images[i][j] = input.get((i * columns) + j);
+				//	images[i][j].setMetadata(getUniqueMetadata(i+1, j+1));
+			}
+		}
+		return lazy;
 	}
 
 	/**

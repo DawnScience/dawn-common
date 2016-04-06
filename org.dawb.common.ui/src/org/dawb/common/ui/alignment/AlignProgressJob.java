@@ -14,6 +14,7 @@ import java.util.List;
 import org.dawb.common.ui.monitor.ProgressMonitorWrapper;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
+import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
 import org.eclipse.dawnsci.analysis.api.image.IImageTransform;
 import org.eclipse.dawnsci.analysis.api.monitor.IMonitor;
 import org.eclipse.dawnsci.analysis.dataset.roi.RectangularROI;
@@ -34,20 +35,32 @@ public class AlignProgressJob implements IRunnableWithProgress {
 	private static final Logger logger = LoggerFactory.getLogger(AlignProgressJob.class);
 
 	// loaded data
-	private List<IDataset> data;
+	private ILazyDataset data;
+	private List<IDataset> nonLazyData;
 	private int mode;
 
 	private List<List<double[]>> shifts;
-	private List<IDataset> shiftedImages;
+	private ILazyDataset shiftedImages;
+	private List<IDataset> nonLazyShiftedImages;
 
 	private AlignMethod alignState;
 
 	private RectangularROI roi;
 
+	private boolean isLazy;
+
 	private static IImageTransform transformer;
 
+	/**
+	 * Use {@code AlignProgressJob(boolean)} instead 
+	 */
 	public AlignProgressJob() {
+		this(false);
+	}
+
+	public AlignProgressJob(boolean isLazy) {
 		super();
+		this.isLazy = isLazy;
 	}
 
 	/**
@@ -60,12 +73,19 @@ public class AlignProgressJob implements IRunnableWithProgress {
 
 	@Override
 	public void run(IProgressMonitor monitor) {
-		if (shiftedImages != null && !shiftedImages.isEmpty())
-			shiftedImages.clear();
+		if (isLazy) {
+			if (shiftedImages != null)
+				shiftedImages = null;
+			if (data == null)
+				return;
+		} else {
+			if (nonLazyShiftedImages != null && !nonLazyShiftedImages.isEmpty())
+				nonLazyShiftedImages.clear();
+			if (nonLazyData == null)
+				return;
+		}
+		int n = isLazy ? data.getShape()[0] : nonLazyData.size();
 
-		if (data == null)
-			return;
-		int n = data.size();
 		if (monitor != null)
 			monitor.beginTask("Aligning images...", n);
 		if (alignState == AlignMethod.WITH_ROI && n % mode != 0) {
@@ -73,9 +93,7 @@ public class AlignProgressJob implements IRunnableWithProgress {
 			Display.getDefault().syncExec(new Runnable() {
 				@Override
 				public void run() {
-					MessageDialog.openError(Display.getDefault()
-							.getActiveShell(), "Alignment error",
-							msg);
+					MessageDialog.openError(Display.getDefault().getActiveShell(), "Alignment error", msg);
 				}
 			});
 			logger.warn(msg);
@@ -88,17 +106,22 @@ public class AlignProgressJob implements IRunnableWithProgress {
 					shifts = new ArrayList<List<double[]>>();
 				if (!shifts.isEmpty())
 					shifts.clear();
-				shiftedImages = AlignImages.alignWithROI(data, shifts, roi, mode, mon);
+				if (isLazy)
+					shiftedImages = AlignImages.alignLazyWithROI(data, shifts, roi, mode, mon);
+				else
+					nonLazyShiftedImages = AlignImages.alignWithROI(nonLazyData, shifts, roi, mode, mon);
 			} else if (alignState == AlignMethod.AFFINE_TRANSFORM) {
 				// align with boofcv
-				shiftedImages = transformer.align(data, mon);
+				if (isLazy)
+					shiftedImages = transformer.align(data, mon);
+				else
+					nonLazyShiftedImages = transformer.align(nonLazyData, mon);
 			}
 		} catch (final Exception e) {
 			Display.getDefault().syncExec(new Runnable() {
 				@Override
 				public void run() {
-					MessageDialog.openError(Display.getDefault()
-							.getActiveShell(), "Alignment error",
+					MessageDialog.openError(Display.getDefault().getActiveShell(), "Alignment error",
 							"An error occured while aligning images:" + e);
 				}
 			});
@@ -107,6 +130,7 @@ public class AlignProgressJob implements IRunnableWithProgress {
 		if (monitor != null) {
 			monitor.done();
 		}
+
 	}
 
 	/**
@@ -123,6 +147,15 @@ public class AlignProgressJob implements IRunnableWithProgress {
 	 *          original stack of images
 	 */
 	public void setData(List<IDataset> data) {
+		this.nonLazyData = data;
+	}
+
+	/**
+	 * 
+	 * @param data
+	 *          original stack of images
+	 */
+	public void setData(ILazyDataset data) {
 		this.data = data;
 	}
 
@@ -140,8 +173,17 @@ public class AlignProgressJob implements IRunnableWithProgress {
 	 * @return
 	 *      Corrected stack of images
 	 */
-	public List<IDataset> getShiftedImages() {
+	public ILazyDataset getLazyShiftedImages() {
 		return shiftedImages;
+	}
+
+	/**
+	 * 
+	 * @return
+	 *      Corrected stack of images
+	 */
+	public List<IDataset> getShiftedImages() {
+		return nonLazyShiftedImages;
 	}
 
 	/**
@@ -154,10 +196,6 @@ public class AlignProgressJob implements IRunnableWithProgress {
 
 	public void setAlignMethod(AlignMethod alignState) {
 		this.alignState = alignState;
-	}
-
-	public void setShiftedImages(List<IDataset> shiftedImages) {
-		this.shiftedImages = shiftedImages;
 	}
 
 }

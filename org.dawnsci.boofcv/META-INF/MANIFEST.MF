@@ -30,6 +30,7 @@ Export-Package: boofcv.abst.filter,
  org.dawnsci.boofcv.converter,
  org.dawnsci.boofcv.stitching
 Import-Package: org.dawb.common.services,
+ org.eclipse.dawnsci.hdf5,
  org.slf4j;version="[1.7.2,2.0.0)"
 Service-Component: OSGI-INF/*.xml
 Bundle-ClassPath: .,

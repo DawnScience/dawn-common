@@ -8,6 +8,7 @@
  */
 package org.dawnsci.boofcv.internal;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -16,8 +17,17 @@ import java.util.List;
 import org.dawnsci.boofcv.converter.ConvertIDataset;
 import org.dawnsci.boofcv.registration.ImageHessianRegistration;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
+import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
+import org.eclipse.dawnsci.analysis.api.dataset.ILazyWriteableDataset;
+import org.eclipse.dawnsci.analysis.api.dataset.Slice;
+import org.eclipse.dawnsci.analysis.api.dataset.SliceND;
 import org.eclipse.dawnsci.analysis.api.image.IImageTransform;
+import org.eclipse.dawnsci.analysis.api.io.ScanFileHolderException;
 import org.eclipse.dawnsci.analysis.api.monitor.IMonitor;
+import org.eclipse.dawnsci.analysis.dataset.impl.AbstractDataset;
+import org.eclipse.dawnsci.hdf5.HDF5Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import boofcv.alg.distort.DistortImageOps;
 import boofcv.alg.interpolate.TypeInterpolate;
@@ -40,6 +50,8 @@ public class BoofCVImageTransformImpl<T extends ImageSingleBand<?>, TD extends T
 	static {
 		System.out.println("Starting BoofCV image transform service.");
 	}
+
+	private Logger logger = LoggerFactory.getLogger(BoofCVImageFilterImpl.class);
 
 	public BoofCVImageTransformImpl() {
 		// Important do nothing here, OSGI may start the service more than once.
@@ -98,6 +110,55 @@ public class BoofCVImageTransformImpl<T extends ImageSingleBand<?>, TD extends T
 	}
 
 	@Override
+	public ILazyDataset align(ILazyDataset lazydata, IMonitor monitor) throws Exception {
+		if (lazydata.getShape().length != 3)
+			throw new Exception("Supported Lazy data is 3D, please provide a 3D dataset");
+		// save on a temp file
+		String file = System.getProperty("java.io.tmpdir") + File.separator + "temp_aligned.h5";
+		String path = "/entry/data/";
+		String name = "aligned";
+		File tmpFile = new File(file);
+		if (tmpFile.exists())
+			tmpFile.delete();
+		IDataset firstSlice = lazydata.getSlice(new Slice(0, lazydata.getShape()[1], lazydata.getShape()[2])).squeeze();
+		int dtype = AbstractDataset.getDType(firstSlice);
+		ILazyWriteableDataset lazy = HDF5Utils.createLazyDataset(file, path, name, lazydata.getShape(), null,
+				lazydata.getShape(), dtype, null, false);
+
+		//convert to boofcv data
+		ImageFloat32 imageA = ConvertIDataset.convertFrom(firstSlice, ImageFloat32.class, 1);
+		// add first image
+		appendDataset(lazy, firstSlice, 0, monitor);
+		int[] shape = lazydata.getShape();
+		if (firstSlice.getShape().length != 2)
+			throw new Exception("Data shape is not 2D");
+		
+		for (int i = 1; i < shape[0]; i++) {
+			IDataset slice = lazydata.getSlice(new Slice(i, lazydata.getShape()[1], lazydata.getShape()[2])).squeeze();
+			if (slice.getShape().length != 2)
+				throw new Exception("Data shape is not 2D");
+			ImageFloat32 imageB = ConvertIDataset.convertFrom(slice, ImageFloat32.class, 1);
+			ImageSingleBand<?> aligned = ImageHessianRegistration.registerHessian(imageA, imageB);
+			IDataset alignedData = ConvertIDataset.convertTo(aligned, true);
+			alignedData.setName(slice.getName());
+			// add data to lazy file
+			appendDataset(lazy, alignedData, i, monitor);
+
+			if(monitor != null) {
+				if (monitor.isCancelled()) {
+					// reload file
+					lazy.setName("Aligned");
+					return getLazyData(file, path + name);
+				}
+				monitor.worked(1);
+			}
+		}
+		// reload file
+		lazy.setName("Aligned");
+		return getLazyData(file, path + name);
+	}
+
+	@Override
 	public IDataset affineTransform(IDataset data, double a11, double a12, double a21, double a22, double dx, double dy) throws Exception {
 		return affineTransform(data, a11, a12, a21, a22, dx, dy, false);
 	}
@@ -136,6 +197,21 @@ public class BoofCVImageTransformImpl<T extends ImageSingleBand<?>, TD extends T
 
 		DistortImageOps.affine(image, transformed, TypeInterpolate.BILINEAR, a22, a21, a12, a11, dy, dx);
 		return ConvertIDataset.convertTo(transformed, true);
+	}
+
+	private ILazyDataset getLazyData(String filename, String node) {
+		ILazyDataset shifted = null;
+		try {
+			shifted = HDF5Utils.loadDataset(filename, node);
+		} catch (ScanFileHolderException e) {
+			logger .error("Could not reload the temp h5 file:", e);
+		}
+		return shifted;
+	}
+
+	private static void appendDataset(ILazyWriteableDataset lazy, IDataset data, int idx, IMonitor monitor) throws Exception {
+		SliceND ndSlice = new SliceND(lazy.getShape(), new int[] {idx, 0, 0}, new int[] {(idx+1), data.getShape()[0], data.getShape()[1]}, null);
+		lazy.setSlice(monitor, data, ndSlice);
 	}
 
 	private static Pair<Double, Double> affineTransformation(double x, double y, double a11, double a12, double a21, double a22, double dx, double dy) {

@@ -40,7 +40,7 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 	private double[][][] translations;
 
 	// used to calculate translation between images
-	private TranslationObject<T, TD> test;
+	private TranslationObject<T, TD> translate;
 
 	// factor to convert between microns and pixels
 //	private double micronsToPixels;
@@ -60,7 +60,7 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 	 */
 	public FullStitchingObject(DetectDescribePoint<T, TD> detDesc,
 			AssociateDescription<TD> associate, Class<T> imageType) {
-		this.test = new TranslationObject<T, TD>(detDesc, associate, imageType);
+		this.translate = new TranslationObject<T, TD>(detDesc, associate, imageType);
 	}
 
 	/**
@@ -74,7 +74,7 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 	 */
 	public void setConversion(int[] shape, double fieldOfView) {
 		// calculates the number of pixels per micron
-		test.setConversion(shape, fieldOfView);
+		translate.setConversion(shape, fieldOfView);
 //		micronsToPixels = image.getWidth()
 //				/ (fieldOfView * Math.cos(Math.PI / 4));
 	}
@@ -116,9 +116,9 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 					// translation of all images in the first column is
 					// calculated using the above image
 					else {
-						test.associate(images.get(x - 1).get(y),
+						translate.associate(images.get(x - 1).get(y),
 								images.get(x).get(y), 0, ytrans);
-						translations[x][y] = test.translation();
+						translations[x][y] = translate.translation();
 						// translation of previous image is added to give the
 						// translation relative to the first image
 						translations[x][y][0] += translations[x - 1][y][0];
@@ -127,9 +127,9 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 				}
 				// translation of all images other images is calculated using the image to the left
 				else {
-					test.associate(images.get(x).get(y - 1), images
+					translate.associate(images.get(x).get(y - 1), images
 							.get(x).get(y), xtrans, 0);
-					translations[x][y] = test.translation();
+					translations[x][y] = translate.translation();
 					// translation of previous image is added to give the translation relative to the first image
 					translations[x][y][0] += translations[x][y-1][0];
 					translations[x][y][1] += translations[x][y-1][1];
@@ -182,9 +182,9 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 					}
 					// translation of all images in the first column is calculated using the above image
 					else {
-						test.associate(images.get(x - 1).get(y),
+						translate.associate(images.get(x - 1).get(y),
 								images.get(x).get(y), 0, ytrans);
-						transform = test.homographyTransform();
+						transform = translate.homographyTransform();
 						// only the translation of the transform is used
 						translations[x][y][0] = transform.a13;
 						translations[x][y][1] = transform.a23;
@@ -196,9 +196,9 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 				}
 				// translation of all images other images is calculated using the image to the left
 				else {
-					test.associate(images.get(x).get(y - 1), images
+					translate.associate(images.get(x).get(y - 1), images
 							.get(x).get(y), xtrans, 0);
-					transform = test.homographyTransform();
+					transform = translate.homographyTransform();
 					// only the translation of the transform is used
 					translations[x][y][0] = transform.a13;
 					translations[x][y][1] = transform.a23;
@@ -256,9 +256,9 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 					}
 					// translation of all images in the first column is calculated using the above image
 					else {
-						test.associate(images.get(x - 1).get(y),
+						translate.associate(images.get(x - 1).get(y),
 								images.get(x).get(y), 0, ytrans);
-						transform = test.specialTransform();
+						transform = translate.specialTransform();
 						// only the translation of the transform is used
 						translations[x][y][0] = transform.getX();
 						translations[x][y][1] = transform.getY();
@@ -270,9 +270,9 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 				}
 				// translation of all images other images is calculated using the image to the left
 				else {
-					test.associate(images.get(x).get(y - 1), images
+					translate.associate(images.get(x).get(y - 1), images
 							.get(x).get(y), xtrans, 0);
-					transform = test.specialTransform();
+					transform = translate.specialTransform();
 					// only the translation of the transform is used
 					translations[x][y][0] = transform.getX();
 					translations[x][y][1] = transform.getY();
@@ -316,7 +316,7 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 				double ytrans = motorTranslations.get(idx)[1];
 
 				// convert the translations from microns into pixels
-				double micronsToPixels = test.getConversion();
+				double micronsToPixels = translate.getConversion();
 				xtrans = micronsToPixels * xtrans;
 				ytrans = micronsToPixels * ytrans;
 

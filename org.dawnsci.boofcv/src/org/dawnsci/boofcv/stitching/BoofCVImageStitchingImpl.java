@@ -13,6 +13,7 @@ import java.util.List;
 
 import org.dawnsci.boofcv.converter.ConvertIDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
+import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
 import org.eclipse.dawnsci.analysis.api.image.IImageStitchingProcess;
 import org.eclipse.dawnsci.analysis.api.monitor.IMonitor;
 import org.slf4j.Logger;
@@ -102,5 +103,49 @@ public class BoofCVImageStitchingImpl implements IImageStitchingProcess {
 		}
 		ImageSingleBand<?> result = stitchObj.stitch(inputImages, monitor);
 		return ConvertIDataset.convertTo(result, true);
+	}
+
+	@Override
+	public IDataset stitch(ILazyDataset input, int rows, int columns,
+			double fieldOfView, List<double[]> translations,
+			boolean hasFeatureAssociation, int[] originalShape, IMonitor monitor) throws Exception {
+		int[] shape = input.getShape();
+		if (shape.length != 3)
+			throw new Exception("The stitching routine works only with 3D dataset");
+
+//		IDataset[][] images = ImagePreprocessing.listToArray(input, rows, columns);
+		
+		List<List<ImageSingleBand<?>>> inputImages = new ArrayList<List<ImageSingleBand<?>>>();
+		
+		for (int i = 0; i < rows; i++) {
+			for(int j = 0; j < columns; j++) {
+				
+			}
+		}
+//		for (int i = 0; i < images.length; i++) {
+//			inputImages.add(new ArrayList<ImageSingleBand<?>>());
+//			for (int j = 0; j < images[0].length; j++) {
+//				ImageFloat32 image = ConvertIDataset.convertFrom(images[i][j], ImageFloat32.class, 1);
+//				inputImages.get(i).add(image);
+//				if (monitor != null && monitor.isCancelled())
+//					return null;
+//			}
+//		}
+//		Class<ImageFloat32> imageType = ImageFloat32.class;
+//		DetectDescribePoint<?, ?> detDesc = FactoryDetectDescribe.surfStable(
+//				new ConfigFastHessian(1, 2, 200, 1, 9, 4, 4), null,null, imageType);
+//		ScoreAssociation<?> scorer = FactoryAssociation.defaultScore(detDesc.getDescriptionType());
+//		AssociateDescription<?> associate = FactoryAssociation.greedy(scorer, Double.MAX_VALUE, true);
+//
+//		FullStitchingObject stitchObj = new FullStitchingObject(detDesc, associate, imageType);
+//		stitchObj.setConversion(originalShape, fieldOfView);
+//		if (hasFeatureAssociation) {
+//			stitchObj.translationArray(inputImages, translations, monitor);
+//		} else {
+//			stitchObj.theoreticalTranslation(columns, rows, translations, monitor);
+//		}
+//		ImageSingleBand<?> result = stitchObj.stitch(inputImages, monitor);
+//		return ConvertIDataset.convertTo(result, true);
+		return null;
 	}
 }
