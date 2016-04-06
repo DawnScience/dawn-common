@@ -13,11 +13,16 @@ import georegression.struct.se.Se2_F64;
 
 import java.util.List;
 
+import org.dawnsci.boofcv.converter.ConvertIDataset;
+import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
+import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
+import org.eclipse.dawnsci.analysis.api.dataset.Slice;
 import org.eclipse.dawnsci.analysis.api.monitor.IMonitor;
 
 import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.struct.feature.TupleDesc;
+import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.MultiSpectral;
 
@@ -129,6 +134,80 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 				else {
 					translate.associate(images.get(x).get(y - 1), images
 							.get(x).get(y), xtrans, 0);
+					translations[x][y] = translate.translation();
+					// translation of previous image is added to give the translation relative to the first image
+					translations[x][y][0] += translations[x][y-1][0];
+					translations[x][y][1] += translations[x][y-1][1];
+				}
+				if (monitor != null) {
+					if (monitor.isCancelled())
+						return;
+					monitor.worked(1);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Calculates the translation that relates each image to the first image.
+	 * Relative translations are found using feature recognition within the
+	 * overlapping region, identifying corresponding features and calculating
+	 * the average translation relation corresponding features. The translation
+	 * is found between successive images and added to the translation found for
+	 * the previous image, thus giving all translations relative to the first
+	 * image.
+	 * 
+	 * @param images
+	 *            The lazy set of images to be stitched
+	 * @param xtrans
+	 *            The expected translation in microns in the x direction
+	 *            relating successive images in a row
+	 * @param ytrans
+	 *            The expected translation in microns in the y direction
+	 *            relating successive images in a column
+	 * @param rows
+	 * @param columns
+	 * @param monitor
+	 *            To monitor progress
+	 */
+	public void translationArray(ILazyDataset images, List<double[]> motorTranslations, int rows, int columns, IMonitor monitor) {
+
+		// stores the translations
+		translations = new double[rows][columns][2];
+		int idx = 0;
+		for (int x = 0; x < translations.length; x++) {
+			for (int y = 0; y < translations[0].length; y++) {
+				double xtrans = motorTranslations.get(idx)[0];
+				double ytrans = motorTranslations.get(idx)[1];
+
+				if (y == 0) {
+					// translation of first image is 0
+					if (x == 0) {
+					}
+					// translation of all images in the first column is
+					// calculated using the above image
+					else {
+						IDataset image1 = images.getSlice(new Slice(((x - 1)*y), images.getShape()[0], images.getShape()[1])).squeeze();
+						ImageSingleBand<?> aimage = ConvertIDataset.convertFrom(image1, ImageFloat32.class, 1);
+						IDataset image2 = images.getSlice(new Slice((x*y), images.getShape()[0], images.getShape()[1])).squeeze();
+						ImageSingleBand<?> bimage = ConvertIDataset.convertFrom(image2, ImageFloat32.class, 1);
+						translate.associate((T)aimage, (T)bimage, 0, ytrans);
+//						translate.associate(images.get(x - 1).get(y), images.get(x).get(y), 0, ytrans);
+						translations[x][y] = translate.translation();
+						// translation of previous image is added to give the
+						// translation relative to the first image
+						translations[x][y][0] += translations[x - 1][y][0];
+						translations[x][y][1] += translations[x - 1][y][1];
+					}
+				}
+				// translation of all images other images is calculated using the image to the left
+				else {
+					IDataset image1 = images.getSlice(new Slice(((y - 1)*x), images.getShape()[0], images.getShape()[1])).squeeze();
+					ImageSingleBand<?> aimage = ConvertIDataset.convertFrom(image1, ImageFloat32.class, 1);
+					IDataset image2 = images.getSlice(new Slice((x*y), images.getShape()[0], images.getShape()[1])).squeeze();
+					ImageSingleBand<?> bimage = ConvertIDataset.convertFrom(image2, ImageFloat32.class, 1);
+					translate.associate((T)aimage, (T)bimage, xtrans, 0);
+//					translate.associate(images.get(x).get(y - 1), images.get(x).get(y), xtrans, 0);
 					translations[x][y] = translate.translation();
 					// translation of previous image is added to give the translation relative to the first image
 					translations[x][y][0] += translations[x][y-1][0];
@@ -383,6 +462,44 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 				if (i != 0 || j != 0) {
 					StitchingObject<?> stitcher = new StitchingObject<>(translations[i][j]);
 					result = stitcher.stitch(result, images.get(i).get(j), origin);
+				}
+				if (monitor != null) {
+					if (monitor.isCancelled())
+						return result;
+					monitor.worked(1);
+				}
+			}
+		}
+		return result;
+	}
+
+	/**
+	 * Stitches a list of images together onto a new image.
+	 * 
+	 * @param images
+	 *            The lazy list of images to be stitched
+	 * @param monitor
+	 *            monitor progress
+	 * @return The new image with all the images stitched to it
+	 */
+	public ImageSingleBand<?> stitch(ILazyDataset images, int rows, int columns, IMonitor monitor) {
+		// define an origin to be the top-corner of the first image such that
+		// all the translations can be given relative to this image
+		double[] origin = new double[2];
+		origin[0] = 0;
+		origin[1] = 0;
+		IDataset image = images.getSlice(new Slice(0, images.getShape()[0], images.getShape()[1])).squeeze();
+		ImageSingleBand<?> result = ConvertIDataset.convertFrom(image, ImageFloat32.class, 1);
+//		ImageSingleBand<?> result = images.get(0).get(0);
+		// stitch each image together with another, in turn, onto a new image
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < columns; j++) {
+				if (i != 0 || j != 0) {
+					StitchingObject<?> stitcher = new StitchingObject<>(translations[i][j]);
+					IDataset slice = images.getSlice(new Slice((i*j), images.getShape()[0], images.getShape()[1])).squeeze();
+					ImageSingleBand<?> im = ConvertIDataset.convertFrom(slice, ImageFloat32.class, 1);
+					result = stitcher.stitch(result, im, origin);
+//					result = stitcher.stitch(result, images.get(i).get(j), origin);
 				}
 				if (monitor != null) {
 					if (monitor.isCancelled())
