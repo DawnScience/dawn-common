@@ -110,6 +110,8 @@ public class BoofCVImageStitchingImpl implements IImageStitchingProcess {
 			double fieldOfView, List<double[]> translations,
 			boolean hasFeatureAssociation, int[] originalShape, IMonitor monitor) throws Exception {
 		int[] shape = input.getShape();
+		if (originalShape ==null)
+			originalShape = input.getShape();
 		if (shape.length != 3)
 			throw new Exception("The stitching routine works only with 3D dataset");
 

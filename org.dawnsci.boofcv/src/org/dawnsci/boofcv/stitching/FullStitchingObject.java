@@ -175,6 +175,7 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 		// stores the translations
 		translations = new double[rows][columns][2];
 		int idx = 0;
+		int index = 0;
 		for (int x = 0; x < translations.length; x++) {
 			for (int y = 0; y < translations[0].length; y++) {
 				double xtrans = motorTranslations.get(idx)[0];
@@ -187,9 +188,9 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 					// translation of all images in the first column is
 					// calculated using the above image
 					else {
-						IDataset image1 = images.getSlice(new Slice(((x - 1)*y), images.getShape()[0], images.getShape()[1])).squeeze();
+						IDataset image1 = images.getSlice(new Slice((index-1), images.getShape()[0], images.getShape()[1])).squeeze();
 						ImageSingleBand<?> aimage = ConvertIDataset.convertFrom(image1, ImageFloat32.class, 1);
-						IDataset image2 = images.getSlice(new Slice((x*y), images.getShape()[0], images.getShape()[1])).squeeze();
+						IDataset image2 = images.getSlice(new Slice(index, images.getShape()[0], images.getShape()[1])).squeeze();
 						ImageSingleBand<?> bimage = ConvertIDataset.convertFrom(image2, ImageFloat32.class, 1);
 						translate.associate((T)aimage, (T)bimage, 0, ytrans);
 //						translate.associate(images.get(x - 1).get(y), images.get(x).get(y), 0, ytrans);
@@ -202,9 +203,9 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 				}
 				// translation of all images other images is calculated using the image to the left
 				else {
-					IDataset image1 = images.getSlice(new Slice(((y - 1)*x), images.getShape()[0], images.getShape()[1])).squeeze();
+					IDataset image1 = images.getSlice(new Slice((index-1), images.getShape()[0], images.getShape()[1])).squeeze();
 					ImageSingleBand<?> aimage = ConvertIDataset.convertFrom(image1, ImageFloat32.class, 1);
-					IDataset image2 = images.getSlice(new Slice((x*y), images.getShape()[0], images.getShape()[1])).squeeze();
+					IDataset image2 = images.getSlice(new Slice(index, images.getShape()[0], images.getShape()[1])).squeeze();
 					ImageSingleBand<?> bimage = ConvertIDataset.convertFrom(image2, ImageFloat32.class, 1);
 					translate.associate((T)aimage, (T)bimage, xtrans, 0);
 //					translate.associate(images.get(x).get(y - 1), images.get(x).get(y), xtrans, 0);
@@ -213,6 +214,7 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 					translations[x][y][0] += translations[x][y-1][0];
 					translations[x][y][1] += translations[x][y-1][1];
 				}
+				index++;
 				if (monitor != null) {
 					if (monitor.isCancelled())
 						return;
@@ -430,7 +432,6 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 		// stitch each image together with another, in turn, onto a new image
 		for (int i = 0; i < images.size(); i++) {
 			for (int j = 0; j < images.get(0).size(); j++) {
-
 				if (i != 0 || j != 0) {
 					StitchingObject stitch = new StitchingObject<>(translations[i][j]);
 					result = stitch.stitchMultiBand(result, images.get(i).get(j), origin);
@@ -490,17 +491,17 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 		origin[1] = 0;
 		IDataset image = images.getSlice(new Slice(0, images.getShape()[0], images.getShape()[1])).squeeze();
 		ImageSingleBand<?> result = ConvertIDataset.convertFrom(image, ImageFloat32.class, 1);
-//		ImageSingleBand<?> result = images.get(0).get(0);
 		// stitch each image together with another, in turn, onto a new image
+		int idx = 0;
 		for (int i = 0; i < rows; i++) {
 			for (int j = 0; j < columns; j++) {
 				if (i != 0 || j != 0) {
 					StitchingObject<?> stitcher = new StitchingObject<>(translations[i][j]);
-					IDataset slice = images.getSlice(new Slice((i*j), images.getShape()[0], images.getShape()[1])).squeeze();
+					IDataset slice = images.getSlice(new Slice(idx, images.getShape()[0], images.getShape()[1])).squeeze();
 					ImageSingleBand<?> im = ConvertIDataset.convertFrom(slice, ImageFloat32.class, 1);
 					result = stitcher.stitch(result, im, origin);
-//					result = stitcher.stitch(result, images.get(i).get(j), origin);
 				}
+				idx++;
 				if (monitor != null) {
 					if (monitor.isCancelled())
 						return result;
