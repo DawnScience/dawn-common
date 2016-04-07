@@ -11,5 +11,6 @@ Require-Bundle: org.eclipse.core.runtime;bundle-version="3.8.0",
  org.dawnsci.boofcv
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
-Import-Package: org.dawb.common.services
+Import-Package: org.dawb.common.services,
+ org.eclipse.dawnsci.hdf5
 
