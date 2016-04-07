@@ -26,7 +26,7 @@ import org.eclipse.dawnsci.analysis.api.dataset.Slice;
 import org.eclipse.dawnsci.analysis.api.dataset.SliceND;
 import org.eclipse.dawnsci.analysis.api.image.IImageFilterService;
 import org.eclipse.dawnsci.analysis.api.image.IImageTransform;
-import org.eclipse.dawnsci.analysis.api.io.ScanFileHolderException;
+import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
 import org.eclipse.dawnsci.analysis.api.monitor.IMonitor;
 import org.eclipse.dawnsci.analysis.dataset.impl.AbstractDataset;
 import org.eclipse.dawnsci.analysis.dataset.impl.DatasetUtils;
@@ -36,6 +36,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import uk.ac.diamond.scisoft.analysis.io.ImageStackLoader;
+import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 
 public class ImageLazyProcessingTest {
 
@@ -116,18 +117,14 @@ public class ImageLazyProcessingTest {
 	 * 
 	 * @param name
 	 * @return lazydataset
+	 * @throws Exception 
 	 */
-	private ILazyDataset getTempLazyData(String name) {
-		ILazyDataset shifted = null;
+	private ILazyDataset getTempLazyData(String name) throws Exception {
 		String filepath = System.getProperty("java.io.tmpdir") + File.separator;
 		String nodepath = "/entry/data/";
 		String file = filepath + "tmp_" + name + ".h5";
-		try {
-			shifted = HDF5Utils.loadDataset(file, nodepath + name);
-			shifted.setName(name);
-		} catch (ScanFileHolderException e) {
-			System.err.println("Could not reload the temp h5 file:" + e.getMessage());
-		}
+		IDataHolder holder = LoaderFactory.getData(file, false, true, null);
+		ILazyDataset shifted = holder.getLazyDataset(nodepath + name);
 		return shifted;
 	}
 
