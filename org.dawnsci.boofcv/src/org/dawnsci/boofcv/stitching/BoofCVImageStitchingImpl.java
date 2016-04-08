@@ -49,26 +49,26 @@ public class BoofCVImageStitchingImpl implements IImageStitchingProcess {
 	}
 
 	@Override
-	public IDataset stitch(List<IDataset> input, IMonitor monitor) {
+	public IDataset stitch(List<IDataset> input, IMonitor monitor) throws Exception {
 		return stitch(input, 1, 6, 49, monitor);
 	}
 
 	@Override
-	public IDataset stitch(List<IDataset> input, int rows, int columns, IMonitor monitor) {
+	public IDataset stitch(List<IDataset> input, int rows, int columns, IMonitor monitor) throws Exception {
 		List<double[]> translations = new ArrayList<double[]>();
 		translations.add(new double[] {25, 25});
 		return stitch(input, rows, columns, 50, translations, false, monitor);
 	}
 
 	@Override
-	public IDataset stitch(List<IDataset> input, int rows, int columns, double fieldOfView, IMonitor monitor) {
+	public IDataset stitch(List<IDataset> input, int rows, int columns, double fieldOfView, IMonitor monitor) throws Exception {
 		List<double[]> translations = new ArrayList<double[]>();
 		translations.add(new double[] {25, 25});
 		return stitch(input, rows, columns, fieldOfView, translations, true, monitor);
 	}
 
 	@Override
-	public IDataset stitch(List<IDataset> input, int rows, int columns, double fieldOfView, List<double[]> translations, boolean hasFeatureAssociation, IMonitor monitor) {
+	public IDataset stitch(List<IDataset> input, int rows, int columns, double fieldOfView, List<double[]> translations, boolean hasFeatureAssociation, IMonitor monitor) throws Exception {
 		int[] shape = input.get(0).getShape();
 		return stitch(input, rows, columns, fieldOfView, translations, hasFeatureAssociation, shape, monitor);
 	}
@@ -76,7 +76,7 @@ public class BoofCVImageStitchingImpl implements IImageStitchingProcess {
 	@Override
 	public IDataset stitch(List<IDataset> input, int rows, int columns,
 			double fieldOfView, List<double[]> translations,
-			boolean hasFeatureAssociation, int[] originalShape, IMonitor monitor) {
+			boolean hasFeatureAssociation, int[] originalShape, IMonitor monitor) throws Exception {
 		IDataset[][] images = ImagePreprocessing.listToArray(input, rows, columns);
 		List<List<ImageSingleBand<?>>> inputImages = new ArrayList<List<ImageSingleBand<?>>>();
 		for (int i = 0; i < images.length; i++) {

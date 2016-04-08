@@ -76,8 +76,9 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 	 * @param fieldOfView
 	 *            The field of view of the uncropped image, from which we get
 	 *            the corresponding number of microns
+	 * @throws Exception 
 	 */
-	public void setConversion(int[] shape, double fieldOfView) {
+	public void setConversion(int[] shape, double fieldOfView) throws Exception {
 		// calculates the number of pixels per micron
 		translate.setConversion(shape, fieldOfView);
 //		micronsToPixels = image.getWidth()
@@ -193,7 +194,6 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 						IDataset image2 = images.getSlice(new Slice(index, images.getShape()[0], images.getShape()[1])).squeeze();
 						ImageSingleBand<?> bimage = ConvertIDataset.convertFrom(image2, ImageFloat32.class, 1);
 						translate.associate((T)aimage, (T)bimage, 0, ytrans);
-//						translate.associate(images.get(x - 1).get(y), images.get(x).get(y), 0, ytrans);
 						translations[x][y] = translate.translation();
 						// translation of previous image is added to give the
 						// translation relative to the first image
@@ -208,7 +208,6 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 					IDataset image2 = images.getSlice(new Slice(index, images.getShape()[0], images.getShape()[1])).squeeze();
 					ImageSingleBand<?> bimage = ConvertIDataset.convertFrom(image2, ImageFloat32.class, 1);
 					translate.associate((T)aimage, (T)bimage, xtrans, 0);
-//					translate.associate(images.get(x).get(y - 1), images.get(x).get(y), xtrans, 0);
 					translations[x][y] = translate.translation();
 					// translation of previous image is added to give the translation relative to the first image
 					translations[x][y][0] += translations[x][y-1][0];

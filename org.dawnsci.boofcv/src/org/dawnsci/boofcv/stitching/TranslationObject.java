@@ -96,11 +96,20 @@ public class TranslationObject<T extends ImageSingleBand<?>, TD extends TupleDes
 	 * @param fieldOfView
 	 *            The field of view of the uncropped image, from which we get
 	 *            the corresponding number of microns
+	 * @throws Exception 
 	 */
-	public void setConversion(int[] shape, double fieldOfView) {
+	public void setConversion(int[] shape, double fieldOfView) throws Exception {
 		// calculates the number of pixels per micron
-		micronsToPixels = shape[0]
-				/ (fieldOfView * Math.cos(Math.PI / 4));
+		int length = 0;
+		if (shape.length == 2)
+			length = shape[0];
+		else if (shape.length == 3)
+			length = shape[1];
+		else
+			throw new Exception(
+					"Error in setting micron/pixel conversion. Shape is not supported: allowed shape are 2 and 3, given was "
+							+ shape.length);
+		micronsToPixels = length / (fieldOfView * Math.cos(Math.PI / 4));
 	}
 
 	public double getConversion() {
