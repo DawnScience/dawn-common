@@ -114,16 +114,15 @@ public class BoofCVImageTransformImpl<T extends ImageSingleBand<?>, TD extends T
 		if (lazydata.getShape().length != 3)
 			throw new Exception("Supported Lazy data is 3D, please provide a 3D dataset");
 		// save on a temp file
-		String file = System.getProperty("java.io.tmpdir") + File.separator + "temp_aligned.h5";
+		String file = System.getProperty("java.io.tmpdir") + File.separator + "tmp_aligned.h5";
 		String path = "/entry/data/";
 		String name = "aligned";
 		File tmpFile = new File(file);
 		if (tmpFile.exists())
 			tmpFile.delete();
 		IDataset firstSlice = lazydata.getSlice(new Slice(0, lazydata.getShape()[1], lazydata.getShape()[2])).squeeze();
-		int dtype = AbstractDataset.getDType(firstSlice);
 		ILazyWriteableDataset lazy = HDF5Utils.createLazyDataset(file, path, name, lazydata.getShape(), null,
-				lazydata.getShape(), dtype, null, false);
+				lazydata.getShape(), AbstractDataset.FLOAT32, null, false);
 
 		//convert to boofcv data
 		ImageFloat32 imageA = ConvertIDataset.convertFrom(firstSlice, ImageFloat32.class, 1);

@@ -63,7 +63,7 @@ public class ImageLazyProcessingTest {
 		// rotated shape
 		int[] newShape = new int[] {data.getShape()[0], 724, 724};
 		String name = "test";
-		ILazyWriteableDataset lazy = createTempLazyFile(data, newShape, name);
+		ILazyWriteableDataset lazy = createTempLazyFile(newShape, name);
 		ILazyDataset rotatedImages = null;
 		try {
 			for (int i = 0; i < shape[0]; i++) {
@@ -95,11 +95,10 @@ public class ImageLazyProcessingTest {
 	/**
 	 * Method that creates an hdf5 file in the temp directory of the OS
 	 * 
-	 * @param data
 	 * @param name
 	 * @return lazy writable dataset on disk
 	 */
-	private ILazyWriteableDataset createTempLazyFile(ILazyDataset data, int[] newShape, String name) {
+	private ILazyWriteableDataset createTempLazyFile(int[] newShape, String name) {
 		// save on a temp file
 		String filepath = System.getProperty("java.io.tmpdir") + File.separator;
 		String nodepath = "/entry/data/";
@@ -107,9 +106,7 @@ public class ImageLazyProcessingTest {
 		File tmpFile = new File(file);
 		if (tmpFile.exists())
 			tmpFile.delete();
-		IDataset slice = data.getSlice(new Slice(0, data.getShape()[0], data.getShape()[1])).squeeze();
-		int dtype = AbstractDataset.getDType(slice);
-		return HDF5Utils.createLazyDataset(file, nodepath, name, newShape, null, newShape, dtype, null, false);
+		return HDF5Utils.createLazyDataset(file, nodepath, name, newShape, null, newShape, AbstractDataset.FLOAT32, null, false);
 	}
 
 	/**
