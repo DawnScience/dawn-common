@@ -8,7 +8,8 @@ Require-Bundle: org.eclipse.core.runtime;bundle-version="3.8.0",
  org.junit,
  uk.ac.diamond.scisoft.analysis;bundle-version="1.3.0",
  org.dawnsci.boofcv.examples;bundle-version="1.0.0",
- org.dawnsci.boofcv
+ org.dawnsci.boofcv,
+ ncsa.hdf;bundle-version="2.9.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Import-Package: org.dawb.common.services,
