@@ -174,13 +174,13 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 	public void translationArray(ILazyDataset images, double[][][] motorTranslations, int rows, int columns, IMonitor monitor) {
 
 		// stores the translations
-		translations = new double[rows][columns][2];
+		translations = new double[columns][rows][2];
 
 		int index = 0;
 		for (int x = 0; x < rows; x++) {
 			for (int y = 0; y < columns; y++) {
-				double xtrans = motorTranslations[x][y][0];
-				double ytrans = motorTranslations[x][y][1];
+				double xtrans = motorTranslations[y][x][0];
+				double ytrans = motorTranslations[y][x][1];
 
 				if (y == 0) {
 					// translation of first image is 0
@@ -194,11 +194,11 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 						IDataset image2 = images.getSlice(new Slice(index, images.getShape()[0], images.getShape()[1])).squeeze();
 						ImageSingleBand<?> bimage = ConvertIDataset.convertFrom(image2, ImageFloat32.class, 1);
 						translate.associate((T)aimage, (T)bimage, 0, ytrans);
-						translations[x][y] = translate.translation();
+						translations[y][x] = translate.translation();
 						// translation of previous image is added to give the
 						// translation relative to the first image
-						translations[x][y][0] += translations[x - 1][y][0];
-						translations[x][y][1] += translations[x - 1][y][1];
+						translations[y][x][0] += translations[y][x - 1][0];
+						translations[y][x][1] += translations[y][x - 1][1];
 					}
 				}
 				// translation of all images other images is calculated using the image to the left
@@ -208,10 +208,10 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 					IDataset image2 = images.getSlice(new Slice(index, images.getShape()[0], images.getShape()[1])).squeeze();
 					ImageSingleBand<?> bimage = ConvertIDataset.convertFrom(image2, ImageFloat32.class, 1);
 					translate.associate((T)aimage, (T)bimage, xtrans, 0);
-					translations[x][y] = translate.translation();
+					translations[y][x] = translate.translation();
 					// translation of previous image is added to give the translation relative to the first image
-					translations[x][y][0] += translations[x][y - 1][0];
-					translations[x][y][1] += translations[x][y - 1][1];
+					translations[y][x][0] += translations[y - 1][x][0];
+					translations[y][x][1] += translations[y - 1][x][1];
 				}
 				index++;
 				if (monitor != null) {
@@ -387,20 +387,20 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 	 */
 	public void theoreticalTranslation(int rows, int columns, double[][][] motorTranslations, IMonitor monitor) {
 		// stores the translations
-		translations = new double[rows][columns][2];
+		translations = new double[columns][rows][2];
 		// calculates the translations of each image relative to the first image
 		for (int x = 0; x < rows; x++) {
 			for (int y = 0; y < columns; y++) {
-				double xtrans = motorTranslations[x][y][0];
-				double ytrans = motorTranslations[x][y][1];
+				double xtrans = motorTranslations[y][x][0];
+				double ytrans = motorTranslations[y][x][1];
 
 				// convert the translations from microns into pixels
 				double micronsToPixels = translate.getConversion();
 				xtrans = micronsToPixels * xtrans;
 				ytrans = micronsToPixels * ytrans;
 
-				translations[x][y][0] = -xtrans*y;
-				translations[x][y][1] = -ytrans*x;
+				translations[y][x][0] = -xtrans*y;
+				translations[y][x][1] = -ytrans*x;
 				if (monitor != null) {
 					if (monitor.isCancelled())
 						return;
@@ -493,7 +493,7 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 		for (int i = 0; i < rows; i++) {
 			for (int j = 0; j < columns; j++) {
 				if (i != 0 || j != 0) {
-					StitchingObject<?> stitcher = new StitchingObject<>(translations[i][j]);
+					StitchingObject<?> stitcher = new StitchingObject<>(translations[j][i]);
 					IDataset slice = images.getSlice(new Slice(idx, images.getShape()[0], images.getShape()[1])).squeeze();
 					ImageSingleBand<?> im = ConvertIDataset.convertFrom(slice, ImageFloat32.class, 1);
 					result = stitcher.stitch(result, im, origin);
