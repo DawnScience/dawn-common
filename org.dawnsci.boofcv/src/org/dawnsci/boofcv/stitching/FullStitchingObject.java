@@ -171,16 +171,16 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 	 * @param monitor
 	 *            To monitor progress
 	 */
-	public void translationArray(ILazyDataset images, List<double[]> motorTranslations, int rows, int columns, IMonitor monitor) {
+	public void translationArray(ILazyDataset images, double[][][] motorTranslations, int rows, int columns, IMonitor monitor) {
 
 		// stores the translations
 		translations = new double[rows][columns][2];
-		int idx = 0;
+
 		int index = 0;
-		for (int x = 0; x < translations.length; x++) {
-			for (int y = 0; y < translations[0].length; y++) {
-				double xtrans = motorTranslations.get(idx)[0];
-				double ytrans = motorTranslations.get(idx)[1];
+		for (int x = 0; x < rows; x++) {
+			for (int y = 0; y < columns; y++) {
+				double xtrans = motorTranslations[x][y][0];
+				double ytrans = motorTranslations[x][y][1];
 
 				if (y == 0) {
 					// translation of first image is 0
@@ -210,8 +210,8 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 					translate.associate((T)aimage, (T)bimage, xtrans, 0);
 					translations[x][y] = translate.translation();
 					// translation of previous image is added to give the translation relative to the first image
-					translations[x][y][0] += translations[x][y-1][0];
-					translations[x][y][1] += translations[x][y-1][1];
+					translations[x][y][0] += translations[x][y - 1][0];
+					translations[x][y][1] += translations[x][y - 1][1];
 				}
 				index++;
 				if (monitor != null) {
@@ -385,15 +385,14 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 	 * @param monitor
 	 *            To monitor progress
 	 */
-	public void theoreticalTranslation(int rows, int columns, List<double[]> motorTranslations, IMonitor monitor) {
+	public void theoreticalTranslation(int rows, int columns, double[][][] motorTranslations, IMonitor monitor) {
 		// stores the translations
 		translations = new double[rows][columns][2];
 		// calculates the translations of each image relative to the first image
-		int idx = 0;
-		for (int x = 0; x < translations.length; x++) {
-			for (int y = 0; y < translations[0].length; y++) {
-				double xtrans = motorTranslations.get(idx)[0];
-				double ytrans = motorTranslations.get(idx)[1];
+		for (int x = 0; x < rows; x++) {
+			for (int y = 0; y < columns; y++) {
+				double xtrans = motorTranslations[x][y][0];
+				double ytrans = motorTranslations[x][y][1];
 
 				// convert the translations from microns into pixels
 				double micronsToPixels = translate.getConversion();
@@ -402,7 +401,6 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 
 				translations[x][y][0] = -xtrans*y;
 				translations[x][y][1] = -ytrans*x;
-				idx++;
 				if (monitor != null) {
 					if (monitor.isCancelled())
 						return;

@@ -215,6 +215,7 @@ public class StitchingObject<T extends ImageSingleBand<?>> {
 		Homography2D_F64 fromAToWork = new Homography2D_F64(1, 0, xshift, 0, 1, yshift, 0, 0, 1);
 		Homography2D_F64 fromWorkToA = fromAToWork.invert(null);
 		ImageSingleBand<?> work = null;
+		try {
 		if (imageA instanceof ImageSInt16 && imageB instanceof ImageSInt16) {
 			// where the output images are rendered into
 			work = new ImageSInt16(outputWidth, outputHeight);
@@ -250,6 +251,9 @@ public class StitchingObject<T extends ImageSingleBand<?>> {
 			Homography2D_F64 fromWorkToB = fromWorkToA.concat(fromAtoB, null);
 			model.set(fromWorkToB);
 			distort.apply((ImageFloat32)imageB, (ImageFloat32) work, 0, 0, outputWidth, outputHeight);
+		}
+		}catch(Exception e) {
+			System.out.println(e.getMessage());
 		}
 		return work;
 	}
