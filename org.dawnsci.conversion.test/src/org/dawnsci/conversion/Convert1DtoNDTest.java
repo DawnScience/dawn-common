@@ -18,15 +18,15 @@ import java.util.List;
 import org.dawnsci.conversion.converters.Convert1DtoND.Convert1DInfoBean;
 import org.dawnsci.conversion.converters.util.LocalServiceManager;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
-import org.eclipse.dawnsci.analysis.api.conversion.IConversionService;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext.ConversionScheme;
+import org.eclipse.dawnsci.analysis.api.conversion.IConversionService;
 import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
 import org.junit.Before;
 import org.junit.Test;
 
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
-import uk.ac.diamond.scisoft.analysis.osgi.LoaderServiceImpl;
+import uk.ac.diamond.scisoft.analysis.io.LoaderServiceImpl;
 
 public class Convert1DtoNDTest {
 	

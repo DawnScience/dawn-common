@@ -23,8 +23,8 @@ import org.dawnsci.boofcv.BoofCVImageTransformCreator;
 import org.dawnsci.conversion.converters.AlignImagesConverter.ConversionAlignBean;
 import org.dawnsci.conversion.converters.util.LocalServiceManager;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
-import org.eclipse.dawnsci.analysis.api.conversion.IConversionService;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext.ConversionScheme;
+import org.eclipse.dawnsci.analysis.api.conversion.IConversionService;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.image.IImageTransform;
 import org.eclipse.dawnsci.analysis.api.monitor.IMonitor;
@@ -32,8 +32,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import uk.ac.diamond.scisoft.analysis.io.LoaderServiceImpl;
 import uk.ac.diamond.scisoft.analysis.io.Utils;
-import uk.ac.diamond.scisoft.analysis.osgi.LoaderServiceImpl;
 
 public class AlignConvertTest {
 
