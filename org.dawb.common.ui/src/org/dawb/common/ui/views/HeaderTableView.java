@@ -14,6 +14,7 @@ package org.dawb.common.ui.views;
 import java.io.File;
 import java.io.Serializable;
 
+import org.dawb.common.ui.Activator;
 import org.dawb.common.ui.util.EclipseUtils;
 import org.dawb.common.ui.util.GridUtils;
 import org.eclipse.core.resources.IFile;
@@ -237,7 +238,7 @@ public class HeaderTableView extends ViewPart implements ISelectionListener, IPa
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 				
-				final ILoaderService service = (ILoaderService)PlatformUI.getWorkbench().getService(ILoaderService.class);
+				final ILoaderService service = Activator.getService(ILoaderService.class);
 				try {
 					meta = service.getMetadata(filePath,new ProgressMonitorWrapper( monitor));
 				} catch (Exception e1) {

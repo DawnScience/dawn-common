@@ -343,7 +343,7 @@ public class PersistenceImportWizard extends AbstractPersistenceWizard implement
 			if (options.is(PersistWizardConstants.DIFF_META) && trace instanceof IImageTrace) {
 				//check loader service and overwrite if not null
 				//check image and overwrite if none in service
-				ILoaderService loaderService = (ILoaderService)PlatformUI.getWorkbench().getService(ILoaderService.class);
+				ILoaderService loaderService = Activator.getService(ILoaderService.class);
 
 				final IDiffractionMetadata fileMeta = NexusDiffractionCalibrationReader.getDiffractionMetadataFromNexus(filePath, null);
 

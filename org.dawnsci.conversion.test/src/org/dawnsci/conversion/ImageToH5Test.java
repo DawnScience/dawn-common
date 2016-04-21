@@ -9,20 +9,21 @@
 
 package org.dawnsci.conversion;
 
+import static org.junit.Assert.fail;
+
 import java.io.File;
 import java.util.Arrays;
 
 import org.dawb.common.util.io.FileUtils;
 import org.dawnsci.conversion.converters.util.LocalServiceManager;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
-import org.eclipse.dawnsci.analysis.api.conversion.IConversionService;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext.ConversionScheme;
+import org.eclipse.dawnsci.analysis.api.conversion.IConversionService;
 import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
-import uk.ac.diamond.scisoft.analysis.osgi.LoaderServiceImpl;
+import uk.ac.diamond.scisoft.analysis.io.LoaderServiceImpl;
 
 public class ImageToH5Test {
 

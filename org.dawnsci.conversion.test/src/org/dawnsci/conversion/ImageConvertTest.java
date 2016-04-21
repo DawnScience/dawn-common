@@ -13,14 +13,14 @@ import java.io.File;
 import org.dawnsci.conversion.converters.ConversionInfoBean;
 import org.dawnsci.conversion.converters.util.LocalServiceManager;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
-import org.eclipse.dawnsci.analysis.api.conversion.IConversionService;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext.ConversionScheme;
+import org.eclipse.dawnsci.analysis.api.conversion.IConversionService;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
 import org.junit.Before;
 import org.junit.Test;
 
-import uk.ac.diamond.scisoft.analysis.osgi.LoaderServiceImpl;
+import uk.ac.diamond.scisoft.analysis.io.LoaderServiceImpl;
 
 
 public class ImageConvertTest {
