@@ -161,8 +161,9 @@ public class ConversionChoicePage extends ResourceChoosePage implements IConvers
 	 */
 	protected List<String> getSelectedFiles() {
 
-		if (super.getSelectedFiles()==null) return null;
-		final List<String> files = new ArrayList<String>(super.getSelectedFiles());
+		final List<String> selectedFiles = super.getSelectedFiles();
+		if (selectedFiles==null) return null;
+		final List<String> files = new ArrayList<String>(selectedFiles);
 		try {
 			if (filterFiles && extensionsFilter.length()>0) {
 				final List<String> exts = ListUtils.getList(extensionsFilter);
@@ -236,22 +237,22 @@ public class ConversionChoicePage extends ResourceChoosePage implements IConvers
 	
 	private void updateFilesLabel() {
 
-		final List<String> selected = getSelectedFiles();
-		if (selected!=null && selected.size()>0) setPath(selected.get(0));
+		final List<String> selectedFiles = getSelectedFiles();
+		if (selectedFiles!=null && selectedFiles.size()>0) setPath(selectedFiles.get(0));
 
-		if (!filterFiles && (selected==null || selected.size()<2)) {
+		if (!filterFiles && (selectedFiles==null || selectedFiles.size()<2)) {
 			GridUtils.setVisible(conversionGroup, false);
 			GridUtils.setVisible(multiFilesLabel, false);
 			GridUtils.setVisible(helpLink, true);
 		} else {
 			//sort list
-			Collections.sort(selected);
+			Collections.sort(selectedFiles);
 			multiFileSelection = true;
 			GridUtils.setVisible(conversionGroup, true);
 			GridUtils.setVisible(multiFilesLabel, true);
-			final File start = new File(selected.get(0));
-			final File end   = new File(selected.get(selected.size()-1));
-			multiFilesLabel.setText("Selected files:   "+start.getName()+" - "+end.getName()+"  (List of "+selected.size()+" files)");
+			final File start = new File(selectedFiles.get(0));
+			final File end   = new File(selectedFiles.get(selectedFiles.size()-1));
+			multiFilesLabel.setText("Selected files:   "+start.getName()+" - "+end.getName()+"  (List of "+selectedFiles.size()+" files)");
 			setFileChoosingEnabled(false);
 			GridUtils.setVisible(helpLink, false);
 		}
@@ -313,8 +314,9 @@ public class ConversionChoicePage extends ResourceChoosePage implements IConvers
 			final int ranks[] = chosenConversion.getPreferredRanks();
 			if (ranks!=null) {
 				IDataHolder holder = null;
-				if (getSelectedFiles()!=null && getSelectedFiles().size()>1) {		
-					for (String path : getSelectedFiles()) {
+				final List<String> selectedFiles = getSelectedFiles();
+				if (selectedFiles!=null && selectedFiles.size()>1) {		
+					for (String path : selectedFiles) {
 						try {
 							holder = LoaderServiceHolder.getLoaderService().getData(path, new IMonitor.Stub());
 						    if (holder==null) continue;
@@ -361,8 +363,9 @@ public class ConversionChoicePage extends ResourceChoosePage implements IConvers
 	private boolean checkH5(String filePath, boolean isH5) {
 		
 		String seg  = isH5 ? "" : "non-";
-		if (getSelectedFiles()!=null && getSelectedFiles().size()>1 && multiFileSelection) {		
-			for (String path : getSelectedFiles()) {
+		final List<String> selectedFiles = getSelectedFiles();
+		if (selectedFiles!=null && selectedFiles.size()>1 && multiFileSelection) {		
+			for (String path : selectedFiles) {
 				if (isH5 == !isH5(path)) {
 					setErrorMessage("The conversion '"+chosenConversion.getUiLabel()+"' supports "+seg+"nexus/hdf5 files only. The file '"+((new File(path).getName())+"' is not."));
 					setPageComplete(false);
