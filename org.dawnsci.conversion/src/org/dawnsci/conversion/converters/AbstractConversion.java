@@ -25,6 +25,7 @@ import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.SliceND;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
 import org.eclipse.dawnsci.analysis.api.monitor.IMonitor;
+import org.eclipse.dawnsci.analysis.dataset.slicer.SliceFromSeriesMetadata;
 import org.eclipse.dawnsci.analysis.dataset.slicer.SliceViewIterator;
 import org.eclipse.dawnsci.analysis.dataset.slicer.SliceVisitor;
 import org.eclipse.dawnsci.analysis.dataset.slicer.Slicer;
@@ -195,7 +196,7 @@ public abstract class AbstractConversion {
 			public void visit(IDataset slice) throws Exception {
 				//no longer squeeze in slicer
 				slice.squeeze();
-				context.setSelectedSlice(it.getSliceND().convertToSlice());
+				context.setSelectedSlice(slice.getFirstMetadata(SliceFromSeriesMetadata.class).getSliceInOutput());
 				context.setSelectedShape(it.getShape());
 				convert(slice);
 			}

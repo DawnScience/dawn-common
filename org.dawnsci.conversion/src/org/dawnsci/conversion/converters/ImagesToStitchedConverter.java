@@ -169,6 +169,7 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 		private boolean featureAssociated;
 		private List<double[]> translations;
 		private IROI roi;
+		private double[][][] translArray;
 
 		public int getRows() {
 			return rows;
@@ -209,8 +210,14 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 		public void setTranslations(List<double[]> translations) {
 			this.translations = translations;
 		}
+		public void setTranslations(double[][][] translations) {
+			this.translArray = translations;
+		}
 		public List<double[]> getTranslations() {
 			return translations;
+		}
+		public double[][][] getTranslationsArray() {
+			return translArray;
 		}
 		@Override
 		public int hashCode() {
