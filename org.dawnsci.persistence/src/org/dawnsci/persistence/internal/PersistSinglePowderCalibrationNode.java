@@ -30,9 +30,9 @@ public class PersistSinglePowderCalibrationNode {
 		
 		if (info != null) {
 			detector.addGroupNode("calibration_method", createCalibrationMethod(info));
-			entry.addGroupNode("calibration_sample", createCalibrationSample(info, metadata.getDiffractionCrystalEnvironment().getWavelength()));
 		}
 		
+		entry.addGroupNode("calibration_sample", createCalibrationSample(info, metadata.getDiffractionCrystalEnvironment().getWavelength()));
 		if (calibrationImage != null) {
 			DataNode data = NexusTreeUtils.createDataNode("data", calibrationImage, null);
 			
@@ -75,15 +75,18 @@ public class PersistSinglePowderCalibrationNode {
 		GroupNode sample = TreeFactory.createGroupNode(0);
 		sample.addAttribute(TreeFactory.createAttribute("NX_class", "NXsample"));
 		
-		sample.addDataNode("d_space",NexusTreeUtils.createDataNode("d_space", info.getCalibrantDSpaceValues(), null));
-		sample.addDataNode("name",NexusTreeUtils.createDataNode("name", info.getCalibrantName(), null));
-		sample.addDataNode("type",NexusTreeUtils.createDataNode("type", "calibration sample", null));
 		
 		GroupNode beam = TreeFactory.createGroupNode(0);
 		beam.addAttribute(TreeFactory.createAttribute("NX_class", NexusTreeUtils.NX_BEAM));
 		beam.addDataNode("incident_wavelength",NexusTreeUtils.createDataNode("incident_wavelength", wavelength, "angstrom"));
 		
 		sample.addGroupNode("beam", beam);
+		
+		if (info != null) {
+			sample.addDataNode("d_space",NexusTreeUtils.createDataNode("d_space", info.getCalibrantDSpaceValues(), null));
+			sample.addDataNode("name",NexusTreeUtils.createDataNode("name", info.getCalibrantName(), null));
+			sample.addDataNode("type",NexusTreeUtils.createDataNode("type", "calibration sample", null));
+		}
 		
 		return sample;
 	}
