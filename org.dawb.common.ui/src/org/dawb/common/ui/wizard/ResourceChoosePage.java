@@ -404,28 +404,23 @@ public class ResourceChoosePage extends WizardPage {
 			final Object[] oa = s.size() > 1 ? s.toArray() : getObjects(s.getFirstElement());
 			
 			final List<String> ret = new ArrayList<String>(oa.length);
-			for (Object object : oa) {
-				if (object instanceof IFile) {
-					ret.add(((IFile)object).getLocation().toOSString());
-				} else if (object instanceof File) {
-					final File file = (File)object;
-					if (file.isFile())
-						ret.add(file.getAbsolutePath());
-				} else if (object instanceof IResource) {
-					ret.add(((IResource)object).getLocation().toOSString());
-				} else if (object instanceof IAdaptable) { // if selected object is part of specific project nature (python project for example)
-					Object obj = ((IAdaptable) object).getAdapter(IFile.class);
-					if (obj == null)
-						obj = ((IAdaptable) object).getAdapter(IFolder.class);
-					if (obj instanceof IFile) {
-						ret.add(((IFile)obj).getLocation().toOSString());
-					} else if (object instanceof IFolder) {
-						ret.add(((IFolder) obj).getLocation().toOSString());
+			for (final Object object : oa) {
+				final Object adapter = EclipseUtils.getFirstAdapter(object, new Class<?>[] {
+					IFile.class, IFolder.class, File.class, IResource.class, java.nio.file.Path.class});
+					if (adapter instanceof IFile) {
+						ret.add(((IFile)adapter).getLocation().toOSString());
+					} else if (adapter instanceof IFolder) {
+						ret.add(((IFolder)adapter).getLocation().toOSString());
+					} else if (adapter instanceof File) {
+						final File file = (File)adapter;
+						if (file.isFile())
+							ret.add(file.getAbsolutePath());
+					} else if (adapter instanceof IResource) {
+						ret.add(((IResource)adapter).getLocation().toOSString());
+					} else if(adapter instanceof java.nio.file.Path) {
+						final String path = ((java.nio.file.Path)adapter).toString();
+						ret.add(path);
 					}
-				} else if(object instanceof java.nio.file.Path) {
-					String path = ((java.nio.file.Path)object).toString();
-					ret.add(path);
-				}
 			}
 			return ret.size()>0 ? ret : null;
 		} catch (Throwable ignored) {
