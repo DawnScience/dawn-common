@@ -483,6 +483,15 @@
             id="org.dawb.common.ui.views.headerTableView"
             name="Header Table">
       </view>
+       <e4view
+             allowMultiple="false"
+             category="uk.ac.diamond.sda.meta.category"
+             class="org.dawb.common.ui.views.HeaderTableE4Part"
+             icon="icons/header_table.gif"
+             id="org.dawb.common.ui.views.e4.headerTableView"
+             name="Header Table E4"
+             restorable="true">
+       </e4view>
          
    </extension>
     <extension
