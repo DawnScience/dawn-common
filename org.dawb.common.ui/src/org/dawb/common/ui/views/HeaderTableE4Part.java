@@ -152,7 +152,6 @@ public class HeaderTableE4Part {
 				}
 				return val1.compareTo(val2);
 			}
-
 		});
 
 		final TableViewerColumn value = new TableViewerColumn(table, SWT.NONE,
@@ -188,14 +187,143 @@ public class HeaderTableE4Part {
 		}
 	}
 
-	private void updateSelection(Object selection) {
+	private UIJob updateTable = new UIJob("Updating Metadata Table") {
+		@Override
+		public IStatus runInUIThread(IProgressMonitor monitor) {
+			if (table == null)
+				return Status.CANCEL_STATUS;
+			if(table.getControl().isDisposed())
+				return Status.CANCEL_STATUS;
+			table.setContentProvider(new IStructuredContentProvider() {
+				@Override
+				public void inputChanged(Viewer viewer, Object oldInput,
+						Object newInput) {
+				}
 
+				@Override
+				public void dispose() {
+				}
+
+				@Override
+				public Object[] getElements(Object inputElement) {
+					if (meta == null)
+						return new Object[] { "" };
+					try {
+						return meta.getMetaNames().toArray(
+								new Object[meta.getMetaNames().size()]);
+					} catch (Exception e) {
+						return new Object[] { "" };
+					}
+				}
+			});
+
+			// Maybe being the selection provider cause the left mouse problem
+			// if (getSite()!=null) getSite().setSelectionProvider(dataViewer);
+			if (table.getControl().isDisposed())
+				return Status.CANCEL_STATUS;
+			table.setInput(new String());
+			return Status.OK_STATUS;
+		}
+	};
+
+	/**
+	 * May be called to set the path from which to update the meta table.
+	 * 
+	 * @param filePath
+	 */
+	public synchronized void updatePath(final String filePath) {
+		try {
+			if (currentFilePath != null && currentFilePath.equals(filePath))
+				return;
+			currentFilePath = filePath;
+			getMetaData(filePath);
+			setFileName((new File(filePath)).getName());
+		} catch (InterruptedException e) {
+			logger.error("Interupted reading meta data.", e);
+		}
+	}
+
+	/**
+	 * Called to programmatically send the meta which should be shown.
+	 * 
+	 * @param prov
+	 */
+	public void setMetaProvider(IMetadataProvider prov) {
+		try {
+			meta = prov.getMetadata();
+			if (meta != null)
+				updateTable.schedule();
+		} catch (Exception e) {
+			logger.error(
+					"There was a error reading the metadata from the selection",
+					e);
+		}
+	}
+
+	/**
+	 * Selection listener
+	 * 
+	 * @param sel
+	 */
+	@Inject
+	public void selectionChanged(@Optional @Named(IServiceConstants.ACTIVE_SELECTION) Object sel) {
+		MPart part = partService.getActivePart();
+		IEclipseContext context = part != null ? part.getContext() : null;
+		IWorkbenchPart wpart = context != null ? context.get(IWorkbenchPart.class) : null;
+		if (wpart != null && wpart instanceof IMetadataProvider) {
+			try {
+				meta = ((IMetadataProvider) part).getMetadata();
+				if (meta != null)
+					updateTable.schedule();
+			} catch (Exception e) {
+				logger.error("There was a error reading the metadata from the selection", e);
+			}
+		} else {
+			ISliceSystem slicer = wpart != null ? (ISliceSystem) wpart.getAdapter(ISliceSystem.class) : null;
+			if (slicer == null && wpart != null) {
+				final IAdaptable page = wpart.getAdapter(Page.class) instanceof IAdaptable
+						? (IAdaptable) wpart.getAdapter(Page.class) : null;
+				if (page != null)
+					slicer = (ISliceSystem) page.getAdapter(ISliceSystem.class);
+			}
+			if (slicer != null) {
+				IMetadata md = slicer.getSliceMetadata();
+				if (md != null) {
+					selectMetadata(md);
+					return;
+				}
+			}
+			updateSelection(sel);
+		}
+	}
+
+	/**
+	 * Part listener
+	 * 
+	 * @param part
+	 */
+	@Inject
+	public void partActivated(@Optional @Named(IServiceConstants.ACTIVE_PART) MPart part) {
+		IEclipseContext context = part != null ? part.getContext() : null;
+		IWorkbenchPart wpart = context != null ? context.get(IWorkbenchPart.class) : null;
+		if (wpart instanceof IMetadataProvider) {
+			updateFromMetaDataProvider(wpart);
+		}
+		if (wpart instanceof IEditorPart) {
+			final IEditorPart ed = (IEditorPart) wpart;
+			final IEditorInput in = ed.getEditorInput();
+			final String path = EclipseUtils.getFilePath(in);
+			if (path != null)
+				updatePath(path);
+		}
+	}
+
+	private void updateSelection(Object selection) {
 		if (selection == null)
 			return;
 		if (selection instanceof StructuredSelection) {
 			this.lastSelection = (StructuredSelection) selection;
 			final Object sel = lastSelection.getFirstElement();
-
 			if (sel instanceof IFile) {
 				final String filePath = ((IFile) sel).getLocation()
 						.toOSString();
@@ -240,9 +368,7 @@ public class HeaderTableE4Part {
 	}
 
 	private void getMetaData(final String filePath) throws InterruptedException {
-
 		final Job metaJob = new Job("Extra Metadata " + filePath) {
-
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 
@@ -255,151 +381,13 @@ public class HeaderTableE4Part {
 					logger.error("Cannot get meta data for " + filePath, e1);
 					return Status.CANCEL_STATUS;
 				}
-
 				updateTable.schedule();
-
 				return Status.OK_STATUS;
 			}
-
 		};
-
 		metaJob.schedule();
 	}
 
-	UIJob updateTable = new UIJob("Updating Metadata Table") {
-		@Override
-		public IStatus runInUIThread(IProgressMonitor monitor) {
-			if (table == null)
-				return Status.CANCEL_STATUS;
-			if(table.getControl().isDisposed())
-				return Status.CANCEL_STATUS;
-			table.setContentProvider(new IStructuredContentProvider() {
-				@Override
-				public void inputChanged(Viewer viewer, Object oldInput,
-						Object newInput) {
-				}
-
-				@Override
-				public void dispose() {
-				}
-
-				@Override
-				public Object[] getElements(Object inputElement) {
-
-					if (meta == null)
-						return new Object[] { "" };
-
-					try {
-						return meta.getMetaNames().toArray(
-								new Object[meta.getMetaNames().size()]);
-					} catch (Exception e) {
-						return new Object[] { "" };
-					}
-				}
-			});
-
-			// Maybe being the selection provider cause the left mouse problem
-			// if (getSite()!=null) getSite().setSelectionProvider(dataViewer);
-
-			if (table.getControl().isDisposed())
-				return Status.CANCEL_STATUS;
-			table.setInput(new String());
-			return Status.OK_STATUS;
-		}
-	};
-
-	/**
-	 * May be called to set the path from which to update the meta table.
-	 * 
-	 * @param filePath
-	 */
-	public synchronized void updatePath(final String filePath) {
-
-		try {
-
-			if (currentFilePath != null && currentFilePath.equals(filePath))
-				return;
-
-			currentFilePath = filePath;
-
-			getMetaData(filePath);
-			setFileName((new File(filePath)).getName());
-		} catch (InterruptedException e) {
-			logger.error("Interupted reading meta data.", e);
-		}
-
-	}
-
-	/**
-	 * Called to programmatically send the meta which should be shown.
-	 * 
-	 * @param prov
-	 */
-	public void setMetaProvider(IMetadataProvider prov) {
-		try {
-			meta = prov.getMetadata();
-			if (meta != null)
-				updateTable.schedule();
-		} catch (Exception e) {
-			logger.error(
-					"There was a error reading the metadata from the selection",
-					e);
-		}
-	}
-
-	@Inject
-	public void selectionChanged(@Optional @Named(IServiceConstants.ACTIVE_SELECTION) Object sel) {
-		MPart part = partService.getActivePart();
-		IEclipseContext context = part != null ? part.getContext() : null;
-		IWorkbenchPart wpart = context != null ? context.get(IWorkbenchPart.class) : null;
-		if (wpart != null && wpart instanceof IMetadataProvider) {
-			try {
-				meta = ((IMetadataProvider) part).getMetadata();
-				if (meta != null)
-					updateTable.schedule();
-			} catch (Exception e) {
-				logger.error("There was a error reading the metadata from the selection", e);
-			}
-		} else {
-			ISliceSystem slicer = wpart != null ? (ISliceSystem) wpart.getAdapter(ISliceSystem.class) : null;
-			if (slicer == null && wpart != null) {
-				final IAdaptable page = wpart.getAdapter(Page.class) instanceof IAdaptable
-						? (IAdaptable) wpart.getAdapter(Page.class) : null;
-				if (page != null)
-					slicer = (ISliceSystem) page.getAdapter(ISliceSystem.class);
-			}
-			if (slicer != null) {
-				IMetadata md = slicer.getSliceMetadata();
-				if (md != null) {
-					selectMetadata(md);
-					return;
-				}
-			}
-			updateSelection(sel);
-		}
-	}
-
-	@Inject
-	public void partActivated(@Optional @Named(IServiceConstants.ACTIVE_PART) MPart part) {
-		IEclipseContext context = part != null ? part.getContext() : null;
-		IWorkbenchPart wpart = context != null ? context.get(IWorkbenchPart.class) : null;
-		if (wpart instanceof IMetadataProvider) {
-			updateFromMetaDataProvider(wpart);
-		}
-		if (wpart instanceof IEditorPart) {
-			final IEditorPart ed = (IEditorPart) wpart;
-			final IEditorInput in = ed.getEditorInput();
-			final String path = EclipseUtils.getFilePath(in);
-			if (path != null)
-				updatePath(path);
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
-	 */
 	@Focus
 	public void setFocus() {
 		if (table != null)
@@ -409,6 +397,7 @@ public class HeaderTableE4Part {
 	@PreDestroy
 	public void dispose() {
 		if (requirePageUpdates) {
+			// E4 takes care of removing the listeners?
 			// getSite().getPage().getWorkbenchWindow().getSelectionService().removeSelectionListener(this);
 			// getSite().getPage().removePartListener(this);
 		}
@@ -468,24 +457,16 @@ public class HeaderTableE4Part {
 		}
 
 		@Override
-		public boolean select(Viewer viewer, Object parentElement,
-				Object element) {
-			if (searchString == null || searchString.length() == 0) {
+		public boolean select(Viewer viewer, Object parentElement, Object element) {
+			if (searchString == null || searchString.length() == 0)
 				return true;
-			}
-
 			final String name = (String) element;
-
 			if (name == null || "".equals(name))
 				return true;
-
-			if (name.toLowerCase().matches(searchString)) {
+			if (name.toLowerCase().matches(searchString))
 				return true;
-			}
-			if (name.toLowerCase().matches(searchString)) {
+			if (name.toLowerCase().matches(searchString))
 				return true;
-			}
-
 			return false;
 		}
 	}
