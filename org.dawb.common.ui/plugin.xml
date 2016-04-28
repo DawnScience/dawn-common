@@ -489,7 +489,7 @@
              class="org.dawb.common.ui.views.HeaderTableE4Part"
              icon="icons/header_table.gif"
              id="org.dawb.common.ui.views.e4.headerTableView"
-             name="Header Table E4"
+             name="Meta Header Table"
              restorable="true">
        </e4view>
          
