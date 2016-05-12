@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2011, 2015 Diamond Light Source Ltd.
+ * Copyright (c) 2011-2016 Diamond Light Source Ltd.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -14,6 +14,7 @@ import java.util.List;
 import org.dawnsci.boofcv.converter.ConvertIDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
+import org.eclipse.dawnsci.analysis.api.dataset.Slice;
 import org.eclipse.dawnsci.analysis.api.image.IImageStitchingProcess;
 import org.eclipse.dawnsci.analysis.api.monitor.IMonitor;
 import org.slf4j.Logger;
@@ -95,7 +96,7 @@ public class BoofCVImageStitchingImpl implements IImageStitchingProcess {
 		if (originalShape ==null)
 			originalShape = input.getShape();
 		if (shape.length != 3)
-			throw new Exception("The stitching routine works only with 3D dataset");
+			throw new Exception("This stitching routine works only with 3D dataset");
 
 		Class<ImageFloat32> imageType = ImageFloat32.class;
 		DetectDescribePoint<?, ?> detDesc = FactoryDetectDescribe.surfStable(
@@ -111,6 +112,21 @@ public class BoofCVImageStitchingImpl implements IImageStitchingProcess {
 			stitchObj.theoreticalTranslation(rows, columns, translations, monitor);
 		}
 		ImageSingleBand<?> result = stitchObj.stitch(input, rows, columns, monitor);
+		return ConvertIDataset.convertTo(result, true);
+	}
+
+	@Override
+	public IDataset stitch(IDataset imageA, IDataset imageB, double[] translation) throws Exception {
+		int[] shapeA = imageA.getShape();
+		int[] shapeB = imageB.getShape();
+		if (shapeA.length != 2 || shapeB.length != 2)
+			throw new Exception("This stitching routine works only with 2D datasets");
+
+		ImageSingleBand<?> image1 = ConvertIDataset.convertFrom(imageA, ImageFloat32.class, 1);
+		ImageSingleBand<?> image2 = ConvertIDataset.convertFrom(imageB, ImageFloat32.class, 1);
+
+		StitchingObject<?> stitcher = new StitchingObject<>(translation);
+		ImageSingleBand<?> result = stitcher.stitch(image1, image2, new double[] {0, 0});
 		return ConvertIDataset.convertTo(result, true);
 	}
 }
