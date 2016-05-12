@@ -8,6 +8,8 @@
  */
 package org.dawnsci.persistence.internal;
 
+import java.io.File;
+
 import org.dawnsci.persistence.json.JacksonMarshaller;
 import org.eclipse.dawnsci.analysis.api.persistence.IPersistenceService;
 import org.eclipse.dawnsci.analysis.api.persistence.IPersistentFile;
@@ -54,6 +56,7 @@ public class PersistenceServiceImpl implements IPersistenceService{
 	
 	@Override
 	public IPersistentFile createPersistentFile(Object file) throws Exception {
+		if (file instanceof File) return createPersistentFile(((File)file).getAbsolutePath());
 		return new PersistentFileImpl((IHierarchicalDataFile)file);
 	}
 

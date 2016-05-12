@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 Diamond Light Source Ltd.
+ * Copyright (c) 2012-2016 Diamond Light Source Ltd.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -18,6 +18,7 @@ import org.eclipse.ui.part.Page;
 /**
  * This class used as a page in the Data page view.
  * @author Matthew Gerring
+ * @author Baha El Kassaby - use TableHeaderE4Part instead of TableHeaderView
  *
  */
 public class HeaderTablePage extends Page implements IAdaptable{
@@ -32,12 +33,11 @@ public class HeaderTablePage extends Page implements IAdaptable{
 
 	@Override
 	public void createControl(Composite parent) {
-		
 		this.control = new Composite(parent, SWT.NONE);
 		control.setLayout(new GridLayout(1,false));
-		final HeaderTableView view = new HeaderTableView(false);
-        view.createPartControl(control);
-        view.updatePath(filePath);
+		final HeaderTableE4Part part = new HeaderTableE4Part(false);
+		part.createPartControl(parent);
+		part.updatePath(filePath);
 	}
 
 	@Override

@@ -53,7 +53,6 @@ import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.Page;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.progress.UIJob;
@@ -61,9 +60,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Use {@code HeaderTableE4Part} instead
+ * 
  * @author suchet + gerring
  * 
  */
+@Deprecated
 public class HeaderTableView extends ViewPart implements ISelectionListener, IPartListener {
 
 	public static final String ID = "org.dawb.common.ui.views.headerTableView";

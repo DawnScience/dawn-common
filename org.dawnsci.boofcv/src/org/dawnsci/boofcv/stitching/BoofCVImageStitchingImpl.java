@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2011, 2015 Diamond Light Source Ltd.
+ * Copyright (c) 2011-2016 Diamond Light Source Ltd.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -54,10 +54,21 @@ public class BoofCVImageStitchingImpl implements IImageStitchingProcess {
 	}
 
 	@Override
+	public IDataset stitch(ILazyDataset input, IMonitor monitor) throws Exception {
+		return stitch(input, 1, 6, 49, monitor);
+	}
+
+	@Override
 	public IDataset stitch(List<IDataset> input, int rows, int columns, IMonitor monitor) throws Exception {
 		List<double[]> translations = new ArrayList<double[]>();
 		translations.add(new double[] {25, 25});
 		return stitch(input, rows, columns, 50, translations, false, monitor);
+	}
+
+	@Override
+	public IDataset stitch(ILazyDataset input, int rows, int columns, IMonitor monitor) throws Exception {
+		double[][][] translations = makeTranslationArray(rows, columns, 25);
+		return stitch(input, rows, columns, 50, translations, true, input.getShape(), monitor);
 	}
 
 	@Override
@@ -71,6 +82,13 @@ public class BoofCVImageStitchingImpl implements IImageStitchingProcess {
 	public IDataset stitch(List<IDataset> input, int rows, int columns, double fieldOfView, List<double[]> translations, boolean hasFeatureAssociation, IMonitor monitor) throws Exception {
 		int[] shape = input.get(0).getShape();
 		return stitch(input, rows, columns, fieldOfView, translations, hasFeatureAssociation, shape, monitor);
+	}
+
+	@Override
+	public IDataset stitch(ILazyDataset input, int rows, int columns, double fieldOfView, IMonitor monitor)
+			throws Exception {
+		double[][][] translations = makeTranslationArray(rows, columns, 25);
+		return stitch(input, rows, columns, 50, translations, true, input.getShape(), monitor);
 	}
 
 	@Override
@@ -95,7 +113,7 @@ public class BoofCVImageStitchingImpl implements IImageStitchingProcess {
 		if (originalShape ==null)
 			originalShape = input.getShape();
 		if (shape.length != 3)
-			throw new Exception("The stitching routine works only with 3D dataset");
+			throw new Exception("This stitching routine works only with 3D dataset");
 
 		Class<ImageFloat32> imageType = ImageFloat32.class;
 		DetectDescribePoint<?, ?> detDesc = FactoryDetectDescribe.surfStable(
@@ -112,5 +130,31 @@ public class BoofCVImageStitchingImpl implements IImageStitchingProcess {
 		}
 		ImageSingleBand<?> result = stitchObj.stitch(input, rows, columns, monitor);
 		return ConvertIDataset.convertTo(result, true);
+	}
+
+	@Override
+	public IDataset stitch(IDataset imageA, IDataset imageB, double[] translation) throws Exception {
+		int[] shapeA = imageA.getShape();
+		int[] shapeB = imageB.getShape();
+		if (shapeA.length != 2 || shapeB.length != 2)
+			throw new Exception("This stitching routine works only with 2D datasets");
+
+		ImageSingleBand<?> image1 = ConvertIDataset.convertFrom(imageA, ImageFloat32.class, 1);
+		ImageSingleBand<?> image2 = ConvertIDataset.convertFrom(imageB, ImageFloat32.class, 1);
+
+		StitchingObject<?> stitcher = new StitchingObject<>(translation);
+		ImageSingleBand<?> result = stitcher.stitch(image1, image2, new double[] {0, 0});
+		return ConvertIDataset.convertTo(result, true);
+	}
+
+	private double[][][] makeTranslationArray(int rows, int columns, double value) {
+		double[][][] array = new double[columns][rows][2];
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < columns; j++) {
+				array[j][i][0] = value;
+				array[j][i][1] = value;
+			}
+		}
+		return array;
 	}
 }
