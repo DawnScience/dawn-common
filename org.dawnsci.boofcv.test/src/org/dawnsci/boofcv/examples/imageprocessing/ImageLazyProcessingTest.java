@@ -1,4 +1,4 @@
-/*
+/*-
  * Copyright (c) 2016 Diamond Light Source Ltd.
  *
  * All rights reserved. This program and the accompanying materials
@@ -12,7 +12,6 @@ package org.dawnsci.boofcv.examples.imageprocessing;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,20 +22,14 @@ import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.ILazyWriteableDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.Slice;
-import org.eclipse.dawnsci.analysis.api.dataset.SliceND;
 import org.eclipse.dawnsci.analysis.api.image.IImageFilterService;
 import org.eclipse.dawnsci.analysis.api.image.IImageTransform;
-import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
-import org.eclipse.dawnsci.analysis.api.monitor.IMonitor;
-import org.eclipse.dawnsci.analysis.dataset.impl.AbstractDataset;
 import org.eclipse.dawnsci.analysis.dataset.impl.DatasetUtils;
 import org.eclipse.dawnsci.analysis.dataset.impl.LazyDataset;
-import org.eclipse.dawnsci.hdf5.HDF5Utils;
 import org.junit.Before;
 import org.junit.Test;
 
 import uk.ac.diamond.scisoft.analysis.io.ImageStackLoader;
-import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 
 public class ImageLazyProcessingTest {
 
@@ -45,7 +38,7 @@ public class ImageLazyProcessingTest {
 	private IImageTransform transform;
 
 	@Before
-	public void before() throws Exception {
+	public void init() throws Exception {
 		if (service == null)
 			service = BoofCVImageFilterServiceCreator.createFilterService();
 		String[] files = Utils.getFileNames("resources/82702_UViewImage", true);
@@ -54,7 +47,6 @@ public class ImageLazyProcessingTest {
 		ImageStackLoader loader = new ImageStackLoader(filenames, null);
 		data = new LazyDataset("test stack", loader.getDtype(), loader.getShape(), loader);
 		transform = BoofCVImageTransformCreator.createTransformService();
-
 	}
 
 	@Test
@@ -62,19 +54,19 @@ public class ImageLazyProcessingTest {
 		int[] shape = data.getShape();
 		// rotated shape
 		int[] newShape = new int[] {data.getShape()[0], 724, 724};
-		String name = "test";
-		ILazyWriteableDataset lazy = createTempLazyFile(newShape, name);
+		String name = "testLazyRotation.h5";
+		ILazyWriteableDataset lazy = TestUtils.createTempLazyFile(newShape, name);
 		ILazyDataset rotatedImages = null;
 		try {
 			for (int i = 0; i < shape[0]; i++) {
 				IDataset slice = data.getSlice(new Slice(i, shape[0], shape[1])).squeeze();
 				IDataset rotated = DatasetUtils.convertToDataset(transform.rotate(slice, 45, false));
 				// add rotated image to temp file
-				appendDataset(lazy, rotated, i, null);
+				TestUtils.appendDataset(lazy, rotated, i, null);
 			}
 		} finally {
 			// read from temp file
-			rotatedImages = getTempLazyData(name);
+			rotatedImages = TestUtils.getTempLazyData(name);
 		}
 		assertArrayEquals(newShape, rotatedImages.getShape());
 		assertEquals(newShape[2], rotatedImages.getShape()[2]);
@@ -92,51 +84,4 @@ public class ImageLazyProcessingTest {
 		assertEquals(shape[2], alignedImages.getShape()[2]);
 	}
 
-	/**
-	 * Method that creates an hdf5 file in the temp directory of the OS
-	 * 
-	 * @param name
-	 * @return lazy writable dataset on disk
-	 */
-	private ILazyWriteableDataset createTempLazyFile(int[] newShape, String name) {
-		// save on a temp file
-		String filepath = System.getProperty("java.io.tmpdir") + File.separator;
-		String nodepath = "/entry/data/";
-		String file = filepath + "tmp_" + name + ".h5";
-		File tmpFile = new File(file);
-		if (tmpFile.exists())
-			tmpFile.delete();
-		return HDF5Utils.createLazyDataset(file, nodepath, name, newShape, null, newShape, AbstractDataset.FLOAT32, null, false);
-	}
-
-	/**
-	 * Method that reads a temporary hdf5 file on disk
-	 * 
-	 * @param name
-	 * @return lazydataset
-	 * @throws Exception 
-	 */
-	private ILazyDataset getTempLazyData(String name) throws Exception {
-		String filepath = System.getProperty("java.io.tmpdir") + File.separator;
-		String nodepath = "/entry/data/";
-		String file = filepath + "tmp_" + name + ".h5";
-		IDataHolder holder = LoaderFactory.getData(file, false, true, null);
-		ILazyDataset shifted = holder.getLazyDataset(nodepath + name);
-		return shifted;
-	}
-
-	/**
-	 * Method that appends a dataset to an existing lazy writable dataset
-	 * 
-	 * @param lazy
-	 * @param data
-	 * @param idx
-	 * @param monitor
-	 * @throws Exception
-	 */
-	private void appendDataset(ILazyWriteableDataset lazy, IDataset data, int idx, IMonitor monitor) throws Exception {
-		SliceND ndSlice = new SliceND(lazy.getShape(), new int[] { idx, 0, 0 },
-				new int[] { (idx + 1), data.getShape()[0], data.getShape()[1] }, null);
-		lazy.setSlice(monitor, data, ndSlice);
-	}
 }

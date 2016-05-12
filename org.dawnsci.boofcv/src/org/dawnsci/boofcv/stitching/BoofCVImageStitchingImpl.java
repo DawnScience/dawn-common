@@ -14,7 +14,6 @@ import java.util.List;
 import org.dawnsci.boofcv.converter.ConvertIDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
-import org.eclipse.dawnsci.analysis.api.dataset.Slice;
 import org.eclipse.dawnsci.analysis.api.image.IImageStitchingProcess;
 import org.eclipse.dawnsci.analysis.api.monitor.IMonitor;
 import org.slf4j.Logger;
@@ -55,10 +54,21 @@ public class BoofCVImageStitchingImpl implements IImageStitchingProcess {
 	}
 
 	@Override
+	public IDataset stitch(ILazyDataset input, IMonitor monitor) throws Exception {
+		return stitch(input, 1, 6, 49, monitor);
+	}
+
+	@Override
 	public IDataset stitch(List<IDataset> input, int rows, int columns, IMonitor monitor) throws Exception {
 		List<double[]> translations = new ArrayList<double[]>();
 		translations.add(new double[] {25, 25});
 		return stitch(input, rows, columns, 50, translations, false, monitor);
+	}
+
+	@Override
+	public IDataset stitch(ILazyDataset input, int rows, int columns, IMonitor monitor) throws Exception {
+		double[][][] translations = makeTranslationArray(rows, columns, 25);
+		return stitch(input, rows, columns, 50, translations, true, input.getShape(), monitor);
 	}
 
 	@Override
@@ -72,6 +82,13 @@ public class BoofCVImageStitchingImpl implements IImageStitchingProcess {
 	public IDataset stitch(List<IDataset> input, int rows, int columns, double fieldOfView, List<double[]> translations, boolean hasFeatureAssociation, IMonitor monitor) throws Exception {
 		int[] shape = input.get(0).getShape();
 		return stitch(input, rows, columns, fieldOfView, translations, hasFeatureAssociation, shape, monitor);
+	}
+
+	@Override
+	public IDataset stitch(ILazyDataset input, int rows, int columns, double fieldOfView, IMonitor monitor)
+			throws Exception {
+		double[][][] translations = makeTranslationArray(rows, columns, 25);
+		return stitch(input, rows, columns, 50, translations, true, input.getShape(), monitor);
 	}
 
 	@Override
@@ -128,5 +145,16 @@ public class BoofCVImageStitchingImpl implements IImageStitchingProcess {
 		StitchingObject<?> stitcher = new StitchingObject<>(translation);
 		ImageSingleBand<?> result = stitcher.stitch(image1, image2, new double[] {0, 0});
 		return ConvertIDataset.convertTo(result, true);
+	}
+
+	private double[][][] makeTranslationArray(int rows, int columns, double value) {
+		double[][][] array = new double[columns][rows][2];
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < columns; j++) {
+				array[j][i][0] = value;
+				array[j][i][1] = value;
+			}
+		}
+		return array;
 	}
 }
