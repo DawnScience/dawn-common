@@ -145,6 +145,7 @@ public class InjectPyDevConsole {
 
 	private String createFlattenCommands(Map<String, IDataset> d, int interpreterType) {
 		
+		@SuppressWarnings("unchecked")
 		AbstractMacroGenerator<Map<String, IDataset>> gen = mservice.getGenerator(d.getClass());
 		return interpreterType==0 ? gen.getPythonCommand(d) : gen.getJythonCommand(d);
 	}
@@ -243,7 +244,7 @@ public class InjectPyDevConsole {
 		}
 
 		List<IPythonNature> naturesUsed = iprocessFactory.getNaturesUsed();
-		return PydevConsoleFactory.createPydevInterpreter(createInteractiveLaunch, naturesUsed);
+		return PydevConsoleFactory.createPydevInterpreter(createInteractiveLaunch, naturesUsed, createInteractiveLaunch.encoding);
 	}
 
 	/**
