@@ -22,11 +22,9 @@ import org.dawb.common.ui.util.GridUtils;
 import org.dawb.common.util.io.FileUtils;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
@@ -405,22 +403,10 @@ public class ResourceChoosePage extends WizardPage {
 			
 			final List<String> ret = new ArrayList<String>(oa.length);
 			for (final Object object : oa) {
-				final Object adapter = EclipseUtils.getFirstAdapter(object, new Class<?>[] {
-					IFile.class, IFolder.class, File.class, IResource.class, java.nio.file.Path.class});
-					if (adapter instanceof IFile) {
-						ret.add(((IFile)adapter).getLocation().toOSString());
-					} else if (adapter instanceof IFolder) {
-						ret.add(((IFolder)adapter).getLocation().toOSString());
-					} else if (adapter instanceof File) {
-						final File file = (File)adapter;
-						if (file.isFile())
-							ret.add(file.getAbsolutePath());
-					} else if (adapter instanceof IResource) {
-						ret.add(((IResource)adapter).getLocation().toOSString());
-					} else if(adapter instanceof java.nio.file.Path) {
-						final String path = ((java.nio.file.Path)adapter).toString();
-						ret.add(path);
-					}
+				final File file = FileUtils.getFile(object);
+				if (!file.isFile())
+					continue;
+				ret.add(file.getAbsolutePath());
 			}
 			return ret.size()>0 ? ret : null;
 		} catch (Throwable ignored) {

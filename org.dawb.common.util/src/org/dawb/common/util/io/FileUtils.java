@@ -34,10 +34,10 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.dawb.common.util.object.AdapterUtils;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.IAdaptable;
 
 /**
  * A class with a collection of file management static utility classes. Several method contents copied from code
@@ -1214,24 +1214,18 @@ public final class FileUtils {
 	 */
 	public static File getFile(final Object fileOrResource) {
 		File result = null;
-		if (fileOrResource instanceof IFolder) {
-			result = new File(((IFolder)fileOrResource).getLocation().toOSString());
-		} else if(fileOrResource instanceof IFile) {
-			result = new File(((IFile)fileOrResource).getLocation().toOSString());
-		} else if (fileOrResource instanceof IResource) {
-			result = new File(((IResource)fileOrResource).getLocation().toOSString());
-		} else if (fileOrResource instanceof File) {
-				result = (File)fileOrResource;
-		} else if (fileOrResource instanceof IAdaptable) {
-			Object object = ((IAdaptable)fileOrResource).getAdapter(IFile.class);
-			if (object == null)
-				object = ((IAdaptable)fileOrResource).getAdapter(IFolder.class);
-			if (object instanceof IFile)
-				result = ((IFile)object).getLocation().toFile();
-			else if (object instanceof IFolder)
-				result = ((IFolder)object).getLocation().toFile();
-		} else if (fileOrResource instanceof java.nio.file.Path) {
-			result = ((java.nio.file.Path)fileOrResource).toFile();
+		final Object adapter = AdapterUtils.getFirstAdapter(fileOrResource, new Class<?>[] {
+			IFolder.class, IFile.class, File.class, IResource.class, java.nio.file.Path.class});
+		if (adapter instanceof IFolder) {
+			result = ((IFolder)adapter).getLocation().toFile();
+		} else if(adapter instanceof IFile) {
+			result = ((IFile)adapter).getLocation().toFile();
+		} else if (adapter instanceof IResource) {
+			result = ((IResource)adapter).getLocation().toFile();
+		} else if (adapter instanceof File) {
+				result = (File)adapter;
+		} else if (adapter instanceof java.nio.file.Path) {
+			result = ((java.nio.file.Path)adapter).toFile();
 		}
 		return result;
 	}

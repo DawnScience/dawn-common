@@ -33,7 +33,6 @@ import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IAdaptable;
@@ -64,7 +63,6 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.FileStoreEditorInput;
-import org.eclipse.ui.ide.ResourceUtil;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.wizards.IWizardDescriptor;
 
@@ -486,75 +484,6 @@ public class EclipseUtils {
 	}
 
 	
-	// Source code and JavaDoc adapted from org.eclipse.ui.internal.util.Util.getAdapter
-	/**
-	 * If it is possible to adapt the given object to the given type, this
-	 * returns the adapter. Performs the following checks:
-	 * 
-	 * <ol>
-	 * <li>Returns <code>sourceObject</code> if it is an instance of the
-	 * adapter type.</li>
-	 * <li>If sourceObject implements IAdaptable, it is queried for adapters.</li>
-	 * <li>If sourceObject is not an instance of PlatformObject (which would have
-	 * already done so), the adapter manager is queried for adapters</li>
-	 * </ol>
-	 * 
-	 * Otherwise returns null.
-	 * 
-	 * @param sourceObject
-	 *            object to adapt, or null
-	 * @param adapterType
-	 *            type to adapt to
-	 * @return a representation of sourceObject that is assignable to the
-	 *         adapter type, or null if no such representation exists
-	 */
-	public static <T> T getAdapter(Object sourceObject, Class<T> adapterType) {
-		Assert.isNotNull(adapterType);
-	    if (sourceObject == null) {
-	        return null;
-	    }
-	    if (adapterType.isInstance(sourceObject)) {
-			return adapterType.cast(sourceObject);
-	    }
-	
-	    return ResourceUtil.getAdapter(sourceObject, adapterType, true);
-	}
-
-	// JavaDoc adapted from org.dawb.common.ui.EclipseUtils.getAdapter
-	/**
-	 * If it is possible to adapt the given object to one of the given types, this
-	 * returns the adapter of first adaptable type.
-	 * 
-	 * <ol>
-	 * <li>Returns <code>sourceObject</code> if it is an instance of one of the
-	 * adapter types.</li>
-	 * <li>If sourceObject implements IAdaptable, it is queried for adapters.</li>
-	 * <li>If sourceObject is not an instance of PlatformObject (which would have
-	 * already done so), the adapter manager is queried for adapters</li>
-	 * </ol>
-	 * 
-	 * Otherwise returns null.
-	 * 
-	 * @param sourceObject
-	 *            object to adapt, or null
-	 * @param adapterTypes
-	 *            array of types to adapt to
-	 * @return a representation of sourceObject that is assignable to the
-	 *         first adaptable adapter type, or null if no such representation exists
-	 */
-	public static Object getFirstAdapter(Object sourceObject, Class<?>[] adapterTypes) {
-		Assert.isNotNull(adapterTypes);
-	    if (sourceObject == null) {
-	        return null;
-	    }
-	    for(final Class<?> adapterType : adapterTypes) {
-	    	final Object adapter = EclipseUtils.getAdapter(sourceObject, adapterType);
-    	    if (adapter != null)
-    	    	return adapter;
-	    }
-	    return null;
-	}
-
 	/**
 	 * Opens an external editor on a file path
 	 * @param file
