@@ -22,11 +22,13 @@ import org.dawnsci.io.h5.H5LazyDataset;
 import org.dawnsci.persistence.json.JacksonMarshaller;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
+import org.eclipse.dawnsci.analysis.api.dataset.ILazyWriteableDataset;
 import org.eclipse.dawnsci.analysis.api.diffraction.DetectorProperties;
 import org.eclipse.dawnsci.analysis.api.diffraction.DiffractionCrystalEnvironment;
 import org.eclipse.dawnsci.analysis.api.diffraction.IPowderCalibrationInfo;
 import org.eclipse.dawnsci.analysis.api.fitting.functions.IFunction;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
+import org.eclipse.dawnsci.analysis.api.io.ILoaderService;
 import org.eclipse.dawnsci.analysis.api.metadata.IDiffractionMetadata;
 import org.eclipse.dawnsci.analysis.api.metadata.OriginMetadata;
 import org.eclipse.dawnsci.analysis.api.monitor.IMonitor;
@@ -55,7 +57,7 @@ import uk.ac.diamond.scisoft.analysis.io.NexusDiffractionMetaReader;
  * Implementation of IPersistentFile<br>
  * 
  * This class is internal and not supposed to be used out of this bundle.
- * 
+ * TODO: use {@link ILazyWriteableDataset} and {@link ILoaderService} instead of {@link IHierarchicalDataFile}
  * @author wqk87977
  *
  */
@@ -64,15 +66,34 @@ class PersistentFileImpl implements IPersistentFile {
 	private static final Logger logger = LoggerFactory.getLogger(PersistentFileImpl.class);
 	private IHierarchicalDataFile file;
 	private String filePath;
+	private ILazyWriteableDataset writableFile;
 
 	/**
 	 * For save
+	 * @param writableFile
+	 * @throws Exception 
+	 */
+	public PersistentFileImpl(ILazyWriteableDataset writableFile) throws Exception {
+		this.writableFile = writableFile;
+		this.filePath = writableFile.getName();
+
+		init();
+	}
+
+	/**
+	 * For save
+	 * Use {@link #PersistentFileImpl(ILazyWriteableDataset)} instead
 	 * @param file
 	 */
+	@Deprecated
 	public PersistentFileImpl(IHierarchicalDataFile file) throws Exception{
 		this.file = file;
 		this.filePath = file.getPath();
 
+		init();
+	}
+
+	private void init() throws Exception {
 		String currentSite = System.getenv("DAWN_SITE");
 		if (currentSite==null || "".equals(currentSite)) {
 			logger.debug("DAWN_SITE is not set, persistence layer defaulting to DLS in file meta information.");
