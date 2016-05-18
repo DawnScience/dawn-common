@@ -19,16 +19,23 @@ import org.dawnsci.conversion.converters.util.LocalServiceManager;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
+import org.eclipse.dawnsci.analysis.api.dataset.ILazyWriteableDataset;
+import org.eclipse.dawnsci.analysis.api.dataset.SliceND;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
+import org.eclipse.dawnsci.analysis.api.monitor.IMonitor;
 import org.eclipse.dawnsci.analysis.api.roi.IROI;
+import org.eclipse.dawnsci.analysis.dataset.impl.AbstractDataset;
 import org.eclipse.dawnsci.analysis.dataset.impl.Image;
 import org.eclipse.dawnsci.analysis.dataset.impl.LazyDataset;
+import org.eclipse.dawnsci.hdf5.HDF5Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.ac.diamond.scisoft.analysis.io.DataHolder;
 import uk.ac.diamond.scisoft.analysis.io.ImageStackLoader;
 import uk.ac.diamond.scisoft.analysis.io.JavaImageSaver;
+import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
+import uk.ac.diamond.scisoft.analysis.utils.FileUtils;
 
 /**
  * Converts a directory of images to a stitched image
@@ -39,7 +46,7 @@ import uk.ac.diamond.scisoft.analysis.io.JavaImageSaver;
 public class ImagesToStitchedConverter extends AbstractImageConversion {
 
 	private static final Logger logger = LoggerFactory.getLogger(ImagesToStitchedConverter.class);
-	private List<IDataset> imageStack = new ArrayList<IDataset>();
+	private ILazyWriteableDataset lazyfile;
 
 	public ImagesToStitchedConverter() {
 		super(null);
@@ -56,6 +63,8 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 		context.addSliceDimension(0, "all");
 	}
 
+	private int idx = 0;
+
 	@Override
 	protected void convert(IDataset slice) throws Exception {
 		if (context.getMonitor() != null && context.getMonitor().isCancelled()) {
@@ -65,25 +74,37 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 		ILazyDataset lazy = context.getLazyDataset();
 		// Rotate each image by angle degrees
 		double angle = conversionBean.getAngle();
-		IDataset rotated = ServiceLoader.getImageTransform().rotate(slice, angle);
+		IDataset rotatedSlice = ServiceLoader.getImageTransform().rotate(slice, angle);
+
+		if (lazyfile == null)
+			lazyfile = createTempLazyFile(lazy.getShape(), "stitchedconverter.h5");
+		
 		// crop each image given an elliptical roi
 		IROI roi = conversionBean.getRoi();
 		if (roi != null) {
-			IDataset cropped = Image.maxRectangleFromEllipticalImage(rotated, roi);
-			imageStack.add(cropped);
+			IDataset cropped = Image.maxRectangleFromEllipticalImage(rotatedSlice, roi);
+			//save to temp file
+			appendDataset(lazyfile, cropped, idx, context.getMonitor());
 		} else {
-			imageStack.add(rotated);
+			//save to temp file
+			appendDataset(lazyfile,rotatedSlice, idx, context.getMonitor());
 		}
+		
 		int stackSize = lazy.getShape()[0];
-		if (imageStack.size() == stackSize) {
+		if (idx == stackSize-1) {
+			
 			String outputPath = context.getOutputPath();
 			int rows = conversionBean.getRows();
 			int columns = conversionBean.getColumns();
 			boolean useFeatureAssociation = conversionBean.isFeatureAssociated();
 			double fieldOfView = conversionBean.getFieldOfView();
-			List<double[]> translations = conversionBean.getTranslations();
+			double[][][] translationsArray = conversionBean.getTranslationsArray();
+			
+			//read from temp file
+			ILazyDataset rotatedImages = getTempLazyData("stitchedconverter.h5", context.getMonitor());
+
 			// stitch the stack of images
-			IDataset stitched = ServiceLoader.getImageStitcher().stitch(imageStack, rows, columns, fieldOfView, translations, useFeatureAssociation, context.getMonitor());
+			IDataset stitched = ServiceLoader.getImageStitcher().stitch(rotatedImages, rows, columns, fieldOfView, translationsArray, useFeatureAssociation, lazy.getShape(), context.getMonitor());
 
 			stitched.setName("stitched");
 			final File outputFile = new File(outputPath);
@@ -103,8 +124,7 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 			dh.setFilePath(outputFile.getAbsolutePath());
 			saver.saveFile(dh);
 		}
-		if (context.getMonitor() != null)
-			context.getMonitor().worked(1);
+		idx++;
 	}
 
 	private ILazyDataset getLazyDataset() throws Exception {
@@ -155,6 +175,52 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 		if (context.getUserObject() == null)
 			return 33;
 		return ((ConversionInfoBean) context.getUserObject()).getBits();
+	}
+
+	/**
+	 * Method that reads a temporary hdf5 file on disk
+	 * 
+	 * @param name
+	 * @return lazydataset
+	 * @throws Exception 
+	 */
+	private ILazyDataset getTempLazyData(String name, IMonitor monitor) throws Exception {
+		String nodepath = "/entry/data/";
+		String file = FileUtils.getTempFilePath(name);
+		IDataHolder holder = LoaderFactory.getData(file, false, true, monitor);
+		ILazyDataset shifted = holder.getLazyDataset(nodepath + name);
+		return shifted;
+	}
+
+	/**
+	 * Method that creates an hdf5 file in the temp directory of the OS
+	 * 
+	 * @param name
+	 * @return lazy writable dataset on disk
+	 */
+	private ILazyWriteableDataset createTempLazyFile(int[] newShape, String name) {
+		// save on a temp file
+		String nodepath = "/entry/data/";
+		String file = FileUtils.getTempFilePath(name);
+		File tmpFile = new File(file);
+		if (tmpFile.exists())
+			tmpFile.delete();
+		return HDF5Utils.createLazyDataset(file, nodepath, name, newShape, null, newShape, AbstractDataset.FLOAT32, null, false);
+	}
+
+	/**
+	 * Method that appends a dataset to an existing lazy writable dataset
+	 * 
+	 * @param lazy
+	 * @param data
+	 * @param idx
+	 * @param monitor
+	 * @throws Exception
+	 */
+	private void appendDataset(ILazyWriteableDataset lazy, IDataset data, int idx, IMonitor monitor) throws Exception {
+		SliceND ndSlice = new SliceND(lazy.getShape(), new int[] { idx, 0, 0 },
+				new int[] { (idx + 1), data.getShape()[0], data.getShape()[1] }, null);
+		lazy.setSlice(monitor, data, ndSlice);
 	}
 
 	/**

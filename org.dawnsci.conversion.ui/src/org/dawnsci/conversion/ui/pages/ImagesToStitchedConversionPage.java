@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2014 Diamond Light Source Ltd.
+ * Copyright (c) 2014-2016 Diamond Light Source Ltd.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -9,8 +9,6 @@
 package org.dawnsci.conversion.ui.pages;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.dawb.common.ui.wizard.ResourceChoosePage;
 import org.dawb.common.util.io.FileUtils;
@@ -131,8 +129,8 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 		context.setWorkSize(dir.list().length);
 
 		final ConversionStitchedBean bean = new ConversionStitchedBean();
-		bean.setRows(rowsSpinner.getSelection());
-		bean.setColumns(columnsSpinner.getSelection());
+		int rows = rowsSpinner.getSelection();
+		int columns = columnsSpinner.getSelection();
 		double angle = getSpinnerAngle();
 		bean.setAngle(angle);
 		Number fov = (Number) fovText.getValue();
@@ -154,7 +152,7 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		List<double[]> translations = new ArrayList<double[]>();
+		double[][][] translations = null;
 		if (filePath.endsWith(".dat")) {
 			String[] names = holder.getNames();
 			ILazyDataset lazyDataset = null;
@@ -168,14 +166,19 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 			firstImage.squeeze();
 			IDataset psxData = holder.getDataset("psx");
 			IDataset psyData = holder.getDataset("psy");
+			rows = ImagePeemUtils.getColumnAndRowNumber(psxData, psyData)[1];
+			columns = ImagePeemUtils.getColumnAndRowNumber(psxData, psyData)[0];
 			if (!hasFeatureAssociated)
-				translations = ImagePeemUtils.getMotorTranslations(psxData, psyData);
+				translations = ImagePeemUtils.getMotorTranslationsArray(psxData, psyData);
 			else
-				translations.add(new double[] { xTrans.floatValue(), yTrans.floatValue() });
+				translations = ImagePeemUtils.fillArray(new double[] {xTrans.floatValue(),  yTrans.floatValue()}, rows, columns);
 		} else {
 			firstImage = holder.getDataset(0);
-			translations.add(new double[] { xTrans.floatValue(), yTrans.floatValue() });
+			translations = ImagePeemUtils.fillArray(new double[] {xTrans.floatValue(),  yTrans.floatValue()}, rows, columns);
 		}
+		
+		bean.setRows(rows);
+		bean.setColumns(columns);
 
 		bean.setTranslations(translations);
 		context.setUserObject(bean);
