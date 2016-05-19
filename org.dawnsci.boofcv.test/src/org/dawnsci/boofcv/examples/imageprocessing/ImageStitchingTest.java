@@ -54,19 +54,13 @@ public class ImageStitchingTest {
 		int[] newShape = new int[] {data.getShape()[0], 512, 512};
 		String name = "testImageStitchingProcess.h5";
 		ILazyWriteableDataset lazy = TestUtils.createTempLazyFile(newShape, name);
-		ILazyDataset rotatedImages = null;
-		try {
-			for (int i = 0; i < shape[0]; i++) {
-				IDataset slice = data.getSlice(new Slice(i, shape[0], shape[1])).squeeze();
-				IDataset rotated = DatasetUtils.convertToDataset(transform.rotate(slice, 45, true));
-				// add rotated image to temp file
-				TestUtils.appendDataset(lazy, rotated, i, null);
-			}
-		} finally {
-			// read from temp file
-			rotatedImages = TestUtils.getTempLazyData(name);
+		for (int i = 0; i < shape[0]; i++) {
+			IDataset slice = data.getSlice(new Slice(i, shape[0], shape[1])).squeeze();
+			IDataset rotated = DatasetUtils.convertToDataset(transform.rotate(slice, 45, true));
+			// add rotated image to temp file
+			TestUtils.appendDataset(lazy, rotated, i, null);
 		}
-		IDataset stitched = stitcher.stitch(rotatedImages, 3, 11, 80, new IMonitor.Stub());
+		IDataset stitched = stitcher.stitch(lazy, 3, 11, 80, new IMonitor.Stub());
 		Assert.assertTrue("Expected value is 1268, Actual value is " + stitched.getShape()[0], 1268 == stitched.getShape()[0]);
 		Assert.assertTrue("Expected value is 4180, Actual value is " + stitched.getShape()[1], 4180 == stitched.getShape()[1]);
 	}

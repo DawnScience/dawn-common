@@ -34,7 +34,6 @@ import org.slf4j.LoggerFactory;
 import uk.ac.diamond.scisoft.analysis.io.DataHolder;
 import uk.ac.diamond.scisoft.analysis.io.ImageStackLoader;
 import uk.ac.diamond.scisoft.analysis.io.JavaImageSaver;
-import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 import uk.ac.diamond.scisoft.analysis.utils.FileUtils;
 
 /**
@@ -89,22 +88,18 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 			//save to temp file
 			appendDataset(lazyfile,rotatedSlice, idx, context.getMonitor());
 		}
-		
+
 		int stackSize = lazy.getShape()[0];
 		if (idx == stackSize-1) {
-			
 			String outputPath = context.getOutputPath();
 			int rows = conversionBean.getRows();
 			int columns = conversionBean.getColumns();
 			boolean useFeatureAssociation = conversionBean.isFeatureAssociated();
 			double fieldOfView = conversionBean.getFieldOfView();
 			double[][][] translationsArray = conversionBean.getTranslationsArray();
-			
-			//read from temp file
-			ILazyDataset rotatedImages = getTempLazyData("stitchedconverter.h5", context.getMonitor());
 
 			// stitch the stack of images
-			IDataset stitched = ServiceLoader.getImageStitcher().stitch(rotatedImages, rows, columns, fieldOfView, translationsArray, useFeatureAssociation, lazy.getShape(), context.getMonitor());
+			IDataset stitched = ServiceLoader.getImageStitcher().stitch(lazyfile, rows, columns, fieldOfView, translationsArray, useFeatureAssociation, lazy.getShape(), context.getMonitor());
 
 			stitched.setName("stitched");
 			final File outputFile = new File(outputPath);
@@ -175,21 +170,6 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 		if (context.getUserObject() == null)
 			return 33;
 		return ((ConversionInfoBean) context.getUserObject()).getBits();
-	}
-
-	/**
-	 * Method that reads a temporary hdf5 file on disk
-	 * 
-	 * @param name
-	 * @return lazydataset
-	 * @throws Exception 
-	 */
-	private ILazyDataset getTempLazyData(String name, IMonitor monitor) throws Exception {
-		String nodepath = "/entry/data/";
-		String file = FileUtils.getTempFilePath(name);
-		IDataHolder holder = LoaderFactory.getData(file, false, true, monitor);
-		ILazyDataset shifted = holder.getLazyDataset(nodepath + name);
-		return shifted;
 	}
 
 	/**

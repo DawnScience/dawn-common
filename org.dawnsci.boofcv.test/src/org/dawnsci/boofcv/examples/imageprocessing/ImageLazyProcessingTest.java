@@ -56,21 +56,15 @@ public class ImageLazyProcessingTest {
 		int[] newShape = new int[] {data.getShape()[0], 724, 724};
 		String name = "testLazyRotation.h5";
 		ILazyWriteableDataset lazy = TestUtils.createTempLazyFile(newShape, name);
-		ILazyDataset rotatedImages = null;
-		try {
-			for (int i = 0; i < shape[0]; i++) {
-				IDataset slice = data.getSlice(new Slice(i, shape[0], shape[1])).squeeze();
-				IDataset rotated = DatasetUtils.convertToDataset(transform.rotate(slice, 45, false));
-				// add rotated image to temp file
-				TestUtils.appendDataset(lazy, rotated, i, null);
-			}
-		} finally {
-			// read from temp file
-			rotatedImages = TestUtils.getTempLazyData(name);
+		for (int i = 0; i < shape[0]; i++) {
+			IDataset slice = data.getSlice(new Slice(i, shape[0], shape[1])).squeeze();
+			IDataset rotated = DatasetUtils.convertToDataset(transform.rotate(slice, 45, false));
+			// add rotated image to temp file
+			TestUtils.appendDataset(lazy, rotated, i, null);
 		}
-		assertArrayEquals(newShape, rotatedImages.getShape());
-		assertEquals(newShape[2], rotatedImages.getShape()[2]);
-		IDataset rotatedImage = rotatedImages.getSlice(new Slice(10, shape[0], shape[1])).squeeze();
+		assertArrayEquals(newShape, lazy.getShape());
+		assertEquals(newShape[2], lazy.getShape()[2]);
+		IDataset rotatedImage = lazy.getSlice(new Slice(10, shape[0], shape[1])).squeeze();
 		assertEquals(newShape[2], rotatedImage.getShape()[1]);
 	}
 
