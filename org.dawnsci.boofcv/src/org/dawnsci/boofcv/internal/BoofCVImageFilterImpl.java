@@ -215,15 +215,15 @@ public class BoofCVImageFilterImpl implements IImageFilterService {
 		case GLOBAL_OTSU:
 			Number min = input.min(true), max = input.max(true);
 			int multiplier = multiply(converted, max.doubleValue(), min.doubleValue());
-			int iMin = min.intValue() * multiplier;
-			int iMax = max.intValue() * multiplier;
+			int iMin = (int) (min.doubleValue() * multiplier);
+			int iMax = (int) (max.doubleValue() * multiplier);
 			GThresholdImageOps.threshold(converted, binary, GThresholdImageOps.computeOtsu(converted, iMin, iMax+1), down);
 			break;
 		case GLOBAL_ENTROPY:
 			min = input.min(true); max = input.max(true);
 			multiplier = multiply(converted, max.doubleValue(), min.doubleValue());
-			iMin = min.intValue() * multiplier;
-			iMax = max.intValue() * multiplier;
+			iMin = (int) (min.doubleValue() * multiplier);
+			iMax = (int) (max.doubleValue() * multiplier);
 			GThresholdImageOps.threshold(converted, binary, GThresholdImageOps.computeEntropy(converted, iMin, iMax+1), down);
 			break;
 		case ADAPTIVE_SQUARE:
