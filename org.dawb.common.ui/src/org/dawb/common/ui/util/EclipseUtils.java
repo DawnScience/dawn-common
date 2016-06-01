@@ -249,8 +249,10 @@ public class EclipseUtils {
 		final IWorkbench bench = PlatformUI.getWorkbench();
 		if (bench==null) return null;
 		final IWorkbenchWindow[] windows = bench.getWorkbenchWindows();
-		if (windows==null) return null;
-		
+		if (windows == null)
+			return null;
+		if (windows.length < 1)
+			return null;
 		return windows[0].getActivePage();
 	}
 
