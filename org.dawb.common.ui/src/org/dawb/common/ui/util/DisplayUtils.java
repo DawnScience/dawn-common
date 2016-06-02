@@ -16,42 +16,100 @@ import org.eclipse.ui.PlatformUI;
 public class DisplayUtils {
 
 	/**
-	 * Run a runnable in the display thread
-	 * @param async if true and not in display thread then run asynchronously or non-blocking
-	 * @param control used to get the display (if null, then {@link Display#getDefault()} is used)
-	 * @param runnable
+	 * @return display
 	 */
-	public static void runInDisplayThread(boolean async, Control control, Runnable runnable) {
-		runInDisplayThread(false, async, control, runnable);
-	}
-
-	/**
-	 * Run a runnable in the display thread
-	 * @param newThread if true and in display thread then run in new thread
-	 * @param async if true and not in display thread then run asynchronously or non-blocking
-	 * @param control used to get the display (if null, then {@link Display#getDefault()} is used)
-	 * @param runnable
-	 */
-	public static void runInDisplayThread(boolean newThread, boolean async, Control control, Runnable runnable) {
-		Display display = control == null ? Display.getDefault() : control.getDisplay();
-		if (display.getThread() != Thread.currentThread()) {
-			if (async)
-				display.asyncExec(runnable);
-			else
-				display.syncExec(runnable);
-		} else {
-			if (newThread)
-				new Thread(runnable).start(); // TODO FIXME Not the display thread!
-			else
-				runnable.run();
-		}
-	}
-	
 	public static Display getDisplay() {
 		Display display = Display.getCurrent();
 		if (display == null && PlatformUI.isWorkbenchRunning()) {
 			display = PlatformUI.getWorkbench().getDisplay();
 		}
 		return display != null ? display : Display.getDefault();
+	}
+
+	/**
+	 * Execute runnable asynchronously in display thread
+	 * @param runnable
+	 * @throws RuntimeException
+	 */
+	public static void asyncExec(Runnable runnable) throws RuntimeException {
+		executeInDisplayThread(true, null, runnable);
+	}
+
+	/**
+	 * Execute runnable asynchronously in display thread
+	 * @param control used to get the display (if null, then {@link Display#getDefault()} is used)
+	 * @param runnable
+	 * @throws RuntimeException
+	 */
+	public static void asyncExec(Control control, Runnable runnable) throws RuntimeException {
+		executeInDisplayThread(true, control, runnable);
+	}
+
+	/**
+	 * Execute runnable synchronously in display thread
+	 * @param runnable
+	 * @throws RuntimeException
+	 */
+	public static void syncExec(Runnable runnable) throws RuntimeException {
+		executeInDisplayThread(false, null, runnable);
+	}
+
+	/**
+	 * Execute runnable synchronously in display thread
+	 * @param control used to get the display (if null, then {@link Display#getDefault()} is used)
+	 * @param runnable
+	 * @throws RuntimeException
+	 */
+	public static void syncExec(Control control, Runnable runnable) throws RuntimeException {
+		executeInDisplayThread(false, control, runnable);
+	}
+
+	/**
+	 * Execute runnable in display thread
+	 * @param async if true, execute asynchronously
+	 * @param control used to get the display (if null, then {@link Display#getDefault()} is used)
+	 * @param runnable
+	 * @throws RuntimeException
+	 */
+	private static void executeInDisplayThread(boolean async, Control control, Runnable runnable) throws RuntimeException {
+		ThrowableRunnable r = new ThrowableRunnable(control, runnable, async);
+		r.run();
+		Throwable t = r.getThrowable();
+		if (t instanceof RuntimeException) {
+			throw (RuntimeException) t;
+		}
+	}
+
+	static class ThrowableRunnable implements Runnable {
+		private Display display;
+		private Runnable runnable;
+		private boolean async;
+		private Throwable exception;
+
+		public ThrowableRunnable(Control control, Runnable runnable, boolean async) {
+			this.display = control == null ? Display.getDefault() : control.getDisplay();
+			this.runnable = runnable;
+			this.async = async;
+		}
+
+		public Throwable getThrowable() {
+			return exception;
+		}
+
+		@Override
+		public void run() {
+			try {
+				if (display.getThread() != Thread.currentThread()) {
+					if (async)
+						display.asyncExec(runnable);
+					else
+						display.syncExec(runnable);
+				} else {
+					runnable.run();
+				}
+			} catch (Exception e) {
+				exception = e.getCause();
+			}
+		}
 	}
 }
