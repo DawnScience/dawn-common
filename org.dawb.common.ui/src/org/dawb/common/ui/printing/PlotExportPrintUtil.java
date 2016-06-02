@@ -299,7 +299,7 @@ public class PlotExportPrintUtil {
 				IStatus result = null;
 				@Override
 				protected IStatus run(final IProgressMonitor monitor) {
-					DisplayUtils.runInDisplayThread(true, false, null, new Runnable() {
+					DisplayUtils.syncExec(new Runnable() {
 						@Override
 						public void run() {
 							try {
