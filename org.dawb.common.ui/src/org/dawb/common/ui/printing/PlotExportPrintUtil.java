@@ -272,6 +272,8 @@ public class PlotExportPrintUtil {
 		if (!Arrays.asList(FILE_FORMATS).contains(fileType.toLowerCase())
 				&& !Arrays.asList(FILE_TYPES).contains(fileType))
 			throw new RuntimeException("Cannot deal with file type " + fileType);
+
+		// This overrides given fileType!
 		// If they have specified the file type in the file name, use that.
 		String lname = filename.toLowerCase();
 		if (lname.endsWith(".png") || lname.endsWith(".jpg") || lname.endsWith(".jpeg"))
@@ -281,11 +283,13 @@ public class PlotExportPrintUtil {
 		if (lname.endsWith(".svg"))
 			fileType = FILE_TYPES[2];
 		if (fileType.equals(FILE_TYPES[0])) {
-			if (!lname.endsWith(".png") && !lname.endsWith(".jpg") && !lname.endsWith(".jpeg"))
+			if (!lname.endsWith(".png") && !lname.endsWith(".jpg") && !lname.endsWith(".jpeg")) {
 				filename = filename + ".png";
+				lname = filename.toLowerCase();
+			}
 			ImageLoader loader = new ImageLoader();
 			loader.data = new ImageData[] { im.getImageData() };
-			loader.save(filename, SWT.IMAGE_PNG);
+			loader.save(filename, lname.endsWith(".png") ? SWT.IMAGE_PNG : SWT.IMAGE_JPEG);
 		} else if (fileType.equals(FILE_TYPES[1])) {
 			if (!lname.endsWith(".ps") && !lname.endsWith(".eps"))
 				filename = filename + ".ps";
