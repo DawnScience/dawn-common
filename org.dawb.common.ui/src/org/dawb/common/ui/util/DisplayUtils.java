@@ -27,8 +27,9 @@ public class DisplayUtils {
 	}
 
 	/**
-	 * Execute runnable asynchronously in display thread
-	 * @param runnable
+	 * Execute runnable asynchronously in display thread if not currently in display thread otherwise
+	 * execute immediately
+	 * @param runnable can be null to wake up display thread
 	 * @throws RuntimeException
 	 */
 	public static void asyncExec(Runnable runnable) throws RuntimeException {
@@ -36,9 +37,10 @@ public class DisplayUtils {
 	}
 
 	/**
-	 * Execute runnable asynchronously in display thread
+	 * Execute runnable asynchronously in display thread if not currently in display thread otherwise
+	 * execute immediately
 	 * @param control used to get the display (if null, then {@link Display#getDefault()} is used)
-	 * @param runnable
+	 * @param runnable can be null to wake up display thread
 	 * @throws RuntimeException
 	 */
 	public static void asyncExec(Control control, Runnable runnable) throws RuntimeException {
@@ -46,8 +48,9 @@ public class DisplayUtils {
 	}
 
 	/**
-	 * Execute runnable synchronously in display thread
-	 * @param runnable
+	 * Execute runnable synchronously in display thread if not currently in display thread otherwise
+	 * execute immediately
+	 * @param runnable can be null to wake up display thread
 	 * @throws RuntimeException
 	 */
 	public static void syncExec(Runnable runnable) throws RuntimeException {
@@ -55,9 +58,10 @@ public class DisplayUtils {
 	}
 
 	/**
-	 * Execute runnable synchronously in display thread
+	 * Execute runnable synchronously in display thread if not currently in display thread otherwise
+	 * execute immediately
 	 * @param control used to get the display (if null, then {@link Display#getDefault()} is used)
-	 * @param runnable
+	 * @param runnable can be null to wake up display thread
 	 * @throws RuntimeException
 	 */
 	public static void syncExec(Control control, Runnable runnable) throws RuntimeException {
@@ -65,10 +69,11 @@ public class DisplayUtils {
 	}
 
 	/**
-	 * Execute runnable in display thread
+	 * Execute runnable in display thread if not currently in display thread otherwise
+	 * execute immediately
 	 * @param async if true, execute asynchronously
 	 * @param control used to get the display (if null, then {@link Display#getDefault()} is used)
-	 * @param runnable
+	 * @param runnable can be null to wake up display thread
 	 * @throws RuntimeException
 	 */
 	private static void executeInDisplayThread(boolean async, Control control, Runnable runnable) throws RuntimeException {
@@ -104,7 +109,7 @@ public class DisplayUtils {
 						display.asyncExec(runnable);
 					else
 						display.syncExec(runnable);
-				} else {
+				} else if (runnable != null) {
 					runnable.run();
 				}
 			} catch (Exception e) {
