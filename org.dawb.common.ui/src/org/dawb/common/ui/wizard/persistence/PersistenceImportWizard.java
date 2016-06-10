@@ -53,11 +53,9 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IImportWizard;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.PlatformUI;
 
 import uk.ac.diamond.scisoft.analysis.diffraction.DiffractionMetadataUtils;
 import uk.ac.diamond.scisoft.analysis.io.NexusDiffractionCalibrationReader;
-import uk.ac.diamond.scisoft.analysis.io.NexusTreeUtils;
 
 /**
  * 
@@ -227,8 +225,13 @@ public class PersistenceImportWizard extends AbstractPersistenceWizard implement
 			 } else {
 				 message = "Cannot import file.";
 			 }
-			 logger.error("Cannot import mask file!", ne);
-		     ErrorDialog.openError(Display.getDefault().getActiveShell(), "Import failure", message, new Status(IStatus.WARNING, "org.dawb.common.ui", ne.getMessage(), ne));
+			 String notSupported = "This file might have been persisted with an older version of DAWN and is not supported in the current version of DAWN.";
+			 String errorMsg = ne.getMessage();
+			 // Check the error message and append to it the notSupported String
+			 if (ne.getMessage().contains("missing property '@bundle_and_class'"))
+				 errorMsg = errorMsg + String.format("%n") + String.format("%n") + notSupported;
+			 logger.error("Cannot import persisted file!", ne);
+		     ErrorDialog.openError(Display.getDefault().getActiveShell(), "Import failure", message, new Status(IStatus.WARNING, "org.dawb.common.ui", errorMsg, ne));
 		     return true;
 		 }
 		 
