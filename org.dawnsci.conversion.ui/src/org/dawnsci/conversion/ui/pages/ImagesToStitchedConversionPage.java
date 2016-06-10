@@ -17,6 +17,7 @@ import org.dawnsci.conversion.ui.IConversionWizardPage;
 import org.dawnsci.conversion.ui.LoaderServiceHolder;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
+import org.eclipse.dawnsci.analysis.api.dataset.DatasetException;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.Slice;
@@ -162,7 +163,12 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 					break;
 			}
 			int[] shape = lazyDataset.getShape();
-			firstImage = lazyDataset.getSlice(new Slice(0, shape[0], shape[1]));
+			try {
+				firstImage = lazyDataset.getSlice(new Slice(0, shape[0], shape[1]));
+			} catch (DatasetException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			firstImage.squeeze();
 			IDataset psxData = holder.getDataset("psx");
 			IDataset psyData = holder.getDataset("psy");

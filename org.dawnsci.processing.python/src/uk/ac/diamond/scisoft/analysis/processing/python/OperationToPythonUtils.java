@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.dawnsci.analysis.api.dataset.DatasetException;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.Slice;
@@ -43,8 +44,18 @@ public class OperationToPythonUtils {
 		IDataset ya = null;
 		if (axes != null) {
 
-			if (axes[0] != null) ya = axes[0].getSlice().squeeze();
-			if (axes[1] != null) xa = axes[1].getSlice().squeeze();
+			if (axes[0] != null) {
+				try {
+					ya = axes[0].getSlice().squeeze();
+				} catch (DatasetException e1) {
+				}
+			}
+			if (axes[1] != null) {
+				try {
+					xa = axes[1].getSlice().squeeze();
+				} catch (DatasetException e1) {
+				}
+			}
 			
 		}
 
@@ -54,10 +65,19 @@ public class OperationToPythonUtils {
 		populateSliceFromSeriesMetadata(AbstractOperation.getSliceSeriesMetadata(input),inputs);
 		
 		ILazyDataset mask = AbstractOperation.getFirstMask(input);
-		if (mask != null) inputs.put(MASK, mask.getSlice());
-		
+		if (mask != null) {
+			try {
+				inputs.put(MASK, mask.getSlice());
+			} catch (DatasetException e1) {
+			}
+		}
 		ILazyDataset e = input.getError();
-		if (e != null) inputs.put(ERROR, e.getSlice());
+		if (e != null) {
+			try {
+				inputs.put(ERROR, e.getSlice());
+			} catch (DatasetException e1) {
+			}
+		}
 		
 		return inputs;
 	}
@@ -118,14 +138,22 @@ public class OperationToPythonUtils {
 		
 		ILazyDataset[] axes = AbstractOperation.getFirstAxes(input);
 		if (axes != null && axes[0] != null) {
-			IDataset ax = axes[0].getSlice();
-			inputs.put(XAXIS, ax);
+			try {
+				IDataset ax = axes[0].getSlice();
+				inputs.put(XAXIS, ax);
+			} catch (DatasetException e1) {
+			}
 		} else {
 			inputs.put(XAXIS, null);
 		}
 		
 		ILazyDataset e = input.getError();
-		if (e != null) inputs.put(ERROR, e.getSlice());
+		if (e != null) {
+			try {
+				inputs.put(ERROR, e.getSlice());
+			} catch (DatasetException e1) {
+			}
+		}
 		
 		populateSliceFromSeriesMetadata(AbstractOperation.getSliceSeriesMetadata(input),inputs);
 		

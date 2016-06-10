@@ -9,6 +9,7 @@
 package org.dawnsci.io.h5;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
 import java.util.HashMap;
@@ -16,7 +17,6 @@ import java.util.Map;
 
 import org.eclipse.dawnsci.analysis.api.dataset.SliceND;
 import org.eclipse.dawnsci.analysis.api.io.ILazyLoader;
-import org.eclipse.dawnsci.analysis.api.io.ScanFileHolderException;
 import org.eclipse.dawnsci.analysis.api.io.SliceObject;
 import org.eclipse.dawnsci.analysis.api.monitor.IMonitor;
 import org.eclipse.dawnsci.analysis.dataset.impl.Dataset;
@@ -54,14 +54,14 @@ public class H5LazyLoader implements ILazyLoader {
 	}
 
 	@Override
-	public Dataset getDataset(IMonitor mon, SliceND slice) throws ScanFileHolderException {
+	public Dataset getDataset(IMonitor mon, SliceND slice) throws IOException {
 		
 		
 		if (slice.isAll()) {
 			try {
 				return getCompleteData(mon);
 			} catch (Exception e) {
-				throw new ScanFileHolderException("Cannot read "+path+", "+fullPath, e);
+				throw new IOException("Cannot read "+path+", "+fullPath, e);
 			}
 		}
 		
@@ -84,7 +84,7 @@ public class H5LazyLoader implements ILazyLoader {
 			cache.put(so, new SoftReference<Dataset>(set));
 			return set;
 		} catch (Exception e) {
-			throw new ScanFileHolderException("Cannot slice "+path+", "+fullPath, e);
+			throw new IOException("Cannot slice "+path+", "+fullPath, e);
 		}	
 	}
 
