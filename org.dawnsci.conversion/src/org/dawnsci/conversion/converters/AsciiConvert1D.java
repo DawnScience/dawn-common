@@ -75,7 +75,7 @@ public class AsciiConvert1D extends AbstractConversion {
 		final File   file;
 		if (context.getFilePaths().size()>1) {
 			final String name = getFileNameNoExtension(selectedConversionFile);
-			file = new File(context.getOutputPath()+"/"+name+"."+getExtension());
+			file = new File(context.getOutputPath()+ File.separator +name+"."+getExtension());
 
 		} else {
 			final String filePath = context.getOutputPath();
