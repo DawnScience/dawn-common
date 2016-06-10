@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 Diamond Light Source Ltd.
+ * Copyright (c) 2012-2016 Diamond Light Source Ltd.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -20,7 +20,10 @@ import org.eclipse.dawnsci.analysis.api.persistence.IPersistenceService;
 import org.eclipse.dawnsci.analysis.api.persistence.IPersistentFile;
 import org.eclipse.dawnsci.analysis.api.roi.IROI;
 import org.eclipse.dawnsci.analysis.dataset.roi.CircularROI;
+import org.eclipse.dawnsci.analysis.dataset.roi.LinearROI;
 import org.eclipse.dawnsci.analysis.dataset.roi.RectangularROI;
+import org.eclipse.dawnsci.analysis.dataset.roi.RingROI;
+import org.eclipse.dawnsci.analysis.dataset.roi.SectorROI;
 import org.junit.Test;
 
 public class ReadWriteROITest extends AbstractThreadTestBase {
@@ -49,63 +52,80 @@ public class ReadWriteROITest extends AbstractThreadTestBase {
 
 	@Test
 	public void testWriteReadRectangularROI() throws Exception {
-		//create and init files
-		File[] tmp = new File[1];
-		IPersistentFile file = before(tmp);
+		RectangularROI rroi = new RectangularROI(0, 0, 100, 200, 0);
+		rroi.setName("MyRectangularROI");
+		testWriteReadROI(rroi);
+	}
 
-		IROI rroi = new RectangularROI();
-		Map<String, IROI> rois = new HashMap<String, IROI>();
-		rois.put("MyROI", rroi);
-		file.setROIs(rois);
-
-		Map<String, IROI> roisRead = null;
-		//read the persistent file and retrieve the functions
-		roisRead = file.getROIs(null);
-	
-		//test that the rois are the same
-		assertEquals(rois.containsKey("MyROI"), roisRead.containsKey("MyROI"));
-
-		//test the unmarshalling of the JSON String
-		IROI resultROI = roisRead.get("MyROI");
-		
-		assertEquals(rroi, resultROI);
-
-		//close files
-		after(tmp[0], file);
+	@Test 
+	public void testWriteReadCircularROI() throws Exception {
+		CircularROI croi = new CircularROI(50, 100, 100);
+		croi.setName("MyCircularROI");
+		testWriteReadROI(croi);
 	}
 
 	@Test
-	public void testWriteReadROI() throws Exception{
-		//create and init files
+	public void testWriteReadSectorROI() throws Exception {
+		SectorROI sroi = new SectorROI();
+		sroi.setDpp(10);
+		sroi.setPoint(new double[] {100, 100});
+		sroi.setName("MySectorROI");
+		testWriteReadROI(sroi);
+	}
+
+	@Test
+	public void testWriteReadRingROI() throws Exception {
+		RingROI rroi = new RingROI();
+		rroi.setPoint(new double[] { 100, 100 });
+		rroi.setRadii(new double[] { 20, 30 });
+		rroi.setName("MyRingROI");
+		testWriteReadROI(rroi);
+	}
+
+	@Test 
+	public void testWriteReadLinearROI() throws Exception {
+		LinearROI lroi = new LinearROI(new double[]{10, 15}, new double[]{150, 200});
+		lroi.setName("MyLinearROI");
+		testWriteReadROI(lroi);
+	}
+
+	private void testWriteReadROI(IROI roi) throws Exception {
+		// create and init files
 		File[] tmp = new File[1];
 		IPersistentFile file = before(tmp);
-		// regions
-		RectangularROI rroi = new RectangularROI(0, 0, 100, 200, 0);
-		CircularROI croi = new CircularROI(50, 100, 100);
-		Map<String, IROI> rois = new HashMap<String, IROI>();
-		rois.put("rectangle0", rroi);
-		rois.put("circle0", croi);
 
-		// create the persistent file and set rois
+		
+		Map<String, IROI> rois = new HashMap<String, IROI>();
+		rois.put(roi.getName(), roi);
 		file.setROIs(rois);
 
-
 		Map<String, IROI> roisRead = null;
-		// read the persistent file and retrieve the regions
+		// read the persistent file and retrieve the functions
 		roisRead = file.getROIs(null);
 
 		// test that the rois are the same
-		if (roisRead != null) {
-			assertEquals(rois.containsKey("rectangle0"),
-					roisRead.containsKey("rectangle0"));
-			assertEquals(rois.containsKey("circle0"),
-					roisRead.containsKey("circle0"));
-		} else {
-			fail("ROIs read are Null.");
-		}
+		assertEquals(rois.containsKey(roi.getName()), roisRead.containsKey(roi.getName()));
 
-		//close files
+		// test the unmarshalling of the JSON String
+		IROI resultROI = roisRead.get(roi.getName());
+
+		assertEquals(roi, resultROI);
+
+		// close files
 		after(tmp[0], file);
+	}
+
+	/**
+	 * Run all writeRead of tested ROIs
+	 * 
+	 * @throws Exception
+	 */
+	public void testWriteReadROI() throws Exception {
+		testWriteReadLinearROI();
+		testWriteReadCircularROI();
+		testWriteReadRectangularROI();
+		testWriteReadRingROI();
+		testWriteReadSectorROI();
 	}
 
 	@Test
@@ -120,6 +140,6 @@ public class ReadWriteROITest extends AbstractThreadTestBase {
 
 	@Override
 	protected void doTestOfDataSet(int index) throws Throwable {
-		testWriteReadROI();
+		testWriteReadRectangularROI();
 	}
 }
