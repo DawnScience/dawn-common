@@ -5,7 +5,8 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry exported="true" kind="lib" path="jars/org.boofcv.feature_0.18.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="jars/org.boofcv.geo_0.18.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="jars/org.boofcv.ip_0.18.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="jars/org.boofcv.ip_0.18.0.jar" sourcepath="jars/BoofCV-ip-0.18-sources.jar"/>
 	<classpathentry exported="true" kind="lib" path="jars/org.boofcv.sfm_0.18.0.jar"/>
+	<classpathentry kind="lib" path="jars/org.boofcv.recognition_0.18.0.jar" sourcepath="jars/BoofCV-recognition-0.18-sources.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -37,4 +37,5 @@ Bundle-ClassPath: .,
  jars/org.boofcv.feature_0.18.0.jar,
  jars/org.boofcv.geo_0.18.0.jar,
  jars/org.boofcv.ip_0.18.0.jar,
- jars/org.boofcv.sfm_0.18.0.jar
+ jars/org.boofcv.sfm_0.18.0.jar,
+ jars/org.boofcv.recognition_0.18.0.jar
