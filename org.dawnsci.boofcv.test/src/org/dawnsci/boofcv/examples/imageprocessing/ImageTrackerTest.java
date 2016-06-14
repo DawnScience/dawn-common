@@ -1,5 +1,7 @@
 package org.dawnsci.boofcv.examples.imageprocessing;
 
+import static org.junit.Assert.assertArrayEquals;
+
 import org.dawnsci.boofcv.BoofCVImageTrackerServiceCreator;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.image.IImageTracker;
@@ -32,8 +34,8 @@ public class ImageTrackerTest {
 		tracker.initialize(data, originalLocation, TrackerType.TLD);
 		// run tracker against second image
 		double[] location = tracker.track(data2);
-
-		//TODO make the assert work
-//		Assert.assertEquals("Value of first item is not the expected one", location[2], 0.5, 0);
+		double[] locationExpected = new double[] { 435.9968422696961, 72.9932498803572, 481.00780718826627,
+				72.9932498803572, 481.00780718826627, 104.00080349092775, 435.9968422696961, 104.00080349092775 };
+		assertArrayEquals(locationExpected, location, 0);
 	}
 }
