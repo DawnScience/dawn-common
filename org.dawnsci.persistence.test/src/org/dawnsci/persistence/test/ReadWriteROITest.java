@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.dawnsci.persistence.PersistenceServiceCreator;
+import org.dawnsci.persistence.ServiceLoader;
 import org.eclipse.dawnsci.analysis.api.persistence.IPersistenceService;
 import org.eclipse.dawnsci.analysis.api.persistence.IPersistentFile;
 import org.eclipse.dawnsci.analysis.api.roi.IROI;
@@ -24,6 +25,7 @@ import org.eclipse.dawnsci.analysis.dataset.roi.LinearROI;
 import org.eclipse.dawnsci.analysis.dataset.roi.RectangularROI;
 import org.eclipse.dawnsci.analysis.dataset.roi.RingROI;
 import org.eclipse.dawnsci.analysis.dataset.roi.SectorROI;
+import org.eclipse.dawnsci.json.MarshallerService;
 import org.junit.Test;
 
 public class ReadWriteROITest extends AbstractThreadTestBase {
@@ -37,6 +39,9 @@ public class ReadWriteROITest extends AbstractThreadTestBase {
 		tmp[0].createNewFile();
 
 		// create the PersistentService
+		// and check that ServiceLoader.getJSONMarshaller() != null
+		if (ServiceLoader.getJSONMarshallerService() == null)
+			ServiceLoader.setJSONMarshallerService(new MarshallerService());
 		IPersistenceService persist = PersistenceServiceCreator.createPersistenceService();
 		IPersistentFile file = persist.createPersistentFile(tmp[0].getAbsolutePath());
 		return file;

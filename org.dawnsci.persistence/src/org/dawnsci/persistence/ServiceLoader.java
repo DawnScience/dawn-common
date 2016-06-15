@@ -2,7 +2,6 @@ package org.dawnsci.persistence;
 
 import org.eclipse.dawnsci.analysis.api.io.ILoaderService;
 import org.eclipse.dawnsci.analysis.api.persistence.IMarshallerService;
-import org.eclipse.dawnsci.json.MarshallerService;
 
 public class ServiceLoader {
 
@@ -30,9 +29,6 @@ public class ServiceLoader {
 	}
 
 	public static IMarshallerService getJSONMarshallerService() {
-		// For unit tests, OSGi won't find the service, so we directly implement it
-		if (mservice == null)
-			mservice = new MarshallerService();
 		return mservice;
 	}
 }
