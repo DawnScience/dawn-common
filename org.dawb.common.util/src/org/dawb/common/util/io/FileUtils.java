@@ -510,24 +510,19 @@ public final class FileUtils {
 		}
 
 		FileChannel srcChannel = null, dstChannel = null;
-		try {
+		try (
+				FileInputStream srcStream = new FileInputStream(source_file);
+				FileOutputStream dstStream = new FileOutputStream(destination_file);
+				)
+		{
 			// Create channel on the source
-			srcChannel = new FileInputStream(source_file).getChannel();
+			srcChannel = srcStream.getChannel();
 
 			// Create channel on the destination
-			dstChannel = new FileOutputStream(destination_file).getChannel();
+			dstChannel = dstStream.getChannel();
 
 			// Copy file contents from source to destination
 			dstChannel.transferFrom(srcChannel, 0, srcChannel.size());
-
-			// Close the channels
-		} finally {
-			if (srcChannel != null) {
-				srcChannel.close();
-			}
-			if (dstChannel != null) {
-				dstChannel.close();
-			}
 		}
 	}
 
