@@ -735,18 +735,13 @@ public final class FileUtils {
 	public static final List<String> readFileAsList(File f) throws Exception {
 
 		List<String> l = new ArrayList<String>();
-		BufferedReader br = null;
-		try {
+		try (
 			Reader reader = new FileReader(f);
-			br = new BufferedReader(reader);
-
+			BufferedReader br = new BufferedReader(reader)) {
+			
 			String str;
 			while ((str = br.readLine()) != null) {
 				l.add(str);
-			}
-		} finally {
-			if (br != null) {
-				br.close();
 			}
 		}
 		return l;
@@ -919,27 +914,36 @@ public final class FileUtils {
 	/**
 	 * @param file
 	 * @param list
+	 * @param lineEnding
 	 * @throws Exception
 	 */
-	public static void write(final File file, final List<String> list) throws Exception {
+	public static void write(final File file, final List<String> list, String lineEnding) throws Exception {
 
-		BufferedWriter bw = null;
-
-		try {
-			final OutputStream out = new FileOutputStream(file);
-			bw = new BufferedWriter(new OutputStreamWriter(out));
+		try ( 
+			OutputStream out = new FileOutputStream(file);
+			BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(out))) {
 			for (int i = 0; i < list.size(); i++) {
 				final String line = list.get(i);
 				bw.write(line, 0, line.length());
-				bw.newLine();
+				// use system line separator default if null is provided
+				if (lineEnding == null)
+					bw.newLine();
+				else
+					bw.write(lineEnding);
 			}
-		} finally {
-			if (bw != null) {
-				bw.close();
-			}
-		}
+		} 
 	}
 
+	/**
+	 * @param file
+	 * @param list
+	 * @throws Exception
+	 */
+	public static void write(final File file, final List<String> list) throws Exception {
+		//use de
+		write(file, list, null);
+	}
+	
 	/**
 	 * @param file
 	 * @return File
