@@ -121,7 +121,7 @@ public class ConversionChoicePage extends ResourceChoosePage implements IConvers
 
 		final Text extensions = new Text(container, SWT.BORDER);
 		extensions.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
-		extensions.setToolTipText("Commana separated list of file extensions. E.g. '*.cbf' or '*.h5, *.nxs, *.hdf5'");
+		extensions.setToolTipText("Comma separated list of file extensions. E.g. '*.cbf' or '*.h5, *.nxs, *.hdf5'");
 		extensions.setVisible(false);
 		extensions.setText(extensionsFilter);
 		extensions.addModifyListener(new ModifyListener() {			

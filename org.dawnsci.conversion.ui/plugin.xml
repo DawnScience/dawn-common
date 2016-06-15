@@ -124,6 +124,11 @@
             conversion_scheme="ALIGNED_FROM_3D"
             id="org.dawnsci.conversion.ui.conversionAlignImages">
       </conversion_page>
+      <conversion_page
+            conversion_page="org.dawnsci.conversion.ui.pages.B18ReprocessAsciiConversionPage"
+            conversion_scheme="B18_REPROCESS_ASCII"
+            id="org.dawnsci.conversion.ui.conversionB18ReprocessAscii">
+      </conversion_page>
    </extension>
 
 </plugin>

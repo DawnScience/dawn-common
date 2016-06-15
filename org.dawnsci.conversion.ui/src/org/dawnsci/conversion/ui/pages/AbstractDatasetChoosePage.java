@@ -57,6 +57,7 @@ public abstract class AbstractDatasetChoosePage extends ResourceChoosePage imple
 	protected Label               multiFileMessage;
 	protected Button              overwriteButton;
 	protected Button              openButton;
+	protected Composite           main;
     
 	protected boolean open      = true;
 	protected boolean overwrite = false;
@@ -101,7 +102,7 @@ public abstract class AbstractDatasetChoosePage extends ResourceChoosePage imple
 		openButton.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 4, 1));
 
 		
-		final Composite main = new Composite(container, SWT.NONE);
+		main = new Composite(container, SWT.NONE);
 		main.setLayout(new GridLayout(2, false));
 		main.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 4, 1));
 		GridUtils.removeMargins(main);

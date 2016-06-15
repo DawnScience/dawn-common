@@ -13,6 +13,7 @@ import org.dawnsci.conversion.converters.AbstractConversion;
 import org.dawnsci.conversion.converters.AlignImagesConverter;
 import org.dawnsci.conversion.converters.AsciiConvert1D;
 import org.dawnsci.conversion.converters.AsciiConvert2D;
+import org.dawnsci.conversion.converters.B18ReprocessAsciiConverter;
 import org.dawnsci.conversion.converters.CompareConverter;
 import org.dawnsci.conversion.converters.Convert1DtoND;
 import org.dawnsci.conversion.converters.CustomNCDConverter;
@@ -23,6 +24,7 @@ import org.dawnsci.conversion.converters.ImagesToStitchedConverter;
 import org.dawnsci.conversion.converters.ProcessConversion;
 import org.dawnsci.conversion.converters.VisitorConversion;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
+import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext.ConversionScheme;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionService;
 import org.eclipse.dawnsci.macro.api.IMacroService;
 import org.eclipse.dawnsci.macro.api.MacroEventObject;
@@ -61,7 +63,8 @@ public class ConversionServiceImpl implements IConversionService {
 				delegate = new VisitorConversion(context);
 			}
 			if (delegate==null) {
-				switch(context.getConversionScheme()) {
+				ConversionScheme scheme = context.getConversionScheme();
+				switch(scheme) {
 				case ASCII_FROM_2D:
 					delegate = new AsciiConvert2D(context);
 					break;
@@ -98,8 +101,11 @@ public class ConversionServiceImpl implements IConversionService {
 				case PROCESS:
 					delegate = new ProcessConversion(context);
 					break;
+				case B18_REPROCESS_ASCII:
+					delegate = new B18ReprocessAsciiConverter(context);
+					break;
 				default:
-					throw new Exception("No conversion for "+context.getConversionScheme());
+					throw new Exception("No conversion for "+scheme);
 				}
 			}
 			

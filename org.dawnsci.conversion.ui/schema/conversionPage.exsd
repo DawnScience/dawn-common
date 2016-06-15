@@ -104,6 +104,8 @@
                   </enumeration>
                   <enumeration value="COMPARE">
                   </enumeration>
+                  <enumeration value="B18_REPROCESS_ASCII">
+                  </enumeration>
                </restriction>
             </simpleType>
          </attribute>
