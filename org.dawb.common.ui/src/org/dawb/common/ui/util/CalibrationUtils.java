@@ -11,8 +11,8 @@ package org.dawb.common.ui.util;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.dawb.common.util.ExpressionFactory;
-import org.dawb.common.util.IExpressionEvaluator;
+import org.dawnsci.jexl.ExpressionFactory;
+import org.dawnsci.jexl.IExpressionEvaluator;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.dataset.impl.Dataset;
