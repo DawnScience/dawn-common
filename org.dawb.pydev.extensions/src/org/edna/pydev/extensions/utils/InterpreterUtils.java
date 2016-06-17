@@ -12,7 +12,7 @@ package org.edna.pydev.extensions.utils;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.dawb.common.python.PythonUtils;
+import org.dawb.common.util.python.PythonUtils;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.python.pydev.core.IInterpreterInfo;
 import org.python.pydev.plugin.PydevPlugin;
