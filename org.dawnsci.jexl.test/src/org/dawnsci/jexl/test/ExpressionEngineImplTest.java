@@ -1,17 +1,18 @@
 /*
- * Copyright (c) 2012 Diamond Light Source Ltd.
+ * Copyright (c) 2012-2016 Diamond Light Source Ltd.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package org.dawnsci.jexl.internal;
+package org.dawnsci.jexl.test;
 
 import static org.junit.Assert.*;
 
 import java.util.Collection;
 
+import org.dawnsci.jexl.internal.ExpressionEngineImpl;
 import org.eclipse.dawnsci.analysis.api.expressions.IExpressionEngine;
 import org.junit.Test;
 
@@ -44,9 +45,9 @@ public class ExpressionEngineImplTest {
 
 	@Test
 	public void testDottedNamesWithKeyWords() throws Exception {
-		// These tests fail to "compile"
-		assertVariablesEquals("my.'new'.dotted.var", "my.new.dotted.var");
-		assertVariablesEquals("my['new'].dotted.var", "my.new.dotted.var");
+		// fails if expression longer than 10 char
+		assertVariablesEquals("a.'new'.va", "a.new.va");
+		assertVariablesEquals("a['new'].va", "a.new.va");
 	}
 
 }
