@@ -9,7 +9,8 @@
 package org.dawb.common.util.object;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.ui.ide.ResourceUtil;
+import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.Platform;
 
 public class AdapterUtils {
 	// Source code and JavaDoc adapted from org.eclipse.ui.internal.util.Util.getAdapter
@@ -43,7 +44,36 @@ public class AdapterUtils {
 			return adapterType.cast(sourceObject);
 	    }
 	
-	    return ResourceUtil.getAdapter(sourceObject, adapterType, true);
+	    return getAdapter(sourceObject, adapterType, true);
+	}
+
+	/**
+	 * Returns the specified adapter for the given element, or <code>null</code>
+	 * if no such adapter was found.<br>
+	 * This method was copied from org.eclipse.ui.ide.ResourceUtil so we don't need to pull the IDE
+	 *
+	 * @param element
+	 *            the model element
+	 * @param adapterType
+	 *            the type of adapter to look up
+	 * @param forceLoad
+	 *            <code>true</code> to force loading of the plug-in providing
+	 *            the adapter, <code>false</code> otherwise
+	 * @return the adapter
+	 * @since 3.2
+	 */
+	public static <T> T getAdapter(Object element, Class<T> adapterType, boolean forceLoad) {
+		if (element instanceof IAdaptable) {
+			IAdaptable adaptable = (IAdaptable) element;
+			T o = adaptable.getAdapter(adapterType);
+			if (o != null) {
+				return o;
+			}
+		}
+		if (forceLoad) {
+			return adapterType.cast(Platform.getAdapterManager().loadAdapter(element, adapterType.getName()));
+		}
+		return Platform.getAdapterManager().getAdapter(element, adapterType);
 	}
 
 	// JavaDoc adapted from org.dawb.common.ui.EclipseUtils.getAdapter
