@@ -17,24 +17,20 @@
       [Enter License Description here.]
    </license>
 
+   <includes
+         id="org.dawnsci.slicing.feature"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.richbeans.feature"
+         version="0.0.0"/>
+
    <plugin
          id="org.dawb.common.ui"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
-
-   <plugin
-         id="org.eclipse.richbeans.widgets"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"/>
-
-   <plugin
-         id="org.eclipse.dawnsci.slicing.api"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"/>
 
    <plugin
          id="org.apache.commons.jexl"
@@ -80,6 +76,13 @@
 
    <plugin
          id="org.apache.batik.svggen"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.emf.common.ui"
          download-size="0"
          install-size="0"
          version="0.0.0"
