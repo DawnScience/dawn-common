@@ -16,6 +16,14 @@
       [Enter License Description here.]
    </license>
 
+   <includes
+         id="net.sf.py4j.defaultserver.feature"
+         version="0.0.0"/>
+
+   <includes
+         id="net.sf.py4j.feature"
+         version="0.0.0"/>
+
    <plugin
          id="org.dawnsci.macro"
          download-size="0"
@@ -28,13 +36,6 @@
          download-size="0"
          install-size="0"
          version="0.0.0"/>
-
-   <plugin
-         id="net.sf.py4j"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
 
    <plugin
          id="com.thoughtworks.xstream"
