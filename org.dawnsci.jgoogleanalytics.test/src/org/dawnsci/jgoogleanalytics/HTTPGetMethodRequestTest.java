@@ -10,7 +10,7 @@ public class HTTPGetMethodRequestTest extends TestCase {
 	public void testRequest_Failure() throws Exception {
 		MockHTTPGetMethod httpGetMethod = new MockHTTPGetMethod();
 		httpGetMethod.setLoggingAdapter(new SystemOutLogger());
-		httpGetMethod.request("http://www.dawnsci.org");
+		httpGetMethod.request("http://www.daw3nsci.org");
 		assertTrue(httpGetMethod.responseCode != HttpURLConnection.HTTP_OK);
 	}
 

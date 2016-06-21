@@ -4,12 +4,10 @@ Bundle-Name: Jgoogleanalytics
 Bundle-SymbolicName: org.dawnsci.jgoogleanalytics;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
-Import-Package: junit.framework,
- org.dawb.common.util.eclipse,
+Import-Package: org.dawb.common.util.eclipse,
  org.eclipse.core.commands.common,
  org.eclipse.dawnsci.analysis.api,
  org.eclipse.dawnsci.plotting.api.preferences,
- org.junit;version="4.10.0",
  org.slf4j;version="[1.7.2,2.0.0)"
 Export-Package: org.dawnsci.jgoogleanalytics
 Service-Component: OSGI-INF/*.xml 
