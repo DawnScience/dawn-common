@@ -32,7 +32,7 @@ public class GeneratorTest {
 		
 		final IDataset nameless = Random.rand(new int[]{112, 112});
 		
-		AbstractMacroGenerator gen = mservice.getGenerator(IDataset.class);
+		AbstractMacroGenerator<Object> gen = mservice.getGenerator(IDataset.class);
 		String line = gen.getPythonCommand(nameless);
 		if (line==null) throw new Exception("Incorrect macro line generated!");
 		if (line.trim().startsWith("=")) throw new Exception("No name generated!");
