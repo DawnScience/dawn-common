@@ -32,7 +32,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.dawb.common.util.object.AdapterUtils;
 import org.eclipse.core.resources.IFile;
@@ -1310,5 +1314,20 @@ public final class FileUtils {
 		} finally {
 			out.close();
 		}
+	}
+	
+	
+	private static final Pattern ROOT_PATTERN = Pattern.compile("(\\/[a-zA-Z0-9]+\\/).+");
+
+	public static String getRootName(Collection<String> names) {
+		if (names==null) return null;
+		
+		Set<String> rootNames = names.stream()
+			.map(name -> ROOT_PATTERN.matcher(name))
+			.filter(matcher -> matcher.matches())
+			.map(matcher -> matcher.group(1))
+			.collect(Collectors.toSet());
+		
+		return rootNames.size() == 1 ? rootNames.iterator().next() : null;
 	}
 }
