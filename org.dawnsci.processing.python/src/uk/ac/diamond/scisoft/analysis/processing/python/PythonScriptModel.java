@@ -6,7 +6,7 @@ import org.eclipse.dawnsci.analysis.api.processing.model.OperationModelField;
 
 public class PythonScriptModel extends AbstractOperationModel {
 
-	@OperationModelField(hint="Enter the path to the file", file = FileType.EXISTING_FILE, label = "File")
+	@OperationModelField(hint="Enter the path to the script", file = FileType.EXISTING_FILE, label = "File")
 	private String filePath = "";
 	
 

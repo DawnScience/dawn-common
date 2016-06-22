@@ -6,6 +6,7 @@
       <operation
             category="org.dawnsci.processing.python.scripting"
             class="uk.ac.diamond.scisoft.analysis.processing.python.PythonImageToImageOperation"
+            description="Process data using a python script that takes an image and returns an image"
             icon="icons/python.png"
             id="uk.ac.diamond.scisoft.analysis.processing.python.PythonImageToImageOperation"
             model="uk.ac.diamond.scisoft.analysis.processing.python.PythonScriptModel"
@@ -14,6 +15,7 @@
       <operation
             category="org.dawnsci.processing.python.scripting"
             class="uk.ac.diamond.scisoft.analysis.processing.python.PythonImageToXYOperation"
+            description="Process data using a python script that takes an image and returns XY data"
             icon="icons/python.png"
             id="uk.ac.diamond.scisoft.analysis.processing.python.PythonImageToXYOperation"
             model="uk.ac.diamond.scisoft.analysis.processing.python.PythonScriptModel"
@@ -22,6 +24,7 @@
       <operation
             category="org.dawnsci.processing.python.scripting"
             class="uk.ac.diamond.scisoft.analysis.processing.python.PythonXYtoXYOperation"
+            description="Process data using a python script that takes XY data and returns XY data"
             icon="icons/python.png"
             id="uk.ac.diamond.scisoft.analysis.processing.python.PythonXYtoXYOperation"
             model="uk.ac.diamond.scisoft.analysis.processing.python.PythonScriptModel"
