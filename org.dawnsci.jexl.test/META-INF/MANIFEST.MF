@@ -3,8 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Jexl Test
 Bundle-SymbolicName: org.dawnsci.jexl.test
 Bundle-Version: 1.0.0.qualifier
+Fragment-Host: org.dawnsci.jexl
 Bundle-Vendor: Diamond Light Source
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
-Require-Bundle: org.junit,
- org.dawnsci.jexl,
- org.eclipse.dawnsci.analysis.api
+Require-Bundle: org.junit;bundle-version="[4.12.0,5.0.0)"
