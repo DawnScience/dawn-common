@@ -4,6 +4,7 @@ Bundle-Name: Python Test
 Bundle-SymbolicName: org.dawb.common.python.test
 Bundle-Version: 1.2.0.qualifier
 Bundle-Vendor: Diamond Light Source
+Fragment-Host: org.dawb.common.python
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.junit,
@@ -13,12 +14,10 @@ Require-Bundle: org.eclipse.ui,
  org.python.pydev;bundle-version="3.6.0",
  org.python.pydev.core;bundle-version="3.6.0",
  org.dawnsci.python.rpc;bundle-version="1.0.0",
- uk.ac.diamond.scisoft.analysis;bundle-version="1.3.0",
- org.dawb.common.python;bundle-version="1.2.0"
+ uk.ac.diamond.scisoft.analysis;bundle-version="1.3.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
-Import-Package: com.isencia.util.commandline;version="7.0.0",
- org.dawb.common.util.eclipse,
+Import-Package: org.dawb.common.util.eclipse,
  org.dawb.common.util.test,
  org.junit,
  org.junit.runner,

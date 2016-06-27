@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.dawb.common.python.Activator;
 import org.dawb.common.util.eclipse.BundleUtils;
 import org.dawb.common.util.test.TestUtils;
 import org.dawnsci.python.rpc.PythonService;
@@ -105,7 +106,7 @@ public class NumpyRpcTest {
 			throw new Exception("No server going!");
 		}
 		
-		String path = TestUtils.getAbsolutePath(org.dawb.common.python.Activator.getDefault().getBundle(), 
+		String path = TestUtils.getAbsolutePath(Activator.getDefault().getBundle(), 
                             "test/org/dawb/common/python/test/billeA_4201_EF_XRD_5998.edf");				
 		final IDataset             set  = LoaderFactory.getData(path).getDataset(0);
 		final Map<String,IDataset> data = new HashMap<String, IDataset>();

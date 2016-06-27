@@ -20,8 +20,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.isencia.util.commandline.ManagedCommandline;
-
 public class OutputRpcTest {
 
 	private static PythonService service;
