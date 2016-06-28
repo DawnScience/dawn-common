@@ -39,7 +39,6 @@ import org.cansas.cansas1d.SAStransmissionSpectrumType;
 import org.dawnsci.conversion.converters.util.LocalServiceManager;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
-import org.eclipse.dawnsci.analysis.api.dataset.IErrorDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.Slice;
 import org.eclipse.dawnsci.analysis.api.io.ScanFileHolderException;
@@ -316,7 +315,7 @@ public class CustomNCDConverter extends AbstractConversion  {
 		return lessPreciseData.cast(dType);
 	}
 
-	private void exportASCII(IErrorDataset axis, Dataset data, IDataset errors, String fullName, String header, List<String> headings) throws ScanFileHolderException {
+	private void exportASCII(IDataset axis, Dataset data, IDataset errors, String fullName, String header, List<String> headings) throws ScanFileHolderException {
 		String dataName = data.getName();
 		IDataset[] columns = new IDataset[] {DatasetUtils.transpose(data, null)};
 		if (axis != null) {
