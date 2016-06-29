@@ -220,7 +220,7 @@ public class CustomNCDConverter extends AbstractConversion  {
 
 			Dataset errors = null;
 			if (hasErrors) {
-				errors = DatasetUtils.cast(data.getError(), data.getDtype());
+				errors = DatasetUtils.cast(data.getError(), data.getDType());
 			}
 
 			String header = sb.toString();
@@ -289,23 +289,23 @@ public class CustomNCDConverter extends AbstractConversion  {
 	}
 	
 	private Dataset[] fixDtypes(Dataset axis, Dataset data, Dataset errors) {
-		int dataDtype = data.getDtype();
+		int dataDtype = data.getDType();
 		int axisDtype = 0;
 		if (axis != null) {
-			axisDtype = axis.getDtype();
+			axisDtype = axis.getDType();
 		}
 		int errorsDtype = 0;
 		if (errors != null) {
-			errorsDtype = errors.getDtype();
+			errorsDtype = errors.getDType();
 		}
 		int largestDtype = Math.max(Math.max(dataDtype, axisDtype), errorsDtype);
-		if (data.getDtype() < largestDtype) {
+		if (data.getDType() < largestDtype) {
 			data = improveLessPreciseData(data, largestDtype);
 		}
-		if (axis != null && axis.getDtype() < largestDtype) {
+		if (axis != null && axis.getDType() < largestDtype) {
 			axis = improveLessPreciseData(axis, largestDtype);
 		}
-		if (errors != null && errors.getDtype() < largestDtype) {
+		if (errors != null && errors.getDType() < largestDtype) {
 			errors = improveLessPreciseData(errors, largestDtype);
 		}
 		return new Dataset[]{axis, data, errors};
@@ -320,7 +320,7 @@ public class CustomNCDConverter extends AbstractConversion  {
 		IDataset[] columns = new IDataset[] {DatasetUtils.transpose(data, null)};
 		if (axis != null) {
 			if (axis.hasErrors()) {
-				Dataset axisErrors = DatasetUtils.cast(axis.getError(), data.getDtype());
+				Dataset axisErrors = DatasetUtils.cast(axis.getError(), data.getDType());
 				columns = (IDataset[]) ArrayUtils.addAll(new IDataset[]{axis, axisErrors}, columns);
 				
 			} else {
@@ -425,7 +425,7 @@ public class CustomNCDConverter extends AbstractConversion  {
 
 			Dataset errors = null;
 			if (hasErrors) {
-				errors = DatasetUtils.cast(data.getError(), data.getDtype());
+				errors = DatasetUtils.cast(data.getError(), data.getDType());
 				errors.squeeze();
 			}
 

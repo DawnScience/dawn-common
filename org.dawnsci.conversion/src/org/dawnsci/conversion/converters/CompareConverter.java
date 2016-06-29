@@ -110,9 +110,9 @@ public class CompareConverter extends AbstractConversion{
  	
 	public static Dataset resize(final Dataset a, final int... shape) {
 		
-		if (a.getDtype()==Dataset.STRING) return a;
+		if (a.getDType()==Dataset.STRING) return a;
 		int size = a.getSize();
-		Dataset rdata = DatasetFactory.zeros(a.getElementsPerItem(), shape, a.getDtype());
+		Dataset rdata = DatasetFactory.zeros(a.getElementsPerItem(), shape, a.getDType());
 		IndexIterator it = rdata.getIterator();
 		while (it.hasNext()) {
 			rdata.setObjectAbs(it.index, it.index<size ? a.getObjectAbs(it.index) : Double.NaN);
