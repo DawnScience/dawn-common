@@ -16,6 +16,7 @@ import org.eclipse.dawnsci.analysis.api.diffraction.DiffractionCrystalEnvironmen
 import org.eclipse.dawnsci.analysis.api.diffraction.IPowderCalibrationInfo;
 import org.eclipse.dawnsci.analysis.api.metadata.IDiffractionMetadata;
 import org.eclipse.dawnsci.analysis.dataset.impl.Dataset;
+import org.eclipse.dawnsci.analysis.dataset.impl.DatasetFactory;
 import org.eclipse.dawnsci.analysis.dataset.impl.DoubleDataset;
 import org.eclipse.dawnsci.hdf.object.HierarchicalDataFileUtils;
 import org.eclipse.dawnsci.hdf.object.IHierarchicalDataFile;
@@ -65,14 +66,14 @@ class PersistSinglePowderCalibration {
 		String transform = file.group("transformations",parent);
 		file.setNexusAttribute(transform, "NXtransformations");
 		
-		DoubleDataset offset = new DoubleDataset(new double[3], new int[]{3});
+		DoubleDataset offset = DatasetFactory.zeros(DoubleDataset.class, 3);
 		offset.setName("offset");
 		
 		Vector3d trans = (Vector3d) det.getOrigin().clone();
 		double length = trans.length();
 		trans.normalize();
 		
-		DoubleDataset vector = new DoubleDataset(new double[3], new int[]{3});
+		DoubleDataset vector = DatasetFactory.zeros(DoubleDataset.class, 3);
 		trans.get(vector.getData());
 		vector.setName("vector");
 		//as passive, so -length
@@ -81,19 +82,19 @@ class PersistSinglePowderCalibration {
 		double[] norm = det.getNormalAnglesInDegrees();
 		
 		
-		vector = new DoubleDataset(new double[3], new int[]{3});
+		vector = DatasetFactory.zeros(DoubleDataset.class, 3);
 		vector.set(1, 2);
 		vector.setName("vector");
 		
 		String roll = createNXtransformation("roll", "rotation",vector,offset,"degrees",ds,norm[2],file,transform);
 		
-		vector = new DoubleDataset(new double[3], new int[]{3});
+		vector = DatasetFactory.zeros(DoubleDataset.class, 3);
 		vector.set(1, 0);
 		vector.setName("vector");
 		
 		String pitch = createNXtransformation("pitch", "rotation",vector,offset,"degrees",roll,-norm[1],file,transform);
 		
-		vector = new DoubleDataset(new double[3], new int[]{3});
+		vector = DatasetFactory.zeros(DoubleDataset.class, 3);
 		vector.set(1, 1);
 		vector.setName("vector");
 		

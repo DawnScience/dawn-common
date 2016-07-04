@@ -23,7 +23,6 @@ import org.eclipse.dawnsci.analysis.api.persistence.IPersistenceService;
 import org.eclipse.dawnsci.analysis.api.persistence.IPersistentFile;
 import org.eclipse.dawnsci.analysis.dataset.impl.Dataset;
 import org.eclipse.dawnsci.analysis.dataset.impl.DatasetFactory;
-import org.eclipse.dawnsci.analysis.dataset.impl.DoubleDataset;
 import org.junit.Test;
 
 public class ReadWriteDataTest extends AbstractThreadTestBase {
@@ -187,9 +186,9 @@ public class ReadWriteDataTest extends AbstractThreadTestBase {
 		for (int i = 0; i < 2048; i++) {
 			axis[i] = i;
 		}
-		DoubleDataset dx = new DoubleDataset(axis);
+		Dataset dx = DatasetFactory.createFromObject(axis);
 		dx.setName("X Axis");
-		DoubleDataset dy = new DoubleDataset(axis);
+		Dataset dy = DatasetFactory.createFromObject(axis);
 		dy.setName("Y Axis");
 		List<IDataset> axes = new ArrayList<IDataset>();
 		axes.add(dx);

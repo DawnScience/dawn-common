@@ -10,9 +10,8 @@ package org.dawb.common.gpu;
 
 
 import org.eclipse.dawnsci.analysis.dataset.impl.Dataset;
+import org.eclipse.dawnsci.analysis.dataset.impl.DatasetFactory;
 import org.eclipse.dawnsci.analysis.dataset.impl.DatasetUtils;
-import org.eclipse.dawnsci.analysis.dataset.impl.DoubleDataset;
-import org.eclipse.dawnsci.analysis.dataset.impl.IntegerDataset;
 import org.eclipse.dawnsci.analysis.dataset.impl.Maths;
 
 import com.amd.aparapi.Kernel;
@@ -64,7 +63,7 @@ class BasicGPUOperation implements IOperation {
 		Range range = Range.create(a.getSize()); 
 		scalarKernel.execute(range);
 
-		return new DoubleDataset(scalarKernel.getResult(), a.getShape());
+		return DatasetFactory.createFromObject(scalarKernel.getResult(), a.getShape());
 	}
 
 	@Override
@@ -108,20 +107,14 @@ class BasicGPUOperation implements IOperation {
 		Range range = Range.create(a.getSize()); 
 		arrayKernel.execute(range);
 
-        return new DoubleDataset(arrayKernel.getResult(), a.getShape());
+        return DatasetFactory.createFromObject(arrayKernel.getResult(), a.getShape());
 	}
 	
 	private static final Object[] getPrimitives(Dataset a) {
-		
-		final int[]     ia = a instanceof IntegerDataset
-                           ? ((IntegerDataset)a).getData()
-		                   : null;
-                           
-        final double[]  da = ia==null
-		                   ? ((DoubleDataset)DatasetUtils.cast(a, Dataset.FLOAT)).getData()
-	                       : null;
-		                   
-		return new Object[]{ia,da};
+		if (a.hasFloatingPointElements() || a.getElementClass().equals(Long.class)) {
+			return new Object[]{null, DatasetUtils.cast(a, Dataset.FLOAT64).getBuffer()};
+		}
+		return new Object[]{DatasetUtils.cast(a, Dataset.INT32).getBuffer(), null};
 	}
 
 	/**

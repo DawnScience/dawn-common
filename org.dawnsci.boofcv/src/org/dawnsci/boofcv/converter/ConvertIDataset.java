@@ -25,6 +25,7 @@ import org.eclipse.dawnsci.analysis.dataset.impl.CompoundFloatDataset;
 import org.eclipse.dawnsci.analysis.dataset.impl.CompoundIntegerDataset;
 import org.eclipse.dawnsci.analysis.dataset.impl.CompoundShortDataset;
 import org.eclipse.dawnsci.analysis.dataset.impl.Dataset;
+import org.eclipse.dawnsci.analysis.dataset.impl.DatasetFactory;
 import org.eclipse.dawnsci.analysis.dataset.impl.DatasetUtils;
 import org.eclipse.dawnsci.analysis.dataset.impl.DoubleDataset;
 import org.eclipse.dawnsci.analysis.dataset.impl.FloatDataset;
@@ -210,25 +211,25 @@ public class ConvertIDataset {
 	 */
 	public static <T extends ImageBase<?>> Dataset convertTo(T src, boolean isBinary) {
 		if (src instanceof ImageUInt8 || src instanceof ImageSInt8) {
-			Dataset dst = new ByteDataset(((ImageInt8<?>) src).data, src.height, src.width);
+			Dataset dst = DatasetFactory.createFromObject(((ImageInt8<?>) src).data, src.height, src.width);
 			if (isBinary) {
 				dst = dst.cast(Dataset.BOOL);
 			}
 			return dst;
 		} else if (src instanceof ImageUInt16 || src instanceof ImageSInt16) {
-			Dataset dst = new ShortDataset(((ImageInt16<?>) src).data, src.height, src.width);
+			Dataset dst = DatasetFactory.createFromObject(((ImageInt16<?>) src).data, src.height, src.width);
 			return dst;
 		} else if (src instanceof ImageSInt32) {
-			Dataset dst = new IntegerDataset(((ImageSInt32) src).data, src.height, src.width);
+			Dataset dst = DatasetFactory.createFromObject(((ImageSInt32) src).data, src.height, src.width);
 			return dst;
 		} else if (src instanceof ImageSInt64) {
-			Dataset dst = new LongDataset(((ImageSInt64) src).data, src.height, src.width);
+			Dataset dst = DatasetFactory.createFromObject(((ImageSInt64) src).data, src.height, src.width);
 			return dst;
 		} else if (src instanceof ImageFloat32) {
-			Dataset dst = new FloatDataset(((ImageFloat32) src).data, src.height, src.width);
+			Dataset dst = DatasetFactory.createFromObject(((ImageFloat32) src).data, src.height, src.width);
 			return dst;
 		} else if (src instanceof ImageFloat64) {
-			Dataset dst = new DoubleDataset(((ImageFloat64) src).data, src.height, src.width);
+			Dataset dst = DatasetFactory.createFromObject(((ImageFloat64) src).data, src.height, src.width);
 			return dst;
 		} else if (src instanceof MultiSpectral) {
 			@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -239,7 +240,7 @@ public class ConvertIDataset {
 				datasets[i] = convertTo(msrc.getBand(i), isBinary);
 			}
 			if (n == 3) {
-				RGBDataset rgb = new RGBDataset(datasets[0], datasets[1], datasets[2]);
+				RGBDataset rgb = DatasetFactory.createCompoundDataset(RGBDataset.class, datasets[0], datasets[1], datasets[2]);
 				return rgb;
 			}
 			return DatasetUtils.createCompoundDataset(datasets);
@@ -261,7 +262,7 @@ public class ConvertIDataset {
 	public static Dataset contourImageToIDataset(List<Contour> contours,
 			int colorExternal, int colorInternal, int width, int height) {
 
-		RGBDataset out = new RGBDataset(width, height);
+		RGBDataset out = DatasetFactory.zeros(RGBDataset.class, width, height);
 		for( Contour c : contours ) {
 			for(Point2D_I32 p : c.external ) {
 				out.set(colorExternal, p.x, p.y);

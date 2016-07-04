@@ -17,7 +17,6 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.dataset.impl.Dataset;
 import org.eclipse.dawnsci.analysis.dataset.impl.DatasetFactory;
-import org.eclipse.dawnsci.analysis.dataset.impl.DoubleDataset;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
 
@@ -73,7 +72,7 @@ public class CalibrationUtils {
 			calib[i] = eval.evaluate(vals);
 		}
 		
-		DoubleDataset ret = new DoubleDataset(calib, calib.length);
+		Dataset ret = DatasetFactory.createFromObject(calib);
 		ret.setName(name);
 		return ret;	
 	}
