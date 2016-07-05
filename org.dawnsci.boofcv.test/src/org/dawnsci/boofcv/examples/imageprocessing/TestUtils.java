@@ -15,7 +15,7 @@ import org.eclipse.dawnsci.analysis.api.dataset.ILazyWriteableDataset;
 import org.eclipse.dawnsci.analysis.api.dataset.SliceND;
 import org.eclipse.dawnsci.analysis.api.io.ScanFileHolderException;
 import org.eclipse.dawnsci.analysis.api.monitor.IMonitor;
-import org.eclipse.dawnsci.analysis.dataset.impl.AbstractDataset;
+import org.eclipse.dawnsci.analysis.dataset.impl.Dataset;
 import org.eclipse.dawnsci.hdf5.HDF5FileFactory;
 import org.eclipse.dawnsci.hdf5.HDF5Utils;
 
@@ -53,7 +53,7 @@ public class TestUtils {
 			File tmpFile = new File(file);
 			if (tmpFile.exists())
 				tmpFile.delete();
-			return HDF5Utils.createLazyDataset(file, nodepath, name, newShape, null, newShape, AbstractDataset.FLOAT32,
+			return HDF5Utils.createLazyDataset(file, nodepath, name, newShape, null, newShape, Dataset.FLOAT32,
 					null, false);
 		} finally {
 			HDF5FileFactory.releaseFile(file, true);

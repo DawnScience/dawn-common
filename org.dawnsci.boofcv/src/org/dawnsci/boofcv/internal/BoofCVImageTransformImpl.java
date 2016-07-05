@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.math3.util.Pair;
 import org.dawnsci.boofcv.converter.ConvertIDataset;
 import org.dawnsci.boofcv.registration.ImageHessianRegistration;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
@@ -24,7 +25,7 @@ import org.eclipse.dawnsci.analysis.api.dataset.SliceND;
 import org.eclipse.dawnsci.analysis.api.image.IImageTransform;
 import org.eclipse.dawnsci.analysis.api.io.ScanFileHolderException;
 import org.eclipse.dawnsci.analysis.api.monitor.IMonitor;
-import org.eclipse.dawnsci.analysis.dataset.impl.AbstractDataset;
+import org.eclipse.dawnsci.analysis.dataset.impl.Dataset;
 import org.eclipse.dawnsci.hdf5.HDF5Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,8 +35,6 @@ import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
-
-import org.apache.commons.math3.util.Pair;
 
 /**
  * Implementation of IImageTransform<br>
@@ -122,7 +121,7 @@ public class BoofCVImageTransformImpl<T extends ImageSingleBand<?>, TD extends T
 			tmpFile.delete();
 		IDataset firstSlice = lazydata.getSlice(new Slice(0, lazydata.getShape()[1], lazydata.getShape()[2])).squeeze();
 		ILazyWriteableDataset lazy = HDF5Utils.createLazyDataset(file, path, name, lazydata.getShape(), null,
-				lazydata.getShape(), AbstractDataset.FLOAT32, null, false);
+				lazydata.getShape(), Dataset.FLOAT32, null, false);
 
 		//convert to boofcv data
 		ImageFloat32 imageA = ConvertIDataset.convertFrom(firstSlice, ImageFloat32.class, 1);

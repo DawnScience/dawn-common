@@ -15,7 +15,7 @@ import java.util.List;
 
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
-import org.eclipse.dawnsci.analysis.dataset.impl.AbstractDataset;
+import org.eclipse.dawnsci.analysis.dataset.impl.DTypeUtils;
 import org.eclipse.dawnsci.analysis.dataset.impl.Dataset;
 import org.eclipse.dawnsci.analysis.dataset.impl.DatasetUtils;
 import org.eclipse.dawnsci.plotting.api.IPlottingSystem;
@@ -102,10 +102,10 @@ public class Plot1DConversionVisitor extends AbstractPlotConversionVisitor {
 		for (ITrace trace : traces ) {
 
 			if (firstTrace) {
-				int ddtype = AbstractDataset.getDType(((ILineTrace)trace).getData());
+				int ddtype = DTypeUtils.getDType(((ILineTrace)trace).getData());
 				data = ((ILineTrace)trace).getXData().getSliceView();
 				data.squeeze();
-				int axdtype = AbstractDataset.getDType(data);
+				int axdtype = DTypeUtils.getDType(data);
 
 				if (ddtype == axdtype) {
 					dtype = ddtype;
@@ -124,7 +124,7 @@ public class Plot1DConversionVisitor extends AbstractPlotConversionVisitor {
 
 			data = ((ILineTrace)trace).getData().getSliceView();
 			data.squeeze();
-			if (dtype != AbstractDataset.getDType(data)) {
+			if (dtype != DTypeUtils.getDType(data)) {
 				data = DatasetUtils.cast(data, dtype);
 			}
 

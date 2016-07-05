@@ -24,7 +24,7 @@ import org.eclipse.dawnsci.analysis.api.dataset.SliceND;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
 import org.eclipse.dawnsci.analysis.api.monitor.IMonitor;
 import org.eclipse.dawnsci.analysis.api.roi.IROI;
-import org.eclipse.dawnsci.analysis.dataset.impl.AbstractDataset;
+import org.eclipse.dawnsci.analysis.dataset.impl.Dataset;
 import org.eclipse.dawnsci.analysis.dataset.impl.Image;
 import org.eclipse.dawnsci.analysis.dataset.impl.LazyDataset;
 import org.eclipse.dawnsci.hdf5.HDF5Utils;
@@ -185,7 +185,7 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 		File tmpFile = new File(file);
 		if (tmpFile.exists())
 			tmpFile.delete();
-		return HDF5Utils.createLazyDataset(file, nodepath, name, newShape, null, newShape, AbstractDataset.FLOAT32, null, false);
+		return HDF5Utils.createLazyDataset(file, nodepath, name, newShape, null, newShape, Dataset.FLOAT32, null, false);
 	}
 
 	/**

@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
-import org.eclipse.dawnsci.analysis.dataset.impl.AbstractDataset;
 import org.eclipse.dawnsci.analysis.dataset.impl.BooleanDataset;
 import org.eclipse.dawnsci.analysis.dataset.impl.ByteDataset;
 import org.eclipse.dawnsci.analysis.dataset.impl.CompoundByteDataset;
@@ -24,6 +23,7 @@ import org.eclipse.dawnsci.analysis.dataset.impl.CompoundDoubleDataset;
 import org.eclipse.dawnsci.analysis.dataset.impl.CompoundFloatDataset;
 import org.eclipse.dawnsci.analysis.dataset.impl.CompoundIntegerDataset;
 import org.eclipse.dawnsci.analysis.dataset.impl.CompoundShortDataset;
+import org.eclipse.dawnsci.analysis.dataset.impl.DTypeUtils;
 import org.eclipse.dawnsci.analysis.dataset.impl.Dataset;
 import org.eclipse.dawnsci.analysis.dataset.impl.DatasetFactory;
 import org.eclipse.dawnsci.analysis.dataset.impl.DatasetUtils;
@@ -192,8 +192,8 @@ public class ConvertIDataset {
 
 	public static <T extends ImageBase<?>> T convertFrom(IDataset src, Class<T> clazz, int bands) {
 		Dataset ds;
-		int ddt = AbstractDataset.getDTypeFromClass(imageToElementClass.get(clazz), bands);
-		if (AbstractDataset.getDType(src) != ddt) {
+		int ddt = DTypeUtils.getDTypeFromClass(imageToElementClass.get(clazz), bands);
+		if (DTypeUtils.getDType(src) != ddt) {
 			ds = DatasetUtils.cast(src, ddt);
 		} else {
 			ds = DatasetUtils.convertToDataset(src);
