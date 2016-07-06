@@ -9,8 +9,8 @@
 
 package org.dawb.common.ui.plot.roi.data;
 
-import org.eclipse.dawnsci.analysis.dataset.impl.Dataset;
 import org.eclipse.dawnsci.analysis.dataset.roi.GridROI;
+import org.eclipse.january.dataset.Dataset;
 import org.eclipse.swt.graphics.RGB;
 
 import uk.ac.diamond.scisoft.analysis.axis.AxisValues;

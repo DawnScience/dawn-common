@@ -10,8 +10,8 @@ package org.dawnsci.boofcv.examples.imageprocessing;
 
 import org.dawnsci.boofcv.converter.ConvertIDataset;
 import org.dawnsci.boofcv.examples.util.Utils;
-import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
+import org.eclipse.january.dataset.IDataset;
 
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 import boofcv.abst.filter.blur.BlurFilter;

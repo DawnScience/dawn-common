@@ -8,7 +8,7 @@
  */
 package org.dawb.common.gpu;
 
-import org.eclipse.dawnsci.analysis.dataset.impl.Dataset;
+import org.eclipse.january.dataset.Dataset;
 
 public interface IOperation {
 

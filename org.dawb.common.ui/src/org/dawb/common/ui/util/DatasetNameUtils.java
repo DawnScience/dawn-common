@@ -12,8 +12,8 @@ import java.util.Map.Entry;
 import org.dawb.common.ui.ServiceLoader;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext.ConversionScheme;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
-import org.eclipse.dawnsci.analysis.api.metadata.IMetadata;
-import org.eclipse.dawnsci.analysis.dataset.impl.AbstractDataset;
+import org.eclipse.january.dataset.AbstractDataset;
+import org.eclipse.january.metadata.IMetadata;
 
 public class DatasetNameUtils {
 

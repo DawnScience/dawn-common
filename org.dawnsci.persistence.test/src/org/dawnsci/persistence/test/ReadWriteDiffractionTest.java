@@ -17,9 +17,9 @@ import java.io.IOException;
 import org.dawnsci.persistence.PersistenceServiceCreator;
 import org.eclipse.dawnsci.analysis.api.diffraction.DetectorProperties;
 import org.eclipse.dawnsci.analysis.api.diffraction.DiffractionCrystalEnvironment;
-import org.eclipse.dawnsci.analysis.api.metadata.IDiffractionMetadata;
 import org.eclipse.dawnsci.analysis.api.persistence.IPersistenceService;
 import org.eclipse.dawnsci.analysis.api.persistence.IPersistentFile;
+import org.eclipse.dawnsci.analysis.api.metadata.IDiffractionMetadata;
 import org.junit.Ignore;
 import org.junit.Test;
 

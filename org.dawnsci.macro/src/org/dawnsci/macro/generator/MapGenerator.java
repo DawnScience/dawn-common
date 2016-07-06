@@ -5,8 +5,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.dawnsci.analysis.api.INameable;
 import org.eclipse.dawnsci.macro.api.AbstractMacroGenerator;
+import org.eclipse.january.INameable;
 
 /**
  * Creates a python dictionary from whatever 

@@ -14,9 +14,9 @@ import java.util.Map;
 import org.dawnsci.jexl.ExpressionFactory;
 import org.dawnsci.jexl.IExpressionEvaluator;
 import org.eclipse.core.runtime.preferences.InstanceScope;
-import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
-import org.eclipse.dawnsci.analysis.dataset.impl.Dataset;
-import org.eclipse.dawnsci.analysis.dataset.impl.DatasetFactory;
+import org.eclipse.january.dataset.Dataset;
+import org.eclipse.january.dataset.DatasetFactory;
+import org.eclipse.january.dataset.IDataset;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
 

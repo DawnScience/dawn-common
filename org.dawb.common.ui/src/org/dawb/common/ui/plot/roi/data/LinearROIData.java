@@ -9,9 +9,9 @@
 
 package org.dawb.common.ui.plot.roi.data;
 
-import org.eclipse.dawnsci.analysis.dataset.impl.CompoundDataset;
-import org.eclipse.dawnsci.analysis.dataset.impl.Dataset;
 import org.eclipse.dawnsci.analysis.dataset.roi.LinearROI;
+import org.eclipse.january.dataset.CompoundDataset;
+import org.eclipse.january.dataset.Dataset;
 
 import uk.ac.diamond.scisoft.analysis.axis.AxisValues;
 import uk.ac.diamond.scisoft.analysis.roi.ROIProfile;

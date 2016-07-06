@@ -31,9 +31,9 @@ import org.apache.commons.jexl2.Script;
 import org.eclipse.dawnsci.analysis.api.expressions.ExpressionEngineEvent;
 import org.eclipse.dawnsci.analysis.api.expressions.IExpressionEngine;
 import org.eclipse.dawnsci.analysis.api.expressions.IExpressionEngineListener;
-import org.eclipse.dawnsci.analysis.api.monitor.IMonitor;
 import org.eclipse.dawnsci.analysis.dataset.impl.Image;
-import org.eclipse.dawnsci.analysis.dataset.impl.Maths;
+import org.eclipse.january.IMonitor;
+import org.eclipse.january.dataset.Maths;
 
 public class ExpressionEngineImpl implements IExpressionEngine{
 	

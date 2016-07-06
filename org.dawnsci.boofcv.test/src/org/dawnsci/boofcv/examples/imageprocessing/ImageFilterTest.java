@@ -10,9 +10,9 @@
 package org.dawnsci.boofcv.examples.imageprocessing;
 
 import org.dawnsci.boofcv.BoofCVImageFilterServiceCreator;
-import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.image.IImageFilterService;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
+import org.eclipse.january.dataset.IDataset;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

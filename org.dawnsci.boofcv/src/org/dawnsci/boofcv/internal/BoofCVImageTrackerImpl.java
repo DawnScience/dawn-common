@@ -9,8 +9,8 @@
 package org.dawnsci.boofcv.internal;
 
 import org.dawnsci.boofcv.converter.ConvertIDataset;
-import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.image.IImageTracker;
+import org.eclipse.january.dataset.IDataset;
 
 import boofcv.abst.tracker.TrackerObjectQuad;
 import boofcv.factory.tracker.FactoryTrackerObjectQuad;
