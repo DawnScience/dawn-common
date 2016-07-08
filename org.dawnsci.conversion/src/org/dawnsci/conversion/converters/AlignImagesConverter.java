@@ -133,7 +133,7 @@ public class AlignImagesConverter extends AbstractImageConversion {
 			ImageStackLoader loader = new ImageStackLoader(paths,
 					context.getMonitor());
 			lazyDataset = new LazyDataset("Folder Stack",
-					loader.getDtype(), loader.getShape(), loader);
+					loader.getDType(), loader.getShape(), loader);
 		} else {
 			lazyDataset = LocalServiceManager.getLoaderService().getData(regexs.get(0),null).getLazyDataset(0);
 		}

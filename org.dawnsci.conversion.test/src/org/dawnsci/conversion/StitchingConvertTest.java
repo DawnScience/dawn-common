@@ -173,7 +173,7 @@ public class StitchingConvertTest {
 			fail("Failed to load image stack:" + e);
 			return null;
 		}
-		ILazyDataset lazy = new LazyDataset("image stack", loader.getDtype(), loader.getShape(), loader);
+		ILazyDataset lazy = new LazyDataset("image stack", loader.getDType(), loader.getShape(), loader);
 		return lazy;
 	}
 

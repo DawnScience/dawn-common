@@ -77,7 +77,7 @@ public abstract class AbstractImageConversion extends AbstractConversion {
 					final IDataHolder holder = LocalServiceManager.getLoaderService().getData(images.get(0), context.getMonitor());
 		 		    Collections.sort(images, new SortNatural<String>(true));
 					ImageStackLoader loader = new ImageStackLoader(images, holder, context.getMonitor());
-					LazyDataset lazyDataset = new LazyDataset("Image Stack", loader.getDtype(), loader.getShape(), loader);
+					LazyDataset lazyDataset = new LazyDataset("Image Stack", loader.getDType(), loader.getShape(), loader);
 				    context.setLazyDataset(lazyDataset);
 				}
 				

@@ -68,7 +68,7 @@ public class Utils {
 		List<IDataset> data = new ArrayList<IDataset>();
 		try {
 			ImageStackLoader loader = new ImageStackLoader(names, progressMonitorWrapper);
-			ILazyDataset lazyStack = new LazyDataset("Folder Stack", loader.getDtype(), loader.getShape(), loader);
+			ILazyDataset lazyStack = new LazyDataset("Folder Stack", loader.getDType(), loader.getShape(), loader);
 			int[] shape = lazyStack.getShape();
 			for (int i = 0; i < shape[0]; i++) {
 				IDataset image = lazyStack.getSlice(new Slice(i, shape[0], shape[1])).squeeze();

@@ -45,7 +45,7 @@ public class ImageLazyProcessingTest {
 		List<String> filenames = new ArrayList<String>();
 		Utils.getArrayAsList(files, filenames);
 		ImageStackLoader loader = new ImageStackLoader(filenames, null);
-		data = new LazyDataset("test stack", loader.getDtype(), loader.getShape(), loader);
+		data = new LazyDataset("test stack", loader.getDType(), loader.getShape(), loader);
 		transform = BoofCVImageTransformCreator.createTransformService();
 	}
 

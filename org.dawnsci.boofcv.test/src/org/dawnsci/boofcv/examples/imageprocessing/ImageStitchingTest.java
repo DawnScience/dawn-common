@@ -42,7 +42,7 @@ public class ImageStitchingTest {
 		String[] files = Utils.getFileNames("resources/82702_UViewImage", true);
 		Utils.getArrayAsList(files, filenames);
 		ImageStackLoader loader = new ImageStackLoader(filenames, null);
-		data = new LazyDataset("test stack", loader.getDtype(), loader.getShape(), loader);
+		data = new LazyDataset("test stack", loader.getDType(), loader.getShape(), loader);
 		stitcher = BoofCVImageStitchingProcessCreator.createStitchingProcess();
 		transform = BoofCVImageTransformCreator.createTransformService();
 	}

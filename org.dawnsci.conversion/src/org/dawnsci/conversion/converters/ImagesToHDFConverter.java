@@ -97,7 +97,7 @@ public class ImagesToHDFConverter extends AbstractConversion{
 		
 		Collections.sort(paths, new SortNatural<String>(true));
 		ImageStackLoader loader = new ImageStackLoader(paths, context.getMonitor());
-		LazyDataset lazyDataset = new LazyDataset("Folder Stack", loader.getDtype(), loader.getShape(), loader);
+		LazyDataset lazyDataset = new LazyDataset("Folder Stack", loader.getDType(), loader.getShape(), loader);
 		return lazyDataset;
 
 	}
