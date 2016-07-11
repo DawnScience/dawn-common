@@ -32,8 +32,8 @@ import org.eclipse.january.dataset.DatasetFactory;
 import org.eclipse.january.dataset.DatasetUtils;
 import org.eclipse.january.dataset.IDataset;
 import org.eclipse.january.dataset.Slice;
+import org.eclipse.january.metadata.MetadataFactory;
 import org.eclipse.january.metadata.OriginMetadata;
-import org.eclipse.january.metadata.internal.OriginMetadataImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -229,7 +229,7 @@ public class PersistJsonOperationsNode {
 		IDataset dd = LoaderFactory.getDataSet(path,  PersistenceConstants.PROCESS_ENTRY + Node.SEPARATOR + ORIGIN + Node.SEPARATOR+ "data dimensions", null);
 		int[] dataDims = (int[])DatasetUtils.cast(dd, Dataset.INT32).getBuffer();
 		
-		return new OriginMetadataImpl(null, Slice.convertFromString(ss), dataDims, fp, dsn);
+		return MetadataFactory.createMetadata(OriginMetadata.class, null, Slice.convertFromString(ss), dataDims, fp, dsn);
 	}
 	
 	public static GroupNode writeOriginalDataInformation(OriginMetadata origin) {

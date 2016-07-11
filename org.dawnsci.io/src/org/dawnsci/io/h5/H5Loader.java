@@ -25,10 +25,10 @@ import org.eclipse.dawnsci.hdf.object.HierarchicalDataUtils;
 import org.eclipse.dawnsci.hdf.object.HierarchicalInfo;
 import org.eclipse.dawnsci.hdf.object.IHierarchicalDataFile;
 import org.eclipse.january.IMonitor;
+import org.eclipse.january.MetadataException;
 import org.eclipse.january.dataset.Dataset;
 import org.eclipse.january.dataset.ILazyDataset;
 import org.eclipse.january.dataset.LazyDataset;
-import org.eclipse.january.dataset.MetadataException;
 import org.eclipse.january.metadata.IMetadata;
 
 import uk.ac.diamond.scisoft.analysis.io.AbstractFileLoader;

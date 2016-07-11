@@ -10,13 +10,15 @@ import java.util.Set;
 import org.eclipse.dawnsci.analysis.api.processing.OperationData;
 import org.eclipse.dawnsci.analysis.dataset.operations.AbstractOperation;
 import org.eclipse.dawnsci.analysis.dataset.slicer.SliceFromSeriesMetadata;
-import org.eclipse.january.dataset.DatasetException;
+import org.eclipse.january.DatasetException;
+import org.eclipse.january.MetadataException;
 import org.eclipse.january.dataset.DatasetFactory;
 import org.eclipse.january.dataset.IDataset;
 import org.eclipse.january.dataset.ILazyDataset;
 import org.eclipse.january.dataset.Slice;
-import org.eclipse.january.metadata.internal.AxesMetadataImpl;
-import org.eclipse.january.metadata.internal.MaskMetadataImpl;
+import org.eclipse.january.metadata.AxesMetadata;
+import org.eclipse.january.metadata.MaskMetadata;
+import org.eclipse.january.metadata.MetadataFactory;
 
 public class OperationToPythonUtils {
 
@@ -82,12 +84,12 @@ public class OperationToPythonUtils {
 		return inputs;
 	}
 	
-	public static OperationData unpackImage(Map<String, Object> output) {
+	public static OperationData unpackImage(Map<String, Object> output) throws MetadataException {
 		
 		IDataset d = (IDataset)output.get(DATA);
 		
 		if (output.containsKey(XAXIS) || output.containsKey(YAXIS)) {
-			AxesMetadataImpl ax = new AxesMetadataImpl(2);
+			AxesMetadata ax = MetadataFactory.createMetadata(AxesMetadata.class, 2);
 			if (output.containsKey(XAXIS)) ax.addAxis(1, (IDataset)output.get(XAXIS));
 			if (output.containsKey(YAXIS)) ax.addAxis(0, (IDataset)output.get(YAXIS));
 			
@@ -95,7 +97,7 @@ public class OperationToPythonUtils {
 		}
 		
 		if (output.containsKey(MASK)) {
-			MaskMetadataImpl mask = new MaskMetadataImpl((IDataset)output.get(MASK));
+			MaskMetadata mask = MetadataFactory.createMetadata(MaskMetadata.class, (IDataset)output.get(MASK));
 			d.setMetadata(mask);
 		}
 		
@@ -109,12 +111,12 @@ public class OperationToPythonUtils {
 		return aux == null ? new OperationData(d) : new OperationData(d, (Serializable[])aux);
 	}
 	
-	public static OperationData unpackXY(Map<String, Object> output) {
+	public static OperationData unpackXY(Map<String, Object> output) throws MetadataException {
 		
 		IDataset data = (IDataset)output.get(DATA);
 		
 		if (output.containsKey(XAXIS)) {
-			AxesMetadataImpl ax = new AxesMetadataImpl(1);
+			AxesMetadata ax = MetadataFactory.createMetadata(AxesMetadata.class, 1);
 			ax.addAxis(0, (IDataset)output.get(XAXIS));
 			data.addMetadata(ax);
 		}
