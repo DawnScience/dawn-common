@@ -36,7 +36,7 @@ import org.eclipse.dawnsci.analysis.api.io.ILoaderService;
 import org.eclipse.dawnsci.plotting.api.expressions.IExpressionObject;
 import org.eclipse.dawnsci.plotting.api.expressions.IExpressionObjectService;
 import org.eclipse.emf.common.ui.dialogs.WorkspaceResourceDialog;
-import org.eclipse.january.dataset.AbstractDataset;
+import org.eclipse.january.dataset.ShapeUtils;
 import org.eclipse.january.metadata.IMetadata;
 import org.eclipse.jface.fieldassist.ContentProposalAdapter;
 import org.eclipse.jface.fieldassist.TextContentAdapter;
@@ -461,7 +461,7 @@ public class ResourceChoosePage extends WizardPage {
 			int[] shape = meta.getDataShapes().get(name);
 			if (shape != null) {
 				//squeeze to get usable rank
-				shape = AbstractDataset.squeezeShape(shape, false);
+				shape = ShapeUtils.squeezeShape(shape, false);
 				if (scheme!=null && scheme.isRankSupported(shape.length)) {
 					names.add(name);
 				} else if (visitor!=null && visitor.isRankSupported(shape.length)) {
