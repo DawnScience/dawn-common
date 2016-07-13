@@ -129,6 +129,11 @@
             conversion_scheme="B18_REPROCESS_ASCII"
             id="org.dawnsci.conversion.ui.conversionB18ReprocessAscii">
       </conversion_page>
+      <conversion_page
+            conversion_page="org.dawnsci.conversion.ui.pages.B18AverageConversionPage"
+            conversion_scheme="B18_AVERAGE"
+            id="org.dawnsci.conversion.ui.conversionB18Average">
+      </conversion_page>
    </extension>
 
 </plugin>

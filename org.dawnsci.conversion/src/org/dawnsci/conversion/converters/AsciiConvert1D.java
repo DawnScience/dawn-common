@@ -112,16 +112,12 @@ public class AsciiConvert1D extends AbstractConversion {
 	 * @throws Exception
 	 */
 	public static void write(final File file, final String text, String encoding) throws Exception {
-		BufferedWriter b = null;
-		try {
-			final OutputStream out = new FileOutputStream(file);
-			final OutputStreamWriter writer = new OutputStreamWriter(out, encoding);
-			b = new BufferedWriter(writer);
+		try (
+			OutputStream out = new FileOutputStream(file);
+			OutputStreamWriter writer = new OutputStreamWriter(out, encoding);
+			BufferedWriter b = new BufferedWriter(writer);
+		) {
 			b.write(text.toCharArray());
-		} finally {
-			if (b != null) {
-				b.close();
-			}
 		}
 	}
 

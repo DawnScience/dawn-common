@@ -106,6 +106,8 @@
                   </enumeration>
                   <enumeration value="B18_REPROCESS_ASCII">
                   </enumeration>
+                  <enumeration value="B18_AVERAGE">
+                  </enumeration>
                </restriction>
             </simpleType>
          </attribute>

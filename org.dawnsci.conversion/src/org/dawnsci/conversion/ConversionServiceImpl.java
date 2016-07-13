@@ -14,6 +14,7 @@ import org.dawnsci.conversion.converters.AlignImagesConverter;
 import org.dawnsci.conversion.converters.AsciiConvert1D;
 import org.dawnsci.conversion.converters.AsciiConvert2D;
 import org.dawnsci.conversion.converters.B18ReprocessAsciiConverter;
+import org.dawnsci.conversion.converters.B18AverageConverter;
 import org.dawnsci.conversion.converters.CompareConverter;
 import org.dawnsci.conversion.converters.Convert1DtoND;
 import org.dawnsci.conversion.converters.CustomNCDConverter;
@@ -103,6 +104,9 @@ public class ConversionServiceImpl implements IConversionService {
 					break;
 				case B18_REPROCESS_ASCII:
 					delegate = new B18ReprocessAsciiConverter(context);
+					break;
+				case B18_AVERAGE:
+					delegate = new B18AverageConverter(context);
 					break;
 				default:
 					throw new Exception("No conversion for "+scheme);
