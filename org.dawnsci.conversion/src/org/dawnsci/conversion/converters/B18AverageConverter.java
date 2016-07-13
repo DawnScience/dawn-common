@@ -72,11 +72,8 @@ public class B18AverageConverter extends AbstractConversion {
 		// add the very last path to rep_1st
 		rep_1st.add(file_list_in.size());
 		
-		//File[][] file_grps = new File[rep_1st.size()-1][];
-		
 		for (int grp_ind = 0 ; grp_ind < rep_1st.size()-1 ; grp_ind++) {
 			List<File> files = file_list_in.subList(rep_1st.get(grp_ind), rep_1st.get(grp_ind+1));
-			//file_grps[grp_ind] = files.stream().toArray(File[]::new);
 			logger.debug("group " + grp_ind + " : " + files.stream().map(File::getAbsolutePath).collect(Collectors.joining(", ")));
 		
 			//if group contains just one file: ignore and go to the next one
@@ -87,16 +84,31 @@ public class B18AverageConverter extends AbstractConversion {
 			//we will be needing several datasets now
 			//for now we will assume that the energy is constant across the files in the current group
 			B18AverageAsciiData data = new B18AverageAsciiData();
-			data.qexafs_energy = DatasetUtils.convertToDataset(LocalServiceManager.getLoaderService().getDataset(files.get(0).getAbsolutePath(), "qexafs_energy", null));
+			
+			//in case all files do not have the same number of rows, use the minimal number of rows
+			int nrows_min = Integer.MAX_VALUE;
+			int nrows_max = Integer.MIN_VALUE;
+			for (File file : files) {
+				//get the number of elements in the energy array
+				int irows = LocalServiceManager.getLoaderService().getDataset(file.getAbsolutePath(), "qexafs_energy", null).getSize();
+				nrows_min = Math.min(nrows_min, irows);
+				nrows_max = Math.max(nrows_max, irows);
+			}
+			
+			if (nrows_min != nrows_max) {
+				logger.warn("files in group do not have the same number of rows: calculating averages on minimum number of rows");
+			}
+			
+			data.qexafs_energy = DatasetUtils.convertToDataset(LocalServiceManager.getLoaderService().getDataset(files.get(0).getAbsolutePath(), "qexafs_energy", null).getSlice(null, new int[]{nrows_min}, null));
 			
 			for (File file : files) {
-				Dataset timeTemp = DatasetUtils.convertToDataset(LocalServiceManager.getLoaderService().getDataset(file.getAbsolutePath(), "time", null));
-				Dataset I0Temp = DatasetUtils.convertToDataset(LocalServiceManager.getLoaderService().getDataset(file.getAbsolutePath(), "I0", null));
-				Dataset ItTemp = DatasetUtils.convertToDataset(LocalServiceManager.getLoaderService().getDataset(file.getAbsolutePath(), "It", null));
-				Dataset IrefTemp = DatasetUtils.convertToDataset(LocalServiceManager.getLoaderService().getDataset(file.getAbsolutePath(), "Iref", null));
-				Dataset lnI0ItTemp = DatasetUtils.convertToDataset(LocalServiceManager.getLoaderService().getDataset(file.getAbsolutePath(), "lnI0It", null));
-				Dataset lnItIrefTemp = DatasetUtils.convertToDataset(LocalServiceManager.getLoaderService().getDataset(file.getAbsolutePath(), "lnItIref", null));
-				Dataset QexafsFFI0Temp = DatasetUtils.convertToDataset(LocalServiceManager.getLoaderService().getDataset(file.getAbsolutePath(), "QexafsFFI0", null));
+				Dataset timeTemp = DatasetUtils.convertToDataset(LocalServiceManager.getLoaderService().getDataset(file.getAbsolutePath(), "time", null).getSlice(null, new int[]{nrows_min}, null));
+				Dataset I0Temp = DatasetUtils.convertToDataset(LocalServiceManager.getLoaderService().getDataset(file.getAbsolutePath(), "I0", null).getSlice(null, new int[]{nrows_min}, null));
+				Dataset ItTemp = DatasetUtils.convertToDataset(LocalServiceManager.getLoaderService().getDataset(file.getAbsolutePath(), "It", null).getSlice(null, new int[]{nrows_min}, null));
+				Dataset IrefTemp = DatasetUtils.convertToDataset(LocalServiceManager.getLoaderService().getDataset(file.getAbsolutePath(), "Iref", null).getSlice(null, new int[]{nrows_min}, null));
+				Dataset lnI0ItTemp = DatasetUtils.convertToDataset(LocalServiceManager.getLoaderService().getDataset(file.getAbsolutePath(), "lnI0It", null).getSlice(null, new int[]{nrows_min}, null));
+				Dataset lnItIrefTemp = DatasetUtils.convertToDataset(LocalServiceManager.getLoaderService().getDataset(file.getAbsolutePath(), "lnItIref", null).getSlice(null, new int[]{nrows_min}, null));
+				Dataset QexafsFFI0Temp = DatasetUtils.convertToDataset(LocalServiceManager.getLoaderService().getDataset(file.getAbsolutePath(), "QexafsFFI0", null).getSlice(null, new int[]{nrows_min}, null));
 				if (file == files.get(0)) {
 					// first file
 					data.time = timeTemp;
