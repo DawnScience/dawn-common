@@ -99,6 +99,11 @@ public class ReadWritePowderCalibration {
 				public String[] getCitationInformation() {
 					return new String[]{"description", "doi","endnote","bibtex"};
 				}
+
+				@Override
+				public String getResultDescription() {
+					return "Result";
+				}
 			};
 			
 			//create the persistent file and set meta
