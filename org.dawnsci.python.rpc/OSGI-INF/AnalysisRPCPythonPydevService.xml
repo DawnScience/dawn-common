@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="false" name="Analysis RPC Python pydev service">
+   <implementation class="org.dawnsci.python.rpc.AnalysisRpcPythonPyDevService"/>
+   <service>
+      <provide interface="org.eclipse.dawnsci.analysis.api.rpc.IAnalysisRpcPythonService"/>
+   </service>
+</scr:component>

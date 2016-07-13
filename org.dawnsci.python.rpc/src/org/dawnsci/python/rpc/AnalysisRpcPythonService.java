@@ -21,12 +21,15 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.dawnsci.analysis.api.rpc.AnalysisRpcException;
+import org.eclipse.dawnsci.analysis.api.rpc.IAnalysisRpcClient;
+import org.eclipse.dawnsci.analysis.api.rpc.IAnalysisRpcPythonRemote;
+import org.eclipse.dawnsci.analysis.api.rpc.IAnalysisRpcPythonService;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.ac.diamond.scisoft.analysis.rpc.AnalysisRpcClient;
-import uk.ac.diamond.scisoft.analysis.rpc.AnalysisRpcException;
 
 /**
  * Launch a python process running the Python Analysis RPC Server
@@ -53,7 +56,7 @@ public class AnalysisRpcPythonService implements IAnalysisRpcPythonService {
 	private final File workingDir;
 	private final Map<String, String> env;
 	private final int port;
-	private final AnalysisRpcClient client;
+	private final IAnalysisRpcClient client;
 	private final IAnalysisRpcPythonRemote proxy;
 	private final String[] parameters;
 
@@ -148,7 +151,7 @@ public class AnalysisRpcPythonService implements IAnalysisRpcPythonService {
 	}
 
 	@Override
-	public AnalysisRpcClient getClient() {
+	public IAnalysisRpcClient getClient() {
 		return client;
 	}
 

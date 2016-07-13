@@ -18,11 +18,10 @@ import java.util.Map;
 import org.apache.commons.io.FileUtils;
 import org.dawb.common.util.eclipse.BundleUtils;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.dawnsci.analysis.api.rpc.AnalysisRpcException;
+import org.eclipse.dawnsci.analysis.api.rpc.AnalysisRpcRemoteException;
 import org.junit.Assert;
 import org.junit.Test;
-
-import uk.ac.diamond.scisoft.analysis.rpc.AnalysisRpcException;
-import uk.ac.diamond.scisoft.analysis.rpc.AnalysisRpcRemoteException;
 
 abstract public class AbstractPythonRunScriptServicePluginTest implements
 		IPythonRunScript {

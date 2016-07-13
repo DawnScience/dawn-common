@@ -13,10 +13,9 @@ import java.util.Map;
 
 import org.dawnsci.python.rpc.PythonRunScriptService;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.dawnsci.analysis.api.rpc.AnalysisRpcException;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-
-import uk.ac.diamond.scisoft.analysis.rpc.AnalysisRpcException;
 
 /**
  * This concrete test runs all the tests in

@@ -23,6 +23,7 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.dawnsci.analysis.api.rpc.AnalysisRpcException;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.python.pydev.core.IInterpreterInfo;
 import org.python.pydev.core.IInterpreterManager;
@@ -36,8 +37,6 @@ import org.python.pydev.runners.SimpleRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.ac.diamond.scisoft.analysis.rpc.AnalysisRpcException;
-
 /**
  * Subclass of {@link AnalysisRpcPythonService} that uses PyDev's
  * InterpreterInfos to generate PYTHONPATHs and path to Python executable.
@@ -47,11 +46,18 @@ import uk.ac.diamond.scisoft.analysis.rpc.AnalysisRpcException;
  * associated interface.
  */
 public class AnalysisRpcPythonPyDevService extends AnalysisRpcPythonService {
-	private static final Logger logger = LoggerFactory
-			.getLogger(AnalysisRpcPythonPyDevService.class);
+	private static final Logger logger = LoggerFactory.getLogger(AnalysisRpcPythonPyDevService.class);
 
 	// TODO should we add bundle dependency on uk.ac.diamond.scisoft.python?
 	private static final String UK_AC_DIAMOND_SCISOFT_PYTHON = "uk.ac.diamond.scisoft.python";
+
+	static {
+		System.out.println("Starting Analysis RPC Pydev service.");
+	}
+
+	public AnalysisRpcPythonPyDevService() throws MisconfigurationException, AnalysisRpcException {
+		this(true);
+	}
 
 	/**
 	 * Create new service using the default (first listed) Python

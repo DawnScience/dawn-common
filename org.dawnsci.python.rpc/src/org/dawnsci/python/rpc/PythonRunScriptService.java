@@ -13,10 +13,11 @@ import java.io.IOException;
 import java.util.Map;
 
 import org.dawb.common.util.eclipse.BundleUtils;
+import org.eclipse.dawnsci.analysis.api.rpc.AnalysisRpcException;
+import org.eclipse.dawnsci.analysis.api.rpc.AnalysisRpcRemoteException;
+import org.eclipse.dawnsci.analysis.api.rpc.IAnalysisRpcPythonService;
 
 import uk.ac.diamond.scisoft.analysis.rpc.AnalysisRpcClient;
-import uk.ac.diamond.scisoft.analysis.rpc.AnalysisRpcException;
-import uk.ac.diamond.scisoft.analysis.rpc.AnalysisRpcRemoteException;
 
 /**
  * Implementation of IPythonRunScript that registers

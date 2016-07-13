@@ -13,10 +13,9 @@ import java.util.Map;
 
 import org.dawnsci.python.rpc.PythonRunScriptService;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.dawnsci.analysis.api.rpc.AnalysisRpcException;
 import org.junit.After;
 import org.junit.Before;
-
-import uk.ac.diamond.scisoft.analysis.rpc.AnalysisRpcException;
 
 /** This concrete test runs each test with its own service instance. */
 public class PythonRunScriptServiceIndividualRunPluginTest extends

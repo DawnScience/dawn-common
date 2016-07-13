@@ -16,9 +16,8 @@ import java.util.Map;
 import org.dawb.common.util.eclipse.BundleUtils;
 import org.dawnsci.python.rpc.AnalysisRpcPythonService;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.dawnsci.analysis.api.rpc.AnalysisRpcException;
 import org.python.pydev.plugin.PydevPlugin;
-
-import uk.ac.diamond.scisoft.analysis.rpc.AnalysisRpcException;
 
 class AnalysisRpcPythonServiceManual extends AnalysisRpcPythonService {
 	public AnalysisRpcPythonServiceManual() throws AnalysisRpcException,

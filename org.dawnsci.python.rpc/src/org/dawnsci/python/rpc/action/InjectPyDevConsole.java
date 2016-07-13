@@ -1,3 +1,11 @@
+/*
+ * Copyright (c) 2016 Diamond Light Source Ltd.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ */
 package org.dawnsci.python.rpc.action;
 
 import java.util.ArrayList;
@@ -51,12 +59,12 @@ public class InjectPyDevConsole {
 	}
 	// End OSGi Injection
 
-	private static Logger logger = LoggerFactory.getLogger(InjectPyDevConsoleHandler.class);
+	private static Logger logger = LoggerFactory.getLogger(InjectPyDevConsole.class);
 
 	/**
 	 * Command ID (as defined in plugin.xml)
 	 */
-	public static String COMMAND_ID = "uk.ac.diamond.scisoft.analysis.rcp.plotting.actions.injectPyDevConsole";
+	public static String COMMAND_ID = "org.dawnsci.python.rpc.injectPyDevConsole";
 	/**
 	 * The parameter key for the ExecutionEvent that specifies whether to create a new console or reuse an existing one
 	 * if possible, value should be "true" or "false". Optional, default false.

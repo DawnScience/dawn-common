@@ -10,8 +10,7 @@ package org.dawnsci.python.rpc;
 
 import java.util.Map;
 
-import uk.ac.diamond.scisoft.analysis.rpc.AnalysisRpcClient;
-import uk.ac.diamond.scisoft.analysis.rpc.AnalysisRpcException;
+import org.eclipse.dawnsci.analysis.api.rpc.AnalysisRpcException;
 
 /**
  * Interface around function provided by python_service_runscript.py
