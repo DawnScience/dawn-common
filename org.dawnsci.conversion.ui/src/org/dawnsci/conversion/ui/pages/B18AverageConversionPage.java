@@ -4,11 +4,24 @@ import java.io.File;
 import java.util.Arrays;
 
 import org.dawb.common.ui.util.GridUtils;
+import org.dawnsci.conversion.converters.B18AverageConverter;
+import org.dawnsci.conversion.converters.B18AverageConverter.B18DataType;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 
 public class B18AverageConversionPage extends AbstractDatasetChoosePage {
 
+	// some Java 8 lambda/stream magic
+	private final static String[] B18DATATYPE_OPTIONS = Arrays.stream(B18AverageConverter.B18DataType.values()).map(e -> e.toString()).toArray(String[]::new);
+	
+	protected int dataTypeSelection;
+	
 	/**
 	 * Create the wizard.
 	 */
@@ -23,6 +36,31 @@ public class B18AverageConversionPage extends AbstractDatasetChoosePage {
     	setFileLabel("Output file");
     }
 
+	/**
+	 * Create contents of the wizard.
+	 * @param parent
+	 */
+	@Override
+	public void createContentBeforeFileChoose(Composite container) {
+				
+		Label convertLabel = new Label(container, SWT.NONE);
+		convertLabel.setText("Datatype");
+		
+		final Combo combo = new Combo(container, SWT.READ_ONLY|SWT.BORDER);
+		combo.setItems(B18DATATYPE_OPTIONS);
+		combo.setToolTipText("Select the type of data");
+		combo.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 3, 1));
+		combo.select(0);
+		
+		dataTypeSelection = 0;
+		combo.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				dataTypeSelection = combo.getSelectionIndex();
+			}
+		});
+
+	}
+	
 	/**
 	 * Ensures that both text fields are set.
 	 */
@@ -95,6 +133,10 @@ public class B18AverageConversionPage extends AbstractDatasetChoosePage {
 	@Override
 	public IConversionContext getContext() {
 		if (context==null) return null;
+		final B18AverageConverter.ConversionInfoBean bean = new B18AverageConverter.ConversionInfoBean();
+		//bean.setConversionType(getExtension());
+		bean.setDataType(B18DataType.values()[dataTypeSelection]);
+		context.setUserObject(bean);
 		context.setOutputPath(getAbsoluteFilePath()); // cvs or dat file.
 		//getSelected will here need to correspond to the datasets we need. Their names are known
 		context.setDatasetNames(Arrays.asList(getSelected()));
