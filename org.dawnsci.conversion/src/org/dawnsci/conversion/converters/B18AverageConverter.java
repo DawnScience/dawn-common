@@ -21,6 +21,8 @@ import org.eclipse.dawnsci.analysis.dataset.impl.DatasetUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sun.msv.writer.relaxng.Context;
+
 import uk.ac.diamond.scisoft.analysis.dataset.function.Interpolation1D;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 
@@ -29,6 +31,8 @@ public class B18AverageConverter extends AbstractConversion {
 	private static final Logger logger = LoggerFactory.getLogger(B18AverageConverter.class);
 
 	private static final double SHORT_RANGE = 10.0;
+
+	private IConversionContext context;
 	
 	private static class B18AverageData {
 		/*public Dataset qexafs_energy;
@@ -48,7 +52,8 @@ public class B18AverageConverter extends AbstractConversion {
 	
 	public enum B18DataType {
 		TRANSMISSION("Transmission", new int[]{1,2,3,4,5}),
-		FLUORESCENCE("Fluorescence", new int[]{1,2,3,4,5,-2,-1});
+		FLUORESCENCE("Fluorescence", new int[]{1,2,3,4,5,-2,-1}),
+		CUSTOM("Custom", null);
 		
 		private final String type;
 		private final int[] dataIndices;
@@ -68,7 +73,22 @@ public class B18AverageConverter extends AbstractConversion {
 			return 0;
 		}
 		
-		public int[] getDataIndices() {
+		public int[] getDataIndices(IConversionContext context, File firstFile) throws Exception {
+			if (dataIndices == null) {
+				// check the context for dataset names and match them with indices
+				IDataHolder dh = LoaderFactory.getData(firstFile.getAbsolutePath());
+				List<String> namesFromFile = Arrays.asList(dh.getNames());
+				List<Integer> dataIndicesList = new ArrayList<>();
+				for (String name : context.getDatasetNames()) {
+					int index = namesFromFile.indexOf(name);
+					if (index == -1) {
+						// this should never happen
+						throw new Exception("getDataIndices: selected dataset not found in first file");
+					}
+					dataIndicesList.add(index);
+				}
+				return dataIndicesList.stream().mapToInt(i -> i).toArray();
+			}
 			return dataIndices;
 		}
 		
@@ -112,6 +132,8 @@ public class B18AverageConverter extends AbstractConversion {
 	
 	public B18AverageConverter(IConversionContext context) {
 		super(context);
+		// hope context is not null here...
+		this.context = context;
 	}
 
 	@Override
@@ -122,6 +144,7 @@ public class B18AverageConverter extends AbstractConversion {
 	@Override
 	public void process(IConversionContext context) throws Exception {
 		final ConversionInfoBean bean = (ConversionInfoBean) context.getUserObject();
+		//this.context = context; 
 		
 		List<File> file_list_in = new ArrayList<>();
 		List<Integer> rep_1st = new ArrayList<>();
@@ -185,7 +208,7 @@ public class B18AverageConverter extends AbstractConversion {
 				
 				List<Integer> indices = new ArrayList<>();
 				indices.add(B18DataType.getEnergyIndex());
-				indices.addAll(IntStream.of(bean.getDataType().getDataIndices()).boxed().collect(Collectors.toList()));
+				indices.addAll(IntStream.of(bean.getDataType().getDataIndices(context, file_list_in.get(0))).boxed().collect(Collectors.toList()));
 				
 				data.allData = null;
 			
@@ -248,7 +271,7 @@ public class B18AverageConverter extends AbstractConversion {
 				if (xarr == null) 
 					throw new Exception("Could not find a suitable energy array for interpolation");
 				
-				int[] indices = bean.getDataType().getDataIndices();
+				int[] indices = bean.getDataType().getDataIndices(context, file_list_in.get(0));
 			
 				data.allData = new Dataset[1 + indices.length];
 				data.allData[0] = xarr;
@@ -290,7 +313,6 @@ public class B18AverageConverter extends AbstractConversion {
 
 
 		
-		//logger.debug("Our datasets: " + context.getDatasetNames());
 		
 	}
 

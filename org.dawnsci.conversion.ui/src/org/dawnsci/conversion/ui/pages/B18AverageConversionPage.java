@@ -1,19 +1,29 @@
 package org.dawnsci.conversion.ui.pages;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
+import org.dawb.common.ui.monitor.ProgressMonitorWrapper;
 import org.dawb.common.ui.util.GridUtils;
 import org.dawnsci.conversion.converters.B18AverageConverter;
 import org.dawnsci.conversion.converters.B18AverageConverter.B18DataType;
 import org.dawnsci.conversion.converters.B18AverageConverter.B18InterpolationType;
+import org.dawnsci.conversion.ui.LoaderServiceHolder;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
+import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
+import org.eclipse.dawnsci.slicing.api.util.SliceUtils;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 
 public class B18AverageConversionPage extends AbstractDatasetChoosePage {
@@ -59,6 +69,11 @@ public class B18AverageConversionPage extends AbstractDatasetChoosePage {
 			combo.addSelectionListener(new SelectionAdapter() {
 				public void widgetSelected(SelectionEvent e) {
 					dataTypeSelection = combo.getSelectionIndex();
+					if (dataTypeSelection == B18AverageConverter.B18DataType.CUSTOM.ordinal()) {
+						recursiveSetEnabled(main, true);
+					} else {
+						recursiveSetEnabled(main, false);
+					}
 				}
 			});
 		}
@@ -106,6 +121,34 @@ public class B18AverageConversionPage extends AbstractDatasetChoosePage {
 		setErrorMessage(null);
 		setPageComplete(true);
 	}
+
+	@Override
+	protected void getDataSetNames() throws Exception {
+		
+		getContainer().run(true, true, new IRunnableWithProgress() {
+
+			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+				
+				try {
+
+					final String source = getSourcePath(context);
+					if (source==null || "".equals(source)) return;
+					// Attempt to use meta data, save memory
+					IDataHolder holder = LoaderServiceHolder.getLoaderService().getData(source, new ProgressMonitorWrapper(monitor));
+					List<String> names = SliceUtils.getSlicableNames(holder, getMinimumDataSize());
+					// get rid of the energy -> it will always be included...
+					names = names.stream().filter(name -> !name.matches("(?i).*energy.*")).collect(Collectors.toList());
+					setDataNames(names.toArray(new String[names.size()]), null, holder);
+					return;
+
+				} catch (Exception ne) {
+					throw new InvocationTargetException(ne);
+				}
+
+			}
+
+		});
+	}
 	
 	@Override
 	public void setContext(IConversionContext context) {
@@ -126,7 +169,10 @@ public class B18AverageConversionPage extends AbstractDatasetChoosePage {
 		} catch (Exception e) {
 			logger.error("Cannot extract data sets!", e);
 		}
-        
+       
+        // necessary to ensure the table is grayed out when opening the page
+    	checkboxTableViewer.getTable().setEnabled(false);
+    	
 		final File source = new File(getSourcePath(context));
        
         setPageComplete(true);
@@ -164,7 +210,6 @@ public class B18AverageConversionPage extends AbstractDatasetChoosePage {
 		return context;
 	}
 
-	
 	protected int getMinimumDataSize() {
 		return 1; // Data must be 1D or better
 	}
@@ -182,7 +227,23 @@ public class B18AverageConversionPage extends AbstractDatasetChoosePage {
 	@Override
 	public void createContentAfterFileChoose(Composite container) {
 		super.createContentAfterFileChoose(container);
-    	main.setVisible(false);
+    	main.setVisible(true);
+    	// the default dataType is never CUSTOM
+    	recursiveSetEnabled(main, false);
+
 	}
 	
+	// Inspired by http://stackoverflow.com/questions/2957657/disable-and-grey-out-an-eclipse-widget
+	public void recursiveSetEnabled(Control ctrl, boolean enabled) {
+		   if (ctrl instanceof Composite) {
+		      Composite comp = (Composite) ctrl;
+		      Control[] kids = comp.getChildren();
+		      for (Control c : kids)
+		         recursiveSetEnabled(c, enabled);
+		      if (kids == null || kids.length == 0) 
+		    	  ctrl.setEnabled(enabled);
+		   } else {
+		      ctrl.setEnabled(enabled);
+		   }
+		}
 }
