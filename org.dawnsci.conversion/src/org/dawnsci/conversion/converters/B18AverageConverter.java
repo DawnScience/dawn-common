@@ -6,9 +6,12 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
+import java.util.stream.DoubleStream;
+import java.util.stream.IntStream;
 
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
@@ -18,15 +21,18 @@ import org.eclipse.dawnsci.analysis.dataset.impl.DatasetUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.ac.diamond.scisoft.analysis.dataset.function.Interpolation1D;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 
 public class B18AverageConverter extends AbstractConversion {
 
 	private static final Logger logger = LoggerFactory.getLogger(B18AverageConverter.class);
 
+	private static final double SHORT_RANGE = 10.0;
+	
 	private static class B18AverageData {
-		public Dataset qexafs_energy;
-		/*public Dataset time;
+		/*public Dataset qexafs_energy;
+		public Dataset time;
 		public Dataset I0;
 		public Dataset It;
 		public Dataset Iref;
@@ -48,7 +54,7 @@ public class B18AverageConverter extends AbstractConversion {
 		private final int[] dataIndices;
 		
 			
-		B18DataType(String type, int[] dataIndices) {
+		private B18DataType(String type, int[] dataIndices) {
 			this.type = type;
 			this.dataIndices = dataIndices;
 		}
@@ -68,9 +74,27 @@ public class B18AverageConverter extends AbstractConversion {
 		
 	}
 	
+	public enum B18InterpolationType {
+		NONE("None"),
+		LINEAR("Linear"),
+		SPLINE("Spline");
+	
+		private final String type;
+		
+		private B18InterpolationType(String type) {
+			this.type = type;
+		}
+		
+		@Override
+		public String toString() {
+			return type;
+		}
+	}
+	
 	public static final class ConversionInfoBean {
 		
 		B18DataType dataType = B18DataType.TRANSMISSION;
+		B18InterpolationType interpolationType = B18InterpolationType.LINEAR;
 		
 		public B18DataType getDataType() {
 			return dataType;
@@ -78,9 +102,12 @@ public class B18AverageConverter extends AbstractConversion {
 		public void setDataType(B18DataType dataType) {
 			this.dataType = dataType;
 		}
-		
-		
-		
+		public B18InterpolationType getInterpolationType() {
+			return interpolationType;
+		}
+		public void setInterpolationType(B18InterpolationType interpolationType) {
+			this.interpolationType = interpolationType;
+		}
 	}
 	
 	public B18AverageConverter(IConversionContext context) {
@@ -122,7 +149,7 @@ public class B18AverageConverter extends AbstractConversion {
 		
 		for (int grp_ind = 0 ; grp_ind < rep_1st.size()-1 ; grp_ind++) {
 			List<File> files = file_list_in.subList(rep_1st.get(grp_ind), rep_1st.get(grp_ind+1));
-			logger.debug("group " + grp_ind + " : " + files.stream().map(File::getAbsolutePath).collect(Collectors.joining(", ")));
+			//logger.debug("group " + grp_ind + " : " + files.stream().map(File::getAbsolutePath).collect(Collectors.joining(", ")));
 		
 			//if group contains just one file: ignore and go to the next one
 			if (files.size() == 1) {
@@ -136,57 +163,134 @@ public class B18AverageConverter extends AbstractConversion {
 			//in case all files do not have the same number of rows, use the minimal number of rows
 			int nrows_min = Integer.MAX_VALUE;
 			int nrows_max = Integer.MIN_VALUE;
-			for (File file : files) {
+			
+			for (int i = 0 ; i < files.size() ; ++i) {
+				File file = files.get(i);
 				//get the number of elements in the energy array
 				IDataHolder dh = LoaderFactory.getData(file.getAbsolutePath());
-				int irows = dh.getDataset(B18DataType.getEnergyIndex()).getSize();
+				Dataset energy = DatasetUtils.convertToDataset(dh.getDataset(B18DataType.getEnergyIndex()));
+				int irows = energy.getSize();
 				nrows_min = Math.min(nrows_min, irows);
 				nrows_max = Math.max(nrows_max, irows);
 			}
+			
 			
 			if (nrows_min != nrows_max) {
 				logger.warn("files in group do not have the same number of rows: calculating averages on minimum number of rows");
 			}
 		
-			IDataHolder dh = LoaderFactory.getData(files.get(0).getAbsolutePath());
+			if (bean.getInterpolationType() == B18InterpolationType.NONE) {
+				// NO interpolation
+				logger.debug("No interpolation used");
+				
+				List<Integer> indices = new ArrayList<>();
+				indices.add(B18DataType.getEnergyIndex());
+				indices.addAll(IntStream.of(bean.getDataType().getDataIndices()).boxed().collect(Collectors.toList()));
+				
+				data.allData = null;
 			
-			// loading datasets by index could be a bit dangerous...
-			data.qexafs_energy = DatasetUtils.convertToDataset(dh.getDataset(B18DataType.getEnergyIndex()).getSlice(null, new int[]{nrows_min}, null));
-			logger.debug("qexafs_energy name: " + data.qexafs_energy.getName());
-			
-			int[] indices = bean.getDataType().getDataIndices();
-			
-			data.allData = null;
-			
-			for (File file : files) {
-				Dataset[] tempData = new Dataset[indices.length];
-				dh = LoaderFactory.getData(file.getAbsolutePath());
-				int counter = 0;
-				for (int index : indices) {
-					if (index < 0)
-						index += dh.size();
-					tempData[counter++] = DatasetUtils.convertToDataset(dh.getDataset(index).getSlice(null, new int[]{nrows_min}, null));
-				}
-				if (file == files.get(0)) {
-					// first file
-					data.allData = tempData;
-				} else {
-					for (int i = 0 ; i < tempData.length ; i++) {
-						data.allData[i].iadd(tempData[i]);
+				for (File file : files) {
+					Dataset[] tempData = new Dataset[indices.size()];
+					IDataHolder dh = LoaderFactory.getData(file.getAbsolutePath());
+					int counter = 0;
+					for (int index : indices) {
+						if (index < 0)
+							index += dh.size();
+						// loading datasets by index could be a bit dangerous...
+						tempData[counter++] = DatasetUtils.convertToDataset(dh.getDataset(index).getSlice(null, new int[]{nrows_min}, null));
+					}
+					if (file == files.get(0)) {
+						// first file
+						data.allData = tempData;
+					} else {
+						for (int i = 0 ; i < tempData.length ; i++) {
+							data.allData[i].iadd(tempData[i]);
+						}
 					}
 				}
-			}
-			for (Dataset tempData : data.allData) {
-				tempData.idivide(files.size());
-			}
+				for (Dataset tempData : data.allData) {
+					tempData.idivide(files.size());
+				}
+			} else {
+				logger.debug("Interpolation used: " + bean.getInterpolationType().toString());
+				// interpolation mode
+				double[] enemin_arr = new double[files.size()]; 
+				double[] enemax_arr = new double[files.size()]; 
 			
+				// identify which energy dataset we should be using
+				for (int i = 0 ; i < files.size() ; ++i) {
+					File file = files.get(i);
+					//get the number of elements in the energy array
+					IDataHolder dh = LoaderFactory.getData(file.getAbsolutePath());
+					Dataset energy = DatasetUtils.convertToDataset(dh.getDataset(B18DataType.getEnergyIndex()).getSlice(null, new int[]{nrows_min}, null));
+					// 
+					double enemin = energy.getDouble(0);
+					double enemax = energy.getDouble(-1);
+					enemin_arr[i] = enemin;
+					enemax_arr[i] = enemax;
+				}
+				
+				double enemin_min = DoubleStream.of(enemin_arr).min().getAsDouble();
+				double enemax_max = DoubleStream.of(enemax_arr).max().getAsDouble();
+
+				Dataset xarr = null; /* energy to be used for interpolation */
+				
+				for (int i = 0 ; i < files.size() ; ++i) {
+					File file = files.get(i);
+					if (enemin_arr[i] < enemin_min + SHORT_RANGE && enemax_arr[i] > enemax_max - SHORT_RANGE) {
+						// good energy array found
+						IDataHolder dh = LoaderFactory.getData(file.getAbsolutePath());
+						xarr = DatasetUtils.convertToDataset(dh.getDataset(B18DataType.getEnergyIndex()).getSlice(null, new int[]{nrows_min}, null));
+						break;
+					}
+				}
+				
+				if (xarr == null) 
+					throw new Exception("Could not find a suitable energy array for interpolation");
+				
+				int[] indices = bean.getDataType().getDataIndices();
+			
+				data.allData = new Dataset[1 + indices.length];
+				data.allData[0] = xarr;
+				
+				for (File file : files) {
+					Dataset[] tempData = new Dataset[indices.length];
+					IDataHolder dh = LoaderFactory.getData(file.getAbsolutePath());
+					Dataset energy_old = DatasetUtils.convertToDataset(dh.getDataset(B18DataType.getEnergyIndex()).getSlice(null, new int[]{nrows_min}, null));
+					int counter = 0;
+					for (int index : indices) {
+						if (index < 0)
+							index += dh.size();
+						Dataset tempDataset = DatasetUtils.convertToDataset(dh.getDataset(index).getSlice(null, new int[]{nrows_min}, null));
+						if (bean.getInterpolationType() == B18InterpolationType.LINEAR) {
+							tempData[counter++] = Interpolation1D.linearInterpolation(energy_old, tempDataset, xarr);
+						} else if (bean.getInterpolationType() == B18InterpolationType.SPLINE) {
+							tempData[counter++] = Interpolation1D.splineInterpolation(energy_old, tempDataset, xarr);
+						}
+					}
+					if (file == files.get(0)) {
+						// first file
+						System.arraycopy(tempData, 0, data.allData, 1, indices.length);
+					} else {
+						for (int i = 0 ; i < tempData.length ; i++) {
+							data.allData[i + 1].iadd(tempData[i]);
+						}
+					}
+				}
+				for (Dataset tempDataset : Arrays.asList(data.allData).subList(1, data.allData.length)) {
+					tempDataset.idivide(files.size());
+				}
+				
+				
+				
+			}
 			//ok time to write these datasets to file
 			writeFile(files.get(0), context, data);
 		}
 
 
 		
-		logger.debug("Our datasets: " + context.getDatasetNames());
+		//logger.debug("Our datasets: " + context.getDatasetNames());
 		
 	}
 
@@ -225,16 +329,14 @@ public class B18AverageConverter extends AbstractConversion {
 	private static void writeData(StringBuilder contents, B18AverageData data, IConversionContext context) {
 		contents.append("# ");
 		StringJoiner header = new StringJoiner("\t");
-		header.add(cleanDatasetName(data.qexafs_energy.getName()));
 		for (Dataset tempData : data.allData) {
 			header.add(cleanDatasetName(tempData.getName()));
 		}
 		contents.append(header.toString());
 		contents.append("\r\n"); // Intentionally windows.
 
-		for (int i = 0 ; i < data.qexafs_energy.getSize() ; i++) {
+		for (int i = 0 ; i < data.allData[0].getSize() ; i++) {
 			StringJoiner dataLine = new StringJoiner("\t");
-			dataLine.add(Double.toString(data.qexafs_energy.getDouble(i)));
 			for (Dataset tempData : data.allData) {
 				dataLine.add(Double.toString(tempData.getDouble(i)));
 			}
@@ -244,6 +346,7 @@ public class B18AverageConverter extends AbstractConversion {
 	}
 	
 	private static String cleanDatasetName(String dirtyName) {
-		return dirtyName.substring(0, dirtyName.length() - 3);
+		int last_bracket = dirtyName.lastIndexOf('[');
+		return dirtyName.substring(0, last_bracket);
 	}
 }

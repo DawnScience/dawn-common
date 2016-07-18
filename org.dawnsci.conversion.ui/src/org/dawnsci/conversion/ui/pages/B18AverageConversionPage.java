@@ -6,6 +6,7 @@ import java.util.Arrays;
 import org.dawb.common.ui.util.GridUtils;
 import org.dawnsci.conversion.converters.B18AverageConverter;
 import org.dawnsci.conversion.converters.B18AverageConverter.B18DataType;
+import org.dawnsci.conversion.converters.B18AverageConverter.B18InterpolationType;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -19,8 +20,10 @@ public class B18AverageConversionPage extends AbstractDatasetChoosePage {
 
 	// some Java 8 lambda/stream magic
 	private final static String[] B18DATATYPE_OPTIONS = Arrays.stream(B18AverageConverter.B18DataType.values()).map(e -> e.toString()).toArray(String[]::new);
+	private final static String[] B18INTERPOLATION_OPTIONS = Arrays.stream(B18AverageConverter.B18InterpolationType.values()).map(e -> e.toString()).toArray(String[]::new);
 	
 	protected int dataTypeSelection;
+	protected int interpolationSelection;
 	
 	/**
 	 * Create the wizard.
@@ -42,23 +45,40 @@ public class B18AverageConversionPage extends AbstractDatasetChoosePage {
 	 */
 	@Override
 	public void createContentBeforeFileChoose(Composite container) {
-				
-		Label convertLabel = new Label(container, SWT.NONE);
-		convertLabel.setText("Datatype");
-		
-		final Combo combo = new Combo(container, SWT.READ_ONLY|SWT.BORDER);
-		combo.setItems(B18DATATYPE_OPTIONS);
-		combo.setToolTipText("Select the type of data");
-		combo.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 3, 1));
-		combo.select(0);
-		
-		dataTypeSelection = 0;
-		combo.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				dataTypeSelection = combo.getSelectionIndex();
-			}
-		});
+		{
+			final Label convertLabel = new Label(container, SWT.NONE);
+			convertLabel.setText("Datatype");
 
+			final Combo combo = new Combo(container, SWT.READ_ONLY|SWT.BORDER);
+			combo.setItems(B18DATATYPE_OPTIONS);
+			combo.setToolTipText("Select the type of data");
+			combo.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 3, 1));
+			combo.select(0);
+
+			dataTypeSelection = 0;
+			combo.addSelectionListener(new SelectionAdapter() {
+				public void widgetSelected(SelectionEvent e) {
+					dataTypeSelection = combo.getSelectionIndex();
+				}
+			});
+		}
+		{
+			final Label convertLabel = new Label(container, SWT.NONE);
+			convertLabel.setText("Interpolation");
+
+			final Combo combo = new Combo(container, SWT.READ_ONLY|SWT.BORDER);
+			combo.setItems(B18INTERPOLATION_OPTIONS);
+			combo.setToolTipText("Select the interpolation type");
+			combo.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 3, 1));
+			combo.select(0);
+
+			interpolationSelection = 0;
+			combo.addSelectionListener(new SelectionAdapter() {
+				public void widgetSelected(SelectionEvent e) {
+					interpolationSelection = combo.getSelectionIndex();
+				}
+			});
+		}
 	}
 	
 	/**
@@ -136,6 +156,7 @@ public class B18AverageConversionPage extends AbstractDatasetChoosePage {
 		final B18AverageConverter.ConversionInfoBean bean = new B18AverageConverter.ConversionInfoBean();
 		//bean.setConversionType(getExtension());
 		bean.setDataType(B18DataType.values()[dataTypeSelection]);
+		bean.setInterpolationType(B18InterpolationType.values()[interpolationSelection]);
 		context.setUserObject(bean);
 		context.setOutputPath(getAbsoluteFilePath()); // cvs or dat file.
 		//getSelected will here need to correspond to the datasets we need. Their names are known
