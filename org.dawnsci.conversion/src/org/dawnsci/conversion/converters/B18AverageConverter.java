@@ -16,12 +16,11 @@ import java.util.stream.IntStream;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
 import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
+import org.eclipse.dawnsci.analysis.api.metadata.IMetadata;
 import org.eclipse.dawnsci.analysis.dataset.impl.Dataset;
 import org.eclipse.dawnsci.analysis.dataset.impl.DatasetUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.sun.msv.writer.relaxng.Context;
 
 import uk.ac.diamond.scisoft.analysis.dataset.function.Interpolation1D;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
@@ -32,8 +31,6 @@ public class B18AverageConverter extends AbstractConversion {
 
 	private static final double SHORT_RANGE = 10.0;
 
-	private IConversionContext context;
-	
 	private static class B18AverageData {
 		/*public Dataset qexafs_energy;
 		public Dataset time;
@@ -115,6 +112,9 @@ public class B18AverageConverter extends AbstractConversion {
 		
 		B18DataType dataType = B18DataType.TRANSMISSION;
 		B18InterpolationType interpolationType = B18InterpolationType.LINEAR;
+		boolean useMetadataForGrouping = false;
+		String metadataForGroupingName = "";
+		double metadataForGroupingDelta = 0.0;
 		
 		public B18DataType getDataType() {
 			return dataType;
@@ -127,6 +127,24 @@ public class B18AverageConverter extends AbstractConversion {
 		}
 		public void setInterpolationType(B18InterpolationType interpolationType) {
 			this.interpolationType = interpolationType;
+		}
+		public boolean isUseMetadataForGrouping() {
+			return useMetadataForGrouping;
+		}
+		public void setUseMetadataForGrouping(boolean useMetadataForGrouping) {
+			this.useMetadataForGrouping = useMetadataForGrouping;
+		}
+		public String getMetadataForGroupingName() {
+			return metadataForGroupingName;
+		}
+		public void setMetadataForGroupingName(String metadataForGroupingName) {
+			this.metadataForGroupingName = metadataForGroupingName;
+		}
+		public double getMetadataForGroupingDelta() {
+			return metadataForGroupingDelta;
+		}
+		public void setMetadataForGroupingDelta(double metadataForGroupingDelta) {
+			this.metadataForGroupingDelta = metadataForGroupingDelta;
 		}
 	}
 	
@@ -149,6 +167,7 @@ public class B18AverageConverter extends AbstractConversion {
 		List<File> file_list_in = new ArrayList<>();
 		List<Integer> rep_1st = new ArrayList<>();
 		final List<String> filePaths = context.getFilePaths();
+		double refMetadataValue = Double.NEGATIVE_INFINITY;
 		for (String filePathRegEx : filePaths) {
 			final List<File> paths = expand(filePathRegEx);
 			// add all paths after expansion to the file_list
@@ -160,9 +179,30 @@ public class B18AverageConverter extends AbstractConversion {
 				String[] components = basename.split("_");
 				//logger.debug("components: " + Arrays.toString(components));
 				// check if this file marks the start of a repetition
-				if (components[components.length-1].equals("1.dat")) {
+				if (!bean.useMetadataForGrouping && components[components.length-1].equals("1.dat")) {
 					int position = file_list_in.indexOf(path);
 					rep_1st.add(position);
+				} else if (bean.useMetadataForGrouping) {
+					// if first component -> add index to list
+					if (components[components.length-1].equals("1.dat")) {
+						int position = file_list_in.indexOf(path);
+						rep_1st.add(position);
+					}
+					//open file and extract the required metadata
+					IDataHolder dh = LoaderFactory.getData(path.getAbsolutePath());
+					IMetadata md = dh.getMetadata();
+					double currentMetadataValue = Double.parseDouble((String) md.getMetaValue(bean.getMetadataForGroupingName()));
+					
+					if (components[components.length-1].equals("1.dat")) {
+						refMetadataValue = currentMetadataValue;
+					} else if (currentMetadataValue > refMetadataValue + bean.getMetadataForGroupingDelta()) {
+						// start a new group
+						int position = file_list_in.indexOf(path);
+						rep_1st.add(position);
+						refMetadataValue = currentMetadataValue;
+					} else {
+						// no nothing
+					}
 				}
 			}
 		}

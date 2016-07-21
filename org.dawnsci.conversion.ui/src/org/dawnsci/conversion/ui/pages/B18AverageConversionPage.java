@@ -15,16 +15,26 @@ import org.dawnsci.conversion.ui.LoaderServiceHolder;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
+import org.eclipse.dawnsci.analysis.api.metadata.IMetadata;
 import org.eclipse.dawnsci.slicing.api.util.SliceUtils;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Event;
 
 public class B18AverageConversionPage extends AbstractDatasetChoosePage {
 
@@ -34,6 +44,12 @@ public class B18AverageConversionPage extends AbstractDatasetChoosePage {
 	
 	protected int dataTypeSelection;
 	protected int interpolationSelection;
+	protected String[] parseableMetadata;
+	protected Table parseableMetadataTable;
+	private IMetadata md;
+	private boolean useMetadata;
+	private double metadataDelta;
+	private Button parseableMetadataButton;
 	
 	/**
 	 * Create the wizard.
@@ -55,14 +71,20 @@ public class B18AverageConversionPage extends AbstractDatasetChoosePage {
 	 */
 	@Override
 	public void createContentBeforeFileChoose(Composite container) {
+		Composite newContainer = new Composite(container, SWT.NONE);
+		newContainer.setLayout(new GridLayout(5, false));
+		final GridData newContainerGrid = new GridData(SWT.FILL, SWT.FILL, true, true, 4, 1);
+		newContainerGrid.minimumHeight = 35;
+		newContainer.setLayoutData(newContainerGrid);
 		{
-			final Label convertLabel = new Label(container, SWT.NONE);
+			final Label convertLabel = new Label(newContainer, SWT.NONE);
 			convertLabel.setText("Datatype");
+			convertLabel.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
 
-			final Combo combo = new Combo(container, SWT.READ_ONLY|SWT.BORDER);
+			final Combo combo = new Combo(newContainer, SWT.READ_ONLY|SWT.BORDER);
 			combo.setItems(B18DATATYPE_OPTIONS);
 			combo.setToolTipText("Select the type of data");
-			combo.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 3, 1));
+			combo.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
 			combo.select(0);
 
 			dataTypeSelection = 0;
@@ -77,14 +99,17 @@ public class B18AverageConversionPage extends AbstractDatasetChoosePage {
 				}
 			});
 		}
+		final Label fillLabel = new Label(newContainer, SWT.NONE);
+		fillLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 		{
-			final Label convertLabel = new Label(container, SWT.NONE);
+			final Label convertLabel = new Label(newContainer, SWT.NONE);
 			convertLabel.setText("Interpolation");
+			convertLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 
-			final Combo combo = new Combo(container, SWT.READ_ONLY|SWT.BORDER);
+			final Combo combo = new Combo(newContainer, SWT.READ_ONLY|SWT.BORDER);
 			combo.setItems(B18INTERPOLATION_OPTIONS);
 			combo.setToolTipText("Select the interpolation type");
-			combo.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 3, 1));
+			combo.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 			combo.select(0);
 
 			interpolationSelection = 0;
@@ -94,6 +119,69 @@ public class B18AverageConversionPage extends AbstractDatasetChoosePage {
 				}
 			});
 		}
+		
+		final Group parseableMetadataGroup = new Group(container, SWT.NONE);
+		parseableMetadataGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 4, 1));
+		parseableMetadataGroup.setLayout(new GridLayout(3, false));
+		parseableMetadataGroup.setText("Metadata");
+		
+		parseableMetadataButton = new Button(parseableMetadataGroup, SWT.CHECK);
+		parseableMetadataButton.setText("Use metadata for grouping");
+		parseableMetadataButton.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
+		final Label parseableMetadataLabel = new Label(parseableMetadataGroup, SWT.RIGHT);
+		parseableMetadataLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+		parseableMetadataLabel.setText("Delta");
+		final Text parseableMetadataText = new Text(parseableMetadataGroup, SWT.BORDER | SWT.SINGLE);
+		final GridData textGrid = new GridData(SWT.FILL, SWT.CENTER, true, false);
+		//textGrid.minimumWidth = 40;
+		parseableMetadataText.setLayoutData(textGrid);
+		parseableMetadataText.setText("0.1");
+		metadataDelta = 0.1;
+		//parseableMetadataText.setSize(450, SWT.DEFAULT);
+		parseableMetadataText.addListener(SWT.Modify, event -> {
+			// check if delta is a double and greater than or equal to zero
+			String text = parseableMetadataText.getText();
+			try {
+				double deltaTemp = Double.parseDouble(text);
+				if (deltaTemp < 0.0)
+					throw new Exception();
+				parseableMetadataText.setBackground(null);
+				setErrorMessage(null);
+				setPageComplete(true);
+				metadataDelta = deltaTemp;
+			} catch (Exception e) {
+				parseableMetadataText.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+				setErrorMessage("Delta must be greater than or equal to zero");
+				setPageComplete(false);
+			}
+		});
+		
+		// parseableMetadata table
+		parseableMetadataTable = new Table(parseableMetadataGroup, SWT.BORDER | SWT.HIDE_SELECTION);
+		parseableMetadataTable.setLinesVisible(true);
+		final GridData tableGrid = new GridData(SWT.FILL, SWT.FILL, true, true, 3, 1);
+		tableGrid.minimumHeight = 100;
+		parseableMetadataTable.setLayoutData(tableGrid);
+		parseableMetadataTable.setHeaderVisible(true);
+		// metadata name column
+		TableColumn tempColumn = new TableColumn(parseableMetadataTable, SWT.LEFT);
+		tempColumn.setWidth(300);
+		tempColumn.setText("Metadata name");
+		// metadata value first file
+		tempColumn = new TableColumn(parseableMetadataTable, SWT.LEFT);
+		tempColumn.setWidth(200);
+		tempColumn.setText("Metadata value first file");
+	
+		parseableMetadataButton.addListener(SWT.Selection, event -> {
+			parseableMetadataLabel.setEnabled(parseableMetadataButton.getSelection());
+			parseableMetadataText.setEnabled(parseableMetadataButton.getSelection());
+			parseableMetadataTable.setEnabled(parseableMetadataButton.getSelection());
+			useMetadata = parseableMetadataButton.getSelection();
+		});
+		
+		parseableMetadataButton.setSelection(false);
+		parseableMetadataButton.notifyListeners(SWT.Selection, new Event());
+		
 	}
 	
 	/**
@@ -127,6 +215,7 @@ public class B18AverageConversionPage extends AbstractDatasetChoosePage {
 		
 		getContainer().run(true, true, new IRunnableWithProgress() {
 
+
 			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 				
 				try {
@@ -139,6 +228,18 @@ public class B18AverageConversionPage extends AbstractDatasetChoosePage {
 					// get rid of the energy -> it will always be included...
 					names = names.stream().filter(name -> !name.matches("(?i).*energy.*")).collect(Collectors.toList());
 					setDataNames(names.toArray(new String[names.size()]), null, holder);
+					
+					md = holder.getMetadata();
+					parseableMetadata = md.getMetaNames().stream().filter(name -> {
+						// lambda magic
+						try {
+							Double.parseDouble((String) md.getMetaValue(name));
+							return true;
+						} catch (Exception e) {
+							return false;
+						}
+					}).toArray(String[]::new);
+					
 					return;
 
 				} catch (Exception ne) {
@@ -185,15 +286,39 @@ public class B18AverageConversionPage extends AbstractDatasetChoosePage {
         	this.overwriteButton.setSelection(true);
         	this.overwrite = true;
         	this.overwriteButton.setEnabled(false);
+        	this.overwriteButton.setVisible(false);
         	this.openButton.setSelection(false);
         	this.open = false;
         	this.openButton.setEnabled(false);
+        	this.openButton.setVisible(false);
+        	//parseableMetadataTable.getParent().getParent().layout(false);
         } else {
         	// this cannot happen... More than one file should always be provided for this to work
         	setPageComplete(false);
         	logger.error("B18 data averaging requires either multiple files or a folder");
         }
 
+    	// clear the table
+    	parseableMetadataTable.removeAll();
+    	// add the metadata names
+    	for (String metaDataName : parseableMetadata) {
+    		TableItem item = new TableItem(parseableMetadataTable, SWT.NONE);
+    		
+    		item.setText(0, metaDataName);
+    		try {
+				item.setText(1, (String) md.getMetaValue(metaDataName));
+			} catch (Exception e) {
+				// unlikely to happen but have to catch it...
+			}
+    	}
+    	if (parseableMetadata == null || parseableMetadata.length == 0) {
+    		parseableMetadataButton.setEnabled(false);
+    		parseableMetadataButton.setSelection(false);
+    		useMetadata = false;
+    	}
+    	else {
+    		parseableMetadataTable.select(0);
+    	}
 	}	
 	
 	@Override
@@ -203,6 +328,13 @@ public class B18AverageConversionPage extends AbstractDatasetChoosePage {
 		//bean.setConversionType(getExtension());
 		bean.setDataType(B18DataType.values()[dataTypeSelection]);
 		bean.setInterpolationType(B18InterpolationType.values()[interpolationSelection]);
+		bean.setUseMetadataForGrouping(useMetadata);
+		if (bean.isUseMetadataForGrouping()) {
+			bean.setMetadataForGroupingDelta(metadataDelta);
+			//now the name of the metadata...
+			String metadataName = parseableMetadataTable.getSelection()[0].getText(0);
+			bean.setMetadataForGroupingName(metadataName);
+		}
 		context.setUserObject(bean);
 		context.setOutputPath(getAbsoluteFilePath()); // cvs or dat file.
 		//getSelected will here need to correspond to the datasets we need. Their names are known
@@ -230,7 +362,6 @@ public class B18AverageConversionPage extends AbstractDatasetChoosePage {
     	main.setVisible(true);
     	// the default dataType is never CUSTOM
     	recursiveSetEnabled(main, false);
-
 	}
 	
 	// Inspired by http://stackoverflow.com/questions/2957657/disable-and-grey-out-an-eclipse-widget
