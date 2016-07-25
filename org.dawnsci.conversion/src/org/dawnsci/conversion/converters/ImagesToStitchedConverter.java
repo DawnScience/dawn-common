@@ -17,17 +17,17 @@ import org.dawb.common.util.list.SortNatural;
 import org.dawnsci.conversion.ServiceLoader;
 import org.dawnsci.conversion.converters.util.LocalServiceManager;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
-import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
-import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
-import org.eclipse.dawnsci.analysis.api.dataset.ILazyWriteableDataset;
-import org.eclipse.dawnsci.analysis.api.dataset.SliceND;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
-import org.eclipse.dawnsci.analysis.api.monitor.IMonitor;
 import org.eclipse.dawnsci.analysis.api.roi.IROI;
-import org.eclipse.dawnsci.analysis.dataset.impl.AbstractDataset;
 import org.eclipse.dawnsci.analysis.dataset.impl.Image;
-import org.eclipse.dawnsci.analysis.dataset.impl.LazyDataset;
 import org.eclipse.dawnsci.hdf5.HDF5Utils;
+import org.eclipse.january.IMonitor;
+import org.eclipse.january.dataset.Dataset;
+import org.eclipse.january.dataset.IDataset;
+import org.eclipse.january.dataset.ILazyDataset;
+import org.eclipse.january.dataset.ILazyWriteableDataset;
+import org.eclipse.january.dataset.LazyDataset;
+import org.eclipse.january.dataset.SliceND;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -156,7 +156,7 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 		ImageStackLoader loader = new ImageStackLoader(paths,
 				context.getMonitor());
 		lazyDataset = new LazyDataset("Folder Stack",
-				loader.getDtype(), loader.getShape(), loader);
+				loader.getDType(), loader.getShape(), loader);
 		return lazyDataset;
 	}
 
@@ -185,7 +185,7 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 		File tmpFile = new File(file);
 		if (tmpFile.exists())
 			tmpFile.delete();
-		return HDF5Utils.createLazyDataset(file, nodepath, name, newShape, null, newShape, AbstractDataset.FLOAT32, null, false);
+		return HDF5Utils.createLazyDataset(file, nodepath, name, newShape, null, newShape, Dataset.FLOAT32, null, false);
 	}
 
 	/**

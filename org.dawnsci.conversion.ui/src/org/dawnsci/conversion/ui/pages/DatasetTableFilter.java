@@ -10,7 +10,7 @@ package org.dawnsci.conversion.ui.pages;
 
 import java.util.Arrays;
 
-import org.eclipse.dawnsci.analysis.api.metadata.IMetadata;
+import org.eclipse.january.metadata.IMetadata;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 

@@ -18,13 +18,13 @@ import java.util.List;
 import org.dawb.common.util.list.SortNatural;
 import org.dawnsci.conversion.converters.util.LocalServiceManager;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
-import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
-import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
 import org.eclipse.dawnsci.analysis.api.downsample.DownsampleMode;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
 import org.eclipse.dawnsci.analysis.dataset.function.Downsample;
-import org.eclipse.dawnsci.analysis.dataset.impl.LazyDataset;
 import org.eclipse.dawnsci.plotting.api.histogram.ImageServiceBean;
+import org.eclipse.january.dataset.IDataset;
+import org.eclipse.january.dataset.ILazyDataset;
+import org.eclipse.january.dataset.LazyDataset;
 
 import uk.ac.diamond.scisoft.analysis.io.ImageStackLoader;
 
@@ -77,7 +77,7 @@ public abstract class AbstractImageConversion extends AbstractConversion {
 					final IDataHolder holder = LocalServiceManager.getLoaderService().getData(images.get(0), context.getMonitor());
 		 		    Collections.sort(images, new SortNatural<String>(true));
 					ImageStackLoader loader = new ImageStackLoader(images, holder, context.getMonitor());
-					LazyDataset lazyDataset = new LazyDataset("Image Stack", loader.getDtype(), loader.getShape(), loader);
+					LazyDataset lazyDataset = new LazyDataset("Image Stack", loader.getDType(), loader.getShape(), loader);
 				    context.setLazyDataset(lazyDataset);
 				}
 				

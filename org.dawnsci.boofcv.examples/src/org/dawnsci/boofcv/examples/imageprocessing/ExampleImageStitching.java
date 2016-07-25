@@ -1,7 +1,7 @@
 package org.dawnsci.boofcv.examples.imageprocessing;
 
 import org.dawnsci.boofcv.examples.util.Utils;
-import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
+import org.eclipse.january.dataset.IDataset;
 
 public class ExampleImageStitching {
 

@@ -14,10 +14,11 @@ import georegression.struct.se.Se2_F64;
 import java.util.List;
 
 import org.dawnsci.boofcv.converter.ConvertIDataset;
-import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
-import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
-import org.eclipse.dawnsci.analysis.api.dataset.Slice;
-import org.eclipse.dawnsci.analysis.api.monitor.IMonitor;
+import org.eclipse.january.DatasetException;
+import org.eclipse.january.IMonitor;
+import org.eclipse.january.dataset.IDataset;
+import org.eclipse.january.dataset.ILazyDataset;
+import org.eclipse.january.dataset.Slice;
 
 import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
@@ -170,8 +171,9 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 	 * @param columns
 	 * @param monitor
 	 *            To monitor progress
+	 * @throws DatasetException 
 	 */
-	public void translationArray(ILazyDataset images, double[][][] motorTranslations, int rows, int columns, IMonitor monitor) {
+	public void translationArray(ILazyDataset images, double[][][] motorTranslations, int rows, int columns, IMonitor monitor) throws DatasetException {
 
 		// stores the translations
 		translations = new double[columns][rows][2];
@@ -479,8 +481,9 @@ public class FullStitchingObject<T extends ImageSingleBand<?>, TD extends TupleD
 	 * @param monitor
 	 *            monitor progress
 	 * @return The new image with all the images stitched to it
+	 * @throws DatasetException 
 	 */
-	public ImageSingleBand<?> stitch(ILazyDataset images, int rows, int columns, IMonitor monitor) {
+	public ImageSingleBand<?> stitch(ILazyDataset images, int rows, int columns, IMonitor monitor) throws DatasetException {
 		// define an origin to be the top-corner of the first image such that
 		// all the translations can be given relative to this image
 		double[] origin = new double[2];

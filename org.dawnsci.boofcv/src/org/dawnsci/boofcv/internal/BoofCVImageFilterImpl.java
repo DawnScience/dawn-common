@@ -10,11 +10,12 @@ package org.dawnsci.boofcv.internal;
 
 import org.dawnsci.boofcv.converter.ConvertIDataset;
 import org.dawnsci.boofcv.util.Utils;
-import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.image.IImageFilterService;
 import org.eclipse.dawnsci.analysis.api.image.ImageThresholdType;
-import org.eclipse.dawnsci.analysis.dataset.impl.AbstractDataset;
-import org.eclipse.dawnsci.analysis.dataset.impl.BooleanDataset;
+import org.eclipse.january.dataset.BooleanDataset;
+import org.eclipse.january.dataset.DTypeUtils;
+import org.eclipse.january.dataset.Dataset;
+import org.eclipse.january.dataset.IDataset;
 
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.GThresholdImageOps;
@@ -54,8 +55,8 @@ public class BoofCVImageFilterImpl implements IImageFilterService {
 	@Override
 	public IDataset filterGaussianBlur(IDataset input, double sigma, int radius) {
 		int[] shape = Utils.getShape(input);
-		int type = AbstractDataset.getDType(input);
-		if (type == AbstractDataset.RGB) {
+		int type = DTypeUtils.getDType(input);
+		if (type == Dataset.RGB) {
 			ImageBase<?> rgbConverted = ConvertIDataset.convertFrom(input, ImageFloat32.class, 3);
 			MultiSpectral<ImageFloat32> blurred = new MultiSpectral<ImageFloat32>(ImageFloat32.class, 3);
 			ImageFloat32 rBlurred = new ImageFloat32(shape[1], shape[0]);
@@ -145,8 +146,8 @@ public class BoofCVImageFilterImpl implements IImageFilterService {
 	@Override
 	public IDataset filterMedian(IDataset input, int radius) {
 		int[] shape = Utils.getShape(input);
-		int type = AbstractDataset.getDType(input);
-		if (type == AbstractDataset.RGB) {
+		int type = DTypeUtils.getDType(input);
+		if (type == Dataset.RGB) {
 			ImageBase<?> rgbConverted = ConvertIDataset.convertFrom(input, ImageFloat32.class, 3);
 			MultiSpectral<ImageFloat32> median = new MultiSpectral<ImageFloat32>(ImageFloat32.class, 3);
 			ImageFloat32 rMedian = new ImageFloat32(shape[1], shape[0]);
@@ -167,8 +168,8 @@ public class BoofCVImageFilterImpl implements IImageFilterService {
 	@Override
 	public IDataset filterMean(IDataset input, int radius) {
 		int[] shape = Utils.getShape(input);
-		int type = AbstractDataset.getDType(input);
-		if (type == AbstractDataset.RGB) {
+		int type = DTypeUtils.getDType(input);
+		if (type == Dataset.RGB) {
 			ImageBase<?> rgbConverted = ConvertIDataset.convertFrom(input, ImageFloat32.class, 3);
 			MultiSpectral<ImageFloat32> mean = new MultiSpectral<ImageFloat32>(ImageFloat32.class, 3);
 			ImageFloat32 rMean = new ImageFloat32(shape[1], shape[0]);

@@ -15,14 +15,14 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.dawb.common.ui.util.EclipseUtils;
-import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
-import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
-import org.eclipse.dawnsci.analysis.api.dataset.Slice;
-import org.eclipse.dawnsci.analysis.api.monitor.IMonitor;
-import org.eclipse.dawnsci.analysis.dataset.impl.LazyDataset;
 import org.eclipse.dawnsci.plotting.api.IPlottingSystem;
 import org.eclipse.dawnsci.plotting.api.PlottingFactory;
 import org.eclipse.dawnsci.plotting.api.trace.IImageTrace;
+import org.eclipse.january.IMonitor;
+import org.eclipse.january.dataset.IDataset;
+import org.eclipse.january.dataset.ILazyDataset;
+import org.eclipse.january.dataset.LazyDataset;
+import org.eclipse.january.dataset.Slice;
 import org.eclipse.ui.IWorkbenchPage;
 
 import uk.ac.diamond.scisoft.analysis.SDAPlotter;
@@ -68,7 +68,7 @@ public class Utils {
 		List<IDataset> data = new ArrayList<IDataset>();
 		try {
 			ImageStackLoader loader = new ImageStackLoader(names, progressMonitorWrapper);
-			ILazyDataset lazyStack = new LazyDataset("Folder Stack", loader.getDtype(), loader.getShape(), loader);
+			ILazyDataset lazyStack = new LazyDataset("Folder Stack", loader.getDType(), loader.getShape(), loader);
 			int[] shape = lazyStack.getShape();
 			for (int i = 0; i < shape[0]; i++) {
 				IDataset image = lazyStack.getSlice(new Slice(i, shape[0], shape[1])).squeeze();

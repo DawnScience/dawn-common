@@ -11,7 +11,7 @@ package org.dawnsci.io.spec;
 import java.util.Collection;
 import java.util.EventObject;
 
-import org.eclipse.dawnsci.analysis.dataset.impl.Dataset;
+import org.eclipse.january.dataset.Dataset;
 
 public class MultiScanDataEvent extends EventObject {
 

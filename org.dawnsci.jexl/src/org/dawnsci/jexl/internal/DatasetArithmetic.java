@@ -9,7 +9,7 @@
 package org.dawnsci.jexl.internal;
 
 import org.apache.commons.jexl2.JexlArithmetic;
-import org.eclipse.dawnsci.analysis.dataset.impl.Maths;
+import org.eclipse.january.dataset.Maths;
 
 /**
  * DatasetArithmetic class overriding the plus, minus, multiplication and

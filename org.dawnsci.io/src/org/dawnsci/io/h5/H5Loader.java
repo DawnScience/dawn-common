@@ -8,6 +8,7 @@
  */ 
 package org.dawnsci.io.h5;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -16,18 +17,19 @@ import java.util.List;
 import java.util.Map;
 
 import org.dawb.common.util.io.FileUtils;
-import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
 import org.eclipse.dawnsci.analysis.api.io.ScanFileHolderException;
 import org.eclipse.dawnsci.analysis.api.io.SliceObject;
-import org.eclipse.dawnsci.analysis.api.metadata.IMetadata;
-import org.eclipse.dawnsci.analysis.api.monitor.IMonitor;
-import org.eclipse.dawnsci.analysis.dataset.impl.Dataset;
-import org.eclipse.dawnsci.analysis.dataset.impl.LazyDataset;
 import org.eclipse.dawnsci.hdf.object.H5Utils;
 import org.eclipse.dawnsci.hdf.object.HierarchicalDataFactory;
 import org.eclipse.dawnsci.hdf.object.HierarchicalDataUtils;
 import org.eclipse.dawnsci.hdf.object.HierarchicalInfo;
 import org.eclipse.dawnsci.hdf.object.IHierarchicalDataFile;
+import org.eclipse.january.IMonitor;
+import org.eclipse.january.MetadataException;
+import org.eclipse.january.dataset.Dataset;
+import org.eclipse.january.dataset.ILazyDataset;
+import org.eclipse.january.dataset.LazyDataset;
+import org.eclipse.january.metadata.IMetadata;
 
 import uk.ac.diamond.scisoft.analysis.io.AbstractFileLoader;
 import uk.ac.diamond.scisoft.analysis.io.DataHolder;
@@ -234,7 +236,7 @@ public class H5Loader extends AbstractFileLoader {
 	private HierarchicalInfo metaInfo;
 
 	@Override
-	public void loadMetadata(IMonitor mon) throws Exception {
+	public void loadMetadata(IMonitor mon) throws IOException {
 		
 		IHierarchicalDataFile file = null;
 		try {
@@ -242,8 +244,16 @@ public class H5Loader extends AbstractFileLoader {
 			if (mon!=null) mon.worked(1);
 			
 			metaInfo = file.getDatasetInformation(IHierarchicalDataFile.NUMBER_ARRAY);
+		} catch (Exception e) {
+			throw new IOException(e);
+			
 		} finally {
-			if (file!=null) file.close();
+			if (file!=null)
+				try {
+					file.close();
+				} catch (Exception e) {
+					throw new IOException("Could not close file", e);
+				}
 		}
 		
 	}
@@ -256,7 +266,7 @@ public class H5Loader extends AbstractFileLoader {
 			private Map<String, Object> attributeValues;
 			
 			@Override
-			public Collection<String> getMetaNames() throws Exception{
+			public Collection<String> getMetaNames() throws MetadataException {
 				/**
 				 * We lazy load the meta data attributes as it's not always needed.
 				 */
@@ -265,7 +275,7 @@ public class H5Loader extends AbstractFileLoader {
 			}
 
 			@Override
-			public String getMetaValue(String fullAttributeKey) throws Exception{
+			public String getMetaValue(String fullAttributeKey) throws MetadataException {
 				/**
 				 * We lazy load the meta data attributes as it's not always needed.
 				 */
@@ -288,15 +298,22 @@ public class H5Loader extends AbstractFileLoader {
 				return Collections.unmodifiableMap(metaInfo.getDataSetShapes());
 			}
 			
-			private void readAttributes() throws Exception {
+			private void readAttributes() throws MetadataException {
 				if (attributeValues==null) {
 					IHierarchicalDataFile file = null;
 					try {
 						file = HierarchicalDataFactory.getReader(fileName);
 						
 						attributeValues = file.getAttributeValues();
+					} catch (Exception e) {
+						throw new MetadataException(e);
 					} finally {
-						if (file!=null) file.close();
+						if (file!=null)
+							try {
+								file.close();
+							} catch (Exception e) {
+								throw new MetadataException("Could not close file", e);
+							}
 					}
 				
 				}

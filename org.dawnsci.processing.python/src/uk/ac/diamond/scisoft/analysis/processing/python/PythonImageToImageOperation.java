@@ -2,9 +2,11 @@ package uk.ac.diamond.scisoft.analysis.processing.python;
 
 import java.util.Map;
 
-import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.processing.OperationData;
+import org.eclipse.dawnsci.analysis.api.processing.OperationException;
 import org.eclipse.dawnsci.analysis.api.processing.OperationRank;
+import org.eclipse.january.MetadataException;
+import org.eclipse.january.dataset.IDataset;
 
 public class PythonImageToImageOperation extends AbstractPythonScriptOperation<PythonScriptModel> {
 
@@ -31,7 +33,11 @@ public class PythonImageToImageOperation extends AbstractPythonScriptOperation<P
 	
 	@Override
 	protected OperationData packAndValidateMap(Map<String, Object> output){ 
-		return OperationToPythonUtils.unpackImage(output);
+		try {
+			return OperationToPythonUtils.unpackImage(output);
+		} catch (MetadataException e) {
+			throw new OperationException(this, e);
+		}
 	}
 
 }

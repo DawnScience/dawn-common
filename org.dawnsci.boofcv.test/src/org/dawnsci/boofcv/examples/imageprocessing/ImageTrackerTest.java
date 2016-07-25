@@ -3,9 +3,9 @@ package org.dawnsci.boofcv.examples.imageprocessing;
 import static org.junit.Assert.assertArrayEquals;
 
 import org.dawnsci.boofcv.BoofCVImageTrackerServiceCreator;
-import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.image.IImageTracker;
 import org.eclipse.dawnsci.analysis.api.image.IImageTracker.TrackerType;
+import org.eclipse.january.dataset.IDataset;
 import org.junit.Before;
 import org.junit.Test;
 

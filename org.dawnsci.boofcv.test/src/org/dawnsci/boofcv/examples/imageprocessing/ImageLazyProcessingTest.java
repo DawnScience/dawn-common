@@ -18,14 +18,14 @@ import java.util.List;
 import org.dawnsci.boofcv.BoofCVImageFilterServiceCreator;
 import org.dawnsci.boofcv.BoofCVImageTransformCreator;
 import org.dawnsci.boofcv.examples.util.Utils;
-import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
-import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
-import org.eclipse.dawnsci.analysis.api.dataset.ILazyWriteableDataset;
-import org.eclipse.dawnsci.analysis.api.dataset.Slice;
 import org.eclipse.dawnsci.analysis.api.image.IImageFilterService;
 import org.eclipse.dawnsci.analysis.api.image.IImageTransform;
-import org.eclipse.dawnsci.analysis.dataset.impl.DatasetUtils;
-import org.eclipse.dawnsci.analysis.dataset.impl.LazyDataset;
+import org.eclipse.january.dataset.DatasetUtils;
+import org.eclipse.january.dataset.IDataset;
+import org.eclipse.january.dataset.ILazyDataset;
+import org.eclipse.january.dataset.ILazyWriteableDataset;
+import org.eclipse.january.dataset.LazyDataset;
+import org.eclipse.january.dataset.Slice;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -45,7 +45,7 @@ public class ImageLazyProcessingTest {
 		List<String> filenames = new ArrayList<String>();
 		Utils.getArrayAsList(files, filenames);
 		ImageStackLoader loader = new ImageStackLoader(filenames, null);
-		data = new LazyDataset("test stack", loader.getDtype(), loader.getShape(), loader);
+		data = new LazyDataset("test stack", loader.getDType(), loader.getShape(), loader);
 		transform = BoofCVImageTransformCreator.createTransformService();
 	}
 

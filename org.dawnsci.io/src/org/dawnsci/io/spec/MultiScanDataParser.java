@@ -21,9 +21,8 @@ import java.util.regex.Matcher;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 
-import org.eclipse.dawnsci.analysis.dataset.impl.Dataset;
-import org.eclipse.dawnsci.analysis.dataset.impl.FloatDataset;
-import org.eclipse.dawnsci.analysis.dataset.impl.IntegerDataset;
+import org.eclipse.january.dataset.Dataset;
+import org.eclipse.january.dataset.DatasetFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -352,7 +351,7 @@ public class MultiScanDataParser {
             	final Integer[] ia   = numbers.toArray(new Integer[numbers.size()]);
             	final int    [] intA = new int[ia.length];
             	for (int i = 0; i < intA.length; i++) intA[i] = ia[i];
-            	ret = new IntegerDataset(intA, intA.length);
+            	ret = DatasetFactory.createFromObject(intA);
             	ret.setName(getName());
             	
             } else if (numbers.get(0) instanceof Float) {
@@ -360,7 +359,7 @@ public class MultiScanDataParser {
 	            	final Float[]  fa  = numbers.toArray(new Float[numbers.size()]);
 	            	final float[] fltA = new float[fa.length];
 	            	for (int i = 0; i < fltA.length; i++) fltA[i] = fa[i];
-	            	ret = new FloatDataset(fltA, fltA.length);
+	            	ret = DatasetFactory.createFromObject(fltA);
 	            	ret.setName(getName());
             	} catch (Exception ne) {
             		ne.printStackTrace();

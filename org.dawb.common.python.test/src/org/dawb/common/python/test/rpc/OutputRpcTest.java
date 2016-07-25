@@ -14,7 +14,7 @@ import java.util.HashMap;
 
 import org.dawb.common.util.eclipse.BundleUtils;
 import org.dawnsci.python.rpc.PythonService;
-import org.eclipse.dawnsci.analysis.dataset.impl.Dataset;
+import org.eclipse.january.dataset.Dataset;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;

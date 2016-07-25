@@ -4,11 +4,11 @@ import java.util.Map;
 
 import org.dawnsci.python.rpc.AnalysisRpcPythonPyDevService;
 import org.dawnsci.python.rpc.PythonRunScriptService;
-import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
-import org.eclipse.dawnsci.analysis.api.monitor.IMonitor;
 import org.eclipse.dawnsci.analysis.api.processing.OperationData;
 import org.eclipse.dawnsci.analysis.api.processing.OperationException;
 import org.eclipse.dawnsci.analysis.dataset.operations.AbstractOperation;
+import org.eclipse.january.IMonitor;
+import org.eclipse.january.dataset.IDataset;
 
 public abstract class AbstractPythonScriptOperation<T extends PythonScriptModel> extends AbstractOperation<PythonScriptModel,OperationData> {
 

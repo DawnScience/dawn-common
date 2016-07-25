@@ -18,10 +18,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.dawnsci.persistence.PersistenceServiceCreator;
-import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.persistence.IPersistenceService;
 import org.eclipse.dawnsci.analysis.api.persistence.IPersistentFile;
-import org.eclipse.dawnsci.analysis.dataset.impl.BooleanDataset;
+import org.eclipse.january.dataset.Dataset;
+import org.eclipse.january.dataset.DatasetFactory;
+import org.eclipse.january.dataset.IDataset;
 import org.junit.Test;
 
 public class ReadWriteMaskTest extends AbstractThreadTestBase{
@@ -40,9 +41,9 @@ public class ReadWriteMaskTest extends AbstractThreadTestBase{
 					false, true, false, false };
 			boolean[] bd2 = { false, false, true, true, false, true, false, true,
 					false, true, true, true };
-			BooleanDataset mask0 = new BooleanDataset(bd0);
-			BooleanDataset mask1 = new BooleanDataset(bd1);
-			BooleanDataset mask2 = new BooleanDataset(bd2);
+			Dataset mask0 = DatasetFactory.createFromObject(bd0);
+			Dataset mask1 = DatasetFactory.createFromObject(bd1);
+			Dataset mask2 = DatasetFactory.createFromObject(bd2);
 			Map<String, IDataset> masks = new HashMap<String, IDataset>();
 			masks.put("mask3", mask0);
 			masks.put("mask4", mask1);

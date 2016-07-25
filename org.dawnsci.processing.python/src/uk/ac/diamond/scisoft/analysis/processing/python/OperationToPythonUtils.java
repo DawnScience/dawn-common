@@ -7,15 +7,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
-import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
-import org.eclipse.dawnsci.analysis.api.dataset.Slice;
 import org.eclipse.dawnsci.analysis.api.processing.OperationData;
-import org.eclipse.dawnsci.analysis.dataset.impl.DatasetFactory;
-import org.eclipse.dawnsci.analysis.dataset.metadata.AxesMetadataImpl;
-import org.eclipse.dawnsci.analysis.dataset.metadata.MaskMetadataImpl;
 import org.eclipse.dawnsci.analysis.dataset.operations.AbstractOperation;
 import org.eclipse.dawnsci.analysis.dataset.slicer.SliceFromSeriesMetadata;
+import org.eclipse.january.DatasetException;
+import org.eclipse.january.MetadataException;
+import org.eclipse.january.dataset.DatasetFactory;
+import org.eclipse.january.dataset.IDataset;
+import org.eclipse.january.dataset.ILazyDataset;
+import org.eclipse.january.dataset.Slice;
+import org.eclipse.january.metadata.AxesMetadata;
+import org.eclipse.january.metadata.MaskMetadata;
+import org.eclipse.january.metadata.MetadataFactory;
 
 public class OperationToPythonUtils {
 
@@ -43,8 +46,18 @@ public class OperationToPythonUtils {
 		IDataset ya = null;
 		if (axes != null) {
 
-			if (axes[0] != null) ya = axes[0].getSlice().squeeze();
-			if (axes[1] != null) xa = axes[1].getSlice().squeeze();
+			if (axes[0] != null) {
+				try {
+					ya = axes[0].getSlice().squeeze();
+				} catch (DatasetException e1) {
+				}
+			}
+			if (axes[1] != null) {
+				try {
+					xa = axes[1].getSlice().squeeze();
+				} catch (DatasetException e1) {
+				}
+			}
 			
 		}
 
@@ -54,20 +67,29 @@ public class OperationToPythonUtils {
 		populateSliceFromSeriesMetadata(AbstractOperation.getSliceSeriesMetadata(input),inputs);
 		
 		ILazyDataset mask = AbstractOperation.getFirstMask(input);
-		if (mask != null) inputs.put(MASK, mask.getSlice());
-		
+		if (mask != null) {
+			try {
+				inputs.put(MASK, mask.getSlice());
+			} catch (DatasetException e1) {
+			}
+		}
 		ILazyDataset e = input.getError();
-		if (e != null) inputs.put(ERROR, e.getSlice());
+		if (e != null) {
+			try {
+				inputs.put(ERROR, e.getSlice());
+			} catch (DatasetException e1) {
+			}
+		}
 		
 		return inputs;
 	}
 	
-	public static OperationData unpackImage(Map<String, Object> output) {
+	public static OperationData unpackImage(Map<String, Object> output) throws MetadataException {
 		
 		IDataset d = (IDataset)output.get(DATA);
 		
 		if (output.containsKey(XAXIS) || output.containsKey(YAXIS)) {
-			AxesMetadataImpl ax = new AxesMetadataImpl(2);
+			AxesMetadata ax = MetadataFactory.createMetadata(AxesMetadata.class, 2);
 			if (output.containsKey(XAXIS)) ax.addAxis(1, (IDataset)output.get(XAXIS));
 			if (output.containsKey(YAXIS)) ax.addAxis(0, (IDataset)output.get(YAXIS));
 			
@@ -75,7 +97,7 @@ public class OperationToPythonUtils {
 		}
 		
 		if (output.containsKey(MASK)) {
-			MaskMetadataImpl mask = new MaskMetadataImpl((IDataset)output.get(MASK));
+			MaskMetadata mask = MetadataFactory.createMetadata(MaskMetadata.class, (IDataset)output.get(MASK));
 			d.setMetadata(mask);
 		}
 		
@@ -89,12 +111,12 @@ public class OperationToPythonUtils {
 		return aux == null ? new OperationData(d) : new OperationData(d, (Serializable[])aux);
 	}
 	
-	public static OperationData unpackXY(Map<String, Object> output) {
+	public static OperationData unpackXY(Map<String, Object> output) throws MetadataException {
 		
 		IDataset data = (IDataset)output.get(DATA);
 		
 		if (output.containsKey(XAXIS)) {
-			AxesMetadataImpl ax = new AxesMetadataImpl(1);
+			AxesMetadata ax = MetadataFactory.createMetadata(AxesMetadata.class, 1);
 			ax.addAxis(0, (IDataset)output.get(XAXIS));
 			data.addMetadata(ax);
 		}
@@ -118,14 +140,22 @@ public class OperationToPythonUtils {
 		
 		ILazyDataset[] axes = AbstractOperation.getFirstAxes(input);
 		if (axes != null && axes[0] != null) {
-			IDataset ax = axes[0].getSlice();
-			inputs.put(XAXIS, ax);
+			try {
+				IDataset ax = axes[0].getSlice();
+				inputs.put(XAXIS, ax);
+			} catch (DatasetException e1) {
+			}
 		} else {
 			inputs.put(XAXIS, null);
 		}
 		
 		ILazyDataset e = input.getError();
-		if (e != null) inputs.put(ERROR, e.getSlice());
+		if (e != null) {
+			try {
+				inputs.put(ERROR, e.getSlice());
+			} catch (DatasetException e1) {
+			}
+		}
 		
 		populateSliceFromSeriesMetadata(AbstractOperation.getSliceSeriesMetadata(input),inputs);
 		

@@ -38,20 +38,19 @@ import org.cansas.cansas1d.SASsourceType;
 import org.cansas.cansas1d.SAStransmissionSpectrumType;
 import org.dawnsci.conversion.converters.util.LocalServiceManager;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
-import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
-import org.eclipse.dawnsci.analysis.api.dataset.IErrorDataset;
-import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
-import org.eclipse.dawnsci.analysis.api.dataset.Slice;
 import org.eclipse.dawnsci.analysis.api.io.ScanFileHolderException;
-import org.eclipse.dawnsci.analysis.api.metadata.AxesMetadata;
-import org.eclipse.dawnsci.analysis.api.monitor.IMonitor;
 import org.eclipse.dawnsci.analysis.api.tree.Node;
 import org.eclipse.dawnsci.analysis.api.tree.Tree;
-import org.eclipse.dawnsci.analysis.dataset.impl.Dataset;
-import org.eclipse.dawnsci.analysis.dataset.impl.DatasetUtils;
-import org.eclipse.dawnsci.analysis.dataset.impl.PositionIterator;
 import org.eclipse.dawnsci.hdf.object.HierarchicalDataFactory;
 import org.eclipse.dawnsci.hdf.object.IHierarchicalDataFile;
+import org.eclipse.january.IMonitor;
+import org.eclipse.january.dataset.Dataset;
+import org.eclipse.january.dataset.DatasetUtils;
+import org.eclipse.january.dataset.IDataset;
+import org.eclipse.january.dataset.ILazyDataset;
+import org.eclipse.january.dataset.PositionIterator;
+import org.eclipse.january.dataset.Slice;
+import org.eclipse.january.metadata.AxesMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -221,7 +220,7 @@ public class CustomNCDConverter extends AbstractConversion  {
 
 			Dataset errors = null;
 			if (hasErrors) {
-				errors = DatasetUtils.cast(data.getError(), data.getDtype());
+				errors = DatasetUtils.cast(data.getError(), data.getDType());
 			}
 
 			String header = sb.toString();
@@ -290,23 +289,23 @@ public class CustomNCDConverter extends AbstractConversion  {
 	}
 	
 	private Dataset[] fixDtypes(Dataset axis, Dataset data, Dataset errors) {
-		int dataDtype = data.getDtype();
+		int dataDtype = data.getDType();
 		int axisDtype = 0;
 		if (axis != null) {
-			axisDtype = axis.getDtype();
+			axisDtype = axis.getDType();
 		}
 		int errorsDtype = 0;
 		if (errors != null) {
-			errorsDtype = errors.getDtype();
+			errorsDtype = errors.getDType();
 		}
 		int largestDtype = Math.max(Math.max(dataDtype, axisDtype), errorsDtype);
-		if (data.getDtype() < largestDtype) {
+		if (data.getDType() < largestDtype) {
 			data = improveLessPreciseData(data, largestDtype);
 		}
-		if (axis != null && axis.getDtype() < largestDtype) {
+		if (axis != null && axis.getDType() < largestDtype) {
 			axis = improveLessPreciseData(axis, largestDtype);
 		}
-		if (errors != null && errors.getDtype() < largestDtype) {
+		if (errors != null && errors.getDType() < largestDtype) {
 			errors = improveLessPreciseData(errors, largestDtype);
 		}
 		return new Dataset[]{axis, data, errors};
@@ -316,12 +315,12 @@ public class CustomNCDConverter extends AbstractConversion  {
 		return lessPreciseData.cast(dType);
 	}
 
-	private void exportASCII(IErrorDataset axis, Dataset data, IDataset errors, String fullName, String header, List<String> headings) throws ScanFileHolderException {
+	private void exportASCII(IDataset axis, Dataset data, IDataset errors, String fullName, String header, List<String> headings) throws ScanFileHolderException {
 		String dataName = data.getName();
 		IDataset[] columns = new IDataset[] {DatasetUtils.transpose(data, null)};
 		if (axis != null) {
 			if (axis.hasErrors()) {
-				Dataset axisErrors = DatasetUtils.cast(axis.getError(), data.getDtype());
+				Dataset axisErrors = DatasetUtils.cast(axis.getError(), data.getDType());
 				columns = (IDataset[]) ArrayUtils.addAll(new IDataset[]{axis, axisErrors}, columns);
 				
 			} else {
@@ -426,7 +425,7 @@ public class CustomNCDConverter extends AbstractConversion  {
 
 			Dataset errors = null;
 			if (hasErrors) {
-				errors = DatasetUtils.cast(data.getError(), data.getDtype());
+				errors = DatasetUtils.cast(data.getError(), data.getDType());
 				errors.squeeze();
 			}
 

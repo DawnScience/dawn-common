@@ -8,11 +8,12 @@
  */
 package org.dawnsci.jexl.internal;
 
-import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
-import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
-import org.eclipse.dawnsci.analysis.api.dataset.Slice;
-import org.eclipse.dawnsci.analysis.dataset.impl.Dataset;
-import org.eclipse.dawnsci.analysis.dataset.impl.LazyMaths;
+import org.eclipse.january.DatasetException;
+import org.eclipse.january.dataset.Dataset;
+import org.eclipse.january.dataset.IDataset;
+import org.eclipse.january.dataset.ILazyDataset;
+import org.eclipse.january.dataset.LazyMaths;
+import org.eclipse.january.dataset.Slice;
 
 /**
  * Functions able to process without loading all the data at once.
@@ -30,8 +31,9 @@ public class JexlLazyFunctions {
 	 * @param data
 	 * @param axis
 	 * @return
+	 * @throws DatasetException 
 	 */
-	public static Dataset rmean(final ILazyDataset data, final int axis) {
+	public static Dataset rmean(final ILazyDataset data, final int axis) throws DatasetException {
 		final int length = data.getShape()[axis];
 		return LazyMaths.sum(data, axis).idivide(length);
 	}
@@ -45,8 +47,9 @@ public class JexlLazyFunctions {
 	 * @param data
 	 * @param axis
 	 * @return
+	 * @throws DatasetException 
 	 */
-	public static IDataset rsum(final ILazyDataset data, final int axis) {
+	public static IDataset rsum(final ILazyDataset data, final int axis) throws DatasetException {
 		return LazyMaths.sum(data, axis);
 	}
 	
@@ -58,19 +61,20 @@ public class JexlLazyFunctions {
 	 * @param data
 	 * @param axis
 	 * @return
+	 * @throws DatasetException 
 	 */
-	public static IDataset slice(final ILazyDataset data, final int axis) {
+	public static IDataset slice(final ILazyDataset data, final int axis) throws DatasetException {
 		return LazyMaths.sum(data, axis);
 	}
 
 	public static IDataset slice(final ILazyDataset data,final int[] start,
 								final int[] stop,
-								final int[] step) {
+								final int[] step) throws DatasetException {
 		
 		return data.getSlice(start, stop, step).squeeze();
 	}
 
-	public static IDataset slice(ILazyDataset data, String sliceString) {
+	public static IDataset slice(ILazyDataset data, String sliceString) throws DatasetException {
 		
 		Slice[] slices = Slice.convertFromString(sliceString);
 

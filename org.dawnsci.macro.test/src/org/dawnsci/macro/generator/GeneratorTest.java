@@ -6,14 +6,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.dawnsci.macro.MacroServiceImpl;
-import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.roi.IROI;
-import org.eclipse.dawnsci.analysis.dataset.impl.Random;
 import org.eclipse.dawnsci.analysis.dataset.roi.EllipticalROI;
 import org.eclipse.dawnsci.analysis.dataset.roi.RectangularROI;
 import org.eclipse.dawnsci.analysis.dataset.roi.SectorROI;
 import org.eclipse.dawnsci.macro.api.AbstractMacroGenerator;
 import org.eclipse.dawnsci.macro.api.IMacroService;
+import org.eclipse.january.dataset.IDataset;
+import org.eclipse.january.dataset.Random;
 import org.junit.BeforeClass;
 import org.junit.Test;
 

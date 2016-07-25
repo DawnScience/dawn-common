@@ -8,8 +8,8 @@
  */
 package org.dawnsci.boofcv.converter;
 
-import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
+import org.eclipse.january.dataset.IDataset;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

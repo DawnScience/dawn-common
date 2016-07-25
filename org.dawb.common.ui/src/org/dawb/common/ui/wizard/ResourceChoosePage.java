@@ -33,11 +33,11 @@ import org.eclipse.dawnsci.analysis.api.conversion.IConversionVisitor;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext.ConversionScheme;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
 import org.eclipse.dawnsci.analysis.api.io.ILoaderService;
-import org.eclipse.dawnsci.analysis.api.metadata.IMetadata;
-import org.eclipse.dawnsci.analysis.dataset.impl.AbstractDataset;
 import org.eclipse.dawnsci.plotting.api.expressions.IExpressionObject;
 import org.eclipse.dawnsci.plotting.api.expressions.IExpressionObjectService;
 import org.eclipse.emf.common.ui.dialogs.WorkspaceResourceDialog;
+import org.eclipse.january.dataset.ShapeUtils;
+import org.eclipse.january.metadata.IMetadata;
 import org.eclipse.jface.fieldassist.ContentProposalAdapter;
 import org.eclipse.jface.fieldassist.TextContentAdapter;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -461,7 +461,7 @@ public class ResourceChoosePage extends WizardPage {
 			int[] shape = meta.getDataShapes().get(name);
 			if (shape != null) {
 				//squeeze to get usable rank
-				shape = AbstractDataset.squeezeShape(shape, false);
+				shape = ShapeUtils.squeezeShape(shape, false);
 				if (scheme!=null && scheme.isRankSupported(shape.length)) {
 					names.add(name);
 				} else if (visitor!=null && visitor.isRankSupported(shape.length)) {

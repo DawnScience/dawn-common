@@ -17,13 +17,13 @@ import java.util.List;
 import org.dawb.common.util.list.SortNatural;
 import org.dawnsci.conversion.converters.util.LocalServiceManager;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
-import org.eclipse.dawnsci.analysis.api.dataset.IDataset;
-import org.eclipse.dawnsci.analysis.api.dataset.ILazyDataset;
-import org.eclipse.dawnsci.analysis.api.monitor.IMonitor;
-import org.eclipse.dawnsci.analysis.dataset.impl.LazyDataset;
 import org.eclipse.dawnsci.hdf.object.HierarchicalDataFactory;
 import org.eclipse.dawnsci.hdf.object.IHierarchicalDataFile;
 import org.eclipse.dawnsci.hdf.object.Nexus;
+import org.eclipse.january.IMonitor;
+import org.eclipse.january.dataset.IDataset;
+import org.eclipse.january.dataset.ILazyDataset;
+import org.eclipse.january.dataset.LazyDataset;
 
 import uk.ac.diamond.scisoft.analysis.io.ImageStackLoader;
 
@@ -97,7 +97,7 @@ public class ImagesToHDFConverter extends AbstractConversion{
 		
 		Collections.sort(paths, new SortNatural<String>(true));
 		ImageStackLoader loader = new ImageStackLoader(paths, context.getMonitor());
-		LazyDataset lazyDataset = new LazyDataset("Folder Stack", loader.getDtype(), loader.getShape(), loader);
+		LazyDataset lazyDataset = new LazyDataset("Folder Stack", loader.getDType(), loader.getShape(), loader);
 		return lazyDataset;
 
 	}

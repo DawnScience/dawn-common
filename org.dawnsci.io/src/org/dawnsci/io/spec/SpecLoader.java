@@ -10,6 +10,7 @@ package org.dawnsci.io.spec;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -17,9 +18,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.dawnsci.analysis.api.io.ScanFileHolderException;
-import org.eclipse.dawnsci.analysis.api.metadata.IMetadata;
-import org.eclipse.dawnsci.analysis.api.monitor.IMonitor;
-import org.eclipse.dawnsci.analysis.dataset.impl.Dataset;
+import org.eclipse.january.IMonitor;
+import org.eclipse.january.dataset.Dataset;
+import org.eclipse.january.metadata.IMetadata;
 
 import uk.ac.diamond.scisoft.analysis.io.AbstractFileLoader;
 import uk.ac.diamond.scisoft.analysis.io.DataHolder;
@@ -83,7 +84,7 @@ public class SpecLoader extends AbstractFileLoader {
 	 * it is slow to run on big files and light on memory.
 	 */
 	@Override
-	public void loadMetadata(IMonitor mon) throws Exception {
+	public void loadMetadata(IMonitor mon) throws IOException {
 		try {
 			this.dataNames  = new ArrayList<String>(31);
 			this.dataSizes  = new HashMap<String,Integer>(31);
@@ -102,7 +103,7 @@ public class SpecLoader extends AbstractFileLoader {
 			}
 					
 		} catch (Exception e) {
-			throw new ScanFileHolderException("Cannot parse "+fileName, e);
+			throw new IOException("Cannot parse "+fileName, e);
 		}
 	}
 
