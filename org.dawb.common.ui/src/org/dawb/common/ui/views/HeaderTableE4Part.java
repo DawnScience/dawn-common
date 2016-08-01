@@ -34,6 +34,7 @@ import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.services.IServiceConstants;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
+import org.eclipse.january.dataset.DatasetFactory;
 import org.eclipse.january.dataset.IMetadataProvider;
 import org.eclipse.january.metadata.IMetadata;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
@@ -436,6 +437,9 @@ public class HeaderTableE4Part {
 				try {
 					m = meta.getMetaValue(element.toString());
 					if (m != null) {
+						if (m.getClass().isArray()) { // can cope with arrays
+							return DatasetFactory.createFromObject(m).toString(true);
+						}
 						return m.toString();
 					}
 				} catch (Exception ignored) {
