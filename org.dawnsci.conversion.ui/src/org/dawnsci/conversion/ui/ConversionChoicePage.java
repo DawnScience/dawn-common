@@ -135,7 +135,7 @@ public class ConversionChoicePage extends ResourceChoosePage implements IConvers
 		filter.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				filterFiles = filter.getSelection();
-				extensions.setVisible(filter.getSelection());
+				GridUtils.setVisible(extensions, filter.getSelection());
 				extensions.getParent().layout();
 				updateFilesLabel();
 			}
@@ -148,7 +148,7 @@ public class ConversionChoicePage extends ResourceChoosePage implements IConvers
 				GridUtils.setVisible(multiFilesLabel, multiFileSelection);
 				setFileChoosingEnabled(!multiFileSelection);
 				GridUtils.setVisible(filter, multiFileSelection);
-				GridUtils.setVisible(extensions, multiFileSelection);
+				GridUtils.setVisible(extensions, multiFileSelection && filter.getSelection());
 			}
 		};
 		useFiles.addSelectionListener(selAd);
