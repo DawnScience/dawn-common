@@ -8,6 +8,7 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
@@ -400,7 +401,7 @@ public class B18AverageConverter extends AbstractConversion {
 		for (int i = 0 ; i < data.allData[0].getSize() ; i++) {
 			StringJoiner dataLine = new StringJoiner("\t");
 			for (Dataset tempData : data.allData) {
-				dataLine.add(Double.toString(tempData.getDouble(i)));
+				dataLine.add(String.format(Locale.US, "%g", tempData.getDouble(i)));
 			}
 			contents.append(dataLine.toString());
 			contents.append("\r\n"); // Intentionally windows.
