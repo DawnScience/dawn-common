@@ -5,6 +5,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.nio.file.CopyOption;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -17,6 +20,7 @@ import java.util.stream.IntStream;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
 import org.eclipse.january.dataset.Dataset;
+import org.eclipse.january.dataset.DatasetFactory;
 import org.eclipse.january.dataset.DatasetUtils;
 import org.eclipse.january.dataset.IDataset;
 import org.eclipse.january.metadata.IMetadata;
@@ -217,7 +221,11 @@ public class B18AverageConverter extends AbstractConversion {
 		
 			//if group contains just one file: ignore and go to the next one
 			if (files.size() == 1) {
-				logger.debug("Orphan file " + files.get(0).getAbsolutePath() + " detected. Ignoring");
+				logger.debug("Orphan file " + files.get(0).getAbsolutePath() + " detected. Copying as is");
+				final File file;
+				final String name = getFileNameNoExtension(files.get(0));
+				file = new File(context.getOutputPath()+ File.separator +name+".dat");
+				Files.copy(files.get(0).toPath(), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
 				continue;
 			}
 			//we will be needing several datasets now
