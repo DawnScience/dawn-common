@@ -276,26 +276,27 @@ public class B18AverageConversionPage extends AbstractDatasetChoosePage {
     	
 		final File source = new File(getSourcePath(context));
        
-        setPageComplete(true);
-        
-        if (context.getFilePaths().size()>1 || source.isDirectory()) { // Multi
-        	setPath(source.getParent());
-        	setDirectory(true);
-        	setFileLabel("Output folder");
-        	GridUtils.setVisible(multiFileMessage, true);
-        	this.overwriteButton.setSelection(true);
-        	this.overwrite = true;
-        	this.overwriteButton.setEnabled(false);
-        	this.overwriteButton.setVisible(false);
-        	this.openButton.setSelection(false);
-        	this.open = false;
-        	this.openButton.setEnabled(false);
-        	this.openButton.setVisible(false);
-        	//parseableMetadataTable.getParent().getParent().layout(false);
-        } else {
+       	setPath(source.getParent());
+       	setDirectory(true);
+       	setFileLabel("Output folder");
+       	GridUtils.setVisible(multiFileMessage, true);
+       	overwriteButton.setSelection(true);
+       	overwrite = true;
+       	overwriteButton.setEnabled(false);
+       	GridUtils.setVisible(overwriteButton, false);
+       	openButton.setSelection(false);
+       	open = false;
+       	openButton.setEnabled(false);
+       	GridUtils.setVisible(openButton, false);
+       	
+        if (context.getFilePaths().size() == 1 && !source.isDirectory()) { // Multi
         	// this cannot happen... More than one file should always be provided for this to work
         	setPageComplete(false);
         	logger.error("B18 data averaging requires either multiple files or a folder");
+        	setErrorMessage("B18 data averaging requires either multiple files or a folder");
+        	return;
+        } else {
+        	setPageComplete(true);
         }
 
     	// clear the table
