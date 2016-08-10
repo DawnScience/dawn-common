@@ -108,18 +108,13 @@ public class ProcessConversion extends AbstractConversion {
 			}
 		}
 		
-		ExecutionType executionType = info.getExecutionType();
 		
-		if (executionType == ExecutionType.SERIES && info.isTryParallel() && parallel) {
-			executionType = ExecutionType.PARALLEL;
-			logger.info("Switching to parallel runner!");
-		}
+		ExecutionType executionType = info.getExecutionType();
 		
 		cc.setMonitor(context.getMonitor());
 		cc.setVisitor(info.getExecutionVisitor(full));
 		cc.setSeries(info.getOperationSeries());
 		cc.setExecutionType(executionType);
-		cc.setPoolSize(info.getPoolSize());
 		service.execute(cc);
 	}
 	
