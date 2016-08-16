@@ -36,7 +36,9 @@ public class CursorUtils {
 	private final static int   CURSOR_SIZE = 28;
 	private final static Color BLACK_COLOR = ColorConstants.black;
 	private final static Color WHITE_COLOR = ColorConstants.white;
-	
+
+	private static final int EXTRA_DECIMAL_PLACES = 2; // number of extra decimal places for cursor coordinates (over axes precision)
+
     private static NumberFormat intensityFormat =  new DecimalFormat("############.0##");
 
     /**
@@ -92,9 +94,9 @@ public class CursorUtils {
 			//buf.append("  ");
 		}
 		buf.append("\n[");
-		buf.append(xAxis.format(xCoordinate));
+		buf.append(xAxis.format(xCoordinate, EXTRA_DECIMAL_PLACES));
 		buf.append(", ");
-		buf.append(yAxis.format(yCoordinate));
+		buf.append(yAxis.format(yCoordinate, EXTRA_DECIMAL_PLACES));
 		buf.append("]");
 		
 		Dimension size = FigureUtilities.getTextExtents(buf.toString(), Display.getDefault().getSystemFont());
