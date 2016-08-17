@@ -104,7 +104,7 @@
                tooltip="Refresh all values and reconnect">
          </command>
          <separator
-               name="org.dawb.common.ui.separator1"
+               name="org.dawb.common.ui.separator2"
                visible="true">
          </separator>
          <command
@@ -350,11 +350,6 @@
             id="org.dawb.common.ui.DashDownCommand"
             name="Dash Item Down">
       </command>
-      <command
-            defaultHandler="org.dawb.common.ui.views.monitor.actions.TangoPreferencesAction"
-            id="org.dawb.common.ui.dashboard.TangoPreferences"
-            name="Tango Preferences">
-      </command>
    </extension>
    <extension
          point="org.eclipse.ui.preferencePages">
@@ -363,12 +358,6 @@
             class="org.dawb.common.ui.views.monitor.MonitorPreferencePage"
             id="org.dawb.common.ui.views.dashboard.dashboardPreferences"
             name="Monitor">
-      </page>
-      <page
-            category="org.dawnsci.preferences.tango"
-            class="org.dawb.common.ui.preferences.TangoPreferencePage"
-            id="org.dawb.common.ui.views.tangoPreferences"
-            name="Configuration">
       </page>
       <page
             category="uk.ac.diamond.scisoft.analysis.rcp.preferences.root"
@@ -399,23 +388,6 @@
             id="org.dawb.common.ui.project.cheat"
             name="Projects">
       </cheatsheet>
-   </extension>
-   <extension
-         point="org.eclipse.ui.actionSets">
-      <actionSet
-            description="Actions required for importing data in another folder"
-            id="org.edna.common.ui.project.import"
-            label="Import Actions"
-            visible="true">
-         <action
-               class="org.dawb.common.ui.project.FolderImportHandler"
-               icon="icons/data_folder_link.gif"
-               id="org.edna.common.ui.import.folder"
-               label="Data Folder Link..."
-               menubarPath="tools/additions"
-               tooltip="Imports a folder as a link to an external folder">
-         </action>
-      </actionSet>
    </extension>
    <extension
          point="org.eclipse.ui.views">
