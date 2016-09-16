@@ -12,7 +12,6 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
 import org.eclipse.dawnsci.plotting.api.axis.IAxis;
-import org.eclipse.dawnsci.plotting.api.histogram.ImageServiceBean.ImageOrigin;
 import org.eclipse.dawnsci.plotting.api.trace.IImageTrace;
 import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.draw2d.FigureUtilities;
@@ -59,8 +58,7 @@ public class CursorUtils {
 			yCoordinate = Math.floor(yCoordinate);
 			IDataset image = imageTrace.getData();
 			int i, j;
-			if (imageTrace.getImageOrigin() == ImageOrigin.TOP_LEFT
-					|| imageTrace.getImageOrigin() == ImageOrigin.BOTTOM_RIGHT) {
+			if (imageTrace.getImageOrigin().isOnLeadingDiagonal()) {
 				i = (int) yCoordinate;
 				j = (int) xCoordinate;
 			} else {
