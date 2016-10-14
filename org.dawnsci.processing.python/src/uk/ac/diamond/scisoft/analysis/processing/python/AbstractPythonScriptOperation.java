@@ -47,7 +47,7 @@ public abstract class AbstractPythonScriptOperation<T extends PythonScriptModel>
 			Map<String, Object> out = pythonRunScriptService.runScript(model.getFilePath(), inputs);
 			return packAndValidateMap(out);
 		} catch (Exception e) {
-			throw new OperationException(this, "Could not run " + model.getFilePath());
+			throw new OperationException(this, "Could not run " + model.getFilePath() + " due to " + e.getMessage());
 		}
 	}
 
