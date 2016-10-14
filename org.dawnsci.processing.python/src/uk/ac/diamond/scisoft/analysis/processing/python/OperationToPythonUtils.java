@@ -87,11 +87,20 @@ public class OperationToPythonUtils {
 	public static OperationData unpackImage(Map<String, Object> output) throws MetadataException {
 		
 		IDataset d = (IDataset)output.get(DATA);
+		d.setName(DATA);
 		
 		if (output.containsKey(XAXIS) || output.containsKey(YAXIS)) {
 			AxesMetadata ax = MetadataFactory.createMetadata(AxesMetadata.class, 2);
-			if (output.containsKey(XAXIS)) ax.addAxis(1, (IDataset)output.get(XAXIS));
-			if (output.containsKey(YAXIS)) ax.addAxis(0, (IDataset)output.get(YAXIS));
+			if (output.containsKey(XAXIS) && output.get(XAXIS) != null) {
+				IDataset xaxis = (IDataset)output.get(XAXIS);
+				xaxis.setName(XAXIS);
+				ax.addAxis(1, xaxis);
+			}
+			if (output.containsKey(YAXIS) && output.get(YAXIS) != null){
+				IDataset yaxis = (IDataset)output.get(YAXIS);
+				yaxis.setName(YAXIS);
+				ax.addAxis(0, yaxis);
+			}
 			
 			d.addMetadata(ax);
 		}
@@ -114,16 +123,21 @@ public class OperationToPythonUtils {
 	public static OperationData unpackXY(Map<String, Object> output) throws MetadataException {
 		
 		IDataset data = (IDataset)output.get(DATA);
+		data.setName(DATA);
 		
-		if (output.containsKey(XAXIS)) {
+		if (output.containsKey(XAXIS) && output.get(XAXIS) != null) {
 			AxesMetadata ax = MetadataFactory.createMetadata(AxesMetadata.class, 1);
-			ax.addAxis(0, (IDataset)output.get(XAXIS));
+			
+			IDataset x = (IDataset)output.get(XAXIS);
+			x.setName(XAXIS);
+			ax.addAxis(0, x);
 			data.addMetadata(ax);
 		}
 		
 		if (output.containsKey(ERROR)) {
-			
-			data.setError((IDataset)output.get(ERROR));
+			IDataset error = (IDataset)output.get(ERROR);
+			error.setName(ERROR);
+			data.setError(error);
 		}
 		
 		IDataset[] aux = unpackAuxiliary(output);
