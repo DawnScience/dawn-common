@@ -23,8 +23,11 @@ import org.eclipse.january.metadata.MetadataFactory;
 public class OperationToPythonUtils {
 
 	public static final String DATA = "data";
+	public static final String DATA_TITLE = "data_title";
 	public static final String XAXIS = "xaxis";
+	public static final String XAXIS_TITLE = "xaxis_title";
 	public static final String YAXIS = "yaxis";
+	public static final String YAXIS_TITLE = "yaxis_title";
 	public static final String MASK = "mask";
 	public static final String ERROR = "error";
 	public static final String FILE_PATH = "file_path";
@@ -38,23 +41,34 @@ public class OperationToPythonUtils {
 	
 
 	public static Map<String, Object> packImage(IDataset input) {
+
 		Map<String,Object> inputs = new HashMap<String,Object>();
-		inputs.put("data", input);
+
+		String dataTitle = " ";
+		String xAxisTitle = " ";
+		String yAxisTitle = " ";
+
+		inputs.put(DATA, input);
+		dataTitle = input.getName();
+		inputs.put(DATA_TITLE, dataTitle);
 		
 		ILazyDataset[] axes = AbstractOperation.getFirstAxes(input);
 		IDataset xa = null;
 		IDataset ya = null;
+		
 		if (axes != null) {
 
 			if (axes[0] != null) {
 				try {
 					ya = axes[0].getSlice().squeeze();
+					yAxisTitle = ya.getName();
 				} catch (DatasetException e1) {
 				}
 			}
 			if (axes[1] != null) {
 				try {
 					xa = axes[1].getSlice().squeeze();
+					xAxisTitle = xa.getName();
 				} catch (DatasetException e1) {
 				}
 			}
@@ -62,7 +76,9 @@ public class OperationToPythonUtils {
 		}
 
 		inputs.put(XAXIS, xa);
+		inputs.put(XAXIS_TITLE, xAxisTitle);
 		inputs.put(YAXIS, ya);
+		inputs.put(YAXIS_TITLE, yAxisTitle);
 		
 		populateSliceFromSeriesMetadata(AbstractOperation.getSliceSeriesMetadata(input),inputs);
 		
@@ -87,18 +103,21 @@ public class OperationToPythonUtils {
 	public static OperationData unpackImage(Map<String, Object> output) throws MetadataException {
 		
 		IDataset d = (IDataset)output.get(DATA);
-		d.setName(DATA);
+		String dataTitle = (String) output.get(DATA_TITLE);
+		d.setName(dataTitle);
 		
 		if (output.containsKey(XAXIS) || output.containsKey(YAXIS)) {
 			AxesMetadata ax = MetadataFactory.createMetadata(AxesMetadata.class, 2);
 			if (output.containsKey(XAXIS) && output.get(XAXIS) != null) {
 				IDataset xaxis = (IDataset)output.get(XAXIS);
-				xaxis.setName(XAXIS);
+				String xAxisTitle = (String) output.get(XAXIS_TITLE);
+				xaxis.setName(xAxisTitle);
 				ax.addAxis(1, xaxis);
 			}
 			if (output.containsKey(YAXIS) && output.get(YAXIS) != null){
 				IDataset yaxis = (IDataset)output.get(YAXIS);
-				yaxis.setName(YAXIS);
+				String yAxisTitle = (String) output.get(YAXIS_TITLE);
+				yaxis.setName(yAxisTitle);
 				ax.addAxis(0, yaxis);
 			}
 			
@@ -123,13 +142,15 @@ public class OperationToPythonUtils {
 	public static OperationData unpackXY(Map<String, Object> output) throws MetadataException {
 		
 		IDataset data = (IDataset)output.get(DATA);
-		data.setName(DATA);
+		String dataTitle = (String) output.get(DATA_TITLE);
+		data.setName(dataTitle);
 		
 		if (output.containsKey(XAXIS) && output.get(XAXIS) != null) {
 			AxesMetadata ax = MetadataFactory.createMetadata(AxesMetadata.class, 1);
 			
 			IDataset x = (IDataset)output.get(XAXIS);
-			x.setName(XAXIS);
+			String xAxisTitle = (String) output.get(XAXIS_TITLE);
+			x.setName(xAxisTitle);
 			ax.addAxis(0, x);
 			data.addMetadata(ax);
 		}
@@ -146,21 +167,28 @@ public class OperationToPythonUtils {
 	}
 
 	public static Map<String, Object> packXY(IDataset input) {
-		
-		
+				
 		Map<String,Object> inputs = new HashMap<String,Object>();
 		
+		String dataTitle = " ";
+		String xAxisTitle = " ";
+
 		inputs.put(DATA, input);
+		dataTitle = input.getName();
+		inputs.put(DATA_TITLE, dataTitle);
 		
 		ILazyDataset[] axes = AbstractOperation.getFirstAxes(input);
 		if (axes != null && axes[0] != null) {
 			try {
 				IDataset ax = axes[0].getSlice();
+				xAxisTitle = ax.getName();
 				inputs.put(XAXIS, ax);
+				inputs.put(XAXIS_TITLE, xAxisTitle);
 			} catch (DatasetException e1) {
 			}
 		} else {
 			inputs.put(XAXIS, null);
+			inputs.put(XAXIS_TITLE, null);
 		}
 		
 		ILazyDataset e = input.getError();
