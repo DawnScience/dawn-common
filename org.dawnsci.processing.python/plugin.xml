@@ -30,6 +30,15 @@
             model="uk.ac.diamond.scisoft.analysis.processing.python.PythonScriptModel"
             name="Python Script - XY to XY">
       </operation>
+      <operation
+            category="org.dawnsci.processing.python.scripting"
+            class="uk.ac.diamond.scisoft.analysis.processing.python.PythonSavuOperation"
+            description="Process data using a dummy savu plugin"
+            icon="icons/python.png"
+            id="uk.ac.diamond.scisoft.analysis.processing.python.PythonSavuOperation"
+            model="uk.ac.diamond.scisoft.analysis.processing.python.PythonSavuModel"
+            name="Python Script - Savu">
+      </operation>
       <category
             id="org.dawnsci.processing.python.scripting"
             name="Scripting">
