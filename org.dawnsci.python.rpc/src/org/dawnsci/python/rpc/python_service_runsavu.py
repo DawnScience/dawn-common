@@ -50,7 +50,7 @@ def runSavu(scriptPath, inputs, funcName='filter_frames'):
             a= imp.load_source('clazz', scriptPath)
             plugin_object = a.PyMcaRefactorLikeSavu()# need to abstract this
             plugin_object.base_pre_process()
-            plugin_object.pre_process()     
+            plugin_object.pre_process()
         else:
             pass
     finally:
@@ -70,6 +70,7 @@ def runSavu(scriptPath, inputs, funcName='filter_frames'):
     # in the Python and an incorrect usage will result in a cast exception 
 #     result = vars[funcName](**inputs)
     result = copy.deepcopy(inputs)
+    print inputs
     result['data'] = plugin_object.filter_frames([inputs['data']])
 
     return result
