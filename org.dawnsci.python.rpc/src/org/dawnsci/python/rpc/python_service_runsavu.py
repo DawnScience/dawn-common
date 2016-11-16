@@ -6,34 +6,45 @@ This script is designed to be passed to scisoftpy.rpc's addHandler, see PythonRu
 '''
 
 import os, sys, threading, imp,copy
+from savu.data.experiment_collection import Experiment
+from savu.data.meta_data import MetaData
+import numpy as np
+from savu.plugins.utils import find_args, load_plugin
+import savu
+import inspect
+from copy import deepcopy as copy
 
 sys_path_0_lock = threading.Lock()
 sys_path_0_set = False
 plugin_object = False
 print "I ran the script"
-def runSavu(scriptPath, inputs, funcName='filter_frames'):
+def runSavu(scriptPath, inputs,funcName='filter_frames'):
     '''
     scriptPath  - is the path to the user script that should be run
     inputs      - is a dictionary of input objects 
     '''
-    print "HELLO"
-    # Add the directory of the Python script to PYTHONPATH
-    # Doing this introduces a potential race condition that
-    # we protect against, if multiple calls
-    # to runScript are done in parallel there is no control
-    # over which one will be set when the execfile below actually
-    # runs. We protect against that race condition by ensuring
-    # that the sys.path[0] isn't changed unexpectedly.
-    # See the Python PyDev Workflow actor (PythonPydevScript#getService)
-    # for an implementation of when to spawn new Python executables
-    # and when they can be reused.
-    # we also need to prime the class for pre-processing etc...
+#     print inputs
+    parameters = {} # this will get passed in, in future
+#     parameters['output_style'] = 'aux'
+    parameters['output_style'] = 'data'
+    output_type = parameters.pop('output_style')
+#     parameters['config'] = '/dls/science/users/clb02321/DAWN_stable/Savu2/Savu/test_data/data/test_config.cfg'
+    parameters['Energy']=53.0
+    parameters['Distance']=1.0
+    parameters['Resolution']=1.28
+    parameters['Ratio']=250.0
+    parameters['Padtopbottom']=10
+    parameters['Padleftright']=10
+    parameters['Padmethod']='edge'
+#     parameters['pattern']='PROJECTION'
+#     parameters['dummy']=10
+    string_key = None
     global sys_path_0_lock
     global sys_path_0_set
     global plugin_object
     sys_path_0_lock.acquire()
     try:
-        print "here I am"
+        result = copy(inputs)
         scriptDir = os.path.dirname(scriptPath)
         sys_path_0 = sys.path[0]
         if sys_path_0_set and scriptDir != sys_path_0:
@@ -45,32 +56,124 @@ def runSavu(scriptPath, inputs, funcName='filter_frames'):
             sys_path_0_set = True
         
         if not plugin_object:
-            print "rocking like a hurricane"
-            # just test this for now
-            a= imp.load_source('clazz', scriptPath)
-            plugin_object = a.PyMcaRefactorLikeSavu()# need to abstract this
-            plugin_object.base_pre_process()
-            plugin_object.pre_process()
+            plugin_object, rank_in, rank_out, axis_labels, axis_values = process_init(scriptPath, inputs, parameters)
+            chkstring =  [any(isinstance(ix, str) for ix in axis_values[label]) for label in axis_labels]
+            if any(chkstring): # are any axis values strings we instead make this an aux out
+                output_type = 'aux'
+                string_key = axis_labels[chkstring.index(True)]
+                result['auxiliary'] = dict.fromkeys(axis_values[string_key])
+            else:
+                string_key = axis_labels[0]# will it always be the first one?
+            if output_type=='data':
+                if rank_out == 1:
+                    result['xaxis']=axis_values[axis_labels[0]]
+                    result['xaxis_title']=axis_labels[0]
+                if rank_out == 2:
+                    result['xaxis']=axis_values[axis_labels[0]]
+                    result['xaxis_title']=axis_labels[0]
+                    result['yaxis']=axis_values[axis_labels[1]]
+                    result['yaxis_title']=axis_labels[1]
         else:
             pass
     finally:
         sys_path_0_lock.release()
 
-    # We don't use globals() to creating vars because we are not
-    # trying to run within the context of this method
-#     vars = {'__name__': '<script>',
-#             '__file__': scriptPath,
-#             'runScriptFuncName': funcName}
-
-    # Run the script, this generates a function to call
-#     execfile(scriptPath, vars) already have this
-
-    # Run the function generated, in the Java interface, the runScript method
-    # is declared as returning a Map<String, Object>, but that is not enforced
-    # in the Python and an incorrect usage will result in a cast exception 
-#     result = vars[funcName](**inputs)
-    result = copy.deepcopy(inputs)
-    print inputs
-    result['data'] = plugin_object.filter_frames([inputs['data']])
-
+    if plugin_object.get_max_frames()>1: # we need to get round this since we are frame independant
+        data = np.expand_dims(inputs['data'], 0)
+    else:
+        data = inputs['data']
+        
+    if output_type=='data':    
+        result['data'] = plugin_object.filter_frames([data])[0]
+        
+    elif output_type=='aux':
+        result['data'] = inputs['data']
+        out_array = plugin_object.filter_frames([data])[0]
+        k=0
+        for key in axis_values[string_key]:
+            result['auxiliary'][key]=np.array(out_array[k])# wow really
+            k+=1
     return result
+
+
+def process_init(path2plugin, inputs, parameters):
+    parameters['in_datasets'] = [inputs['dataset_name']]
+    parameters['out_datasets'] = [inputs['dataset_name']]
+    plugin = load_plugin(path2plugin.strip('.py'))
+    plugin.exp = setup_exp_and_data(inputs, inputs['data'], plugin)
+    plugin._set_parameters(parameters)
+    plugin._set_plugin_datasets()
+    plugin.setup()
+    rank_in = get_input_rank(plugin)
+    rank_out = get_output_rank(plugin)
+    axis_labels = plugin.get_out_datasets()[0].get_axis_label_keys()
+    axis_labels.remove('idx') # get the labels
+    axis_values = {}
+    plugin._clean_up() # this copies the metadata!
+    for label in axis_labels:
+        axis_values[label] = plugin.get_out_datasets()[0].meta_data.get_meta_data(label)
+    plugin.base_pre_process()
+    plugin.pre_process()
+    return plugin, rank_in, rank_out, axis_labels, axis_values
+
+def setup_exp_and_data(inputs, data, plugin):
+    exp = DawnExperiment(get_options())
+    data_obj = exp.create_data_object('in_data', inputs['dataset_name'])
+    data_obj.data = None
+    if len(inputs['data_dimensions'])==1:
+        print data.shape
+        if inputs['xaxis_title'] is None:
+            inputs['xaxis_title']='x'
+        data_obj.set_axis_labels('idx.units', inputs['xaxis_title'] + '.units')
+        data_obj.meta_data.set_meta_data('idx', np.array([1]))
+        data_obj.meta_data.set_meta_data(str(inputs['xaxis_title']), inputs['xaxis'])
+        data_obj.add_pattern(plugin.get_plugin_pattern(), core_dir=(1,), slice_dir=(0, ))
+        data_obj.add_pattern('SINOGRAM', core_dir=(1,), slice_dir=(0, )) # good to add these two on too
+        data_obj.add_pattern('PROJECTION', core_dir=(1,), slice_dir=(0, ))
+    if len(inputs['data_dimensions'])==2:
+        if inputs['xaxis_title'] is None:
+            inputs['xaxis_title']='x'
+        if inputs['yaxis_title'] is None:
+            inputs['yaxis_title']='y'
+        data_obj.set_axis_labels('idx.units', inputs['xaxis_title'] + '.units', inputs['yaxis_title'] + '.units')
+        data_obj.meta_data.set_meta_data('idx', np.array([1]))
+        data_obj.meta_data.set_meta_data(str(inputs['xaxis_title']), inputs['xaxis'])
+        data_obj.meta_data.set_meta_data(str(inputs['yaxis_title']), inputs['yaxis'])
+        data_obj.add_pattern(plugin.get_plugin_pattern(), core_dir=(1,2,), slice_dir=(0, ))
+        data_obj.add_pattern('SINOGRAM', core_dir=(1,2,), slice_dir=(0, )) # good to add these two on too
+        data_obj.add_pattern('PROJECTION', core_dir=(1,2,), slice_dir=(0, ))
+    data_obj.set_shape((1, ) + data.shape) # need to add for now for slicing...
+    data_obj.get_preview().set_preview([])
+    return exp
+
+class DawnExperiment(Experiment):
+    def __init__(self, options):
+        self.index={"in_data": {}, "out_data": {}, "mapping": {}}
+        self.meta_data = MetaData(get_options())
+        self.nxs_file = None
+
+def get_options():
+    options = {}
+    options['transport'] = 'hdf5'
+    options['process_names'] = 'CPU0'
+    options['data_file'] = ''
+    options['process_file'] = ''
+    options['out_path'] = ''
+    options['inter_path'] = ''
+    options['log_path'] = ''
+    options['run_type'] = ''
+    options['verbose'] = 'True'
+    return options
+
+def get_input_rank(plugin):
+    in_sh = plugin.get_in_datasets()[0].get_shape()
+    slices = plugin.get_in_datasets()[0].get_slice_directions()
+    rank = len(in_sh)-len(slices)
+    return rank
+    
+def get_output_rank(plugin):
+    in_sh = plugin.get_out_datasets()[0].get_shape()
+    slices = plugin.get_out_datasets()[0].get_slice_directions()
+    rank = len(in_sh)-len(slices)
+    return rank
+

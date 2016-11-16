@@ -19,23 +19,25 @@ public class PythonSavuOperation extends AbstractPythonSavuOperation<PythonSavuM
 
 	@Override
 	public OperationRank getInputRank() {
-		return OperationRank.ANY;
+		return OperationRank.TWO;
 	}
 
 	@Override
 	public OperationRank getOutputRank() {
-		return OperationRank.SAME;
+		return OperationRank.TWO;
 	}
 
 	@Override
 	protected Map<String, Object> packInput(IDataset input) {
-		return OperationToPythonUtils.packXY(input);
+		return OperationToPythonUtils.packImage(input);
+//		return OperationToPythonUtils.packXY(input);
 	}
 
 	@Override
 	protected OperationData packAndValidateMap(Map<String, Object> output) {
 		try {
-			return OperationToPythonUtils.unpackXY(output);
+			return OperationToPythonUtils.unpackImage(output);
+//			return OperationToPythonUtils.unpackXY(output);
 		} catch (MetadataException e) {
 			throw new OperationException(this, e);
 		}
