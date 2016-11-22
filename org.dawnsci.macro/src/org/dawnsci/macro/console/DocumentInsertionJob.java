@@ -19,7 +19,6 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.python.pydev.debug.newconsole.prefs.InteractiveConsolePrefs;
@@ -225,10 +224,13 @@ public class DocumentInsertionJob extends Job {
 
 	public void stop() {
 		super.cancel();
-		try {
-		    getThread().interrupt(); // Incase waiting on a take
-		} catch (Throwable swallowed) {
-			// we just try this in case
+		Thread t = getThread();
+		if (t != null) {
+			try {
+				t.interrupt(); // In case waiting on a take
+			} catch (Throwable swallowed) {
+				// we just try this in case
+			}
 		}
 	}
 
