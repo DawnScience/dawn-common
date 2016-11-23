@@ -119,7 +119,7 @@ public class BoofCVImageTransformImpl<T extends ImageSingleBand<?>, TD extends T
 		File tmpFile = new File(file);
 		if (tmpFile.exists())
 			tmpFile.delete();
-		IDataset firstSlice = lazydata.getSlice(new Slice(0, lazydata.getShape()[1], lazydata.getShape()[2])).squeeze();
+		IDataset firstSlice = lazydata.getSlice(new Slice(1)).squeeze();
 		ILazyWriteableDataset lazy = HDF5Utils.createLazyDataset(file, path, name, lazydata.getShape(), null,
 				lazydata.getShape(), Dataset.FLOAT32, null, false);
 
@@ -132,7 +132,7 @@ public class BoofCVImageTransformImpl<T extends ImageSingleBand<?>, TD extends T
 			throw new Exception("Data shape is not 2D");
 		
 		for (int i = 1; i < shape[0]; i++) {
-			IDataset slice = lazydata.getSlice(new Slice(i, lazydata.getShape()[1], lazydata.getShape()[2])).squeeze();
+			IDataset slice = lazydata.getSlice(new Slice(i, i + 1)).squeeze();
 			if (slice.getShape().length != 2)
 				throw new Exception("Data shape is not 2D");
 			ImageFloat32 imageB = ConvertIDataset.convertFrom(slice, ImageFloat32.class, 1);
