@@ -189,7 +189,7 @@ public class AlignImagesConversionPage extends ResourceChoosePage
 			if (lazy.getRank() == 2)
 				firstImage = lazy.getSlice(new Slice());
 			else
-				firstImage = lazy.getSlice(new Slice(0, shape[0], shape[1])).squeeze();
+				firstImage = lazy.getSlice(new Slice(1)).squeeze();
 		} catch (Exception e) {
 			logger.error("Error loading file:" + e.getMessage());
 		}
