@@ -33,7 +33,7 @@
       <operation
             category="org.dawnsci.processing.python.scripting"
             class="uk.ac.diamond.scisoft.analysis.processing.python.PythonSavuOperation"
-            description="Process data using a dummy savu plugin"
+            description="Process data using savu plugins"
             icon="icons/python.png"
             id="uk.ac.diamond.scisoft.analysis.processing.python.PythonSavuOperation"
             model="uk.ac.diamond.scisoft.analysis.processing.python.PythonSavuModel"
@@ -44,5 +44,15 @@
             name="Scripting">
       </category>
    </extension>
+   <extension
+         point="org.eclipse.dawnsci.analysis.api.operationsetupwizardpage">
+      <operationsetupwizardpage
+            class="org.dawnsci.processing.python.ui.SavuPluginModelWizardPage"
+            id="org.dawnsci.processing.python.ui.SavuPluginModelWizardPage"
+            name="Savu Filter Operation Set-up Wizard Page"
+            operationid="uk.ac.diamond.scisoft.analysis.processing.python.PythonSavuOperation">
+      </operationsetupwizardpage>
+   </extension>
+   
 
 </plugin>

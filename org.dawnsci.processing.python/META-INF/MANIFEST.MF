@@ -10,7 +10,15 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.dawnsci.analysis.dataset;bundle-version="1.0.0",
  org.dawnsci.python.rpc,
  org.python.pydev.core;bundle-version="3.6.0",
- uk.ac.diamond.scisoft.analysis.xmlrpc;bundle-version="1.0.0"
+ uk.ac.diamond.scisoft.analysis.xmlrpc;bundle-version="1.0.0",
+ org.eclipse.core.resources
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
-Export-Package: uk.ac.diamond.scisoft.analysis.processing.python
+Export-Package: org.dawnsci.processing.python.ui,
+ uk.ac.diamond.scisoft.analysis.processing.python
+Import-Package: org.apache.commons.beanutils;version="1.9.2",
+ org.dawnsci.processing.ui.model,
+ org.eclipse.swt,
+ org.eclipse.swt.events,
+ org.eclipse.swt.layout,
+ org.eclipse.swt.widgets

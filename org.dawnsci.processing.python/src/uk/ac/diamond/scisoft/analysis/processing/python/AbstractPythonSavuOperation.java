@@ -22,8 +22,11 @@ public abstract class AbstractPythonSavuOperation<T extends PythonSavuModel> ext
 		try {
 			s = new AnalysisRpcPythonPyDevService(false);
 			pythonRunSavuService = new PythonRunSavuService(s);
+			// can I add a plugin populator here? drop down+params list test it with a fake param. No needs to be model...
+			
+			
 		} catch (Exception e) {
-			throw new OperationException(this, "Could not create script service!");
+			throw new OperationException(this, "Could not create script service!");			
 		}
 		
 	}
@@ -40,15 +43,17 @@ public abstract class AbstractPythonSavuOperation<T extends PythonSavuModel> ext
 	protected OperationData process(IDataset input, IMonitor monitor) throws OperationException {
 		
 		if (s == null || pythonRunSavuService == null) throw new OperationException(this, "Could not create python interpreter");
-		if (model.getFilePath() == null || model.getFilePath().isEmpty()) throw new OperationException(this, "Path to script not set");
+		if (model.getPluginName() == null || model.getPluginPath()== null) throw new OperationException(this, "Path to script not set");
 		
 		Map<String,Object> inputs = packInput(input);
 		
 		try {
-			Map<String, Object> out = pythonRunSavuService.runSavu(model.getFilePath(), inputs);
+			// need to pass a dictionary of inputs into here.
+//			generate a hashmap in model, with a single getter to pass it here
+			Map<String, Object> out = pythonRunSavuService.runSavu((String) model.getPluginPath(),(Map <String, Object>) model.getParameters(),(Boolean) model.isMetaDataOnly(),(Map <String, Object>) inputs);
 			return packAndValidateMap(out);
 		} catch (Exception e) {
-			throw new OperationException(this, "Could not run " + model.getFilePath() + " due to " + e.getMessage());
+			throw new OperationException(this, "Could not run " + model.getPluginName() + " due to " + e.getMessage());
 		}
 	}
 

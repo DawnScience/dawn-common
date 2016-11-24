@@ -75,7 +75,16 @@ public class PythonRunSavuService implements IPythonRunSavu{
 	 * @param rpcservice
 	 *            the running service to register with
 	 * @param debug
-	 *            if true uses's the client's
+	 *            if true uses's the client's	public Map <String, Object> getSanitizedParams() {
+		Map<String, Object> out = null;
+		Map<String, Object> params = getParameters();
+		for (Map.Entry<String, Object> entry : params.entrySet())
+			out.put(entry.getKey(), value)
+		return out;
+		
+		
+	}
+	
 	 *            {@link AnalysisRpcClient#request_debug(String, Object[], boolean)}
 	 *            , if false uses
 	 *            {@link AnalysisRpcClient#request(String, Object[])}
@@ -109,25 +118,18 @@ public class PythonRunSavuService implements IPythonRunSavu{
 			// script has a function definition called "runScript", add a
 			// handler for it, then create a proxy to run the function
 			rpcservice.addHandlers("execfile(r'" + script + "')",
-					new String[] { "runSavu" });
+					new String[] { "runSavu", "populate_plugins", "get_plugin_info", "get_plugin_params" });
 		}
 		proxy = rpcservice.getClient().newProxyInstance(IPythonRunSavu.class,
 				debug);
 	}
 
 	@Override
-	public Map<String, Object> runSavu(String scriptFullPath,
-			Map<String, ?> data) throws AnalysisRpcException {
-		return proxy.runSavu(scriptFullPath, data);
+	public Map<String, Object> runSavu(String scriptFullPath,Map<String, Object> params,
+			Boolean metaOnly, Map<String, ?> data) throws AnalysisRpcException {
+		return proxy.runSavu(scriptFullPath,params, metaOnly,data);
 	}
 
-	@Override
-	public Map<String, Object> runSavu(String scriptFullPath,
-			Map<String, ?> data, String funcName)
-			throws AnalysisRpcException {
-		return proxy.runSavu(scriptFullPath, data, funcName);
-	}
-	
 	/**
 	 * Formats a remote exception to limit the Python code that was not "users" code. 
 	 * @param e Remote Exception to format
@@ -136,4 +138,23 @@ public class PythonRunSavuService implements IPythonRunSavu{
 	public String formatException(AnalysisRpcRemoteException e) {
 		return e.getPythonFormattedStackTrace(PYTHON_SERVICE_RUNSAVU_PY);
 	}
+
+	@Override
+	public Map<String, Object> get_plugin_info() throws AnalysisRpcException {
+		// TODO Auto-generated method stub
+		return proxy.get_plugin_info();
+	}
+	
+	@Override
+	public void populate_plugins() throws AnalysisRpcException {
+		// TODO Auto-generated method stub
+		proxy.populate_plugins();
+	}
+	@Override
+	public Map<String, Object> get_plugin_params(String pluginName) throws AnalysisRpcException {
+		// TODO Auto-generated method stub
+		return proxy.get_plugin_params(pluginName);
+	}
+	
 }
+

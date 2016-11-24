@@ -13,21 +13,24 @@ from savu.plugins.utils import find_args, load_plugin
 import savu
 import inspect
 from copy import deepcopy as copy
+from savu.plugins import utils as pu
+
 
 sys_path_0_lock = threading.Lock()
 sys_path_0_set = False
 plugin_object = False
 print "I ran the script"
-def runSavu(scriptPath, inputs,funcName='filter_frames'):
+def runSavu(path2plugin, params, metaOnly, inputs):
     '''
-    scriptPath  - is the path to the user script that should be run
+    path2plugin  - is the path to the user script that should be run
+    params - are the savu parameters
+    metaOnly - a boolean for whether the data is kept in metadata or is passed as data
     inputs      - is a dictionary of input objects 
     '''
 #     print inputs
     parameters = {} # this will get passed in, in future
 #     parameters['output_style'] = 'aux'
-    parameters['output_style'] = 'data'
-    output_type = parameters.pop('output_style')
+
 #     parameters['config'] = '/dls/science/users/clb02321/DAWN_stable/Savu2/Savu/test_data/data/test_config.cfg'
     parameters['Energy']=53.0
     parameters['Distance']=1.0
@@ -45,7 +48,7 @@ def runSavu(scriptPath, inputs,funcName='filter_frames'):
     sys_path_0_lock.acquire()
     try:
         result = copy(inputs)
-        scriptDir = os.path.dirname(scriptPath)
+        scriptDir = os.path.dirname(path2plugin)
         sys_path_0 = sys.path[0]
         if sys_path_0_set and scriptDir != sys_path_0:
             raise Exception("runSavu attempted to change sys.path[0] in a way that "
@@ -56,19 +59,19 @@ def runSavu(scriptPath, inputs,funcName='filter_frames'):
             sys_path_0_set = True
         
         if not plugin_object:
-            plugin_object, rank_in, rank_out, axis_labels, axis_values = process_init(scriptPath, inputs, parameters)
+            plugin_object, axis_labels, axis_values = process_init(path2plugin, inputs, parameters)
             chkstring =  [any(isinstance(ix, str) for ix in axis_values[label]) for label in axis_labels]
             if any(chkstring): # are any axis values strings we instead make this an aux out
-                output_type = 'aux'
+                metaOnly = True
                 string_key = axis_labels[chkstring.index(True)]
                 result['auxiliary'] = dict.fromkeys(axis_values[string_key])
             else:
                 string_key = axis_labels[0]# will it always be the first one?
-            if output_type=='data':
-                if rank_out == 1:
+            if not metaOnly:
+                if len(axis_labels) == 1:
                     result['xaxis']=axis_values[axis_labels[0]]
                     result['xaxis_title']=axis_labels[0]
-                if rank_out == 2:
+                if len(axis_labels) == 2:
                     result['xaxis']=axis_values[axis_labels[0]]
                     result['xaxis_title']=axis_labels[0]
                     result['yaxis']=axis_values[axis_labels[1]]
@@ -83,16 +86,18 @@ def runSavu(scriptPath, inputs,funcName='filter_frames'):
     else:
         data = inputs['data']
         
-    if output_type=='data':    
+    if not metaOnly:    
         result['data'] = plugin_object.filter_frames([data])[0]
         
-    elif output_type=='aux':
+    elif metaOnly:
         result['data'] = inputs['data']
         out_array = plugin_object.filter_frames([data])[0]
         k=0
         for key in axis_values[string_key]:
+            result['auxiliary'] = {}
             result['auxiliary'][key]=np.array(out_array[k])# wow really
             k+=1
+#     print "I went here"
     return result
 
 
@@ -104,8 +109,6 @@ def process_init(path2plugin, inputs, parameters):
     plugin._set_parameters(parameters)
     plugin._set_plugin_datasets()
     plugin.setup()
-    rank_in = get_input_rank(plugin)
-    rank_out = get_output_rank(plugin)
     axis_labels = plugin.get_out_datasets()[0].get_axis_label_keys()
     axis_labels.remove('idx') # get the labels
     axis_values = {}
@@ -114,14 +117,15 @@ def process_init(path2plugin, inputs, parameters):
         axis_values[label] = plugin.get_out_datasets()[0].meta_data.get_meta_data(label)
     plugin.base_pre_process()
     plugin.pre_process()
-    return plugin, rank_in, rank_out, axis_labels, axis_values
+    print "I went here"
+    return plugin, axis_labels, axis_values
 
 def setup_exp_and_data(inputs, data, plugin):
     exp = DawnExperiment(get_options())
     data_obj = exp.create_data_object('in_data', inputs['dataset_name'])
     data_obj.data = None
     if len(inputs['data_dimensions'])==1:
-        print data.shape
+#         print data.shape
         if inputs['xaxis_title'] is None:
             inputs['xaxis_title']='x'
         data_obj.set_axis_labels('idx.units', inputs['xaxis_title'] + '.units')
@@ -165,15 +169,24 @@ def get_options():
     options['verbose'] = 'True'
     return options
 
-def get_input_rank(plugin):
-    in_sh = plugin.get_in_datasets()[0].get_shape()
-    slices = plugin.get_in_datasets()[0].get_slice_directions()
-    rank = len(in_sh)-len(slices)
-    return rank
-    
-def get_output_rank(plugin):
-    in_sh = plugin.get_out_datasets()[0].get_shape()
-    slices = plugin.get_out_datasets()[0].get_slice_directions()
-    rank = len(in_sh)-len(slices)
-    return rank
 
+def populate_plugins():
+    print "method populate plugins was called"
+    pu.populate_plugins()
+
+def get_plugin_info():
+    '''
+    returns all the info about the plugins in the form of a dict
+    need to call this from the ui on click button
+    '''
+    print "returning the plugin descriptions and stuff"
+    print pu.dawn_plugins.keys()
+    return pu.dawn_plugins
+
+
+def get_plugin_params(pluginName):
+    '''
+    returns a hashmap with the parameters
+    '''
+    out = pu.dawn_plugin_params[pluginName]
+    return out
