@@ -22,17 +22,21 @@ import org.eclipse.dawnsci.analysis.api.diffraction.IPowderCalibrationInfo;
 import org.eclipse.dawnsci.analysis.api.fitting.functions.IFunction;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
 import org.eclipse.dawnsci.analysis.api.io.ILoaderService;
+import org.eclipse.dawnsci.analysis.api.metadata.IDiffractionMetadata;
 import org.eclipse.dawnsci.analysis.api.persistence.IJSonMarshaller;
 import org.eclipse.dawnsci.analysis.api.persistence.IPersistentFile;
 import org.eclipse.dawnsci.analysis.api.processing.IOperation;
 import org.eclipse.dawnsci.analysis.api.processing.OperationData;
 import org.eclipse.dawnsci.analysis.api.processing.model.IOperationModel;
 import org.eclipse.dawnsci.analysis.api.roi.IROI;
+import org.eclipse.dawnsci.analysis.api.tree.GroupNode;
 import org.eclipse.dawnsci.hdf.object.H5Utils;
 import org.eclipse.dawnsci.hdf.object.HierarchicalDataFactory;
+import org.eclipse.dawnsci.hdf.object.HierarchicalDataFile;
 import org.eclipse.dawnsci.hdf.object.HierarchicalDataFileUtils;
 import org.eclipse.dawnsci.hdf.object.IHierarchicalDataFile;
 import org.eclipse.dawnsci.hdf.object.Nexus;
+import org.eclipse.dawnsci.hdf5.nexus.NexusFileHDF5;
 import org.eclipse.january.IMonitor;
 import org.eclipse.january.dataset.BooleanDataset;
 import org.eclipse.january.dataset.Comparisons;
@@ -41,7 +45,6 @@ import org.eclipse.january.dataset.DatasetUtils;
 import org.eclipse.january.dataset.IDataset;
 import org.eclipse.january.dataset.ILazyDataset;
 import org.eclipse.january.dataset.ILazyWriteableDataset;
-import org.eclipse.dawnsci.analysis.api.metadata.IDiffractionMetadata;
 import org.eclipse.january.metadata.OriginMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -683,15 +686,31 @@ class PersistentFileImpl implements IPersistentFile {
 
 	public void setOperations(IOperation<? extends IOperationModel, ? extends OperationData>... operations)
 			throws Exception {
-		if (file == null)
-			file = HierarchicalDataFactory.getWriter(filePath);
-		PersistJsonOperationHelper helper = new PersistJsonOperationHelper();
-		helper.writeOperations(file, operations);
+		
+		boolean isOpen = false;
+		boolean isWrite = false;
+		if (file != null){
+			isOpen = true;
+			isWrite = HierarchicalDataFile.isWriting(filePath);
+			file.close();
+		}
+		
+		try (NexusFileHDF5 nexusFile = new NexusFileHDF5(filePath);) {
+			nexusFile.createAndOpenToWrite();
+			GroupNode gn = PersistJsonOperationsNode.writeOperationsToNode(operations);
+			nexusFile.getGroup("/entry", true);
+			nexusFile.addNode("/entry/process", gn);
+		} finally {
+			if (isOpen && !isWrite) {
+				file = HierarchicalDataFactory.getReader(filePath);
+			} else if (isOpen && isWrite) {
+				file = HierarchicalDataFactory.getWriter(filePath);
+			}
+		}
+
 	}
 
 	public IOperation<? extends IOperationModel, ? extends OperationData>[] getOperations() throws Exception {
-		if (file == null)
-			file = HierarchicalDataFactory.getReader(filePath);
 		PersistJsonOperationsNode helper = new PersistJsonOperationsNode();
 		return helper.readOperations(LoaderFactory.getData(filePath).getTree());
 	}
