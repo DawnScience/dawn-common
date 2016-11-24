@@ -44,7 +44,7 @@ public class SpecSyntax {
 		buf = new StringBuilder();
 		buf.append(NUM);
 		buf.append(NUMWS);
-		for (int i = 0; i < 50; i++) {
+		for (int i = 0; i < 100; i++) {
 			buf.append(NUMWS);
 			buf.append("?");
 		}

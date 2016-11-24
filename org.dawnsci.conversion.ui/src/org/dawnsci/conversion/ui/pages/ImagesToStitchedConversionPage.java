@@ -162,9 +162,8 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 				if (lazyDataset != null && lazyDataset.getRank() == 3)
 					break;
 			}
-			int[] shape = lazyDataset.getShape();
 			try {
-				firstImage = lazyDataset.getSlice(new Slice(0, shape[0], shape[1]));
+				firstImage = lazyDataset.getSlice(new Slice(1));
 			} catch (DatasetException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
