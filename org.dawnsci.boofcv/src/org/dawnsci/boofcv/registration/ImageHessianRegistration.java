@@ -13,8 +13,13 @@ import java.util.List;
 
 import org.ddogleg.fitting.modelset.ModelManager;
 import org.ddogleg.fitting.modelset.ModelMatcher;
+import org.ddogleg.fitting.modelset.lmeds.LeastMedianOfSquares;
 import org.ddogleg.fitting.modelset.ransac.Ransac;
 import org.ddogleg.struct.FastQueue;
+import org.eclipse.dawnsci.analysis.api.image.HessianRegParameters;
+import org.eclipse.dawnsci.analysis.api.image.HessianRegParameters.TransformationType;
+import org.eclipse.dawnsci.analysis.api.image.DetectionAlgoParameters;
+import org.eclipse.dawnsci.analysis.api.image.DetectionAlgoParameters.DetectionType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +34,9 @@ import boofcv.alg.distort.impl.DistortSupport;
 import boofcv.alg.distort.impl.ImplImageDistort_F32;
 import boofcv.alg.feature.UtilFeature;
 import boofcv.alg.interpolate.impl.ImplBilinearPixel_F32;
+import boofcv.alg.sfm.robust.DistanceAffine2D;
 import boofcv.alg.sfm.robust.DistanceHomographySq;
+import boofcv.alg.sfm.robust.GenerateAffine2D;
 import boofcv.alg.sfm.robust.GenerateHomographyLinear;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
@@ -40,6 +47,7 @@ import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.MultiSpectral;
+import georegression.fitting.affine.ModelManagerAffine2D_F64;
 import georegression.fitting.homography.ModelManagerHomography2D_F64;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.homography.Homography2D_F64;
@@ -152,7 +160,44 @@ public class ImageHessianRegistration {
 	 */
 	public static ImageSingleBand<?> registerHessian(ImageSingleBand<?> imageA,
 			ImageSingleBand<?> imageB) {
-		ConfigFastHessian config = new ConfigFastHessian(1, 2, 200, 1, 9, 4, 4);
+		DetectionAlgoParameters detectionParams = new DetectionAlgoParameters(10, 100000, 1, 0, DetectionType.RANSAC);
+		HessianRegParameters hessianParams = new HessianRegParameters(1, 2, 200, 1, TransformationType.AFFINE);
+		return registerHessian(imageA, imageB, detectionParams, hessianParams);
+	}
+
+	/**
+	 * Registers imageB to imageA
+	 * 
+	 * @param imageA
+	 *             The reference image
+	 * @param imageB
+	 *             The image to be registered
+	 * @param detectionParams
+	 * @param hessianParams
+	 * @return The rendered, registered image
+	 */
+	public static ImageSingleBand<?> registerHessian(ImageSingleBand<?> imageA, ImageSingleBand<?> imageB, DetectionAlgoParameters detectionParams, HessianRegParameters hessianParams) {
+		if (detectionParams == null) {
+			detectionParams = new DetectionAlgoParameters(10, 100000, 1, 0, DetectionType.RANSAC);
+		}
+		if (hessianParams == null) {
+			hessianParams = new HessianRegParameters(1, 2, 200, 1, TransformationType.AFFINE);
+		}
+		DetectionType algoType = detectionParams.getType();
+		long randSeed = detectionParams.getRandSeed();
+		int maxIterations = detectionParams.getMaxIterations();
+		double thresholdFit = detectionParams.getThresholdFit();
+		int inlierFraction = detectionParams.getInlierFraction();
+		float detectThreshold = hessianParams.getDetectThreshold();
+		int extractRadius = hessianParams.getExtractRadius();
+		int maxFeaturesPerScale = hessianParams.getMaxFeaturesPerScale();
+		int initialSampleSize = hessianParams.getInitialSampleSize();
+		int initialSize = 9;
+		int numberScalesPerOctave = 4;
+		int numberOfOctaves = 4;
+		TransformationType type = hessianParams.getType();
+		ConfigFastHessian config = new ConfigFastHessian(detectThreshold, extractRadius, maxFeaturesPerScale,
+				initialSampleSize, initialSize, numberScalesPerOctave, numberOfOctaves);
 		// Detect using the standard SURF feature descriptor and describer
 		DetectDescribePoint detDesc = FactoryDetectDescribe.surfStable(config,
 				null, null, ImageFloat32.class);
@@ -162,31 +207,56 @@ public class ImageHessianRegistration {
 				.greedy(scorer, 2, true);
 		// fit the images using a homography. This works well for rotations and
 		// distant objects.
-//		ModelManager<Affine2D_F64> manager = new ModelManagerAffine2D_F64();
-		ModelManager<Homography2D_F64> manager = new ModelManagerHomography2D_F64();
-		
-//		GenerateAffine2D modelFitter = new GenerateAffine2D();
-		GenerateHomographyLinear modelFitter = new GenerateHomographyLinear(true);
-		
-//		DistanceAffine2D distance = new DistanceAffine2D();
-		DistanceHomographySq distance = new DistanceHomographySq();
+		if (type == TransformationType.AFFINE) {
+			ModelManager<Affine2D_F64> manager = new ModelManagerAffine2D_F64();
+			
+			GenerateAffine2D modelFitter = new GenerateAffine2D();
+			
+			DistanceAffine2D distance = new DistanceAffine2D();
+			// manage Ransac and Lmeds algo 
+			ModelMatcher<Affine2D_F64, AssociatedPair> modelMatcher;
+			if (algoType == DetectionType.LMEDS) {
+				modelMatcher = new Ransac<Affine2D_F64, AssociatedPair>(
+						randSeed, manager, modelFitter, distance, maxIterations, thresholdFit);
+			} else {
+				modelMatcher = new LeastMedianOfSquares<Affine2D_F64, AssociatedPair>(randSeed, maxIterations, Double.MAX_VALUE, inlierFraction, manager, modelFitter, distance);
+			}
+				
+			Affine2D_F64 H = computeTransform(imageA, imageB, detDesc, associate, modelMatcher);
+			
+			if (H == null) {
+				return (ImageFloat32) imageB;
+			}
+			ImageSingleBand<?> output = renderHessianRegistration(imageA, (ImageFloat32) imageB, H);
 
-//		ModelMatcher<Affine2D_F64, AssociatedPair> modelMatcher = new Ransac<Affine2D_F64, AssociatedPair>(
-//				10, manager, modelFitter, distance, 100000, 1);
-		// TODO Add UI to manage different algorithms and also different parameters
-		ModelMatcher<Homography2D_F64, AssociatedPair> modelMatcher = new Ransac<Homography2D_F64, AssociatedPair>(
-				10, manager, modelFitter, distance, 10000, 1);
-		
-//		Affine2D_F64 H = computeTransform(imageA, imageB, detDesc, associate, modelMatcher);
-		Homography2D_F64 H = computeTransform2(imageA, imageB, detDesc, associate, modelMatcher);
-		
-		if (H == null) {
-			return (ImageFloat32) imageB;
+			return output;
+		} else if (type == TransformationType.HOMOGRAPHY) {
+			ModelManager<Homography2D_F64> manager = new ModelManagerHomography2D_F64();
+			
+			GenerateHomographyLinear modelFitter = new GenerateHomographyLinear(true);
+			
+			DistanceHomographySq distance = new DistanceHomographySq();
+
+			// manage Ransac and Lmeds algo 
+			ModelMatcher<Homography2D_F64, AssociatedPair> modelMatcher;
+			if (algoType == DetectionType.LMEDS) {
+				modelMatcher = new Ransac<Homography2D_F64, AssociatedPair>(randSeed, manager, modelFitter, distance,
+						maxIterations, thresholdFit);
+			} else {
+				modelMatcher = new LeastMedianOfSquares<Homography2D_F64, AssociatedPair>(randSeed, maxIterations,
+						Double.MAX_VALUE, inlierFraction, manager, modelFitter, distance);
+			}
+			
+			Homography2D_F64 H = computeTransform2(imageA, imageB, detDesc, associate, modelMatcher);
+			
+			if (H == null) {
+				return (ImageFloat32) imageB;
+			}
+			ImageSingleBand<?> output = renderHessianRegistration(imageA, (ImageFloat32) imageB, H);
+
+			return output;
 		}
-//		ImageSingleBand<?> output = renderHessianRegistration(imageA, (ImageFloat32) imageB, H);
-		ImageSingleBand<?> output = renderHessianRegistration(imageA, (ImageFloat32) imageB, H);
-
-		return output;
+		return null;
 	}
 
 	/**

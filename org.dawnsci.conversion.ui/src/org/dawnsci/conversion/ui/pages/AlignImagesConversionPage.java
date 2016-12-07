@@ -254,7 +254,7 @@ public class AlignImagesConversionPage extends ResourceChoosePage
 								"Error running image alignment", warning, "", MessageDialog.WARNING, dialogButtonLabel, 0);
 						messageDialog.open();
 					}
-				} else if (alignState == AlignMethod.AFFINE_TRANSFORM) {
+				} else if (alignState == AlignMethod.HESSIAN_REGISTRATION) {
 					align(null);
 				}
 				setPageComplete(true);
