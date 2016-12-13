@@ -43,6 +43,7 @@ public abstract class AbstractPythonSavuOperation<T extends PythonSavuModel> ext
 	protected OperationData process(IDataset input, IMonitor monitor) throws OperationException {
 		
 		if (s == null || pythonRunSavuService == null) throw new OperationException(this, "Could not create python interpreter");
+		System.out.println("pluginname and path are"+model.getPluginName()+" "+model.getPluginPath());
 		if (model.getPluginName() == null || model.getPluginPath()== null) throw new OperationException(this, "Path to script not set");
 		
 		Map<String,Object> inputs = packInput(input);
@@ -50,7 +51,11 @@ public abstract class AbstractPythonSavuOperation<T extends PythonSavuModel> ext
 		try {
 			// need to pass a dictionary of inputs into here.
 //			generate a hashmap in model, with a single getter to pass it here
-			Map<String, Object> out = pythonRunSavuService.runSavu((String) model.getPluginPath(),(Map <String, Object>) model.getParameters(),(Boolean) model.isMetaDataOnly(),(Map <String, Object>) inputs);
+			String pluginPath = (String) model.getPluginPath();
+			Map <String, Object> parameters = (Map <String, Object>) model.getParameters();
+			Boolean metaDataOnly = (Boolean) model.isMetaDataOnly();
+			System.out.println(parameters);
+			Map<String, Object> out = pythonRunSavuService.runSavu(pluginPath,parameters,metaDataOnly,inputs);
 			return packAndValidateMap(out);
 		} catch (Exception e) {
 			throw new OperationException(this, "Could not run " + model.getPluginName() + " due to " + e.getMessage());

@@ -9,7 +9,7 @@ import org.eclipse.dawnsci.analysis.api.processing.OperationRank;
 import org.eclipse.january.MetadataException;
 import org.eclipse.january.dataset.IDataset;
 
-@Atomic
+//@Atomic
 public class PythonSavuOperation extends AbstractPythonSavuOperation<PythonSavuModel> {
 
 	@Override
@@ -19,19 +19,34 @@ public class PythonSavuOperation extends AbstractPythonSavuOperation<PythonSavuM
 
 	@Override
 	public OperationRank getInputRank() {
-		return OperationRank.TWO;
+		if (model != null && model.getPluginRank()!=null) {
+			return OperationRank.get(model.getPluginRank());
+		}
+		return OperationRank.ANY;
 	}
 
 	@Override
 	public OperationRank getOutputRank() {
+		if (model.isMetaDataOnly()) {
+			return getInputRank();
+		}
 		return OperationRank.TWO;
 	}
 
 	@Override
 	protected Map<String, Object> packInput(IDataset input) {
+		if (model.getPluginRank().equals(2)) {
 		return OperationToPythonUtils.packImage(input);
-//		return OperationToPythonUtils.packXY(input);
-	}
+		}
+		else if (model.getPluginRank().equals(1)) {
+		return OperationToPythonUtils.packXY(input);
+		}
+		else {
+		return null;			
+		}
+
+		}
+
 
 	@Override
 	protected OperationData packAndValidateMap(Map<String, Object> output) {

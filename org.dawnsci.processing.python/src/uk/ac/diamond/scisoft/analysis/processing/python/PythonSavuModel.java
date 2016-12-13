@@ -11,11 +11,12 @@ import org.eclipse.dawnsci.analysis.api.processing.model.OperationModelField;
 
 public class PythonSavuModel extends AbstractOperationModel {
 	
-	String wspacePath = ResourcesPlugin.getWorkspace().getRoot().getLocation().toString();
-	@OperationModelField(label="Plugin Name")
+//	The plugin name
+	@OperationModelField(editable = false, visible = false, label="Plugin Name")
 	private String pluginName = null;
-	
-	@OperationModelField(label="Meta data only", hint="Do we want the data in the meta data or to be passed down the chain")
+
+	// Whether this is to be treated as metadata or just passed down the chain
+	@OperationModelField(editable = false, visible = false, label="Meta data only", hint="Do we want the data in the meta data or to be passed down the chain")
 	private boolean MetaDataOnly = false;
 
 	public boolean isMetaDataOnly() {
@@ -25,13 +26,23 @@ public class PythonSavuModel extends AbstractOperationModel {
 	public void setMetaDataOnly(boolean metaDataOnly) {
 		MetaDataOnly = metaDataOnly;
 	}
-	@OperationModelField(label="Plugin Path")
-	private String pluginPath = null;
 	
-	@OperationModelField(label="Parameters", hint="parameters for the filter")
+//	the pluginPath
+	@OperationModelField(editable = false, visible = false, label="Plugin Path")
+	private String pluginPath = null;
+
+	public String getPluginPath() {
+		return pluginPath;
+	}
+
+	public void setPluginPath(String pluginPath) {
+		this.pluginPath = pluginPath;
+	}
+
+	// the parameters Map
+	@OperationModelField(editable = false, visible = false, label="Parameters", hint="parameters for the filter")
 	private Map <String, Object> parameters = null;
 
-	
 	public Map<String, Object> getParameters() {
 		
 		return this.parameters;
@@ -47,64 +58,29 @@ public class PythonSavuModel extends AbstractOperationModel {
 
 	public void setPluginName(String pluginName) {
 		this.pluginName = pluginName;
-		Map <String, Object> pluginMap = (Map<String, Object>) getPluginMap().get(pluginName);
-		setPluginPath((String) pluginMap.get("path2plugin"));
-		Map <String, Object> parameters = (Map <String, Object>) getPluginParams(pluginName);
-		System.out.println(parameters);
-		setParameters(parameters);
-
-		}	
-		
-
-	public Object getPluginPath() {
-		return pluginPath;
-	}
-
-	public void setPluginPath(String pluginPath) {
-		this.pluginPath = pluginPath;
-	}
-
-	public Map <String, Object> getPluginMap(){
-
-		final String savuPluginPath = wspacePath+"savu_plugin_info.ser";
-		
-		Map <String, Object> pluginDict = null;
-		FileInputStream fileIn = null;
-
-		try {
-			fileIn = new FileInputStream(savuPluginPath);
-			ObjectInputStream in = new ObjectInputStream(fileIn);
-			pluginDict = (Map<String, Object>) in.readObject();
-			in.close();
-			fileIn.close();
-		} catch (IOException | ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		return pluginDict;
-	}
-	public Map <String, Object> getPluginParams(String pluginName){
-
-		final String savuPluginPath = wspacePath+pluginName+".ser";
-		
-		Map <String, Object> pluginDict = null;
-		FileInputStream fileIn = null;
-
-		try {
-			fileIn = new FileInputStream(savuPluginPath);
-			ObjectInputStream in = new ObjectInputStream(fileIn);
-			pluginDict = (Map<String, Object>) in.readObject();
-			in.close();
-			fileIn.close();
-			System.out.println(pluginDict.keySet().toString());
-		} catch (IOException | ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		return pluginDict;
 	}
 	
+//	the plugin input rank
+	@OperationModelField(editable = false, visible = false, label="Plugin input rank")
+	private Integer pluginRank = null;
+
+	public Integer getPluginRank() {
+		return pluginRank;
+	}
+
+	public void setPluginRank(Integer pluginRank) {
+		this.pluginRank = pluginRank;
+	}
+
+	@OperationModelField(editable = false, visible = false, label="selected list item")
+	private Integer selectedItem = null;
+
+	public Integer getSelectedItem() {
+		return selectedItem;
+	}
+
+	public void setSelectedItem(Integer selectedItem) {
+		this.selectedItem = selectedItem;
+	}
 	
 }

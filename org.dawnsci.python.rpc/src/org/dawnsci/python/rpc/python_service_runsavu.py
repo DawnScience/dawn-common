@@ -14,11 +14,16 @@ import savu
 import inspect
 from copy import deepcopy as copy
 from savu.plugins import utils as pu
-
+import time
 
 sys_path_0_lock = threading.Lock()
 sys_path_0_set = False
 plugin_object = False
+axis_labels = False
+axis_values = False
+string_key = None
+parameters = None
+aux = {}
 print "I ran the script"
 def runSavu(path2plugin, params, metaOnly, inputs):
     '''
@@ -27,27 +32,22 @@ def runSavu(path2plugin, params, metaOnly, inputs):
     metaOnly - a boolean for whether the data is kept in metadata or is passed as data
     inputs      - is a dictionary of input objects 
     '''
-#     print inputs
-    parameters = {} # this will get passed in, in future
-#     parameters['output_style'] = 'aux'
+    t1 = time.time()
 
-#     parameters['config'] = '/dls/science/users/clb02321/DAWN_stable/Savu2/Savu/test_data/data/test_config.cfg'
-    parameters['Energy']=53.0
-    parameters['Distance']=1.0
-    parameters['Resolution']=1.28
-    parameters['Ratio']=250.0
-    parameters['Padtopbottom']=10
-    parameters['Padleftright']=10
-    parameters['Padmethod']='edge'
-#     parameters['pattern']='PROJECTION'
-#     parameters['dummy']=10
-    string_key = None
+
+    print "in the python "
     global sys_path_0_lock
     global sys_path_0_set
     global plugin_object
+    global axis_labels
+    global axis_values
+    global string_key
+    global parameters
+    global aux
     sys_path_0_lock.acquire()
     try:
         result = copy(inputs)
+
         scriptDir = os.path.dirname(path2plugin)
         sys_path_0 = sys.path[0]
         if sys_path_0_set and scriptDir != sys_path_0:
@@ -59,12 +59,24 @@ def runSavu(path2plugin, params, metaOnly, inputs):
             sys_path_0_set = True
         
         if not plugin_object:
+            parameters = {}
+                # slight repack here
+            for key in params.keys():
+                print "here"
+                val = params[key]["value"]
+                if type(val)==type(''):
+                    val = val.replace('\n','').strip()
+                print val
+                parameters[key] = val
+            print "initialising the object"
             plugin_object, axis_labels, axis_values = process_init(path2plugin, inputs, parameters)
             chkstring =  [any(isinstance(ix, str) for ix in axis_values[label]) for label in axis_labels]
             if any(chkstring): # are any axis values strings we instead make this an aux out
                 metaOnly = True
+                print "AXIS LABELS"+str(axis_values)
                 string_key = axis_labels[chkstring.index(True)]
-                result['auxiliary'] = dict.fromkeys(axis_values[string_key])
+                aux = dict.fromkeys(axis_values[string_key])
+                print aux.keys()
             else:
                 string_key = axis_labels[0]# will it always be the first one?
             if not metaOnly:
@@ -90,14 +102,21 @@ def runSavu(path2plugin, params, metaOnly, inputs):
         result['data'] = plugin_object.filter_frames([data])[0]
         
     elif metaOnly:
+        print "metadata only operation"
         result['data'] = inputs['data']
+        print type(result['data'])
         out_array = plugin_object.filter_frames([data])[0]
         k=0
-        for key in axis_values[string_key]:
-            result['auxiliary'] = {}
-            result['auxiliary'][key]=np.array(out_array[k])# wow really
+        print aux.keys()
+        for key in aux.keys():
+            print "assigning the dict in aux"
+            aux[key]=np.array(out_array[k])# wow really
             k+=1
-#     print "I went here"
+        result['auxiliary'] = aux
+    print "ran the python part fine"
+    print result
+    t2 = time.time()
+    print "time to runSavu = "+str((t2-t1))
     return result
 
 
