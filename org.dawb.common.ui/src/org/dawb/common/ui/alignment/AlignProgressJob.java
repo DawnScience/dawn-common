@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2015 Diamond Light Source Ltd.
+ * Copyright (c) 2015-2016 Diamond Light Source Ltd.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -13,7 +13,9 @@ import java.util.List;
 
 import org.dawb.common.ui.monitor.ProgressMonitorWrapper;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.dawnsci.analysis.api.image.HessianRegParameters;
 import org.eclipse.dawnsci.analysis.api.image.IImageTransform;
+import org.eclipse.dawnsci.analysis.api.image.DetectionAlgoParameters;
 import org.eclipse.dawnsci.analysis.dataset.roi.RectangularROI;
 import org.eclipse.january.IMonitor;
 import org.eclipse.january.dataset.IDataset;
@@ -48,6 +50,9 @@ public class AlignProgressJob implements IRunnableWithProgress {
 	private RectangularROI roi;
 
 	private boolean isLazy;
+
+	private DetectionAlgoParameters detectionParams;
+	private HessianRegParameters hessianParams;
 
 	private static IImageTransform transformer;
 
@@ -110,12 +115,13 @@ public class AlignProgressJob implements IRunnableWithProgress {
 					shiftedImages = AlignImages.alignLazyWithROI(data, shifts, roi, mode, mon);
 				else
 					nonLazyShiftedImages = AlignImages.alignWithROI(nonLazyData, shifts, roi, mode, mon);
-			} else if (alignState == AlignMethod.AFFINE_TRANSFORM) {
+			} else if (alignState == AlignMethod.HESSIAN_REGISTRATION) {
 				// align with boofcv
-				if (isLazy)
-					shiftedImages = transformer.align(data, mon);
-				else
+				if (isLazy) {
+					shiftedImages = transformer.align(data, detectionParams, hessianParams, mon);
+				} else {
 					nonLazyShiftedImages = transformer.align(nonLazyData, mon);
+				}
 			}
 		} catch (final Exception e) {
 			Display.getDefault().syncExec(new Runnable() {
@@ -196,6 +202,14 @@ public class AlignProgressJob implements IRunnableWithProgress {
 
 	public void setAlignMethod(AlignMethod alignState) {
 		this.alignState = alignState;
+	}
+
+	public void setRansacParameters(DetectionAlgoParameters ransacParams) {
+		this.detectionParams = ransacParams;
+	}
+
+	public void setHessianParameters(HessianRegParameters hessianParams) {
+		this.hessianParams = hessianParams;
 	}
 
 }

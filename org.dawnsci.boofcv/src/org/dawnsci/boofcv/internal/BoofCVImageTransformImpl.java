@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 Diamond Light Source Ltd.
+ * Copyright (c) 2012, 2016 Diamond Light Source Ltd.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -17,7 +17,9 @@ import java.util.List;
 import org.apache.commons.math3.util.Pair;
 import org.dawnsci.boofcv.converter.ConvertIDataset;
 import org.dawnsci.boofcv.registration.ImageHessianRegistration;
+import org.eclipse.dawnsci.analysis.api.image.HessianRegParameters;
 import org.eclipse.dawnsci.analysis.api.image.IImageTransform;
+import org.eclipse.dawnsci.analysis.api.image.DetectionAlgoParameters;
 import org.eclipse.dawnsci.analysis.api.io.ScanFileHolderException;
 import org.eclipse.dawnsci.hdf5.HDF5Utils;
 import org.eclipse.january.IMonitor;
@@ -41,7 +43,7 @@ import boofcv.struct.image.ImageSingleBand;
  * 
  * This class is internal and not supposed to be used out of this bundle.
  * 
- * @author wqk87977
+ * @author Baha El-Kassaby
  *
  */
 public class BoofCVImageTransformImpl<T extends ImageSingleBand<?>, TD extends TupleDesc<?>> implements IImageTransform {
@@ -110,6 +112,11 @@ public class BoofCVImageTransformImpl<T extends ImageSingleBand<?>, TD extends T
 
 	@Override
 	public ILazyDataset align(ILazyDataset lazydata, IMonitor monitor) throws Exception {
+		return align(lazydata, null, null, monitor);
+	}
+
+	@Override
+	public ILazyDataset align(ILazyDataset lazydata, DetectionAlgoParameters detectParams, HessianRegParameters hessianParams, IMonitor monitor) throws Exception {
 		if (lazydata.getShape().length != 3)
 			throw new Exception("Supported Lazy data is 3D, please provide a 3D dataset");
 		// save on a temp file
@@ -136,7 +143,7 @@ public class BoofCVImageTransformImpl<T extends ImageSingleBand<?>, TD extends T
 			if (slice.getShape().length != 2)
 				throw new Exception("Data shape is not 2D");
 			ImageFloat32 imageB = ConvertIDataset.convertFrom(slice, ImageFloat32.class, 1);
-			ImageSingleBand<?> aligned = ImageHessianRegistration.registerHessian(imageA, imageB);
+			ImageSingleBand<?> aligned = ImageHessianRegistration.registerHessian(imageA, imageB, detectParams, hessianParams);
 			IDataset alignedData = ConvertIDataset.convertTo(aligned, true);
 			alignedData.setName(slice.getName());
 			// add data to lazy file
