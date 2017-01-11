@@ -89,7 +89,7 @@ public class OperationToPythonUtils {
 			} catch (DatasetException e1) {
 			}
 		}
-		ILazyDataset e = input.getError();
+		ILazyDataset e = input.getErrors();
 		if (e != null) {
 			try {
 				inputs.put(ERROR, e.getSlice());
@@ -131,7 +131,7 @@ public class OperationToPythonUtils {
 		
 		if (output.containsKey(ERROR)) {
 			
-			d.setError((IDataset)output.get(ERROR));
+			d.setErrors((IDataset)output.get(ERROR));
 		}
 		
 		IDataset[] aux = unpackAuxiliary(output);
@@ -158,7 +158,7 @@ public class OperationToPythonUtils {
 		if (output.containsKey(ERROR)) {
 			IDataset error = (IDataset)output.get(ERROR);
 			error.setName(ERROR);
-			data.setError(error);
+			data.setErrors(error);
 		}
 		
 		IDataset[] aux = unpackAuxiliary(output);
@@ -191,7 +191,7 @@ public class OperationToPythonUtils {
 			inputs.put(XAXIS_TITLE, null);
 		}
 		
-		ILazyDataset e = input.getError();
+		ILazyDataset e = input.getErrors();
 		if (e != null) {
 			try {
 				inputs.put(ERROR, e.getSlice());

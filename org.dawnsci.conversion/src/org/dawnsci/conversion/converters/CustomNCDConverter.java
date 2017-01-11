@@ -223,7 +223,7 @@ public class CustomNCDConverter extends AbstractConversion  {
 
 			Dataset errors = null;
 			if (hasErrors) {
-				errors = DatasetUtils.cast(data.getError(), data.getDType());
+				errors = DatasetUtils.cast(data.getErrors(), data.getDType());
 			}
 
 			String header = sb.toString();
@@ -288,7 +288,7 @@ public class CustomNCDConverter extends AbstractConversion  {
 	}
 
 	private boolean hasErrors(ILazyDataset lz) {
-		return lz.getError() != null ? true : false;
+		return lz.getErrors() != null ? true : false;
 	}
 	
 	private Dataset[] fixDtypes(Dataset axis, Dataset data, Dataset errors) {
@@ -323,7 +323,7 @@ public class CustomNCDConverter extends AbstractConversion  {
 		IDataset[] columns = new IDataset[] {DatasetUtils.transpose(data, null)};
 		if (axis != null) {
 			if (axis.hasErrors()) {
-				Dataset axisErrors = DatasetUtils.cast(axis.getError(), data.getDType());
+				Dataset axisErrors = DatasetUtils.cast(axis.getErrors(), data.getDType());
 				columns = (IDataset[]) ArrayUtils.addAll(new IDataset[]{axis, axisErrors}, columns);
 				
 			} else {
@@ -357,12 +357,12 @@ public class CustomNCDConverter extends AbstractConversion  {
 		
 		//get the x axis if required
 		Dataset axis = outputBean.axis;
-		Dataset axisErrors = outputBean.axis.getError();
+		Dataset axisErrors = outputBean.axis.getErrors();
 		String axisUnits = outputBean.axisUnits;
 	
 		//Set up position iterator (final 2 dimensions saved in a single file
 		int[] stop = lz.getShape();
-		boolean hasErrors = (lz.getError() != null ? true : false);
+		boolean hasErrors = (lz.getErrors() != null ? true : false);
 		int iterDim = lz.getRank() - 1;
 		int[] cutAxes = new int[] {lz.getRank() - 1};
 
@@ -428,7 +428,7 @@ public class CustomNCDConverter extends AbstractConversion  {
 
 			Dataset errors = null;
 			if (hasErrors) {
-				errors = DatasetUtils.cast(data.getError(), data.getDType());
+				errors = DatasetUtils.cast(data.getErrors(), data.getDType());
 				errors.squeeze();
 			}
 
@@ -635,7 +635,7 @@ public class CustomNCDConverter extends AbstractConversion  {
 			outputBean.axis = getAxis(context.getAxisDatasetName(), context.getSelectedConversionFile());
 			// ATSAS ASCII format doesn't support axis errors
 			if (outputBean.axis != null && outputBean.axis.hasErrors() && exportFormat.equals(SAS_FORMAT.ATSAS)) {
-				outputBean.axis.setError(null);
+				outputBean.axis.setErrors(null);
 			}
 			outputBean.axisUnits = getAxisUnit(context.getAxisDatasetName(), context.getSelectedConversionFile());
 		}

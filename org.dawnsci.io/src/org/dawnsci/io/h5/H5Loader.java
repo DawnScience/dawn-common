@@ -176,7 +176,7 @@ public class H5Loader extends AbstractFileLoader {
 				if (errSet!=null) {
 					resetDims(errSet);
 					final Object  errVal = errSet.read(); // Dangerous if data large!
-					ret.setError(H5Utils.getSet(errVal,errSet));
+					ret.setErrors(H5Utils.getSet(errVal,errSet));
 				}
 			}
 			
@@ -216,7 +216,7 @@ public class H5Loader extends AbstractFileLoader {
 				if (error!=null) {
 					error.getMetadata();
 					final LazyDataset errLazy = new H5LazyDataset(error);
-					lazy.setError(errLazy);
+					lazy.setErrors(errLazy);
 					ret.put(errorPath, errLazy);
 				}
 			}

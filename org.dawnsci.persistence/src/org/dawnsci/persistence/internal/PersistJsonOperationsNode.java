@@ -82,9 +82,9 @@ public class PersistJsonOperationsNode {
 		while (memberList.contains(Integer.toString(i))){
 			GroupNode gn = (GroupNode)process.getNodeLink(Integer.toString(i)).getDestination();
 			DataNode dataNode = gn.getDataNode(DATA);
-			IDataset data = dataNode.getDataset().getSlice();
+			Dataset data = DatasetUtils.convertToDataset(dataNode.getDataset().getSlice());
 			dataNode = gn.getDataNode(ID);
-			IDataset id = dataNode.getDataset().getSlice();
+			Dataset id = DatasetUtils.convertToDataset(dataNode.getDataset().getSlice());
 			String json = data.getObject().toString();
 			String sid = id.getObject().toString();
 			
@@ -267,7 +267,7 @@ public class PersistJsonOperationsNode {
 			for (String s : names) {
 //				String rName = s.substring(s.lastIndexOf(SLASH)+1);
 				if (model.isModelField(s)) {
-					IDataset ob = gn.getDataNode(s).getDataset().getSlice();
+					Dataset ob = DatasetUtils.convertToDataset(gn.getDataNode(s).getDataset().getSlice());
 					if (type.equals(DATASETS)) {
 						model.set(s, ob);
 					} else {

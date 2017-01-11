@@ -37,19 +37,19 @@ public class ImageFilterTest {
 	@Test
 	public void filterDerivativeSobel() {
 		IDataset derivativeX = service.filterDerivativeSobel(data, true);
-		Assert.assertEquals("Value of first item is not the expected one", -9, derivativeX.getDouble(0), 0);
+		Assert.assertEquals("Value of first item is not the expected one", -9, derivativeX.getDouble(0, 0), 0);
 	}
 
 	@Test
 	public void filterGaussianBlur() {
 		IDataset blurred = service.filterGaussianBlur(data, -1, 10);
-		Assert.assertEquals("Value of first item is not the expected one", 67.0, blurred.getDouble(0), 0);
+		Assert.assertEquals("Value of first item is not the expected one", 67.0, blurred.getDouble(0, 0), 0);
 	}
 
 	@Test
 	public void filterThreshold() {
 		IDataset thresholded = service.globalThreshold(data, 100, true, false);
-		Assert.assertEquals("Value of first item is not the expected one", 0, thresholded.getDouble(0), 0);
+		Assert.assertEquals("Value of first item is not the expected one", 0, thresholded.getDouble(0, 0), 0);
 	}
 
 	@Test
@@ -75,42 +75,42 @@ public class ImageFilterTest {
 	@Test
 	public void testFirstValueOfThreshold() {
 		IDataset thresholded = service.globalThreshold(data, 20, true, true);
-		Assert.assertEquals("Value of first item is not the expected one", false, thresholded.getBoolean(0));
+		Assert.assertEquals("Value of first item is not the expected one", false, thresholded.getBoolean(0, 0));
 	}
 
 	@Test
 	public void testFirstValueOfMeanThreshold() {
 		IDataset thresholded = service.globalMeanThreshold(data, true, true);
-		Assert.assertEquals("Value of first item is not the expected one", false, thresholded.getBoolean(0));
+		Assert.assertEquals("Value of first item is not the expected one", false, thresholded.getBoolean(0, 0));
 	}
 
 	@Test
 	public void testFirstValueOfOtsuThreshold() {
 		IDataset thresholded = service.globalOtsuThreshold(data, true, true);
-		Assert.assertEquals("Value of first item is not the expected one", false, thresholded.getBoolean(0));
+		Assert.assertEquals("Value of first item is not the expected one", false, thresholded.getBoolean(0, 0));
 	}
 
 	@Test
 	public void testFirstValueOfEntropyThreshold() {
 		IDataset thresholded = service.globalEntropyThreshold(data, true, true);
-		Assert.assertEquals("Value of first item is not the expected one", false, thresholded.getBoolean(0));
+		Assert.assertEquals("Value of first item is not the expected one", false, thresholded.getBoolean(0, 0));
 	}
 
 	@Test
 	public void testFirstValueOfAdaptiveSquareThreshold() {
 		IDataset thresholded = service.adaptiveSquareThreshold(data, 15, true, true);
-		Assert.assertEquals("Value of first item is not the expected one", false, thresholded.getBoolean(0));
+		Assert.assertEquals("Value of first item is not the expected one", false, thresholded.getBoolean(0, 0));
 	}
 
 	@Test
 	public void testFirstValueOfAdaptiveGaussianThreshold() {
 		IDataset thresholded = service.adaptiveGaussianThreshold(data, 15, true, true);
-		Assert.assertEquals("Value of first item is not the expected one", false, thresholded.getBoolean(0));
+		Assert.assertEquals("Value of first item is not the expected one", false, thresholded.getBoolean(0, 0));
 	}
 
 	@Test
 	public void testFirstValueOfAdaptiveSauvolaThreshold() {
 		IDataset thresholded = service.adaptiveSauvolaThreshold(data, 15, true, true);
-		Assert.assertEquals("Value of first item is not the expected one", false, thresholded.getBoolean(0));
+		Assert.assertEquals("Value of first item is not the expected one", false, thresholded.getBoolean(0, 0));
 	}
 }
