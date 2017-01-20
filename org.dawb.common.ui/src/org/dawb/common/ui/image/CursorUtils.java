@@ -84,6 +84,20 @@ public class CursorUtils {
 			} catch (Exception ignored) {
 				// It is not fatal for the custom axes not to work.
 			}
+		} else if (imageTrace!=null && imageTrace.hasTrueAxes()){
+
+			int[] shape = imageTrace.getData().getShape();
+			double[] globalRange = imageTrace.getGlobalRange();
+			int x = (int)Math.floor((xCoordinate-globalRange[0])/(globalRange[1]-globalRange[0])*shape[1]);
+			int y = (int)Math.floor((yCoordinate-globalRange[2])/(globalRange[3]-globalRange[2])*shape[0]);
+			IDataset image = imageTrace.getData();
+			if (!(x < 0 || y < 0 || x >= shape[1] || y >= shape[0])){
+				double intensity = image.getDouble(y, x);
+			    if (!Double.isNaN(intensity)) {
+			    	image.setStringFormat(intensityFormat);
+			    	intensityText = image.getString(y, x);
+			    }
+			}
 		}
 		
 		StringBuilder buf = new StringBuilder();
