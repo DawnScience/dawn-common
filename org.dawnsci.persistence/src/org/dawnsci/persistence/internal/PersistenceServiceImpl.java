@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 Diamond Light Source Ltd.
+ * Copyright (c) 2012-2017 Diamond Light Source Ltd.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -10,12 +10,13 @@ package org.dawnsci.persistence.internal;
 
 import java.io.File;
 
+import org.dawnsci.persistence.ServiceLoader;
 import org.dawnsci.persistence.json.JacksonMarshaller;
 import org.eclipse.dawnsci.analysis.api.persistence.IPersistenceService;
 import org.eclipse.dawnsci.analysis.api.persistence.IPersistentFile;
 import org.eclipse.dawnsci.analysis.api.persistence.IPersistentNodeFactory;
-import org.eclipse.dawnsci.hdf.object.HierarchicalDataFactory;
 import org.eclipse.dawnsci.hdf.object.IHierarchicalDataFile;
+import org.eclipse.dawnsci.nexus.NexusFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,7 +27,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * 
  * This class is internal and not supposed to be used out of this bundle.
  * 
- * @author wqk87977
+ * @author Baha El-Kassaby
  *
  */
 public class PersistenceServiceImpl implements IPersistenceService{
@@ -50,14 +51,17 @@ public class PersistenceServiceImpl implements IPersistenceService{
 
 	@Override
 	public IPersistentFile createPersistentFile(String filePath) throws Exception {
-		IHierarchicalDataFile file = HierarchicalDataFactory.getWriter(filePath);
+		NexusFile file = null;
+		if (ServiceLoader.getNexusFactory() != null)
+			file = ServiceLoader.getNexusFactory().newNexusFile(filePath);
 		return new PersistentFileImpl(file);
 	}
 	
 	@Override
 	public IPersistentFile createPersistentFile(Object file) throws Exception {
 		if (file instanceof File) return createPersistentFile(((File)file).getAbsolutePath());
-		return new PersistentFileImpl((IHierarchicalDataFile)file);
+		if (file instanceof IHierarchicalDataFile) return new PersistentFileImpl((IHierarchicalDataFile)file);
+		return new PersistentFileImpl((NexusFile)file);
 	}
 
 

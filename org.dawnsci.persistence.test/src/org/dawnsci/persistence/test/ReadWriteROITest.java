@@ -25,10 +25,18 @@ import org.eclipse.dawnsci.analysis.dataset.roi.LinearROI;
 import org.eclipse.dawnsci.analysis.dataset.roi.RectangularROI;
 import org.eclipse.dawnsci.analysis.dataset.roi.RingROI;
 import org.eclipse.dawnsci.analysis.dataset.roi.SectorROI;
+import org.eclipse.dawnsci.hdf5.nexus.NexusFileFactoryHDF5;
 import org.eclipse.dawnsci.json.MarshallerService;
+import org.junit.Before;
 import org.junit.Test;
 
 public class ReadWriteROITest extends AbstractThreadTestBase {
+
+	@Before
+	public void init() {
+		// Set factory for test
+		ServiceLoader.setNexusFactory(new NexusFileFactoryHDF5());
+	}
 
 	//Do not put the annotation as the files needs to be created and closed after each test
 	//so it can run with the thread tests
@@ -99,7 +107,6 @@ public class ReadWriteROITest extends AbstractThreadTestBase {
 		File[] tmp = new File[1];
 		IPersistentFile file = before(tmp);
 
-		
 		Map<String, IROI> rois = new HashMap<String, IROI>();
 		rois.put(roi.getName(), roi);
 		file.setROIs(rois);

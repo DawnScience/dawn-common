@@ -18,17 +18,27 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.dawnsci.persistence.PersistenceServiceCreator;
+import org.dawnsci.persistence.ServiceLoader;
 import org.eclipse.dawnsci.analysis.api.persistence.IPersistenceService;
 import org.eclipse.dawnsci.analysis.api.persistence.IPersistentFile;
+import org.eclipse.dawnsci.hdf5.nexus.NexusFileFactoryHDF5;
 import org.eclipse.january.dataset.Dataset;
 import org.eclipse.january.dataset.DatasetFactory;
 import org.eclipse.january.dataset.IDataset;
+import org.junit.Before;
 import org.junit.Test;
 
 public class ReadWriteMaskTest extends AbstractThreadTestBase{
-	
+
+	@Before
+	public void init() {
+		// Set factory for test
+		ServiceLoader.setNexusFactory(new NexusFileFactoryHDF5());
+	}
+
 	@Test
 	public void testWriteReadMask(){
+
 		try {
 			final File tmp = File.createTempFile("TestMask", ".nxs");
 			tmp.deleteOnExit();
@@ -45,8 +55,8 @@ public class ReadWriteMaskTest extends AbstractThreadTestBase{
 			Dataset mask1 = DatasetFactory.createFromObject(bd1);
 			Dataset mask2 = DatasetFactory.createFromObject(bd2);
 			Map<String, IDataset> masks = new HashMap<String, IDataset>();
-			masks.put("mask3", mask0);
-			masks.put("mask4", mask1);
+			masks.put("mask4", mask0);
+			masks.put("mask5", mask1);
 			
 			// create the PersistentService
 			IPersistenceService persist = PersistenceServiceCreator.createPersistenceService();
@@ -54,12 +64,11 @@ public class ReadWriteMaskTest extends AbstractThreadTestBase{
 			IPersistentFile file = null;
 			try{
 				file = persist.createPersistentFile(tmp.getAbsolutePath());
-				//overwrite mask1 with mask2
 				file.addMask("mask0", mask0, null);
 				file.addMask("mask1", mask1, null);
-				file.addMask("mask1", mask2, null);
-				// add another mask
 				file.addMask("mask2", mask2, null);
+				// add another mask
+				file.addMask("mask3", mask2, null);
 				// add a set of masks
 				file.setMasks(masks);
 
@@ -94,10 +103,10 @@ public class ReadWriteMaskTest extends AbstractThreadTestBase{
 				//check that the rewriting did work
 				IDataset mask = masksRead.get("mask1");
 				for (int i = 0, imax = mask.getSize(); i < imax; i++) {
-					assertEquals(bd2[i], mask.getBoolean(i));
+					assertEquals(bd1[i], mask.getBoolean(i));
 				}
 			} else {
-				fail("ROIs read are Null.");
+				fail("Masks read are Null.");
 			}
 		} catch (IOException e1) {
 			e1.printStackTrace();

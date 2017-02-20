@@ -9,6 +9,7 @@
 package org.dawnsci.persistence.test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.File;
@@ -17,55 +18,75 @@ import java.util.Arrays;
 import java.util.Map;
 
 import org.dawnsci.persistence.PersistenceServiceCreator;
+import org.dawnsci.persistence.ServiceLoader;
+import org.dawnsci.persistence.internal.PersistenceConstants;
 import org.eclipse.dawnsci.analysis.api.persistence.IPersistenceService;
 import org.eclipse.dawnsci.analysis.api.persistence.IPersistentFile;
+import org.eclipse.dawnsci.hdf5.nexus.NexusFileFactoryHDF5;
+import org.eclipse.dawnsci.json.MarshallerService;
 import org.eclipse.january.IMonitor;
 import org.eclipse.january.dataset.Dataset;
 import org.eclipse.january.dataset.DatasetFactory;
 import org.eclipse.january.dataset.ILazyDataset;
+import org.junit.Before;
 import org.junit.Test;
 
 public class ReadWriteHistoryTest extends AbstractThreadTestBase {
 
+	@Before
+	public void init() {
+		// Set factory for test
+		ServiceLoader.setNexusFactory(new NexusFileFactoryHDF5());
+	}
+
+	public void after(File tmp, IPersistentFile file){
+		if (tmp != null)
+			tmp.deleteOnExit();
+
+		if(file != null)
+			file.close();
+	}
+
 	@Test
 	public void testWriteReadHisto1D() throws Exception {
 		try {
-			final File tmp = File.createTempFile("TestData", ".nxs");
-			tmp.deleteOnExit();
+			// create and init files
+			File tmp = File.createTempFile("TestHistory", ".nxs");
 			tmp.createNewFile();
+			tmp.deleteOnExit();
+			// create the PersistentService
+			// and check that ServiceLoader.getJSONMarshaller() != null
+			if (ServiceLoader.getJSONMarshallerService() == null)
+				ServiceLoader.setJSONMarshallerService(new MarshallerService());
+			IPersistenceService persist = PersistenceServiceCreator.createPersistenceService();
+			IPersistentFile file = persist.createPersistentFile(tmp.getAbsolutePath());
 			
 			// dataset
 			Dataset[]  da = new Dataset[]{createTestData(new int []{512}, 1), 
 					                                      createTestData(new int []{256}, 2), 
 					                                      createTestData(new int []{128}, 3)};
 
-			// create the PersistentService
-			IPersistenceService persist = PersistenceServiceCreator.createPersistenceService();
-
-			// create the persistent file
-			IPersistentFile file = null;
 			try {
-				file = persist.createPersistentFile(tmp.getAbsolutePath());
 				file.setHistory(da);
 			} catch (Exception e) {
 				e.printStackTrace();
-				fail("Exception occured while writing the data/axes");
+				fail("Exception occured while writing history:" + e.getMessage());
 			} finally{
-				if(file!= null)
+				if (file != null)
 					file.close();
 			}
 
+			file = persist.createPersistentFile(tmp.getAbsolutePath());
 			// read the persistent file and retrieve the regions
 			Map<String, ILazyDataset> history = null;
 			try {
-				file = persist.getPersistentFile(tmp.getAbsolutePath());
 				history = file.getHistory(new IMonitor.Stub());
 				
 			} catch (Exception e) {
 				e.printStackTrace();
-				fail("Exception occured while reading the data/axes");
+				fail("Exception occured while reading history:" + e.getMessage());
 			} finally{
-				if(file!= null)
+				if (file != null)
 					file.close();
 			}
 
@@ -86,43 +107,36 @@ public class ReadWriteHistoryTest extends AbstractThreadTestBase {
 
 	@Test
 	public void testWriteReadHistoImage() throws Exception {
+		// create and init files
+		File tmp = File.createTempFile("TestHistory", ".nxs");
+		tmp.createNewFile();
+		tmp.deleteOnExit();
+		// create the PersistentService
+		// and check that ServiceLoader.getJSONMarshaller() != null
+		if (ServiceLoader.getJSONMarshallerService() == null)
+			ServiceLoader.setJSONMarshallerService(new MarshallerService());
+		IPersistenceService persist = PersistenceServiceCreator.createPersistenceService();
+		IPersistentFile file = persist.createPersistentFile(tmp.getAbsolutePath());
 		try {
-			final File tmp = File.createTempFile("TestData", ".nxs");
-			tmp.deleteOnExit();
-			tmp.createNewFile();
-			
 			// dataset
 			Dataset  da = createTestData(new int[]{2048, 2048});
 
-			// create the PersistentService
-			IPersistenceService persist = PersistenceServiceCreator.createPersistenceService();
-
-			// create the persistent file
-			IPersistentFile file = null;
 			try {
-				file = persist.createPersistentFile(tmp.getAbsolutePath());
 				file.setHistory(da);
 			} catch (Exception e) {
 				e.printStackTrace();
 				fail("Exception occured while writing the data/axes");
-			} finally{
-				if(file!= null)
-					file.close();
 			}
 
 			// read the persistent file and retrieve the regions
 			ILazyDataset dataRead = null;
 			try {
-				file = persist.getPersistentFile(tmp.getAbsolutePath());
 				Map<String, ILazyDataset> history = file.getHistory(new IMonitor.Stub());
 				dataRead = history.values().iterator().next();
 				
 			} catch (Exception e) {
 				e.printStackTrace();
 				fail("Exception occured while reading the data/axes");
-			} finally{
-				if(file!= null)
-					file.close();
 			}
 
 			// test that the data/axes are the same
@@ -134,64 +148,73 @@ public class ReadWriteHistoryTest extends AbstractThreadTestBase {
 		} catch (IOException e1) {
 			e1.printStackTrace();
 			fail("IOException occured while creating test file");
+		} finally{
+			if (file != null)
+				file.close();
 		}
 	}
 
 	@Test
 	public void testReWriteHisto() throws Exception {
 		try {
-			final File tmp = File.createTempFile("TestData", ".nxs");
-			tmp.deleteOnExit();
+			// create and init files
+			File tmp = File.createTempFile("TestHistory", ".nxs");
 			tmp.createNewFile();
-			
+			tmp.deleteOnExit();
+			// create the PersistentService
+			// and check that ServiceLoader.getJSONMarshaller() != null
+			if (ServiceLoader.getJSONMarshallerService() == null)
+				ServiceLoader.setJSONMarshallerService(new MarshallerService());
+			IPersistenceService persist = PersistenceServiceCreator.createPersistenceService();
+			IPersistentFile file = persist.createPersistentFile(tmp.getAbsolutePath());
 			// dataset
 			Dataset da  = createTestData(new int[]{2048, 2048});
-			
-			// create the PersistentService
-			IPersistenceService persist = PersistenceServiceCreator.createPersistenceService();
 
-			// create the persistent file
-			IPersistentFile file = null;
 			try {
-				file = persist.createPersistentFile(tmp.getAbsolutePath());
 				file.setHistory(da);
 			} catch (Exception e) {
 				e.printStackTrace();
-				fail("Exception occured while writing the data/axes");
+				fail("Exception occured while writing history:" + e.getMessage());
 			} finally{
-				if(file!= null)
+				if (file!= null)
 					file.close();
 			}
 
+			file = persist.createPersistentFile(tmp.getAbsolutePath());
 			// rewrite the persistent file
 			try {
-				file = persist.createPersistentFile(tmp.getAbsolutePath());
 				file.setHistory(da);
 				
 			} catch (Exception e) {
-				e.printStackTrace();
-				fail("Exception occured while rewriting the data/axes");
+				assertTrue(e.getMessage().startsWith("Object already exists at specified location"));
 			} finally{
-				if(file!= null)
-					file.close();
+				try {
+					// change name
+					da.setName(da.getName() + "0");
+					// write
+					file.setHistory(da);
+				} catch (Exception e) {
+					fail("Exception occured while writing history:" + e.getMessage());
+				} finally {
+					if (file != null)
+						file.close();
+				}
 			}
 
+			file = persist.createPersistentFile(tmp.getAbsolutePath());
 			// read the persistent file and retrieve the regions
 			ILazyDataset dataRead = null;
   		    try {
-				file = persist.getPersistentFile(tmp.getAbsolutePath());
 				Map<String, ILazyDataset> history = file.getHistory(new IMonitor.Stub());
-				dataRead = history.values().iterator().next();
+				dataRead = history.get(PersistenceConstants.HISTORY_ENTRY + "/" + da.getName());
 
 			} catch (Exception e) {
 				e.printStackTrace();
 				fail("Exception occured while reading the data/axes");
 			} finally{
-				if(file!= null)
+				if (file != null)
 					file.close();
 			}
-			
-			file.close();
 
 			// test that the data/axes are the same
 			assertEquals(da.getName(), dataRead.getName());

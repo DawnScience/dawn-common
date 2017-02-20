@@ -16,10 +16,11 @@ import java.util.Map;
 
 import org.dawnsci.common.widgets.gda.function.jexl.JexlExpressionFunction;
 import org.dawnsci.persistence.PersistenceServiceCreator;
+import org.dawnsci.persistence.ServiceLoader;
 import org.eclipse.dawnsci.analysis.api.fitting.functions.IFunction;
 import org.eclipse.dawnsci.analysis.api.persistence.IPersistenceService;
 import org.eclipse.dawnsci.analysis.api.persistence.IPersistentFile;
-import org.junit.After;
+import org.eclipse.dawnsci.hdf5.nexus.NexusFileFactoryHDF5;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -30,33 +31,42 @@ import uk.ac.diamond.scisoft.analysis.fitting.functions.Parameter;
 
 public class ReadWriteFunctionTest {
 
-	private File tmp;
-	private IPersistenceService persist;
-	private IPersistentFile file;
-
 	@Before
-	public void before() throws Exception {
-		tmp = File.createTempFile("TestFunction", ".txt");
-		tmp.createNewFile();
-
-		// create the PersistentService
-		persist = PersistenceServiceCreator.createPersistenceService();
-		file = persist.createPersistentFile(tmp.getAbsolutePath());
+	public void init() {
+		// Set factory for test
+		ServiceLoader.setNexusFactory(new NexusFileFactoryHDF5());
 	}
 
-	@After
-	public void after(){
+	// Do not put the annotation as the files needs to be created and closed
+	// after each test
+	// so it can run with the thread tests
+	// Passes value by array
+	public IPersistentFile before(File[] tmp) throws Exception {
+		// Set factory for test
+		ServiceLoader.setNexusFactory(new NexusFileFactoryHDF5());
+
+		tmp[0] = File.createTempFile("TestFunction", ".txt");
+		tmp[0].createNewFile();
+
+		// create the PersistentService
+		IPersistenceService persist = PersistenceServiceCreator.createPersistenceService();
+		IPersistentFile file = persist.createPersistentFile(tmp[0].getAbsolutePath());
+		return file;
+	}
+
+	public void after(File tmp, IPersistentFile file){
 		if (tmp != null)
 			tmp.deleteOnExit();
-
 		if(file != null)
 			file.close();
 	}
 
-
 	@Test
 	public void testWriteFunction() throws Exception {
-		
+		// create and init files
+		File[] tmp = new File[1];
+		IPersistentFile file = before(tmp);
+
 		Gaussian gaussian = new Gaussian();
 		Map<String, IFunction> functions = new HashMap<String, IFunction>();
 		functions.put("MyFunction", gaussian);
@@ -66,11 +76,17 @@ public class ReadWriteFunctionTest {
 		Map<String, IFunction> functionsRead = file.getFunctions(null);
 
 		assertEquals(gaussian, functionsRead.get("MyFunction"));
+
+		// close files
+		after(tmp[0], file);
 	}
 
 	@Test
 	public void testWriteFunctionWithParam() throws Exception {
-		
+		// create and init files
+		File[] tmp = new File[1];
+		IPersistentFile file = before(tmp);
+
 		Gaussian gaussian = new Gaussian(1,2,3);
 		Map<String, IFunction> functions = new HashMap<String, IFunction>();
 		functions.put("MyFunction", gaussian);
@@ -80,11 +96,16 @@ public class ReadWriteFunctionTest {
 		Map<String, IFunction> functionsRead = file.getFunctions(null);
 		assertEquals(gaussian, functionsRead.get("MyFunction"));
 
+		// close files
+		after(tmp[0], file);
 	}
 
 	@Test
 	public void testWriteFermiFunctionWithParam() throws Exception {
-		
+		// create and init files
+		File[] tmp = new File[1];
+		IPersistentFile file = before(tmp);
+
 		Fermi fermi = new Fermi(1,2,3,4);
 		Map<String, IFunction> functions = new HashMap<String, IFunction>();
 		functions.put("MyFunction", fermi);
@@ -94,10 +115,17 @@ public class ReadWriteFunctionTest {
 		Map<String, IFunction> functionsRead = file.getFunctions(null);
 
 		assertEquals(fermi, functionsRead.get("MyFunction"));
+
+		// close files
+		after(tmp[0], file);
 	}
 	
 	@Test
 	public void testWriteCompositeFunction() throws Exception {
+		// create and init files
+		File[] tmp = new File[1];
+		IPersistentFile file = before(tmp);
+
 		CompositeFunction compoundFunction = new CompositeFunction();
 		Gaussian gaussian = new Gaussian(1,2,3);
 		Fermi fermi = new Fermi(1,2,3,4);
@@ -112,10 +140,17 @@ public class ReadWriteFunctionTest {
 		Map<String, IFunction> functionsRead = file.getFunctions(null);
 
 		assertEquals(compoundFunction, functionsRead.get("MyFunction"));
+
+		// close files
+		after(tmp[0], file);
 	}
 
 	@Test
 	public void testWriteJexlExpressionFunction() throws Exception {
+		// create and init files
+		File[] tmp = new File[1];
+		IPersistentFile file = before(tmp);
+
 		String expression = "func:Gaussian(x,pos,fwhm,area)+func:Gaussian(x,pos+offset,fwhm,area/proportion)";
 		JexlExpressionFunction jexl = new JexlExpressionFunction(expression);
 		for (int i = 0; i < jexl.getNoOfParameters(); i++) {
@@ -130,5 +165,7 @@ public class ReadWriteFunctionTest {
 
 		assertEquals(jexl, functionsRead.get("MyFunction"));
 
+		// close files
+		after(tmp[0], file);
 	}
 }

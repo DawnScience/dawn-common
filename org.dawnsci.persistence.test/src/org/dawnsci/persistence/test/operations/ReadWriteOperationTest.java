@@ -76,19 +76,20 @@ public class ReadWriteOperationTest {
 		final File tmp = File.createTempFile("Test", ".nxs");
 		tmp.deleteOnExit();
 		tmp.createNewFile();
-		
-		IPersistentFile file = pservice.createPersistentFile(tmp.getAbsolutePath());
+		IHierarchicalDataFile filewriter = HierarchicalDataFactory.getWriter(tmp.getAbsolutePath());
+		IPersistentFile persist = pservice.createPersistentFile(filewriter);
 		try {
-			file.setOperations(functionOp);
+			persist.setOperations(functionOp);
 			
 		} finally {
-			file.close();
+			persist.close();
 		}
 		
-		file = pservice.createPersistentFile(tmp.getAbsolutePath());
+		IHierarchicalDataFile filereader = HierarchicalDataFactory.getReader(tmp.getAbsolutePath());
+		persist = pservice.createPersistentFile(filereader);
 		try {
 
-			IOperation[] readOperations = file.getOperations();
+			IOperation[] readOperations = persist.getOperations();
 
 			final FunctionModel model = (FunctionModel)readOperations[0].getModel();
             if (!poly.equals(model.getFunction())) {
@@ -96,13 +97,12 @@ public class ReadWriteOperationTest {
             }
             
 		} finally {
-			file.close();
+			persist.close();
 		}
 	}
 	
 	@Test
 	public void testWriteReadOperations() throws Exception {
-		
 		IOperation op2 = service.create("org.dawnsci.persistence.test.operations.JunkTestOperation");
 		Class modelType = (Class)((ParameterizedType)op2.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
 		IOperationModel model2  = (IOperationModel) modelType.newInstance();
@@ -129,7 +129,6 @@ public class ReadWriteOperationTest {
 	
 	@Test
 	public void testWriteReadOperationRoiFuncData() throws Exception {
-		
 		IOperation op2 = service.create("org.dawnsci.persistence.test.operations.JunkTestOperationROI");
 		Class modelType = (Class)((ParameterizedType)op2.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
 		JunkTestModelROI model2  = (JunkTestModelROI) modelType.newInstance();
@@ -163,12 +162,10 @@ public class ReadWriteOperationTest {
 		assertTrue(mo.getFunc() != null);
 		assertTrue(mo.getRoi2() != null);
 
-
 	}
-	
+
 	@Test
 	public void testWriteReadOperationRoiFuncDataNode() throws Exception {
-		
 		IOperation op2 = service.create("org.dawnsci.persistence.test.operations.JunkTestOperationROI");
 		Class modelType = (Class)((ParameterizedType)op2.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
 		JunkTestModelROI model2  = (JunkTestModelROI) modelType.newInstance();
@@ -184,7 +181,6 @@ public class ReadWriteOperationTest {
 
 //		String modelJson = util.getModelJson(model2);
 
-
 		GroupNode n = PersistJsonOperationsNode.writeOperationsToNode(op2);
 		
 		IOperation<? extends IOperationModel, ? extends OperationData>[] readOperations = PersistJsonOperationsNode.readOperations(n);
@@ -198,12 +194,10 @@ public class ReadWriteOperationTest {
 		assertTrue(mo.getFunc() != null);
 		assertTrue(mo.getRoi2() != null);
 
-
 	}
 	
 	@Test
 	public void testWriteOrigin() throws Exception {
-
 		Slice[] slices = Slice.convertFromString("0:10:2,2:20,:,:");
 		int[] shape = new int[]{100,100,100,100};
 		int[] dataDims = new int[]{2,3};
