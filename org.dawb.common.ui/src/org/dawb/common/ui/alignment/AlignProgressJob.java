@@ -79,8 +79,9 @@ public class AlignProgressJob implements IRunnableWithProgress {
 	@Override
 	public void run(IProgressMonitor monitor) {
 		if (isLazy) {
-			if (shiftedImages != null)
+			if (shiftedImages != null) {
 				shiftedImages = null;
+			}
 			if (data == null)
 				return;
 		} else {
@@ -92,7 +93,7 @@ public class AlignProgressJob implements IRunnableWithProgress {
 		int n = isLazy ? data.getShape()[0] : nonLazyData.size();
 
 		if (monitor != null)
-			monitor.beginTask("Aligning images...", n);
+			monitor.beginTask("Aligning images...", alignState == AlignMethod.WITH_ROI ? 5*n : n);
 		if (alignState == AlignMethod.WITH_ROI && n % mode != 0) {
 			final String msg = "Missing file? Could not load multiple of " + mode + " images";
 			Display.getDefault().syncExec(new Runnable() {
