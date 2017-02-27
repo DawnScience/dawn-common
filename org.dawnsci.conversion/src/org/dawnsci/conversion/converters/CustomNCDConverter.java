@@ -38,11 +38,13 @@ import org.cansas.cansas1d.SASsourceType;
 import org.cansas.cansas1d.SAStransmissionSpectrumType;
 import org.dawnsci.conversion.converters.util.LocalServiceManager;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
+import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
 import org.eclipse.dawnsci.analysis.api.io.ScanFileHolderException;
+import org.eclipse.dawnsci.analysis.api.tree.DataNode;
+import org.eclipse.dawnsci.analysis.api.tree.GroupNode;
 import org.eclipse.dawnsci.analysis.api.tree.Node;
+import org.eclipse.dawnsci.analysis.api.tree.NodeLink;
 import org.eclipse.dawnsci.analysis.api.tree.Tree;
-import org.eclipse.dawnsci.hdf.object.HierarchicalDataFactory;
-import org.eclipse.dawnsci.hdf.object.IHierarchicalDataFile;
 import org.eclipse.january.IMonitor;
 import org.eclipse.january.dataset.Dataset;
 import org.eclipse.january.dataset.DatasetUtils;
@@ -50,6 +52,7 @@ import org.eclipse.january.dataset.IDataset;
 import org.eclipse.january.dataset.ILazyDataset;
 import org.eclipse.january.dataset.PositionIterator;
 import org.eclipse.january.dataset.Slice;
+import org.eclipse.january.dataset.StringDataset;
 import org.eclipse.january.metadata.AxesMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -586,47 +589,45 @@ public class CustomNCDConverter extends AbstractConversion  {
 		}
 		return name;
 	}
-	
-	private String getTitleNodeString(IHierarchicalDataFile hdf5Reader) throws Exception {
-		@SuppressWarnings("deprecation")
-		hdf.object.Dataset titleData = (hdf.object.Dataset) hdf5Reader.getData(DEFAULT_TITLE_NODE);
-		String[] str = null;
+
+	private String getTitleNodeString(GroupNode rootnode) throws Exception {
+		NodeLink titlelink = rootnode.findNodeLink(DEFAULT_TITLE_NODE);
+		DataNode titleData = (DataNode) titlelink.getDestination();
 		if (titleData != null) {
-			str = (String[]) titleData.getData();
-			String title = str[0];
+			ILazyDataset lazy = titleData.getDataset();
+			IDataset data = lazy.getSlice(new Slice(0, lazy.getShape()[0], 1)).squeeze();
+			StringDataset str = (StringDataset) data;
+			String title = str.toString(true);
 			return title;
 		}
 		return "";
 	}
-	
-	private String getCommandNodeString(IHierarchicalDataFile hdf5Reader) throws Exception {
-		@SuppressWarnings("deprecation")
-		hdf.object.Dataset scanCommandData = (hdf.object.Dataset) hdf5Reader.getData(DEFAULT_SCAN_COMMAND_NODE);
-		String[] str = null;
+
+	private String getCommandNodeString(GroupNode rootnode) throws Exception {
+		NodeLink scancmdlink = rootnode.findNodeLink(DEFAULT_SCAN_COMMAND_NODE);
+		DataNode scanCommandData = (DataNode) scancmdlink.getDestination();
 		if (scanCommandData != null) {
-			str = (String[])scanCommandData.getData();
-			String scanCommand = str[0];
+			ILazyDataset lazy = scanCommandData.getDataset();
+			IDataset data = lazy.getSlice(new Slice(0, lazy.getShape()[0], 1)).squeeze();
+			StringDataset str = (StringDataset) data;
+			String scanCommand = str.toString(true);
 			return scanCommand;
 		}
 		return "";
 	}
-	
+
 	public OutputBean createBean(SAS_FORMAT exportFormat, ILazyDataset lz) throws Exception {
 		OutputBean outputBean = new OutputBean();
 		if (context.getSelectedConversionFile() != null) {
-			IHierarchicalDataFile hdf5Reader = null;
 			try {
 				outputBean.filepath = context.getSelectedConversionFile().getAbsolutePath();
-				hdf5Reader = HierarchicalDataFactory.getReader(outputBean.filepath);
-				outputBean.title = getTitleNodeString(hdf5Reader);
-				outputBean.command = getCommandNodeString(hdf5Reader);
+				IDataHolder dh = LocalServiceManager.getLoaderService().getData(outputBean.filepath, null);
+				Tree tree = dh.getTree();
+				GroupNode rootNode = tree.getGroupNode();
+				outputBean.title = getTitleNodeString(rootNode);
+				outputBean.command = getCommandNodeString(rootNode);
 			} catch (Exception e) {
 				logger.error("Exception while getting title and command information", e);
-			}
-			finally {
-				if (hdf5Reader != null) {
-					hdf5Reader.close();
-				}
 			}
 		}
 		
