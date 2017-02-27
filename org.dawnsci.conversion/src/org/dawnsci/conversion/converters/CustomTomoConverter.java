@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 Diamond Light Source Ltd.
+ * Copyright (c) 2012-2017 Diamond Light Source Ltd.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -9,25 +9,26 @@
 package org.dawnsci.conversion.converters;
 
 import java.io.File;
-import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.dawnsci.conversion.converters.util.LocalServiceManager;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
-import org.eclipse.dawnsci.hdf.object.H5Utils;
-import org.eclipse.dawnsci.hdf.object.HierarchicalDataFactory;
-import org.eclipse.dawnsci.hdf.object.IHierarchicalDataFile;
-import org.eclipse.dawnsci.hdf.object.nexus.IFindInNexus;
-import org.eclipse.dawnsci.hdf.object.nexus.NexusUtils;
+import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
+import org.eclipse.dawnsci.analysis.api.tree.DataNode;
+import org.eclipse.dawnsci.analysis.api.tree.GroupNode;
+import org.eclipse.dawnsci.analysis.api.tree.IFindInTree;
+import org.eclipse.dawnsci.analysis.api.tree.NodeLink;
+import org.eclipse.dawnsci.analysis.api.tree.Tree;
+import org.eclipse.dawnsci.analysis.api.tree.TreeUtils;
 import org.eclipse.january.dataset.IDataset;
 import org.eclipse.january.dataset.ILazyDataset;
+import org.eclipse.january.dataset.Slice;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import hdf.object.Dataset;
-import hdf.object.Datatype;
-import hdf.object.HObject;
-import hdf.object.h5.H5ScalarDS;
 import uk.ac.diamond.scisoft.analysis.io.DataHolder;
 import uk.ac.diamond.scisoft.analysis.io.JavaImageSaver;
 
@@ -35,10 +36,12 @@ import uk.ac.diamond.scisoft.analysis.io.JavaImageSaver;
  * Custom converter for tomography data.
  * 
  * Manages the conversion of tomography nexus files containing NXtomo into image files
- *
+ * 
+ * @author Baha El Kassaby - Removal of IHierchicalDataFile and HObject usage
  */
 public class CustomTomoConverter extends AbstractConversion {
 	
+	@SuppressWarnings("unused")
 	private static final Logger logger = LoggerFactory.getLogger(CustomTomoConverter.class);
 
 	private final static String DEF = "definition";
@@ -52,7 +55,6 @@ public class CustomTomoConverter extends AbstractConversion {
 		super(context);
 	}
 
-	
 	@Override
 	protected ILazyDataset getLazyDataset(final File                   path, 
 							              final String               dsPath,
@@ -66,10 +68,9 @@ public class CustomTomoConverter extends AbstractConversion {
 		}
 		counter = 0;
 		nImages = ((TomoInfoBean)context.getUserObject()).getNumberOfImages();
-		
 		return super.getLazyDataset(path, dsPath, context);	
 	}
-	
+
 	@Override
 	protected void convert(IDataset slice) throws Exception {
 		if (context.getMonitor()!=null && context.getMonitor().isCancelled()) {
@@ -78,25 +79,23 @@ public class CustomTomoConverter extends AbstractConversion {
 
 		String filename = ((TomoInfoBean)context.getUserObject()).getNextFileName();
 		int nBits = ((TomoInfoBean)context.getUserObject()).getBits();
-		
+
 		File file = new File(filename);
 		file.getParentFile().mkdirs();
-		
+
 		final JavaImageSaver saver = new JavaImageSaver(filename, "tiff", nBits, true);
 		final DataHolder     dh    = new DataHolder();
 		dh.addDataset(slice.getName(), slice);
 		saver.saveFile(dh);
-		
+
 		if (nImages < 101 || counter%(nImages/100) == 0) {
 			if (context.getMonitor()!=null) context.getMonitor().worked((100)/(nImages));
 		}
-		
+
 		counter++;
-		
 	}
 
 	private void processTomoInfoBeanContext(File path, IConversionContext context) throws Exception {
-		
 		if (findGroupContainingDefinition(path.getAbsolutePath()) == null) {
 			throw new IllegalArgumentException("Not a recognised tomography file");
 		}
@@ -104,7 +103,6 @@ public class CustomTomoConverter extends AbstractConversion {
 		TomoInfoBean bean = (TomoInfoBean)context.getUserObject();
 
 		if( context.getOutputPath() != null) bean.setOutputPath(context.getOutputPath() + File.separator + getFileNameNoExtension(path));
-		
 
 		IDataset key = getImageKey(bean, path);
 		if (key != null) bean.setImageKey(key);
@@ -113,90 +111,63 @@ public class CustomTomoConverter extends AbstractConversion {
 		counter = 0;
 		bean.resetCounters();
 	}
-	
+
 	private IDataset getImageKey(TomoInfoBean bean, File path) {
-		
-		IHierarchicalDataFile file = null;
 		try {
-			
-			file = HierarchicalDataFactory.getReader(path.getAbsolutePath());
-			Dataset dataset = (Dataset)file.getData(bean.tomoPath + KEY_LOCATION);
-			return H5Utils.getSet(dataset.getData(),dataset.getDims(),dataset);
-			
+			IDataHolder dh = LocalServiceManager.getLoaderService().getData(path.getAbsolutePath(), null);
+			String nodepath = bean.tomoPath + KEY_LOCATION;
+			//path should start with /
+			nodepath = !nodepath.startsWith("/") ? "/" + nodepath : nodepath;
+			NodeLink link = dh.getTree().findNodeLink(nodepath);
+			DataNode datanode = (DataNode) link.getDestination();
+			ILazyDataset lazydata = datanode.getDataset();
+			IDataset dataset = lazydata.getSlice(new Slice(0, lazydata.getShape()[0], 1)).squeeze();
+			return dataset;
 		} catch (Exception e) {
 			e.printStackTrace();
-		} finally {
-			try {
-				file.close();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
 		}
 		return null;
-
 	}
-	
+
 	private static String findGroupContainingDefinition(String path) throws Exception {
-		
-		final IHierarchicalDataFile file = HierarchicalDataFactory.getReader(path);
+		IDataHolder dh = LocalServiceManager.getLoaderService().getData(path, null);
 		try {
-			
-			String object = file.getRoot();
-			
-			IFindInNexus finder = new IFindInNexus() {
-				
+			IFindInTree treefinder = new IFindInTree() {
 				@Override
-				public boolean inNexus(String nexusObjectPath) {
-					
-					try {
-						if (file.isDataset(nexusObjectPath)) {
-							
-							final String objectName = nexusObjectPath.substring(nexusObjectPath.lastIndexOf('/')+1);
-							if (objectName.toLowerCase().equals(DEF)) {
-								
-								HObject object = (HObject)file.getData(nexusObjectPath);
-								if (((Dataset)object).getDatatype().getDatatypeClass() == Datatype.CLASS_STRING) {
-									String name = null;
-									try {
-										((H5ScalarDS)object).setConvertByteToString(true);
-										name = ((String[])((H5ScalarDS)object).getData())[0];
-									} catch (Exception e) {
-										e.printStackTrace();
-									}
-									if (name != null) {
-										if (name != null && name.toLowerCase().contains(NXTOMO)) return true;
-									}
-								}
-							}
+				public boolean found(NodeLink node) {
+					if (node.getDestination() instanceof DataNode) {
+						DataNode datanode = (DataNode) node.getDestination();
+						ILazyDataset dataset = datanode.getDataset();
+						String name = dataset.getName();
+						if (name != null && name.toLowerCase().equals(DEF)) {
+							String value = datanode.getString();
+							if (value != null && value.toLowerCase().contains(NXTOMO))
+								return true;
 						}
-					} catch (Exception ne) {
-						logger.debug("Cannot test object @ '"+nexusObjectPath+"'");
-						return false;
 					}
-					
 					return false;
 				}
+				
 			};
+			Tree tree = dh.getTree();
+			GroupNode root = tree.getGroupNode();
+			Map<String, NodeLink> outmap = TreeUtils.treeBreadthFirstSearch(root, treefinder, true, null);
 			
-			List<String> out = NexusUtils.nexusBreadthFirstSearch(file, finder, object, true);
-			
-			if (out != null && !out.isEmpty()){
-				final String detectorPath = out.get(0);
-				return file.getParent(detectorPath);
+			Set<String> names = outmap.keySet();
+			if (names != null && !names.isEmpty()) {
+				for (String name : names) {
+					final String detectorPath = name;
+					int idx = detectorPath.lastIndexOf("/");
+					String parent = detectorPath.substring(0, idx);
+					return parent;
+				}
 			}
-			
 		} catch (Exception e) {
 			e.printStackTrace();
-		} finally {
-			try {
-				file.close();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Bean to handle the custom aspects of converting tomography data
 	 *
@@ -222,7 +193,6 @@ public class CustomTomoConverter extends AbstractConversion {
 			return output;
 		}
 		
-		
 		/**
 		 * Method to check is a valid tomography file (returns true)
 		 * and populate some internal data
@@ -238,6 +208,7 @@ public class CustomTomoConverter extends AbstractConversion {
 			tomoPath = ob;
 			// tomo Path should end with /
 			if (!tomoPath.endsWith("/")) tomoPath = tomoPath+"/";
+			if (!tomoPath.startsWith("/")) tomoPath = "/" + tomoPath;
 			return true;
 			
 		}
@@ -253,8 +224,6 @@ public class CustomTomoConverter extends AbstractConversion {
 			if (imageKey != null) {
 				return imageKey.getShape()[0];
 			}
-			
-			
 			return -1;
 		}
 		
@@ -278,7 +247,6 @@ public class CustomTomoConverter extends AbstractConversion {
 			if (tomoPath == null) return null;
 			return tomoPath + DATA_LOCATION;
 		}
-		
 		
 		public void setDarkFieldPath(String path){
 			this.darkPath = path;
@@ -370,6 +338,5 @@ public class CustomTomoConverter extends AbstractConversion {
 			return nBits;
 			
 		}
-		
 	}
 }
