@@ -196,7 +196,7 @@ public class AlignImagesConversionPage extends ResourceChoosePage
 		Label methodLabel = new Label(controlComp, SWT.NONE);
 		methodLabel.setText("Align method:");
 		alignMethodCombo = new Combo(controlComp, SWT.READ_ONLY);
-		alignMethodCombo.setItems(new String[] {"With ROI", "Affine transform"});
+		alignMethodCombo.setItems(new String[] {"With whole image", "With ROI", "Affine transform"});
 		alignMethodCombo.setToolTipText("Choose the method of alignement: with a region of interest or without using an affine transformation");
 		alignMethodCombo.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -206,8 +206,10 @@ public class AlignImagesConversionPage extends ResourceChoosePage
 				if (region != null) {
 					boolean withROI = alignState == AlignMethod.WITH_ROI;
 					region.setVisible(withROI);
-					radioButtons.get(0).setEnabled(withROI);
-					radioButtons.get(1).setEnabled(withROI);
+					boolean bMode = alignState != AlignMethod.HESSIAN_REGISTRATION;
+					for (Button b : radioButtons) {
+						b.setEnabled(bMode);
+					}
 				}
 			}
 		});
@@ -221,6 +223,11 @@ public class AlignImagesConversionPage extends ResourceChoosePage
 		modeComp.setToolTipText("Number of columns used for image alignment with ROI");
 		Button b;
 		radioButtons = new ArrayList<Button>();
+		b = new Button(modeComp, SWT.RADIO);
+		b.setText("0");
+		b.setToolTipText("Do not use columns but all images together to align with ROI");
+		b.addSelectionListener(radioListener);
+		radioButtons.add(b);
 		b = new Button(modeComp, SWT.RADIO);
 		b.setText("2");
 		b.setToolTipText("Use 2 columns to implement image alignment with ROI");
@@ -339,11 +346,12 @@ public class AlignImagesConversionPage extends ResourceChoosePage
 		@Override
 		public void widgetSelected(SelectionEvent e) {
 			Button btn = (Button) e.widget;
-			if (!btn.getSelection()) {
+			boolean value = btn.getSelection();
+			int idx = radioButtons.indexOf(btn);
+			if (!value) {
 				btn.setSelection(false);
-			} else {
-				mode = radioButtons.indexOf(btn) == 0 ? 2 : 4;
 			}
+			mode = idx*2;
 		}
 	};
 

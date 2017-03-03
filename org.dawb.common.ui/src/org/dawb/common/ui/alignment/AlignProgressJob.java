@@ -94,7 +94,7 @@ public class AlignProgressJob implements IRunnableWithProgress {
 
 		if (monitor != null)
 			monitor.beginTask("Aligning images...", alignState == AlignMethod.WITH_ROI ? 5*n : n);
-		if (alignState == AlignMethod.WITH_ROI && n % mode != 0) {
+		if (mode != 0 && alignState == AlignMethod.WITH_ROI && n % mode != 0) {
 			final String msg = "Missing file? Could not load multiple of " + mode + " images";
 			Display.getDefault().syncExec(new Runnable() {
 				@Override
@@ -107,7 +107,14 @@ public class AlignProgressJob implements IRunnableWithProgress {
 		}
 		final IMonitor mon = new ProgressMonitorWrapper(monitor);
 		try {
-			if (alignState == AlignMethod.WITH_ROI) {
+			if (alignState == AlignMethod.HESSIAN_REGISTRATION) {
+				// align with boofcv
+				if (isLazy) {
+					shiftedImages = transformer.align(data, detectionParams, hessianParams, mon);
+				} else {
+					nonLazyShiftedImages = transformer.align(nonLazyData, mon);
+				}
+			} else {
 				if (shifts == null)
 					shifts = new ArrayList<List<double[]>>();
 				if (!shifts.isEmpty())
@@ -116,13 +123,6 @@ public class AlignProgressJob implements IRunnableWithProgress {
 					shiftedImages = AlignImages.alignLazyWithROI(data, shifts, roi, mode, mon);
 				else
 					nonLazyShiftedImages = AlignImages.alignWithROI(nonLazyData, shifts, roi, mode, mon);
-			} else if (alignState == AlignMethod.HESSIAN_REGISTRATION) {
-				// align with boofcv
-				if (isLazy) {
-					shiftedImages = transformer.align(data, detectionParams, hessianParams, mon);
-				} else {
-					nonLazyShiftedImages = transformer.align(nonLazyData, mon);
-				}
 			}
 		} catch (final Exception e) {
 			Display.getDefault().syncExec(new Runnable() {
