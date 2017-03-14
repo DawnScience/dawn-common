@@ -78,6 +78,7 @@ public class ResourceChoosePage extends WizardPage {
 	private boolean pathEditable=false;
 	private boolean buttonsEnabled=true;
 	private boolean isOverwrite=true;
+	private boolean mustBeReadable, mustBeWriteable;
 	
 	private String   path;
 	private String   fileLabel=null;
@@ -97,9 +98,19 @@ public class ResourceChoosePage extends WizardPage {
 	 */
 	public ResourceChoosePage(String pageName, String description, ImageDescriptor icon) {
 		super(pageName, description, icon);
+
+		// False-false means don't care. The file merely must be in some way accessible.
+		mustBeReadable = false;
+		mustBeWriteable = false;
 		
 	}
 
+	public ResourceChoosePage(String pageName, String description, ImageDescriptor icon, boolean mustRead, boolean mustWrite) {
+		this(pageName, description, icon);
+		mustBeReadable = mustRead;
+		mustBeWriteable = mustWrite;
+	}
+	
 	@Override
 	public final void createControl(Composite parent) {
 		
@@ -118,7 +129,7 @@ public class ResourceChoosePage extends WizardPage {
 	}
 	
     public void setPageComplete(boolean complete) {
-    	if (complete==super.isPageComplete()) return;
+//    	if (complete==super.isPageComplete()) return;
         super.setPageComplete(complete);
     }
 
@@ -204,6 +215,7 @@ public class ResourceChoosePage extends WizardPage {
 	
 	public boolean isPageComplete() {
     	if (getErrorMessage()!=null) return false;
+    	if (!isAccessible()) return false;
         return super.isPageComplete();
     }
 
@@ -298,8 +310,7 @@ public class ResourceChoosePage extends WizardPage {
 	 * Call to update
 	 */
 	protected void pathChanged() {
-		// TODO Auto-generated method stub
-		
+		setPageComplete(isAccessible());
 	}
 
 	/**
@@ -577,4 +588,34 @@ public class ResourceChoosePage extends WizardPage {
 	public void setBrowseToExternalOnly(boolean hasBrowseToExternalOnly) {
 		this.hasBrowseToExternalOnly = hasBrowseToExternalOnly;
 	}
+	
+	private boolean isWriteableOrCanCreatePath() {
+		if (path == null) return false;
+		File pathFile = new File(getPath());
+		File parentFile = pathFile.getParentFile();
+		if (parentFile == null) return false;
+		
+		return pathFile.canWrite() || (!pathFile.exists() && parentFile.canWrite());
+	}
+	
+	private boolean isReadable() {
+		if (path == null) return false;
+		File pathFile = new File(getPath());
+		return pathFile.canWrite();
+	}
+
+	private boolean isAccessible() {
+		boolean isReadable = isReadable(),
+				isWriteable = isWriteableOrCanCreatePath();
+		if (!mustBeReadable && !mustBeWriteable)
+			return isReadable || isWriteable;
+		else if (!mustBeReadable)
+			return isWriteable;
+		else if (!mustBeWriteable)
+			return isReadable;
+		else
+			return isReadable && isWriteable;
+			
+	}
+
 }
