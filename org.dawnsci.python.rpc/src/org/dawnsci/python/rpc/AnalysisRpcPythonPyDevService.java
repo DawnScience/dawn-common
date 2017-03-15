@@ -24,6 +24,8 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.dawnsci.analysis.api.rpc.AnalysisRpcException;
+import org.eclipse.debug.core.DebugPlugin;
+import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.python.pydev.core.IInterpreterInfo;
 import org.python.pydev.core.IInterpreterManager;
@@ -46,6 +48,8 @@ import org.slf4j.LoggerFactory;
  * associated interface.
  */
 public class AnalysisRpcPythonPyDevService extends AnalysisRpcPythonService {
+	private static final String PYTHON_ON_PATH = "python";
+
 	private static final Logger logger = LoggerFactory.getLogger(AnalysisRpcPythonPyDevService.class);
 
 	// TODO should we add bundle dependency on uk.ac.diamond.scisoft.python?
@@ -53,6 +57,29 @@ public class AnalysisRpcPythonPyDevService extends AnalysisRpcPythonService {
 
 	static {
 		System.out.println("Starting Analysis RPC Pydev service.");
+	}
+
+	/**
+	 * Create new service using the default (first listed) Python
+	 * InterpreterInfo if any are available, or else use python from the PATH.
+	 * 
+	 * This is a convenience method that ensures that MisconfigurationException and
+	 * NotConfiguredInterpreterException will not be thrown and be handled
+	 * instead by picking python from the PATH.
+	 * 
+	 * @throws AnalysisRpcException
+	 *             if an error occurs setting up the AnalysisRpc remote Python
+	 *             server or the Java client
+	 */
+	public static AnalysisRpcPythonPyDevService create() throws AnalysisRpcException {
+		try {
+			return new AnalysisRpcPythonPyDevService(false);
+		} catch (MisconfigurationException e) {
+			String jobUserDescription = getJobUserDescription(PYTHON_ON_PATH);
+			File pythonExe = new File(PYTHON_ON_PATH);
+			Map<String, String> env = getEnvWithoutPyDev();
+			return new AnalysisRpcPythonPyDevService(jobUserDescription, pythonExe, env);
+		}
 	}
 
 	public AnalysisRpcPythonPyDevService() throws MisconfigurationException, AnalysisRpcException {
@@ -150,8 +177,24 @@ public class AnalysisRpcPythonPyDevService extends AnalysisRpcPythonService {
 		this(getJobUserDescription(interpreter), getPythonExe(interpreter), getEnv(interpreter, project));
 	}
 
-	private AnalysisRpcPythonPyDevService(String jobUserDescription,
-			File pythonExe, Map<String, String> env)
+	/**
+	 * The private constructor, accessed via the create* methods or public
+	 * constructors. The key thing about this constructor is all the PyDev
+	 * settings have been flattened so no PyDev types are needed by this point.
+	 * The callers are responsible for resolving to actual exe name, etc.
+	 * 
+	 * @param jobUserDescription
+	 *            Description of the job, use
+	 *            {@link #getJobUserDescription(String)} helper.
+	 * @param pythonExe
+	 *            Python executable.
+	 * @param env
+	 *            Environment, containing SciSoftPy on the PYTHONPATH
+	 * @throws AnalysisRpcException
+	 *             if an error occurs setting up the AnalysisRpc remote Python
+	 *             server or the Java client
+	 */
+	private AnalysisRpcPythonPyDevService(String jobUserDescription, File pythonExe, Map<String, String> env)
 			throws AnalysisRpcException {
 		super(jobUserDescription, pythonExe, null, env);
 
@@ -196,7 +239,11 @@ public class AnalysisRpcPythonPyDevService extends AnalysisRpcPythonService {
 	}
 
 	private static String getJobUserDescription(IInterpreterInfo interpreter) {
-		return "Python Service (" + interpreter.getExecutableOrJar() + ")";
+		return getJobUserDescription(interpreter.getExecutableOrJar());
+	}
+
+	private static String getJobUserDescription(String pythonExe) {
+		return "Python Service (" + pythonExe + ")";
 	}
 
 	private static File getPythonExe(IInterpreterInfo interpreter) {
@@ -228,6 +275,16 @@ public class AnalysisRpcPythonPyDevService extends AnalysisRpcPythonService {
 			String kv[] = s.split("=", 2);
 			env.put(kv[0], kv[1]);
 		}
+		return updatePythonPathForSciSoftPy(env);
+	}
+
+	private static Map<String, String> getEnvWithoutPyDev() {
+        ILaunchManager launchManager = DebugPlugin.getDefault().getLaunchManager();
+        Map<String, String> env = launchManager.getNativeEnvironment();
+		return updatePythonPathForSciSoftPy(env);
+	}
+
+	private static Map<String, String> updatePythonPathForSciSoftPy(Map<String, String> env) {
 
 		// To support this flow, we need both Diamond and PyDev's python
 		// paths in the PYTHONPATH. We add the expected ones here.

@@ -20,7 +20,7 @@ public abstract class AbstractPythonSavuOperation<T extends PythonSavuModel> ext
 	public void init() {
 		
 		try {
-			s = new AnalysisRpcPythonPyDevService(false);
+			s = AnalysisRpcPythonPyDevService.create();
 			pythonRunSavuService = new PythonRunSavuService(s);
 			// can I add a plugin populator here? drop down+params list test it with a fake param. No needs to be model...
 			
