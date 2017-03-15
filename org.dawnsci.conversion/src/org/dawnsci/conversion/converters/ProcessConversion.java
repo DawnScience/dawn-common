@@ -21,9 +21,11 @@ import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
 import org.eclipse.dawnsci.analysis.api.io.ILoaderService;
 import org.eclipse.dawnsci.analysis.api.processing.Atomic;
 import org.eclipse.dawnsci.analysis.api.processing.ExecutionType;
+import org.eclipse.dawnsci.analysis.api.processing.IExecutionVisitor;
 import org.eclipse.dawnsci.analysis.api.processing.IOperation;
 import org.eclipse.dawnsci.analysis.api.processing.IOperationContext;
 import org.eclipse.dawnsci.analysis.api.processing.IOperationService;
+import org.eclipse.dawnsci.analysis.api.processing.ISavesToFile;
 import org.eclipse.dawnsci.analysis.dataset.slicer.SliceFromSeriesMetadata;
 import org.eclipse.dawnsci.analysis.dataset.slicer.Slicer;
 import org.eclipse.dawnsci.analysis.dataset.slicer.SourceInformation;
@@ -111,8 +113,14 @@ public class ProcessConversion extends AbstractConversion {
 		
 		ExecutionType executionType = info.getExecutionType();
 		
+		IExecutionVisitor exVisitor = info.getExecutionVisitor(full);
+		
+		if (info.getProcessingOutputType() == ProcessingOutputType.LINK_ORIGINAL && exVisitor instanceof ISavesToFile) {
+			((ISavesToFile)exVisitor).includeLinkTo(context.getSelectedConversionFile().getAbsolutePath());
+		}
+		
 		cc.setMonitor(context.getMonitor());
-		cc.setVisitor(info.getExecutionVisitor(full));
+		cc.setVisitor(exVisitor);
 		cc.setSeries(info.getOperationSeries());
 		cc.setExecutionType(executionType);
 		service.execute(cc);
