@@ -19,7 +19,7 @@ public abstract class AbstractPythonScriptOperation<T extends PythonScriptModel>
 	public void init() {
 		
 		try {
-			s = new AnalysisRpcPythonPyDevService(false);
+			s = AnalysisRpcPythonPyDevService.create();
 			pythonRunScriptService = new PythonRunScriptService(s);
 		} catch (Exception e) {
 			System.out.println(e);
