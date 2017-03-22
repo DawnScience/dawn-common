@@ -9,7 +9,7 @@ import org.eclipse.dawnsci.analysis.api.processing.OperationRank;
 import org.eclipse.january.MetadataException;
 import org.eclipse.january.dataset.IDataset;
 
-//@Atomic
+@Atomic
 public class PythonSavuOperation extends AbstractPythonSavuOperation<PythonSavuModel> {
 
 	@Override
