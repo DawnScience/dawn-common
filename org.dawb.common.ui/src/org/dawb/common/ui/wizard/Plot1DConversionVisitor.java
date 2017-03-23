@@ -11,6 +11,8 @@ package org.dawb.common.ui.wizard;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
@@ -22,7 +24,6 @@ import org.eclipse.january.dataset.DTypeUtils;
 import org.eclipse.january.dataset.Dataset;
 import org.eclipse.january.dataset.DatasetUtils;
 import org.eclipse.january.dataset.IDataset;
-import org.eclipse.swt.widgets.Composite;
 
 import uk.ac.diamond.scisoft.analysis.io.ASCIIDataHolderSaver;
 import uk.ac.diamond.scisoft.analysis.io.ASCIIDataWithHeadingSaver;
@@ -86,9 +87,23 @@ public class Plot1DConversionVisitor extends AbstractPlotConversionVisitor {
 		return "dat";
 	}
 
+	private static final Comparator<ITrace> ITraceComparator = new Comparator<ITrace>() {
+		@Override
+		public int compare(ITrace a, ITrace b) {
+			if (a == null || a.getData() == null || a.getData().getName() == null || a.getData().getName().isEmpty())
+				return 1;
+
+			if (b == null || b.getData() == null || b.getData().getName() == null || b.getData().getName().isEmpty())
+				return -1;
+			
+			return a.getData().getName().compareTo(b.getData().getName());
+		}
+	};
+	
 	private void saveLineTracesAsAscii(String filename) throws Exception {
 
 		Collection<ITrace> traces = system.getTraces(ILineTrace.class);
+		List<ITrace> tracesList = new ArrayList<>(traces);
 
 		boolean firstTrace = true;
 		List<IDataset> datasets = new ArrayList<IDataset>();
@@ -99,7 +114,9 @@ public class Plot1DConversionVisitor extends AbstractPlotConversionVisitor {
 
 		int i = 0;
 
-		for (ITrace trace : traces ) {
+		Collections.sort(tracesList, ITraceComparator);
+		
+		for (ITrace trace : tracesList ) {
 
 			if (firstTrace) {
 				int ddtype = DTypeUtils.getDType(((ILineTrace)trace).getData());
@@ -118,7 +135,10 @@ public class Plot1DConversionVisitor extends AbstractPlotConversionVisitor {
 
 				data.setShape(data.getShape()[0],1);
 				datasets.add(data);
-				headings.add("x");
+				if (data.getName() != null && !data.getName().isEmpty())
+					headings.add(data.getName());
+				else
+					headings.add("x");
 				firstTrace = false;
 			}
 
@@ -130,8 +150,10 @@ public class Plot1DConversionVisitor extends AbstractPlotConversionVisitor {
 
 			data.setShape(data.getShape()[0],1);
 			datasets.add(data);
-			headings.add("dataset_" + i);
-			i++;
+			if (data.getName() != null && !data.getName().isEmpty())
+				headings.add(data.getName());
+			else
+				headings.add("dataset_" + i++);
 		}
 
 		Dataset allTraces = DatasetUtils.concatenate(datasets.toArray(new IDataset[datasets.size()]), 1);
