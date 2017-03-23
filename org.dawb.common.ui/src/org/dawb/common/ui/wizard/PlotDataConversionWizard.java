@@ -13,7 +13,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.dawb.common.services.ServiceManager;
+import org.dawb.common.ui.Activator;
 import org.dawb.common.ui.monitor.ProgressMonitorWrapper;
 import org.dawb.common.ui.util.EclipseUtils;
 import org.eclipse.core.runtime.IAdaptable;
@@ -21,8 +21,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionService;
 import org.eclipse.dawnsci.plotting.api.IPlottingSystem;
-import org.eclipse.january.dataset.Dataset;
 import org.eclipse.january.dataset.DatasetFactory;
+import org.eclipse.january.dataset.IntegerDataset;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -58,7 +58,7 @@ public class PlotDataConversionWizard extends Wizard implements IExportWizard {
 		
 		// It's an OSGI service, not required to use ServiceManager
 		try {
-			this.service = (IConversionService)ServiceManager.getService(IConversionService.class);
+			this.service = Activator.getService(IConversionService.class);
 		} catch (Exception e) {
 			logger.error("Cannot get conversion service!", e);
 			return;
@@ -86,7 +86,7 @@ public class PlotDataConversionWizard extends Wizard implements IExportWizard {
 		context.setConversionVisitor(visitor);
 		
 		//HACK - put in a dataset so the conversion class goes straight to iterate
-		context.setLazyDataset(DatasetFactory.zeros(new int[]{10},Dataset.INT32));
+		context.setLazyDataset(DatasetFactory.zeros(IntegerDataset.class, new int[]{10}));
 		context.addSliceDimension(0, "all");
 		
 		conversionPage = new PlotDataConversionPage();
