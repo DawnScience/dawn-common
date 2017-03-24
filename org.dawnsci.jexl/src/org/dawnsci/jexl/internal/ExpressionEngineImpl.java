@@ -33,7 +33,6 @@ import org.eclipse.dawnsci.analysis.api.expressions.IExpressionEngine;
 import org.eclipse.dawnsci.analysis.api.expressions.IExpressionEngineListener;
 import org.eclipse.dawnsci.analysis.dataset.impl.Image;
 import org.eclipse.january.IMonitor;
-import org.eclipse.january.dataset.Maths;
 
 public class ExpressionEngineImpl implements IExpressionEngine{
 	
@@ -50,7 +49,7 @@ public class ExpressionEngineImpl implements IExpressionEngine{
 
 		//Add some useful functions to the engine
 		Map<String,Object> funcs = new HashMap<String,Object>();
-		funcs.put("dnp", Maths.class);
+		funcs.put("dnp", JexlMaths.class);
 		funcs.put("dat", JexlGeneralFunctions.class);
 		funcs.put("im",  Image.class);
 		funcs.put("lz",  JexlLazyFunctions.class);
