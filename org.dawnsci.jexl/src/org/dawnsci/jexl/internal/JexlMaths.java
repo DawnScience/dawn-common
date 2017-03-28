@@ -19,6 +19,10 @@ import org.eclipse.january.dataset.Maths;
 
 public class JexlMaths {
 	
+	public static Dataset pow(final Object a, final Object b) {
+		return Maths.power(a, b);
+	}
+
 	public static Dataset power(final Object a, final Object b) {
 		return Maths.power(a, b);
 	}
