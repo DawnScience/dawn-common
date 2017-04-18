@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import org.dawb.common.ui.monitor.ProgressMonitorWrapper;
 import org.dawb.common.ui.util.GridUtils;
+import org.dawnsci.common.widgets.utils.ControlUtils;
 import org.dawnsci.conversion.converters.B18AverageConverter;
 import org.dawnsci.conversion.converters.B18AverageConverter.B18DataType;
 import org.dawnsci.conversion.converters.B18AverageConverter.B18InterpolationType;
@@ -92,9 +93,9 @@ public class B18AverageConversionPage extends AbstractDatasetChoosePage {
 				public void widgetSelected(SelectionEvent e) {
 					dataTypeSelection = combo.getSelectionIndex();
 					if (dataTypeSelection == B18AverageConverter.B18DataType.CUSTOM.ordinal()) {
-						recursiveSetEnabled(main, true);
+						ControlUtils.recursiveSetEnabled(main, true);
 					} else {
-						recursiveSetEnabled(main, false);
+						ControlUtils.recursiveSetEnabled(main, false);
 					}
 				}
 			});
@@ -362,20 +363,7 @@ public class B18AverageConversionPage extends AbstractDatasetChoosePage {
 		super.createContentAfterFileChoose(container);
     	main.setVisible(true);
     	// the default dataType is never CUSTOM
-    	recursiveSetEnabled(main, false);
+    	ControlUtils.recursiveSetEnabled(main, false);
 	}
 	
-	// Inspired by http://stackoverflow.com/questions/2957657/disable-and-grey-out-an-eclipse-widget
-	public void recursiveSetEnabled(Control ctrl, boolean enabled) {
-		   if (ctrl instanceof Composite) {
-		      Composite comp = (Composite) ctrl;
-		      Control[] kids = comp.getChildren();
-		      for (Control c : kids)
-		         recursiveSetEnabled(c, enabled);
-		      if (kids == null || kids.length == 0) 
-		    	  ctrl.setEnabled(enabled);
-		   } else {
-		      ctrl.setEnabled(enabled);
-		   }
-		}
 }
