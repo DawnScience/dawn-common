@@ -25,6 +25,7 @@ Require-Bundle: org.eclipse.osgi;bundle-version="3.7.2",
 Import-Package: org.dawb.common.util.eclipse,
  org.slf4j;version="[1.7.2,2.0.0)"
 Export-Package: org.dawnsci.persistence,
+ org.dawnsci.persistence.internal,
  org.dawnsci.persistence.json
 Important-Note: This plugin SHOULD NOT be lazy activated because we always want this 
  plugin to be loaded to contribute the service.
