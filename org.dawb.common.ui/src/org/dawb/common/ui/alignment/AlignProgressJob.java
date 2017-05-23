@@ -53,6 +53,9 @@ public class AlignProgressJob implements IRunnableWithProgress {
 
 	private DetectionAlgoParameters detectionParams;
 	private HessianRegParameters hessianParams;
+	
+	private IDataset darkImageData;
+	private IDataset brightImageData;
 
 	private static IImageTransform transformer;
 
@@ -120,7 +123,7 @@ public class AlignProgressJob implements IRunnableWithProgress {
 				if (!shifts.isEmpty())
 					shifts.clear();
 				if (isLazy)
-					shiftedImages = AlignImages.alignLazyWithROI(data, shifts, roi, mode, mon);
+					shiftedImages = AlignImages.alignLazyWithROI(data, shifts, roi, darkImageData, brightImageData, mode, mon);
 				else
 					nonLazyShiftedImages = AlignImages.alignWithROI(nonLazyData, shifts, roi, mode, mon);
 			}
@@ -211,6 +214,13 @@ public class AlignProgressJob implements IRunnableWithProgress {
 
 	public void setHessianParameters(HessianRegParameters hessianParams) {
 		this.hessianParams = hessianParams;
+	}
+	
+	public void setDarkImageData(IDataset darkImageData){
+		this.darkImageData =  darkImageData;
+	}
+	public void setBrightImageData(IDataset brightImageData){
+		this.brightImageData = brightImageData;
 	}
 
 }
