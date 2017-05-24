@@ -35,6 +35,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.dawnsci.analysis.api.fitting.functions.IFunction;
 import org.eclipse.dawnsci.analysis.api.fitting.functions.IFunctionService;
+import org.eclipse.dawnsci.analysis.api.metadata.IDiffractionMetadata;
 import org.eclipse.dawnsci.analysis.api.persistence.IPersistenceService;
 import org.eclipse.dawnsci.analysis.api.persistence.IPersistentFile;
 import org.eclipse.dawnsci.analysis.api.persistence.IPersistentNodeFactory;
@@ -50,10 +51,7 @@ import org.eclipse.dawnsci.plotting.api.trace.IImageTrace;
 import org.eclipse.dawnsci.plotting.api.trace.ILineTrace;
 import org.eclipse.dawnsci.plotting.api.trace.ITrace;
 import org.eclipse.january.IMonitor;
-import org.eclipse.january.dataset.BooleanDataset;
 import org.eclipse.january.dataset.IDataset;
-import org.eclipse.dawnsci.analysis.api.metadata.IDiffractionMetadata;
-import org.eclipse.january.metadata.IMetadata;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -93,7 +91,8 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
 		addPage(options);
 		
 	}
-	
+
+	@Override
 	public void createPageControls(Composite pageContainer) {
 		super.createPageControls(pageContainer);
 		
@@ -113,7 +112,8 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
 		if (staticFileName!=null)    page.setFileLabel(staticFileName);
 	}
 
-    public boolean canFinish() {
+    @Override
+	public boolean canFinish() {
     	if (page.isPageComplete() && getContainer().getCurrentPage()==page) {
     		options.setDescription("Please choose the things to save in '"+page.getPath()+"'.");
     		options.setOptionEnabled(PersistWizardConstants.ORIGINAL_DATA,   false);
@@ -170,15 +170,15 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
     				}
     				
     				if (trace!=null && trace instanceof IImageTrace && trace.getData() != null) {
-    					IMetadata meta = trace.getData().getMetadata();
-    					if (meta != null && (meta instanceof IDiffractionMetadata)) {
+    					IDiffractionMetadata meta = trace.getData().getFirstMetadata(IDiffractionMetadata.class);
+    					if (meta != null) {
     						options.setOptionEnabled(PersistWizardConstants.DIFF_META, true);
     					}
     				}
     				
     				final IWorkbenchPart   part   = EclipseUtils.getPage().getActivePart();
     				if (part!=null) {
-    					final IFunctionService funcService = (IFunctionService)part.getAdapter(IFunctionService.class);
+    					final IFunctionService funcService = part.getAdapter(IFunctionService.class);
     					if (funcService != null) {
     						options.setOptionEnabled(PersistWizardConstants.FUNCTIONS, true);
     					}
@@ -203,11 +203,11 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
 			 IWorkspace workspace= ResourcesPlugin.getWorkspace();
 			 File afile = new File(page.getAbsoluteFilePath());
 			 IPath location= Path.fromOSString(afile.getAbsolutePath());
-			 file= workspace.getRoot().getFileForLocation(location); 
-			 			 			 
+			 file= workspace.getRoot().getFileForLocation(location);
+
 			 final IWorkbenchPart  part   = EclipseUtils.getPage().getActivePart();
 			 final IPlottingSystem<Composite> system = getPlottingSystem();
-			 final IFunctionService funcService = (IFunctionService)part.getAdapter(IFunctionService.class);
+			 final IFunctionService funcService = part.getAdapter(IFunctionService.class);
 
 			 final IFile finalFile = file;
 			 
@@ -251,7 +251,7 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
 							 }
 						 }
 						 if (options.is(PersistWizardConstants.IMAGE_HIST)) {
-			    				final IToolPageSystem tsystem = (IToolPageSystem)system.getAdapter(IToolPageSystem.class);
+			    				final IToolPageSystem tsystem = system.getAdapter(IToolPageSystem.class);
 			    				final IToolPage       tool    = tsystem.getActiveTool();
 			    				if (tool != null && tool.getToolId().equals("org.dawb.workbench.plotting.tools.imageCompareTool")) {
 			    					final Map<String, IDataset> data = (Map<String, IDataset>)tool.getToolData();
@@ -267,7 +267,7 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
 							 IImageTrace image = (IImageTrace)trace;
 							 final String name = options.getString(PersistWizardConstants.MASK);
 							 if (image.getMask()!=null) {
-								 file.addMask(name, (BooleanDataset)image.getMask(), mon);
+								 file.addMask(name, image.getMask(), mon);
 								 monitor.worked(1);
 							 }
 						 }
@@ -284,7 +284,7 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
 								 file.addROI(iRegion.getName(), iRegion.getROI());
 								 file.setRegionAttribute(iRegion.getName(), "Region Type", iRegion.getRegionType().getName());
 								 if (iRegion.getUserObject()!=null) {
-									 file.setRegionAttribute(iRegion.getName(), "User Object", iRegion.getUserObject().toString()); 
+									 file.setRegionAttribute(iRegion.getName(), "User Object", iRegion.getUserObject().toString());
 								 }
 							 }
 						 }
@@ -311,13 +311,11 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
 							 final ITrace trace = system.getTraces().iterator().next();
 							 if (options.is(PersistWizardConstants.DIFF_META)) {
 								 if (trace!=null && trace instanceof IImageTrace && trace.getData() != null) {
-									 IMetadata meta = trace.getData().getMetadata();
-									 if (meta == null || meta instanceof IDiffractionMetadata) {
-										 IPersistentNodeFactory pnf = service.getPersistentNodeFactory();
-										 GroupNode node = pnf.writePowderCalibrationToFile((IDiffractionMetadata)meta, null, null);
-										 nexusFile = NexusFileHDF5.openNexusFile(savePath);
-										 nexusFile.addNode("/entry",node);
-									 }
+									 IDiffractionMetadata meta = trace.getData().getFirstMetadata(IDiffractionMetadata.class);
+									 IPersistentNodeFactory pnf = service.getPersistentNodeFactory();
+									 GroupNode node = pnf.writePowderCalibrationToFile(meta, null, null);
+									 nexusFile = NexusFileHDF5.openNexusFile(savePath);
+									 nexusFile.addNode("/entry",node);
 								 }
 							 }
 						 }catch (Exception e) {
@@ -371,7 +369,7 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
 				ret+=traces!=null?traces.size():0;
 			}
 			if (options.is(PersistWizardConstants.IMAGE_HIST)) {
-				final IToolPageSystem tsystem = (IToolPageSystem)system.getAdapter(IToolPageSystem.class);
+				final IToolPageSystem tsystem = system.getAdapter(IToolPageSystem.class);
 				final IToolPage       tool    = tsystem.getActiveTool();
 				if (tool != null && tool.getToolId().equals("org.dawb.workbench.plotting.tools.imageCompareTool")) {
 					final Map<String, IDataset> data = (Map<String, IDataset>)tool.getToolData();
@@ -423,9 +421,9 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
 		if (shells!=null) for (Shell shell : shells) {
 			final Object o = shell.getData();
 			if (o!=null && o instanceof IAdaptable) {
-				IPlottingSystem<Composite> s = (IPlottingSystem<Composite>)((IAdaptable)o).getAdapter(IPlottingSystem.class);
+				IPlottingSystem<Composite> s = ((IAdaptable)o).getAdapter(IPlottingSystem.class);
 				if (s!=null) return s;
-			} 
+			}
 		}
 		
 		final IWorkbenchPart  part   = EclipseUtils.getPage().getActivePart();
@@ -435,8 +433,8 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
 			Object ob = part.getAdapter(IToolPageSystem.class);
 			
 			if (ob != null && ob instanceof IPlottingSystem) return (IPlottingSystem<Composite>)ob;
-			
-			return (IPlottingSystem<Composite>)part.getAdapter(IPlottingSystem.class);
+
+			return part.getAdapter(IPlottingSystem.class);
 		}
 		
 		return null;

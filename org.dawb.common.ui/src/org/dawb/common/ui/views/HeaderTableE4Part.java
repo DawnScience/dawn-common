@@ -251,7 +251,7 @@ public class HeaderTableE4Part {
 	 */
 	public void setMetaProvider(IMetadataProvider prov) {
 		try {
-			meta = prov.getMetadata();
+			meta = prov.getFirstMetadata(IMetadata.class);
 			if (meta != null)
 				updateTable.schedule();
 		} catch (Exception e) {
@@ -273,7 +273,7 @@ public class HeaderTableE4Part {
 		IWorkbenchPart wpart = context != null ? context.get(IWorkbenchPart.class) : null;
 		if (wpart != null && wpart instanceof IMetadataProvider) {
 			try {
-				meta = ((IMetadataProvider) part).getMetadata();
+				meta = ((IMetadataProvider) part).getFirstMetadata(IMetadata.class);
 				if (meta != null)
 					updateTable.schedule();
 			} catch (Exception e) {
@@ -338,7 +338,7 @@ public class HeaderTableE4Part {
 				selectMetadata((IMetadata) sel);
 			} else if (sel instanceof IMetadataProvider) {
 				try {
-					selectMetadata(((IMetadataProvider) sel).getMetadata());
+					selectMetadata(((IMetadataProvider) sel).getFirstMetadata(IMetadata.class));
 				} catch (Exception e) {
 					logger.error("Cannot get metadata", e);
 				}
@@ -411,7 +411,7 @@ public class HeaderTableE4Part {
 	private void updateFromMetaDataProvider(IWorkbenchPart part) {
 		if (part instanceof IMetadataProvider) {
 			try {
-				meta = ((IMetadataProvider) part).getMetadata();
+				meta = ((IMetadataProvider) part).getFirstMetadata(IMetadata.class);
 				if (meta != null && !table.getTable().isDisposed()) {
 					updateTable.schedule();
 					setFileName(part.getTitle());
