@@ -319,7 +319,7 @@ public class HeaderTableView extends ViewPart implements ISelectionListener, IPa
 	 */
 	public void setMetaProvider(IMetadataProvider prov) {
 		try {
-			meta = prov.getMetadata();
+			meta = prov.getFirstMetadata(IMetadata.class);
 			if (meta != null) updateTable.schedule();
 		} catch (Exception e) {
 			logger.error("There was a error reading the metadata from the selection", e);
@@ -331,7 +331,7 @@ public class HeaderTableView extends ViewPart implements ISelectionListener, IPa
 
 		if (part instanceof IMetadataProvider) {
 			try {
-				meta = ((IMetadataProvider) part).getMetadata();
+				meta = ((IMetadataProvider) part).getFirstMetadata(IMetadata.class);
 				if (meta != null)
 					updateTable.schedule();
 			} catch (Exception e) {
