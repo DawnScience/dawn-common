@@ -239,7 +239,7 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
 							 for (ITrace trace : traces) {
 								 monitor.worked(1);
 								 IDataset data = trace.getData();
-								 if (trace.getName()!=null) data.setName(trace.getName());
+								 if (trace.getName()!=null) data.setName(trace.getName().replace("/", "_"));
 								 file.setData(data);
 								 if (trace instanceof IImageTrace) {
 									 final List<IDataset> iaxes = ((IImageTrace)trace).getAxes();
