@@ -4,18 +4,20 @@ import java.util.Map;
 
 import org.dawnsci.python.rpc.AnalysisRpcPythonPyDevService;
 import org.dawnsci.python.rpc.PythonRunSavuService;
-import org.dawnsci.python.rpc.PythonRunScriptService;
 import org.eclipse.dawnsci.analysis.api.processing.OperationData;
 import org.eclipse.dawnsci.analysis.api.processing.OperationException;
 import org.eclipse.dawnsci.analysis.dataset.operations.AbstractOperation;
 import org.eclipse.january.IMonitor;
 import org.eclipse.january.dataset.IDataset;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractPythonSavuOperation<T extends PythonSavuModel> extends AbstractOperation<PythonSavuModel,OperationData> {
 
 	AnalysisRpcPythonPyDevService s = null;
 	PythonRunSavuService pythonRunSavuService;
-	
+	private final static Logger logger = LoggerFactory.getLogger(AbstractPythonSavuOperation.class);
+
 	@Override
 	public void init() {
 		
@@ -43,7 +45,7 @@ public abstract class AbstractPythonSavuOperation<T extends PythonSavuModel> ext
 	protected OperationData process(IDataset input, IMonitor monitor) throws OperationException {
 		
 		if (s == null || pythonRunSavuService == null) throw new OperationException(this, "Could not create python interpreter");
-		System.out.println("pluginname and path are"+model.getPluginName()+" "+model.getPluginPath());
+		logger.debug("pluginname and path are"+model.getPluginName()+" "+model.getPluginPath());
 		if (model.getPluginName() == null || model.getPluginPath()== null) throw new OperationException(this, "Path to script not set");
 		
 		Map<String,Object> inputs = packInput(input);
@@ -54,7 +56,7 @@ public abstract class AbstractPythonSavuOperation<T extends PythonSavuModel> ext
 			String pluginPath = (String) model.getPluginPath();
 			Map <String, Object> parameters = (Map <String, Object>) model.getParameters();
 			Boolean metaDataOnly = (Boolean) model.isMetaDataOnly();
-			System.out.println(parameters);
+			logger.debug(parameters.toString());
 			Map<String, Object> out = pythonRunSavuService.runSavu(pluginPath,parameters,metaDataOnly,inputs);
 			return packAndValidateMap(out);
 		} catch (Exception e) {
