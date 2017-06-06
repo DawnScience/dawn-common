@@ -591,7 +591,7 @@ public class ResourceChoosePage extends WizardPage {
 	
 	private boolean isWriteableOrCanCreatePath() {
 		if (path == null) return false;
-		File pathFile = new File(getPath());
+		File pathFile = new File(getAbsoluteFilePath());
 		File parentFile = pathFile.getParentFile();
 		if (parentFile == null) return false;
 		
@@ -600,7 +600,7 @@ public class ResourceChoosePage extends WizardPage {
 	
 	private boolean isReadable() {
 		if (path == null) return false;
-		File pathFile = new File(getPath());
+		File pathFile = new File(getAbsoluteFilePath());
 		return pathFile.canWrite();
 	}
 
