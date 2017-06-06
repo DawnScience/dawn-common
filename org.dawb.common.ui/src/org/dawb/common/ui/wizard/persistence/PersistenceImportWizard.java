@@ -29,6 +29,7 @@ import org.eclipse.dawnsci.analysis.api.fitting.functions.IFunction;
 import org.eclipse.dawnsci.analysis.api.fitting.functions.IFunctionService;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
 import org.eclipse.dawnsci.analysis.api.io.ILoaderService;
+import org.eclipse.dawnsci.analysis.api.metadata.IDiffractionMetadata;
 import org.eclipse.dawnsci.analysis.api.persistence.IPersistenceService;
 import org.eclipse.dawnsci.analysis.api.persistence.IPersistentFile;
 import org.eclipse.dawnsci.analysis.api.roi.IROI;
@@ -39,12 +40,10 @@ import org.eclipse.dawnsci.plotting.api.tool.IToolPage;
 import org.eclipse.dawnsci.plotting.api.tool.IToolPageSystem;
 import org.eclipse.dawnsci.plotting.api.trace.IImageTrace;
 import org.eclipse.dawnsci.plotting.api.trace.ITrace;
-import org.eclipse.dawnsci.analysis.api.metadata.IDiffractionMetadata;
 import org.eclipse.january.IMonitor;
 import org.eclipse.january.dataset.BooleanDataset;
 import org.eclipse.january.dataset.Dataset;
 import org.eclipse.january.dataset.DatasetUtils;
-import org.eclipse.january.metadata.IMetadata;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -356,12 +355,10 @@ public class PersistenceImportWizard extends AbstractPersistenceWizard implement
 					public void run() {
 						if (lockedmeta != null) {
 							DiffractionMetadataUtils.copyNewOverOld(fileMeta, lockedmeta);
-						} else if (image.getData() != null && image.getData().getMetadata()!= null){
-							//Should only need to copy over here, not replace
-							IMetadata meta = image.getData().getMetadata();
-							if (meta instanceof IDiffractionMetadata) {
-								DiffractionMetadataUtils.copyNewOverOld(fileMeta, (IDiffractionMetadata)meta);
-							}
+						} else if (image.getData() != null && image.getData().getFirstMetadata(IDiffractionMetadata.class) != null) {
+							// Should only need to copy over here, not replace
+							IDiffractionMetadata meta = image.getData().getFirstMetadata(IDiffractionMetadata.class);
+							DiffractionMetadataUtils.copyNewOverOld(fileMeta, meta);
 						}
 					}
 				});
