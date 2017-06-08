@@ -79,6 +79,7 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
 		setNeedsProgressMonitor(true);
 		
 		this.page = new PlotDataConversionPage();
+		page.setFileExtension(".nxs");
 		page.setDescription("Please choose the location of the file to export. (This file will be a nexus HDF5 file.)");
 		addPage(page);
 		
