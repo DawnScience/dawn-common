@@ -87,6 +87,7 @@ public class ResourceChoosePage extends WizardPage {
 	private Button   resourceButton;
 	private Button   fileButton;
 	protected Button overwrite;
+	private String   fileExtension;
 
 	private boolean hasBrowseToExternalOnly = false;
 
@@ -284,6 +285,9 @@ public class ResourceChoosePage extends WizardPage {
 		} else {
 			final FileDialog dialog = new FileDialog(Display.getDefault().getActiveShell(), (isNewFile()?SWT.SAVE:SWT.OPEN));
 			dialog.setText("Choose file");
+			if (fileExtension != null) {
+				dialog.setFilterExtensions(new String[]{"*" + fileExtension});
+			}
 			final String filePath = getAbsoluteFilePath();
 			if (filePath!=null) {
 				final File file = new File(filePath);
@@ -298,6 +302,10 @@ public class ResourceChoosePage extends WizardPage {
 				
 			}
 			path = dialog.open();
+			if (fileExtension != null) {
+				if (!path.endsWith(fileExtension))
+					path = path.concat(fileExtension);
+			}
 		}
 		if (path!=null) {
 			setPath(path);
@@ -616,6 +624,14 @@ public class ResourceChoosePage extends WizardPage {
 		else
 			return isReadable && isWriteable;
 			
+	}
+
+	public String getFileExtension() {
+		return fileExtension;
+	}
+
+	public void setFileExtension(String fileExtension) {
+		this.fileExtension = fileExtension;
 	}
 
 }
