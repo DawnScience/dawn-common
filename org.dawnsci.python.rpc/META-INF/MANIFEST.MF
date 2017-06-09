@@ -1,4 +1,5 @@
 Manifest-Version: 1.0
+Eclipse-BundleShape: dir
 Bundle-ManifestVersion: 2
 Bundle-Name: Rpc
 Bundle-SymbolicName: org.dawnsci.python.rpc;singleton:=true
