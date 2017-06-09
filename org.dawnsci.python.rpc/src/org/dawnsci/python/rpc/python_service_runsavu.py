@@ -20,6 +20,16 @@ except ImportError:
     print("It looks like savu.plugin.utils is not on your path, have you added savu to the PYTHONPATH")
 except:
     raise
+SAVUVERSION=None
+try:
+    from scripts.config_generator.config_utils import populate_plugins
+    pu.populate_plugins = populate_plugins
+    SAVUVERSION = 'master'
+    print('Assuming savu version master')
+except ImportError:
+    SAVUVERSION='1.2'
+    print('Assuming savu version 1.2')
+
 print("done with imports")
 persistence = {}
 persistence['sys_path_0_lock'] = threading.Lock()
