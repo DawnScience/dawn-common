@@ -20,6 +20,8 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Marshaller;
 
 import si.uom.SI;
+import tec.units.ri.unit.MetricPrefix;
+import tec.units.ri.unit.Units;
 import si.uom.NonSI;
 
 import org.apache.commons.lang.ArrayUtils;
@@ -550,8 +552,7 @@ public class CustomNCDConverter extends AbstractConversion  {
 			if (units != null) {
 				UnitFormat unitFormat = UnitFormat.getUCUMInstance();
 				String angstrom = unitFormat.format(NonSI.ANGSTROM.inverse());
-				String nanometer = unitFormat.format(SI.NANO(SI.METER)
-						.inverse());
+				String nanometer = unitFormat.format(MetricPrefix.NANO(Units.METRE).inverse());
 				String angle = unitFormat.format(NonSI.DEGREE_ANGLE);
 				String dspace = unitFormat.format(NonSI.ANGSTROM);
 				if (units.equals(nanometer)) {
