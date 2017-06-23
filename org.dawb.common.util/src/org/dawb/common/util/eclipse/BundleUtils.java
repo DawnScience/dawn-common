@@ -76,9 +76,11 @@ public class BundleUtils {
 		}
 
 		String path = hDirectory.getName();
-		if (path.equals("plugins") || path.equals("bundles")) {
+		if (System.getProperty("os.name").equals("Mac OS X")) {
+			path = hDirectory.getParentFile().getAbsolutePath(); // eclipse.home.location returns /Applications/Dawn.app/Contents/Eclipse
+		} else if (path.equals("plugins") || path.equals("bundles")) {
 			path = hDirectory.getParentFile().getParentFile().getAbsolutePath();
-		} else{
+		} else {
 			path = hDirectory.getAbsolutePath();
 		}
         return path;
