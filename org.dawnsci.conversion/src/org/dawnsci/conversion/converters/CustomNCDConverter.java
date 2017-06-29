@@ -15,11 +15,11 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.measure.format.UnitFormat;
+import javax.measure.spi.ServiceProvider;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Marshaller;
 
-import si.uom.SI;
 import tec.units.ri.unit.MetricPrefix;
 import tec.units.ri.unit.Units;
 import si.uom.NonSI;
@@ -550,7 +550,7 @@ public class CustomNCDConverter extends AbstractConversion  {
 				units = node.getAttribute("unit").getFirstElement();
 			}
 			if (units != null) {
-				UnitFormat unitFormat = UnitFormat.getUCUMInstance();
+				UnitFormat unitFormat = ServiceProvider.current().getUnitFormatService().getUnitFormat();
 				String angstrom = unitFormat.format(NonSI.ANGSTROM.inverse());
 				String nanometer = unitFormat.format(MetricPrefix.NANO(Units.METRE).inverse());
 				String angle = unitFormat.format(NonSI.DEGREE_ANGLE);
