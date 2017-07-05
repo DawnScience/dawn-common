@@ -13,8 +13,8 @@ import java.io.File;
 import org.dawb.common.ui.wizard.ResourceChoosePage;
 import org.dawb.common.util.io.FileUtils;
 import org.dawnsci.conversion.converters.ImagesToStitchedConverter.ConversionStitchedBean;
-import org.dawnsci.conversion.ui.IConversionWizardPage;
-import org.dawnsci.conversion.ui.LoaderServiceHolder;
+import org.dawnsci.conversion.ui.ServiceHolder;
+import org.dawnsci.conversion.ui.api.IConversionWizardPage;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
 import org.eclipse.dawnsci.analysis.api.image.IImageTransform;
@@ -148,7 +148,7 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 		String filePath = getSelectedPaths()[0];
 		IDataHolder holder = null;
 		try {
-			holder = LoaderServiceHolder.getLoaderService().getData(filePath, new IMonitor.Stub());
+			holder = ServiceHolder.getLoaderService().getData(filePath, new IMonitor.Stub());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -207,7 +207,7 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 		double angle = 0, fov = 0, theta = 0;
 		int rowNum = 0, columnNum = 0;
 		try {
-			IDataHolder holder = LoaderServiceHolder.getLoaderService().getData(filePath, new IMonitor.Stub());
+			IDataHolder holder = ServiceHolder.getLoaderService().getData(filePath, new IMonitor.Stub());
 			if (datFileLoaded) {
 				//load metadatavalues
 				IMetadata meta = holder.getMetadata();

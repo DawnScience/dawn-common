@@ -9,7 +9,6 @@
 package org.dawnsci.conversion.ui;
 
 import java.io.File;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -19,9 +18,11 @@ import java.util.List;
 import org.dawb.common.ui.util.GridUtils;
 import org.dawb.common.ui.wizard.ResourceChoosePage;
 import org.dawb.common.util.list.ListUtils;
+import org.dawnsci.conversion.ui.api.IConversionWizardPage;
+import org.dawnsci.conversion.ui.api.IConversionWizardPageService;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
+import org.eclipse.dawnsci.analysis.api.conversion.IConversionScheme;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionService;
-import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext.ConversionScheme;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
 import org.eclipse.january.IMonitor;
 import org.eclipse.jface.wizard.IWizardPage;
@@ -31,16 +32,15 @@ import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Text;
+import org.osgi.framework.Bundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,7 +49,7 @@ public class ConversionChoicePage extends ResourceChoosePage implements IConvers
 	private static final Logger logger = LoggerFactory.getLogger(ConversionChoicePage.class);
 
 	private IConversionService service;
-	private ConversionScheme   chosenConversion;
+	private IConversionScheme  chosenConversion;
 	private Composite          conversionGroup;
 	private Label              multiFilesLabel;
 	private boolean            multiFileSelection=false;
@@ -65,7 +65,7 @@ public class ConversionChoicePage extends ResourceChoosePage implements IConvers
 	private final static String SCHEME_KEY = "org.dawnsci.conversion.ui.schemeKey";
 	@Override
 	protected void createContentBeforeFileChoose(Composite container) {
-
+		conversionWizardPageService = ServiceHolder.getConversionWizardPageService();
 		Label label = new Label(container, SWT.NONE);
 		label.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 4, 1));
 		
@@ -75,21 +75,31 @@ public class ConversionChoicePage extends ResourceChoosePage implements IConvers
 		convLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
 		
 		final Combo choice = new Combo(container, SWT.READ_ONLY|SWT.BORDER);
-		choice.setItems(ConversionScheme.getLabels());
+		choice.setItems(conversionWizardPageService.getLabels(true));
 		choice.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
 		choice.select(0);
-		this.chosenConversion = ConversionScheme.values()[0]; // Is user visible
+		List<IConversionScheme> schemes = conversionWizardPageService.getSchemes(true);
+		this.chosenConversion = schemes.get(0); 
 		if (Activator.getDefault().getPreferenceStore().contains(SCHEME_KEY)) {
-			try {
-				this.chosenConversion = ConversionScheme.valueOf(Activator.getDefault().getPreferenceStore().getString(SCHEME_KEY));
+			String scheme = Activator.getDefault().getPreferenceStore().getString(SCHEME_KEY);
+			Bundle[] bundles = Activator.getDefault().getBundle().getBundleContext().getBundles();
+			for (Bundle bundle : bundles) {
+				Class<?> klazz = null;
+				logger.debug("Trying bundle: {}", bundle.getSymbolicName());
+				try {
+					klazz = bundle.loadClass(scheme);
+					logger.debug("Successful bundle: {}", bundle.getSymbolicName());
+				} catch (ClassNotFoundException e1) {
+					continue;
+				}
+				this.chosenConversion = conversionWizardPageService.getSchemeForClass((Class<IConversionScheme>) klazz);
 				choice.select(choice.indexOf(chosenConversion.getUiLabel()));
-			} catch (Throwable ne) {
-				logger.warn("Problem with old conversion scheme key!", ne);
+				break;
 			}
 		}
 		choice.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				chosenConversion = ConversionScheme.fromLabel(choice.getItem(choice.getSelectionIndex()));
+				chosenConversion = conversionWizardPageService.fromLabel(choice.getItem(choice.getSelectionIndex()));
 				Activator.getDefault().getPreferenceStore().setValue(SCHEME_KEY, chosenConversion.toString());
 				pathChanged();
 			}
@@ -266,14 +276,11 @@ public class ConversionChoicePage extends ResourceChoosePage implements IConvers
 	 * 
 	 * @return
 	 */
-	public Image getImage(ConversionScheme scheme) {
-		InputStream in = getClass().getResourceAsStream(scheme.toString()+".png");
-		if (in==null) return null;
+	public Image getImage(IConversionScheme scheme) {
 		
 		if (lastImage!=null) lastImage.dispose();
 		
-		final ImageData id = new ImageData(in);
-		this.lastImage = new Image(Display.getDefault(), id);
+		this.lastImage = conversionWizardPageService.getImage(scheme).createImage();
 		return lastImage;
 	}
 
@@ -287,7 +294,6 @@ public class ConversionChoicePage extends ResourceChoosePage implements IConvers
 		}
 		
 		if (chosenConversion!=null) {
-			
 			infoDiagram.setImage(getImage(chosenConversion));
 			infoText.setText(chosenConversion.getDescription());
 			
@@ -318,7 +324,7 @@ public class ConversionChoicePage extends ResourceChoosePage implements IConvers
 				if (selectedFiles!=null && selectedFiles.size()>1) {		
 					for (String path : selectedFiles) {
 						try {
-							holder = LoaderServiceHolder.getLoaderService().getData(path, new IMonitor.Stub());
+							holder = ServiceHolder.getLoaderService().getData(path, new IMonitor.Stub());
 						    if (holder==null) continue;
 						    if (holder.size()<1) continue;
 						    break;
@@ -327,7 +333,7 @@ public class ConversionChoicePage extends ResourceChoosePage implements IConvers
 						}
 					}
 				} else {
-					holder = LoaderServiceHolder.getLoaderService().getData(filePath, new IMonitor.Stub());
+					holder = ServiceHolder.getLoaderService().getData(filePath, new IMonitor.Stub());
 				}
 				boolean foundRequiredRank = false;
 				for (int i = 0; i < holder.size(); i++) {
@@ -398,7 +404,7 @@ public class ConversionChoicePage extends ResourceChoosePage implements IConvers
 		return context;
 	}
 
-	public ConversionScheme getScheme() {
+	public IConversionScheme getScheme() {
 		return chosenConversion;
 	}
 
@@ -439,6 +445,8 @@ public class ConversionChoicePage extends ResourceChoosePage implements IConvers
 	}
 
 	public final static List<String> EXT;
+
+	private IConversionWizardPageService conversionWizardPageService;
 	static {
 		List<String> tmp = new ArrayList<String>(7);
 		tmp.add("h5");

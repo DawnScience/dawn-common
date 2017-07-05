@@ -70,46 +70,29 @@
                   The wizard page which we will show to the user for this conversion choice.
                </documentation>
                <appinfo>
-                  <meta.attribute kind="java" basedOn=":org.dawnsci.conversion.ui.IConversionWizardPage"/>
+                  <meta.attribute kind="java" basedOn=":org.dawnsci.conversion.ui.api.IConversionWizardPage"/>
                </appinfo>
             </annotation>
          </attribute>
-         <attribute name="conversion_scheme" use="required">
+         <attribute name="conversion_scheme" type="string" use="required">
             <annotation>
                <documentation>
                   
                </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.dawnsci.analysis.api.conversion.IConversionScheme"/>
+               </appinfo>
             </annotation>
-            <simpleType>
-               <restriction base="string">
-                  <enumeration value="ASCII_FROM_1D">
-                  </enumeration>
-                  <enumeration value="ASCII_FROM_2D">
-                  </enumeration>
-                  <enumeration value="TIFF_FROM_3D">
-                  </enumeration>
-                  <enumeration value="STITCHED_FROM_IMAGEDIR">
-                  </enumeration>
-                  <enumeration value="ALIGNED_FROM_3D">
-                  </enumeration>
-                  <enumeration value="H5_FROM_IMAGEDIR">
-                  </enumeration>
-                  <enumeration value="CUSTOM_NCD">
-                  </enumeration>
-                  <enumeration value="CUSTOM_TOMO">
-                  </enumeration>
-                  <enumeration value="AVI_FROM_3D">
-                  </enumeration>
-                  <enumeration value="H5_FROM_1D">
-                  </enumeration>
-                  <enumeration value="COMPARE">
-                  </enumeration>
-                  <enumeration value="B18_REPROCESS_ASCII">
-                  </enumeration>
-                  <enumeration value="B18_AVERAGE">
-                  </enumeration>
-               </restriction>
-            </simpleType>
+         </attribute>
+         <attribute name="image" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="resource"/>
+               </appinfo>
+            </annotation>
          </attribute>
       </complexType>
    </element>

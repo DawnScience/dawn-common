@@ -23,8 +23,9 @@ import org.dawnsci.boofcv.BoofCVImageStitchingProcessCreator;
 import org.dawnsci.boofcv.BoofCVImageTransformCreator;
 import org.dawnsci.conversion.converters.ImagesToStitchedConverter.ConversionStitchedBean;
 import org.dawnsci.conversion.converters.util.LocalServiceManager;
+import org.dawnsci.conversion.schemes.ImagesToStitchedConverterScheme;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
-import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext.ConversionScheme;
+import org.eclipse.dawnsci.analysis.api.conversion.IConversionScheme;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionService;
 import org.eclipse.dawnsci.analysis.api.image.IImageStitchingProcess;
 import org.eclipse.dawnsci.analysis.api.image.IImageTransform;
@@ -47,7 +48,7 @@ import uk.ac.diamond.scisoft.analysis.io.LoaderServiceImpl;
 import uk.ac.diamond.scisoft.analysis.io.Utils;
 
 public class StitchingConvertTest {
-
+	private static final IConversionScheme scheme = new ImagesToStitchedConverterScheme();
 	private File dir;
 	private File output;
 	private String stitchedFileName;
@@ -104,7 +105,7 @@ public class StitchingConvertTest {
 		// disable macro
 		context.setEchoMacro(false);
 		context.setOutputPath(output.getAbsolutePath() + File.separator + stitchedFileName);
-		context.setConversionScheme(ConversionScheme.STITCHED_FROM_IMAGEDIR);
+		context.setConversionScheme(scheme);
 
 		ConversionStitchedBean bean = new ConversionStitchedBean();
 

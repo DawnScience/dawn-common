@@ -18,8 +18,9 @@ import java.util.Map;
 import org.dawnsci.conversion.ServiceLoader;
 import org.dawnsci.conversion.converters.util.LocalServiceManager;
 import org.eclipse.dawnsci.analysis.api.EventTracker;
+import org.eclipse.dawnsci.analysis.api.conversion.IConversion;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
-import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext.ConversionScheme;
+import org.eclipse.dawnsci.analysis.api.conversion.IConversionScheme;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
 import org.eclipse.dawnsci.analysis.dataset.slicer.SliceFromSeriesMetadata;
 import org.eclipse.dawnsci.analysis.dataset.slicer.SliceViewIterator;
@@ -37,7 +38,7 @@ import org.eclipse.january.dataset.SliceND;
  * @author Matthew Gerring
  *
  */
-public abstract class AbstractConversion {
+public abstract class AbstractConversion implements IConversion {
 	
 	protected IConversionContext context;
 
@@ -49,6 +50,7 @@ public abstract class AbstractConversion {
 		this.context = context;
 	}
 
+	@Override
 	public void process(IConversionContext context) throws Exception {
 		
 		// If they directly specify an ILazyDataset, loop it and only
@@ -90,6 +92,7 @@ public abstract class AbstractConversion {
 	 * 
 	 * @param context
 	 */
+	@Override
 	public void close(IConversionContext context) throws Exception{
 		// track conversion event
 		trackConversion();
@@ -209,6 +212,7 @@ public abstract class AbstractConversion {
 		});
 	}
 
+	@Override
 	public List<String> getData(File path, String datasetName) throws Exception {
         return getData(getDataNames(path), datasetName);
 	}
@@ -241,7 +245,7 @@ public abstract class AbstractConversion {
 	 * @return null if none match, the datasets otherwise
 	 * @throws Exception
 	 */
-	
+	@Override
 	public List<String> getDataNames(File ioFile) throws Exception {
 
 		if (ioFile.isDirectory()) return Collections.emptyList();
@@ -256,6 +260,7 @@ public abstract class AbstractConversion {
 	 * @param context
 	 * @return
 	 */
+	@Override
 	public List<File> expand(String path) {
 		
 		if (path.isEmpty()) return null;
@@ -292,10 +297,10 @@ public abstract class AbstractConversion {
 	 * for the corresponding conversion scheme event.
 	 */
 	protected void trackConversion() {
-		ConversionScheme scheme = context.getConversionScheme();
+		IConversionScheme scheme = context.getConversionScheme();
 		try {
 			EventTracker tracker = ServiceLoader.getEventTracker();
-			String conversionName = scheme.name().toLowerCase();
+			String conversionName = scheme.toString();
 			if (tracker != null)
 				tracker.trackConversionEvent(conversionName);
 		} catch(Exception e) {

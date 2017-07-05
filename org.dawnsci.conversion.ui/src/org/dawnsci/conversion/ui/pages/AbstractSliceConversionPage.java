@@ -8,7 +8,7 @@
  */
 package org.dawnsci.conversion.ui.pages;
 
-import org.dawnsci.conversion.ui.IConversionWizardPage;
+import org.dawnsci.conversion.ui.api.IConversionWizardPage;
 import org.eclipse.jface.resource.ImageDescriptor;
 
 /**

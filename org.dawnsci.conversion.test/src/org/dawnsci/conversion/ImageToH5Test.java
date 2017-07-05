@@ -16,10 +16,11 @@ import java.util.Arrays;
 
 import org.dawb.common.util.io.FileUtils;
 import org.dawnsci.conversion.converters.util.LocalServiceManager;
+import org.dawnsci.conversion.schemes.ImagesToHDFConverterScheme;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
-import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext.ConversionScheme;
-import org.eclipse.january.dataset.ILazyDataset;
+import org.eclipse.dawnsci.analysis.api.conversion.IConversionScheme;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionService;
+import org.eclipse.january.dataset.ILazyDataset;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -27,6 +28,8 @@ import uk.ac.diamond.scisoft.analysis.io.LoaderServiceImpl;
 
 public class ImageToH5Test {
 
+	private static final IConversionScheme scheme = new ImagesToHDFConverterScheme();
+	
 	@Before
 	public void before() {
 		LocalServiceManager.setLoaderService(new LoaderServiceImpl());
@@ -78,7 +81,7 @@ public class ImageToH5Test {
 	        output.deleteOnExit();
 	        context.setOutputPath(output.getAbsolutePath());
 	        context.setDatasetName(dPath); // With this conversion dataset is the OUTPUT
-	        context.setConversionScheme(ConversionScheme.H5_FROM_IMAGEDIR);
+	        context.setConversionScheme(scheme);
 			
 			service.process(context);
 			

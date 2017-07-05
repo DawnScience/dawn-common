@@ -20,8 +20,8 @@ import org.dawb.common.ui.wizard.ResourceChoosePage;
 import org.dawnsci.common.widgets.radio.RadioGroupWidget;
 import org.dawnsci.conversion.converters.CustomNCDConverter.SAS_FORMAT;
 import org.dawnsci.conversion.ui.Activator;
-import org.dawnsci.conversion.ui.IConversionWizardPage;
-import org.dawnsci.conversion.ui.LoaderServiceHolder;
+import org.dawnsci.conversion.ui.ServiceHolder;
+import org.dawnsci.conversion.ui.api.IConversionWizardPage;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
 import org.eclipse.january.dataset.IDataset;
@@ -284,7 +284,7 @@ public class NCDConvertPage extends ResourceChoosePage implements
 		
 		IDataset ds = null;
 		try {
-			ds = LoaderServiceHolder.getLoaderService().getDataset(source, datasetName, null);
+			ds = ServiceHolder.getLoaderService().getDataset(source, datasetName, null);
 		} catch (Exception e) {
 			logger.error("Failed to read dataset {}", datasetName, e);
 		}

@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.dawb.common.ui.ServiceLoader;
-import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext.ConversionScheme;
+import org.eclipse.dawnsci.analysis.api.conversion.IConversionScheme;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
 import org.eclipse.january.dataset.ShapeUtils;
 import org.eclipse.january.metadata.IMetadata;
@@ -18,7 +18,7 @@ import org.eclipse.january.metadata.IMetadata;
 public class DatasetNameUtils {
 
 	
-	public static Map<String, int[]> getDatasetInfo(String path, ConversionScheme scheme) {
+	public static Map<String, int[]> getDatasetInfo(String path, IConversionScheme scheme) {
 		IMetadata meta;
 		final Map<String, int[]>     names  = new HashMap<String, int[]>();
 		try {
@@ -33,9 +33,9 @@ public class DatasetNameUtils {
         		if (shape != null) {
         			//squeeze to get usable rank
         			int[] ss = ShapeUtils.squeezeShape(shape, false);
-        			if (scheme==null || scheme.isRankSupported(ss.length)) {
-        				names.put(name, shape);
-        			} 
+					if (scheme==null || scheme.isRankSupported(ss.length)) {
+						names.put(name, shape);
+					}
         		} else {
         			//null shape is a bad sign
         			names.clear();
@@ -57,10 +57,9 @@ public class DatasetNameUtils {
 
         			int[] shape = dataHolder.getLazyDataset(name).getShape();
         			int[] ss = ShapeUtils.squeezeShape(shape, false);
-        			if (scheme==null || scheme.isRankSupported(ss.length)) {
-        				names.put(name, shape);
-        			} 
-
+					if (scheme==null || scheme.isRankSupported(ss.length)) {
+						names.put(name, shape);
+					}
         		}
         	}
         }

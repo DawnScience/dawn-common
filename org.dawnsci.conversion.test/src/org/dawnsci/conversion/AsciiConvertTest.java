@@ -20,18 +20,21 @@ import java.util.Map;
 
 import org.dawnsci.conversion.converters.AsciiConvert1D;
 import org.dawnsci.conversion.converters.util.LocalServiceManager;
+import org.dawnsci.conversion.schemes.AsciiConvert1DScheme;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
-import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext.ConversionScheme;
+import org.eclipse.dawnsci.analysis.api.conversion.IConversionScheme;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionService;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.sun.xml.bind.v2.runtime.AssociationMap;
+
 import uk.ac.diamond.scisoft.analysis.io.LoaderServiceImpl;
 
 
 public class AsciiConvertTest {
-
+	private static final IConversionScheme scheme = new AsciiConvert1DScheme();
 	private String testfile = "MoKedge_1_15.nxs";
 	
 	@Before
@@ -51,7 +54,7 @@ public class AsciiConvertTest {
 		final File tmp = File.createTempFile("testSimple", ".dat");
 		tmp.deleteOnExit();
         context.setOutputPath(tmp.getAbsolutePath());
-        context.setConversionScheme(ConversionScheme.ASCII_FROM_1D);
+        context.setConversionScheme(scheme);
         context.setDatasetName("/entry1/counterTimer01/(Energy|I0|lnI0It|It)");
         
         service.process(context);
@@ -75,7 +78,7 @@ public class AsciiConvertTest {
 		final File tmp = File.createTempFile("testConfig", ".dat");
 		tmp.deleteOnExit();
         context.setOutputPath(tmp.getAbsolutePath());
-        context.setConversionScheme(ConversionScheme.ASCII_FROM_1D);
+        context.setConversionScheme(scheme);
         context.setDatasetName("/entry1/counterTimer01/(Energy|I0|lnI0It|It)");
         
         // Set some custom data
@@ -119,7 +122,7 @@ public class AsciiConvertTest {
 		final File tmp = File.createTempFile("testConfig", ".csv");
 		tmp.deleteOnExit();
         context.setOutputPath(tmp.getAbsolutePath());
-        context.setConversionScheme(ConversionScheme.ASCII_FROM_1D);
+        context.setConversionScheme(scheme);
         context.setDatasetName("/entry1/counterTimer01/(Energy|I0|lnI0It|It)");
         
         // Set some custom data

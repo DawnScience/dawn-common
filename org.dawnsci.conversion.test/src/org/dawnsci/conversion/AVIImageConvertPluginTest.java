@@ -16,11 +16,12 @@ import org.dawb.common.ui.image.PaletteFactory;
 import org.dawnsci.conversion.converters.AVIImageConverter;
 import org.dawnsci.conversion.converters.ConversionInfoBean;
 import org.dawnsci.conversion.converters.util.LocalServiceManager;
+import org.dawnsci.conversion.schemes.AVIImageConverterScheme;
 import org.dawnsci.plotting.histogram.service.PaletteService;
 import org.dawnsci.plotting.services.ImageService;
 import org.dawnsci.plotting.services.PlotImageService;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
-import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext.ConversionScheme;
+import org.eclipse.dawnsci.analysis.api.conversion.IConversionScheme;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionService;
 import org.eclipse.dawnsci.analysis.api.downsample.DownsampleMode;
 import org.eclipse.dawnsci.plotting.api.histogram.HistogramBound;
@@ -37,6 +38,8 @@ import uk.ac.diamond.scisoft.analysis.io.LoaderServiceImpl;
 
 public class AVIImageConvertPluginTest {
 
+	private static final IConversionScheme scheme = new AVIImageConverterScheme();
+	
 	@Before
 	public void before() {
 		LocalServiceManager.setLoaderService(new LoaderServiceImpl());
@@ -60,7 +63,7 @@ public class AVIImageConvertPluginTest {
 		final File avi = File.createTempFile("test_video", ".avi");
 		avi.deleteOnExit();
         context.setOutputPath(avi.getAbsolutePath());
-        context.setConversionScheme(ConversionScheme.AVI_FROM_3D);
+        context.setConversionScheme(scheme);
         context.setDatasetName("/entry/edf/data");
         context.addSliceDimension(0, "all");
         

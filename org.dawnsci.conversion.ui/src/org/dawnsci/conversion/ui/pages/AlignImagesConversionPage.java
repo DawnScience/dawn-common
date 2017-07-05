@@ -18,8 +18,8 @@ import org.dawb.common.ui.alignment.AlignProgressJob;
 import org.dawb.common.ui.wizard.ResourceChoosePage;
 import org.dawb.common.util.io.FileUtils;
 import org.dawnsci.conversion.converters.AlignImagesConverter.ConversionAlignBean;
-import org.dawnsci.conversion.ui.IConversionWizardPage;
-import org.dawnsci.conversion.ui.LoaderServiceHolder;
+import org.dawnsci.conversion.ui.ServiceHolder;
+import org.dawnsci.conversion.ui.api.IConversionWizardPage;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -183,7 +183,7 @@ public class AlignImagesConversionPage extends ResourceChoosePage
 			return;
 		String filePath = getSelectedPaths()[0];
 		try {
-			IDataHolder holder = LoaderServiceHolder.getLoaderService().getData(filePath, new IMonitor.Stub());
+			IDataHolder holder = ServiceHolder.getLoaderService().getData(filePath, new IMonitor.Stub());
 			ILazyDataset lazy = holder.getLazyDataset(0);
 			int[] shape = lazy.getShape();
 			if (lazy.getRank() == 2)

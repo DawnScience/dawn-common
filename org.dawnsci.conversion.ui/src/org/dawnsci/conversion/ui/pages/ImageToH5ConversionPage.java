@@ -12,7 +12,7 @@ import java.io.File;
 
 import org.dawb.common.ui.wizard.ResourceChoosePage;
 import org.dawb.common.util.io.FileUtils;
-import org.dawnsci.conversion.ui.IConversionWizardPage;
+import org.dawnsci.conversion.ui.api.IConversionWizardPage;
 import org.dawnsci.io.h5.H5Loader;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
 import org.eclipse.richbeans.widgets.decorator.RegexDecorator;

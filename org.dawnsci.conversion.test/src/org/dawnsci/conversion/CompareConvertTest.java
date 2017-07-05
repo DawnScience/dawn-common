@@ -16,8 +16,9 @@ import java.util.Arrays;
 
 import org.dawb.common.util.io.FileUtils;
 import org.dawnsci.conversion.converters.util.LocalServiceManager;
+import org.dawnsci.conversion.schemes.CompareConverterScheme;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
-import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext.ConversionScheme;
+import org.eclipse.dawnsci.analysis.api.conversion.IConversionScheme;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionService;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
 import org.eclipse.january.dataset.ILazyDataset;
@@ -28,6 +29,8 @@ import uk.ac.diamond.scisoft.analysis.io.LoaderServiceImpl;
 
 public class CompareConvertTest {
 
+	private static final IConversionScheme scheme = new CompareConverterScheme();
+	
 	@Before
 	public void before() {
 		LocalServiceManager.setLoaderService(new LoaderServiceImpl());
@@ -63,7 +66,7 @@ public class CompareConvertTest {
 			context.setDatasetNames(Arrays.asList("/entry1/instrument/cold_head_temp/cold_head_temp", 
 											      "/entry1/instrument/xas_scannable/Energy", 
 												  "/entry1/instrument/FFI0/FFI0"));
-			context.setConversionScheme(ConversionScheme.COMPARE);
+			context.setConversionScheme(scheme);
 	
 			service.process(context);
 			

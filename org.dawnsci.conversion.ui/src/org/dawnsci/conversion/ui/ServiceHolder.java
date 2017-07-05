@@ -1,19 +1,21 @@
 package org.dawnsci.conversion.ui;
 
+import org.dawnsci.conversion.ui.api.IConversionWizardPageService;
 import org.eclipse.dawnsci.analysis.api.io.ILoaderService;
 
 /**
  * This class is used to inject the Loader service using OSGI and retrieve in ConvertWizard
  *
  */
-public class LoaderServiceHolder {
+public class ServiceHolder {
 
 	private static ILoaderService service;
-
+	private static IConversionWizardPageService conversionPageService;
+	
 	/**
 	 * Used for OSGI injection
 	 */
-	public LoaderServiceHolder() {
+	public ServiceHolder() {
 		
 	}
 
@@ -27,5 +29,13 @@ public class LoaderServiceHolder {
 
 	public static ILoaderService getLoaderService() {
 		return service;
+	}
+	
+	public static void setConversionWizardPageService(IConversionWizardPageService conversionPageService) {
+		ServiceHolder.conversionPageService = conversionPageService;
+	}
+	
+	public static IConversionWizardPageService getConversionWizardPageService() {
+		return conversionPageService;
 	}
 }

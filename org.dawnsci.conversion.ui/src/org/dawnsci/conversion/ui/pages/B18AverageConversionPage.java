@@ -12,7 +12,7 @@ import org.dawnsci.common.widgets.utils.ControlUtils;
 import org.dawnsci.conversion.converters.B18AverageConverter;
 import org.dawnsci.conversion.converters.B18AverageConverter.B18DataType;
 import org.dawnsci.conversion.converters.B18AverageConverter.B18InterpolationType;
-import org.dawnsci.conversion.ui.LoaderServiceHolder;
+import org.dawnsci.conversion.ui.ServiceHolder;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
@@ -27,7 +27,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
@@ -224,7 +223,7 @@ public class B18AverageConversionPage extends AbstractDatasetChoosePage {
 					final String source = getSourcePath(context);
 					if (source==null || "".equals(source)) return;
 					// Attempt to use meta data, save memory
-					IDataHolder holder = LoaderServiceHolder.getLoaderService().getData(source, new ProgressMonitorWrapper(monitor));
+					IDataHolder holder = ServiceHolder.getLoaderService().getData(source, new ProgressMonitorWrapper(monitor));
 					List<String> names = SliceUtils.getSlicableNames(holder, getMinimumDataSize());
 					// get rid of the energy -> it will always be included...
 					names = names.stream().filter(name -> !name.matches("(?i).*energy.*")).collect(Collectors.toList());

@@ -32,7 +32,8 @@ Require-Bundle: org.apache.commons.lang;bundle-version="2.6.0",
  com.fasterxml.jackson.core.jackson-databind;bundle-version="2.2.0"
 Export-Package: org.dawnsci.conversion,
  org.dawnsci.conversion.converters,
- org.dawnsci.conversion.converters.util
+ org.dawnsci.conversion.converters.util,
+ org.dawnsci.conversion.schemes
 Bundle-ClassPath: .,
  jars/cansas1d-1.1.jar
 Bundle-ActivationPolicy: lazy

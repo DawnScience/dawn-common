@@ -19,6 +19,8 @@ import java.util.Map;
 import org.dawb.common.ui.monitor.ProgressMonitorWrapper;
 import org.dawb.common.ui.util.EclipseUtils;
 import org.dawb.common.ui.wizard.AbstractSliceConversionPage;
+import org.dawnsci.conversion.ui.api.IConversionWizardPage;
+import org.dawnsci.conversion.ui.api.IConversionWizardPageService;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -26,8 +28,8 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
+import org.eclipse.dawnsci.analysis.api.conversion.IConversionScheme;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionService;
-import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext.ConversionScheme;
 import org.eclipse.dawnsci.slicing.api.data.ITransferableDataObject;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -53,12 +55,13 @@ public class ConvertWizard extends Wizard implements IExportWizard{
 	private static final Logger logger = LoggerFactory.getLogger(ConvertWizard.class);
 	
 	private IConversionWizardPage selectedConversionPage;
-	private Map<ConversionScheme, IConversionWizardPage> conversionPages;
 
-	private static IConversionService service;
+	private IConversionService service;
+	private IConversionWizardPageService pageService;
 	private ConversionChoicePage setupPage;
 
-	private List<String> overidePaths, overideDatasets;
+	private List<String> overridePaths;
+	private List<String> overrideDatasets;
 
 	public ConvertWizard() {
 		setNeedsProgressMonitor(true);
@@ -70,32 +73,27 @@ public class ConvertWizard extends Wizard implements IExportWizard{
 			logger.error("Cannot get conversion service through OSGI injection");
 			return;
 		}
+		
+		pageService = ServiceHolder.getConversionWizardPageService();
+		if (pageService == null) {
+			logger.error("Cannot get conversion wizardpage service through OSGI injection");
+			return;
+		}
+		
 		// Add choice of file(s) and conversion type page.
 		this.setupPage = new ConversionChoicePage("Conversion Type", service);
-		setupPage.setSelectedFiles(overidePaths);
+		setupPage.setSelectedFiles(overridePaths);
 		addPage(setupPage);
 		
-		// Create map of possible pages, only one of which will be selected at one time.
-		this.conversionPages = new HashMap<IConversionContext.ConversionScheme, IConversionWizardPage>(7);
-		final IConfigurationElement[] ce = Platform.getExtensionRegistry().getConfigurationElementsFor("org.dawnsci.conversion.ui.conversionPage");
-		if (ce!=null) for (IConfigurationElement e : ce) {
-			
-			final String schemeName  = e.getAttribute("conversion_scheme");
-			final ConversionScheme s = Enum.valueOf(ConversionScheme.class, schemeName);
-			if (s.isUserVisible()) {
-				try {
-					final IConversionWizardPage p = (IConversionWizardPage)e.createExecutableExtension("conversion_page");
-					if (overideDatasets!=null && overideDatasets.size()>0 && p instanceof AbstractSliceConversionPage) {
-						((AbstractSliceConversionPage)p).setDatasetName(overideDatasets.get(0));
-					}
-					conversionPages.put(s, p);
-					addPage(p);
-				} catch (CoreException e1) {
-					logger.error("Cannot get page "+e.getAttribute("conversion_page"), e1);
-				}
+		IConversionWizardPage[] pages = pageService.getPages(true);
+		
+		for (IConversionWizardPage page : pages) {
+			if (overrideDatasets!=null && overrideDatasets.size()>0 && page instanceof AbstractSliceConversionPage) {
+				((AbstractSliceConversionPage) page).setDatasetName(overrideDatasets.get(0));
 			}
+			addPage(page);
 		}
-		this.selectedConversionPage = conversionPages.get(ConversionScheme.values()[0]);
+		this.selectedConversionPage = pages[0];
 		
 		setWindowTitle("Convert Data Wizard");
 
@@ -127,8 +125,8 @@ public class ConvertWizard extends Wizard implements IExportWizard{
 				}
 			}
 		}
-		this.overidePaths    = paths;
-		this.overideDatasets = sets;
+		this.overridePaths    = paths;
+		this.overrideDatasets = sets;
 	}
 
 	@Override
@@ -146,8 +144,8 @@ public class ConvertWizard extends Wizard implements IExportWizard{
     public IWizardPage getNextPage(IWizardPage page) {
 
     	if (page==setupPage) {
-       		IConversionContext.ConversionScheme scheme = setupPage.getScheme();
-       		selectedConversionPage = conversionPages.get(scheme);
+       		IConversionScheme scheme = setupPage.getScheme();
+       		selectedConversionPage = pageService.getPage(scheme);
        		if (selectedConversionPage!=null) selectedConversionPage.setContext(setupPage.getContext());
        		return selectedConversionPage;
     	} else if (page instanceof IConversionWizardPage) {

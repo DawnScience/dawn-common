@@ -21,8 +21,8 @@ import org.dawb.common.ui.util.GridUtils;
 import org.dawb.common.ui.wizard.ResourceChoosePage;
 import org.dawnsci.conversion.converters.Convert1DtoND.Convert1DInfoBean;
 import org.dawnsci.conversion.ui.Activator;
-import org.dawnsci.conversion.ui.IConversionWizardPage;
-import org.dawnsci.conversion.ui.LoaderServiceHolder;
+import org.dawnsci.conversion.ui.ServiceHolder;
+import org.dawnsci.conversion.ui.api.IConversionWizardPage;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
@@ -253,7 +253,7 @@ IConversionWizardPage {
 					final String source = getSourcePath(context);
 					if (source==null || "".equals(source)) return;
 					// Attempt to use meta data, save memory
-					final IMetadata    meta = LoaderServiceHolder.getLoaderService().getMetadata(source, new ProgressMonitorWrapper(monitor));
+					final IMetadata    meta = ServiceHolder.getLoaderService().getMetadata(source, new ProgressMonitorWrapper(monitor));
 					if (meta != null) {
 						final Collection<String> names = meta.getDataNames();
 						if (names !=null) {
@@ -262,7 +262,7 @@ IConversionWizardPage {
 						}
 					}
 
-					IDataHolder holder = LoaderServiceHolder.getLoaderService().getData(source, new ProgressMonitorWrapper(monitor));
+					IDataHolder holder = ServiceHolder.getLoaderService().getData(source, new ProgressMonitorWrapper(monitor));
 					final List<String> names = new ArrayList<String>(holder.toLazyMap().keySet());
 					Collections.sort(names);
 					setDataNames(names.toArray(new String[names.size()]), null, holder);

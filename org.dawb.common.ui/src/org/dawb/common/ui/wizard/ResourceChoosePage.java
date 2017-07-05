@@ -29,8 +29,8 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
+import org.eclipse.dawnsci.analysis.api.conversion.IConversionScheme;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionVisitor;
-import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext.ConversionScheme;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
 import org.eclipse.dawnsci.analysis.api.io.ILoaderService;
 import org.eclipse.dawnsci.plotting.api.expressions.IExpressionObject;
@@ -471,7 +471,7 @@ public class ResourceChoosePage extends WizardPage {
 		final String source = getSourcePath(context);
 		if (source==null || "".equals(source)) return null;
 
-		final ConversionScheme scheme = context.getConversionScheme();
+		final IConversionScheme scheme = context.getConversionScheme();
 		IConversionVisitor     visitor= context.getConversionVisitor();
 		ILoaderService loader = ServiceLoader.getLoaderService();
 		final IMetadata        meta   = loader.getMetadata(source, new ProgressMonitorWrapper(monitor));

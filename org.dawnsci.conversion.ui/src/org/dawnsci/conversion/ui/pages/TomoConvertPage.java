@@ -19,11 +19,13 @@ import org.dawb.common.ui.util.GridUtils;
 import org.dawb.common.ui.wizard.ResourceChoosePage;
 import org.dawnsci.conversion.converters.CustomTomoConverter;
 import org.dawnsci.conversion.converters.CustomTomoConverter.TomoInfoBean;
+import org.dawnsci.conversion.schemes.CustomTomoConverterScheme;
 import org.dawnsci.conversion.ui.Activator;
-import org.dawnsci.conversion.ui.IConversionWizardPage;
+import org.dawnsci.conversion.ui.ServiceHolder;
+import org.dawnsci.conversion.ui.api.IConversionWizardPage;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
-import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext.ConversionScheme;
+import org.eclipse.dawnsci.analysis.api.conversion.IConversionScheme;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.swt.SWT;
@@ -313,9 +315,11 @@ public final class TomoConvertPage extends ResourceChoosePage implements IConver
 		
 		final String source = getSourcePath(context);
 		if (source==null || "".equals(source)) return null;
-		final ConversionScheme scheme = context.getConversionScheme();
+		IConversionScheme scheme = context.getConversionScheme();
+	
+		CustomTomoConverterScheme schemeFromService = ServiceHolder.getConversionWizardPageService().getSchemeForClass(CustomTomoConverterScheme.class);
 		
-		if (scheme == null || scheme != ConversionScheme.CUSTOM_TOMO) return null;
+		if (scheme == null || scheme != schemeFromService) return null;
 		
 		TomoInfoBean bean = new TomoInfoBean();
 		

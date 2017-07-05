@@ -17,8 +17,9 @@ import java.util.Map;
 
 import org.dawnsci.conversion.converters.CustomNCDConverter.SAS_FORMAT;
 import org.dawnsci.conversion.converters.util.LocalServiceManager;
+import org.dawnsci.conversion.schemes.CustomNCDConverterScheme;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
-import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext.ConversionScheme;
+import org.eclipse.dawnsci.analysis.api.conversion.IConversionScheme;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionService;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
 import org.junit.Before;
@@ -27,6 +28,8 @@ import org.junit.Test;
 import uk.ac.diamond.scisoft.analysis.io.LoaderServiceImpl;
 
 public class NCDConvertTest {
+	
+	public static final IConversionScheme scheme = new CustomNCDConverterScheme();
 	
 	@Before
 	public void before() {
@@ -49,7 +52,7 @@ public class NCDConvertTest {
 		dir.deleteOnExit();
 		
         context.setOutputPath(dir.getAbsolutePath());
-        context.setConversionScheme(ConversionScheme.CUSTOM_NCD);
+        context.setConversionScheme(scheme);
         context.setDatasetName("/entry1/Pilatus2M_result/data");
         context.setAxisDatasetName("/entry1/Pilatus2M_result/q");
         context.addSliceDimension(0, "all");
@@ -83,7 +86,7 @@ public class NCDConvertTest {
 		dir.deleteOnExit();
 		
         context.setOutputPath(dir.getAbsolutePath());
-        context.setConversionScheme(ConversionScheme.CUSTOM_NCD);
+        context.setConversionScheme(scheme);
         context.setDatasetName("/entry1/Pilatus2M_result/data");
         context.addSliceDimension(0, "all");
         context.setUserObject(SAS_FORMAT.ASCII);
@@ -117,7 +120,7 @@ public class NCDConvertTest {
 		dir.deleteOnExit();
 		
         context.setOutputPath(dir.getAbsolutePath());
-        context.setConversionScheme(ConversionScheme.CUSTOM_NCD);
+        context.setConversionScheme(scheme);
         context.setDatasetName("/entry1/Pilatus2M_result/data");
         context.setAxisDatasetName("/entry1/Pilatus2M_result/q");
         context.addSliceDimension(0, "all");
@@ -152,7 +155,7 @@ public class NCDConvertTest {
 		dir.deleteOnExit();
 		
         context.setOutputPath(dir.getAbsolutePath());
-        context.setConversionScheme(ConversionScheme.CUSTOM_NCD);
+        context.setConversionScheme(scheme);
         context.setDatasetNames(Arrays.asList(new String[] {"/entry1/Pilatus2M_result/data","/entry1/Pilatus2M_processing/Normalisation/data"}));
         context.setAxisDatasetName("/entry1/Pilatus2M_result/q");
         context.addSliceDimension(0, "all");
@@ -201,7 +204,7 @@ public class NCDConvertTest {
 		dir.deleteOnExit();
 		
         context.setOutputPath(dir.getAbsolutePath());
-        context.setConversionScheme(ConversionScheme.CUSTOM_NCD);
+        context.setConversionScheme(scheme);
         context.setDatasetNames(Arrays.asList(new String[] {"/entry1/Pilatus2M_result/data","/entry1/Pilatus2M_processing/Normalisation/data"}));
         context.setAxisDatasetName("/entry1/Pilatus2M_result/q");
         context.addSliceDimension(0, "all");

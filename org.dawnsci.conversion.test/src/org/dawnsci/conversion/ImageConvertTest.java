@@ -12,8 +12,9 @@ import java.io.File;
 
 import org.dawnsci.conversion.converters.ConversionInfoBean;
 import org.dawnsci.conversion.converters.util.LocalServiceManager;
+import org.dawnsci.conversion.schemes.ImageConverterScheme;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
-import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext.ConversionScheme;
+import org.eclipse.dawnsci.analysis.api.conversion.IConversionScheme;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionService;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
 import org.eclipse.january.dataset.IDataset;
@@ -25,6 +26,8 @@ import uk.ac.diamond.scisoft.analysis.io.LoaderServiceImpl;
 
 public class ImageConvertTest {
 
+	private static final IConversionScheme scheme = new ImageConverterScheme();
+	
 	@Before
 	public void before() {
 		LocalServiceManager.setLoaderService(new LoaderServiceImpl());
@@ -45,7 +48,7 @@ public class ImageConvertTest {
 		dir.mkdirs();
 		dir.deleteOnExit();
         context.setOutputPath(dir.getAbsolutePath());
-        context.setConversionScheme(ConversionScheme.TIFF_FROM_3D);
+        context.setConversionScheme(scheme);
         context.setDatasetName("/entry/edf/data");
         context.addSliceDimension(0, "all");
         
@@ -92,7 +95,7 @@ public class ImageConvertTest {
 		dir.mkdirs();
 		dir.deleteOnExit();
         context.setOutputPath(dir.getAbsolutePath());
-        context.setConversionScheme(ConversionScheme.TIFF_FROM_3D);
+        context.setConversionScheme(scheme);
         context.setDatasetName("/entry/edf/data");
         context.addSliceDimension(0, "all");
         

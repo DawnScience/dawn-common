@@ -12,8 +12,9 @@ import java.io.File;
 
 import org.dawnsci.conversion.converters.CustomTomoConverter;
 import org.dawnsci.conversion.converters.util.LocalServiceManager;
+import org.dawnsci.conversion.schemes.CustomTomoConverterScheme;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
-import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext.ConversionScheme;
+import org.eclipse.dawnsci.analysis.api.conversion.IConversionScheme;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionService;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
 import org.eclipse.january.dataset.IDataset;
@@ -24,6 +25,8 @@ import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 import uk.ac.diamond.scisoft.analysis.io.LoaderServiceImpl;
 
 public class TomoConvertTest {
+
+	private static final IConversionScheme scheme = new CustomTomoConverterScheme();
 	
 	@Before
 	public void before() {
@@ -43,7 +46,7 @@ public class TomoConvertTest {
 		dir.mkdirs();
 		dir.deleteOnExit();
 		
-        context.setConversionScheme(ConversionScheme.CUSTOM_TOMO);
+        context.setConversionScheme(scheme);
         
         //Guide using the tomo converter bean
         CustomTomoConverter.TomoInfoBean bean = new CustomTomoConverter.TomoInfoBean();
@@ -100,7 +103,7 @@ public class TomoConvertTest {
 		dir.mkdirs();
 		dir.deleteOnExit();
 		
-        context.setConversionScheme(ConversionScheme.CUSTOM_TOMO);
+        context.setConversionScheme(scheme);
         
         //Guide using the tomo converter bean
         CustomTomoConverter.TomoInfoBean bean = new CustomTomoConverter.TomoInfoBean();
@@ -158,7 +161,7 @@ public class TomoConvertTest {
 		dir.mkdirs();
 		dir.deleteOnExit();
 		
-        context.setConversionScheme(ConversionScheme.CUSTOM_TOMO);
+        context.setConversionScheme(scheme);
         
         //Guide using the tomo converter bean
         CustomTomoConverter.TomoInfoBean bean = new CustomTomoConverter.TomoInfoBean();

@@ -22,8 +22,9 @@ import org.dawb.common.util.io.FileUtils;
 import org.dawnsci.boofcv.BoofCVImageTransformCreator;
 import org.dawnsci.conversion.converters.AlignImagesConverter.ConversionAlignBean;
 import org.dawnsci.conversion.converters.util.LocalServiceManager;
+import org.dawnsci.conversion.schemes.AlignImagesConverterScheme;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
-import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext.ConversionScheme;
+import org.eclipse.dawnsci.analysis.api.conversion.IConversionScheme;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionService;
 import org.eclipse.dawnsci.analysis.api.image.IImageTransform;
 import org.eclipse.january.IMonitor;
@@ -36,7 +37,8 @@ import uk.ac.diamond.scisoft.analysis.io.LoaderServiceImpl;
 import uk.ac.diamond.scisoft.analysis.io.Utils;
 
 public class AlignConvertTest {
-
+	
+	private static final IConversionScheme scheme = new AlignImagesConverterScheme();
 	private File dir;
 	private File output;
 	private IImageTransform transformer;
@@ -88,7 +90,7 @@ public class AlignConvertTest {
 		// disable macro
 		context.setEchoMacro(false);
 		context.setOutputPath(output.getAbsolutePath());
-		context.setConversionScheme(ConversionScheme.ALIGNED_FROM_3D);
+		context.setConversionScheme(scheme);
 
 		ConversionAlignBean bean = new ConversionAlignBean();
 
@@ -146,7 +148,7 @@ public class AlignConvertTest {
 		// disable macro
 		context.setEchoMacro(false);
 		context.setOutputPath(output.getAbsolutePath());
-		context.setConversionScheme(ConversionScheme.ALIGNED_FROM_3D);
+		context.setConversionScheme(scheme);
 
 		ConversionAlignBean bean = new ConversionAlignBean();
 

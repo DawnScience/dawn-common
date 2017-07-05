@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="org.dawnsci.conversion.ui.ConversionSchemeServiceImpl">
+   <implementation class="org.dawnsci.conversion.ui.ConversionSchemeServiceImpl"/>
+   <service>
+      <provide interface="org.eclipse.dawnsci.analysis.api.conversion.IConversionSchemeService"/>
+   </service>
+</scr:component>

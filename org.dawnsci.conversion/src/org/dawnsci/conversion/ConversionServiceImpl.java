@@ -8,24 +8,13 @@
  */
 package org.dawnsci.conversion;
 
-import org.dawnsci.conversion.converters.AVIImageConverter;
+import java.lang.reflect.Constructor;
+
 import org.dawnsci.conversion.converters.AbstractConversion;
-import org.dawnsci.conversion.converters.AlignImagesConverter;
-import org.dawnsci.conversion.converters.AsciiConvert1D;
-import org.dawnsci.conversion.converters.AsciiConvert2D;
-import org.dawnsci.conversion.converters.B18ReprocessAsciiConverter;
-import org.dawnsci.conversion.converters.B18AverageConverter;
-import org.dawnsci.conversion.converters.CompareConverter;
-import org.dawnsci.conversion.converters.Convert1DtoND;
-import org.dawnsci.conversion.converters.CustomNCDConverter;
-import org.dawnsci.conversion.converters.CustomTomoConverter;
-import org.dawnsci.conversion.converters.ImageConverter;
-import org.dawnsci.conversion.converters.ImagesToHDFConverter;
-import org.dawnsci.conversion.converters.ImagesToStitchedConverter;
-import org.dawnsci.conversion.converters.ProcessConversion;
 import org.dawnsci.conversion.converters.VisitorConversion;
+import org.eclipse.dawnsci.analysis.api.conversion.IConversion;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
-import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext.ConversionScheme;
+import org.eclipse.dawnsci.analysis.api.conversion.IConversionScheme;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionService;
 import org.eclipse.dawnsci.macro.api.IMacroService;
 import org.eclipse.dawnsci.macro.api.MacroEventObject;
@@ -64,53 +53,9 @@ public class ConversionServiceImpl implements IConversionService {
 				delegate = new VisitorConversion(context);
 			}
 			if (delegate==null) {
-				ConversionScheme scheme = context.getConversionScheme();
-				switch(scheme) {
-				case ASCII_FROM_2D:
-					delegate = new AsciiConvert2D(context);
-					break;
-				case ASCII_FROM_1D:
-					delegate = new AsciiConvert1D(context);
-					break;
-				case CUSTOM_NCD:
-					delegate = new CustomNCDConverter(context);
-					break;
-				case TIFF_FROM_3D:
-					delegate = new ImageConverter(context);
-					break;
-				case STITCHED_FROM_IMAGEDIR:
-					delegate = new ImagesToStitchedConverter(context);
-					break;
-				case ALIGNED_FROM_3D:
-					delegate = new AlignImagesConverter(context);
-					break;
-				case H5_FROM_IMAGEDIR:
-					delegate = new ImagesToHDFConverter(context);
-					break;
-				case AVI_FROM_3D:
-					delegate = new AVIImageConverter(context);
-					break;
-				case CUSTOM_TOMO:
-					delegate = new CustomTomoConverter(context);
-					break;
-				case H5_FROM_1D:
-					delegate = new Convert1DtoND(context);
-					break;
-				case COMPARE:
-					delegate = new CompareConverter(context);
-					break;
-				case PROCESS:
-					delegate = new ProcessConversion(context);
-					break;
-				case B18_REPROCESS_ASCII:
-					delegate = new B18ReprocessAsciiConverter(context);
-					break;
-				case B18_AVERAGE:
-					delegate = new B18AverageConverter(context);
-					break;
-				default:
-					throw new Exception("No conversion for "+scheme);
-				}
+				IConversionScheme scheme = context.getConversionScheme();
+				Constructor<? extends IConversion> constructor = scheme.getConversion().getConstructor(IConversionContext.class);
+				delegate = (AbstractConversion) constructor.newInstance(context);
 			}
 			
 			// We send some macro commands, to tell people how to drive the service with
@@ -137,7 +82,7 @@ public class ConversionServiceImpl implements IConversionService {
 			MacroEventObject evt = new MacroEventObject(this);
 			evt.setPythonCommand("cservice = dnp.plot.getService('"+IConversionService.class.getName()+"')\n");
 			evt.append("context = cservice.open("+evt.getStringArguments(context.getFilePaths())+")");
-			evt.append("context.setConversionScheme('"+context.getConversionScheme().name()+"')");
+			evt.append("context.setConversionScheme('"+context.getConversionScheme().getClass().getName()+"')");
 			evt.append("context.setDatasetNames("+evt.getStringArguments(context.getDatasetNames())+")");
 			evt.append("context.setOutputPath('"+context.getOutputPath().replace('\\', '/')+"')");
 			evt.append("context.setSliceDimensions("+evt.getMap(context.getSliceDimensions())+")");

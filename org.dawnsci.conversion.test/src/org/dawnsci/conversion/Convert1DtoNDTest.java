@@ -17,8 +17,9 @@ import java.util.List;
 
 import org.dawnsci.conversion.converters.Convert1DtoND.Convert1DInfoBean;
 import org.dawnsci.conversion.converters.util.LocalServiceManager;
+import org.dawnsci.conversion.schemes.Convert1DtoNDScheme;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
-import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext.ConversionScheme;
+import org.eclipse.dawnsci.analysis.api.conversion.IConversionScheme;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionService;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
 import org.eclipse.january.dataset.ILazyDataset;
@@ -29,7 +30,7 @@ import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 import uk.ac.diamond.scisoft.analysis.io.LoaderServiceImpl;
 
 public class Convert1DtoNDTest {
-	
+	private static final IConversionScheme scheme = new Convert1DtoNDScheme();
 	private String testfile = "MoKedge_1_15.nxs";
 	private String nonNexusTest = "HyperOut.dat";
 	
@@ -53,7 +54,7 @@ public class Convert1DtoNDTest {
 		final File tmp = File.createTempFile("testSimple", ".nxs");
 		tmp.deleteOnExit();
         context.setOutputPath(tmp.getAbsolutePath());
-        context.setConversionScheme(ConversionScheme.H5_FROM_1D);
+        context.setConversionScheme(scheme);
         context.setAxisDatasetName("/entry1/counterTimer01/Energy");
         context.setDatasetName("/entry1/counterTimer01/(I0|lnI0It|It)");
         
@@ -91,7 +92,7 @@ public class Convert1DtoNDTest {
 		final File tmp = File.createTempFile("testSimple3d", ".nxs");
 		tmp.deleteOnExit();
         context.setOutputPath(tmp.getAbsolutePath());
-        context.setConversionScheme(ConversionScheme.H5_FROM_1D);
+        context.setConversionScheme(scheme);
         context.setAxisDatasetName("/entry1/counterTimer01/Energy");
         context.setDatasetName("/entry1/counterTimer01/(I0|lnI0It|It)");
         
@@ -122,7 +123,7 @@ public class Convert1DtoNDTest {
 		final File tmp = File.createTempFile("testSimple", ".nxs");
 		tmp.deleteOnExit();
         context.setOutputPath(tmp.getAbsolutePath());
-        context.setConversionScheme(ConversionScheme.H5_FROM_1D);
+        context.setConversionScheme(scheme);
         context.setAxisDatasetName("x");
         context.setDatasetName("(dataset_0|dataset_1)");
         

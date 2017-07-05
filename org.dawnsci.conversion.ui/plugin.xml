@@ -76,63 +76,75 @@
          point="org.dawnsci.conversion.ui.conversionPage">
       <conversion_page
             conversion_page="org.dawnsci.conversion.ui.pages.AsciiConvertPage"
-            conversion_scheme="ASCII_FROM_1D"
-            id="org.dawnsci.conversion.ui.conversionAscii1D">
+            conversion_scheme="org.dawnsci.conversion.schemes.AsciiConvert1DScheme"
+            id="org.dawnsci.conversion.ui.conversionAscii1D"
+            image="conversion-images/ASCII_FROM_1D.png">
       </conversion_page>
       <conversion_page
             conversion_page="org.dawnsci.conversion.ui.pages.ImageConvertPage"
-            conversion_scheme="TIFF_FROM_3D"
-            id="org.dawnsci.conversion.ui.conversionImage">
+            conversion_scheme="org.dawnsci.conversion.schemes.ImageConverterScheme"
+            id="org.dawnsci.conversion.ui.conversionImage"
+            image="conversion-images/TIFF_FROM_3D.png">
       </conversion_page>
      <conversion_page
             conversion_page="org.dawnsci.conversion.ui.pages.ImagesToStitchedConversionPage"
-            conversion_scheme="STITCHED_FROM_IMAGEDIR"
-            id="org.dawnsci.conversion.ui.conversionStitchedImage">
+            conversion_scheme="org.dawnsci.conversion.schemes.ImagesToStitchedConverterScheme"
+            id="org.dawnsci.conversion.ui.conversionStitchedImage"
+            image="conversion-images/STITCHED_FROM_IMAGEDIR.png">
       </conversion_page>
       <conversion_page
             conversion_page="org.dawnsci.conversion.ui.pages.TomoConvertPage"
-            conversion_scheme="CUSTOM_TOMO"
-            id="org.dawnsci.conversion.ui.conversionTomo">
+            conversion_scheme="org.dawnsci.conversion.schemes.CustomTomoConverterScheme"
+            id="org.dawnsci.conversion.ui.conversionTomo"
+            image="conversion-images/CUSTOM_TOMO.png">
       </conversion_page>
       <conversion_page
             conversion_page="org.dawnsci.conversion.ui.pages.AVIConvertPage"
-            conversion_scheme="AVI_FROM_3D"
-            id="org.dawnsci.conversion.ui.conversionVideo">
+            conversion_scheme="org.dawnsci.conversion.schemes.AVIImageConverterScheme"
+            id="org.dawnsci.conversion.ui.conversionVideo"
+            image="conversion-images/AVI_FROM_3D.png">
       </conversion_page>
       <conversion_page
             conversion_page="org.dawnsci.conversion.ui.pages.NCDConvertPage"
-            conversion_scheme="CUSTOM_NCD"
-            id="org.dawnsci.conversion.ui.conversionNCD">
+            conversion_scheme="org.dawnsci.conversion.schemes.CustomNCDConverterScheme"
+            id="org.dawnsci.conversion.ui.conversionNCD"
+            image="conversion-images/CUSTOM_NCD.png">
       </conversion_page>
       <conversion_page
             conversion_page="org.dawnsci.conversion.ui.pages.ImageToH5ConversionPage"
-            conversion_scheme="H5_FROM_IMAGEDIR"
-            id="org.dawnsci.conversion.ui.conversionImageToH5">
+            conversion_scheme="org.dawnsci.conversion.schemes.ImagesToHDFConverterScheme"
+            id="org.dawnsci.conversion.ui.conversionImageToH5"
+            image="conversion-images/H5_FROM_IMAGEDIR.png">
       </conversion_page>
       <conversion_page
             conversion_page="org.dawnsci.conversion.ui.pages.H5From1DConvertPage"
-            conversion_scheme="H5_FROM_1D"
-            id="org.dawnsci.conversion.ui.conversionH5From1D">
+            conversion_scheme="org.dawnsci.conversion.schemes.Convert1DtoNDScheme"
+            id="org.dawnsci.conversion.ui.conversionH5From1D"
+            image="conversion-images/H5_FROM_1D.png">
       </conversion_page>
       <conversion_page
             conversion_page="org.dawnsci.conversion.ui.pages.CompareConvertPage"
-            conversion_scheme="COMPARE"
-            id="org.dawnsci.conversion.ui.compareConversion">
+            conversion_scheme="org.dawnsci.conversion.schemes.CompareConverterScheme"
+            id="org.dawnsci.conversion.ui.compareConversion"
+            image="conversion-images/COMPARE.png">
       </conversion_page>
       <conversion_page
             conversion_page="org.dawnsci.conversion.ui.pages.AlignImagesConversionPage"
-            conversion_scheme="ALIGNED_FROM_3D"
-            id="org.dawnsci.conversion.ui.conversionAlignImages">
+            conversion_scheme="org.dawnsci.conversion.schemes.AlignImagesConverterScheme"
+            id="org.dawnsci.conversion.ui.conversionAlignImages"
+            image="conversion-images/ALIGNED_FROM_3D.png">
       </conversion_page>
       <conversion_page
             conversion_page="org.dawnsci.conversion.ui.pages.B18ReprocessAsciiConversionPage"
-            conversion_scheme="B18_REPROCESS_ASCII"
-            id="org.dawnsci.conversion.ui.conversionB18ReprocessAscii">
+            conversion_scheme="org.dawnsci.conversion.schemes.B18ReprocessAsciiConverterScheme"
+            id="org.dawnsci.conversion.ui.conversionB18ReprocessAscii"
+            image="conversion-images/B18_REPROCESS_ASCII.png">
       </conversion_page>
       <conversion_page
             conversion_page="org.dawnsci.conversion.ui.pages.B18AverageConversionPage"
-            conversion_scheme="B18_AVERAGE"
-            id="org.dawnsci.conversion.ui.conversionB18Average">
+            conversion_scheme="org.dawnsci.conversion.schemes.B18AverageConverterScheme"
+            id="org.dawnsci.conversion.ui.conversionB18Average"
+            image="conversion-images/B18_AVERAGE.png">
       </conversion_page>
    </extension>
 

@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
+import org.eclipse.dawnsci.analysis.api.conversion.IConversionScheme;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionVisitor;
 import org.eclipse.january.IMonitor;
 import org.eclipse.january.dataset.ILazyDataset;
@@ -26,7 +27,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 class ConversionContext implements IConversionContext {
 
 	// Core data to drive the context (some can still be null)
-	private ConversionScheme    conversionScheme;
+	private IConversionScheme   conversionScheme;
 	private List<String>        filePaths;
 	private List<String>        datasetNames;
 	private String              outputFolder;
@@ -58,10 +59,10 @@ class ConversionContext implements IConversionContext {
 	public void setEchoMacro(boolean echoMacro) {
 		this.echoMacro = echoMacro;
 	}
-	public ConversionScheme getConversionScheme() {
+	public IConversionScheme getConversionScheme() {
 		return conversionScheme;
 	}
-	public void setConversionScheme(ConversionScheme conversionScheme) {
+	public void setConversionScheme(IConversionScheme conversionScheme) {
 		this.conversionScheme = conversionScheme;
 	}
 	public List<String> getFilePaths() {
