@@ -84,7 +84,7 @@
                </appinfo>
             </annotation>
          </attribute>
-         <attribute name="image" type="string">
+         <attribute name="image" type="string" use="required">
             <annotation>
                <documentation>
                   
