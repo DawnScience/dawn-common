@@ -99,4 +99,49 @@ public abstract class AbstractConversionScheme implements IConversionScheme {
 	public String toString() {
         return getClass().getName();
     }
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((conversion == null) ? 0 : conversion.hashCode());
+		result = prime * result + (nexusOnly ? 1231 : 1237);
+		result = prime * result + (nexusSourceAllowed ? 1231 : 1237);
+		result = prime * result + Arrays.hashCode(preferredRanks);
+		result = prime * result + ((uiLabel == null) ? 0 : uiLabel.hashCode());
+		result = prime * result + (userVisible ? 1231 : 1237);
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		AbstractConversionScheme other = (AbstractConversionScheme) obj;
+		if (conversion == null) {
+			if (other.conversion != null)
+				return false;
+		} else if (!conversion.equals(other.conversion))
+			return false;
+		if (nexusOnly != other.nexusOnly)
+			return false;
+		if (nexusSourceAllowed != other.nexusSourceAllowed)
+			return false;
+		if (!Arrays.equals(preferredRanks, other.preferredRanks))
+			return false;
+		if (uiLabel == null) {
+			if (other.uiLabel != null)
+				return false;
+		} else if (!uiLabel.equals(other.uiLabel))
+			return false;
+		if (userVisible != other.userVisible)
+			return false;
+		return true;
+	}
+	
+	
 }
