@@ -134,18 +134,6 @@
             id="org.dawnsci.conversion.ui.conversionAlignImages"
             image="conversion-images/ALIGNED_FROM_3D.png">
       </conversion_page>
-      <conversion_page
-            conversion_page="org.dawnsci.conversion.ui.pages.B18ReprocessAsciiConversionPage"
-            conversion_scheme="org.dawnsci.conversion.schemes.B18ReprocessAsciiConverterScheme"
-            id="org.dawnsci.conversion.ui.conversionB18ReprocessAscii"
-            image="conversion-images/B18_REPROCESS_ASCII.png">
-      </conversion_page>
-      <conversion_page
-            conversion_page="org.dawnsci.conversion.ui.pages.B18AverageConversionPage"
-            conversion_scheme="org.dawnsci.conversion.schemes.B18AverageConverterScheme"
-            id="org.dawnsci.conversion.ui.conversionB18Average"
-            image="conversion-images/B18_AVERAGE.png">
-      </conversion_page>
    </extension>
 
 </plugin>
