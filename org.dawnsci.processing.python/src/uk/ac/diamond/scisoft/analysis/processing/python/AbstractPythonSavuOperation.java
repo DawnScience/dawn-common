@@ -20,14 +20,14 @@ public abstract class AbstractPythonSavuOperation<T extends PythonSavuModel> ext
 
 	@Override
 	public void init() {
-		
+		long t = System.currentTimeMillis();
 		try {
 			s = AnalysisRpcPythonPyDevService.create();
 			pythonRunSavuService = new PythonRunSavuService(s);
-			// can I add a plugin populator here? drop down+params list test it with a fake param. No needs to be model...
-			
-			
+			logger.debug("Time to start service: " + (System.currentTimeMillis()-t));
 		} catch (Exception e) {
+			logger.debug("Failed to start service in: " + (System.currentTimeMillis()-t));
+			logger.error("Could not create script service!");
 			throw new OperationException(this, "Could not create script service!");			
 		}
 		

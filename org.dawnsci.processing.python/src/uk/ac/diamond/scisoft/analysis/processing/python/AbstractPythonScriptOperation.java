@@ -9,20 +9,26 @@ import org.eclipse.dawnsci.analysis.api.processing.OperationException;
 import org.eclipse.dawnsci.analysis.dataset.operations.AbstractOperation;
 import org.eclipse.january.IMonitor;
 import org.eclipse.january.dataset.IDataset;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractPythonScriptOperation<T extends PythonScriptModel> extends AbstractOperation<PythonScriptModel,OperationData> {
 
 	AnalysisRpcPythonPyDevService s = null;
 	PythonRunScriptService pythonRunScriptService;
 	
+	private final static Logger logger = LoggerFactory.getLogger(AbstractPythonScriptOperation.class);
+	
 	@Override
 	public void init() {
-		
+		long t = System.currentTimeMillis();
 		try {
 			s = AnalysisRpcPythonPyDevService.create();
 			pythonRunScriptService = new PythonRunScriptService(s);
+			logger.debug("Time to start service: " + (System.currentTimeMillis()-t));
 		} catch (Exception e) {
-			System.out.println(e);
+			logger.debug("Failed to start service in: " + (System.currentTimeMillis()-t));
+			logger.error("Could not create script service!");
 			throw new OperationException(this, "Could not create script service!");
 		}
 		
