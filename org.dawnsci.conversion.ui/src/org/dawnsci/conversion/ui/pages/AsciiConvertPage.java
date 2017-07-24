@@ -32,7 +32,7 @@ import org.eclipse.swt.widgets.Label;
 public class AsciiConvertPage extends AbstractDatasetChoosePage {
 	
 	
-	private final static String[] CONVERT_OPTIONS = new String[] {"Tab Separated Values (*.dat)", 
+	private static final String[] CONVERT_OPTIONS = new String[] {"Tab Separated Values (*.dat)", 
 		                                                          "Comma Separated Values (*.csv)"};
 
 	protected int conversionSelection;
@@ -69,6 +69,7 @@ public class AsciiConvertPage extends AbstractDatasetChoosePage {
 		
 		conversionSelection = 0;
 		combo.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				conversionSelection = combo.getSelectionIndex();
 			}
@@ -79,6 +80,7 @@ public class AsciiConvertPage extends AbstractDatasetChoosePage {
 	/**
 	 * Ensures that both text fields are set.
 	 */
+	@Override
 	protected void pathChanged() {
 
         final String p = getAbsoluteFilePath();
@@ -152,7 +154,7 @@ public class AsciiConvertPage extends AbstractDatasetChoosePage {
         	this.openButton.setEnabled(false);
         } else {
         	if (source.isFile()) {
-        	    final String strName = source.getName().substring(0, source.getName().indexOf("."))+"."+getExtension();
+        	    final String strName = source.getName().substring(0, source.getName().indexOf('.'))+"."+getExtension();
 	        	setPath((new File(source.getParentFile(), strName)).getAbsolutePath());
 	        	setDirectory(false);
 	        	setFileLabel("Output file");

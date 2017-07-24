@@ -69,7 +69,8 @@ public abstract class AbstractDatasetChoosePage extends ResourceChoosePage imple
 	protected AbstractDatasetChoosePage(String pageName, String description, ImageDescriptor icon) {
 		super(pageName, description, icon);
 	}
-	
+
+	@Override
 	public void createContentAfterFileChoose(Composite container) {
 	
 		this.multiFileMessage = new Label(container, SWT.WRAP);

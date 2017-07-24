@@ -85,10 +85,8 @@ public class ConversionChoicePage extends ResourceChoosePage implements IConvers
 			Bundle[] bundles = Activator.getDefault().getBundle().getBundleContext().getBundles();
 			for (Bundle bundle : bundles) {
 				Class<?> klazz = null;
-				logger.debug("Trying bundle: {}", bundle.getSymbolicName());
 				try {
 					klazz = bundle.loadClass(scheme);
-					logger.debug("Successful bundle: {}", bundle.getSymbolicName());
 				} catch (ClassNotFoundException e1) {
 					continue;
 				}
@@ -413,7 +411,8 @@ public class ConversionChoicePage extends ResourceChoosePage implements IConvers
 	public void setContext(IConversionContext context) {
 		// Does nothing, we generate the context in this class.
 	}
-	
+
+	@Override
     public boolean isPageComplete() {
     	boolean parentOk = super.isPageComplete();
     	

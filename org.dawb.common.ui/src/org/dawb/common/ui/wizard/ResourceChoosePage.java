@@ -56,6 +56,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
@@ -357,7 +358,10 @@ public class ResourceChoosePage extends WizardPage {
 
 	public void setPath(String path) {
 		this.path = path;
-		if (txtPath!=null) txtPath.setText(path);
+		if (txtPath!=null) {
+			txtPath.setText(path);
+			txtPath.notifyListeners(SWT.Modify, new Event());
+		}
 	}
 	
 	protected IResource getIResource() {
@@ -389,7 +393,7 @@ public class ResourceChoosePage extends WizardPage {
 	private List<String> selectedFiles;
 	public void setOverwriteVisible(boolean isVis) {
 		overwriteVisible = isVis;
-		if (overwrite!=null) {
+		if (overwrite!=null && !overwrite.isDisposed()) {
 			GridUtils.setVisible(overwrite, isVis);
 		}
 	}
