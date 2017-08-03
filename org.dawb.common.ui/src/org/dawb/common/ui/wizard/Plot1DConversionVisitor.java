@@ -28,6 +28,7 @@ import org.eclipse.january.dataset.IDataset;
 import uk.ac.diamond.scisoft.analysis.io.ASCIIDataHolderSaver;
 import uk.ac.diamond.scisoft.analysis.io.ASCIIDataWithHeadingSaver;
 import uk.ac.diamond.scisoft.analysis.io.DataHolder;
+import uk.ac.diamond.scisoft.analysis.utils.VersionSort;
 
 /**
  * TODO FIXME This is not a UI class. Suggest move to data/algorithm plugin like org.dawnsci.persistence perhaps.
@@ -94,7 +95,10 @@ public class Plot1DConversionVisitor extends AbstractPlotConversionVisitor {
 			if (b == null || b.getYData() == null || b.getYData().getName() == null || b.getYData().getName().isEmpty())
 				return -1;
 			
-			return a.getYData().getName().compareTo(b.getYData().getName());
+			return VersionSort.versionCompare(
+					a.getYData().getName(),
+					b.getYData().getName()
+				);
 		}
 	};
 	
@@ -133,7 +137,7 @@ public class Plot1DConversionVisitor extends AbstractPlotConversionVisitor {
 				data.setShape(data.getShape()[0],1);
 				datasets.add(data);
 				if (data.getName() != null && !data.getName().isEmpty())
-					headings.add(data.getName());
+					headings.add(data.getName().replace(' ', '_'));
 				else
 					headings.add("x");
 				firstTrace = false;
@@ -148,7 +152,7 @@ public class Plot1DConversionVisitor extends AbstractPlotConversionVisitor {
 			data.setShape(data.getShape()[0],1);
 			datasets.add(data);
 			if (data.getName() != null && !data.getName().isEmpty())
-				headings.add(data.getName());
+				headings.add(data.getName().replace(' ', '_'));
 			else
 				headings.add("dataset_" + i++);
 		}
