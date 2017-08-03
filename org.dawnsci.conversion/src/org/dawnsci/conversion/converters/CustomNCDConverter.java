@@ -20,9 +20,9 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Marshaller;
 
-import tec.units.ri.unit.MetricPrefix;
-import tec.units.ri.unit.Units;
 import si.uom.NonSI;
+import tec.uom.se.unit.MetricPrefix;
+import tec.uom.se.unit.Units;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.cansas.cansas1d.FloatUnitType;

@@ -30,9 +30,9 @@ Require-Bundle: org.apache.commons.lang;bundle-version="[2.6.0,2.7.0)",
  com.fasterxml.jackson.core.jackson-core;bundle-version="2.2.0",
  com.fasterxml.jackson.core.jackson-databind;bundle-version="2.2.0",
  javax.measure.unit-api;bundle-version="1.0.0",
- si.uom.si-units;bundle-version="0.6.6",
- tec.units.unit-ri;bundle-version="1.0.2",
- tec.uom.lib.uom-lib-common;bundle-version="1.0.2"
+ tec.uom.lib.uom-lib-common;bundle-version="1.0.2",
+ tec.uom.se;bundle-version="1.0.8",
+ si.uom.si-units-java8;bundle-version="0.6.6"
 Export-Package: org.dawnsci.conversion,
  org.dawnsci.conversion.converters,
  org.dawnsci.conversion.converters.util
