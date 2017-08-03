@@ -53,26 +53,24 @@ public class Plot1DConversionVisitor extends AbstractPlotConversionVisitor {
 		final File outFile = new File(context.getOutputPath());
 		if (!outFile.getParentFile().exists()) outFile.getParentFile().mkdirs();
 		
-		Collection<ITrace> traces = system.getTraces(ILineTrace.class);
+		Collection<ILineTrace> traces = system.getTracesByClass(ILineTrace.class);
 		
 		//Determine if x datasets are the same
 		IDataset x = null;
 		boolean xAxisEquivalent = true;
 		
-		for (ITrace trace : traces) {
+		for (ILineTrace trace : traces) {
 			
-			if (trace instanceof ILineTrace) {
-				IDataset currentx = ((ILineTrace)trace).getXData();
+			IDataset currentx = trace.getXData();
 				
-				if (x == null) {
-					x = currentx;
-					continue;
-				}
+			if (x == null) {
+				x = currentx;
+				continue;
+			}
 				
-				if (!x.equals(currentx)) {
-					xAxisEquivalent = false;
-					break;
-				}
+			if (!x.equals(currentx)) {
+				xAxisEquivalent = false;
+				break;
 			}
 		}
 		
@@ -87,40 +85,39 @@ public class Plot1DConversionVisitor extends AbstractPlotConversionVisitor {
 		return "dat";
 	}
 
-	private static final Comparator<ITrace> ITraceComparator = new Comparator<ITrace>() {
+	private static final Comparator<ILineTrace> ILineTraceComparator = new Comparator<ILineTrace>() {
 		@Override
-		public int compare(ITrace a, ITrace b) {
-			if (a == null || a.getData() == null || a.getData().getName() == null || a.getData().getName().isEmpty())
+		public int compare(ILineTrace a, ILineTrace b) {
+			if (a == null || a.getYData() == null || a.getYData().getName() == null || a.getYData().getName().isEmpty())
 				return 1;
 
-			if (b == null || b.getData() == null || b.getData().getName() == null || b.getData().getName().isEmpty())
+			if (b == null || b.getYData() == null || b.getYData().getName() == null || b.getYData().getName().isEmpty())
 				return -1;
 			
-			return a.getData().getName().compareTo(b.getData().getName());
+			return a.getYData().getName().compareTo(b.getYData().getName());
 		}
 	};
 	
 	private void saveLineTracesAsAscii(String filename) throws Exception {
 
-		Collection<ITrace> traces = system.getTraces(ILineTrace.class);
-		List<ITrace> tracesList = new ArrayList<>(traces);
+		List<ILineTrace> tracesList = new ArrayList<>(system.getTracesByClass(ILineTrace.class));
 
 		boolean firstTrace = true;
-		List<IDataset> datasets = new ArrayList<IDataset>();
-		List<String> headings = new ArrayList<String>();
+		List<IDataset> datasets = new ArrayList<>();
+		List<String> headings = new ArrayList<>();
 		IDataset data;
 
 		int dtype = 0;
 
 		int i = 0;
 
-		Collections.sort(tracesList, ITraceComparator);
+		Collections.sort(tracesList, ILineTraceComparator);
 		
-		for (ITrace trace : tracesList ) {
+		for (ILineTrace trace : tracesList ) {
 
 			if (firstTrace) {
-				int ddtype = DTypeUtils.getDType(((ILineTrace)trace).getData());
-				data = ((ILineTrace)trace).getXData().getSliceView();
+				int ddtype = DTypeUtils.getDType(trace.getData());
+				data = trace.getXData().getSliceView();
 				data.squeeze();
 				int axdtype = DTypeUtils.getDType(data);
 
@@ -142,7 +139,7 @@ public class Plot1DConversionVisitor extends AbstractPlotConversionVisitor {
 				firstTrace = false;
 			}
 
-			data = ((ILineTrace)trace).getData().getSliceView();
+			data = trace.getYData().getSliceView();
 			data.squeeze();
 			if (dtype != DTypeUtils.getDType(data)) {
 				data = DatasetUtils.cast(data, dtype);
@@ -168,16 +165,16 @@ public class Plot1DConversionVisitor extends AbstractPlotConversionVisitor {
 	}
 	
 	private void saveLineTracesXDifferent(String filename) throws Exception {
-		Collection<ITrace> traces = system.getTraces(ILineTrace.class);
+		Collection<ILineTrace> traces = system.getTracesByClass(ILineTrace.class);
 
 		int i = 0;
 		
 		DataHolder dh = new DataHolder();
 		
-		for (ITrace trace : traces ) {
+		for (ILineTrace trace : traces ) {
 			
-			IDataset x = ((ILineTrace)trace).getXData();
-			IDataset y = trace.getData();
+			IDataset x = trace.getXData();
+			IDataset y = trace.getYData();
 			
 			
 			
