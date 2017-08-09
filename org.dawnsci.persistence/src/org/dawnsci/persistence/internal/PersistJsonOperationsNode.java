@@ -61,7 +61,7 @@ public class PersistJsonOperationsNode {
 	private final static String ORIGIN = "origin";
 	private final static String VERSION = "version";
 	
-	private final static String VERSIONFILE = "product version number.txt";
+	private final static String VERSIONFILE = "product_version_number.txt";
 	
 	private static IOperationService  service;
 	
