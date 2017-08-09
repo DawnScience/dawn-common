@@ -1,6 +1,10 @@
 package org.dawnsci.persistence.internal;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -9,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.dawnsci.persistence.json.JacksonMarshaller;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.dawnsci.analysis.api.fitting.functions.IFunction;
 import org.eclipse.dawnsci.analysis.api.persistence.IJSonMarshaller;
 import org.eclipse.dawnsci.analysis.api.processing.IOperation;
@@ -54,6 +59,9 @@ public class PersistJsonOperationsNode {
 	private final static String FUNCTIONS = "functions";
 	private final static String DATASETS = "datasets";
 	private final static String ORIGIN = "origin";
+	private final static String VERSION = "version";
+	
+	private final static String VERSIONFILE = "product version number.txt";
 	
 	private static IOperationService  service;
 	
@@ -110,7 +118,6 @@ public class PersistJsonOperationsNode {
 			IOperationModel	 unmarshal = mapper.readValue(json, modelType);
 			op.setModel(unmarshal);
 			} catch (Exception e) {
-				e.printStackTrace();
 				logger.error("Could not read model values", e);
 				IOperationModel model  = (IOperationModel) modelType.newInstance();
 				op.setModel(model);
@@ -140,6 +147,20 @@ public class PersistJsonOperationsNode {
 			writeOperationToProcessGroup(process, i, operations[i]);
 		}
 		
+		try {
+			
+			String fullPath = Platform.getInstallLocation().getURL().getPath().toString()+VERSIONFILE;
+			List<String> lines = Files.readAllLines(Paths.get(fullPath), Charset.defaultCharset());
+			
+			if (lines != null && !lines.isEmpty()) {
+				DataNodeImpl node = new DataNodeImpl(1);
+				node.setDataset(DatasetFactory.createFromObject(lines.get(0)));
+				process.addDataNode(VERSION, node);
+			}
+			
+		} catch (IOException e) {
+			logger.debug("Could not read version number",e);
+		}
 		
 		return process;
 	}
