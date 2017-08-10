@@ -7,10 +7,12 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 import org.dawnsci.persistence.json.JacksonMarshaller;
 import org.eclipse.core.runtime.Platform;
@@ -60,6 +62,9 @@ public class PersistJsonOperationsNode {
 	private final static String DATASETS = "datasets";
 	private final static String ORIGIN = "origin";
 	private final static String VERSION = "version";
+	private final static String DATE = "date";
+	private final static String PROGRAM = "program";
+	private final static String DAWN = "DAWN";
 	
 	private final static String VERSIONFILE = "product_version_number.txt";
 	
@@ -148,6 +153,16 @@ public class PersistJsonOperationsNode {
 		}
 		
 		try {
+			
+			DataNodeImpl n = new DataNodeImpl(1);
+			n.setDataset(DatasetFactory.createFromObject(DAWN));
+			process.addDataNode(PROGRAM, n);
+			String date = String.format("%tFT%<tR", Calendar.getInstance(TimeZone.getDefault()));
+			
+			DataNodeImpl ndate = new DataNodeImpl(1);
+			ndate.setDataset(DatasetFactory.createFromObject(date));
+			process.addDataNode(DATE, ndate);
+			
 			
 			String fullPath = Platform.getInstallLocation().getURL().getPath().toString()+VERSIONFILE;
 			List<String> lines = Files.readAllLines(Paths.get(fullPath), Charset.defaultCharset());
