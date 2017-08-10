@@ -173,7 +173,7 @@ public class PersistJsonOperationsNode {
 				process.addDataNode(VERSION, node);
 			}
 			
-		} catch (IOException e) {
+		} catch (Exception e) {
 			logger.debug("Could not read version number",e);
 		}
 		
