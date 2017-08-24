@@ -21,6 +21,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Marshaller;
 
 import si.uom.NonSI;
+import tec.uom.se.spi.DefaultServiceProvider;
 import tec.uom.se.unit.MetricPrefix;
 import tec.uom.se.unit.Units;
 
@@ -550,7 +551,7 @@ public class CustomNCDConverter extends AbstractConversion  {
 				units = node.getAttribute("unit").getFirstElement();
 			}
 			if (units != null) {
-				UnitFormat unitFormat = ServiceProvider.current().getUnitFormatService().getUnitFormat();
+				UnitFormat unitFormat = getUOMServiceProvider().getUnitFormatService().getUnitFormat();
 				String angstrom = unitFormat.format(NonSI.ANGSTROM.inverse());
 				String nanometer = unitFormat.format(MetricPrefix.NANO(Units.METRE).inverse());
 				String angle = unitFormat.format(NonSI.DEGREE_ANGLE);
@@ -570,7 +571,17 @@ public class CustomNCDConverter extends AbstractConversion  {
 		}
 		return "a.u.";
 	}
-	
+
+	private ServiceProvider getUOMServiceProvider() {
+		ServiceProvider serviceProvider = null;
+		try {
+			serviceProvider = ServiceProvider.current();
+		} catch (IllegalStateException e) {
+			serviceProvider = new DefaultServiceProvider();
+		}
+		return serviceProvider;
+	}
+
 	private String buildFileName(String pathToOriginal, String datasetName) {
 		
 		String name = new File(pathToOriginal).getName();
