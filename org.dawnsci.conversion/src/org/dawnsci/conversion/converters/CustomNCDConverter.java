@@ -15,7 +15,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.measure.format.UnitFormat;
-import javax.measure.spi.ServiceProvider;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Marshaller;
@@ -551,7 +550,7 @@ public class CustomNCDConverter extends AbstractConversion  {
 				units = node.getAttribute("unit").getFirstElement();
 			}
 			if (units != null) {
-				UnitFormat unitFormat = getUOMServiceProvider().getUnitFormatService().getUnitFormat();
+				UnitFormat unitFormat = new DefaultServiceProvider().getUnitFormatService().getUnitFormat();
 				String angstrom = unitFormat.format(NonSI.ANGSTROM.inverse());
 				String nanometer = unitFormat.format(MetricPrefix.NANO(Units.METRE).inverse());
 				String angle = unitFormat.format(NonSI.DEGREE_ANGLE);
@@ -570,16 +569,6 @@ public class CustomNCDConverter extends AbstractConversion  {
 			logger.warn("Unit information for axis dataset {} not found", datasetName);
 		}
 		return "a.u.";
-	}
-
-	private ServiceProvider getUOMServiceProvider() {
-		ServiceProvider serviceProvider = null;
-		try {
-			serviceProvider = ServiceProvider.current();
-		} catch (IllegalStateException e) {
-			serviceProvider = new DefaultServiceProvider();
-		}
-		return serviceProvider;
 	}
 
 	private String buildFileName(String pathToOriginal, String datasetName) {
