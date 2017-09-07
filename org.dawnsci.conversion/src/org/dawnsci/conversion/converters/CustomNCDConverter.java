@@ -39,6 +39,7 @@ import org.cansas.cansas1d.SASsampleType;
 import org.cansas.cansas1d.SASsourceType;
 import org.cansas.cansas1d.SAStransmissionSpectrumType;
 import org.dawnsci.conversion.converters.util.LocalServiceManager;
+import org.eclipse.dawnsci.analysis.api.Constants;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
 import org.eclipse.dawnsci.analysis.api.io.ScanFileHolderException;
@@ -551,10 +552,10 @@ public class CustomNCDConverter extends AbstractConversion  {
 			}
 			if (units != null) {
 				UnitFormat unitFormat = new DefaultServiceProvider().getUnitFormatService().getUnitFormat();
-				String angstrom = unitFormat.format(NonSI.ANGSTROM.inverse());
+				String angstrom = unitFormat.format(Constants.ANGSTROM.inverse());
 				String nanometer = unitFormat.format(MetricPrefix.NANO(Units.METRE).inverse());
 				String angle = unitFormat.format(NonSI.DEGREE_ANGLE);
-				String dspace = unitFormat.format(NonSI.ANGSTROM);
+				String dspace = unitFormat.format(Constants.ANGSTROM);
 				if (units.equals(nanometer)) {
 					return INVERSE_NM;
 				} else if (units.equals(angstrom)) {
