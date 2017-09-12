@@ -19,6 +19,8 @@ import org.eclipse.january.dataset.Slice;
 import org.eclipse.january.metadata.AxesMetadata;
 import org.eclipse.january.metadata.MaskMetadata;
 import org.eclipse.january.metadata.MetadataFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class OperationToPythonUtils {
 
@@ -37,7 +39,7 @@ public class OperationToPythonUtils {
 	public static final String TOTAL = "total";
 	public static final String AUXILIARY = "auxiliary";
 	
-
+	private final static Logger logger = LoggerFactory.getLogger(OperationToPythonUtils.class);
 	
 
 	public static Map<String, Object> packImage(IDataset input) {
@@ -62,14 +64,16 @@ public class OperationToPythonUtils {
 				try {
 					ya = axes[0].getSlice().squeeze();
 					yAxisTitle = ya.getName();
-				} catch (DatasetException e1) {
+				} catch (Exception e1) {
+					logger.error("Could not add axes",e1);
 				}
 			}
 			if (axes[1] != null) {
 				try {
 					xa = axes[1].getSlice().squeeze();
 					xAxisTitle = xa.getName();
-				} catch (DatasetException e1) {
+				} catch (Exception e1) {
+					logger.error("Could not add axes",e1);
 				}
 			}
 			
@@ -184,7 +188,8 @@ public class OperationToPythonUtils {
 				xAxisTitle = ax.getName();
 				inputs.put(XAXIS, ax);
 				inputs.put(XAXIS_TITLE, xAxisTitle);
-			} catch (DatasetException e1) {
+			} catch (Exception e1) {
+				logger.error("Could not add axes",e1);
 			}
 		} else {
 			inputs.put(XAXIS, null);
@@ -195,7 +200,8 @@ public class OperationToPythonUtils {
 		if (e != null) {
 			try {
 				inputs.put(ERROR, e.getSlice());
-			} catch (DatasetException e1) {
+			} catch (Exception e1) {
+				logger.error("Could not add axes",e1);
 			}
 		}
 		
