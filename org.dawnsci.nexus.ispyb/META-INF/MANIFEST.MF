@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Ispyb
+Bundle-SymbolicName: org.dawnsci.nexus.ispyb
+Bundle-Version: 1.0.0.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Export-Package: org.dawnsci.nexus.ispyb
+Require-Bundle: uk.ac.diamond.ispyb.api,
+ org.eclipse.dawnsci.nexus,
+ org.eclipse.dawnsci.analysis.api
+Service-Component: OSGI-INF/serviceHolder.xml
+Bundle-ActivationPolicy: lazy
