@@ -72,6 +72,8 @@ public class SpecLoader extends AbstractFileLoader {
 				}
 			}
 			
+			if (holder.size() == 0) throw new ScanFileHolderException(fileName + "Contains no data!");
+			
 			return holder;
 			
 		} catch (Exception e) {
