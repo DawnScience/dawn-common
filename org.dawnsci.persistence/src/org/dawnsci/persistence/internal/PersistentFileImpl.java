@@ -9,6 +9,7 @@
 package org.dawnsci.persistence.internal;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -47,12 +48,15 @@ import org.eclipse.january.dataset.DatasetFactory;
 import org.eclipse.january.dataset.DatasetUtils;
 import org.eclipse.january.dataset.IDataset;
 import org.eclipse.january.dataset.ILazyDataset;
+import org.eclipse.january.dataset.RGBDataset;
+import org.eclipse.january.dataset.ShortDataset;
 import org.eclipse.january.dataset.Slice;
 import org.eclipse.january.metadata.OriginMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
+import uk.ac.diamond.scisoft.analysis.io.NexusTreeUtils;
 
 /**
  * Implementation of IPersistentFile<br>
@@ -169,6 +173,12 @@ class PersistentFileImpl implements IPersistentFile {
 	public void setData(IDataset data) throws Exception {
 		writeH5Data(data, null, null);
 	}
+	
+	@Override
+	public void setData(IDataset data, IDataset xAxis, IDataset yAxis) throws Exception {
+		writeH5Data(data, xAxis, yAxis);
+	}
+	
 
 	@Override
 	public void setHistory(IDataset... sets) throws Exception {
@@ -201,21 +211,59 @@ class PersistentFileImpl implements IPersistentFile {
 	 * @param yAxisData
 	 * @throws Exception
 	 */
-	private void writeH5Data(final IDataset data, final IDataset xAxisData, final IDataset yAxisData) {
+	private void writeH5Data(IDataset data, final IDataset xAxisData, final IDataset yAxisData) {
 		// create nodes in separate try/catch clauses in order to try creating the next node even if the previous one wasn't successful
 		GroupNode group = createDataNode(file, PersistenceConstants.DATA_ENTRY);
 		if (data != null) {
 			try {
 				String dataName = !data.getName().equals("") ? data.getName() : "data";
+				if (dataName.contains(":")) {
+					dataName = dataName.replace(":", "_");
+				}
 				data.setName(dataName);
+				boolean isRGB = false;
 				// we create the dataset
-				DataNode dNode = file.createData(group, data);
+				DataNode dNode = null;
+				if (data instanceof RGBDataset) {
+					int[] oShape = data.getShape();
+					int[] shape = new int[oShape.length+1];
+					shape[shape.length-1] = 3;
+					for (int i = 0; i < oShape.length;i++) {
+						shape[i] = oShape[i];
+					}
+					
+					data = DatasetFactory.createFromObject(ShortDataset.class, ((RGBDataset)data).getData(), shape);
+					data.setName(dataName);
+					isRGB = true;
+				}
+				
+				dNode = file.createData(group, data);
+				
 				// we set the JSON attribute
 				file.addAttribute(dNode, new AttributeImpl("signal", 1));
+				file.addAttribute(group, new AttributeImpl("signal", dataName));
+				if (isRGB) {
+					file.addAttribute(dNode,  new AttributeImpl("interpretation","rgba-image"));
+				}
+				
 			} catch (NexusException ne) {
 				logger.warn(ne.getMessage());
 			}
 		}
+
+		int rank = 1;
+		
+		if (data != null) {
+			data.getRank();
+		} else if (yAxisData != null) {
+			rank = 2;
+		}
+		
+		
+		
+		String[] axes = new String[rank];
+		Arrays.fill(axes, ".");
+		
 		if (xAxisData != null) {
 			try {
 				String xAxisName = !xAxisData.getName().equals("") ? xAxisData.getName() : "X Axis";
@@ -224,6 +272,8 @@ class PersistentFileImpl implements IPersistentFile {
 				DataNode dNode = file.createData(group, xAxisData);
 				// we set the JSON attribute
 				file.addAttribute(dNode, new AttributeImpl("axis", 1));
+				file.addAttribute(group, new AttributeImpl(xAxisName + NexusTreeUtils.NX_INDICES_SUFFIX, rank == 1 ? 0 : 1));
+				axes[rank == 1 ? 0 : 1] = xAxisName;
 			} catch (NexusException ne) {
 				logger.warn(ne.getMessage());
 			}
@@ -236,9 +286,16 @@ class PersistentFileImpl implements IPersistentFile {
 				DataNode dNode = file.createData(group, yAxisData);
 				// we set the JSON attribute
 				file.addAttribute(dNode, new AttributeImpl("axis", 2));
+				file.addAttribute(group, new AttributeImpl(yAxisName + NexusTreeUtils.NX_INDICES_SUFFIX, 0));
+				axes[0] = yAxisName;
 			} catch (NexusException ne) {
 				logger.warn(ne.getMessage());
 			}
+		}
+		try {
+			file.addAttribute(group, new AttributeImpl("axes", axes));
+		} catch (NexusException ne) {
+			logger.warn(ne.getMessage());
 		}
 	}
 
