@@ -254,7 +254,7 @@ class PersistentFileImpl implements IPersistentFile {
 		int rank = 1;
 		
 		if (data != null) {
-			data.getRank();
+			rank = data.getRank();
 		} else if (yAxisData != null) {
 			rank = 2;
 		}
