@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" enabled="true" name="Service Holder">
+   <implementation class="org.dawnsci.nexus.ispyb.ServiceHolder"/>
+   <reference bind="setNexusFactory" cardinality="1..1" interface="org.eclipse.dawnsci.nexus.INexusFileFactory" name="INexusFileFactory" policy="static"/>
+   <reference bind="setIspybDataCollectionFactory" cardinality="1..1" interface="uk.ac.diamond.ispyb.api.IspybDataCollectionFactoryService" name="IspybDataCollectionFactoryService" policy="static"/>
+</scr:component>
