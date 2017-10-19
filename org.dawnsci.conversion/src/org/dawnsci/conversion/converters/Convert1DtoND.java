@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 Diamond Light Source Ltd.
+ * Copyright (c) 2012, 2017 Diamond Light Source Ltd.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -15,17 +15,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.dawnsci.conversion.ServiceLoader;
 import org.dawnsci.conversion.converters.util.LocalServiceManager;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
-import org.eclipse.dawnsci.hdf.object.HierarchicalDataFactory;
-import org.eclipse.dawnsci.hdf.object.IHierarchicalDataFile;
-import org.eclipse.dawnsci.hdf.object.Nexus;
+import org.eclipse.dawnsci.analysis.api.tree.DataNode;
+import org.eclipse.dawnsci.analysis.api.tree.GroupNode;
+import org.eclipse.dawnsci.analysis.api.tree.Node;
+import org.eclipse.dawnsci.analysis.api.tree.Tree;
+import org.eclipse.dawnsci.analysis.tree.impl.AttributeImpl;
+import org.eclipse.dawnsci.nexus.NexusFile;
 import org.eclipse.january.dataset.AggregateDataset;
-import org.eclipse.january.dataset.Dataset;
 import org.eclipse.january.dataset.IDataset;
 import org.eclipse.january.dataset.ILazyDataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import uk.ac.diamond.scisoft.analysis.io.NexusTreeUtils;
 
 public class Convert1DtoND extends AbstractConversion {
 	
@@ -40,20 +45,22 @@ public class Convert1DtoND extends AbstractConversion {
 		
 		//overwrite if exists
 		if (file.exists()) {
-        	file.delete();
-        } else {
-        	file.getParentFile().mkdirs();   	
-        }
+			file.delete();
+		} else {
+			file.getParentFile().mkdirs();
+		}
 		
 		//test file can be opened
-		IHierarchicalDataFile fileH = HierarchicalDataFactory.getWriter(context.getOutputPath());
+		NexusFile fileH = ServiceLoader.getNexusFileFactory().newNexusFile(context.getOutputPath());
+		fileH.createAndOpenToWrite();
 		fileH.close();
 		
 	}
 
 	@Override
 	protected void convert(IDataset slice) throws Exception {
-		if (!dataMap.containsKey(slice.getName()))dataMap.put(slice.getName(), new ArrayList<ILazyDataset>());
+		if (!dataMap.containsKey(slice.getName()))
+			dataMap.put(slice.getName(), new ArrayList<ILazyDataset>());
 		dataMap.get(slice.getName()).add(slice);
 
 	}
@@ -61,10 +68,8 @@ public class Convert1DtoND extends AbstractConversion {
 	@Override
 	public void close(IConversionContext context) throws Exception {
 
-		IHierarchicalDataFile file = null;
-		try {
-			file = HierarchicalDataFactory.getWriter(context.getOutputPath());
-			
+		try (NexusFile file = ServiceLoader.getNexusFileFactory().newNexusFile(context.getOutputPath())) {
+			file.openToWrite(true);
 			IDataset axis = null;
 			int axisLength = -1;
 			String axisName = context.getAxisDatasetName();
@@ -79,98 +84,94 @@ public class Convert1DtoND extends AbstractConversion {
 				List<ILazyDataset> out = dataMap.get(key);
 				String[] paths = getNexusPathAndNameFromKey(key);
 
-				String entry = file.group(paths[0]);
-				file.setNexusAttribute(entry, Nexus.ENTRY);
+				String entry = Tree.ROOT + paths[0];
+				GroupNode groupNode = file.getGroup(entry, true);
+				file.addAttribute(groupNode, new AttributeImpl(NexusFile.NXCLASS, "NXentry"));
 
 				if (paths.length>2) {
+					String path = "";
 					for (int i = 1; i < paths.length-1; i++) {
-						final String path = paths[i];
-						entry = file.group(path, entry);
-						if (i<(paths.length-1)) file.setNexusAttribute(entry, Nexus.ENTRY);
+						path = path + Node.SEPARATOR + paths[i];
+						groupNode = file.getGroup(path, true);
+						if (i<(paths.length-1))
+							file.addAttribute(groupNode, new AttributeImpl(NexusFile.NXCLASS, "NXentry"));
 					}
 				}
 				
 				if (context.getUserObject() == null ||
 					!(context.getUserObject() instanceof Convert1DInfoBean)) {
-					
-					saveTo2DStack(file, entry, out, paths, key,axisLength);
-					
+					saveTo2DStack(file, groupNode, out, paths, key,axisLength);
 				} else {
-					
 					Convert1DInfoBean bean = (Convert1DInfoBean)context.getUserObject();
-					
 					if (bean.fastAxis*bean.slowAxis != out.size()) {
-						saveTo2DStack(file, entry, out, paths, key, axisLength);
+						saveTo2DStack(file, groupNode, out, paths, key, axisLength);
 					} else {
-						saveTo3DStack(file, entry, out, paths, key, bean,axisLength);
+						saveTo3DStack(file, groupNode, out, paths, key, bean,axisLength);
 					}
 				}
 			}
 			if (axis != null) {
 				String[] paths = getNexusPathAndNameFromKey(axisName);
-				String entry = file.group(paths[0]);
-				file.setNexusAttribute(entry, Nexus.ENTRY);
+				String entry = Tree.ROOT + paths[0];
+				GroupNode groupNode = file.getGroup(entry, true);
+				file.addAttribute(groupNode, new AttributeImpl(NexusFile.NXCLASS, "NXentry"));
 				
 				if (paths.length>2) {
+					String path = "";
 					for (int i = 1; i < paths.length-1; i++) {
-						final String path = paths[i];
-						entry = file.group(path, entry);
-						if (i<(paths.length-1)) file.setNexusAttribute(entry, Nexus.ENTRY);
+						path = path + Node.SEPARATOR + paths[i];
+						groupNode = file.getGroup(path, true);
+						if (i<(paths.length-1))
+							file.addAttribute(groupNode, new AttributeImpl(NexusFile.NXCLASS, "NXentry"));
 					}
 				}
-				saveAxis(file, entry, axis, paths);
+				saveAxis(file, groupNode, axis, paths);
 			}
-			
-			
 			file.close();
 		} catch (Exception e) {
-			if (file != null)
-				try {
-					file.close();
-				} catch (Exception e1) {
-					logger.error("Problem writing to h5 file :" + e1.getMessage() +" and inner: " + e.getMessage());
-				}
+			logger.error(e.getMessage());
 		}
 		super.close(context);
 	}
 	
-	private void saveAxis(IHierarchicalDataFile file,String entry, IDataset out, String[] paths) throws Exception {
+	private void saveAxis(NexusFile file, GroupNode group, IDataset out, String[] paths) throws Exception {
 		
 		String name = paths[paths.length-1];
-		String d = file.createDataset(name, out, entry);
 		
-		file.setNexusAttribute(d, Nexus.SDS);
-		file.setAttribute(d,"axis","1");
+		out.setName(name);
+		DataNode dNode = file.createData(group, out);
+		
+		
+		file.addAttribute(dNode, new AttributeImpl(NexusTreeUtils.NX_AXIS, "1"));
+
 	}
 	
-	private void saveTo2DStack(IHierarchicalDataFile file,String entry, List<ILazyDataset> out,String[] paths,String key, int axisLength) throws Exception{
+	private void saveTo2DStack(NexusFile file, GroupNode group, List<ILazyDataset> out,String[] paths,String key, int axisLength) throws Exception{
 		
 		String name = paths[paths.length-1];
 		
 		IDataset first = out.get(0).getSlice();
+		first.setName(name);
+		DataNode dNode = file.createData(group, first);
 		
-		String d = file.appendDataset(name, first, entry);
-		
-		if (first.getShape()[0] == axisLength) file.setAttribute(d,"signal","1");
-		
-		file.setNexusAttribute(d, Nexus.SDS);
-		file.setAttribute(d, "original_name", key);				
+		if (first.getShape()[0] == axisLength)
+			file.addAttribute(dNode, new AttributeImpl(NexusTreeUtils.NX_SIGNAL, "1"));
+		file.addAttribute(dNode, new AttributeImpl("original_name", key));
 		
 		for (int i = 1; i < out.size(); i++) {
 			IDataset a = out.get(i).getSlice();
-			d = file.appendDataset(name, a, entry);
+			a.setName(name);
+			dNode = file.createData(group, a);
 		}
 	}
 	
-	private void saveTo3DStack(IHierarchicalDataFile file,String entry, List<ILazyDataset> out,String[] paths,String key, Convert1DInfoBean bean,int axisLength) throws Exception{
+	private void saveTo3DStack(NexusFile file, GroupNode group, List<ILazyDataset> out,String[] paths,String key, Convert1DInfoBean bean,int axisLength) throws Exception{
 		
 		ILazyDataset[] lz = new ILazyDataset[bean.fastAxis];
 		String name = paths[paths.length-1];
-
-		String d = null;
 		
 		IDataset first = out.get(0).getSlice();
-		
+		DataNode dataNode = null;
 		for (int i = 0; i < bean.slowAxis; i++) {
 			
 			for (int j = 0; j < bean.fastAxis; j++) {
@@ -179,18 +180,18 @@ public class Convert1DtoND extends AbstractConversion {
 			
 			ILazyDataset ds = new AggregateDataset(true, lz);
 			IDataset a = ds.getSlice();
-			d = file.appendDataset(name, a, entry);
-			
+			a.setName(name);
+			dataNode = file.createData(group, a);
 		}
-		
-		file.setNexusAttribute(d, Nexus.SDS);
-		file.setAttribute(d, "original_name", key);
-		if (first.getShape()[0] == axisLength) file.setAttribute(d,"signal","1");
-		
+		if (dataNode != null)
+			file.addAttribute(dataNode, new AttributeImpl("original_name", key));
+
+		if (first.getShape()[0] == axisLength && dataNode != null)
+			file.addAttribute(dataNode, new AttributeImpl(NexusTreeUtils.NX_SIGNAL, "1"));
 	}
 	
 	private String[] getNexusPathAndNameFromKey(String key) {
-		String[]  paths = key.split("/");
+		String[]  paths = key.split(Node.SEPARATOR);
 		
 		if (paths.length == 1) {
 			return new String[] {"entry1", paths[0]};

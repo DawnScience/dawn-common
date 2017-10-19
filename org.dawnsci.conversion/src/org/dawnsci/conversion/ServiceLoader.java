@@ -3,12 +3,14 @@ package org.dawnsci.conversion;
 import org.eclipse.dawnsci.analysis.api.EventTracker;
 import org.eclipse.dawnsci.analysis.api.image.IImageStitchingProcess;
 import org.eclipse.dawnsci.analysis.api.image.IImageTransform;
+import org.eclipse.dawnsci.nexus.INexusFileFactory;
 
 public class ServiceLoader {
 
 	private static EventTracker serviceTracker;
 	private static IImageStitchingProcess stitcher;
 	private static IImageTransform transformer;
+	private static INexusFileFactory nexusFileFactory;
 
 	/**
 	 * used by OSGI
@@ -39,5 +41,13 @@ public class ServiceLoader {
 
 	public static void setImageTransform(IImageTransform its) {
 		transformer = its;
+	}
+
+	public static INexusFileFactory getNexusFileFactory() {
+		return nexusFileFactory;
+	}
+
+	public static void setNexusFileFactory(INexusFileFactory nexusFileFactory) {
+		ServiceLoader.nexusFileFactory = nexusFileFactory;
 	}
 }
