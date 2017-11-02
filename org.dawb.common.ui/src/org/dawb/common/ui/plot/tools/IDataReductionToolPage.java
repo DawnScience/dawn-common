@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 Diamond Light Source Ltd.
+ * Copyright (c) 2012, 2017 Diamond Light Source Ltd.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -13,12 +13,16 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.dawnsci.hdf.object.H5Utils;
-import org.eclipse.dawnsci.hdf.object.IHierarchicalDataFile;
+import org.eclipse.dawnsci.hdf5.HDF5Utils;
+import org.eclipse.dawnsci.nexus.NexusFile;
 import org.eclipse.dawnsci.plotting.api.tool.IToolPage;
 import org.eclipse.january.IMonitor;
+import org.eclipse.january.dataset.Dataset;
 import org.eclipse.january.dataset.IDataset;
+import org.eclipse.january.dataset.ILazyWriteableDataset;
+import org.eclipse.january.dataset.ShapeUtils;
 import org.eclipse.january.dataset.Slice;
+import org.eclipse.january.dataset.SliceND;
 
 /**
  * Interface used  to define this tool as a data reduction tool. 
@@ -62,11 +66,11 @@ public interface IDataReductionToolPage extends IToolPage {
 	 *
 	 */
 	public final class DataReductionSlice {
-				
+
 		/**
 		 * The file we are writing to.
 		 */
-		private IHierarchicalDataFile file;
+		private NexusFile file;
 		/**
 		 * The Group which the user chose.
 		 */
@@ -93,27 +97,24 @@ public interface IDataReductionToolPage extends IToolPage {
 		
 		private Slice[]               slice;
 		private int[]                 shape;
-		
-		public DataReductionSlice(IHierarchicalDataFile hf,
-				                  String group,
-				                  IDataset set, 
-				                  Object ud,
-				                  Slice[] slice,
-				                  int[] shape,
-				                  IMonitor mon) {
-			this.file    = hf;
-			this.parent  = group;
-			this.data    = set;
-			this.userData= ud;
+		private ILazyWriteableDataset lazyWritable;
+
+		public DataReductionSlice(NexusFile hf, String group, IDataset set, Object ud, Slice[] slice,
+				int[] shape, IMonitor mon) {
+			this.file = hf;
+			this.parent = group;
+			this.data = set;
+			this.userData = ud;
 			this.monitor = mon;
 			this.slice = slice;
 			this.shape = shape;
 		}
-		public IHierarchicalDataFile getFile() {
+
+		public NexusFile getFile() {
 			return file;
 		}
-		public void setFile(IHierarchicalDataFile hf) {
-			this.file = hf;
+		public void setFile(NexusFile file) {
+			this.file = file;
 		}
 		public String getParent() {
 			return parent;
@@ -132,18 +133,32 @@ public interface IDataReductionToolPage extends IToolPage {
 			appendData(more, parent);
 		}
 		
+		/**
+		 * Uses IHierchicalDataFile to append data
+		 *
+		 * @param more
+		 * @param group
+		 * @throws Exception
+		 */
 		public void appendData(IDataset more, String group) throws Exception {
-			
-			if (slice == null) {
-				H5Utils.appendDataset(file, group, more);
+			int[] mShape = more.getShape();
+			if (lazyWritable == null) {
+				String filename = file.getFilePath();
+				lazyWritable = HDF5Utils.createLazyDataset(filename, group, more.getName(), mShape, null,
+						mShape, Dataset.INT32, null, false);
 				return;
 			}
+			//append slice to lazy writable
+			int index = 0;
+			SliceND ndSlice = new SliceND(lazyWritable.getShape(), new int[] {index, 0, 0}, new int[] {(index+1), mShape[0], mShape[1]}, null);
+			lazyWritable.setSlice(null, more, ndSlice);
 			
 			int dataRank = 1;
 			if (more.getSize() != 1) {
-				dataRank = more.getSliceView().squeeze().getRank();
+				dataRank = ShapeUtils.squeezeShape(mShape, false).length;
 			} else {
-				more.setShape(new int[]{1});
+				mShape = new int[]{1};
+				more.setShape(mShape);
 			}
 			
 			
@@ -171,8 +186,8 @@ public interface IDataReductionToolPage extends IToolPage {
 				if (dimList.contains(counter)) {
 					
 					if (padCounter < dataRank) {
-						sliceList.add(new Slice(0,more.getShape()[padCounter],1));
-						int dShape = more.getShape()[padCounter];
+						int dShape = mShape[padCounter];
+						sliceList.add(new Slice(0,dShape,1));
 						totalDimList.add(dShape);
 						sliceShape.add(dShape);
 						padCounter++;
@@ -197,17 +212,18 @@ public interface IDataReductionToolPage extends IToolPage {
 			for (int i = 0; i < newShape.length; i++) newShape[i] = totalDimList.get(i);
 			
 			//update dataset rank to match output
-			int[] s = new int[newShape.length];
-			for (int i = 0; i < sliceShape.size(); i++) s[i] = sliceShape.get(i);
-			more.setShape(s);
+			mShape = new int[newShape.length];
+			for (int i = 0; i < sliceShape.size(); i++) mShape[i] = sliceShape.get(i);
+			more.setShape(mShape);
 			
 			if (more.getRank() == 0 && newShape.length == 0) {
-				more.setShape(new int[]{1});
-				newShape = new long[]{1};
+				mShape = new int[] {1};
+				more.setShape(mShape);
+				newShape = new long[] {1};
 			}
 			
-			H5Utils.insertDataset(file, group, more, sliceOut, newShape);
-			
+			ndSlice = new SliceND(lazyWritable.getShape(), new int[] {index, 0, 0}, new int[] {(index+1), mShape[0], mShape[1]}, null);
+			lazyWritable.setSlice(null, more, ndSlice);
 			return;
 		}
 
