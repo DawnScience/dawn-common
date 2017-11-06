@@ -108,7 +108,6 @@ public class ActionBarWrapper extends SubActionBars2 {
 		Composite toolbarControl = new Composite(main, SWT.RIGHT);
 		toolbarControl.setLayout(new GridLayout(2, false));
 		GridUtils.removeMargins(toolbarControl);
-		toolbarControl.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
 		// We use a local toolbar to make it clear to the user the tools
 		// that they can use, also because the toolbar actions are 
