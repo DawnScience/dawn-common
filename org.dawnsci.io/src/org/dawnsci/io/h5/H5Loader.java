@@ -35,6 +35,7 @@ import uk.ac.diamond.scisoft.analysis.io.AbstractFileLoader;
 import uk.ac.diamond.scisoft.analysis.io.DataHolder;
 import uk.ac.diamond.scisoft.analysis.io.MetaDataAdapter;
 
+@Deprecated
 public class H5Loader extends AbstractFileLoader {
 
 	public final static List<String> EXT;

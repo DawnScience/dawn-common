@@ -14,6 +14,7 @@ import org.eclipse.january.IMonitor;
 import org.eclipse.january.dataset.Dataset;
 import org.eclipse.january.dataset.LazyDataset;
 
+@Deprecated
 public class H5LazyDataset extends LazyDataset {
 
 	/**

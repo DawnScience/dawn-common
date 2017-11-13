@@ -24,6 +24,7 @@ import org.eclipse.january.dataset.Dataset;
 import org.eclipse.january.dataset.SliceND;
 import org.eclipse.january.io.ILazyLoader;
 
+@Deprecated
 public class H5LazyLoader implements ILazyLoader {
 
 	private Map<SliceObject,Reference<Dataset>> cache;
