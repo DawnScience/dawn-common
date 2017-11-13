@@ -8,9 +8,9 @@
  */
 package org.dawb.common.ui.plot.tools;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.dawnsci.hdf5.HDF5Utils;
@@ -20,7 +20,6 @@ import org.eclipse.january.IMonitor;
 import org.eclipse.january.dataset.Dataset;
 import org.eclipse.january.dataset.IDataset;
 import org.eclipse.january.dataset.ILazyWriteableDataset;
-import org.eclipse.january.dataset.ShapeUtils;
 import org.eclipse.january.dataset.Slice;
 import org.eclipse.january.dataset.SliceND;
 
@@ -97,7 +96,6 @@ public interface IDataReductionToolPage extends IToolPage {
 		
 		private Slice[]               slice;
 		private int[]                 shape;
-		private ILazyWriteableDataset lazyWritable;
 
 		public DataReductionSlice(NexusFile hf, String group, IDataset set, Object ud, Slice[] slice,
 				int[] shape, IMonitor mon) {
@@ -129,102 +127,79 @@ public interface IDataReductionToolPage extends IToolPage {
 			this.data = set;
 		}
 
-		public void appendData(IDataset more) throws Exception {
-			appendData(more, parent);
-		}
-		
-		/**
-		 * Uses IHierchicalDataFile to append data
+		/** Appends data at path provided by this.getParent at index 0
 		 *
+		 * @param lazyWritables
+		 *            Map of ILazyWriteableDataset
 		 * @param more
-		 * @param group
+		 *            dataset
 		 * @throws Exception
 		 */
-		public void appendData(IDataset more, String group) throws Exception {
-			int[] mShape = more.getShape();
-			if (lazyWritable == null) {
-				String filename = file.getFilePath();
-				lazyWritable = HDF5Utils.createLazyDataset(filename, group, more.getName(), mShape, null,
-						mShape, Dataset.INT32, null, false);
-				return;
-			}
-			//append slice to lazy writable
-			int index = 0;
-			SliceND ndSlice = new SliceND(lazyWritable.getShape(), new int[] {index, 0, 0}, new int[] {(index+1), mShape[0], mShape[1]}, null);
-			lazyWritable.setSlice(null, more, ndSlice);
-			
-			int dataRank = 1;
-			if (more.getSize() != 1) {
-				dataRank = ShapeUtils.squeezeShape(mShape, false).length;
-			} else {
-				mShape = new int[]{1};
-				more.setShape(mShape);
-			}
-			
-			
-			//determine if dataset different rank to slice
-			List<Integer> dimList = new ArrayList<Integer>();
-			for (int i = 0; i < slice.length; i++) {
-				if (slice[i].getStop() == null && slice[i].getLength() ==-1) {
-					dimList.add(i);
-				} else {
-					int nSteps = slice[i].getNumSteps();
-					if (nSteps > 1) dimList.add(i);
+		public void appendData(Map<String, ILazyWriteableDataset> lazyWritables, IDataset more) throws Exception {
+			appendData(lazyWritables, more, parent);
+		}
+
+		/** Appends data at path provided by this.getParent
+		 *
+		 * @param lazyWritables
+		 *            Map of ILazyWriteableDataset
+		 * @param more
+		 *            dataset
+		 * @param index
+		 *            of data reduction export
+		 * @throws Exception
+		 */
+		public void appendData(Map<String, ILazyWriteableDataset> lazyWritables, IDataset more, int index) throws Exception {
+			appendData(lazyWritables, more, parent, index);
+		}
+
+		/**
+		 * Appends data at index 0
+		 *
+		 * @param lazyWritables
+		 *            Map of ILazyWriteableDataset
+		 * @param more
+		 *            dataset
+		 * @param group
+		 *            group path of dataset to append to
+		 * @throws Exception
+		 */
+		public void appendData(Map<String, ILazyWriteableDataset> lazyWritables, IDataset more, String group) throws Exception {
+			appendData(lazyWritables, more, group, 0);
+		}
+
+		/**
+		 * Appends data
+		 *
+		 * @param lazyWritables
+		 *            Map of ILazyWriteableDataset
+		 * @param more
+		 *            dataset
+		 * @param group
+		 *            group path of dataset to append to
+		 * @param index
+		 *            of data reduction export
+		 * @throws Exception
+		 */
+		public void appendData(Map<String, ILazyWriteableDataset> lazyWritables, IDataset more, String group, int index) throws Exception {
+			int[] newShape = new int[more.getRank() + 1];
+			for (int i = 0; i < newShape.length; i++) {
+				if (i == 0)
+					newShape[i] = shape[0];
+				else {
+					newShape[i] = more.getShape()[i - 1];
 				}
-				
 			}
+			String filename = file.getFilePath();
+			String dataname = more.getName();
+			Dataset dataset = (Dataset) more;
+			int type = dataset.getDType();
+			if (!lazyWritables.containsKey(dataname))
+				lazyWritables.put(dataname, HDF5Utils.createLazyDataset(filename, group, more.getName(), newShape, null,
+						newShape, type, null, false));
 			
-			//Make new slice array to deal with new dimensions
-			List<Slice> sliceList = new ArrayList<Slice>();
-			List<Integer> totalDimList = new ArrayList<Integer>();
-			List<Integer> sliceShape =  new ArrayList<Integer>();
-			
-			int padCounter = 0;
-			int counter = 0;
-			for (Slice s: slice) {
-				
-				if (dimList.contains(counter)) {
-					
-					if (padCounter < dataRank) {
-						int dShape = mShape[padCounter];
-						sliceList.add(new Slice(0,dShape,1));
-						totalDimList.add(dShape);
-						sliceShape.add(dShape);
-						padCounter++;
-					} else {
-						continue;
-					}
-					
-					
-				}else {
-					sliceList.add(s);
-					totalDimList.add(shape[counter]);
-					sliceShape.add(1);
-				}
-				
-				counter++;
-			}
-			
-			Slice[] sliceOut = new Slice[sliceList.size()];
-			sliceList.toArray(sliceOut);
-			
-			long[] newShape = new long[totalDimList.size()];
-			for (int i = 0; i < newShape.length; i++) newShape[i] = totalDimList.get(i);
-			
-			//update dataset rank to match output
-			mShape = new int[newShape.length];
-			for (int i = 0; i < sliceShape.size(); i++) mShape[i] = sliceShape.get(i);
-			more.setShape(mShape);
-			
-			if (more.getRank() == 0 && newShape.length == 0) {
-				mShape = new int[] {1};
-				more.setShape(mShape);
-				newShape = new long[] {1};
-			}
-			
-			ndSlice = new SliceND(lazyWritable.getShape(), new int[] {index, 0, 0}, new int[] {(index+1), mShape[0], mShape[1]}, null);
-			lazyWritable.setSlice(null, more, ndSlice);
-			return;
+			ILazyWriteableDataset lwd = lazyWritables.get(dataname);
+			lwd.setSlice(monitor, more, new SliceND(lwd.getShape(), new Slice(index, index+1)));
 		}
 
 		public Object getUserData() {
@@ -363,4 +338,18 @@ public interface IDataReductionToolPage extends IToolPage {
 		}
 		
 	}
+
+	/**
+	 * Returns the export index
+	 *
+	 * @return index
+	 */
+	public int getExportIndex();
+
+	/**
+	 * Sets the incremented index
+	 *
+	 * @param index
+	 */
+	public void setExportIndex(int exportIndex);
 }
