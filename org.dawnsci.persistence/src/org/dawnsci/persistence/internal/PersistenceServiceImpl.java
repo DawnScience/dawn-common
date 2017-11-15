@@ -15,7 +15,6 @@ import org.dawnsci.persistence.json.JacksonMarshaller;
 import org.eclipse.dawnsci.analysis.api.persistence.IPersistenceService;
 import org.eclipse.dawnsci.analysis.api.persistence.IPersistentFile;
 import org.eclipse.dawnsci.analysis.api.persistence.IPersistentNodeFactory;
-import org.eclipse.dawnsci.hdf.object.IHierarchicalDataFile;
 import org.eclipse.dawnsci.nexus.NexusFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,7 +59,6 @@ public class PersistenceServiceImpl implements IPersistenceService{
 	@Override
 	public IPersistentFile createPersistentFile(Object file) throws Exception {
 		if (file instanceof File) return createPersistentFile(((File)file).getAbsolutePath());
-		if (file instanceof IHierarchicalDataFile) return new PersistentFileImpl((IHierarchicalDataFile)file);
 		return new PersistentFileImpl((NexusFile)file);
 	}
 

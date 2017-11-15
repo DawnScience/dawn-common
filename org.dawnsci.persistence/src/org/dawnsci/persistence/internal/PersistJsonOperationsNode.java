@@ -32,7 +32,7 @@ import org.eclipse.dawnsci.analysis.dataset.slicer.SliceFromSeriesMetadata;
 import org.eclipse.dawnsci.analysis.tree.impl.AttributeImpl;
 import org.eclipse.dawnsci.analysis.tree.impl.DataNodeImpl;
 import org.eclipse.dawnsci.analysis.tree.impl.GroupNodeImpl;
-import org.eclipse.dawnsci.hdf.object.Nexus;
+import org.eclipse.dawnsci.nexus.NexusFile;
 import org.eclipse.january.dataset.Dataset;
 import org.eclipse.january.dataset.DatasetFactory;
 import org.eclipse.january.dataset.DatasetUtils;
@@ -146,7 +146,7 @@ public class PersistJsonOperationsNode {
 	
 	public static GroupNode writeOperationsToNode(IOperation<? extends IOperationModel, ? extends OperationData>... operations) {
 		GroupNodeImpl process = new GroupNodeImpl(1);
-		process.addAttribute(new AttributeImpl("NX_class", Nexus.PROCESS));
+		process.addAttribute(new AttributeImpl(NexusFile.NXCLASS, "NXprocess"));
 		
 		for (int i = 0; i < operations.length; i++) {
 			writeOperationToProcessGroup(process, i, operations[i]);
@@ -191,7 +191,7 @@ public class PersistJsonOperationsNode {
 		IDataset pass = op.isPassUnmodifiedData() ? boolTrue : boolFalse;
 		IDataset save = op.isStoreOutput() ? boolTrue : boolFalse;
 		GroupNodeImpl gn = new GroupNodeImpl(1);
-		gn.addAttribute(new AttributeImpl("NX_class",Nexus.NOTE));
+		gn.addAttribute(new AttributeImpl(NexusFile.NXCLASS, "NXnote"));
 		n.addGroupNode(Integer.toString(i),gn);
 		DataNodeImpl nameNode = new DataNodeImpl(1);
 		nameNode.setDataset(DatasetFactory.createFromObject(name));
@@ -235,7 +235,7 @@ public class PersistJsonOperationsNode {
 	private static void writeSpecialObjects(Map<String, Object> special, String type, GroupNodeImpl node,IJSonMarshaller converter) throws Exception  {
 		 if (!special.isEmpty()) {
 			 GroupNodeImpl gn = new GroupNodeImpl(1);
-			 gn.addAttribute(new AttributeImpl("NX_class","NXcollection"));
+			 gn.addAttribute(new AttributeImpl(NexusFile.NXCLASS,"NXcollection"));
 			 node.addGroupNode(type, gn);
 
 			 
@@ -259,9 +259,9 @@ public class PersistJsonOperationsNode {
 	}
 	
 	public static OriginMetadata readOriginalDataInformation(String path) throws Exception {
-		String fp = LoaderFactory.getDataSet(path,  PersistenceConstants.PROCESS_ENTRY + Node.SEPARATOR + ORIGIN+ Node.SEPARATOR + "path", null).getString(0);
-		String dsn = LoaderFactory.getDataSet(path,  PersistenceConstants.PROCESS_ENTRY + Node.SEPARATOR + ORIGIN+ Node.SEPARATOR + "dataset", null).getString(0);
-		String ss = LoaderFactory.getDataSet(path,  PersistenceConstants.PROCESS_ENTRY + Node.SEPARATOR + ORIGIN+ Node.SEPARATOR + "sampling", null).getString(0);
+		String fp = LoaderFactory.getDataSet(path,  PersistenceConstants.PROCESS_ENTRY + Node.SEPARATOR + ORIGIN+ Node.SEPARATOR + "path", null).getString();
+		String dsn = LoaderFactory.getDataSet(path,  PersistenceConstants.PROCESS_ENTRY + Node.SEPARATOR + ORIGIN+ Node.SEPARATOR + "dataset", null).getString();
+		String ss = LoaderFactory.getDataSet(path,  PersistenceConstants.PROCESS_ENTRY + Node.SEPARATOR + ORIGIN+ Node.SEPARATOR + "sampling", null).getString();
 		IDataset dd = LoaderFactory.getDataSet(path,  PersistenceConstants.PROCESS_ENTRY + Node.SEPARATOR + ORIGIN + Node.SEPARATOR+ "data dimensions", null);
 		int[] dataDims = (int[])DatasetUtils.cast(dd, Dataset.INT32).getBuffer();
 		
@@ -270,7 +270,7 @@ public class PersistJsonOperationsNode {
 	
 	public static GroupNode writeOriginalDataInformation(OriginMetadata origin) {
 		GroupNode node = new GroupNodeImpl(1);
-		node.addAttribute(new AttributeImpl("NX_class", Nexus.NOTE));
+		node.addAttribute(new AttributeImpl(NexusFile.NXCLASS, "NXnote"));
 		DataNode dn = new DataNodeImpl(1);
 		dn.setDataset(DatasetFactory.createFromObject(origin.getFilePath()));
 		node.addDataNode("path", dn);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 Diamond Light Source Ltd.
+ * Copyright (c) 2012, 2017 Diamond Light Source Ltd.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -22,9 +22,10 @@ import org.eclipse.dawnsci.analysis.api.processing.IOperation;
 import org.eclipse.dawnsci.analysis.api.processing.OperationData;
 import org.eclipse.dawnsci.analysis.api.processing.model.IOperationModel;
 import org.eclipse.dawnsci.analysis.api.roi.IROI;
+import org.eclipse.dawnsci.analysis.api.tree.GroupNode;
+import org.eclipse.dawnsci.analysis.api.tree.Node;
 import org.eclipse.dawnsci.analysis.dataset.slicer.SliceFromSeriesMetadata;
-import org.eclipse.dawnsci.hdf.object.IHierarchicalDataFile;
-import org.eclipse.dawnsci.hdf.object.Nexus;
+import org.eclipse.dawnsci.nexus.NexusFile;
 import org.eclipse.january.dataset.Dataset;
 import org.eclipse.january.dataset.DatasetFactory;
 import org.eclipse.january.dataset.IDataset;
@@ -61,19 +62,16 @@ public class PersistJsonOperationHelper {
 	
 	private ObjectMapper mapper;
 	
-	
-	public void writeOperations(IHierarchicalDataFile file, IOperation<? extends IOperationModel, ? extends OperationData>... operations) throws Exception {
-		String entry = file.group(PersistenceConstants.ENTRY);
-		String process = file.group(PersistenceConstants.PROCESS_ENTRY);
-		file.setNexusAttribute(process, Nexus.PROCESS);
+	public void writeOperations(NexusFile file, IOperation<? extends IOperationModel, ? extends OperationData>... operations) throws Exception {
+		GroupNode entryGroup = file.getGroup(PersistenceConstants.ENTRY, true);
+		GroupNode processGroup = file.getGroup(entryGroup, "process", "NXprocess", true);
 
 		for (int i = 0; i < operations.length; i++) {
-			writeOperationToProcess(file, process, i, operations[i]);
+			writeOperationToProcess(file, processGroup, i, operations[i]);
 		}
-		
 	}
 	
-	private void writeOperationToProcess(IHierarchicalDataFile file,String group, int i, IOperation<? extends IOperationModel, ? extends OperationData> op) throws Exception {
+	private void writeOperationToProcess(NexusFile file, GroupNode group, int i, IOperation<? extends IOperationModel, ? extends OperationData> op) throws Exception {
 		
 		String opId = op.getId();
 		String name = op.getName();
@@ -85,22 +83,35 @@ public class PersistJsonOperationHelper {
 		IDataset pass = op.isPassUnmodifiedData() ? boolTrue : boolFalse;
 		IDataset save = op.isStoreOutput() ? boolTrue : boolFalse;
 		
-		String note = file.group(Integer.toString(i), group);
-		file.setNexusAttribute(note, Nexus.NOTE);
-		file.createStringDataset(NAME, name, note);
-		file.createStringDataset(ID, opId, note);
-		file.createDataset(SAVE, save, note);
-		file.createDataset(PASS, pass, note);
+		GroupNode groupNote =  file.getGroup(group, Integer.toString(i), "NXnote", true);
 		
+		Dataset dataName = DatasetFactory.createFromObject(name);
+		dataName.setName(NAME);
+		file.createData(groupNote, dataName);
+
+		Dataset dataID = DatasetFactory.createFromObject(opId);
+		dataID.setName(ID);
+		file.createData(groupNote, dataID);
+
+		Dataset dataSave = DatasetFactory.createFromObject(save);
+		dataSave.setName(SAVE);
+		file.createData(groupNote, dataSave);
+
+		Dataset dataPass = DatasetFactory.createFromObject(pass);
+		dataPass.setName(PASS);
+		file.createData(groupNote, dataPass);
+
 		Map<String, Object> m = specialObjects.get(IROI.class);
-		writeSpecialObjects(m,REGIONS,file,note);
+		writeSpecialObjects(m, REGIONS, file, groupNote);
 		m = specialObjects.get(IFunction.class);
-		writeSpecialObjects(m,FUNCTIONS,file,note);
+		writeSpecialObjects(m, FUNCTIONS, file, groupNote);
 		m = specialObjects.get(IDataset.class);
-		writeSpecialObjects(m,DATASETS,file,note);
-		
+		writeSpecialObjects(m, DATASETS, file, groupNote);
+
 		String modelJson = getModelJson(op.getModel());
-		file.createStringDataset(DATA, modelJson, note);
+		Dataset dataJson = DatasetFactory.createFromObject(modelJson);
+		dataJson.setName(DATA);
+		file.createData(groupNote, dataJson);
 
 	}
 	
@@ -160,37 +171,48 @@ public class PersistJsonOperationHelper {
 		return out;
 	}
 	
-	public void writeSpecialObjects(Map<String, Object> special, String type, IHierarchicalDataFile file, String group) throws Exception {
-		 if (!special.isEmpty()) {
-			 String g = file.group(type, group);
-			 file.setNexusAttribute(g, "NXcollection");
-			 
-			 for (Map.Entry<String, Object> entry : special.entrySet()) {
-				    String key = entry.getKey();
-				    Object value = entry.getValue();
-				    if (value instanceof IDataset) {
-				    	file.createDataset(key, (IDataset)value, g);
-				    } else {
-				    	IJSonMarshaller converter = new JacksonMarshaller();
-						String json = converter.marshal(value);
-						file.createStringDataset(key, json, g);
-				    }
+	public void writeSpecialObjects(Map<String, Object> special, String type, NexusFile file, GroupNode group) throws Exception {
+		if (!special.isEmpty()) {
+			GroupNode groupCollection = file.getGroup(group, type, "NXcollection", true);
+
+			for (Map.Entry<String, Object> entry : special.entrySet()) {
+				String key = entry.getKey();
+				Object value = entry.getValue();
+				if (value instanceof IDataset) {
+					IDataset data = (IDataset) value;
+					data.setName(key);
+					file.createData(groupCollection, data);
+				} else {
+					IJSonMarshaller converter = new JacksonMarshaller();
+					String json = converter.marshal(value);
+					Dataset data = DatasetFactory.createFromObject(json);
+					data.setName(key);
+					file.createData(groupCollection, data);
 				}
-		 }
+			}
+		}
 	}
 	
-	public void writeOriginalDataInformation(IHierarchicalDataFile file, OriginMetadata origin) throws Exception {
-		String entry = file.group(PersistenceConstants.ENTRY);
-		String process = file.group(PersistenceConstants.PROCESS_ENTRY);
-		file.setNexusAttribute(process, Nexus.PROCESS);
-		String note = file.group(ORIGIN, process);
-		file.createStringDataset("path", origin.getFilePath(), note);
-		file.createStringDataset("dataset", origin.getDatasetName(), note);
-		if (origin instanceof SliceFromSeriesMetadata) file.createStringDataset("sampling",
-				Slice.createString(((SliceFromSeriesMetadata)origin).getSliceInfo().getSubSampling()), note);
-		Dataset dd = DatasetFactory.createFromObject(origin.getDataDimensions());
-		file.createDataset("data dimensions", dd, note);
+	public void writeOriginalDataInformation(NexusFile file, OriginMetadata origin) throws Exception {
+		GroupNode groupEntry = file.getGroup(PersistenceConstants.ENTRY, true);
 		
+		GroupNode processNode = file.getGroup(groupEntry, "process", "NXprocess", true);
+		String originPath = PersistenceConstants.PROCESS_ENTRY + Node.SEPARATOR + ORIGIN;
+		GroupNode originNode = file.getGroup(originPath, true);
+		Dataset pathData = DatasetFactory.createFromObject(origin.getFilePath());
+		pathData.setName("path");
+		file.createData(originNode, pathData);
+		Dataset dataset = DatasetFactory.createFromObject(origin.getDatasetName());
+		dataset.setName("dataset");
+		file.createData(originNode, dataset);
+		if (origin instanceof SliceFromSeriesMetadata) {
+			Dataset samplingData = DatasetFactory.createFromObject(Slice.createString(((SliceFromSeriesMetadata)origin).getSliceInfo().getSubSampling()));
+			samplingData.setName("sampling");
+			file.createData(originNode, samplingData);
+		}
+		Dataset dd = DatasetFactory.createFromObject(origin.getDataDimensions());
+		dd.setName("data dimensions");
+		file.createData(originNode, dd);
 	}
 	
 	private ObjectMapper getMapper() {

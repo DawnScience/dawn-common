@@ -33,10 +33,6 @@ import org.eclipse.dawnsci.analysis.api.tree.DataNode;
 import org.eclipse.dawnsci.analysis.api.tree.GroupNode;
 import org.eclipse.dawnsci.analysis.tree.impl.AttributeImpl;
 import org.eclipse.dawnsci.analysis.tree.impl.DataNodeImpl;
-import org.eclipse.dawnsci.hdf.object.HierarchicalDataFactory;
-import org.eclipse.dawnsci.hdf.object.HierarchicalDataFile;
-import org.eclipse.dawnsci.hdf.object.IHierarchicalDataFile;
-import org.eclipse.dawnsci.hdf5.nexus.NexusFileHDF5;
 import org.eclipse.dawnsci.nexus.NexusException;
 import org.eclipse.dawnsci.nexus.NexusFile;
 import org.eclipse.january.IMonitor;
@@ -69,7 +65,7 @@ class PersistentFileImpl implements IPersistentFile {
 
 	private static final Logger logger = LoggerFactory.getLogger(PersistentFileImpl.class);
 	// Used for the persistence of operations and calibration
-	private IHierarchicalDataFile fileForOperations;
+//	private IHierarchicalDataFile fileForOperations;
 	private NexusFile file;
 	private String filePath;
 
@@ -93,7 +89,13 @@ class PersistentFileImpl implements IPersistentFile {
 		// open file
 		if (file == null)
 			file = ServiceLoader.getNexusFactory().newNexusFile(filePath);
-		file.openToWrite(true);
+		try {
+			file.openToWrite(true);
+		} catch (IllegalStateException ie) {
+			// do nothing if file is already open
+			if (!ie.getMessage().startsWith("File is already open"))
+				throw ie;
+		}
 
 		setSite(currentSite);
 		setVersion(PersistenceConstants.CURRENT_VERSION);
@@ -107,21 +109,21 @@ class PersistentFileImpl implements IPersistentFile {
 		this.filePath = filePath;
 		try {
 			this.file = ServiceLoader.getNexusFactory().newNexusFile(filePath);
-			file.openToRead();
+			file.openToWrite(true);
 		} catch (Exception e) {
 			logger.error("Error creating Nexus file:" + e);
 		}
 	}
 
-	/**
-	 * Used for persisting operations and calibration
-	 * 
-	 * @param filePath
-	 */
-	public PersistentFileImpl(IHierarchicalDataFile file) {
-		this.fileForOperations = file;
-		this.filePath = fileForOperations.getPath();
-	}
+//	/**
+//	 * Used for persisting operations and calibration
+//	 * 
+//	 * @param filePath
+//	 */
+//	public PersistentFileImpl(IHierarchicalDataFile file) {
+//		this.fileForOperations = file;
+//		this.filePath = fileForOperations.getPath();
+//	}
 
 	@Override
 	public void setMasks(Map<String, ? extends IDataset> masks) throws Exception {
@@ -345,7 +347,7 @@ class PersistentFileImpl implements IPersistentFile {
 		if (file == null)
 			file = ServiceLoader.getNexusFactory().newNexusFile(filePath);
 		GroupNode group = file.getGroup(PersistenceConstants.ENTRY, true);
-		file.addAttribute(group, new AttributeImpl("NX_class", "NXentry"));
+		file.addAttribute(group, new AttributeImpl(NexusFile.NXCLASS, "NXentry"));
 		// group = file.getGroup("/entry/Version", true);
 		file.addAttribute(group, new AttributeImpl("Version", version));
 	}
@@ -355,7 +357,7 @@ class PersistentFileImpl implements IPersistentFile {
 		if (file == null)
 			file = ServiceLoader.getNexusFactory().newNexusFile(filePath);
 		GroupNode group = file.getGroup(PersistenceConstants.ENTRY, true);
-		file.addAttribute(group, new AttributeImpl("NX_class", "NXentry"));
+		file.addAttribute(group, new AttributeImpl(NexusFile.NXCLASS, "NXentry"));
 		// group = file.getGroup("/entry/Site", true);
 		file.addAttribute(group, new AttributeImpl("Site", site));
 	}
@@ -602,9 +604,9 @@ class PersistentFileImpl implements IPersistentFile {
 		GroupNode group = null;
 		try {
 			group = file.getGroup("/entry", true);
-			file.addAttribute(group, new AttributeImpl("NX_class", "NXentry"));
+			file.addAttribute(group, new AttributeImpl(NexusFile.NXCLASS, "NXentry"));
 			group = file.getGroup(path, true);
-			file.addAttribute(group, new AttributeImpl("NX_class", nxclass));
+			file.addAttribute(group, new AttributeImpl(NexusFile.NXCLASS, nxclass));
 			return group;
 		} catch (NexusException e) {
 			e.printStackTrace();
@@ -740,35 +742,21 @@ class PersistentFileImpl implements IPersistentFile {
 	@Override
 	public void setPowderCalibrationInformation(IDataset calibrationImage, IDiffractionMetadata metadata,
 			IPowderCalibrationInfo info) throws Exception {
-		if (fileForOperations == null)
-			fileForOperations = HierarchicalDataFactory.getWriter(filePath);
+		if (file == null)
+			file = ServiceLoader.getNexusFactory().newNexusFile(filePath);
 
-		PersistSinglePowderCalibration.writeCalibrationToFile(fileForOperations, calibrationImage, metadata, info);
+		PersistSinglePowderCalibration.writeCalibrationToFile(file, calibrationImage, metadata, info);
 	}
 
 	@Override
 	public void setOperations(IOperation<? extends IOperationModel, ? extends OperationData>... operations)
 			throws Exception {
 		
-		boolean isOpen = false;
-		boolean isWrite = false;
-		if (fileForOperations != null){
-			isOpen = true;
-			isWrite = HierarchicalDataFile.isWriting(filePath);
-			fileForOperations.close();
-		}
-		
-		try (NexusFileHDF5 nexusFile = new NexusFileHDF5(filePath);) {
-			nexusFile.createAndOpenToWrite();
+		try (NexusFile nexusFile = ServiceLoader.getNexusFactory().newNexusFile(filePath)) {
+			nexusFile.openToWrite(true);
 			GroupNode gn = PersistJsonOperationsNode.writeOperationsToNode(operations);
 			nexusFile.getGroup("/entry", true);
 			nexusFile.addNode("/entry/process", gn);
-		} finally {
-			if (isOpen && !isWrite) {
-				fileForOperations = HierarchicalDataFactory.getReader(filePath);
-			} else if (isOpen && isWrite) {
-				fileForOperations = HierarchicalDataFactory.getWriter(filePath);
-			}
 		}
 	}
 
@@ -782,10 +770,10 @@ class PersistentFileImpl implements IPersistentFile {
 	public void setOperationDataOrigin(OriginMetadata origin) throws Exception {
 		if (origin == null)
 			return;
-		if (fileForOperations == null)
-			fileForOperations = HierarchicalDataFactory.getWriter(filePath);
+		if (file == null)
+			file = ServiceLoader.getNexusFactory().newNexusFile(filePath);
 		PersistJsonOperationHelper helper = new PersistJsonOperationHelper();
-		helper.writeOriginalDataInformation(fileForOperations, origin);
+		helper.writeOriginalDataInformation(file, origin);
 	}
 
 	@Override

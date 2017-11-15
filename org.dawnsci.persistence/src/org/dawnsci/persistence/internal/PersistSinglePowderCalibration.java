@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 Diamond Light Source Ltd.
+ * Copyright (c) 2012, 2017 Diamond Light Source Ltd.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -13,15 +13,16 @@ import javax.vecmath.Vector3d;
 import org.eclipse.dawnsci.analysis.api.diffraction.DetectorProperties;
 import org.eclipse.dawnsci.analysis.api.diffraction.DiffractionCrystalEnvironment;
 import org.eclipse.dawnsci.analysis.api.diffraction.IPowderCalibrationInfo;
-import org.eclipse.dawnsci.hdf.object.HierarchicalDataFileUtils;
-import org.eclipse.dawnsci.hdf.object.IHierarchicalDataFile;
-import org.eclipse.dawnsci.hdf.object.Nexus;
-import org.eclipse.dawnsci.hdf.object.nexus.NexusUtils;
 import org.eclipse.january.dataset.Dataset;
 import org.eclipse.january.dataset.DatasetFactory;
 import org.eclipse.january.dataset.DoubleDataset;
 import org.eclipse.january.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.metadata.IDiffractionMetadata;
+import org.eclipse.dawnsci.analysis.api.tree.DataNode;
+import org.eclipse.dawnsci.analysis.api.tree.GroupNode;
+import org.eclipse.dawnsci.analysis.api.tree.Node;
+import org.eclipse.dawnsci.analysis.tree.impl.AttributeImpl;
+import org.eclipse.dawnsci.nexus.NexusFile;
 
 class PersistSinglePowderCalibration {
 
@@ -32,24 +33,26 @@ class PersistSinglePowderCalibration {
 
 	public static final String DATANAME = "data";
 	
-	public static void writeCalibrationToFile(IHierarchicalDataFile file, IDataset calibrationImage,
+	public static void writeCalibrationToFile(NexusFile file, IDataset calibrationImage,
 			IDiffractionMetadata metadata, IPowderCalibrationInfo info) throws Exception {
 		
-		String parent = HierarchicalDataFileUtils.createParentEntry(file, DEFAULTINSTRUMENTNAME,Nexus.INST);
+		GroupNode parentNode = file.getGroup(DEFAULTINSTRUMENTNAME, true);
+		parentNode.addAttribute(new AttributeImpl("NXinstrument"));
+//		String parent = HierarchicalDataFileUtils.createParentEntry(file, DEFAULTINSTRUMENTNAME,Nexus.INST);
 		
-		parent = file.group("detector", parent);
-		file.setNexusAttribute(parent, Nexus.DETECT);
+		String parent = DEFAULTINSTRUMENTNAME + Node.SEPARATOR + "detector";
+		GroupNode detectorNode = file.getGroup(parentNode, "detector", "NXdetector", true);
 		
 		//write in data
-		final String dataset = file.createDataset(DATANAME,  calibrationImage, parent);
-		file.setNexusAttribute(dataset, Nexus.SDS);
+		calibrationImage.setName(DATANAME);
+		DataNode calibrationDataNode = file.createData(parentNode, calibrationImage);
 		
 		//make NXData in root as link to this data, make sure data has a link attribute back to the detector
-		String group = file.group(DEFAULTDATANAME);
-		file.setNexusAttribute(group, Nexus.DATA);
-		file.createLink(group, dataset.substring(dataset.lastIndexOf('/')+1), dataset); // TODO FIXME Is this right?
-		
-		
+		GroupNode defaultGroupNode = file.getGroup(DEFAULTDATANAME, true);
+//		String group = file.group(DEFAULTDATANAME);
+		file.addAttribute(defaultGroupNode, new AttributeImpl(NexusFile.NXCLASS, "NXdata"));
+//		file.setNexusAttribute(group, "NXdata");
+//		file.createLink(group, dataset.substring(dataset.lastIndexOf('/')+1), dataset); // TODO FIXME Is this right?
 		
 		//pixel+beam centre information
 		DetectorProperties detprop = metadata.getDetector2DProperties();
@@ -62,9 +65,12 @@ class PersistSinglePowderCalibration {
 		
 	}
 	
-	private static void createDependsOnTransformations(IHierarchicalDataFile file, DetectorProperties det, String parent) throws Exception {
-		String transform = file.group("transformations",parent);
-		file.setNexusAttribute(transform, "NXtransformations");
+	private static void createDependsOnTransformations(NexusFile file, DetectorProperties det, String parent) throws Exception {
+		
+		String transformationPath = parent + Node.SEPARATOR + "transformations";
+		GroupNode parentGroup = file.getGroup(parent, true);
+		
+		file.getGroup(parentGroup, "transformations", "NXtransformations", true);
 		
 		DoubleDataset offset = DatasetFactory.zeros(DoubleDataset.class, 3);
 		offset.setName("offset");
@@ -77,7 +83,7 @@ class PersistSinglePowderCalibration {
 		trans.get(vector.getData());
 		vector.setName("vector");
 		//as passive, so -length
-		String ds = createNXtransformation("translation", "translation",vector,offset,"mm",".",length,file,transform);
+		String ds = createNXtransformation("translation", "translation",vector,offset,"mm",".",length,file,transformationPath);
 		
 		double[] norm = det.getNormalAnglesInDegrees();
 		
@@ -86,62 +92,75 @@ class PersistSinglePowderCalibration {
 		vector.set(1, 2);
 		vector.setName("vector");
 		
-		String roll = createNXtransformation("roll", "rotation",vector,offset,"degrees",ds,norm[2],file,transform);
+		String roll = createNXtransformation("roll", "rotation",vector,offset,"degrees",ds,norm[2],file,transformationPath);
 		
 		vector = DatasetFactory.zeros(DoubleDataset.class, 3);
 		vector.set(1, 0);
 		vector.setName("vector");
 		
-		String pitch = createNXtransformation("pitch", "rotation",vector,offset,"degrees",roll,-norm[1],file,transform);
+		String pitch = createNXtransformation("pitch", "rotation",vector,offset,"degrees",roll,-norm[1],file,transformationPath);
 		
 		vector = DatasetFactory.zeros(DoubleDataset.class, 3);
 		vector.set(1, 1);
 		vector.setName("vector");
 		
-		String yaw = createNXtransformation("yaw", "rotation",vector,offset,"degrees",pitch,norm[0],file,transform);
+		String yaw = createNXtransformation("yaw", "rotation",vector,offset,"degrees",pitch,norm[0],file,transformationPath);
 	
-		file.createStringDataset("depends_on", yaw, parent);
+		Dataset yawData = DatasetFactory.createFromObject(yaw);
+		yawData.setName("depends_on");
+		file.createData(parent, yawData, true);
 		
 	}
 	
-	private static void createCalibrationMethod(IHierarchicalDataFile file, IPowderCalibrationInfo info, String parent) throws Exception {
-		String note = file.group("calibration_method",parent);
-		file.setNexusAttribute(note, "NXnote");
-		file.createStringDataset("author", DAWNCALIBRATIONID, note);
-		file.createStringDataset("description", info.getMethodDescription(), note);
+	private static void createCalibrationMethod(NexusFile file, IPowderCalibrationInfo info, String parent) throws Exception {
+		String calibrationPath = parent + Node.SEPARATOR + "calibration_method";
+		GroupNode parentGroup = file.getGroup(parent, true);
+		
+		GroupNode noteGroup = file.getGroup(parentGroup, "calibration_method", "NXnote", true);
+		Dataset authorData = DatasetFactory.createFromObject(DAWNCALIBRATIONID);
+		authorData.setName("author");
+		file.createData(noteGroup, authorData);
+		Dataset descriptionData = DatasetFactory.createFromObject(info.getMethodDescription());
+		descriptionData.setName("description");
+		file.createData(noteGroup, descriptionData);
 		
 		IDataset data = info.getUsedDSpaceIndexValues();
-		final String datasetd = file.createDataset("d_space_index",  data, note);
-		file.setNexusAttribute(datasetd, Nexus.SDS);
+		data.setName("d_space_index");
+		file.createData(noteGroup, data);
 		
-		createDoubleDataset("residual", info.getResidual(), file, note);
+		createDoubleDataset("residual", info.getResidual(), file, calibrationPath);
 		
 		if (info.getCitationInformation() == null || info.getCitationInformation().length == 0) return;
 		
-		String cite = file.group("reference", note);
-		file.setNexusAttribute(cite, "NXcite");
-		file.createStringDataset("description", info.getCitationInformation()[0], cite);
-		file.createStringDataset("doi", info.getCitationInformation()[1], cite);
-		file.createStringDataset("endnote", info.getCitationInformation()[2], cite);
-		file.createStringDataset("bibtex", info.getCitationInformation()[3], cite);
-		
+		GroupNode referenceGroup = file.getGroup(noteGroup, "reference", "NXcite", true);
+		Dataset descrData = DatasetFactory.createFromObject(info.getCitationInformation()[0]);
+		descrData.setName("description");
+		file.createData(referenceGroup, descrData);
+		Dataset doiData = DatasetFactory.createFromObject(info.getCitationInformation()[1]);
+		doiData.setName("doi");
+		file.createData(referenceGroup, doiData);
+		Dataset endNodeData = DatasetFactory.createFromObject(info.getCitationInformation()[2]);
+		endNodeData.setName("endnote");
+		file.createData(referenceGroup, endNodeData);
+		Dataset bibtexData = DatasetFactory.createFromObject(info.getCitationInformation()[3]);
+		bibtexData.setName("bibtex");
+		file.createData(referenceGroup, bibtexData);
 	}
 	
-	private static String createNXtransformation(String name, String type, Dataset vector, Dataset offset, String units, String depends_on, double value, IHierarchicalDataFile file, String group) throws Exception {
+	private static String createNXtransformation(String name, String type, Dataset vector, Dataset offset, String units, String depends_on, double value, NexusFile file, String group) throws Exception {
 		
 		String ds = createDoubleDataset(name, value,file, group);
-		NexusUtils.setDatasetAttribute(vector, ds, file);
-		NexusUtils.setDatasetAttribute(offset, ds, file);
-		file.setAttribute(ds, "units", units);
-		file.setAttribute(ds, "transformation_type", type);
-		file.setAttribute(ds, "depends_on", depends_on);
+		file.addAttribute(ds, new AttributeImpl(ds, vector));
+		file.addAttribute(ds, new AttributeImpl(ds, offset));
+		file.addAttribute(ds, new AttributeImpl("transformation_type", type));
+		file.addAttribute(ds, new AttributeImpl("depends_on", depends_on));
 		return ds;
 	}
 		
-	private static String createDoubleDataset(String name, double val, IHierarchicalDataFile file, String group) throws Exception {
-		
-		return file.createDataset(name, Dataset.INT64, new long[]{1}, new double[]{val}, group);
-		
+	private static String createDoubleDataset(String name, double val, NexusFile file, String group) throws Exception {
+		file.createData(group, name, DatasetFactory.createFromObject(Dataset.INT64, new double[]{val}, new int[]{1}), true);
+		group = group + Node.SEPARATOR + name;
+		return group;
 	}
 	
 }

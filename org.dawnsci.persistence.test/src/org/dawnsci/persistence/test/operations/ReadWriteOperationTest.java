@@ -23,8 +23,8 @@ import org.eclipse.dawnsci.analysis.dataset.roi.SectorROI;
 import org.eclipse.dawnsci.analysis.dataset.slicer.SliceFromSeriesMetadata;
 import org.eclipse.dawnsci.analysis.dataset.slicer.SliceInformation;
 import org.eclipse.dawnsci.analysis.dataset.slicer.SourceInformation;
-import org.eclipse.dawnsci.hdf.object.HierarchicalDataFactory;
-import org.eclipse.dawnsci.hdf.object.IHierarchicalDataFile;
+import org.eclipse.dawnsci.hdf5.nexus.NexusFileHDF5;
+import org.eclipse.dawnsci.nexus.NexusFile;
 import org.eclipse.january.dataset.Dataset;
 import org.eclipse.january.dataset.DatasetFactory;
 import org.eclipse.january.dataset.Slice;
@@ -42,7 +42,6 @@ import uk.ac.diamond.scisoft.analysis.processing.OperationServiceImpl;
 import uk.ac.diamond.scisoft.analysis.processing.operations.FunctionModel;
 
 public class ReadWriteOperationTest {
-	
 	
 	private static IOperationService   service;
 	private static IPersistenceService pservice;
@@ -76,16 +75,28 @@ public class ReadWriteOperationTest {
 		final File tmp = File.createTempFile("Test", ".nxs");
 		tmp.deleteOnExit();
 		tmp.createNewFile();
-		IHierarchicalDataFile filewriter = HierarchicalDataFactory.getWriter(tmp.getAbsolutePath());
+		NexusFile filewriter = NexusFileHDF5.openNexusFile(tmp.getAbsolutePath());
+		try {
+			filewriter.openToWrite(true);
+		} catch (IllegalStateException ie) {
+			if (!ie.getMessage().startsWith("File is already open"))
+				throw(ie);
+		}
 		IPersistentFile persist = pservice.createPersistentFile(filewriter);
 		try {
 			persist.setOperations(functionOp);
-			
 		} finally {
 			persist.close();
 		}
 		
-		IHierarchicalDataFile filereader = HierarchicalDataFactory.getReader(tmp.getAbsolutePath());
+		NexusFile filereader = NexusFileHDF5.openNexusFile(tmp.getAbsolutePath());
+		try {
+			filereader.openToRead();
+		} catch (IllegalStateException ie) {
+			// do nothing if file is already open
+			if (!ie.getMessage().startsWith("File is already open"))
+				throw ie;
+		}
 		persist = pservice.createPersistentFile(filereader);
 		try {
 
@@ -117,8 +128,13 @@ public class ReadWriteOperationTest {
 		tmp.createNewFile();
 		
 		// TODO Must be closed in a try{} finally{} ?
-		IHierarchicalDataFile file = HierarchicalDataFactory.getWriter(tmp.getAbsolutePath());
-
+		NexusFile file = NexusFileHDF5.createNexusFile(tmp.getAbsolutePath());
+		try {
+			file.openToWrite(true);
+		} catch(IllegalStateException ie) {
+			if (!ie.getMessage().startsWith("File is already open"))
+				throw(ie);
+		}
 		util.writeOperations(file, new IOperation[]{op2});
 
 		IOperation[] readOperations = PersistJsonOperationsNode.readOperations(LoaderFactory.getData(tmp.getAbsolutePath()).getTree());
@@ -148,8 +164,13 @@ public class ReadWriteOperationTest {
 		final File tmp = File.createTempFile("Test", ".nxs");
 		tmp.deleteOnExit();
 		tmp.createNewFile();
-		IHierarchicalDataFile file = HierarchicalDataFactory.getWriter(tmp.getAbsolutePath());
-
+		NexusFile file = NexusFileHDF5.createNexusFile(tmp.getAbsolutePath());
+		try {
+			file.openToWrite(true);
+		} catch (IllegalStateException ie) {
+			if (!ie.getMessage().startsWith("File is already open"))
+				throw(ie);
+		}
 		util.writeOperations(file, new IOperation[]{op2});
 
 		IOperation[] readOperations = PersistJsonOperationsNode.readOperations(LoaderFactory.getData(tmp.getAbsolutePath()).getTree());
@@ -214,11 +235,16 @@ public class ReadWriteOperationTest {
 		final File tmp = File.createTempFile("Test", ".nxs");
 		tmp.deleteOnExit();
 		tmp.createNewFile();
-		IHierarchicalDataFile file = HierarchicalDataFactory.getWriter(tmp.getAbsolutePath());
-
+		NexusFile file = NexusFileHDF5.createNexusFile(tmp.getAbsolutePath());
+		try {
+			file.openToWrite(true);
+		} catch (IllegalStateException ie) {
+			if (!ie.getMessage().startsWith("File is already open"))
+				throw(ie);
+		}
 		util.writeOriginalDataInformation(file, ssm);
 
-		OriginMetadata outOm = PersistJsonOperationsNode.readOriginalDataInformation(file.getPath());
+		OriginMetadata outOm = PersistJsonOperationsNode.readOriginalDataInformation(file.getFilePath());
 		outOm.toString();	
 		
 	}
