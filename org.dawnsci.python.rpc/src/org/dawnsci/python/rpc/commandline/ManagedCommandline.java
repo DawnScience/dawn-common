@@ -158,7 +158,7 @@ public class ManagedCommandline extends EnvCommandline {
     try {
       currentProcess.waitFor();
     } catch (InterruptedException e) {
-      logger.error("Thread was interrupted while executing command \"" + this.toString() + "\".", e);
+      logger.error("Thread was interrupted while executing command \"{}\".", this.toString(), e);
     }
 
     // make sure last outputs are also captured, even if no new-line was at the
@@ -210,7 +210,7 @@ public class ManagedCommandline extends EnvCommandline {
         try {
           read();
         } catch (IOException e) {
-          logger.error("Error reading from stream by Gobbler " + getName(), e);
+          logger.error("Error reading from stream by Gobbler {}", getName(), e);
         }
       }
     }
@@ -221,10 +221,9 @@ public class ManagedCommandline extends EnvCommandline {
       String line = null;
       while ((line = lineByLineReader.readLine()) != null) {
         if (streamLogsToLogging) {
-          logger.info(getName() + "> " + line);
-
+            logger.info("{}> {}", getName(), line);
         } else if (streamLogsToLoggingAndSaved) {
-          logger.info(getName() + "> " + line);
+          logger.info("{}> {}", getName(), line);
           streamDataAsStringBuilder.append(line + LINE_SEPARATOR);
           streamDataAsList.add(line);
 
@@ -251,13 +250,13 @@ public class ManagedCommandline extends EnvCommandline {
         if (logger.isDebugEnabled()) {
           // Note that ready might be false here since
           // we already read the data.
-          logger.debug("_read(): Gobbler '" + getName() + "' Ready: " + inputStreamReader.ready() + " Value: '" + String.valueOf(chars, 0, length) + "'");
+          logger.debug("_read(): Gobbler '{}' Ready: {} Value: '{}'", getName(), inputStreamReader.ready(), String.valueOf(chars, 0, length));
         }
 
         if (streamLogsToLogging) {
-          logger.info(getName() + "> " + new String(chars));
+          logger.info("{}> {}", getName(), new String(chars));
         } else if (streamLogsToLoggingAndSaved) {
-          logger.info(getName() + "> " + new String(chars));
+          logger.info("{}> {}", getName(), new String(chars));
           streamDataAsStringBuilder.append(chars, 0, length);
           streamDataAsList.add(new String(chars));
         } else {
