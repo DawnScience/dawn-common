@@ -1,6 +1,5 @@
 package org.dawnsci.persistence.internal;
 
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -38,6 +37,7 @@ import org.eclipse.january.dataset.Dataset;
 import org.eclipse.january.dataset.DatasetFactory;
 import org.eclipse.january.dataset.DatasetUtils;
 import org.eclipse.january.dataset.IDataset;
+import org.eclipse.january.dataset.IntegerDataset;
 import org.eclipse.january.dataset.Slice;
 import org.eclipse.january.metadata.MetadataFactory;
 import org.eclipse.january.metadata.OriginMetadata;
@@ -183,10 +183,10 @@ public class PersistJsonOperationsNode {
 	private static void writeOperationToProcessGroup(GroupNodeImpl n, int i, IOperation op) {
 		String opId = op.getId();
 		String name = op.getName();
-		IDataset boolTrue = DatasetFactory.ones(new int[] {1}, Dataset.INT);
-		IDataset boolFalse =  DatasetFactory.zeros(new int[] {1}, Dataset.INT);
+		IDataset boolTrue = DatasetFactory.ones(IntegerDataset.class, 1);
+		IDataset boolFalse =  DatasetFactory.zeros(IntegerDataset.class, 1);
 		
-		Map<Class, Map<String, Object>> specialObjects = getSpecialObjects(op.getModel());
+		Map<Class<?>, Map<String, Object>> specialObjects = getSpecialObjects(op.getModel());
 		
 		IDataset pass = op.isPassUnmodifiedData() ? boolTrue : boolFalse;
 		IDataset save = op.isStoreOutput() ? boolTrue : boolFalse;
@@ -316,9 +316,9 @@ public class PersistJsonOperationsNode {
 
 	}
 	
-	private static Map<Class,Map<String, Object>> getSpecialObjects(IOperationModel model) {
+	private static Map<Class<?>,Map<String, Object>> getSpecialObjects(IOperationModel model) {
 
-		Map<Class,Map<String, Object>> out = new HashMap<Class, Map<String,Object>>();
+		Map<Class<?>,Map<String, Object>> out = new HashMap<>();
 		out.put(IROI.class, new HashMap<String, Object>());
 		out.put(IDataset.class, new HashMap<String, Object>());
 		out.put(IFunction.class, new HashMap<String, Object>());
