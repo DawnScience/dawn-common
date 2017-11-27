@@ -78,13 +78,21 @@ public class ProcessConversion extends AbstractConversion {
 		cc.setData(localLazy);
 		cc.setSlicing(Slicer.getSliceNDFromSliceDimensions(context.getSliceDimensions(), localLazy.getShape()));
 		cc.setDataDimensions(Slicer.getDataDimensions(localLazy.getShape(), context.getSliceDimensions()));
-		
+
+		IOperation[] operationSeries = info.getOperationSeries();
+		String suffix = operationSeries[operationSeries.length - 1].getFilenameSuffix();
+		if (suffix == null) {
+			suffix = "";
+		} else {
+			suffix = "_" + suffix;
+		}
+
 		String name = getFileNameNoExtension(context.getSelectedConversionFile());
 		String outputFolder = context.getOutputPath();
 		Date date = new Date() ;
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyMMdd_HHmmss") ;
 		String timeStamp = "_" +dateFormat.format(date);
-		String full = outputFolder + File.separator + name + PROCESSED+ timeStamp + EXT;
+		String full = outputFolder + File.separator + name + PROCESSED + suffix + timeStamp + EXT;
 		File fh = new File(outputFolder);
 		fh.mkdir();
 		
@@ -101,7 +109,6 @@ public class ProcessConversion extends AbstractConversion {
 		}
 		
 		boolean parallel = true;
-		IOperation[] operationSeries = info.getOperationSeries();
 		for (IOperation op : operationSeries) {
 			Atomic atomic = op.getClass().getAnnotation(Atomic.class);
 			if (atomic == null) {
