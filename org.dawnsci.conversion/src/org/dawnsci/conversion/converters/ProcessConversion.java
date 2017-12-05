@@ -19,7 +19,6 @@ import org.eclipse.dawnsci.analysis.api.conversion.IProcessingConversionInfo;
 import org.eclipse.dawnsci.analysis.api.conversion.ProcessingOutputType;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
 import org.eclipse.dawnsci.analysis.api.io.ILoaderService;
-import org.eclipse.dawnsci.analysis.api.processing.Atomic;
 import org.eclipse.dawnsci.analysis.api.processing.ExecutionType;
 import org.eclipse.dawnsci.analysis.api.processing.IExecutionVisitor;
 import org.eclipse.dawnsci.analysis.api.processing.IOperation;
@@ -107,16 +106,6 @@ public class ProcessConversion extends AbstractConversion {
 			FileUtils.copyNio(source, dest);
 			logger.debug("Copy ran in: " +(System.currentTimeMillis()-start)/1000. + " s : Thread" +Thread.currentThread().toString());
 		}
-		
-		boolean parallel = true;
-		for (IOperation op : operationSeries) {
-			Atomic atomic = op.getClass().getAnnotation(Atomic.class);
-			if (atomic == null) {
-				parallel = false;
-				break;
-			}
-		}
-		
 		
 		ExecutionType executionType = info.getExecutionType();
 		
