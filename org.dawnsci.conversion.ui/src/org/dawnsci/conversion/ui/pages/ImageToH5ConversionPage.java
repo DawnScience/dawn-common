@@ -13,8 +13,8 @@ import java.io.File;
 import org.dawb.common.ui.wizard.ResourceChoosePage;
 import org.dawb.common.util.io.FileUtils;
 import org.dawnsci.conversion.ui.api.IConversionWizardPage;
-import org.dawnsci.io.h5.H5Loader;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
+import org.eclipse.dawnsci.hdf5.HDF5Utils;
 import org.eclipse.richbeans.widgets.decorator.RegexDecorator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -102,8 +102,8 @@ public class ImageToH5ConversionPage extends ResourceChoosePage implements IConv
 				setErrorMessage("Please choose another location to export to; this one is read only.");
 				return;
 			}
-	    }
-		if (!H5Loader.isH5(p)) {
+		}
+		if (!HDF5Utils.isHDF5(p)) {
 			setErrorMessage("Please choose a file with extension 'h5' or 'nxs' to convert to.");
 			return;
 
