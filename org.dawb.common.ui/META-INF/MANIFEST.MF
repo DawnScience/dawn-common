@@ -31,7 +31,8 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.e4.ui.workbench,
  org.eclipse.emf.common.ui,
  org.dawnsci.jexl,
- org.eclipse.dawnsci.analysis.api
+ org.eclipse.dawnsci.analysis.api,
+ org.eclipse.dawnsci.hdf.object;bundle-version="1.3.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Export-Package: org.dawb.common.ui,
