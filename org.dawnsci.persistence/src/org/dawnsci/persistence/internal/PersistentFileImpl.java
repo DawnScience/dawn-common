@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.dawnsci.io.h5.H5LazyDataset;
 import org.dawnsci.persistence.ServiceLoader;
 import org.dawnsci.persistence.json.JacksonMarshaller;
 import org.eclipse.dawnsci.analysis.api.diffraction.IPowderCalibrationInfo;
@@ -636,12 +635,8 @@ class PersistentFileImpl implements IPersistentFile {
 	@SuppressWarnings("unused")
 	private BooleanDataset readH5Mask(IDataHolder dh, String maskName) throws Exception {
 		ILazyDataset ld = dh.getLazyDataset(PersistenceConstants.MASK_ENTRY + "/" + maskName);
-		if (ld instanceof H5LazyDataset) {
-			return (BooleanDataset) DatasetUtils.cast(((H5LazyDataset) ld).getCompleteData(null), Dataset.BOOL);
-		} else {
-			return (BooleanDataset) DatasetUtils.cast(dh.getDataset(PersistenceConstants.MASK_ENTRY + "/" + maskName),
-					Dataset.BOOL);
-		}
+		return (BooleanDataset) DatasetUtils.cast(dh.getDataset(PersistenceConstants.MASK_ENTRY + "/" + maskName),
+				Dataset.BOOL);
 	}
 
 	@Override
