@@ -99,7 +99,8 @@ public class ReadWriteTest extends AbstractThreadTestBase {
 				file.getMasks(null);
 				fail("Reading Exception not caught");
 			} catch (Exception e) {
-				boolean resultException = e.getMessage().startsWith("Group does not exist ");
+				String msg = e.getMessage();
+				boolean resultException = msg.startsWith("Group ") && msg.contains(" does not exist ");
 				if(resultException)
 					assertTrue("Reading Exception caught", resultException);
 				else
@@ -110,7 +111,8 @@ public class ReadWriteTest extends AbstractThreadTestBase {
 				file.getROIs(null);
 				fail("Reading Exception not caught");
 			} catch (Exception e) {
-				boolean resultException = e.getMessage().startsWith("Group does not exist ");
+				String msg = e.getMessage();
+				boolean resultException = msg.startsWith("Group ") && msg.contains(" does not exist ");
 				if(resultException)
 					assertTrue("Reading Exception caught", resultException);
 				else
