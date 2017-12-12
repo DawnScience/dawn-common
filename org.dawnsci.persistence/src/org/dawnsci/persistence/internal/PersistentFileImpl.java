@@ -93,7 +93,8 @@ class PersistentFileImpl implements IPersistentFile {
 			file.openToWrite(true);
 		} catch (IllegalStateException ie) {
 			// do nothing if file is already open
-			if (!ie.getMessage().startsWith("File is already open"))
+			String msg = ie.getMessage();
+			if (!msg.startsWith("File ") && !msg.endsWith(" is already open"))
 				throw ie;
 		}
 
