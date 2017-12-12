@@ -7,6 +7,7 @@ import java.io.File;
 import java.lang.reflect.ParameterizedType;
 
 import org.dawb.common.services.ServiceManager;
+import org.dawnsci.persistence.ServiceLoader;
 import org.dawnsci.persistence.internal.PersistJsonOperationHelper;
 import org.dawnsci.persistence.internal.PersistJsonOperationsNode;
 import org.dawnsci.persistence.internal.PersistenceServiceImpl;
@@ -23,6 +24,7 @@ import org.eclipse.dawnsci.analysis.dataset.roi.SectorROI;
 import org.eclipse.dawnsci.analysis.dataset.slicer.SliceFromSeriesMetadata;
 import org.eclipse.dawnsci.analysis.dataset.slicer.SliceInformation;
 import org.eclipse.dawnsci.analysis.dataset.slicer.SourceInformation;
+import org.eclipse.dawnsci.hdf5.nexus.NexusFileFactoryHDF5;
 import org.eclipse.dawnsci.hdf5.nexus.NexusFileHDF5;
 import org.eclipse.dawnsci.nexus.NexusFile;
 import org.eclipse.january.dataset.Dataset;
@@ -50,11 +52,11 @@ public class ReadWriteOperationTest {
 	public static void before() throws Exception {
 
 		ServiceManager.setService(IOperationService.class, new OperationServiceImpl());
+		ServiceLoader.setNexusFactory(new NexusFileFactoryHDF5());
 		service = (IOperationService)ServiceManager.getService(IOperationService.class);
 		service.createOperations(service.getClass().getClassLoader(), "org.dawnsci.persistence.test.operations");
 		service.createOperations(service.getClass().getClassLoader(), "uk.ac.diamond.scisoft.analysis.processing.operations");
 		PersistJsonOperationsNode.setOperationService(service);
-		
 		pservice = new PersistenceServiceImpl();
 		
 		/*FunctionFactory has been set up as an OSGI service so need to register
@@ -76,27 +78,15 @@ public class ReadWriteOperationTest {
 		tmp.deleteOnExit();
 		tmp.createNewFile();
 		NexusFile filewriter = NexusFileHDF5.openNexusFile(tmp.getAbsolutePath());
-		try {
-			filewriter.openToWrite(true);
-		} catch (IllegalStateException ie) {
-			if (!ie.getMessage().startsWith("File is already open"))
-				throw(ie);
-		}
 		IPersistentFile persist = pservice.createPersistentFile(filewriter);
 		try {
 			persist.setOperations(functionOp);
 		} finally {
 			persist.close();
 		}
-		
+		filewriter.close();
+
 		NexusFile filereader = NexusFileHDF5.openNexusFile(tmp.getAbsolutePath());
-		try {
-			filereader.openToRead();
-		} catch (IllegalStateException ie) {
-			// do nothing if file is already open
-			if (!ie.getMessage().startsWith("File is already open"))
-				throw ie;
-		}
 		persist = pservice.createPersistentFile(filereader);
 		try {
 
@@ -126,16 +116,10 @@ public class ReadWriteOperationTest {
 		final File tmp = File.createTempFile("Test", ".nxs");
 		tmp.deleteOnExit();
 		tmp.createNewFile();
-		
 		// TODO Must be closed in a try{} finally{} ?
 		NexusFile file = NexusFileHDF5.createNexusFile(tmp.getAbsolutePath());
-		try {
-			file.openToWrite(true);
-		} catch(IllegalStateException ie) {
-			if (!ie.getMessage().startsWith("File is already open"))
-				throw(ie);
-		}
 		util.writeOperations(file, new IOperation[]{op2});
+		file.close();
 
 		IOperation[] readOperations = PersistJsonOperationsNode.readOperations(LoaderFactory.getData(tmp.getAbsolutePath()).getTree());
 
@@ -165,13 +149,8 @@ public class ReadWriteOperationTest {
 		tmp.deleteOnExit();
 		tmp.createNewFile();
 		NexusFile file = NexusFileHDF5.createNexusFile(tmp.getAbsolutePath());
-		try {
-			file.openToWrite(true);
-		} catch (IllegalStateException ie) {
-			if (!ie.getMessage().startsWith("File is already open"))
-				throw(ie);
-		}
 		util.writeOperations(file, new IOperation[]{op2});
+		file.close();
 
 		IOperation[] readOperations = PersistJsonOperationsNode.readOperations(LoaderFactory.getData(tmp.getAbsolutePath()).getTree());
 		JunkTestModelROI mo = (JunkTestModelROI)readOperations[0].getModel();
@@ -236,13 +215,8 @@ public class ReadWriteOperationTest {
 		tmp.deleteOnExit();
 		tmp.createNewFile();
 		NexusFile file = NexusFileHDF5.createNexusFile(tmp.getAbsolutePath());
-		try {
-			file.openToWrite(true);
-		} catch (IllegalStateException ie) {
-			if (!ie.getMessage().startsWith("File is already open"))
-				throw(ie);
-		}
 		util.writeOriginalDataInformation(file, ssm);
+		file.close();
 
 		OriginMetadata outOm = PersistJsonOperationsNode.readOriginalDataInformation(file.getFilePath());
 		outOm.toString();	
