@@ -21,6 +21,7 @@ import org.eclipse.dawnsci.analysis.api.tree.Node;
 import org.eclipse.dawnsci.analysis.api.tree.Tree;
 import org.eclipse.dawnsci.analysis.tree.impl.AttributeImpl;
 import org.eclipse.dawnsci.nexus.NexusFile;
+import org.eclipse.dawnsci.nexus.NexusUtils;
 import org.eclipse.january.dataset.Dataset;
 import org.eclipse.january.dataset.DatasetFactory;
 import org.eclipse.january.dataset.DatasetUtils;
@@ -101,7 +102,7 @@ public class CompareConverter extends AbstractConversion{
 		abs = resize(abs, requiredShape);
 		abs.setName(name);
 		GroupNode groupNode = hFile.getGroup(group, true);
-		DataNode dNode = hFile.createData(groupNode, abs);
+		DataNode dNode = NexusUtils.appendData(hFile, groupNode, abs);
 		if (!written.get(datasetPath)) {
 			hFile.addAttribute(dNode, new AttributeImpl("original_name", datasetPath));
 			written.put(datasetPath, true);
@@ -117,7 +118,7 @@ public class CompareConverter extends AbstractConversion{
 		if (a.getDType() == Dataset.STRING)
 			return a;
 		int size = a.getSize();
-		Dataset rdata = DatasetFactory.zeros(a.getElementsPerItem(), shape, a.getDType());
+		Dataset rdata = DatasetFactory.zeros(a);
 		IndexIterator it = rdata.getIterator();
 		while (it.hasNext()) {
 			rdata.setObjectAbs(it.index, it.index < size ? a.getObjectAbs(it.index) : Double.NaN);

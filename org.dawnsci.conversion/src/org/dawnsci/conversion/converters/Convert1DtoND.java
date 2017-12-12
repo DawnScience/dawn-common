@@ -24,7 +24,10 @@ import org.eclipse.dawnsci.analysis.api.tree.Node;
 import org.eclipse.dawnsci.analysis.api.tree.Tree;
 import org.eclipse.dawnsci.analysis.tree.impl.AttributeImpl;
 import org.eclipse.dawnsci.nexus.NexusFile;
+import org.eclipse.dawnsci.nexus.NexusUtils;
 import org.eclipse.january.dataset.AggregateDataset;
+import org.eclipse.january.dataset.Dataset;
+import org.eclipse.january.dataset.DatasetUtils;
 import org.eclipse.january.dataset.IDataset;
 import org.eclipse.january.dataset.ILazyDataset;
 import org.slf4j.Logger;
@@ -89,9 +92,9 @@ public class Convert1DtoND extends AbstractConversion {
 				file.addAttribute(groupNode, new AttributeImpl(NexusFile.NXCLASS, "NXentry"));
 
 				if (paths.length>2) {
-					String path = "";
+					String path = entry;
 					for (int i = 1; i < paths.length-1; i++) {
-						path = path + Node.SEPARATOR + paths[i];
+						path += Node.SEPARATOR + paths[i];
 						groupNode = file.getGroup(path, true);
 						if (i<(paths.length-1))
 							file.addAttribute(groupNode, new AttributeImpl(NexusFile.NXCLASS, "NXentry"));
@@ -117,9 +120,9 @@ public class Convert1DtoND extends AbstractConversion {
 				file.addAttribute(groupNode, new AttributeImpl(NexusFile.NXCLASS, "NXentry"));
 				
 				if (paths.length>2) {
-					String path = "";
+					String path = entry;
 					for (int i = 1; i < paths.length-1; i++) {
-						path = path + Node.SEPARATOR + paths[i];
+						path += Node.SEPARATOR + paths[i];
 						groupNode = file.getGroup(path, true);
 						if (i<(paths.length-1))
 							file.addAttribute(groupNode, new AttributeImpl(NexusFile.NXCLASS, "NXentry"));
@@ -150,18 +153,18 @@ public class Convert1DtoND extends AbstractConversion {
 		
 		String name = paths[paths.length-1];
 		
-		IDataset first = out.get(0).getSlice();
+		Dataset first = DatasetUtils.convertToDataset(out.get(0).getSlice());
 		first.setName(name);
-		DataNode dNode = file.createData(group, first);
+		DataNode dNode = NexusUtils.appendData(file, group, first);
 		
 		if (first.getShape()[0] == axisLength)
 			file.addAttribute(dNode, new AttributeImpl(NexusTreeUtils.NX_SIGNAL, "1"));
 		file.addAttribute(dNode, new AttributeImpl("original_name", key));
 		
 		for (int i = 1; i < out.size(); i++) {
-			IDataset a = out.get(i).getSlice();
+			Dataset a = DatasetUtils.convertToDataset(out.get(i).getSlice());
 			a.setName(name);
-			dNode = file.createData(group, a);
+			dNode = NexusUtils.appendData(file, group, a);
 		}
 	}
 	
@@ -179,9 +182,9 @@ public class Convert1DtoND extends AbstractConversion {
 			}
 			
 			ILazyDataset ds = new AggregateDataset(true, lz);
-			IDataset a = ds.getSlice();
+			Dataset a = DatasetUtils.convertToDataset(ds.getSlice());
 			a.setName(name);
-			dataNode = file.createData(group, a);
+			dataNode = NexusUtils.appendData(file, group, a);
 		}
 		if (dataNode != null)
 			file.addAttribute(dataNode, new AttributeImpl("original_name", key));

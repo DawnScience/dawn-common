@@ -21,6 +21,7 @@ import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionScheme;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionService;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
+import org.eclipse.dawnsci.hdf5.nexus.NexusFileFactoryHDF5;
 import org.eclipse.january.dataset.ILazyDataset;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,6 +35,7 @@ public class CompareConvertTest {
 	@Before
 	public void before() {
 		LocalServiceManager.setLoaderService(new LoaderServiceImpl());
+		ServiceLoader.setNexusFileFactory(new NexusFileFactoryHDF5());
 	}
 	
 	@Test

@@ -23,15 +23,14 @@ import org.eclipse.dawnsci.analysis.api.tree.GroupNode;
 import org.eclipse.dawnsci.analysis.api.tree.Node;
 import org.eclipse.dawnsci.analysis.api.tree.Tree;
 import org.eclipse.dawnsci.analysis.tree.impl.AttributeImpl;
-import org.eclipse.dawnsci.hdf5.HDF5Utils;
 import org.eclipse.dawnsci.nexus.NexusFile;
+import org.eclipse.dawnsci.nexus.NexusUtils;
 import org.eclipse.january.IMonitor;
 import org.eclipse.january.dataset.Dataset;
+import org.eclipse.january.dataset.DatasetUtils;
 import org.eclipse.january.dataset.IDataset;
 import org.eclipse.january.dataset.ILazyDataset;
-import org.eclipse.january.dataset.ILazyWriteableDataset;
 import org.eclipse.january.dataset.LazyDataset;
-import org.eclipse.january.dataset.SliceND;
 
 import uk.ac.diamond.scisoft.analysis.io.ImageStackLoader;
 
@@ -46,6 +45,7 @@ public class ImagesToHDFConverter extends AbstractConversion{
 
 	private NexusFile hFile;
 	private String name;
+	private GroupNode group;
 
 	public ImagesToHDFConverter(IConversionContext context) throws Exception {
 		super(context);
@@ -59,7 +59,7 @@ public class ImagesToHDFConverter extends AbstractConversion{
 		if ("".equals(paths[0]))
 			paths = Arrays.copyOfRange(paths, 1, paths.length);
 		final String entry = Tree.ROOT + paths[0];
-		GroupNode group = hFile.getGroup(entry, true);
+		group = hFile.getGroup(entry, true);
 		hFile.addAttribute(group, new AttributeImpl(NexusFile.NXCLASS, "NXentry"));
 
 		if (paths.length>2) {
@@ -106,35 +106,18 @@ public class ImagesToHDFConverter extends AbstractConversion{
 
 	}
 
-	// Flag used to count number of convert calls (in case of 3d data)
-	private int index = 0;
-	private ILazyWriteableDataset lazyWritable = null;
+	private boolean first = true;
 
 	@Override
 	protected void convert(IDataset slice) throws Exception {
 		final String datasetPath = context.getDatasetNames().get(0);
-		String parentPath = datasetPath.substring(0, datasetPath.lastIndexOf(Node.SEPARATOR));
-		final String filename = context.getOutputPath();
-		final ILazyDataset lazyDataset = context.getLazyDataset();
-		lazyDataset.setName(name);
-		int[] shape = lazyDataset.getShape();
-		// create lazy writable
-		if (lazyWritable == null)
-			lazyWritable = HDF5Utils.createLazyDataset(filename, parentPath, name, shape, null,
-					shape, Dataset.INT32, null, false);
-		//append slice to lazy writable
-		int[] sliceShape = slice.getShape();
-		SliceND ndSlice = new SliceND(lazyWritable.getShape(), new int[] {index, 0, 0}, new int[] {(index+1), sliceShape[0], sliceShape[1]}, null);
-		lazyWritable.setSlice(null, slice, ndSlice);
-
-		int rank = lazyDataset.getRank();
-		index++;
-		// if not the last slice (and last call of the convert method) then we exit early.
-		if (index < rank)
-			return;
-		// set attribute of datanode
-		DataNode dataNode = hFile.getData(datasetPath);
-		hFile.addAttribute(dataNode, new AttributeImpl("original_name", datasetPath));
+		Dataset data = DatasetUtils.convertToDataset(slice);
+		data.setName(name);
+		DataNode d = NexusUtils.appendData(hFile, group, data);
+		if (first) {
+			hFile.addAttribute(d, new AttributeImpl("original_name", datasetPath));
+			first = false;
+		}
 		
 		IMonitor mon = context.getMonitor();
 		if (mon != null) {
