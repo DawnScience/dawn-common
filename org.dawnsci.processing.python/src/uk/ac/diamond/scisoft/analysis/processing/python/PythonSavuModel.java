@@ -1,10 +1,7 @@
 package uk.ac.diamond.scisoft.analysis.processing.python;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
+import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.dawnsci.analysis.api.processing.model.AbstractOperationModel;
 import org.eclipse.dawnsci.analysis.api.processing.model.OperationModelField;
 
@@ -15,16 +12,24 @@ public class PythonSavuModel extends AbstractOperationModel {
 	@OperationModelField(editable = false, visible = false, label="Plugin Name")
 	private String pluginName = null;
 
+	public String getPluginName() {
+		return this.pluginName;
+	}
+
+	public void setPluginName(String pluginName) {
+		firePropertyChange("pluginName", this.pluginName, this.pluginName = pluginName);
+	}
+	
 	// Whether this is to be treated as metadata or just passed down the chain
 	@OperationModelField(editable = false, visible = false, label="Meta data only", hint="Do we want the data in the meta data or to be passed down the chain")
-	private boolean MetaDataOnly = false;
+	private boolean metaDataOnly = false;
 
 	public boolean isMetaDataOnly() {
-		return this.MetaDataOnly;
+		return this.metaDataOnly;
 	}
 
 	public void setMetaDataOnly(boolean metaDataOnly) {
-		MetaDataOnly = metaDataOnly;
+		firePropertyChange("metaDataOnly", this.metaDataOnly, this.metaDataOnly = metaDataOnly);
 	}
 	
 //	the pluginPath
@@ -36,51 +41,32 @@ public class PythonSavuModel extends AbstractOperationModel {
 	}
 
 	public void setPluginPath(String pluginPath) {
-		this.pluginPath = pluginPath;
+		firePropertyChange("pluginPath", this.pluginPath, this.pluginPath = pluginPath);
 	}
 
-	// the parameters Map
+	// the parameters Map -> read only!
 	@OperationModelField(editable = false, visible = false, label="Parameters", hint="parameters for the filter")
-	private Map <String, Object> parameters = null;
+	private Map<String, Object> parameters = new HashMap<>();
 
 	public Map<String, Object> getParameters() {
-		
-		return this.parameters;
+		return parameters;
 	}
 
 	public void setParameters(Map<String, Object> parameters) {
-		this.parameters = parameters;
+		this.parameters.clear();
+		this.parameters.putAll(parameters);
 	}
 
-	public String getPluginName() {
-		return this.pluginName;
-	}
-
-	public void setPluginName(String pluginName) {
-		this.pluginName = pluginName;
-	}
-	
 //	the plugin input rank
 	@OperationModelField(editable = false, visible = false, label="Plugin input rank")
-	private Integer pluginRank = null;
+	private int pluginRank = 0;
 
-	public Integer getPluginRank() {
+	public int getPluginRank() {
 		return pluginRank;
 	}
 
-	public void setPluginRank(Integer pluginRank) {
-		this.pluginRank = pluginRank;
+	public void setPluginRank(int pluginRank) {
+		this.pluginRank = pluginRank; // notice the lack of firePropertyChange...
 	}
 
-	@OperationModelField(editable = false, visible = false, label="selected list item")
-	private Integer selectedItem = null;
-
-	public Integer getSelectedItem() {
-		return selectedItem;
-	}
-
-	public void setSelectedItem(Integer selectedItem) {
-		this.selectedItem = selectedItem;
-	}
-	
 }
