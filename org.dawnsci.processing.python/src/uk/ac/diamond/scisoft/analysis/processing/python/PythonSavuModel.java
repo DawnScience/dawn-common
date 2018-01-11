@@ -59,7 +59,7 @@ public class PythonSavuModel extends AbstractOperationModel {
 
 //	the plugin input rank
 	@OperationModelField(editable = false, visible = false, label="Plugin input rank")
-	private int pluginRank = 0;
+	private int pluginRank = -1;
 
 	public int getPluginRank() {
 		return pluginRank;

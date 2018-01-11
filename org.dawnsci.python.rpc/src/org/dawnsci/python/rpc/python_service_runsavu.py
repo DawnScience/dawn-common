@@ -43,6 +43,13 @@ persistence['aux'] = {}
 
 print("calling to the python_service_runsavu")
 
+def get_output_rank(path2plugin, inputs, parameters):
+    print("running get_output_rank")
+    global persistence
+    rank = run_savu.get_output_rank(path2plugin, inputs, parameters, persistence)
+    print("done")
+    return rank
+
 def runSavu(path2plugin, params, metaOnly, inputs):
     '''
     path2plugin  - is the path to the user script that should be run

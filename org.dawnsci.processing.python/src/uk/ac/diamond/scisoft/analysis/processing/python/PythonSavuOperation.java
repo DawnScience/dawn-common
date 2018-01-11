@@ -19,7 +19,7 @@ public class PythonSavuOperation extends AbstractPythonSavuOperation<PythonSavuM
 
 	@Override
 	public OperationRank getInputRank() {
-		if (model != null && model.getPluginRank()!=null) {
+		if (model != null && model.getPluginRank() > -1) {
 			return OperationRank.get(model.getPluginRank());
 		}
 		return OperationRank.ANY;
@@ -27,32 +27,36 @@ public class PythonSavuOperation extends AbstractPythonSavuOperation<PythonSavuM
 
 	@Override
 	public OperationRank getOutputRank() {
-		if (model.isMetaDataOnly()) {
+		if (outputRank != null)
+			return OperationRank.get(outputRank);
+		/*if (model.isMetaDataOnly()) {
 			return getInputRank();
-		}
-		return OperationRank.TWO;
+		}*/
+		return OperationRank.SAME;
 	}
 
 	@Override
 	protected Map<String, Object> packInput(IDataset input) {
-		if (model.getPluginRank().equals(2)) {
-		return OperationToPythonUtils.packImage(input);
+		if (model.getPluginRank() == 2) {
+			return OperationToPythonUtils.packImage(input);
+		} else if (model.getPluginRank() == 1) {
+			return OperationToPythonUtils.packXY(input);
+		} else {
+			return null;			
 		}
-		else if (model.getPluginRank().equals(1)) {
-		return OperationToPythonUtils.packXY(input);
-		}
-		else {
-		return null;			
-		}
-
-		}
+	}
 
 
 	@Override
 	protected OperationData packAndValidateMap(Map<String, Object> output) {
 		try {
-			return OperationToPythonUtils.unpackImage(output);
-//			return OperationToPythonUtils.unpackXY(output);
+			if (model.getPluginRank() == 2) {
+				return OperationToPythonUtils.unpackImage(output);
+			} else if (model.getPluginRank() == 1) {
+				return OperationToPythonUtils.unpackXY(output);
+			} else {
+				return null;
+			}
 		} catch (MetadataException e) {
 			throw new OperationException(this, e);
 		}

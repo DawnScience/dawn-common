@@ -41,4 +41,6 @@ public interface IPythonRunSavu {
 	public void populate_plugins() throws AnalysisRpcException;
 
 	public Map<String, Object> get_plugin_params(String pluginName) throws AnalysisRpcException;
+	
+	public int get_output_rank(String path2plugin, Map<String,Object> inputs, Map<String,Object> parameters) throws AnalysisRpcException;
 }

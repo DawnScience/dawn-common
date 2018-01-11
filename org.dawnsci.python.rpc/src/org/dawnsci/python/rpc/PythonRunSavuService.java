@@ -118,7 +118,13 @@ public class PythonRunSavuService implements IPythonRunSavu{
 			// script has a function definition called "runScript", add a
 			// handler for it, then create a proxy to run the function
 			rpcservice.addHandlers("execfile(r'" + script + "')",
-					new String[] { "runSavu", "populate_plugins", "get_plugin_info", "get_plugin_params" });
+					new String[] {
+						"runSavu",
+						"populate_plugins",
+						"get_plugin_info",
+						"get_plugin_params",
+						"get_output_rank"
+					});
 		}
 		proxy = rpcservice.getClient().newProxyInstance(IPythonRunSavu.class,
 				debug);
@@ -141,20 +147,21 @@ public class PythonRunSavuService implements IPythonRunSavu{
 
 	@Override
 	public Map<String, Object> get_plugin_info() throws AnalysisRpcException {
-		// TODO Auto-generated method stub
 		return proxy.get_plugin_info();
 	}
 	
 	@Override
 	public void populate_plugins() throws AnalysisRpcException {
-		// TODO Auto-generated method stub
 		proxy.populate_plugins();
 	}
 	@Override
 	public Map<String, Object> get_plugin_params(String pluginName) throws AnalysisRpcException {
-		// TODO Auto-generated method stub
 		return proxy.get_plugin_params(pluginName);
 	}
-	
+
+	@Override
+	public int get_output_rank(String path2plugin, Map<String, Object> inputs, Map<String, Object> parameters) throws AnalysisRpcException {
+		return proxy.get_output_rank(path2plugin, inputs, parameters);
+	}
 }
 

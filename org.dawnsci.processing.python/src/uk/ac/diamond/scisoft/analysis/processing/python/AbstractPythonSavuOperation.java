@@ -17,6 +17,7 @@ public abstract class AbstractPythonSavuOperation<T extends PythonSavuModel> ext
 	AnalysisRpcPythonPyDevService s = null;
 	PythonRunSavuService pythonRunSavuService;
 	private final static Logger logger = LoggerFactory.getLogger(AbstractPythonSavuOperation.class);
+	protected Integer outputRank = null;
 
 	@Override
 	public void init() {
@@ -57,6 +58,9 @@ public abstract class AbstractPythonSavuOperation<T extends PythonSavuModel> ext
 			Map <String, Object> parameters = model.getParameters();
 			Boolean metaDataOnly = model.isMetaDataOnly();
 			logger.debug(parameters.toString());
+			if (outputRank == null) {
+				outputRank = pythonRunSavuService.get_output_rank(pluginPath, inputs, parameters);
+			}
 			Map<String, Object> out = pythonRunSavuService.runSavu(pluginPath,parameters,metaDataOnly,inputs);
 			return packAndValidateMap(out);
 		} catch (Exception e) {
