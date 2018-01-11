@@ -103,13 +103,13 @@ public class PythonSavuOperation extends AbstractOperation<PythonSavuModel,Opera
 			// need to pass a dictionary of inputs into here.
 //			generate a hashmap in model, with a single getter to pass it here
 			String pluginPath = model.getPluginPath();
-			Map <String, Object> parameters = model.getParameters();
+			Map<String, Map<String, Object>> parameters = model.getParameters();
 			Boolean metaDataOnly = model.isMetaDataOnly();
 			logger.debug(parameters.toString());
 			if (outputRank == null) {
-				outputRank = pythonRunSavuService.get_output_rank(pluginPath, inputs, parameters);
+				outputRank = pythonRunSavuService.get_output_rank(pluginPath, inputs, parameters.get(model.getPluginName()));
 			}
-			Map<String, Object> out = pythonRunSavuService.runSavu(pluginPath,parameters,metaDataOnly,inputs);
+			Map<String, Object> out = pythonRunSavuService.runSavu(pluginPath,parameters.get(model.getPluginName()),metaDataOnly,inputs);
 			return packAndValidateMap(out);
 		} catch (Exception e) {
 			throw new OperationException(this, "Could not run " + model.getPluginName() + " due to " + e.getMessage());

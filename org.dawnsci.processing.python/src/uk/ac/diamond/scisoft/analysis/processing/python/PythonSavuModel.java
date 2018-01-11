@@ -46,13 +46,13 @@ public class PythonSavuModel extends AbstractOperationModel {
 
 	// the parameters Map -> read only!
 	@OperationModelField(editable = false, visible = false, label="Parameters", hint="parameters for the filter")
-	private Map<String, Object> parameters = new HashMap<>();
+	private Map<String, Map<String,Object>> parameters = new HashMap<>();
 
-	public Map<String, Object> getParameters() {
+	public Map<String, Map<String,Object>> getParameters() {
 		return parameters;
 	}
 
-	public void setParameters(Map<String, Object> parameters) {
+	public void setParameters(Map<String, Map<String, Object>> parameters) {
 		this.parameters.clear();
 		this.parameters.putAll(parameters);
 	}
