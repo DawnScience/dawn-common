@@ -131,9 +131,9 @@ public class PythonRunSavuService implements IPythonRunSavu{
 	}
 
 	@Override
-	public Map<String, Object> runSavu(String scriptFullPath,Map<String, Object> params,
-			Boolean metaOnly, Map<String, ?> data) throws AnalysisRpcException {
-		return proxy.runSavu(scriptFullPath,params, metaOnly,data);
+	public Map<String, Object> runSavu(String scriptFullPath,Map<String, Map<String, Object>> map,
+			boolean metaOnly, Map<String, ?> data) throws AnalysisRpcException {
+		return proxy.runSavu(scriptFullPath,map, metaOnly,data);
 	}
 
 	/**
@@ -160,8 +160,8 @@ public class PythonRunSavuService implements IPythonRunSavu{
 	}
 
 	@Override
-	public int get_output_rank(String path2plugin, Map<String, Object> inputs, Map<String, Object> parameters) throws AnalysisRpcException {
-		return proxy.get_output_rank(path2plugin, inputs, parameters);
+	public int get_output_rank(String path2plugin, Map<String, Object> inputs, Map<String, Map<String, Object>> map) throws AnalysisRpcException {
+		return proxy.get_output_rank(path2plugin, inputs, map);
 	}
 }
 

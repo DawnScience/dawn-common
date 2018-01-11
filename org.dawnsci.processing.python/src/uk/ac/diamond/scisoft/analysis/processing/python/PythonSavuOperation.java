@@ -103,7 +103,7 @@ public class PythonSavuOperation extends AbstractOperation<PythonSavuModel,Opera
 			// need to pass a dictionary of inputs into here.
 //			generate a hashmap in model, with a single getter to pass it here
 			String pluginPath = model.getPluginPath();
-			Map<String, Map<String, Object>> parameters = model.getParameters();
+			Map<String, Map<String, Map<String, Object>>> parameters = model.getParameters();
 			Boolean metaDataOnly = model.isMetaDataOnly();
 			logger.debug(parameters.toString());
 			if (outputRank == null) {

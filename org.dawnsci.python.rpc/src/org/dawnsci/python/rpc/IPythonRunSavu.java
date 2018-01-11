@@ -31,9 +31,11 @@ public interface IPythonRunSavu {
 	 *             if the request fails,
 	 * @see AnalysisRpcClient#request(String, Object[])
 	 */
-	public Map<String, Object> runSavu(String scriptFullPath,Map<String, Object> params,
-			Boolean metaOnly,
-			Map<String, ?> script_inputs) throws AnalysisRpcException;
+	public Map<String, Object> runSavu(
+		String scriptFullPath,
+		Map<String, Map<String, Object>> params,
+		boolean metaOnly,
+		Map<String, ?> script_inputs) throws AnalysisRpcException;
 
 
 	public Map<String, Object> get_plugin_info() throws AnalysisRpcException;
@@ -42,5 +44,5 @@ public interface IPythonRunSavu {
 
 	public Map<String, Object> get_plugin_params(String pluginName) throws AnalysisRpcException;
 	
-	public int get_output_rank(String path2plugin, Map<String,Object> inputs, Map<String,Object> parameters) throws AnalysisRpcException;
+	public int get_output_rank(String path2plugin, Map<String,Object> inputs, Map<String, Map<String, Object>> parameters) throws AnalysisRpcException;
 }
