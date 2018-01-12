@@ -1,5 +1,6 @@
 package org.dawnsci.persistence;
 
+import org.eclipse.dawnsci.analysis.api.expressions.IExpressionService;
 import org.eclipse.dawnsci.analysis.api.io.ILoaderService;
 import org.eclipse.dawnsci.analysis.api.persistence.IMarshallerService;
 import org.eclipse.dawnsci.nexus.INexusFileFactory;
@@ -11,6 +12,8 @@ public class ServiceLoader {
 	private static IMarshallerService mservice;
 
 	private static INexusFileFactory nexusFactory;
+	
+	private static IExpressionService expressionService;
 
 	/**
 	 * Do nothing, loaded by OSGi
@@ -41,5 +44,13 @@ public class ServiceLoader {
 
 	public static void setNexusFactory(INexusFileFactory nf) {
 		nexusFactory = nf;
+	}
+	
+	public static IExpressionService getExpressionService() {
+		return expressionService;
+	}
+
+	public static void setExpressionService(IExpressionService expressionService) {
+		ServiceLoader.expressionService = expressionService;
 	}
 }

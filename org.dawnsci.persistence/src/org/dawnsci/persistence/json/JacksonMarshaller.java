@@ -8,7 +8,6 @@
  */
 package org.dawnsci.persistence.json;
 
-import org.dawnsci.common.widgets.gda.function.jexl.JexlExpressionFunction;
 import org.dawnsci.persistence.json.function.FunctionBean;
 import org.dawnsci.persistence.json.function.FunctionListBean;
 import org.dawnsci.persistence.util.PersistenceUtils;
@@ -37,6 +36,7 @@ import org.eclipse.dawnsci.analysis.dataset.roi.XAxisBoxROI;
 import org.eclipse.dawnsci.analysis.dataset.roi.YAxisBoxROI;
 import org.eclipse.dawnsci.analysis.dataset.roi.json.ROIBeanFactory;
 
+import uk.ac.diamond.scisoft.analysis.fitting.functions.JexlExpressionFunction;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.Parameter;
 
 import com.fasterxml.jackson.core.Version;

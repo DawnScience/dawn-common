@@ -13,8 +13,7 @@ import static org.junit.Assert.assertEquals;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.dawnsci.common.widgets.gda.function.jexl.JexlExpressionFunction;
+import org.dawnsci.jexl.internal.ExpressionServiceImpl;
 import org.dawnsci.persistence.PersistenceServiceCreator;
 import org.dawnsci.persistence.ServiceLoader;
 import org.eclipse.dawnsci.analysis.api.fitting.functions.IFunction;
@@ -27,6 +26,7 @@ import org.junit.Test;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.CompositeFunction;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.Fermi;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.Gaussian;
+import uk.ac.diamond.scisoft.analysis.fitting.functions.JexlExpressionFunction;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.Parameter;
 
 public class ReadWriteFunctionTest {
@@ -35,6 +35,7 @@ public class ReadWriteFunctionTest {
 	public void init() {
 		// Set factory for test
 		ServiceLoader.setNexusFactory(new NexusFileFactoryHDF5());
+		ServiceLoader.setExpressionService(new ExpressionServiceImpl());
 	}
 
 	// Do not put the annotation as the files needs to be created and closed
@@ -152,7 +153,7 @@ public class ReadWriteFunctionTest {
 		IPersistentFile file = before(tmp);
 
 		String expression = "func:Gaussian(x,pos,fwhm,area)+func:Gaussian(x,pos+offset,fwhm,area/proportion)";
-		JexlExpressionFunction jexl = new JexlExpressionFunction(expression);
+		JexlExpressionFunction jexl = new JexlExpressionFunction(new ExpressionServiceImpl(), expression);
 		for (int i = 0; i < jexl.getNoOfParameters(); i++) {
 			jexl.setParameter(i, new Parameter(i+1));
 		}
