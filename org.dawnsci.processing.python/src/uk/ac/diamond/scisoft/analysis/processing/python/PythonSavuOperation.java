@@ -59,9 +59,9 @@ public class PythonSavuOperation extends AbstractOperation<PythonSavuModel,Opera
 
 	private OperationData packAndValidateMap(Map<String, Object> output) {
 		try {
-			if (model.getPluginRank() == 2) {
+			if (getOutputRank() == OperationRank.TWO) {
 				return OperationToPythonUtils.unpackImage(output);
-			} else if (model.getPluginRank() == 1) {
+			} else if (getOutputRank() == OperationRank.ONE) {
 				return OperationToPythonUtils.unpackXY(output);
 			} else {
 				return null;
@@ -81,6 +81,7 @@ public class PythonSavuOperation extends AbstractOperation<PythonSavuModel,Opera
 		} catch (Exception e) {
 			logger.debug("Failed to start service in: " + (System.currentTimeMillis()-t));
 			logger.error("Could not create script service!");
+			logger.error("Python exception: ", e);
 			throw new OperationException(this, "Could not create script service!");			
 		}
 		
