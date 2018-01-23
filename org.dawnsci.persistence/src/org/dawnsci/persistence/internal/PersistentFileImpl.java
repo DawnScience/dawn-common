@@ -103,14 +103,14 @@ class PersistentFileImpl implements IPersistentFile {
 	}
 
 	/**
-	 * 
+	 * Construct read-only persistent file
 	 * @param filePath
 	 */
 	public PersistentFileImpl(String filePath) {
 		this.filePath = filePath;
 		try {
 			this.file = ServiceLoader.getNexusFactory().newNexusFile(filePath);
-			file.openToWrite(true);
+			file.openToRead();
 		} catch (Exception e) {
 			logger.error("Error creating Nexus file:" + e);
 		}
