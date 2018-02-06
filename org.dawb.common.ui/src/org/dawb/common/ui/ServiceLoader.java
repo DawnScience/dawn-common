@@ -26,7 +26,7 @@ public class ServiceLoader {
 	 * Injected by OSGI
 	 * @param et
 	 */
-	public static void setEventTrackerService(EventTracker et) {
+	public void setEventTrackerService(EventTracker et) {
 		eventTrackerService = et;
 	}
 
@@ -38,7 +38,7 @@ public class ServiceLoader {
 	 * Injected by OSGI
 	 * @param ps
 	 */
-	public static void setPersistenceService(IPersistenceService ps) {
+	public void setPersistenceService(IPersistenceService ps) {
 		persistenceService = ps;
 	}
 
@@ -50,7 +50,7 @@ public class ServiceLoader {
 	 * Injected by OSGI
 	 * @param ls
 	 */
-	public static void setLoaderService(ILoaderService ls) {
+	public void setLoaderService(ILoaderService ls) {
 		loaderService = ls;
 	}
 

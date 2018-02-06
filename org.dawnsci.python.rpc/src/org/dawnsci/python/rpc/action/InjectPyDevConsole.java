@@ -51,7 +51,7 @@ public class InjectPyDevConsole {
 	
 	// OSGi Injection
 	private static IMacroService mservice;
-	public static void setMacroService(IMacroService s) {
+	public void setMacroService(IMacroService s) {
 		mservice = s;
 	}
 	public InjectPyDevConsole() {

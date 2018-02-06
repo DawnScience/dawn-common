@@ -72,7 +72,7 @@ public class PersistJsonOperationsNode {
 	
 	private final static Logger logger = LoggerFactory.getLogger(PersistJsonOperationsNode.class);
 	
-	public static void setOperationService(IOperationService s) {
+	public void setOperationService(IOperationService s) {
 		service = s;
 	}
 	

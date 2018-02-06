@@ -22,7 +22,7 @@ public class ServiceLoader {
 		
 	}
 
-	public static void setLoaderService(ILoaderService service) {
+	public void setLoaderService(ILoaderService service) {
 		sloader = service;
 	}
 
@@ -30,7 +30,7 @@ public class ServiceLoader {
 		return sloader;
 	}
 
-	public static void setJSONMarshallerService(IMarshallerService js) {
+	public void setJSONMarshallerService(IMarshallerService js) {
 		mservice = js;
 	}
 
@@ -42,7 +42,7 @@ public class ServiceLoader {
 		return nexusFactory;
 	}
 
-	public static void setNexusFactory(INexusFileFactory nf) {
+	public void setNexusFactory(INexusFileFactory nf) {
 		nexusFactory = nf;
 	}
 	
@@ -50,7 +50,7 @@ public class ServiceLoader {
 		return expressionService;
 	}
 
-	public static void setExpressionService(IExpressionService expressionService) {
+	public void setExpressionService(IExpressionService expressionService) {
 		ServiceLoader.expressionService = expressionService;
 	}
 }

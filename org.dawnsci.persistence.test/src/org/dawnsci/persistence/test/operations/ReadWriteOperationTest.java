@@ -52,11 +52,11 @@ public class ReadWriteOperationTest {
 	public static void before() throws Exception {
 
 		ServiceManager.setService(IOperationService.class, new OperationServiceImpl());
-		ServiceLoader.setNexusFactory(new NexusFileFactoryHDF5());
+		new ServiceLoader().setNexusFactory(new NexusFileFactoryHDF5());
 		service = (IOperationService)ServiceManager.getService(IOperationService.class);
 		service.createOperations(service.getClass().getClassLoader(), "org.dawnsci.persistence.test.operations");
 		service.createOperations(service.getClass().getClassLoader(), "uk.ac.diamond.scisoft.analysis.processing.operations");
-		PersistJsonOperationsNode.setOperationService(service);
+		new PersistJsonOperationsNode().setOperationService(service);
 		pservice = new PersistenceServiceImpl();
 		
 		/*FunctionFactory has been set up as an OSGI service so need to register

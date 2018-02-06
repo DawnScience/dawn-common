@@ -32,7 +32,7 @@ public class ReadWriteDataTest extends AbstractThreadTestBase {
 	@Before
 	public void init() {
 		// Set factory for test
-		ServiceLoader.setNexusFactory(new NexusFileFactoryHDF5());
+		new ServiceLoader().setNexusFactory(new NexusFileFactoryHDF5());
 	}
 
 	// Do not put the annotation as the files needs to be created and closed
@@ -41,7 +41,7 @@ public class ReadWriteDataTest extends AbstractThreadTestBase {
 	// Passes value by array
 	public IPersistentFile before(File[] tmp) throws Exception {
 		// Set factory for test
-		ServiceLoader.setNexusFactory(new NexusFileFactoryHDF5());
+		new ServiceLoader().setNexusFactory(new NexusFileFactoryHDF5());
 
 		tmp[0] = File.createTempFile("TestData", ".nxs");
 		tmp[0].createNewFile();

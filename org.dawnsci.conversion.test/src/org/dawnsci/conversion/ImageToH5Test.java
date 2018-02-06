@@ -33,8 +33,8 @@ public class ImageToH5Test {
 	
 	@Before
 	public void before() {
-		LocalServiceManager.setLoaderService(new LoaderServiceImpl());
-		ServiceLoader.setNexusFileFactory(new NexusFileFactoryHDF5());
+		new LocalServiceManager().setLoaderService(new LoaderServiceImpl());
+		new ServiceLoader().setNexusFileFactory(new NexusFileFactoryHDF5());
 	}
 	
 	@Test

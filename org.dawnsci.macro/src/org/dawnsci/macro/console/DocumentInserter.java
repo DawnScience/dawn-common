@@ -41,7 +41,7 @@ public class DocumentInserter implements IMacroEventListener, IPartListener {
 	private static Logger logger = LoggerFactory.getLogger(DocumentInserter.class);
 
 	private static IMacroService mservice;
-	public static void setMacroService(IMacroService s) {
+	public void setMacroService(IMacroService s) {
 		mservice = s;
 	}
 	public static IMacroService getMacroService() {

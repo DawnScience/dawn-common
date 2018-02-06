@@ -52,11 +52,11 @@ public class AVIImageConverter extends AbstractImageConversion {
 	private static final Logger logger = LoggerFactory.getLogger(AVIImageConverter.class);
 
 	private static IImageService        imageService;
-	public static void setImageService(IImageService service) {
+	public void setImageService(IImageService service) {
 		imageService = service;
 	}
 	private static IPlotImageService    thumbService;
-	public static void setPlotImageService(IPlotImageService service) {
+	public void setPlotImageService(IPlotImageService service) {
 		thumbService = service;
 	}
 	

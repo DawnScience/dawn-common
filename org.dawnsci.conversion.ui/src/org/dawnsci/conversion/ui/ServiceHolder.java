@@ -23,7 +23,7 @@ public class ServiceHolder {
 	 * Injected by OSGI
 	 * @param ls
 	 */
-	public static void setLoaderService(ILoaderService ls) {
+	public void setLoaderService(ILoaderService ls) {
 		service = ls;
 	}
 
@@ -31,7 +31,7 @@ public class ServiceHolder {
 		return service;
 	}
 	
-	public static void setConversionWizardPageService(IConversionWizardPageService conversionPageService) {
+	public void setConversionWizardPageService(IConversionWizardPageService conversionPageService) {
 		ServiceHolder.conversionPageService = conversionPageService;
 	}
 	

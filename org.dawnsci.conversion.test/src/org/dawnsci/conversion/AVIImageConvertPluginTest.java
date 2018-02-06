@@ -42,7 +42,7 @@ public class AVIImageConvertPluginTest {
 	
 	@Before
 	public void before() {
-		LocalServiceManager.setLoaderService(new LoaderServiceImpl());
+		new LocalServiceManager().setLoaderService(new LoaderServiceImpl());
 	}
 	
 	@Test
@@ -53,8 +53,8 @@ public class AVIImageConvertPluginTest {
 		// Not sure of this will work...
 		ServiceManager.setService(IPaletteService.class,     new PaletteService());
 		ServiceManager.setService(IImageService.class,       new ImageService());
-		AVIImageConverter.setImageService(new ImageService());
-		AVIImageConverter.setPlotImageService(new PlotImageService());
+		new AVIImageConverter().setImageService(new ImageService());
+		new AVIImageConverter().setPlotImageService(new PlotImageService());
 		
 		// Determine path to test file
 		final String path = getTestFilePath("export.h5");

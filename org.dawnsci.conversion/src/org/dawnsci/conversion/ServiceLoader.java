@@ -19,7 +19,7 @@ public class ServiceLoader {
 		
 	}
 
-	public static void setEventTracker(EventTracker et) {
+	public void setEventTracker(EventTracker et) {
 		serviceTracker = et;
 	}
 
@@ -31,7 +31,7 @@ public class ServiceLoader {
 		return stitcher;
 	}
 
-	public static void setImageStitcher(IImageStitchingProcess s) {
+	public void setImageStitcher(IImageStitchingProcess s) {
 		stitcher = s;
 	}
 
@@ -39,7 +39,7 @@ public class ServiceLoader {
 		return transformer;
 	}
 
-	public static void setImageTransform(IImageTransform its) {
+	public void setImageTransform(IImageTransform its) {
 		transformer = its;
 	}
 
@@ -47,7 +47,7 @@ public class ServiceLoader {
 		return nexusFileFactory;
 	}
 
-	public static void setNexusFileFactory(INexusFileFactory nexusFileFactory) {
+	public void setNexusFileFactory(INexusFileFactory nexusFileFactory) {
 		ServiceLoader.nexusFileFactory = nexusFileFactory;
 	}
 }

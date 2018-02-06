@@ -33,7 +33,7 @@ public class ReadWriteMaskTest extends AbstractThreadTestBase{
 	@Before
 	public void init() {
 		// Set factory for test
-		ServiceLoader.setNexusFactory(new NexusFileFactoryHDF5());
+		new ServiceLoader().setNexusFactory(new NexusFileFactoryHDF5());
 	}
 
 	@Test

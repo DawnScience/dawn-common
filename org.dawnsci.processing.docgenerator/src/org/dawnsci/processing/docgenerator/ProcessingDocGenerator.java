@@ -17,7 +17,7 @@ public class ProcessingDocGenerator {
 
 	private static IOperationService service;
 	
-	public static void setOperationService(IOperationService s) {
+	public void setOperationService(IOperationService s) {
 		service = s;
 	}
 	

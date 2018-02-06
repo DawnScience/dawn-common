@@ -35,7 +35,7 @@ public class ReadWriteROITest extends AbstractThreadTestBase {
 	@Before
 	public void init() {
 		// Set factory for test
-		ServiceLoader.setNexusFactory(new NexusFileFactoryHDF5());
+		new ServiceLoader().setNexusFactory(new NexusFileFactoryHDF5());
 	}
 
 	//Do not put the annotation as the files needs to be created and closed after each test
@@ -49,7 +49,7 @@ public class ReadWriteROITest extends AbstractThreadTestBase {
 		// create the PersistentService
 		// and check that ServiceLoader.getJSONMarshaller() != null
 		if (ServiceLoader.getJSONMarshallerService() == null)
-			ServiceLoader.setJSONMarshallerService(new MarshallerService());
+			new ServiceLoader().setJSONMarshallerService(new MarshallerService());
 		IPersistenceService persist = PersistenceServiceCreator.createPersistenceService();
 		IPersistentFile file = persist.createPersistentFile(tmp[0].getAbsolutePath());
 		return file;

@@ -75,7 +75,7 @@ public class AlignProgressJob implements IRunnableWithProgress {
 	 * Injected by OSGI
 	 * @param it
 	 */
-	public static void setImageTransform(IImageTransform it) {
+	public void setImageTransform(IImageTransform it) {
 		transformer = it;
 	}
 

@@ -39,7 +39,7 @@ public class AsciiConvertTest {
 	
 	@Before
 	public void before() {
-		LocalServiceManager.setLoaderService(new LoaderServiceImpl());
+		new LocalServiceManager().setLoaderService(new LoaderServiceImpl());
 	}
 	
 	@Test

@@ -48,7 +48,7 @@ public class AlignConvertTest {
 		dir = new File(System.getProperty("java.io.tmpdir"), "AlignTestFolder");
 		output = new File(dir.getAbsolutePath()+"/Aligned_images");
 		FileUtils.createNewUniqueDir(output);
-		LocalServiceManager.setLoaderService(new LoaderServiceImpl());
+		new LocalServiceManager().setLoaderService(new LoaderServiceImpl());
 	}
 
 	@Test

@@ -66,12 +66,12 @@ public class StitchingConvertTest {
 		output = new File(dir.getAbsolutePath()+"/stitchedImage");
 		stitchedFileName = "image.tif";
 		FileUtils.createNewUniqueDir(output);
-		LocalServiceManager.setLoaderService(new LoaderServiceImpl());
+		new LocalServiceManager().setLoaderService(new LoaderServiceImpl());
 
 		sticher = BoofCVImageStitchingProcessCreator.createStitchingProcess();
 		transformer = BoofCVImageTransformCreator.createTransformService();
-		ServiceLoader.setImageStitcher(sticher);
-		ServiceLoader.setImageTransform(transformer);
+		new ServiceLoader().setImageStitcher(sticher);
+		new ServiceLoader().setImageTransform(transformer);
 	}
 
 	@Test

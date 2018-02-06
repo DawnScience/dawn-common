@@ -8,7 +8,7 @@ public class LocalServiceManager {
 	private static ILoaderService lservice;
 	private static IOperationService oservice;
 	
-	public static void setLoaderService(ILoaderService s) {
+	public void setLoaderService(ILoaderService s) {
 		lservice = s;
 	}
 	
@@ -16,7 +16,7 @@ public class LocalServiceManager {
 		return lservice;
 	}
 	
-	public static void setOperationService(IOperationService s) {
+	public void setOperationService(IOperationService s) {
 		oservice = s;
 	}
 	

@@ -22,7 +22,7 @@ public class ConversionServiceLoader {
 	 * Injected by OSGI
 	 * @param cs
 	 */
-	public static void setService(IConversionService cs) {
+	public void setService(IConversionService cs) {
 		service = cs;
 	}
 
