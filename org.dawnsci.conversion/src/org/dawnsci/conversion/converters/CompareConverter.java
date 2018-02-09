@@ -19,7 +19,8 @@ import org.eclipse.dawnsci.analysis.api.tree.DataNode;
 import org.eclipse.dawnsci.analysis.api.tree.GroupNode;
 import org.eclipse.dawnsci.analysis.api.tree.Node;
 import org.eclipse.dawnsci.analysis.api.tree.Tree;
-import org.eclipse.dawnsci.analysis.tree.impl.AttributeImpl;
+import org.eclipse.dawnsci.analysis.tree.TreeFactory;
+import org.eclipse.dawnsci.nexus.NexusConstants;
 import org.eclipse.dawnsci.nexus.NexusFile;
 import org.eclipse.dawnsci.nexus.NexusUtils;
 import org.eclipse.january.dataset.Dataset;
@@ -27,8 +28,6 @@ import org.eclipse.january.dataset.DatasetFactory;
 import org.eclipse.january.dataset.DatasetUtils;
 import org.eclipse.january.dataset.IDataset;
 import org.eclipse.january.dataset.IndexIterator;
-
-import uk.ac.diamond.scisoft.analysis.io.NexusTreeUtils;
 
 /**
  * This converter creates stacks from 
@@ -62,18 +61,18 @@ public class CompareConverter extends AbstractConversion{
 			
 			group = Tree.ROOT + paths[0];
 			GroupNode groupNode = hFile.getGroup(group, true);
-			hFile.addAttribute(groupNode, new AttributeImpl(NexusFile.NXCLASS, "NXentry"));
+			hFile.addAttribute(groupNode, TreeFactory.createAttribute(NexusConstants.NXCLASS, NexusConstants.ENTRY));
 			String path = group;
 			if (paths.length>2) {
 				for (int i = 1; i < paths.length-1; i++) {
 					path = path + Node.SEPARATOR + paths[i];
 					groupNode = hFile.getGroup(path, true);
 					if (i<(paths.length-2))
-						hFile.addAttribute(groupNode, new AttributeImpl(NexusFile.NXCLASS, "NXentry"));
+						hFile.addAttribute(groupNode, TreeFactory.createAttribute(NexusConstants.NXCLASS, NexusConstants.ENTRY));
 				}
 				try {
 					groupNode = hFile.getGroup(path, true);
-					hFile.addAttribute(groupNode, new AttributeImpl(NexusFile.NXCLASS, NexusTreeUtils.NX_DATA));
+					hFile.addAttribute(groupNode, TreeFactory.createAttribute(NexusConstants.NXCLASS, NexusConstants.DATA));
 				} catch (Exception ignored) {
 					continue;
 				}
@@ -104,7 +103,7 @@ public class CompareConverter extends AbstractConversion{
 		GroupNode groupNode = hFile.getGroup(group, true);
 		DataNode dNode = NexusUtils.appendData(hFile, groupNode, abs);
 		if (!written.get(datasetPath)) {
-			hFile.addAttribute(dNode, new AttributeImpl("original_name", datasetPath));
+			hFile.addAttribute(dNode, TreeFactory.createAttribute("original_name", datasetPath));
 			written.put(datasetPath, true);
 		}
 		if (context.getMonitor() != null && context.getMonitor().isCancelled()) {

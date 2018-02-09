@@ -31,8 +31,8 @@ import org.eclipse.dawnsci.analysis.api.processing.model.IOperationModel;
 import org.eclipse.dawnsci.analysis.api.roi.IROI;
 import org.eclipse.dawnsci.analysis.api.tree.DataNode;
 import org.eclipse.dawnsci.analysis.api.tree.GroupNode;
-import org.eclipse.dawnsci.analysis.tree.impl.AttributeImpl;
-import org.eclipse.dawnsci.analysis.tree.impl.DataNodeImpl;
+import org.eclipse.dawnsci.analysis.tree.TreeFactory;
+import org.eclipse.dawnsci.nexus.NexusConstants;
 import org.eclipse.dawnsci.nexus.NexusException;
 import org.eclipse.dawnsci.nexus.NexusFile;
 import org.eclipse.january.IMonitor;
@@ -43,6 +43,7 @@ import org.eclipse.january.dataset.DatasetFactory;
 import org.eclipse.january.dataset.DatasetUtils;
 import org.eclipse.january.dataset.IDataset;
 import org.eclipse.january.dataset.ILazyDataset;
+import org.eclipse.january.dataset.IntegerDataset;
 import org.eclipse.january.dataset.RGBDataset;
 import org.eclipse.january.dataset.ShortDataset;
 import org.eclipse.january.dataset.Slice;
@@ -51,7 +52,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
-import uk.ac.diamond.scisoft.analysis.io.NexusTreeUtils;
 
 /**
  * Implementation of IPersistentFile<br>
@@ -150,7 +150,7 @@ class PersistentFileImpl implements IPersistentFile {
 				try {
 					data.setName(name);
 					DataNode dNode = file.createData(group, data);
-					file.addAttribute(dNode, new AttributeImpl("attribute", "SDS"));
+					file.addAttribute(dNode, TreeFactory.createAttribute("attribute", "SDS"));
 				} catch (Exception de) {
 					de.printStackTrace();
 				}
@@ -167,7 +167,7 @@ class PersistentFileImpl implements IPersistentFile {
 		try {
 			file.createData(group, name, id);
 		} catch (NexusException ne) {
-			file.addNode(group, name, new DataNodeImpl(this.hashCode()));
+			file.addNode(group, name, TreeFactory.createDataNode(this.hashCode()));
 		}
 	}
 
@@ -242,10 +242,10 @@ class PersistentFileImpl implements IPersistentFile {
 				dNode = file.createData(group, data);
 				
 				// we set the JSON attribute
-				file.addAttribute(dNode, new AttributeImpl("signal", 1));
-				file.addAttribute(group, new AttributeImpl("signal", dataName));
+				file.addAttribute(dNode, TreeFactory.createAttribute("signal", 1));
+				file.addAttribute(group, TreeFactory.createAttribute("signal", dataName));
 				if (isRGB) {
-					file.addAttribute(dNode,  new AttributeImpl("interpretation","rgba-image"));
+					file.addAttribute(dNode,  TreeFactory.createAttribute("interpretation","rgba-image"));
 				}
 				
 			} catch (NexusException ne) {
@@ -273,8 +273,8 @@ class PersistentFileImpl implements IPersistentFile {
 				// we create the dataset
 				DataNode dNode = file.createData(group, xAxisData);
 				// we set the JSON attribute
-				file.addAttribute(dNode, new AttributeImpl("axis", 1));
-				file.addAttribute(group, new AttributeImpl(xAxisName + NexusTreeUtils.NX_INDICES_SUFFIX, rank == 1 ? 0 : 1));
+				file.addAttribute(dNode, TreeFactory.createAttribute("axis", 1));
+				file.addAttribute(group, TreeFactory.createAttribute(xAxisName + NexusConstants.DATA_INDICES_SUFFIX, rank == 1 ? 0 : 1));
 				axes[rank == 1 ? 0 : 1] = xAxisName;
 			} catch (NexusException ne) {
 				logger.warn(ne.getMessage());
@@ -287,15 +287,15 @@ class PersistentFileImpl implements IPersistentFile {
 				// we create the dataset
 				DataNode dNode = file.createData(group, yAxisData);
 				// we set the JSON attribute
-				file.addAttribute(dNode, new AttributeImpl("axis", 2));
-				file.addAttribute(group, new AttributeImpl(yAxisName + NexusTreeUtils.NX_INDICES_SUFFIX, 0));
+				file.addAttribute(dNode, TreeFactory.createAttribute("axis", 2));
+				file.addAttribute(group, TreeFactory.createAttribute(yAxisName + NexusConstants.DATA_INDICES_SUFFIX, 0));
 				axes[0] = yAxisName;
 			} catch (NexusException ne) {
 				logger.warn(ne.getMessage());
 			}
 		}
 		try {
-			file.addAttribute(group, new AttributeImpl("axes", axes));
+			file.addAttribute(group, TreeFactory.createAttribute("axes", axes));
 		} catch (NexusException ne) {
 			logger.warn(ne.getMessage());
 		}
@@ -330,7 +330,7 @@ class PersistentFileImpl implements IPersistentFile {
 		if ("JSON".equals(attributeName))
 			throw new Exception("Cannot override the JSON attribute!");
 		final DataNode node = file.getData(PersistenceConstants.ROI_ENTRY + "/" + regionName);
-		file.addAttribute(node, new AttributeImpl(attributeName, attributeValue));
+		file.addAttribute(node, TreeFactory.createAttribute(attributeName, attributeValue));
 	}
 
 	@Override
@@ -348,9 +348,9 @@ class PersistentFileImpl implements IPersistentFile {
 		if (file == null)
 			file = ServiceLoader.getNexusFactory().newNexusFile(filePath);
 		GroupNode group = file.getGroup(PersistenceConstants.ENTRY, true);
-		file.addAttribute(group, new AttributeImpl(NexusFile.NXCLASS, "NXentry"));
+		file.addAttribute(group, TreeFactory.createAttribute(NexusConstants.NXCLASS, NexusConstants.ENTRY));
 		// group = file.getGroup("/entry/Version", true);
-		file.addAttribute(group, new AttributeImpl("Version", version));
+		file.addAttribute(group, TreeFactory.createAttribute("Version", version));
 	}
 
 	@Override
@@ -358,16 +358,16 @@ class PersistentFileImpl implements IPersistentFile {
 		if (file == null)
 			file = ServiceLoader.getNexusFactory().newNexusFile(filePath);
 		GroupNode group = file.getGroup(PersistenceConstants.ENTRY, true);
-		file.addAttribute(group, new AttributeImpl(NexusFile.NXCLASS, "NXentry"));
+		file.addAttribute(group, TreeFactory.createAttribute(NexusConstants.NXCLASS, NexusConstants.ENTRY));
 		// group = file.getGroup("/entry/Site", true);
-		file.addAttribute(group, new AttributeImpl("Site", site));
+		file.addAttribute(group, TreeFactory.createAttribute("Site", site));
 	}
 
 	@Override
 	public ILazyDataset getData(String dataName, IMonitor mon) throws Exception {
 		if (file == null)
 			file = ServiceLoader.getNexusFactory().newNexusFile(filePath);
-		dataName = !dataName.equals("") ? dataName : "data";
+		dataName = !dataName.equals("") ? dataName : NexusConstants.DATA_DATA;
 		DataNode datanode = file.getData(PersistenceConstants.DATA_ENTRY + "/" + dataName);
 		return datanode.getDataset();
 	}
@@ -586,28 +586,28 @@ class PersistentFileImpl implements IPersistentFile {
 	private void writeRoi(GroupNode group, String parent, String name, IROI roi) throws Exception {
 		String json = ServiceLoader.getJSONMarshallerService().marshal(roi);
 		// we create the dataset
-		Dataset data = DatasetFactory.createFromObject(Dataset.INT32, new int[] { 0 });
+		Dataset data = DatasetFactory.createFromObject(IntegerDataset.class, (Object) new int[] { 0 });
 		try {
 			data.setName(name);
 			DataNode dNode = file.createData(group, data);
 			// we set the JSON attribute
-			file.addAttribute(dNode, new AttributeImpl("JSON", json));
+			file.addAttribute(dNode, TreeFactory.createAttribute("JSON", json));
 		} catch (Exception de) {
 			de.printStackTrace();
 		}
 	}
 
 	private GroupNode createDataNode(NexusFile file, String path) {
-		return createNode(file, path, "NXdata");
+		return createNode(file, path, NexusConstants.DATA);
 	}
 
 	public static GroupNode createNode(NexusFile file, String path, String nxclass) {
 		GroupNode group = null;
 		try {
 			group = file.getGroup("/entry", true);
-			file.addAttribute(group, new AttributeImpl(NexusFile.NXCLASS, "NXentry"));
+			file.addAttribute(group, TreeFactory.createAttribute(NexusConstants.NXCLASS, NexusConstants.ENTRY));
 			group = file.getGroup(path, true);
-			file.addAttribute(group, new AttributeImpl(NexusFile.NXCLASS, nxclass));
+			file.addAttribute(group, TreeFactory.createAttribute(NexusConstants.NXCLASS, nxclass));
 			return group;
 		} catch (NexusException e) {
 			e.printStackTrace();
@@ -729,12 +729,12 @@ class PersistentFileImpl implements IPersistentFile {
 		// TODO replace JacksonMarshaller by IMarshallerService
 		String json = new JacksonMarshaller().marshal(function);
 		// we create the dataset
-		Dataset data = DatasetFactory.createFromObject(Dataset.INT32, new int[] { 0 });
+		Dataset data = DatasetFactory.createFromObject(IntegerDataset.class, (Object) new int[] { 0 });
 		try {
 			data.setName(name);
 			DataNode dNode = file.createData(group, data);
 			// we set the JSON attribute
-			file.addAttribute(dNode, new AttributeImpl("JSON", json));
+			file.addAttribute(dNode, TreeFactory.createAttribute("JSON", json));
 		} catch (Exception de) {
 			de.printStackTrace();
 		}

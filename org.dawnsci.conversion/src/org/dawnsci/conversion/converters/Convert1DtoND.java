@@ -22,7 +22,8 @@ import org.eclipse.dawnsci.analysis.api.tree.DataNode;
 import org.eclipse.dawnsci.analysis.api.tree.GroupNode;
 import org.eclipse.dawnsci.analysis.api.tree.Node;
 import org.eclipse.dawnsci.analysis.api.tree.Tree;
-import org.eclipse.dawnsci.analysis.tree.impl.AttributeImpl;
+import org.eclipse.dawnsci.analysis.tree.TreeFactory;
+import org.eclipse.dawnsci.nexus.NexusConstants;
 import org.eclipse.dawnsci.nexus.NexusFile;
 import org.eclipse.dawnsci.nexus.NexusUtils;
 import org.eclipse.january.dataset.AggregateDataset;
@@ -32,8 +33,6 @@ import org.eclipse.january.dataset.IDataset;
 import org.eclipse.january.dataset.ILazyDataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import uk.ac.diamond.scisoft.analysis.io.NexusTreeUtils;
 
 public class Convert1DtoND extends AbstractConversion {
 	
@@ -89,7 +88,7 @@ public class Convert1DtoND extends AbstractConversion {
 
 				String entry = Tree.ROOT + paths[0];
 				GroupNode groupNode = file.getGroup(entry, true);
-				file.addAttribute(groupNode, new AttributeImpl(NexusFile.NXCLASS, "NXentry"));
+				file.addAttribute(groupNode, TreeFactory.createAttribute(NexusConstants.NXCLASS, NexusConstants.ENTRY));
 
 				if (paths.length>2) {
 					String path = entry;
@@ -97,7 +96,7 @@ public class Convert1DtoND extends AbstractConversion {
 						path += Node.SEPARATOR + paths[i];
 						groupNode = file.getGroup(path, true);
 						if (i<(paths.length-1))
-							file.addAttribute(groupNode, new AttributeImpl(NexusFile.NXCLASS, "NXentry"));
+							file.addAttribute(groupNode, TreeFactory.createAttribute(NexusConstants.NXCLASS, NexusConstants.ENTRY));
 					}
 				}
 				
@@ -117,7 +116,7 @@ public class Convert1DtoND extends AbstractConversion {
 				String[] paths = getNexusPathAndNameFromKey(axisName);
 				String entry = Tree.ROOT + paths[0];
 				GroupNode groupNode = file.getGroup(entry, true);
-				file.addAttribute(groupNode, new AttributeImpl(NexusFile.NXCLASS, "NXentry"));
+				file.addAttribute(groupNode, TreeFactory.createAttribute(NexusConstants.NXCLASS, NexusConstants.ENTRY));
 				
 				if (paths.length>2) {
 					String path = entry;
@@ -125,7 +124,7 @@ public class Convert1DtoND extends AbstractConversion {
 						path += Node.SEPARATOR + paths[i];
 						groupNode = file.getGroup(path, true);
 						if (i<(paths.length-1))
-							file.addAttribute(groupNode, new AttributeImpl(NexusFile.NXCLASS, "NXentry"));
+							file.addAttribute(groupNode, TreeFactory.createAttribute(NexusConstants.NXCLASS, NexusConstants.ENTRY));
 					}
 				}
 				saveAxis(file, groupNode, axis, paths);
@@ -145,7 +144,7 @@ public class Convert1DtoND extends AbstractConversion {
 		DataNode dNode = file.createData(group, out);
 		
 		
-		file.addAttribute(dNode, new AttributeImpl(NexusTreeUtils.NX_AXIS, "1"));
+		file.addAttribute(dNode, TreeFactory.createAttribute(NexusConstants.DATA_AXIS, "1"));
 
 	}
 	
@@ -158,8 +157,8 @@ public class Convert1DtoND extends AbstractConversion {
 		DataNode dNode = NexusUtils.appendData(file, group, first);
 		
 		if (first.getShape()[0] == axisLength)
-			file.addAttribute(dNode, new AttributeImpl(NexusTreeUtils.NX_SIGNAL, "1"));
-		file.addAttribute(dNode, new AttributeImpl("original_name", key));
+			file.addAttribute(dNode, TreeFactory.createAttribute(NexusConstants.DATA_SIGNAL, "1"));
+		file.addAttribute(dNode, TreeFactory.createAttribute("original_name", key));
 		
 		for (int i = 1; i < out.size(); i++) {
 			Dataset a = DatasetUtils.convertToDataset(out.get(i).getSlice());
@@ -187,10 +186,10 @@ public class Convert1DtoND extends AbstractConversion {
 			dataNode = NexusUtils.appendData(file, group, a);
 		}
 		if (dataNode != null)
-			file.addAttribute(dataNode, new AttributeImpl("original_name", key));
+			file.addAttribute(dataNode, TreeFactory.createAttribute("original_name", key));
 
 		if (first.getShape()[0] == axisLength && dataNode != null)
-			file.addAttribute(dataNode, new AttributeImpl(NexusTreeUtils.NX_SIGNAL, "1"));
+			file.addAttribute(dataNode, TreeFactory.createAttribute(NexusConstants.DATA_SIGNAL, "1"));
 	}
 	
 	private String[] getNexusPathAndNameFromKey(String key) {
