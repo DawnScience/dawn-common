@@ -1,9 +1,12 @@
 package org.dawb.common.ui.selection;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
 import org.eclipse.dawnsci.analysis.api.tree.Attribute;
 import org.eclipse.dawnsci.analysis.api.tree.Node;
@@ -153,5 +156,24 @@ public class SelectionUtils {
 			info.item = obj;
 		}
 		return results;
+	}
+
+	/**
+	 * Parse tree selection as file paths
+	 * @param selection
+	 * @return list of file paths
+	 */
+	public static List<String> parseTreeSelectionAsFilePaths(ITreeSelection selection) {
+		List<String> paths = new ArrayList<>();
+		for (Object o : selection.toArray()) {
+			if (!(o instanceof IFile) && o instanceof IAdaptable) {
+				o = ((IAdaptable) o).getAdapter(IFile.class);
+			}
+			if (o instanceof IFile) {
+				IFile file = (IFile) o;
+				paths.add(file.getLocation().toOSString());
+			}
+		}
+		return paths;
 	}
 }
