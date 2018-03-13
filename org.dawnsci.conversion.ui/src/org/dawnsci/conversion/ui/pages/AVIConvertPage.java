@@ -23,10 +23,10 @@ import org.eclipse.dawnsci.plotting.api.trace.ITrace;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -81,11 +81,11 @@ public final class AVIConvertPage extends AbstractSliceConversionPage {
 		final ExpandableComposite advancedComposite = new ExpandableComposite(parent, SWT.NONE);
 		advancedComposite.setExpanded(false);
 		advancedComposite.setText("Advanced");
-		advancedComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 4, 1));
+		advancedComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		
 		final Composite advanced = new Composite(parent, SWT.NONE);
 		advanced.setLayout(new GridLayout(3, false));
-		advanced.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 4, 1));
+		advanced.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1));
 			
 		Label label = new Label(advanced, SWT.NULL);
 		label.setLayoutData(new GridData());
@@ -107,6 +107,7 @@ public final class AVIConvertPage extends AbstractSliceConversionPage {
 		downsampleSize = 2;
 		bd.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
 		bd.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				final String str = bd.getItem(bd.getSelectionIndex());
 				downsampleSize = Integer.parseInt(str);
@@ -114,6 +115,7 @@ public final class AVIConvertPage extends AbstractSliceConversionPage {
 			}
 		});
 		imf.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				downsampleName = imf.getItem(imf.getSelectionIndex());				
 				pathChanged();
@@ -129,15 +131,12 @@ public final class AVIConvertPage extends AbstractSliceConversionPage {
         rate.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
         rate.setText("20");
         frameRate = 20;
-        rate.addModifyListener(new ModifyListener() {			
-			@Override
-			public void modifyText(ModifyEvent e) {
-				try {
-					frameRate = Integer.parseInt(rate.getText());
-					rate.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_BLACK));
-				} catch (Throwable ne) {
-					rate.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_RED));
-				}
+        rate.addModifyListener(e -> {
+			try {
+				frameRate = Integer.parseInt(rate.getText());
+				rate.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_BLACK));
+			} catch (Exception ne) {
+				rate.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_RED));
 			}
 		});
 		
@@ -151,6 +150,7 @@ public final class AVIConvertPage extends AbstractSliceConversionPage {
         useMap.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
         useMap.setSelection(useCurrentColours);
         useMap.addSelectionListener(new SelectionAdapter() {
+        	@Override
         	public void widgetSelected(SelectionEvent e) {
         		useCurrentColours = useMap.getSelection();
         	}
@@ -161,12 +161,11 @@ public final class AVIConvertPage extends AbstractSliceConversionPage {
         showTitle.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
         showTitle.setSelection(alwaysShowTitle);
         showTitle.addSelectionListener(new SelectionAdapter() {
+        	@Override
         	public void widgetSelected(SelectionEvent e) {
         		alwaysShowTitle = showTitle.getSelection();
         	}
 		});
-
-
 
 		GridUtils.setVisible(advanced, false);
 		ExpansionAdapter expansionListener = new ExpansionAdapter() {
@@ -174,12 +173,18 @@ public final class AVIConvertPage extends AbstractSliceConversionPage {
 			public void expansionStateChanged(ExpansionEvent e) {
 				GridUtils.setVisible(advanced, !advanced.isVisible());
 				parent.layout(new Control[]{advanced, advancedComposite});
-				parent.layout();
-				parent.getParent().layout();
+				Composite comp = parent.getParent();
+				if (comp instanceof ScrolledComposite) {
+					Rectangle r = ((ScrolledComposite)comp).getClientArea();
+					((ScrolledComposite)comp).setMinSize(parent.computeSize(r.width, SWT.DEFAULT));
+					parent.layout();
+				} else {
+					parent.layout();
+					parent.getParent().layout();
+				}
 			}
 		};
 		advancedComposite.addExpansionListener(expansionListener);
-		
 	}
 	
 	@Override
@@ -190,7 +195,7 @@ public final class AVIConvertPage extends AbstractSliceConversionPage {
 	
 	private static final String getFileNameNoExtension(File file) {
 		final String fileName = file.getName();
-		int posExt = fileName.lastIndexOf(".");
+		int posExt = fileName.lastIndexOf('.');
 		// No File Extension
 		return posExt == -1 ? fileName : fileName.substring(0, posExt);
 	}
@@ -203,6 +208,7 @@ public final class AVIConvertPage extends AbstractSliceConversionPage {
 	/**
 	 * Checks the path is ok.
 	 */
+	@Override
 	protected void pathChanged() {
 
 		super.pathChanged();
@@ -235,11 +241,12 @@ public final class AVIConvertPage extends AbstractSliceConversionPage {
 		
 		super.setContext(context);
 		
-		if (context==null) return;
+		if (context==null)
+			return;
 		
 		// We either are directories if we are choosing multiple files or
 		// we are single file output and specifying a single output file.
-        if (context.getFilePaths().size()>1) { // Multi
+        if (context.getFilePaths().size() > 1) {
     		final File source = new File(getSourcePath(context));
     		setPath(source.getParent());
        	    setDirectory(true);
@@ -269,6 +276,7 @@ public final class AVIConvertPage extends AbstractSliceConversionPage {
 		bean.setAlwaysShowTitle(alwaysShowTitle);
 		
 		if (useCurrentColours) {
+			@SuppressWarnings("unchecked")
 			ISystemService<IPlottingSystem<Composite>> service = (ISystemService<IPlottingSystem<Composite>>)PlatformUI.getWorkbench().getService(ISystemService.class);
 			if (service!=null) {
 				// If we have a plotting system for the input file, use that.
@@ -293,7 +301,8 @@ public final class AVIConvertPage extends AbstractSliceConversionPage {
 		if (system == null) return null;
 
 		final Collection<ITrace> traces = system.getTraces();
-		if (traces==null || traces.size()==0) return null;
+		if (traces==null || traces.isEmpty())
+			return null;
         return  traces.iterator().next();
 	}
 

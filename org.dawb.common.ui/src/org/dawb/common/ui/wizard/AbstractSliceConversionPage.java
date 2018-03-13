@@ -117,9 +117,10 @@ public abstract class AbstractSliceConversionPage extends ResourceChoosePage {
 		sep.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 4, 1));
 
 		final ScrolledComposite scrollComposite = new ScrolledComposite(container, SWT.V_SCROLL);
-		scrollComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 4, 8));
+		scrollComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 4, 1));
 		final Composite contentComposite = new Composite(scrollComposite, SWT.NONE);
 		contentComposite.setLayout(new GridLayout(1, false));
+		contentComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
 		try {
 			this.sliceComponent = SlicingFactory.createSliceSystem("org.dawb.workbench.views.h5GalleryView");
@@ -131,8 +132,7 @@ public abstract class AbstractSliceConversionPage extends ResourceChoosePage {
 	    sliceComponent.setRangeMode(RangeMode.MULTI_RANGE);
 
 	    final Control slicer = sliceComponent.createPartControl(contentComposite);
-		GridData data = new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1);
-		data.minimumHeight=560;
+		GridData data = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
 		slicer.setLayoutData(data);
 		sliceComponent.setVisible(true);
 		sliceComponent.setSliceActionsEnabled(false);

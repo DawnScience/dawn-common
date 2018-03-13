@@ -41,7 +41,7 @@ public final class ImageConvertPage extends AbstractSliceConversionPage {
 	private static final String[] IMAGE_FORMATS = new String[]{"tif", "png", "jpg"};
 	private static final Map<String,int[]> BIT_DEPTHS;
 	static {
-		BIT_DEPTHS = new HashMap<String, int[]>(3);
+		BIT_DEPTHS = new HashMap<>(3);
 		// TODO investigate other bit depths for different formats.
 		BIT_DEPTHS.put("tif", new int[]{32,16});
 		BIT_DEPTHS.put("png", new int[]{16});
@@ -72,11 +72,11 @@ public final class ImageConvertPage extends AbstractSliceConversionPage {
 		final ExpandableComposite advancedComposite = new ExpandableComposite(parent, SWT.NONE);
 		advancedComposite.setExpanded(false);
 		advancedComposite.setText("Advanced");
-		advancedComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 4, 1));
+		advancedComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		
 		final Composite advanced = new Composite(parent, SWT.NONE);
 		advanced.setLayout(new GridLayout(3, false));
-		advanced.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 4, 1));
+		advanced.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1));
 			
 		Label label = new Label(advanced, SWT.NULL);
 		label.setLayoutData(new GridData());
@@ -98,6 +98,7 @@ public final class ImageConvertPage extends AbstractSliceConversionPage {
 		bitDepth = 32;
 		bd.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
 		bd.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				final String str = bd.getItem(bd.getSelectionIndex());
 				bitDepth = Integer.parseInt(str);
@@ -107,6 +108,7 @@ public final class ImageConvertPage extends AbstractSliceConversionPage {
 			}
 		});
 		imf.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				imageFormat = imf.getItem(imf.getSelectionIndex());
 				
@@ -202,6 +204,7 @@ public final class ImageConvertPage extends AbstractSliceConversionPage {
 	/**
 	 * Checks the path is ok.
 	 */
+	@Override
 	protected void pathChanged() {
 
 		super.pathChanged();
@@ -238,7 +241,8 @@ public final class ImageConvertPage extends AbstractSliceConversionPage {
 	public void setContext(IConversionContext context) {
 		super.setContext(context);
 		
-		if (context==null) return;
+		if (context==null)
+			return;
 		
 		// We either are directories if we are choosing multiple files or
 		// we are single file output and specifying a single output file.
