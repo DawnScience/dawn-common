@@ -12,20 +12,17 @@ import org.eclipse.dawnsci.plotting.api.IPlottingSystem;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
-import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -126,16 +123,20 @@ public class DocumentInserter implements IMacroEventListener, IPartListener {
 			connect();
 		}
 	}
-	
+
+	public static final String PY4J_DEFAULTSERVER = "org.py4j.defaultserver";
+	public static final String PREF_PY4J_ACTIVE = "PREF_PY4J_ACTIVE";
+	public static final String PREF_DEFAULT_PORT = "PREF_DEFAULT_PORT";
+	public static final String PREF_DEFAULT_CALLBACK_PORT = "PREF_DEFAULT_CALLBACK_PORT";
+
 	/**
 	 * User friendly stuff to remind them how to set up py4j
 	 * @return
 	 */
 	private boolean checkPy4jServer() {
-		
-        final IPreferenceStore pref = new ScopedPreferenceStore(InstanceScope.INSTANCE, "net.sf.py4j.defaultserver");
-        boolean isActive = pref.getBoolean("PREF_PY4J_ACTIVE");
-		boolean override = Boolean.getBoolean("PREF_PY4J_ACTIVE"); // They can override the default using -DPREF_PY4J_ACTIVE=...
+        final IPreferenceStore pref = new ScopedPreferenceStore(InstanceScope.INSTANCE, PY4J_DEFAULTSERVER);
+        boolean isActive = pref.getBoolean(PREF_PY4J_ACTIVE);
+		boolean override = Boolean.getBoolean(PREF_PY4J_ACTIVE); // They can override the default using -DPREF_PY4J_ACTIVE=...
         if (!isActive && !override) {
         	boolean yes = MessageDialog.openQuestion(Display.getDefault().getActiveShell(), "Cannot connect to DAWN",
         			       "The macro server is not going. Would you like to turn it on now and restart DAWN?\n\n"+
@@ -154,8 +155,8 @@ public class DocumentInserter implements IMacroEventListener, IPartListener {
         }
 
         // Recheck
-        isActive = pref.getBoolean("PREF_PY4J_ACTIVE");
-		override = Boolean.getBoolean("PREF_PY4J_ACTIVE"); // They can override the default using -DPREF_PY4J_ACTIVE=...
+        isActive = pref.getBoolean(PREF_PY4J_ACTIVE);
+		override = Boolean.getBoolean(PREF_PY4J_ACTIVE); // They can override the default using -DPREF_PY4J_ACTIVE=...
 
         return isActive || override;
 	}
@@ -163,7 +164,7 @@ public class DocumentInserter implements IMacroEventListener, IPartListener {
 	@Override
 	public void partActivated(IWorkbenchPart part) {
         try {
-        	IPlottingSystem<Composite> sys = (IPlottingSystem<Composite>)part.getAdapter(IPlottingSystem.class);
+        	IPlottingSystem<?> sys = part.getAdapter(IPlottingSystem.class);
         	if (sys!=null && mservice!=null) {
     			mservice.publish(new MacroEventObject(sys));
     		}
