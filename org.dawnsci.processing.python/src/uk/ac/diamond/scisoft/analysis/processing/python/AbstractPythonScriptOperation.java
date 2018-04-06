@@ -12,7 +12,7 @@ import org.eclipse.january.dataset.IDataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class AbstractPythonScriptOperation<T extends PythonScriptModel> extends AbstractOperation<PythonScriptModel,OperationData> {
+public abstract class AbstractPythonScriptOperation<T extends AbstractPythonScriptModel> extends AbstractOperation<AbstractPythonScriptModel,OperationData> {
 
 	AnalysisRpcPythonPyDevService s = null;
 	PythonRunScriptService pythonRunScriptService;
@@ -54,6 +54,7 @@ public abstract class AbstractPythonScriptOperation<T extends PythonScriptModel>
 			Map<String, Object> out = pythonRunScriptService.runScript(model.getFilePath(), inputs);
 			return packAndValidateMap(out);
 		} catch (Exception e) {
+			e.printStackTrace();
 			throw new OperationException(this, "Could not run " + model.getFilePath() + " due to " + e.getMessage());
 		}
 	}
