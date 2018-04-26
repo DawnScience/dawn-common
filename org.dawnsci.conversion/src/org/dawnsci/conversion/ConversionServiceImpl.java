@@ -77,7 +77,10 @@ public class ConversionServiceImpl implements IConversionService {
 		
 		IMacroService mservice = (IMacroService)Activator.getService(IMacroService.class);
 		if (mservice==null) return;
-		
+		if (context.getConversionScheme() == null) {
+			return;
+		}
+
 		try {
 			MacroEventObject evt = new MacroEventObject(this);
 			evt.setPythonCommand("cservice = dnp.plot.getService('"+IConversionService.class.getName()+"')\n");
