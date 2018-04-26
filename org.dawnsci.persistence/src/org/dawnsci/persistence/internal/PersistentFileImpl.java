@@ -227,14 +227,7 @@ class PersistentFileImpl implements IPersistentFile {
 				// we create the dataset
 				DataNode dNode = null;
 				if (data instanceof RGBDataset) {
-					int[] oShape = data.getShape();
-					int[] shape = new int[oShape.length+1];
-					shape[shape.length-1] = 3;
-					for (int i = 0; i < oShape.length;i++) {
-						shape[i] = oShape[i];
-					}
-					
-					data = DatasetFactory.createFromObject(ShortDataset.class, ((RGBDataset)data).getData(), shape);
+					data = ((RGBDataset) data).asNonCompoundDataset(true);
 					data.setName(dataName);
 					isRGB = true;
 				}
