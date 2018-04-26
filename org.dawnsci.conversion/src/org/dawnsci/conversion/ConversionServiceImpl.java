@@ -77,15 +77,14 @@ public class ConversionServiceImpl implements IConversionService {
 		
 		IMacroService mservice = (IMacroService)Activator.getService(IMacroService.class);
 		if (mservice==null) return;
-		if (context.getConversionScheme() == null) {
-			return;
-		}
 
 		try {
 			MacroEventObject evt = new MacroEventObject(this);
 			evt.setPythonCommand("cservice = dnp.plot.getService('"+IConversionService.class.getName()+"')\n");
 			evt.append("context = cservice.open("+evt.getStringArguments(context.getFilePaths())+")");
-			evt.append("context.setConversionScheme('"+context.getConversionScheme().getClass().getName()+"')");
+			if (context.getConversionScheme() != null) {
+				evt.append("context.setConversionScheme('"+context.getConversionScheme().getClass().getName()+"')");
+			}
 			evt.append("context.setDatasetNames("+evt.getStringArguments(context.getDatasetNames())+")");
 			evt.append("context.setOutputPath('"+context.getOutputPath().replace('\\', '/')+"')");
 			evt.append("context.setSliceDimensions("+evt.getMap(context.getSliceDimensions())+")");
