@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -29,12 +30,16 @@ import org.eclipse.dawnsci.analysis.api.processing.IOperation;
 import org.eclipse.dawnsci.analysis.api.processing.OperationData;
 import org.eclipse.dawnsci.analysis.api.processing.model.IOperationModel;
 import org.eclipse.dawnsci.analysis.api.roi.IROI;
+import org.eclipse.dawnsci.analysis.api.tree.Attribute;
 import org.eclipse.dawnsci.analysis.api.tree.DataNode;
 import org.eclipse.dawnsci.analysis.api.tree.GroupNode;
+import org.eclipse.dawnsci.analysis.api.tree.Node;
 import org.eclipse.dawnsci.analysis.tree.TreeFactory;
 import org.eclipse.dawnsci.nexus.NexusConstants;
 import org.eclipse.dawnsci.nexus.NexusException;
 import org.eclipse.dawnsci.nexus.NexusFile;
+import org.eclipse.dawnsci.nexus.NexusUtils;
+import org.eclipse.january.DatasetException;
 import org.eclipse.january.IMonitor;
 import org.eclipse.january.dataset.BooleanDataset;
 import org.eclipse.january.dataset.Comparisons;
@@ -65,7 +70,6 @@ class PersistentFileImpl implements IPersistentFile {
 
 	private static final Logger logger = LoggerFactory.getLogger(PersistentFileImpl.class);
 	// Used for the persistence of operations and calibration
-//	private IHierarchicalDataFile fileForOperations;
 	private NexusFile file;
 	private String filePath;
 
@@ -116,16 +120,6 @@ class PersistentFileImpl implements IPersistentFile {
 		}
 	}
 
-//	/**
-//	 * Used for persisting operations and calibration
-//	 * 
-//	 * @param filePath
-//	 */
-//	public PersistentFileImpl(IHierarchicalDataFile file) {
-//		this.fileForOperations = file;
-//		this.filePath = fileForOperations.getPath();
-//	}
-
 	@Override
 	public void setMasks(Map<String, ? extends IDataset> masks) throws Exception {
 		if (file == null) {
@@ -172,15 +166,14 @@ class PersistentFileImpl implements IPersistentFile {
 	}
 
 	@Override
-	public void setData(IDataset data) throws Exception {
-		writeH5Data(data, null, null);
-	}
-	
-	@Override
 	public void setData(IDataset data, IDataset xAxis, IDataset yAxis) throws Exception {
-		writeH5Data(data, xAxis, yAxis);
+		setData(data, new IDataset[] {yAxis, xAxis});
 	}
-	
+
+	@Override
+	public void setData(IDataset data, IDataset[] axes) throws Exception {
+		writeH5Data(data, axes);
+	}
 
 	@Override
 	public void setHistory(IDataset... sets) throws Exception {
@@ -200,29 +193,82 @@ class PersistentFileImpl implements IPersistentFile {
 	}
 
 	@Override
-	public void setAxes(List<? extends IDataset> axes) throws Exception {
-		writeH5Data(null, axes.get(0), axes.get(1));
+	public void setAxes(IDataset... axes) throws Exception {
+		writeH5Data(null, axes);
 	}
+
+	private final static String DATA = "data";
 
 	/**
 	 * Method to write image data (and axis) to an HDF5 file given a specific
 	 * path entry to save the data.
 	 * 
 	 * @param data
-	 * @param xAxisData
-	 * @param yAxisData
+	 * @param axes
 	 * @throws Exception
 	 */
-	private void writeH5Data(IDataset data, final IDataset xAxisData, final IDataset yAxisData) {
+	private void writeH5Data(IDataset data, final IDataset... axes) {
 		// create nodes in separate try/catch clauses in order to try creating the next node even if the previous one wasn't successful
 		GroupNode group = createDataNode(file, PersistenceConstants.DATA_ENTRY);
+
+		// if there are data nodes already then move them to a new NXdata group
+		if (group.getNumberOfDataNodes() > 0) {
+			Map<String, DataNode> dMap = group.getDataNodeMap();
+			Map<String, Dataset> oDataMap = new LinkedHashMap<>();
+			for (String n : dMap.keySet()) {
+				try {
+					Dataset d = DatasetUtils.sliceAndConvertLazyDataset(dMap.get(n).getDataset());
+					d.setName(n);
+					oDataMap.put(n, d);
+					file.removeNode(group, n);
+				} catch (NexusException | DatasetException e) {
+				}
+			}
+			try { // make new collection instead and move old data into new subgroup
+				file.removeNode(PersistenceConstants.ENTRY, DATA);
+				GroupNode nGroup = file.getGroup(PersistenceConstants.DATA_ENTRY, true);
+				file.addAttribute(nGroup, TreeFactory.createAttribute(NexusConstants.NXCLASS, NexusConstants.COLLECTION));
+				String signal = group.getAttribute(NexusConstants.DATA_SIGNAL).getFirstElement();
+				GroupNode sGroup = file.getGroup(nGroup, signal, NexusConstants.DATA, true);
+				Iterator<String> it = group.getAttributeNameIterator();
+				while (it.hasNext()) {
+					String an = it.next();
+					Attribute a;
+					if (NexusConstants.DATA_SIGNAL.equals(an)) {
+						a = TreeFactory.createAttribute(an, DATA);
+					} else {
+						a = group.getAttribute(an);
+					}
+					file.addAttribute(sGroup, a);
+				}
+				for (String n : oDataMap.keySet()) {
+					Dataset d = oDataMap.get(n);
+					if (signal.equals(n)) {
+						d.setName(DATA);
+					}
+					file.createData(sGroup, d);
+				}
+				group = nGroup;
+			} catch (NexusException e) {
+			}
+		}
+
 		if (data != null) {
 			try {
-				String dataName = !data.getName().equals("") ? data.getName() : "data";
+				String dataName = data.getName();
+				if (dataName.isEmpty()) {
+					dataName = DATA;
+				}
 				if (dataName.contains(":")) {
 					dataName = dataName.replace(":", "_");
 				}
+				if (group.getNumberOfGroupNodes() > 0) {
+					GroupNode sGroup = file.getGroup(group, dataName, NexusConstants.DATA, true);
+					dataName = NexusConstants.DATA_SIGNAL;
+					group = sGroup;
+				}
 				data.setName(dataName);
+
 				boolean isRGB = false;
 				// we create the dataset
 				DataNode dNode = null;
@@ -234,8 +280,7 @@ class PersistentFileImpl implements IPersistentFile {
 				
 				dNode = file.createData(group, data);
 				
-				// we set the JSON attribute
-				file.addAttribute(dNode, TreeFactory.createAttribute("signal", 1));
+				// add attributes according to NeXus standard for NXdata
 				file.addAttribute(group, TreeFactory.createAttribute("signal", dataName));
 				if (isRGB) {
 					file.addAttribute(dNode,  TreeFactory.createAttribute("interpretation","rgba-image"));
@@ -246,49 +291,41 @@ class PersistentFileImpl implements IPersistentFile {
 			}
 		}
 
-		int rank = 1;
-		
-		if (data != null) {
-			rank = data.getRank();
-		} else if (yAxisData != null) {
-			rank = 2;
-		}
-		
-		
-		
-		String[] axes = new String[rank];
-		Arrays.fill(axes, ".");
-		
-		if (xAxisData != null) {
-			try {
-				String xAxisName = !xAxisData.getName().equals("") ? xAxisData.getName() : "X Axis";
-				xAxisData.setName(xAxisName);
-				// we create the dataset
-				DataNode dNode = file.createData(group, xAxisData);
-				// we set the JSON attribute
-				file.addAttribute(dNode, TreeFactory.createAttribute("axis", 1));
-				file.addAttribute(group, TreeFactory.createAttribute(xAxisName + NexusConstants.DATA_INDICES_SUFFIX, rank == 1 ? 0 : 1));
-				axes[rank == 1 ? 0 : 1] = xAxisName;
-			} catch (NexusException ne) {
-				logger.warn(ne.getMessage());
-			}
-		}
-		if (yAxisData != null) {
-			try {
-				String yAxisName = !yAxisData.getName().equals("") ? yAxisData.getName() : "Y Axis";
-				yAxisData.setName(yAxisName);
-				// we create the dataset
-				DataNode dNode = file.createData(group, yAxisData);
-				// we set the JSON attribute
-				file.addAttribute(dNode, TreeFactory.createAttribute("axis", 2));
-				file.addAttribute(group, TreeFactory.createAttribute(yAxisName + NexusConstants.DATA_INDICES_SUFFIX, 0));
-				axes[0] = yAxisName;
-			} catch (NexusException ne) {
-				logger.warn(ne.getMessage());
+		int nAxes = axes == null ? 0 : axes.length;
+		int rank = data == null ? nAxes : data.getRank();
+		String[] axisNames = new String[rank];
+		Arrays.fill(axisNames, ".");
+
+		for (int n = 0; n < rank; n++) {
+			IDataset a = n < nAxes ? axes[n] : null;
+			if (a != null) {
+				String axisName = a.getName();
+				if (axisName.isEmpty()) {
+					if (rank == 1) {
+						axisName = "X Axis";
+					} else if (rank == 2) {
+						axisName = n == 0 ? "Y Axis" : "X Axis";
+					} else {
+						axisName = "Axis " + n;
+					}
+					a.setName(axisName);
+				}
+				try {
+					file.createData(group, a);
+					file.addAttribute(group, TreeFactory.createAttribute(axisName + NexusConstants.DATA_INDICES_SUFFIX, n));
+				} catch (NexusException ne) {
+					logger.warn(ne.getMessage());
+				}
+				axisNames[n] = axisName;
 			}
 		}
 		try {
-			file.addAttribute(group, TreeFactory.createAttribute("axes", axes));
+			file.addAttribute(group, TreeFactory.createAttribute("axes", axisNames));
+		} catch (NexusException ne) {
+			logger.warn(ne.getMessage());
+		}
+		try {
+			file.flush();
 		} catch (NexusException ne) {
 			logger.warn(ne.getMessage());
 		}
@@ -322,13 +359,13 @@ class PersistentFileImpl implements IPersistentFile {
 	public void setRegionAttribute(String regionName, String attributeName, String attributeValue) throws Exception {
 		if ("JSON".equals(attributeName))
 			throw new Exception("Cannot override the JSON attribute!");
-		final DataNode node = file.getData(PersistenceConstants.ROI_ENTRY + "/" + regionName);
+		final DataNode node = file.getData(PersistenceConstants.ROI_ENTRY + Node.SEPARATOR + regionName);
 		file.addAttribute(node, TreeFactory.createAttribute(attributeName, attributeValue));
 	}
 
 	@Override
 	public String getRegionAttribute(String regionName, String attributeName) throws Exception {
-		return file.getAttributeValue(PersistenceConstants.ROI_ENTRY + "/" + regionName + "@" + attributeName);
+		return file.getAttributeValue(PersistenceConstants.ROI_ENTRY + Node.SEPARATOR + regionName + "@" + attributeName);
 	}
 
 	/**
@@ -360,9 +397,18 @@ class PersistentFileImpl implements IPersistentFile {
 	public ILazyDataset getData(String dataName, IMonitor mon) throws Exception {
 		if (file == null)
 			file = ServiceLoader.getNexusFactory().newNexusFile(filePath);
-		dataName = !dataName.equals("") ? dataName : NexusConstants.DATA_DATA;
-		DataNode datanode = file.getData(PersistenceConstants.DATA_ENTRY + "/" + dataName);
-		return datanode.getDataset();
+		dataName = dataName.isEmpty() ? NexusConstants.DATA_DATA : dataName;
+		GroupNode group = file.getGroup(PersistenceConstants.DATA_ENTRY, false);
+		if (!group.containsDataNode(dataName)) {
+			if (group.containsGroupNode(dataName)) {
+				group = file.getGroup(group, dataName, null, false);
+				dataName = DATA;
+			}
+			if (!group.containsDataNode(dataName)) {
+				throw new IllegalArgumentException("No such dataset found: " + dataName);
+			}
+		}
+		return group.getDataNode(dataName).getDataset();
 	}
 
 	/**
@@ -376,32 +422,37 @@ class PersistentFileImpl implements IPersistentFile {
 		List<String> names = getNames(file, PersistenceConstants.HISTORY_ENTRY, mon);
 		Map<String, ILazyDataset> sets = new HashMap<String, ILazyDataset>(names.size());
 		Iterator<String> it = names.iterator();
+		GroupNode group = file.getGroup(PersistenceConstants.HISTORY_ENTRY, false);
 		while (it.hasNext()) {
-			String name = (String) it.next();
+			String name = it.next();
 //			if (PersistenceConstants.HISTORY_ENTRY.endsWith(name)) {
-				GroupNode group = file.getGroup(PersistenceConstants.HISTORY_ENTRY, false);
-				DataNode datanode = file.getData(group, name);
+				DataNode datanode = group.getDataNode(name);
 				ILazyDataset data = datanode.getDataset();
-				sets.put(PersistenceConstants.HISTORY_ENTRY + "/" + name, data);
+				sets.put(PersistenceConstants.HISTORY_ENTRY + Node.SEPARATOR + name, data);
 //			}
 		}
 		return sets;
 	}
 
 	@Override
-	public List<ILazyDataset> getAxes(String xAxisName, String yAxisName, IMonitor mon) throws Exception {
+	public List<ILazyDataset> getAxes(IMonitor mon, String dataName, String... axisNames) throws Exception {
 		List<ILazyDataset> axes = new ArrayList<ILazyDataset>();
-		ILazyDataset xaxis = null, yaxis = null;
 
-		IDataHolder dh = LoaderFactory.getData(filePath, true, mon);
-		xAxisName = !xAxisName.equals("") ? xAxisName : "X Axis";
-		xaxis = readH5Data(dh, xAxisName, PersistenceConstants.DATA_ENTRY);
-		if (xaxis != null)
-			axes.add(xaxis);
-		yAxisName = !yAxisName.equals("") ? yAxisName : "Y Axis";
-		yaxis = readH5Data(dh, yAxisName, PersistenceConstants.DATA_ENTRY);
-		if (yaxis != null)
-			axes.add(yaxis);
+		GroupNode group = file.getGroup(PersistenceConstants.DATA_ENTRY, false);
+		if (dataName == null) {
+			if (group.getNumberOfGroupNodes() > 0) {
+				group = group.getGroupNodes().get(0);
+			}
+		}
+		for (String a : axisNames) {
+			if (a == null || a.isEmpty()) { // TODO automatically get all axes
+				throw new IllegalArgumentException();
+			}
+			ILazyDataset axis = group.getDataNode(a).getDataset();
+			if (axis != null) {
+				axes.add(axis);
+			}
+		}
 		return axes;
 	}
 
@@ -409,7 +460,7 @@ class PersistentFileImpl implements IPersistentFile {
 	public BooleanDataset getMask(String maskName, IMonitor mon) throws Exception {
 		if (file == null)
 			file = ServiceLoader.getNexusFactory().newNexusFile(filePath);
-		DataNode datanode = file.getData(PersistenceConstants.MASK_ENTRY + "/" + maskName);
+		DataNode datanode = file.getData(PersistenceConstants.MASK_ENTRY + Node.SEPARATOR + maskName);
 		if (datanode == null)
 			throw new Exception("The mask with the name " + maskName + " is null");
 		ILazyDataset lazy = datanode.getDataset();
@@ -433,7 +484,7 @@ class PersistentFileImpl implements IPersistentFile {
 		Iterator<String> it = names.iterator();
 		while (it.hasNext()) {
 			String name = (String) it.next();
-			DataNode datanode = file.getData(PersistenceConstants.MASK_ENTRY + "/" + name);
+			DataNode datanode = file.getData(PersistenceConstants.MASK_ENTRY + Node.SEPARATOR + name);
 			ILazyDataset data = datanode.getDataset();
 
 			IDataset bdataset = data.getSlice(new Slice(0, data.getShape()[0], 1)).squeeze();
@@ -457,7 +508,7 @@ class PersistentFileImpl implements IPersistentFile {
 
 	@Override
 	public IROI getROI(String roiName) throws Exception {
-		String json = file.getAttributeValue(PersistenceConstants.ROI_ENTRY + "/" + roiName + "@JSON");
+		String json = file.getAttributeValue(PersistenceConstants.ROI_ENTRY + Node.SEPARATOR + roiName + "@JSON");
 		if (json == null)
 			throw new Exception("Reading Exception: " + PersistenceConstants.ROI_ENTRY
 					+ " entry does not exist in the file " + filePath);
@@ -478,7 +529,7 @@ class PersistentFileImpl implements IPersistentFile {
 		Iterator<String> it = names.iterator();
 		while (it.hasNext()) {
 			String name = (String) it.next();
-			String json = file.getAttributeValue(PersistenceConstants.ROI_ENTRY + "/" + name + "@JSON");
+			String json = file.getAttributeValue(PersistenceConstants.ROI_ENTRY + Node.SEPARATOR + name + "@JSON");
 			IROI roi = (IROI) ServiceLoader.getJSONMarshallerService().unmarshal(json, IROI.class);
 			rois.put(name, roi);
 		}
@@ -684,7 +735,7 @@ class PersistentFileImpl implements IPersistentFile {
 
 	@Override
 	public IFunction getFunction(String functionName) throws Exception {
-		String json = file.getAttributeValue(PersistenceConstants.FUNCTION_ENTRY + "/" + functionName);
+		String json = file.getAttributeValue(PersistenceConstants.FUNCTION_ENTRY + Node.SEPARATOR + functionName);
 		if (json == null)
 			throw new Exception("Reading Exception: " + PersistenceConstants.FUNCTION_ENTRY
 					+ " entry does not exist in the file " + filePath);
@@ -704,7 +755,7 @@ class PersistentFileImpl implements IPersistentFile {
 		Iterator<String> it = names.iterator();
 		while (it.hasNext()) {
 			String name = (String) it.next();
-			String json = file.getAttributeValue(PersistenceConstants.FUNCTION_ENTRY + "/" + name + "@JSON");
+			String json = file.getAttributeValue(PersistenceConstants.FUNCTION_ENTRY + Node.SEPARATOR + name + "@JSON");
 			// Deserialize the json back to a function
 			// TODO replace JacksonMarshaller by IMarshallerService
 			IFunction function = (IFunction) converter.unmarshal(json);

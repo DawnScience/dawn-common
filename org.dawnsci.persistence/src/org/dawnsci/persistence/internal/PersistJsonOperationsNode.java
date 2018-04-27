@@ -32,6 +32,7 @@ import org.eclipse.dawnsci.analysis.dataset.slicer.SliceFromSeriesMetadata;
 import org.eclipse.dawnsci.analysis.tree.impl.AttributeImpl;
 import org.eclipse.dawnsci.analysis.tree.impl.DataNodeImpl;
 import org.eclipse.dawnsci.analysis.tree.impl.GroupNodeImpl;
+import org.eclipse.dawnsci.nexus.NexusConstants;
 import org.eclipse.dawnsci.nexus.NexusFile;
 import org.eclipse.january.dataset.Dataset;
 import org.eclipse.january.dataset.DatasetFactory;
@@ -146,7 +147,7 @@ public class PersistJsonOperationsNode {
 	
 	public static GroupNode writeOperationsToNode(IOperation<? extends IOperationModel, ? extends OperationData>... operations) {
 		GroupNodeImpl process = new GroupNodeImpl(1);
-		process.addAttribute(new AttributeImpl(NexusFile.NXCLASS, "NXprocess"));
+		process.addAttribute(new AttributeImpl(NexusConstants.NXCLASS, NexusConstants.PROCESS));
 		
 		for (int i = 0; i < operations.length; i++) {
 			writeOperationToProcessGroup(process, i, operations[i]);
@@ -191,7 +192,7 @@ public class PersistJsonOperationsNode {
 		IDataset pass = op.isPassUnmodifiedData() ? boolTrue : boolFalse;
 		IDataset save = op.isStoreOutput() ? boolTrue : boolFalse;
 		GroupNodeImpl gn = new GroupNodeImpl(1);
-		gn.addAttribute(new AttributeImpl(NexusFile.NXCLASS, "NXnote"));
+		gn.addAttribute(new AttributeImpl(NexusConstants.NXCLASS, NexusConstants.NOTE));
 		n.addGroupNode(Integer.toString(i),gn);
 		DataNodeImpl nameNode = new DataNodeImpl(1);
 		nameNode.setDataset(DatasetFactory.createFromObject(name));
@@ -235,7 +236,7 @@ public class PersistJsonOperationsNode {
 	private static void writeSpecialObjects(Map<String, Object> special, String type, GroupNodeImpl node,IJSonMarshaller converter) throws Exception  {
 		 if (!special.isEmpty()) {
 			 GroupNodeImpl gn = new GroupNodeImpl(1);
-			 gn.addAttribute(new AttributeImpl(NexusFile.NXCLASS,"NXcollection"));
+			 gn.addAttribute(new AttributeImpl(NexusConstants.NXCLASS, NexusConstants.COLLECTION));
 			 node.addGroupNode(type, gn);
 
 			 
@@ -270,7 +271,7 @@ public class PersistJsonOperationsNode {
 	
 	public static GroupNode writeOriginalDataInformation(OriginMetadata origin) {
 		GroupNode node = new GroupNodeImpl(1);
-		node.addAttribute(new AttributeImpl(NexusFile.NXCLASS, "NXnote"));
+		node.addAttribute(new AttributeImpl(NexusConstants.NXCLASS, NexusConstants.NOTE));
 		DataNode dn = new DataNodeImpl(1);
 		dn.setDataset(DatasetFactory.createFromObject(origin.getFilePath()));
 		node.addDataNode("path", dn);

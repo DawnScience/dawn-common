@@ -10,6 +10,7 @@ import org.dawb.common.services.ServiceManager;
 import org.dawnsci.persistence.ServiceLoader;
 import org.dawnsci.persistence.internal.PersistJsonOperationHelper;
 import org.dawnsci.persistence.internal.PersistJsonOperationsNode;
+import org.dawnsci.persistence.internal.PersistenceConstants;
 import org.dawnsci.persistence.internal.PersistenceServiceImpl;
 import org.eclipse.dawnsci.analysis.api.fitting.functions.IFunction;
 import org.eclipse.dawnsci.analysis.api.persistence.IPersistenceService;
@@ -18,17 +19,21 @@ import org.eclipse.dawnsci.analysis.api.processing.IOperation;
 import org.eclipse.dawnsci.analysis.api.processing.IOperationService;
 import org.eclipse.dawnsci.analysis.api.processing.OperationData;
 import org.eclipse.dawnsci.analysis.api.processing.model.IOperationModel;
+import org.eclipse.dawnsci.analysis.api.processing.model.SleepModel;
 import org.eclipse.dawnsci.analysis.api.tree.GroupNode;
 import org.eclipse.dawnsci.analysis.dataset.roi.RectangularROI;
 import org.eclipse.dawnsci.analysis.dataset.roi.SectorROI;
 import org.eclipse.dawnsci.analysis.dataset.slicer.SliceFromSeriesMetadata;
 import org.eclipse.dawnsci.analysis.dataset.slicer.SliceInformation;
 import org.eclipse.dawnsci.analysis.dataset.slicer.SourceInformation;
+import org.eclipse.dawnsci.hdf5.HDF5FileFactory;
 import org.eclipse.dawnsci.hdf5.nexus.NexusFileFactoryHDF5;
 import org.eclipse.dawnsci.hdf5.nexus.NexusFileHDF5;
 import org.eclipse.dawnsci.nexus.NexusFile;
+import org.eclipse.dawnsci.nexus.NexusUtils;
 import org.eclipse.january.dataset.Dataset;
 import org.eclipse.january.dataset.DatasetFactory;
+import org.eclipse.january.dataset.IntegerDataset;
 import org.eclipse.january.dataset.Slice;
 import org.eclipse.january.dataset.SliceND;
 import org.eclipse.january.metadata.OriginMetadata;
@@ -119,9 +124,13 @@ public class ReadWriteOperationTest {
 		// TODO Must be closed in a try{} finally{} ?
 		NexusFile file = NexusFileHDF5.createNexusFile(tmp.getAbsolutePath());
 		util.writeOperations(file, new IOperation[]{op2});
-		file.close();
+//		file.close();
+//
+//		file = NexusFileHDF5.createNexusFile(tmp.getAbsolutePath());
+//		file.openToRead();
+		GroupNode g = NexusUtils.loadGroupFully(file, PersistenceConstants.PROCESS_ENTRY, 3);
+		IOperation[] readOperations = PersistJsonOperationsNode.readOperations(g);
 
-		IOperation[] readOperations = PersistJsonOperationsNode.readOperations(LoaderFactory.getData(tmp.getAbsolutePath()).getTree());
 
 		assertEquals(((JunkTestOperationModel)(readOperations[0].getModel())).getxDim(), 50);
 
@@ -136,8 +145,8 @@ public class ReadWriteOperationTest {
 		model2.setRoi(new SectorROI());
 		model2.setxDim(50);
 		model2.setBar(new Gaussian());
-		model2.setFoo(DatasetFactory.createRange(10, Dataset.INT32));
-		model2.setData(DatasetFactory.createRange(5, Dataset.INT32));
+		model2.setFoo(DatasetFactory.createRange(IntegerDataset.class, 10));
+		model2.setData(DatasetFactory.createRange(IntegerDataset.class, 5));
 		model2.setFunc(new Lorentzian());
 		model2.setRoi2(new RectangularROI());
 		op2.setModel(model2);
@@ -150,9 +159,12 @@ public class ReadWriteOperationTest {
 		tmp.createNewFile();
 		NexusFile file = NexusFileHDF5.createNexusFile(tmp.getAbsolutePath());
 		util.writeOperations(file, new IOperation[]{op2});
-		file.close();
-
-		IOperation[] readOperations = PersistJsonOperationsNode.readOperations(LoaderFactory.getData(tmp.getAbsolutePath()).getTree());
+//		file.close();
+//
+//		file = NexusFileHDF5.createNexusFile(tmp.getAbsolutePath());
+//		file.openToRead();
+		GroupNode g = NexusUtils.loadGroupFully(file, PersistenceConstants.PROCESS_ENTRY, 3);
+		IOperation[] readOperations = PersistJsonOperationsNode.readOperations(g);
 		JunkTestModelROI mo = (JunkTestModelROI)readOperations[0].getModel();
 		assertEquals(mo.getxDim(), 50);
 		assertTrue(mo.getRoi() != null);
@@ -173,8 +185,8 @@ public class ReadWriteOperationTest {
 		model2.setRoi(new SectorROI());
 		model2.setxDim(50);
 		model2.setBar(new Gaussian());
-		model2.setFoo(DatasetFactory.createRange(10, Dataset.INT32));
-		model2.setData(DatasetFactory.createRange(5, Dataset.INT32));
+		model2.setFoo(DatasetFactory.createRange(IntegerDataset.class, 10));
+		model2.setData(DatasetFactory.createRange(IntegerDataset.class, 5));
 		model2.setFunc(new Lorentzian());
 		model2.setRoi2(new RectangularROI());
 		op2.setModel(model2);

@@ -10,8 +10,8 @@ package org.dawb.common.ui.wizard.persistence;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -234,23 +234,28 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
 						 monitor.beginTask("Export", length);
 						 final IMonitor mon = new ProgressMonitorWrapper(monitor);
 
-						 // Save things.
-						 if (options.is(PersistWizardConstants.ORIGINAL_DATA)) {
-							 Collection<ITrace> traces  = system.getTraces();
-							 for (ITrace trace : traces) {
-								 monitor.worked(1);
-								 IDataset data = trace.getData();
-								 if (trace.getName()!=null) data.setName(trace.getName().replace("/", "_"));
-								 file.setData(data);
-								 if (trace instanceof IImageTrace) {
-									 final List<IDataset> iaxes = ((IImageTrace)trace).getAxes();
-									 if (iaxes!=null) file.setAxes(iaxes);
-								 } else if (trace instanceof ILineTrace) {
-									 IDataset xData = ((ILineTrace)trace).getXData();
-									 if (xData != null) file.setAxes(Arrays.asList(new IDataset[]{xData,null}));
-								 }
-							 }
-						 }
+						// Save things.
+						if (options.is(PersistWizardConstants.ORIGINAL_DATA)) {
+							Collection<ITrace> traces = system.getTraces();
+							for (ITrace trace : traces) {
+								monitor.worked(1);
+								IDataset data = trace.getData();
+								if (trace.getName() != null)
+									data.setName(trace.getName().replace("/", "_"));
+								IDataset[] axes = null;
+								if (trace instanceof IImageTrace) {
+									final List<IDataset> iaxes = ((IImageTrace) trace).getAxes();
+									if (iaxes != null) {
+										Collections.reverse(iaxes); // as axes are returned as x-axis then y-axis
+										axes = iaxes.toArray(new IDataset[iaxes.size()]);
+									}
+								} else if (trace instanceof ILineTrace) {
+									IDataset xData = ((ILineTrace) trace).getXData();
+									axes = new IDataset[] { xData };
+								}
+								file.setData(data, axes);
+							}
+						}
 						 if (options.is(PersistWizardConstants.IMAGE_HIST)) {
 			    				final IToolPageSystem tsystem = system.getAdapter(IToolPageSystem.class);
 			    				final IToolPage       tool    = tsystem.getActiveTool();
