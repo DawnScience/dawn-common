@@ -14,8 +14,8 @@ import org.slf4j.LoggerFactory;
 
 public abstract class AbstractPythonScriptOperation<T extends AbstractPythonScriptModel> extends AbstractOperation<AbstractPythonScriptModel,OperationData> {
 
-	AnalysisRpcPythonPyDevService s = null;
-	PythonRunScriptService pythonRunScriptService;
+	protected AnalysisRpcPythonPyDevService s = null;
+	protected PythonRunScriptService pythonRunScriptService;
 	
 	private final static Logger logger = LoggerFactory.getLogger(AbstractPythonScriptOperation.class);
 	
