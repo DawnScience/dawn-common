@@ -19,9 +19,6 @@ public class PersistenceConstants {
 	public static final String ROI_ENTRY      = "/entry/region";
 	public static final String FUNCTION_ENTRY = "/entry/function";
 	public static final String PROCESS_ENTRY  = "/entry/process";
-	public static final String NOTE           = "NXnote";
-	public static final String COLLECTION     = "NXcollection";
-	public static final String PROCESS        = "NXprocess";
 	public static final String DIFFRACTIONMETADATA_ENTRY = "/entry/instrument";
 	public static final String SITE = "Diamond Light Source";
 }
