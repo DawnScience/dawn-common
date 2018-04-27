@@ -112,13 +112,13 @@ public class OperationToPythonUtils {
 		
 		if (output.containsKey(XAXIS) || output.containsKey(YAXIS)) {
 			AxesMetadata ax = MetadataFactory.createMetadata(AxesMetadata.class, 2);
-			if (output.containsKey(XAXIS) && output.get(XAXIS) != null) {
+			if (output.get(XAXIS) != null) {
 				IDataset xaxis = (IDataset)output.get(XAXIS);
 				String xAxisTitle = (String) output.get(XAXIS_TITLE);
 				xaxis.setName(xAxisTitle != null ? xAxisTitle : XAXIS);
 				ax.addAxis(1, xaxis);
 			}
-			if (output.containsKey(YAXIS) && output.get(YAXIS) != null){
+			if (output.get(YAXIS) != null) {
 				IDataset yaxis = (IDataset)output.get(YAXIS);
 				String yAxisTitle = (String) output.get(YAXIS_TITLE);
 				yaxis.setName(yAxisTitle != null ? yAxisTitle : YAXIS);
@@ -134,7 +134,6 @@ public class OperationToPythonUtils {
 		}
 		
 		if (output.containsKey(ERROR)) {
-			
 			d.setErrors((IDataset)output.get(ERROR));
 		}
 		
@@ -149,7 +148,7 @@ public class OperationToPythonUtils {
 		String dataTitle = (String) output.get(DATA_TITLE);
 		data.setName(dataTitle != null ? dataTitle : DATA);
 		
-		if (output.containsKey(XAXIS) && output.get(XAXIS) != null) {
+		if (output.get(XAXIS) != null) {
 			AxesMetadata ax = MetadataFactory.createMetadata(AxesMetadata.class, 1);
 			
 			IDataset x = (IDataset)output.get(XAXIS);
