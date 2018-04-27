@@ -13,6 +13,9 @@ import static org.junit.Assert.assertEquals;
 
 import org.dawnsci.persistence.json.JacksonMarshaller;
 import org.dawnsci.persistence.json.function.FunctionBean;
+import org.eclipse.dawnsci.analysis.api.fitting.functions.IFunction;
+import org.eclipse.dawnsci.analysis.api.fitting.functions.IParameter;
+import org.eclipse.dawnsci.analysis.dataset.roi.RectangularROI;
 import org.eclipse.dawnsci.analysis.dataset.roi.json.RectangularROIBean;
 import org.junit.Before;
 import org.junit.Test;
@@ -85,18 +88,12 @@ public class JacksonMarshallerTest {
 	}
 
 	@Test
-	public void testUnMarshallFromJSonStringToROIBean(){
-		RectangularROIBean resultbean;
-		try {
-			resultbean = (RectangularROIBean) jackMarshall.unmarshal(jsonroi);
+	public void testUnMarshallFromJSonStringToROIBean() throws Exception {
+		RectangularROI resultbean = (RectangularROI) jackMarshall.unmarshal(jsonroi);
 
-			assertEquals(roibean.getName(), resultbean.getName());
-			assertEquals(roibean.getType(), resultbean.getType());
-			assertArrayEquals(roibean.getLengths(), resultbean.getLengths(), 0);
-			assertEquals(roibean.getAngle(), resultbean.getAngle(), 0);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		assertEquals(roibean.getName(), resultbean.getName());
+		assertArrayEquals(roibean.getLengths(), resultbean.getLengths(), 0);
+		assertEquals(roibean.getAngle(), resultbean.getAngle(), 0);
 	}
 
 	@Test
@@ -106,18 +103,14 @@ public class JacksonMarshallerTest {
 	}
 
 	@Test
-	public void testUnMarshallFromJSonStringToFunctionBean(){
-		FunctionBean resultbean;
-		try {
-			resultbean = (FunctionBean) jackMarshall.unmarshal(jsonfunction);
-			assertEquals(functionbean.getType(), resultbean.getType());
-			for (int i = 0; i < functionbean.getParameters().length; i++) {
-				assertEquals(functionbean.getParameters()[i].getLowerLimit(), resultbean.getParameters()[i].getLowerLimit(), 0);
-				assertEquals(functionbean.getParameters()[i].getUpperLimit(), resultbean.getParameters()[i].getUpperLimit(), 0);
-				assertEquals(functionbean.getParameters()[i].getValue(), resultbean.getParameters()[i].getValue(), 0);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
+	public void testUnMarshallFromJSonStringToFunctionBean() throws Exception {
+		IFunction resultbean = (IFunction) jackMarshall.unmarshal(jsonfunction);
+		for (int i = 0, imax = functionbean.getParameters().length; i < imax; i++) {
+			IParameter p = functionbean.getParameters()[i];
+			IParameter q = resultbean.getParameters()[i];
+			assertEquals(p.getLowerLimit(), q.getLowerLimit(), 0);
+			assertEquals(p.getUpperLimit(), q.getUpperLimit(), 0);
+			assertEquals(p.getValue(), q.getValue(), 0);
 		}
 	}
 }
