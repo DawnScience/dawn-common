@@ -36,7 +36,7 @@ class PersistDiffractionMetadataUtils {
 		Dataset ypixelNumber = DatasetFactory.createFromObject(intType, new int[]{detprop.getPy()}, new int[] {1});
 		ypixelNumber.setName("y_pixel_number");
 		DataNode yPixelNumberNode = file.createData(parentGroup, ypixelNumber);
-		file.addAttribute(xPixelNumberNode, new AttributeImpl("units", "pixels"));
+		file.addAttribute(yPixelNumberNode, new AttributeImpl("units", "pixels"));
 
 		Dataset xpixelSize = DatasetFactory.createFromObject(doubleType, new double[]{detprop.getHPxSize()}, new int[] {1});
 		xpixelSize.setName("x_pixel_size");
