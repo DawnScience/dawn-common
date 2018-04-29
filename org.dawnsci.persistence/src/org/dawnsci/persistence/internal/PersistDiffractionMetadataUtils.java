@@ -15,6 +15,7 @@ import org.eclipse.dawnsci.analysis.api.diffraction.IPowderCalibrationInfo;
 import org.eclipse.dawnsci.analysis.api.tree.DataNode;
 import org.eclipse.dawnsci.analysis.api.tree.GroupNode;
 import org.eclipse.dawnsci.analysis.tree.impl.AttributeImpl;
+import org.eclipse.dawnsci.nexus.NexusConstants;
 import org.eclipse.dawnsci.nexus.NexusFile;
 import org.eclipse.january.dataset.Dataset;
 import org.eclipse.january.dataset.DatasetFactory;
@@ -24,72 +25,69 @@ class PersistDiffractionMetadataUtils {
 	public static final String SAMPLEGROUPNAME = "/entry/calibration_sample";
 
 	public static void writeDetectorProperties(NexusFile file, String parent, DetectorProperties detprop) throws Exception {
-		int intType    = Dataset.INT32;
-		int doubleType = Dataset.FLOAT64;
-
 		GroupNode parentGroup = file.getGroup(parent, true);
-		Dataset xpixelNumber = DatasetFactory.createFromObject(intType, new int[]{detprop.getPx()}, new int[] {1});
+		Dataset xpixelNumber = DatasetFactory.createFromObject(new int[]{detprop.getPx()});
 		xpixelNumber.setName("x_pixel_number");
 		DataNode xPixelNumberNode = file.createData(parentGroup, xpixelNumber);
-		file.addAttribute(xPixelNumberNode, new AttributeImpl("units", "pixels"));
-		
-		Dataset ypixelNumber = DatasetFactory.createFromObject(intType, new int[]{detprop.getPy()}, new int[] {1});
+		file.addAttribute(xPixelNumberNode, new AttributeImpl(NexusConstants.UNITS, "pixels"));
+
+		Dataset ypixelNumber = DatasetFactory.createFromObject(new int[]{detprop.getPy()});
 		ypixelNumber.setName("y_pixel_number");
 		DataNode yPixelNumberNode = file.createData(parentGroup, ypixelNumber);
-		file.addAttribute(yPixelNumberNode, new AttributeImpl("units", "pixels"));
+		file.addAttribute(yPixelNumberNode, new AttributeImpl(NexusConstants.UNITS, "pixels"));
 
-		Dataset xpixelSize = DatasetFactory.createFromObject(doubleType, new double[]{detprop.getHPxSize()}, new int[] {1});
+		Dataset xpixelSize = DatasetFactory.createFromObject(new double[]{detprop.getHPxSize()});
 		xpixelSize.setName("x_pixel_size");
 		DataNode xPixelSizeNode = file.createData(parentGroup, xpixelSize);
-		file.addAttribute(xPixelSizeNode, new AttributeImpl("units", "mm"));
+		file.addAttribute(xPixelSizeNode, new AttributeImpl(NexusConstants.UNITS, "mm"));
 
-		Dataset ypixelSize = DatasetFactory.createFromObject(doubleType, new double[]{detprop.getVPxSize()}, new int[] {1});
+		Dataset ypixelSize = DatasetFactory.createFromObject(new double[]{detprop.getVPxSize()});
 		ypixelSize.setName("y_pixel_size");
 		DataNode yPixelSizeNode = file.createData(parentGroup, ypixelSize);
-		file.addAttribute(yPixelSizeNode, new AttributeImpl("units", "mm"));
+		file.addAttribute(yPixelSizeNode, new AttributeImpl(NexusConstants.UNITS, "mm"));
 
 		double dist = detprop.getBeamCentreDistance();
 		double[] bc = detprop.getBeamCentreCoords();
-		
-		Dataset bcXPix = DatasetFactory.createFromObject(doubleType, new double[]{bc[0]}, new int[] {1});
+
+		Dataset bcXPix = DatasetFactory.createFromObject(new double[]{bc[0]});
 		bcXPix.setName("beam_center_x");
 		DataNode bcXPixNode = file.createData(parentGroup, bcXPix);
-		file.addAttribute(bcXPixNode, new AttributeImpl("units", "pixels"));
+		file.addAttribute(bcXPixNode, new AttributeImpl(NexusConstants.UNITS, "pixels"));
 
-		Dataset bcYPix = DatasetFactory.createFromObject(doubleType, new double[]{bc[1]}, new int[] {1});
+		Dataset bcYPix = DatasetFactory.createFromObject(new double[]{bc[1]});
 		bcYPix.setName("beam_center_y");
 		DataNode bcYPixNode = file.createData(parentGroup, bcYPix);
-		file.addAttribute(bcYPixNode, new AttributeImpl("units", "pixels"));
+		file.addAttribute(bcYPixNode, new AttributeImpl(NexusConstants.UNITS, "pixels"));
 		
-		Dataset distance = DatasetFactory.createFromObject(doubleType, new double[]{dist}, new int[] {1});
+		Dataset distance = DatasetFactory.createFromObject(new double[]{dist});
 		distance.setName("distance");
 		DataNode distanceNode = file.createData(parentGroup, distance);
-		file.addAttribute(distanceNode, new AttributeImpl("units", "mm"));
+		file.addAttribute(distanceNode, new AttributeImpl(NexusConstants.UNITS, "mm"));
 
 		Matrix3d or = detprop.getOrientation();
 		double[] orientation = new double[] {or.m00 ,or.m01, or.m02,
 				or.m10, or.m11, or.m12,
 				or.m20, or.m21, or.m22};
 
-		Dataset orientationData = DatasetFactory.createFromObject(doubleType, orientation, new int[] {9});
+		Dataset orientationData = DatasetFactory.createFromObject(orientation);
 		orientationData.setName("detector_orientation");
 		file.createData(parentGroup, orientationData);
 	}
 	
 	public static void writeWavelengthMono(NexusFile file, String instrument, double wavelength) throws Exception {
 		GroupNode instrumentGroup = file.getGroup(instrument, true);
-		GroupNode monochromatorGroup = file.getGroup(instrumentGroup, "monochromator", "NXmonochromator", true);
+		GroupNode monochromatorGroup = file.getGroup(instrumentGroup, "monochromator", NexusConstants.MONOCHROMATOR, true);
 		
-		Dataset energy = DatasetFactory.createFromObject(Dataset.FLOAT64, new double[]{wavelength}, new int[] {1});
+		Dataset energy = DatasetFactory.createFromObject(new double[]{wavelength});
 		energy.setName("wavelength");
 		DataNode energyNode = file.createData(monochromatorGroup, energy);
-		file.addAttribute(energyNode, new AttributeImpl("units", "Angstrom"));
+		file.addAttribute(energyNode, new AttributeImpl(NexusConstants.UNITS, "Angstrom"));
 	}
 	
 	public static void writeWavelengthSample(NexusFile file, IPowderCalibrationInfo info, double wavelength) throws Exception {
 		
 		GroupNode parentGroup = file.getGroup("/entry", true);
-		GroupNode calibrationSampleGroup = file.getGroup(parentGroup, "calibration_sample", "NXsample", true);
+		GroupNode calibrationSampleGroup = file.getGroup(parentGroup, "calibration_sample", NexusConstants.SAMPLE, true);
 		
 		Dataset nameData = DatasetFactory.createFromObject(info.getCalibrantName());
 		nameData.setName("name");
@@ -102,12 +100,12 @@ class PersistDiffractionMetadataUtils {
 		datasetd.setName("d_space");
 		file.createData(calibrationSampleGroup, datasetd);
 		
-		GroupNode beamNode = file.getGroup(calibrationSampleGroup, "beam", "NXbeam", true);
+		GroupNode beamNode = file.getGroup(calibrationSampleGroup, "beam", NexusConstants.BEAM, true);
 		
-		Dataset w = DatasetFactory.createFromObject(Dataset.FLOAT64, new double[]{wavelength}, new int[] {1});
+		Dataset w = DatasetFactory.createFromObject(new double[]{wavelength});
 		w.setName("incident_wavelength");
 		DataNode wNode = file.createData(beamNode, w);
-		file.addAttribute(wNode, new AttributeImpl("units", "Angstrom"));
+		file.addAttribute(wNode, new AttributeImpl(NexusConstants.UNITS, "Angstrom"));
 	}
 
 }

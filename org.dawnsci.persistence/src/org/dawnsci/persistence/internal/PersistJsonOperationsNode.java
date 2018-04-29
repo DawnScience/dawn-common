@@ -264,7 +264,7 @@ public class PersistJsonOperationsNode {
 		String dsn = LoaderFactory.getDataSet(path,  PersistenceConstants.PROCESS_ENTRY + Node.SEPARATOR + ORIGIN+ Node.SEPARATOR + "dataset", null).getString();
 		String ss = LoaderFactory.getDataSet(path,  PersistenceConstants.PROCESS_ENTRY + Node.SEPARATOR + ORIGIN+ Node.SEPARATOR + "sampling", null).getString();
 		IDataset dd = LoaderFactory.getDataSet(path,  PersistenceConstants.PROCESS_ENTRY + Node.SEPARATOR + ORIGIN + Node.SEPARATOR+ "data dimensions", null);
-		int[] dataDims = (int[])DatasetUtils.cast(dd, Dataset.INT32).getBuffer();
+		int[] dataDims = DatasetUtils.cast(IntegerDataset.class, dd).getData();
 		
 		return MetadataFactory.createMetadata(OriginMetadata.class, null, Slice.convertFromString(ss), dataDims, fp, dsn);
 	}

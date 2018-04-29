@@ -23,6 +23,7 @@ import org.eclipse.dawnsci.analysis.api.tree.GroupNode;
 import org.eclipse.dawnsci.analysis.api.tree.Node;
 import org.eclipse.dawnsci.analysis.api.tree.Tree;
 import org.eclipse.dawnsci.analysis.tree.impl.AttributeImpl;
+import org.eclipse.dawnsci.nexus.NexusConstants;
 import org.eclipse.dawnsci.nexus.NexusFile;
 import org.eclipse.dawnsci.nexus.NexusUtils;
 import org.eclipse.january.IMonitor;
@@ -60,7 +61,7 @@ public class ImagesToHDFConverter extends AbstractConversion{
 			paths = Arrays.copyOfRange(paths, 1, paths.length);
 		final String entry = Tree.ROOT + paths[0];
 		group = hFile.getGroup(entry, true);
-		hFile.addAttribute(group, new AttributeImpl(NexusFile.NXCLASS, "NXentry"));
+		hFile.addAttribute(group, new AttributeImpl(NexusConstants.NXCLASS, NexusConstants.ENTRY));
 
 		if (paths.length>2) {
 			String path = "";
@@ -68,7 +69,7 @@ public class ImagesToHDFConverter extends AbstractConversion{
 				path = path + Node.SEPARATOR + paths[i];
 				group = hFile.getGroup(path, true);
 				if (i<(paths.length-2))
-					hFile.addAttribute(group, new AttributeImpl(NexusFile.NXCLASS, "NXentry"));
+					hFile.addAttribute(group, new AttributeImpl(NexusConstants.NXCLASS, NexusConstants.ENTRY));
 			}
 		}
 		name = paths[paths.length-1];

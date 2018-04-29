@@ -142,8 +142,7 @@ class PersistentFileImpl implements IPersistentFile {
 
 				try {
 					data.setName(name);
-					DataNode dNode = file.createData(group, data);
-					file.addAttribute(dNode, TreeFactory.createAttribute("attribute", "SDS"));
+					file.createData(group, data);
 				} catch (Exception de) {
 					de.printStackTrace();
 				}
@@ -196,7 +195,7 @@ class PersistentFileImpl implements IPersistentFile {
 		writeH5Data(null, axes);
 	}
 
-	private final static String DATA = "data";
+	private final static String DATA = NexusConstants.DATA_DATA;
 	private Map<IDataset, String> cachedAxisPath = new IdentityHashMap<>();
 
 	/**
@@ -296,7 +295,7 @@ class PersistentFileImpl implements IPersistentFile {
 				dNode = file.createData(group, data);
 
 				// add attributes according to NeXus standard for NXdata
-				file.addAttribute(group, TreeFactory.createAttribute("signal", dataName));
+				file.addAttribute(group, TreeFactory.createAttribute(NexusConstants.DATA_SIGNAL, dataName));
 				if (isRGB) {
 					file.addAttribute(dNode, TreeFactory.createAttribute("interpretation", "rgba-image"));
 				}
@@ -341,7 +340,7 @@ class PersistentFileImpl implements IPersistentFile {
 			}
 		}
 		try {
-			file.addAttribute(group, TreeFactory.createAttribute("axes", axisNames));
+			file.addAttribute(group, TreeFactory.createAttribute(NexusConstants.DATA_AXES, axisNames));
 		} catch (NexusException ne) {
 			logger.error("Could not add axes attribute", ne);
 		}
@@ -381,7 +380,7 @@ class PersistentFileImpl implements IPersistentFile {
 
 	@Override
 	public String getRegionAttribute(String regionName, String attributeName) throws Exception {
-		return file.getAttributeValue(PersistenceConstants.ROI_ENTRY + Node.SEPARATOR + regionName + "@" + attributeName);
+		return file.getAttributeValue(PersistenceConstants.ROI_ENTRY + Node.SEPARATOR + regionName + Node.ATTRIBUTE + attributeName);
 	}
 
 	/**

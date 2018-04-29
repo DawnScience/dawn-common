@@ -25,10 +25,12 @@ import org.eclipse.dawnsci.analysis.api.roi.IROI;
 import org.eclipse.dawnsci.analysis.api.tree.GroupNode;
 import org.eclipse.dawnsci.analysis.api.tree.Node;
 import org.eclipse.dawnsci.analysis.dataset.slicer.SliceFromSeriesMetadata;
+import org.eclipse.dawnsci.nexus.NexusConstants;
 import org.eclipse.dawnsci.nexus.NexusFile;
 import org.eclipse.january.dataset.Dataset;
 import org.eclipse.january.dataset.DatasetFactory;
 import org.eclipse.january.dataset.IDataset;
+import org.eclipse.january.dataset.IntegerDataset;
 import org.eclipse.january.dataset.Slice;
 import org.eclipse.january.metadata.OriginMetadata;
 import org.slf4j.Logger;
@@ -64,7 +66,7 @@ public class PersistJsonOperationHelper {
 	
 	public void writeOperations(NexusFile file, IOperation<? extends IOperationModel, ? extends OperationData>... operations) throws Exception {
 		GroupNode entryGroup = file.getGroup(PersistenceConstants.ENTRY, true);
-		GroupNode processGroup = file.getGroup(entryGroup, "process", "NXprocess", true);
+		GroupNode processGroup = file.getGroup(entryGroup, "process", NexusConstants.PROCESS, true);
 
 		for (int i = 0; i < operations.length; i++) {
 			writeOperationToProcess(file, processGroup, i, operations[i]);
@@ -75,8 +77,8 @@ public class PersistJsonOperationHelper {
 		
 		String opId = op.getId();
 		String name = op.getName();
-		IDataset boolTrue = DatasetFactory.ones(new int[] {1}, Dataset.INT);
-		IDataset boolFalse =  DatasetFactory.zeros(new int[] {1}, Dataset.INT);
+		IDataset boolTrue = DatasetFactory.ones(IntegerDataset.class, 1);
+		IDataset boolFalse =  DatasetFactory.zeros(IntegerDataset.class, 1);
 		
 		Map<Class, Map<String, Object>> specialObjects = getSpecialObjects(op.getModel());
 		
@@ -133,7 +135,7 @@ public class PersistJsonOperationHelper {
 	 */
 	private Map<Class,Map<String, Object>> getSpecialObjects(IOperationModel model) {
 
-		Map<Class,Map<String, Object>> out = new HashMap<Class, Map<String,Object>>();
+		Map<Class,Map<String, Object>> out = new HashMap<>();
 		out.put(IROI.class, new HashMap<String, Object>());
 		out.put(IDataset.class, new HashMap<String, Object>());
 		out.put(IFunction.class, new HashMap<String, Object>());
@@ -173,7 +175,7 @@ public class PersistJsonOperationHelper {
 	
 	public void writeSpecialObjects(Map<String, Object> special, String type, NexusFile file, GroupNode group) throws Exception {
 		if (!special.isEmpty()) {
-			GroupNode groupCollection = file.getGroup(group, type, "NXcollection", true);
+			GroupNode groupCollection = file.getGroup(group, type, NexusConstants.COLLECTION, true);
 
 			for (Map.Entry<String, Object> entry : special.entrySet()) {
 				String key = entry.getKey();
@@ -196,7 +198,7 @@ public class PersistJsonOperationHelper {
 	public void writeOriginalDataInformation(NexusFile file, OriginMetadata origin) throws Exception {
 		GroupNode groupEntry = file.getGroup(PersistenceConstants.ENTRY, true);
 		
-		GroupNode processNode = file.getGroup(groupEntry, "process", "NXprocess", true);
+		GroupNode processNode = file.getGroup(groupEntry, "process", NexusConstants.PROCESS, true);
 		String originPath = PersistenceConstants.PROCESS_ENTRY + Node.SEPARATOR + ORIGIN;
 		GroupNode originNode = file.getGroup(originPath, true);
 		Dataset pathData = DatasetFactory.createFromObject(origin.getFilePath());

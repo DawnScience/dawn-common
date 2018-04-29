@@ -13,16 +13,18 @@ import javax.vecmath.Vector3d;
 import org.eclipse.dawnsci.analysis.api.diffraction.DetectorProperties;
 import org.eclipse.dawnsci.analysis.api.diffraction.DiffractionCrystalEnvironment;
 import org.eclipse.dawnsci.analysis.api.diffraction.IPowderCalibrationInfo;
-import org.eclipse.january.dataset.Dataset;
-import org.eclipse.january.dataset.DatasetFactory;
-import org.eclipse.january.dataset.DoubleDataset;
-import org.eclipse.january.dataset.IDataset;
 import org.eclipse.dawnsci.analysis.api.metadata.IDiffractionMetadata;
 import org.eclipse.dawnsci.analysis.api.tree.DataNode;
 import org.eclipse.dawnsci.analysis.api.tree.GroupNode;
 import org.eclipse.dawnsci.analysis.api.tree.Node;
 import org.eclipse.dawnsci.analysis.tree.impl.AttributeImpl;
+import org.eclipse.dawnsci.nexus.NexusConstants;
 import org.eclipse.dawnsci.nexus.NexusFile;
+import org.eclipse.january.dataset.Dataset;
+import org.eclipse.january.dataset.DatasetFactory;
+import org.eclipse.january.dataset.DoubleDataset;
+import org.eclipse.january.dataset.IDataset;
+import org.eclipse.january.dataset.LongDataset;
 
 class PersistSinglePowderCalibration {
 
@@ -37,11 +39,11 @@ class PersistSinglePowderCalibration {
 			IDiffractionMetadata metadata, IPowderCalibrationInfo info) throws Exception {
 		
 		GroupNode parentNode = file.getGroup(DEFAULTINSTRUMENTNAME, true);
-		parentNode.addAttribute(new AttributeImpl("NXinstrument"));
+		parentNode.addAttribute(new AttributeImpl(NexusConstants.INSTRUMENT));
 //		String parent = HierarchicalDataFileUtils.createParentEntry(file, DEFAULTINSTRUMENTNAME,Nexus.INST);
 		
 		String parent = DEFAULTINSTRUMENTNAME + Node.SEPARATOR + "detector";
-		GroupNode detectorNode = file.getGroup(parentNode, "detector", "NXdetector", true);
+		GroupNode detectorNode = file.getGroup(parentNode, "detector", NexusConstants.DETECTOR, true);
 		
 		//write in data
 		calibrationImage.setName(DATANAME);
@@ -50,7 +52,7 @@ class PersistSinglePowderCalibration {
 		//make NXData in root as link to this data, make sure data has a link attribute back to the detector
 		GroupNode defaultGroupNode = file.getGroup(DEFAULTDATANAME, true);
 //		String group = file.group(DEFAULTDATANAME);
-		file.addAttribute(defaultGroupNode, new AttributeImpl(NexusFile.NXCLASS, "NXdata"));
+		file.addAttribute(defaultGroupNode, new AttributeImpl(NexusConstants.NXCLASS, NexusConstants.DATA));
 //		file.setNexusAttribute(group, "NXdata");
 //		file.createLink(group, dataset.substring(dataset.lastIndexOf('/')+1), dataset); // TODO FIXME Is this right?
 		
@@ -70,7 +72,7 @@ class PersistSinglePowderCalibration {
 		String transformationPath = parent + Node.SEPARATOR + "transformations";
 		GroupNode parentGroup = file.getGroup(parent, true);
 		
-		file.getGroup(parentGroup, "transformations", "NXtransformations", true);
+		file.getGroup(parentGroup, "transformations", NexusConstants.TRANSFORMATIONS, true);
 		
 		DoubleDataset offset = DatasetFactory.zeros(DoubleDataset.class, 3);
 		offset.setName("offset");
@@ -116,7 +118,7 @@ class PersistSinglePowderCalibration {
 		String calibrationPath = parent + Node.SEPARATOR + "calibration_method";
 		GroupNode parentGroup = file.getGroup(parent, true);
 		
-		GroupNode noteGroup = file.getGroup(parentGroup, "calibration_method", "NXnote", true);
+		GroupNode noteGroup = file.getGroup(parentGroup, "calibration_method", NexusConstants.NOTE, true);
 		Dataset authorData = DatasetFactory.createFromObject(DAWNCALIBRATIONID);
 		authorData.setName("author");
 		file.createData(noteGroup, authorData);
@@ -132,7 +134,7 @@ class PersistSinglePowderCalibration {
 		
 		if (info.getCitationInformation() == null || info.getCitationInformation().length == 0) return;
 		
-		GroupNode referenceGroup = file.getGroup(noteGroup, "reference", "NXcite", true);
+		GroupNode referenceGroup = file.getGroup(noteGroup, "reference", NexusConstants.CITE, true);
 		Dataset descrData = DatasetFactory.createFromObject(info.getCitationInformation()[0]);
 		descrData.setName("description");
 		file.createData(referenceGroup, descrData);
@@ -158,7 +160,7 @@ class PersistSinglePowderCalibration {
 	}
 		
 	private static String createDoubleDataset(String name, double val, NexusFile file, String group) throws Exception {
-		file.createData(group, name, DatasetFactory.createFromObject(Dataset.INT64, new double[]{val}, new int[]{1}), true);
+		file.createData(group, name, DatasetFactory.createFromObject(LongDataset.class, new double[]{val}, 1), true);
 		group = group + Node.SEPARATOR + name;
 		return group;
 	}

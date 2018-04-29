@@ -45,6 +45,7 @@ import org.eclipse.dawnsci.analysis.api.tree.GroupNode;
 import org.eclipse.dawnsci.analysis.api.tree.Node;
 import org.eclipse.dawnsci.analysis.api.tree.NodeLink;
 import org.eclipse.dawnsci.analysis.api.tree.Tree;
+import org.eclipse.dawnsci.nexus.NexusConstants;
 import org.eclipse.january.IMonitor;
 import org.eclipse.january.dataset.Dataset;
 import org.eclipse.january.dataset.DatasetUtils;
@@ -542,8 +543,8 @@ public class CustomNCDConverter extends AbstractConversion  {
 			Tree tree = new HDF5Loader(path.getAbsolutePath()).loadTree();
 			Node node = tree.findNodeLink(datasetName).getDestination();
 			String units = null;
-			if (node.containsAttribute("units")) {
-				units = node.getAttribute("units").getFirstElement();
+			if (node.containsAttribute(NexusConstants.UNITS)) {
+				units = node.getAttribute(NexusConstants.UNITS).getFirstElement();
 			} else if (node.containsAttribute("unit")) {
 				units = node.getAttribute("unit").getFirstElement();
 			}
