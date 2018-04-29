@@ -88,7 +88,7 @@ public class ReadWriteTest extends AbstractThreadTestBase {
 			file = persist.getPersistentFile(path);
 
 			try {
-				file.getData("data", null);
+				file.getData(null, "data");
 				fail("Reading Exception not caught");
 			} catch (Exception e) {
 				String classException = e.getClass().getName();

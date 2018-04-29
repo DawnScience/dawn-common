@@ -156,7 +156,7 @@ class PersistentFileImpl implements IPersistentFile {
 	}
 
 	@Override
-	public void addMask(String name, IDataset mask, IMonitor mon) throws Exception {
+	public void addMask(IMonitor mon, String name, IDataset mask) throws Exception {
 		// Inverse the dataset
 		mask = Comparisons.logicalNot((BooleanDataset) mask);
 		Dataset id = DatasetUtils.cast((BooleanDataset) mask, Dataset.INT8);
@@ -414,7 +414,7 @@ class PersistentFileImpl implements IPersistentFile {
 	}
 
 	@Override
-	public ILazyDataset getData(String dataName, IMonitor mon) throws Exception {
+	public ILazyDataset getData(IMonitor mon, String dataName) throws Exception {
 		if (file == null) {
 			file = ServiceLoader.getNexusFactory().newNexusFile(filePath);
 		}

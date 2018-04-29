@@ -85,7 +85,7 @@ public class ReadWriteDataTest extends AbstractThreadTestBase {
 		List<ILazyDataset> axesRead = null;
 		try {
 			file = persist.getPersistentFile(tmp[0].getAbsolutePath());
-			dataRead = file.getData("data", null);
+			dataRead = file.getData(null, "data");
 			axesRead = file.getAxes(null, null, "Y Axis", "X Axis");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -137,7 +137,7 @@ public class ReadWriteDataTest extends AbstractThreadTestBase {
 		List<ILazyDataset> axesRead = null;
 		try {
 			file = persist.getPersistentFile(tmp[0].getAbsolutePath());
-			dataRead = file.getData("data", null);
+			dataRead = file.getData(null, "data");
 			axesRead = file.getAxes(null, null, "Y Axis", "X Axis");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -209,7 +209,7 @@ public class ReadWriteDataTest extends AbstractThreadTestBase {
 		for (int i = 0; i < 5; i++) {
 			String dName = "data" + i;
 			try {
-				dataRead = file.getData(dName, null);
+				dataRead = file.getData(null, dName);
 				axesRead = file.getAxes(null, dName, "X Axis");
 			} catch (Exception e) {
 				e.printStackTrace();

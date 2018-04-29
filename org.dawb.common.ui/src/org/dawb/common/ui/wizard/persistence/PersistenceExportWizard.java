@@ -273,7 +273,7 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
 							 IImageTrace image = (IImageTrace)trace;
 							 final String name = options.getString(PersistWizardConstants.MASK);
 							 if (image.getMask()!=null) {
-								 file.addMask(name, image.getMask(), mon);
+								 file.addMask(mon, name, image.getMask());
 								 monitor.worked(1);
 							 }
 						 }
