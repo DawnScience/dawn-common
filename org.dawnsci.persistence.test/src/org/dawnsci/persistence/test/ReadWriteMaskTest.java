@@ -64,11 +64,11 @@ public class ReadWriteMaskTest extends AbstractThreadTestBase{
 			IPersistentFile file = null;
 			try{
 				file = persist.createPersistentFile(tmp.getAbsolutePath());
-				file.addMask("mask0", mask0, null);
-				file.addMask("mask1", mask1, null);
-				file.addMask("mask2", mask2, null);
+				file.addMask(null, "mask0", mask0);
+				file.addMask(null, "mask1", mask1);
+				file.addMask(null, "mask2", mask2);
 				// add another mask
-				file.addMask("mask3", mask2, null);
+				file.addMask(null, "mask3", mask2);
 				// add a set of masks
 				file.setMasks(masks);
 
