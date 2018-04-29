@@ -24,7 +24,6 @@ import org.dawnsci.persistence.ServiceLoader;
 import org.dawnsci.persistence.json.JacksonMarshaller;
 import org.eclipse.dawnsci.analysis.api.diffraction.IPowderCalibrationInfo;
 import org.eclipse.dawnsci.analysis.api.fitting.functions.IFunction;
-import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
 import org.eclipse.dawnsci.analysis.api.metadata.IDiffractionMetadata;
 import org.eclipse.dawnsci.analysis.api.persistence.IJSonMarshaller;
 import org.eclipse.dawnsci.analysis.api.persistence.IPersistentFile;
@@ -53,13 +52,10 @@ import org.eclipse.january.dataset.IDataset;
 import org.eclipse.january.dataset.ILazyDataset;
 import org.eclipse.january.dataset.IntegerDataset;
 import org.eclipse.january.dataset.RGBDataset;
-import org.eclipse.january.dataset.ShortDataset;
 import org.eclipse.january.dataset.Slice;
 import org.eclipse.january.metadata.OriginMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 
 /**
  * Implementation of IPersistentFile<br>
@@ -709,33 +705,6 @@ class PersistentFileImpl implements IPersistentFile {
 		return group;
 	}
 
-	/**
-	 * Method to read image data (axes, masks, image) from an HDF5 file and
-	 * returns an ILazyDataset
-	 * 
-	 * @return ILazyDataset
-	 * @throws Exception
-	 */
-	private ILazyDataset readH5Data(IDataHolder dh, String dataName, String dataEntry) throws Exception {
-		ILazyDataset ld = dh.getLazyDataset(dataEntry + "/" + dataName);
-		if (ld == null)
-			throw new Exception("Reading Exception: " + dataEntry + " entry does not exist in the file " + filePath);
-		return ld;
-	}
-
-	/**
-	 * Method to read mask data from an HDF5 file
-	 * 
-	 * @return BooleanDataset
-	 * @throws Exception
-	 */
-	@SuppressWarnings("unused")
-	private BooleanDataset readH5Mask(IDataHolder dh, String maskName) throws Exception {
-		ILazyDataset ld = dh.getLazyDataset(PersistenceConstants.MASK_ENTRY + "/" + maskName);
-		return (BooleanDataset) DatasetUtils.cast(dh.getDataset(PersistenceConstants.MASK_ENTRY + "/" + maskName),
-				Dataset.BOOL);
-	}
-
 	@Override
 	public void close() {
 		try {
@@ -857,8 +826,11 @@ class PersistentFileImpl implements IPersistentFile {
 
 	@Override
 	public IOperation<? extends IOperationModel, ? extends OperationData>[] getOperations() throws Exception {
-		PersistJsonOperationsNode helper = new PersistJsonOperationsNode();
-		return helper.readOperations(LoaderFactory.getData(filePath).getTree());
+		if (file == null) {
+			file = ServiceLoader.getNexusFactory().newNexusFile(filePath);
+			file.openToRead();
+		}
+		return PersistJsonOperationsNode.readOperations(NexusUtils.loadGroupFully(file, PersistenceConstants.PROCESS_ENTRY, 3));
 	}
 
 	@Override
