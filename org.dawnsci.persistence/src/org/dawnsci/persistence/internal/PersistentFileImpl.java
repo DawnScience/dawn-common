@@ -12,10 +12,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.dawnsci.persistence.ServiceLoader;
@@ -34,6 +36,7 @@ import org.eclipse.dawnsci.analysis.api.tree.Attribute;
 import org.eclipse.dawnsci.analysis.api.tree.DataNode;
 import org.eclipse.dawnsci.analysis.api.tree.GroupNode;
 import org.eclipse.dawnsci.analysis.api.tree.Node;
+import org.eclipse.dawnsci.analysis.api.tree.NodeLink;
 import org.eclipse.dawnsci.analysis.tree.TreeFactory;
 import org.eclipse.dawnsci.nexus.NexusConstants;
 import org.eclipse.dawnsci.nexus.NexusException;
@@ -198,6 +201,7 @@ class PersistentFileImpl implements IPersistentFile {
 	}
 
 	private final static String DATA = "data";
+	private Map<IDataset, String> cachedAxisPath = new IdentityHashMap<>();
 
 	/**
 	 * Method to write image data (and axis) to an HDF5 file given a specific
@@ -207,64 +211,79 @@ class PersistentFileImpl implements IPersistentFile {
 	 * @param axes
 	 * @throws Exception
 	 */
-	private void writeH5Data(IDataset data, final IDataset... axes) {
+	private void writeH5Data(IDataset data, final IDataset... axes) throws Exception {
 		// create nodes in separate try/catch clauses in order to try creating the next node even if the previous one wasn't successful
 		GroupNode group = createDataNode(file, PersistenceConstants.DATA_ENTRY);
 
-		// if there are data nodes already then move them to a new NXdata group
-		if (group.getNumberOfDataNodes() > 0) {
-			Map<String, DataNode> dMap = group.getDataNodeMap();
-			Map<String, Dataset> oDataMap = new LinkedHashMap<>();
-			for (String n : dMap.keySet()) {
-				try {
-					Dataset d = DatasetUtils.sliceAndConvertLazyDataset(dMap.get(n).getDataset());
-					d.setName(n);
-					oDataMap.put(n, d);
-					file.removeNode(group, n);
-				} catch (NexusException | DatasetException e) {
-				}
-			}
-			try { // make new collection instead and move old data into new subgroup
-				file.removeNode(PersistenceConstants.ENTRY, DATA);
-				GroupNode nGroup = file.getGroup(PersistenceConstants.DATA_ENTRY, true);
-				file.addAttribute(nGroup, TreeFactory.createAttribute(NexusConstants.NXCLASS, NexusConstants.COLLECTION));
-				String signal = group.getAttribute(NexusConstants.DATA_SIGNAL).getFirstElement();
-				GroupNode sGroup = file.getGroup(nGroup, signal, NexusConstants.DATA, true);
-				Iterator<String> it = group.getAttributeNameIterator();
-				while (it.hasNext()) {
-					String an = it.next();
-					Attribute a;
-					if (NexusConstants.DATA_SIGNAL.equals(an)) {
-						a = TreeFactory.createAttribute(an, DATA);
-					} else {
-						a = group.getAttribute(an);
-					}
-					file.addAttribute(sGroup, a);
-				}
-				for (String n : oDataMap.keySet()) {
-					Dataset d = oDataMap.get(n);
-					if (signal.equals(n)) {
-						d.setName(DATA);
-					}
-					file.createData(sGroup, d);
-				}
-				group = nGroup;
-			} catch (NexusException e) {
-			}
-		}
-
 		if (data != null) {
+			String dataName = data.getName();
+			if (dataName.isEmpty()) {
+				dataName = DATA;
+			}
+			if (dataName.contains(":")) {
+				dataName = dataName.replace(":", "_");
+			}
+
+			// if there are data nodes already then move them to a new NXdata group
+			if (group.getNumberOfDataNodes() > 0 && !group.containsDataNode(dataName)) {
+				Map<String, DataNode> dMap = group.getDataNodeMap();
+				Map<String, Dataset> oDataMap = new LinkedHashMap<>();
+				for (String n : dMap.keySet()) {
+					try {
+						Dataset d = DatasetUtils.sliceAndConvertLazyDataset(dMap.get(n).getDataset());
+						d.setName(n);
+						oDataMap.put(n, d);
+						file.removeNode(group, n);
+					} catch (NexusException | DatasetException e) {
+						logger.error("Could not remove node {}", n, e);
+						throw e;
+					}
+				}
+				String signal = group.getAttribute(NexusConstants.DATA_SIGNAL).getFirstElement();
+				try { // make new collection instead and move old data into new subgroup
+					file.removeNode(PersistenceConstants.ENTRY, DATA);
+					GroupNode nGroup = file.getGroup(PersistenceConstants.DATA_ENTRY, true);
+					file.addAttribute(nGroup,
+							TreeFactory.createAttribute(NexusConstants.NXCLASS, NexusConstants.COLLECTION));
+					GroupNode sGroup = file.getGroup(nGroup, signal, NexusConstants.DATA, true);
+					Iterator<String> it = group.getAttributeNameIterator();
+					while (it.hasNext()) {
+						String an = it.next();
+						Attribute a;
+						if (NexusConstants.DATA_SIGNAL.equals(an)) {
+							a = TreeFactory.createAttribute(an, DATA);
+						} else {
+							a = group.getAttribute(an);
+						}
+						file.addAttribute(sGroup, a);
+					}
+					String sPath = file.getPath(sGroup);
+					for (String n : oDataMap.keySet()) { // populate subgroup
+						Dataset d = oDataMap.get(n);
+						if (signal.equals(n)) {
+							d.setName(DATA);
+						} else { // update cache
+							String o = PersistenceConstants.DATA_ENTRY + Node.SEPARATOR + n;
+							for (Entry<IDataset, String> ad : cachedAxisPath.entrySet()) {
+								if (o.equals(ad.getValue())) {
+									cachedAxisPath.put(ad.getKey(), sPath + n);
+									break;
+								}
+							}
+						}
+						file.createData(sGroup, d);
+					}
+					group = nGroup;
+				} catch (NexusException e) {
+					logger.error("Could not move old data to new subgroup {}", signal, e);
+					throw e;
+				}
+			}
+
 			try {
-				String dataName = data.getName();
-				if (dataName.isEmpty()) {
-					dataName = DATA;
-				}
-				if (dataName.contains(":")) {
-					dataName = dataName.replace(":", "_");
-				}
 				if (group.getNumberOfGroupNodes() > 0) {
 					GroupNode sGroup = file.getGroup(group, dataName, NexusConstants.DATA, true);
-					dataName = NexusConstants.DATA_SIGNAL;
+					dataName = DATA;
 					group = sGroup;
 				}
 				data.setName(dataName);
@@ -277,17 +296,18 @@ class PersistentFileImpl implements IPersistentFile {
 					data.setName(dataName);
 					isRGB = true;
 				}
-				
+
 				dNode = file.createData(group, data);
-				
+
 				// add attributes according to NeXus standard for NXdata
 				file.addAttribute(group, TreeFactory.createAttribute("signal", dataName));
 				if (isRGB) {
-					file.addAttribute(dNode,  TreeFactory.createAttribute("interpretation","rgba-image"));
+					file.addAttribute(dNode, TreeFactory.createAttribute("interpretation", "rgba-image"));
 				}
-				
+
 			} catch (NexusException ne) {
-				logger.warn(ne.getMessage());
+				logger.error("Could not write data", ne);
+				throw ne;
 			}
 		}
 
@@ -311,10 +331,15 @@ class PersistentFileImpl implements IPersistentFile {
 					a.setName(axisName);
 				}
 				try {
-					file.createData(group, a);
+					if (cachedAxisPath.containsKey(a)) {
+						file.link(cachedAxisPath.get(a), file.getPath(group) + axisName);
+					} else {
+						DataNode dn = file.createData(group, a);
+						cachedAxisPath.put(a, file.getPath(dn));
+					}
 					file.addAttribute(group, TreeFactory.createAttribute(axisName + NexusConstants.DATA_INDICES_SUFFIX, n));
 				} catch (NexusException ne) {
-					logger.warn(ne.getMessage());
+					logger.error("Could not add axis {}", axisName, ne);
 				}
 				axisNames[n] = axisName;
 			}
@@ -322,12 +347,7 @@ class PersistentFileImpl implements IPersistentFile {
 		try {
 			file.addAttribute(group, TreeFactory.createAttribute("axes", axisNames));
 		} catch (NexusException ne) {
-			logger.warn(ne.getMessage());
-		}
-		try {
-			file.flush();
-		} catch (NexusException ne) {
-			logger.warn(ne.getMessage());
+			logger.error("Could not add axes attribute", ne);
 		}
 	}
 
@@ -395,20 +415,36 @@ class PersistentFileImpl implements IPersistentFile {
 
 	@Override
 	public ILazyDataset getData(String dataName, IMonitor mon) throws Exception {
-		if (file == null)
+		if (file == null) {
 			file = ServiceLoader.getNexusFactory().newNexusFile(filePath);
-		dataName = dataName.isEmpty() ? NexusConstants.DATA_DATA : dataName;
+		}
+		if (dataName == null || dataName.isEmpty()) {
+			dataName = DATA;
+		}
 		GroupNode group = file.getGroup(PersistenceConstants.DATA_ENTRY, false);
 		if (!group.containsDataNode(dataName)) {
-			if (group.containsGroupNode(dataName)) {
+			if (!group.containsGroupNode(dataName)) {
+				NodeLink nl = getFirstSubGroup(group);
+				dataName = nl.getName();
+				group = (GroupNode) nl.getDestination();
+			} else {
 				group = file.getGroup(group, dataName, null, false);
-				dataName = DATA;
 			}
+			dataName = DATA;
 			if (!group.containsDataNode(dataName)) {
 				throw new IllegalArgumentException("No such dataset found: " + dataName);
 			}
 		}
 		return group.getDataNode(dataName).getDataset();
+	}
+
+	private static NodeLink getFirstSubGroup(GroupNode g) {
+		for (NodeLink l : g) {
+			if (l.isDestinationGroup()) {
+				return l;
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -436,14 +472,28 @@ class PersistentFileImpl implements IPersistentFile {
 
 	@Override
 	public List<ILazyDataset> getAxes(IMonitor mon, String dataName, String... axisNames) throws Exception {
-		List<ILazyDataset> axes = new ArrayList<ILazyDataset>();
-
+		if (file == null) {
+			file = ServiceLoader.getNexusFactory().newNexusFile(filePath);
+		}
+		if (dataName == null || dataName.isEmpty()) {
+			dataName = DATA;
+		}
 		GroupNode group = file.getGroup(PersistenceConstants.DATA_ENTRY, false);
-		if (dataName == null) {
-			if (group.getNumberOfGroupNodes() > 0) {
-				group = group.getGroupNodes().get(0);
+		if (!group.containsDataNode(dataName)) {
+			if (!group.containsGroupNode(dataName)) {
+				NodeLink nl = getFirstSubGroup(group);
+				dataName = nl.getName();
+				group = (GroupNode) nl.getDestination();
+			} else {
+				group = file.getGroup(group, dataName, null, false);
+			}
+			dataName = DATA;
+			if (!group.containsDataNode(dataName)) {
+				throw new IllegalArgumentException("No such dataset found: " + dataName);
 			}
 		}
+
+		List<ILazyDataset> axes = new ArrayList<ILazyDataset>();
 		for (String a : axisNames) {
 			if (a == null || a.isEmpty()) { // TODO automatically get all axes
 				throw new IllegalArgumentException();
