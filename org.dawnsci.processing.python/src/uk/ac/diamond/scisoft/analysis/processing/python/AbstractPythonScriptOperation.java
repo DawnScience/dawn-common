@@ -42,6 +42,10 @@ public abstract class AbstractPythonScriptOperation<T extends AbstractPythonScri
 	protected abstract Map<String, Object> packInput(IDataset input);
 	
 	protected abstract OperationData packAndValidateMap(Map<String, Object> output);
+
+	protected OperationData postValidateProcessing(IDataset input, Map<String, Object> output, OperationData operationData) {
+		return operationData;
+	}
 	
 	protected OperationData process(IDataset input, IMonitor monitor) throws OperationException {
 		
@@ -52,7 +56,7 @@ public abstract class AbstractPythonScriptOperation<T extends AbstractPythonScri
 		
 		try {
 			Map<String, Object> out = pythonRunScriptService.runScript(model.getFilePath(), inputs);
-			return packAndValidateMap(out);
+			return postValidateProcessing(input, out, packAndValidateMap(out));
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new OperationException(this, "Could not run " + model.getFilePath() + " due to " + e.getMessage());
