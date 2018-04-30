@@ -10,7 +10,6 @@ package org.dawnsci.persistence.internal;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
@@ -90,8 +89,9 @@ class PersistentFileImpl implements IPersistentFile {
 			currentSite = PersistenceConstants.SITE;
 		}
 		// open file
-		if (file == null)
+		if (file == null) {
 			file = ServiceLoader.getNexusFactory().newNexusFile(filePath);
+		}
 		try {
 			file.openToWrite(true);
 		} catch (IllegalStateException ie) {
@@ -121,11 +121,6 @@ class PersistentFileImpl implements IPersistentFile {
 
 	@Override
 	public void setMasks(Map<String, ? extends IDataset> masks) throws Exception {
-		if (file == null) {
-			file = ServiceLoader.getNexusFactory().newNexusFile(filePath);
-			file.openToWrite(true);
-		}
-
 		GroupNode group = createDataNode(file, PersistenceConstants.MASK_ENTRY);
 
 		if (masks != null) {
@@ -175,9 +170,6 @@ class PersistentFileImpl implements IPersistentFile {
 
 	@Override
 	public void setHistory(IDataset... sets) throws Exception {
-		if (file == null)
-			file = ServiceLoader.getNexusFactory().newNexusFile(filePath);
-
 		GroupNode group = createDataNode(file, PersistenceConstants.HISTORY_ENTRY);
 		int index = 0;
 		for (IDataset data : sets) {
@@ -348,9 +340,6 @@ class PersistentFileImpl implements IPersistentFile {
 
 	@Override
 	public void setROIs(Map<String, IROI> rois) throws Exception {
-		if (file == null)
-			file = ServiceLoader.getNexusFactory().newNexusFile(filePath);
-
 		GroupNode group = createDataNode(file, PersistenceConstants.ROI_ENTRY);
 		if (rois != null) {
 			Iterator<String> it = rois.keySet().iterator();
@@ -364,8 +353,6 @@ class PersistentFileImpl implements IPersistentFile {
 
 	@Override
 	public void addROI(String name, IROI roiBase) throws Exception {
-		if (file == null)
-			file = ServiceLoader.getNexusFactory().newNexusFile(filePath);
 		GroupNode group = createDataNode(file, PersistenceConstants.ROI_ENTRY);
 		writeRoi(group, PersistenceConstants.ROI_ENTRY, name, roiBase);
 	}
@@ -390,8 +377,6 @@ class PersistentFileImpl implements IPersistentFile {
 	 * @throws Exception
 	 */
 	private void setVersion(String version) throws Exception {
-		if (file == null)
-			file = ServiceLoader.getNexusFactory().newNexusFile(filePath);
 		GroupNode group = file.getGroup(PersistenceConstants.ENTRY, true);
 		file.addAttribute(group, TreeFactory.createAttribute(NexusConstants.NXCLASS, NexusConstants.ENTRY));
 		// group = file.getGroup("/entry/Version", true);
@@ -400,8 +385,6 @@ class PersistentFileImpl implements IPersistentFile {
 
 	@Override
 	public void setSite(String site) throws Exception {
-		if (file == null)
-			file = ServiceLoader.getNexusFactory().newNexusFile(filePath);
 		GroupNode group = file.getGroup(PersistenceConstants.ENTRY, true);
 		file.addAttribute(group, TreeFactory.createAttribute(NexusConstants.NXCLASS, NexusConstants.ENTRY));
 		// group = file.getGroup("/entry/Site", true);
@@ -410,9 +393,6 @@ class PersistentFileImpl implements IPersistentFile {
 
 	@Override
 	public ILazyDataset getData(IMonitor mon, String dataName) throws Exception {
-		if (file == null) {
-			file = ServiceLoader.getNexusFactory().newNexusFile(filePath);
-		}
 		if (dataName == null || dataName.isEmpty()) {
 			dataName = DATA;
 		}
@@ -451,25 +431,18 @@ class PersistentFileImpl implements IPersistentFile {
 	@Override
 	public Map<String, ILazyDataset> getHistory(IMonitor mon) throws Exception {
 		List<String> names = getNames(file, PersistenceConstants.HISTORY_ENTRY, mon);
-		Map<String, ILazyDataset> sets = new HashMap<String, ILazyDataset>(names.size());
-		Iterator<String> it = names.iterator();
+		Map<String, ILazyDataset> sets = new HashMap<>(names.size());
 		GroupNode group = file.getGroup(PersistenceConstants.HISTORY_ENTRY, false);
-		while (it.hasNext()) {
-			String name = it.next();
-//			if (PersistenceConstants.HISTORY_ENTRY.endsWith(name)) {
-				DataNode datanode = group.getDataNode(name);
-				ILazyDataset data = datanode.getDataset();
-				sets.put(PersistenceConstants.HISTORY_ENTRY + Node.SEPARATOR + name, data);
-//			}
+		for (String name : names) {
+			DataNode datanode = group.getDataNode(name);
+			ILazyDataset data = datanode.getDataset();
+			sets.put(PersistenceConstants.HISTORY_ENTRY + Node.SEPARATOR + name, data);
 		}
 		return sets;
 	}
 
 	@Override
 	public List<ILazyDataset> getAxes(IMonitor mon, String dataName, String... axisNames) throws Exception {
-		if (file == null) {
-			file = ServiceLoader.getNexusFactory().newNexusFile(filePath);
-		}
 		if (dataName == null || dataName.isEmpty()) {
 			dataName = DATA;
 		}
@@ -503,8 +476,6 @@ class PersistentFileImpl implements IPersistentFile {
 
 	@Override
 	public BooleanDataset getMask(String maskName, IMonitor mon) throws Exception {
-		if (file == null)
-			file = ServiceLoader.getNexusFactory().newNexusFile(filePath);
 		DataNode datanode = file.getData(PersistenceConstants.MASK_ENTRY + Node.SEPARATOR + maskName);
 		if (datanode == null)
 			throw new Exception("The mask with the name " + maskName + " is null");
@@ -521,14 +492,8 @@ class PersistentFileImpl implements IPersistentFile {
 
 	@Override
 	public Map<String, IDataset> getMasks(IMonitor mon) throws Exception {
-		if (file == null) {
-			file = ServiceLoader.getNexusFactory().newNexusFile(filePath);
-		}
 		Map<String, IDataset> masks = new HashMap<String, IDataset>();
-		List<String> names = getMaskNames(mon);
-		Iterator<String> it = names.iterator();
-		while (it.hasNext()) {
-			String name = (String) it.next();
+		for (String name : getMaskNames(mon)) {
 			DataNode datanode = file.getData(PersistenceConstants.MASK_ENTRY + Node.SEPARATOR + name);
 			ILazyDataset data = datanode.getDataset();
 
@@ -565,15 +530,8 @@ class PersistentFileImpl implements IPersistentFile {
 
 	@Override
 	public Map<String, IROI> getROIs(IMonitor mon) throws Exception {
-		Map<String, IROI> rois = new HashMap<String, IROI>();
-		if (file == null)
-			file = ServiceLoader.getNexusFactory().newNexusFile(filePath);
-		List<String> names = getROINames(mon);
-		if (names == null)
-			return null;
-		Iterator<String> it = names.iterator();
-		while (it.hasNext()) {
-			String name = (String) it.next();
+		Map<String, IROI> rois = new HashMap<>();
+		for (String name : getROINames(mon)) {
 			String json = file.getAttributeValue(PersistenceConstants.ROI_ENTRY + Node.SEPARATOR + name + "@JSON");
 			IROI roi = (IROI) ServiceLoader.getJSONMarshallerService().unmarshal(json, IROI.class);
 			rois.put(name, roi);
@@ -597,13 +555,11 @@ class PersistentFileImpl implements IPersistentFile {
 	}
 
 	private List<String> getNames(NexusFile f, String nodepath, IMonitor mon) throws Exception {
-		List<String> names = null;
 		GroupNode grp = f.getGroup(nodepath, false);
-		if (grp == null)
+		if (grp == null) {
 			throw new Exception("Reading Exception: " + nodepath + " entry does not exist in the file " + filePath);
-		Collection<String> children = grp.getNames();
-		names = new ArrayList<String>(children);
-		return names;
+		}
+		return new ArrayList<>(grp.getNames());
 	}
 
 	@Override
@@ -730,8 +686,6 @@ class PersistentFileImpl implements IPersistentFile {
 
 	@Override
 	public void setFunctions(Map<String, IFunction> functions) throws Exception {
-		if (file == null)
-			file = ServiceLoader.getNexusFactory().newNexusFile(filePath);
 		GroupNode group = createDataNode(file, PersistenceConstants.FUNCTION_ENTRY);
 		if (functions != null) {
 			Iterator<String> it = functions.keySet().iterator();
@@ -745,8 +699,6 @@ class PersistentFileImpl implements IPersistentFile {
 
 	@Override
 	public void addFunction(String name, IFunction function) throws Exception {
-		if (file == null)
-			file = ServiceLoader.getNexusFactory().newNexusFile(filePath);
 		GroupNode group = createDataNode(file, PersistenceConstants.FUNCTION_ENTRY);
 		writeFunction(group, PersistenceConstants.FUNCTION_ENTRY, name, function);
 	}
@@ -766,8 +718,6 @@ class PersistentFileImpl implements IPersistentFile {
 	@Override
 	public Map<String, IFunction> getFunctions(IMonitor mon) throws Exception {
 		Map<String, IFunction> functions = new HashMap<String, IFunction>();
-		if (file == null)
-			file = ServiceLoader.getNexusFactory().newNexusFile(filePath);
 		IJSonMarshaller converter = new JacksonMarshaller();
 		List<String> names = getFunctionNames(mon);
 		Iterator<String> it = names.iterator();
@@ -805,30 +755,19 @@ class PersistentFileImpl implements IPersistentFile {
 	@Override
 	public void setPowderCalibrationInformation(IDataset calibrationImage, IDiffractionMetadata metadata,
 			IPowderCalibrationInfo info) throws Exception {
-		if (file == null)
-			file = ServiceLoader.getNexusFactory().newNexusFile(filePath);
-
 		PersistSinglePowderCalibration.writeCalibrationToFile(file, calibrationImage, metadata, info);
 	}
 
 	@Override
 	public void setOperations(IOperation<? extends IOperationModel, ? extends OperationData>... operations)
 			throws Exception {
-		
-		try (NexusFile nexusFile = ServiceLoader.getNexusFactory().newNexusFile(filePath)) {
-			nexusFile.openToWrite(true);
-			GroupNode gn = PersistJsonOperationsNode.writeOperationsToNode(operations);
-			nexusFile.getGroup("/entry", true);
-			nexusFile.addNode("/entry/process", gn);
-		}
+		GroupNode gn = PersistJsonOperationsNode.writeOperationsToNode(operations);
+		file.getGroup("/entry", true);
+		file.addNode("/entry/process", gn);
 	}
 
 	@Override
 	public IOperation<? extends IOperationModel, ? extends OperationData>[] getOperations() throws Exception {
-		if (file == null) {
-			file = ServiceLoader.getNexusFactory().newNexusFile(filePath);
-			file.openToRead();
-		}
 		return PersistJsonOperationsNode.readOperations(NexusUtils.loadGroupFully(file, PersistenceConstants.PROCESS_ENTRY, 3));
 	}
 
@@ -836,8 +775,6 @@ class PersistentFileImpl implements IPersistentFile {
 	public void setOperationDataOrigin(OriginMetadata origin) throws Exception {
 		if (origin == null)
 			return;
-		if (file == null)
-			file = ServiceLoader.getNexusFactory().newNexusFile(filePath);
 		PersistJsonOperationHelper helper = new PersistJsonOperationHelper();
 		helper.writeOriginalDataInformation(file, origin);
 	}

@@ -51,17 +51,25 @@ public class PersistenceServiceImpl implements IPersistenceService{
 	@Override
 	public IPersistentFile createPersistentFile(String filePath) throws Exception {
 		NexusFile file = null;
-		if (ServiceLoader.getNexusFactory() != null)
+		if (ServiceLoader.getNexusFactory() != null) {
 			file = ServiceLoader.getNexusFactory().newNexusFile(filePath);
+		}
 		return new PersistentFileImpl(file);
 	}
-	
+
 	@Override
 	public IPersistentFile createPersistentFile(Object file) throws Exception {
-		if (file instanceof File) return createPersistentFile(((File)file).getAbsolutePath());
-		return new PersistentFileImpl((NexusFile)file);
+		if (file instanceof File) {
+			file = ((File) file).getAbsolutePath();
+		}
+		if (file instanceof String) {
+			return createPersistentFile((String) file);
+		}
+		if (file instanceof NexusFile) {
+			return new PersistentFileImpl((NexusFile)file);
+		}
+		throw new IllegalArgumentException("Parameter type not supported");
 	}
-
 
 	@Override
 	public Object unmarshal(String json) throws Exception {
