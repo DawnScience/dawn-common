@@ -1,9 +1,6 @@
 package org.dawnsci.persistence.internal;
 
 import java.lang.reflect.Field;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -13,8 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
+import org.dawb.common.util.eclipse.BundleUtils;
 import org.dawnsci.persistence.json.JacksonMarshaller;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.dawnsci.analysis.api.fitting.functions.IFunction;
 import org.eclipse.dawnsci.analysis.api.persistence.IJSonMarshaller;
 import org.eclipse.dawnsci.analysis.api.processing.IOperation;
@@ -66,9 +63,7 @@ public class PersistJsonOperationsNode {
 	private final static String DATE = "date";
 	private final static String PROGRAM = "program";
 	private final static String DAWN = "DAWN";
-	
-	private final static String VERSIONFILE = "product_version_number.txt";
-	
+
 	private static IOperationService  service;
 	
 	private final static Logger logger = LoggerFactory.getLogger(PersistJsonOperationsNode.class);
@@ -164,13 +159,10 @@ public class PersistJsonOperationsNode {
 			ndate.setDataset(DatasetFactory.createFromObject(date));
 			process.addDataNode(DATE, ndate);
 			
-			
-			String fullPath = Platform.getInstallLocation().getURL().getPath().toString()+VERSIONFILE;
-			List<String> lines = Files.readAllLines(Paths.get(fullPath), Charset.defaultCharset());
-			
-			if (lines != null && !lines.isEmpty()) {
+			String v = BundleUtils.getDawnVersion();
+			if (v != null) {
 				DataNodeImpl node = new DataNodeImpl(1);
-				node.setDataset(DatasetFactory.createFromObject(lines.get(0)));
+				node.setDataset(DatasetFactory.createFromObject(v));
 				process.addDataNode(VERSION, node);
 			}
 			
