@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.TimeZone;
 
 import org.dawb.common.util.eclipse.BundleUtils;
+import org.dawnsci.persistence.ServiceLoader;
 import org.dawnsci.persistence.json.JacksonMarshaller;
 import org.eclipse.dawnsci.analysis.api.fitting.functions.IFunction;
 import org.eclipse.dawnsci.analysis.api.persistence.IJSonMarshaller;
@@ -45,8 +46,6 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.annotation.JsonIgnoreType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-
-import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 
 public class PersistJsonOperationsNode {
 
@@ -252,13 +251,18 @@ public class PersistJsonOperationsNode {
 	}
 	
 	public static OriginMetadata readOriginalDataInformation(String path) throws Exception {
-		String fp = LoaderFactory.getDataSet(path,  PersistenceConstants.PROCESS_ENTRY + Node.SEPARATOR + ORIGIN+ Node.SEPARATOR + "path", null).getString();
-		String dsn = LoaderFactory.getDataSet(path,  PersistenceConstants.PROCESS_ENTRY + Node.SEPARATOR + ORIGIN+ Node.SEPARATOR + "dataset", null).getString();
-		String ss = LoaderFactory.getDataSet(path,  PersistenceConstants.PROCESS_ENTRY + Node.SEPARATOR + ORIGIN+ Node.SEPARATOR + "sampling", null).getString();
-		IDataset dd = LoaderFactory.getDataSet(path,  PersistenceConstants.PROCESS_ENTRY + Node.SEPARATOR + ORIGIN + Node.SEPARATOR+ "data dimensions", null);
-		int[] dataDims = DatasetUtils.cast(IntegerDataset.class, dd).getData();
-		
-		return MetadataFactory.createMetadata(OriginMetadata.class, null, Slice.convertFromString(ss), dataDims, fp, dsn);
+		try (NexusFile nexusFile = ServiceLoader.getNexusFactory().newNexusFile(path)) {
+			nexusFile.openToRead();
+			GroupNode group = nexusFile.getGroup(PersistenceConstants.PROCESS_ENTRY + Node.SEPARATOR + ORIGIN, false);
+			String fp = group.getDataNode("path").getString();
+			String dsn = group.getDataNode("dataset").getString();
+			String ss = group.getDataNode("sampling").getString();
+			
+			Dataset dd = DatasetUtils.sliceAndConvertLazyDataset(group.getDataNode("data dimensions").getDataset());
+			int[] dataDims = dd.cast(IntegerDataset.class).getData();
+			
+			return MetadataFactory.createMetadata(OriginMetadata.class, null, Slice.convertFromString(ss), dataDims, fp, dsn);
+		}
 	}
 	
 	public static GroupNode writeOriginalDataInformation(OriginMetadata origin) {
