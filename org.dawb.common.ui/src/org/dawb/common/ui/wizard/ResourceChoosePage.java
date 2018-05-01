@@ -159,7 +159,7 @@ public class ResourceChoosePage extends WizardPage {
 		FileContentProposalProvider prov = new FileContentProposalProvider();
 		ContentProposalAdapter ad = new ContentProposalAdapter(txtPath, new TextContentAdapter(), prov, null, null);
 		ad.setProposalAcceptanceStyle(ContentProposalAdapter.PROPOSAL_REPLACE);
-        if (getPath()!=null) txtPath.setText(getPath());
+		if (path == null) txtPath.setText(path);
 		txtPath.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		txtPath.addModifyListener(new ModifyListener() {			
 			@Override
@@ -308,9 +308,9 @@ public class ResourceChoosePage extends WizardPage {
 					path = path.concat(fileExtension);
 			}
 		}
-		if (path!=null) {
+		if (path != null) {
 			setPath(path);
-		    txtPath.setText(this.path);
+			txtPath.setText(this.path);
 			pathChanged();
 		}
 	}
@@ -335,13 +335,15 @@ public class ResourceChoosePage extends WizardPage {
 	 * @return the output file path
 	 */
 	public String getAbsoluteFilePath() {
-		
+		if (path == null) {
+			return null;
+		}
 		if (selectedFiles!=null && selectedFiles.size()==1) return selectedFiles.get(0);
 		try{
-			IResource res = ResourcesPlugin.getWorkspace().getRoot().findMember(getPath());
+			IResource res = ResourcesPlugin.getWorkspace().getRoot().findMember(path);
 			if (res!=null) return res.getLocation().toOSString();
 			if (isNewFile()) { // We try for a new file
-				final File file = new File(getPath());
+				final File file = new File(path);
 				String parDir = file.getParent();
 				IContainer folder = (IContainer)ResourcesPlugin.getWorkspace().getRoot().findMember(parDir);
 				if (folder!=null) {
@@ -350,7 +352,7 @@ public class ResourceChoosePage extends WizardPage {
 					return newFile.getLocation().toOSString();
 				}
 			}
-			return getPath();
+			return path;
 		} catch (Throwable ignored) {
 			return null;
 		}
@@ -367,12 +369,12 @@ public class ResourceChoosePage extends WizardPage {
 	protected IResource getIResource() {
 		IResource res = null;
 		if (path!=null) {
-			res = ResourcesPlugin.getWorkspace().getRoot().findMember(getPath());
+			res = ResourcesPlugin.getWorkspace().getRoot().findMember(path);
 		}
-		if (res == null && getPath()!=null) {
+		if (res == null && path != null) {
 			final String workspace = ResourcesPlugin.getWorkspace().getRoot().getLocation().toOSString();
-			if (getPath().startsWith(workspace)) {
-				String relPath = getPath().substring(workspace.length());
+			if (path.startsWith(workspace)) {
+				String relPath = path.substring(workspace.length());
 				res = ResourcesPlugin.getWorkspace().getRoot().findMember(relPath);
 			}
 		}
