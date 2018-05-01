@@ -30,13 +30,6 @@
          version="0.0.0"/>
 
    <plugin
-         id="org.mihalis.opal"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
          id="com.fasterxml.jackson.core.jackson-annotations"
          download-size="0"
          install-size="0"
@@ -59,6 +52,13 @@
 
    <plugin
          id="org.dawnsci.conversion.ui.api"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.nebula.widgets.opal.checkboxgroup"
          download-size="0"
          install-size="0"
          version="0.0.0"

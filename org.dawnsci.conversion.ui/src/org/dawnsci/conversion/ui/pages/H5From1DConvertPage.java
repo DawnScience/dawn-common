@@ -55,7 +55,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.forms.events.ExpansionAdapter;
 import org.eclipse.ui.forms.events.ExpansionEvent;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
-import org.mihalis.opal.checkBoxGroup.CheckBoxGroup;
+import org.eclipse.nebula.widgets.opal.checkboxgroup.CheckBoxGroup;
 
 public class H5From1DConvertPage extends ResourceChoosePage implements
 IConversionWizardPage {

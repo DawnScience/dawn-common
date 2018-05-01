@@ -19,11 +19,11 @@ Require-Bundle: org.eclipse.ui,
  org.dawnsci.common.widgets;bundle-version="1.2.0",
  org.eclipse.dawnsci.slicing.api;bundle-version="1.0.0",
  org.eclipse.emf.common.ui,
- org.mihalis.opal,
  org.eclipse.dawnsci.plotting.api;bundle-version="1.2.0",
  org.eclipse.richbeans.widgets;bundle-version="1.0.0",
  org.dawnsci.conversion.ui.api;visibility:=reexport,
- org.eclipse.dawnsci.hdf5;bundle-version="1.3.0"
+ org.eclipse.dawnsci.hdf5;bundle-version="1.3.0",
+ org.eclipse.nebula.widgets.opal.checkboxgroup;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Import-Package: org.dawb.common.ui.monitor,
