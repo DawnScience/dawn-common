@@ -15,8 +15,7 @@ import java.util.List;
 
 import org.dawb.common.ui.Activator;
 import org.dawb.common.ui.monitor.ProgressMonitorWrapper;
-import org.dawb.common.ui.util.EclipseUtils;
-import org.eclipse.core.runtime.IAdaptable;
+import org.dawb.common.ui.plot.PlottingSystemUtils;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionService;
@@ -27,12 +26,9 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
-import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IExportWizard;
 import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.IWorkbenchPart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,7 +63,7 @@ public class PlotDataConversionWizard extends Wizard implements IExportWizard {
 	
 	public void addPages() {
 		
-		if (system == null) system = getPlottingSystem();
+		if (system == null) system = PlottingSystemUtils.getPlottingSystem();
 		
 		if (system == null) {
 			logger.error("Could not find plotting system to export data from");
@@ -161,26 +157,6 @@ public class PlotDataConversionWizard extends Wizard implements IExportWizard {
 		this.system = system;
 	}
 	
-	private IPlottingSystem<Composite> getPlottingSystem() {
-		
-		// Perhaps the plotting system is on a dialog
-		final Shell[] shells = Display.getDefault().getShells();
-		if (shells!=null) for (Shell shell : shells) {
-			final Object o = shell.getData();
-			if (o!=null && o instanceof IAdaptable) {
-				IPlottingSystem<Composite> s = (IPlottingSystem<Composite>)((IAdaptable)o).getAdapter(IPlottingSystem.class);
-				if (s!=null) return s;
-			} 
-		}
-		
-		final IWorkbenchPart  part   = EclipseUtils.getPage().getActivePart();
-		if (part!=null) {
-			return (IPlottingSystem<Composite>)part.getAdapter(IPlottingSystem.class);
-		}
-		
-		return null;
-	}
-
 	public String getFilePath() {
 		return filePath;
 	}

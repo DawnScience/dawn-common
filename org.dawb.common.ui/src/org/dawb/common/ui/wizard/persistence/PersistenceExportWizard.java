@@ -18,6 +18,7 @@ import java.util.Map;
 
 import org.dawb.common.ui.ServiceLoader;
 import org.dawb.common.ui.monitor.ProgressMonitorWrapper;
+import org.dawb.common.ui.plot.PlottingSystemUtils;
 import org.dawb.common.ui.util.EclipseUtils;
 import org.dawb.common.ui.wizard.CheckWizardPage;
 import org.dawb.common.ui.wizard.PlotDataConversionPage;
@@ -26,7 +27,6 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -57,7 +57,6 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IExportWizard;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPart;
@@ -143,7 +142,7 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
     			if (pf!=null) pf.close();
     		}
 
-    		final IPlottingSystem<Composite>  system   = getPlottingSystem();
+    		final IPlottingSystem<?> system = PlottingSystemUtils.getPlottingSystem();
     		if (system!=null) {
     			if (system != null) {
     				ITrace trace  = system.getTraces().iterator().next();
@@ -207,7 +206,7 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
 			 file= workspace.getRoot().getFileForLocation(location);
 
 			 final IWorkbenchPart  part   = EclipseUtils.getPage().getActivePart();
-			 final IPlottingSystem<Composite> system = getPlottingSystem();
+			 final IPlottingSystem<?> system = PlottingSystemUtils.getPlottingSystem();
 			 final IFunctionService funcService = part.getAdapter(IFunctionService.class);
 
 			 final IFile finalFile = file;
@@ -366,7 +365,7 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
 		 return true;
 	}
 
-	private int getTotalWork(CheckWizardPage options, IPlottingSystem<Composite> system,  final IFunctionService funcService) {
+	private int getTotalWork(CheckWizardPage options, IPlottingSystem<?> system,  final IFunctionService funcService) {
 
 		try {
 			int ret = 1;
@@ -417,33 +416,6 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
 			logger.error("Cannot estimate work, assuming 100 things to do!", ne);
 			return 100;
 		}
-	}
-
-	private IPlottingSystem<Composite> getPlottingSystem() {
-		
-		
-		// Perhaps the plotting system is on a dialog
-		final Shell[] shells = Display.getDefault().getShells();
-		if (shells!=null) for (Shell shell : shells) {
-			final Object o = shell.getData();
-			if (o!=null && o instanceof IAdaptable) {
-				IPlottingSystem<Composite> s = ((IAdaptable)o).getAdapter(IPlottingSystem.class);
-				if (s!=null) return s;
-			}
-		}
-		
-		final IWorkbenchPart  part   = EclipseUtils.getPage().getActivePart();
-		if (part!=null) {
-			
-			//First test if part is a tool page which might have its own plotting system
-			Object ob = part.getAdapter(IToolPageSystem.class);
-			
-			if (ob != null && ob instanceof IPlottingSystem) return (IPlottingSystem<Composite>)ob;
-
-			return part.getAdapter(IPlottingSystem.class);
-		}
-		
-		return null;
 	}
 
 }
