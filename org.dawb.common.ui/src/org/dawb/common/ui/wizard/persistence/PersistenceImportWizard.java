@@ -192,8 +192,8 @@ public class PersistenceImportWizard extends AbstractPersistenceWizard implement
 			 absolutePath   = fcp.getAbsoluteFilePath();
 			 			 
 			 final IWorkbenchPart  part   = EclipseUtils.getPage().getActivePart();
-			 final IPlottingSystem<Composite> system = (IPlottingSystem<Composite>)part.getAdapter(IPlottingSystem.class);
-			 final IFunctionService funcService = (IFunctionService)part.getAdapter(IFunctionService.class);
+			 final IPlottingSystem<?> system = part.getAdapter(IPlottingSystem.class);
+			 final IFunctionService funcService = part.getAdapter(IFunctionService.class);
 
 			 final String finalPath = absolutePath;
 			 getContainer().run(true, true, new IRunnableWithProgress() {
@@ -239,7 +239,7 @@ public class PersistenceImportWizard extends AbstractPersistenceWizard implement
 		 return true;
 	}
 
-	protected void createFit2DMask(String filePath, IPlottingSystem<Composite> system, IProgressMonitor monitor) throws Exception {
+	protected void createFit2DMask(String filePath, IPlottingSystem<?> system, IProgressMonitor monitor) throws Exception {
 		ILoaderService loader = ServiceLoader.getLoaderService();
 		final IDataHolder     holder = loader.getData(filePath, new ProgressMonitorWrapper(monitor));
 		final Dataset mask   = DatasetUtils.cast(holder.getDataset(0), Dataset.BOOL);
@@ -255,7 +255,7 @@ public class PersistenceImportWizard extends AbstractPersistenceWizard implement
 		}
 	}
 
-	protected void createDawnMask(final String filePath, final IPlottingSystem<Composite> system, final IProgressMonitor monitor, final IFunctionService funcService) throws Exception{
+	protected void createDawnMask(final String filePath, final IPlottingSystem<?> system, final IProgressMonitor monitor, final IFunctionService funcService) throws Exception{
 		 
 		IPersistentFile file = null;
 		ITrace trace = null;

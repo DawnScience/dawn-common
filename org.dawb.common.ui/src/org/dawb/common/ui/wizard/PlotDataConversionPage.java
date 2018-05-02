@@ -19,5 +19,4 @@ public class PlotDataConversionPage extends ResourceChoosePage {
 		this.setNewFile(true);
 		this.setPathEditable(true);
 	}
-	
 }

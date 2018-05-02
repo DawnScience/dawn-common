@@ -155,13 +155,8 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
     					}
     				}
     				
-    				boolean requireHistory = false;
-    				final IToolPageSystem tsystem = (IToolPageSystem)system.getAdapter(IToolPageSystem.class);
-    				final IToolPage       tool    = tsystem.getActiveTool();
-    				if (tool != null && tool.getToolId().equals("org.dawb.workbench.plotting.tools.imageCompareTool")) {
-    					final Map<String, IDataset> data = (Map<String, IDataset>)tool.getToolData();
-    					if (data!=null && !data.isEmpty()) requireHistory = true;
-    				}
+    				Map<String, IDataset> data = getData(system);
+    				boolean requireHistory = data != null && !data.isEmpty();
       				options.setOptionEnabled(PersistWizardConstants.IMAGE_HIST, requireHistory);
     				
     				final Collection<IRegion> regions = system.getRegions();
@@ -189,6 +184,16 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
     	}
         return super.canFinish();
     }
+
+	@SuppressWarnings("unchecked")
+	private Map<String, IDataset> getData(final IPlottingSystem<?> system) {
+		final IToolPageSystem tsystem = (IToolPageSystem) system.getAdapter(IToolPageSystem.class);
+		final IToolPage tool = tsystem.getActiveTool();
+		if (tool != null && tool.getToolId().equals("org.dawb.workbench.plotting.tools.imageCompareTool")) {
+			return (Map<String, IDataset>) tool.getToolData();
+		}
+		return null;
+	}
 
 	@Override
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
@@ -255,17 +260,13 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
 								file.setData(data, axes);
 							}
 						}
-						 if (options.is(PersistWizardConstants.IMAGE_HIST)) {
-			    				final IToolPageSystem tsystem = system.getAdapter(IToolPageSystem.class);
-			    				final IToolPage       tool    = tsystem.getActiveTool();
-			    				if (tool != null && tool.getToolId().equals("org.dawb.workbench.plotting.tools.imageCompareTool")) {
-			    					final Map<String, IDataset> data = (Map<String, IDataset>)tool.getToolData();
-			    					if (data!=null && !data.isEmpty()) {
-			    						file.setHistory(data.values().toArray(new IDataset[data.size()]));
-			    						monitor.worked(1);
-			    					}
-			    				}
-						 }
+						if (options.is(PersistWizardConstants.IMAGE_HIST)) {
+							Map<String, IDataset> data = getData(system);
+							if (data != null && !data.isEmpty()) {
+								file.setHistory(data.values().toArray(new IDataset[data.size()]));
+								monitor.worked(1);
+							}
+						}
 						 
 						 final ITrace trace = system.getTraces().iterator().next();
 						 if (options.is(PersistWizardConstants.MASK) && trace instanceof IImageTrace) {
@@ -374,20 +375,16 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
 				ret+=traces!=null?traces.size():0;
 			}
 			if (options.is(PersistWizardConstants.IMAGE_HIST)) {
-				final IToolPageSystem tsystem = system.getAdapter(IToolPageSystem.class);
-				final IToolPage       tool    = tsystem.getActiveTool();
-				if (tool != null && tool.getToolId().equals("org.dawb.workbench.plotting.tools.imageCompareTool")) {
-					final Map<String, IDataset> data = (Map<String, IDataset>)tool.getToolData();
-					if (data!=null && !data.isEmpty()) {
-						ret+=data.size();
-					}
+				Map<String, IDataset> data = getData(system);
+				if (data != null && !data.isEmpty()) {
+					ret += data.size();
 				}
 			}
 
 			final ITrace trace = system.getTraces().iterator().next();
 			if (options.is(PersistWizardConstants.MASK) && trace instanceof IImageTrace) {
 				IImageTrace image = (IImageTrace)trace;
-				final String name = options.getString(PersistWizardConstants.MASK);
+//				final String name = options.getString(PersistWizardConstants.MASK);
 				if (image.getMask()!=null) {
 					ret+=1;
 				}
