@@ -159,16 +159,6 @@ class PersistentFileImpl implements IPersistentFile {
 	}
 
 	@Override
-	public void setData(IDataset data, IDataset xAxis, IDataset yAxis) throws Exception {
-		setData(data, new IDataset[] {yAxis, xAxis});
-	}
-
-	@Override
-	public void setData(IDataset data, IDataset[] axes) throws Exception {
-		writeH5Data(data, axes);
-	}
-
-	@Override
 	public void setHistory(IDataset... sets) throws Exception {
 		GroupNode group = createDataNode(file, PersistenceConstants.HISTORY_ENTRY);
 		int index = 0;
@@ -182,24 +172,13 @@ class PersistentFileImpl implements IPersistentFile {
 		}
 	}
 
-	@Override
-	public void setAxes(IDataset... axes) throws Exception {
-		writeH5Data(null, axes);
-	}
-
 	private final static String DATA = NexusConstants.DATA_DATA;
 	private Map<IDataset, String> cachedAxisPath = new IdentityHashMap<>();
 
-	/**
-	 * Method to write image data (and axis) to an HDF5 file given a specific
-	 * path entry to save the data.
-	 * 
-	 * @param data
-	 * @param axes
-	 * @throws Exception
-	 */
-	private void writeH5Data(IDataset data, final IDataset... axes) throws Exception {
-		// create nodes in separate try/catch clauses in order to try creating the next node even if the previous one wasn't successful
+	@Override
+	public void setData(IDataset data, IDataset... axes) throws Exception {
+		// create nodes in separate try/catch clauses in order to try creating the
+		// next node even if the previous one wasn't successful
 		GroupNode group = createDataNode(file, PersistenceConstants.DATA_ENTRY);
 
 		if (data != null) {
