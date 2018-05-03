@@ -8,6 +8,19 @@
  */
 package org.dawb.common.ui.wizard;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
+
 public class PlotDataConversionPage extends ResourceChoosePage {
 
 	public PlotDataConversionPage() {
@@ -18,5 +31,123 @@ public class PlotDataConversionPage extends ResourceChoosePage {
 		this.setDirectory(false);
 		this.setNewFile(true);
 		this.setPathEditable(true);
+	}
+
+	private boolean asDat = true;
+	private boolean asSingle = true;
+	final List<Button> allButtons = new ArrayList<>();
+
+	@Override
+	protected void createContentAfterFileChoose(Composite container) {
+		Label label = new Label(container, SWT.NONE);
+		label.setText("Format");
+		label.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		Composite c = new Composite(container, SWT.NONE);
+		c.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
+		c.setLayout(new FillLayout(SWT.HORIZONTAL));
+
+		SelectionListener radioListener = new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				Button btn = (Button) e.widget;
+
+				if (!btn.getSelection()) {
+					btn.setSelection(false);
+				}
+				int n = allButtons.indexOf(btn);
+				if (n < 2) { // first 2 buttons for format
+					setIsDat(n == 0);
+				} else { // last 2 buttons for single/multiple files
+					asSingle = n == 2;
+				}
+			}
+		};
+		Button bFormat = new Button(c, SWT.RADIO);
+		allButtons.add(bFormat);
+		bFormat.setSelection(asDat);
+		bFormat.setText("dat");
+		bFormat.setToolTipText("save traces in columns as ASCII dat");
+		bFormat.addSelectionListener(radioListener);
+		bFormat = new Button(c, SWT.RADIO);
+		allButtons.add(bFormat);
+		bFormat.setSelection(!asDat);
+		bFormat.setText("cvs");
+		bFormat.setToolTipText("save traces in rows as CSV");
+		bFormat.addSelectionListener(radioListener);
+
+		label = new Label(container, SWT.NONE);
+		label.setText("Number of files");
+		label.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+
+		c = new Composite(container, SWT.NONE);
+		c.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
+		c.setLayout(new FillLayout(SWT.HORIZONTAL));
+
+		Button bNumber = new Button(c, SWT.RADIO);
+		allButtons.add(bNumber);
+		bNumber.setSelection(asSingle);
+		bNumber.setEnabled(asDat);
+		bNumber.setText("single");
+		bNumber.setToolTipText("save as single file (with NaNs padding if columns have different lengths)");
+		bNumber.addSelectionListener(radioListener);
+
+		bNumber = new Button(c, SWT.RADIO);
+		allButtons.add(bNumber);
+		bNumber.setSelection(!asSingle);
+		bNumber.setEnabled(asDat);
+		bNumber.setText("multiple");
+		bNumber.setToolTipText("save in multiple files");
+		bNumber.addSelectionListener(radioListener);
+
+		// spacer
+		label = new Label(container, SWT.NONE);
+		label.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true, 4, 1));
+
+		label = new Label(container, SWT.NONE);
+		label.setText("Plot data is saved in x/y pairs (in rows or columns according to the format)");
+		label.setLayoutData(new GridData(SWT.LEFT, SWT.BOTTOM, true, false, 4, 1));
+	}
+
+	public boolean isSingle() {
+		return asSingle;
+	}
+
+	public void setIsSingle(boolean single) {
+		this.asSingle = single;
+	}
+
+	public boolean isDat() {
+		return asDat;
+	}
+
+	public void setIsDat(boolean isDat) {
+		this.asDat = isDat;
+		if (allButtons.size() > 3) {
+			allButtons.get(2).setEnabled(asDat); // only enable when choosing dat
+			allButtons.get(3).setEnabled(asDat);
+		}
+	}
+
+	@Override
+	public void setPath(String path) {
+		super.setPath(path);
+		updateIsDat(path);
+	}
+
+	@Override
+	protected void pathChanged() {
+		super.pathChanged();
+		updateIsDat(getPath());
+	}
+
+	private void updateIsDat(String path) {
+		path = path.toLowerCase();
+		setIsDat(!path.endsWith(Plot1DConversionVisitor.EXTENSION_CSV));
+	}
+
+	@Override
+	public void dispose() {
+		allButtons.clear();
+		super.dispose();
 	}
 }

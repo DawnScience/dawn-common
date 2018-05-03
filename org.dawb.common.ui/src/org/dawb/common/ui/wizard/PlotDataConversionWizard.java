@@ -11,6 +11,7 @@ package org.dawb.common.ui.wizard;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.dawb.common.ui.Activator;
@@ -20,7 +21,9 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionService;
 import org.eclipse.dawnsci.plotting.api.IPlottingSystem;
+import org.eclipse.dawnsci.plotting.api.trace.ILineTrace;
 import org.eclipse.january.dataset.DatasetFactory;
+import org.eclipse.january.dataset.IDataset;
 import org.eclipse.january.dataset.IntegerDataset;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -89,12 +92,33 @@ public class PlotDataConversionWizard extends Wizard implements IExportWizard {
 		if (filePath!=null) {
 			conversionPage.setPath(filePath);
 		} else {
-		    conversionPage.setPath(System.getProperty("user.home") +File.separator+ "plotdata."+ visitor.getExtension());
+			conversionPage.setPath(System.getProperty("user.home") +File.separator+ "plotdata."+ visitor.getExtension());
 		}
 		conversionPage.setBrowseToExternalOnly(hasBrowseToExternalOnly);
-		
+
+		boolean sameX = areXAxesAllEqual();
+		conversionPage.setIsSingle(sameX);
 		addPage(conversionPage);
-	
+	}
+
+	private boolean areXAxesAllEqual() {
+		Collection<ILineTrace> traces = system.getTracesByClass(ILineTrace.class);
+		// Determine if x datasets are the same
+		IDataset x = null;
+		for (ILineTrace trace : traces) {
+			
+			IDataset currentx = trace.getXData();
+				
+			if (x == null) {
+				x = currentx;
+				continue;
+			}
+				
+			if (!x.equals(currentx)) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	@Override
@@ -134,6 +158,13 @@ public class PlotDataConversionWizard extends Wizard implements IExportWizard {
 						context.setOutputPath(filePath);
 						context.setMonitor(new ProgressMonitorWrapper(monitor));
 						context.setConversionVisitor(visitor);
+						if (visitor instanceof Plot1DConversionVisitor) {
+							Plot1DConversionVisitor v1d = (Plot1DConversionVisitor) visitor;
+							
+							v1d.setAsDat(conversionPage.isDat());
+							v1d.setAsSingle(conversionPage.isSingle());
+						}
+
 						// Bit with the juice
 						monitor.beginTask(visitor.getConversionSchemeName(), context.getWorkSize());
 						monitor.worked(1);
