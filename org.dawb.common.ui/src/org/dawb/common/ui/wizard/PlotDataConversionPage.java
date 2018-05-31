@@ -35,6 +35,8 @@ public class PlotDataConversionPage extends ResourceChoosePage {
 
 	private boolean asDat = true;
 	private boolean asSingle = true;
+	private boolean allXEqual = false;
+	private boolean asSingleX = allXEqual;
 	final List<Button> allButtons = new ArrayList<>();
 
 	@Override
@@ -57,8 +59,15 @@ public class PlotDataConversionPage extends ResourceChoosePage {
 				int n = allButtons.indexOf(btn);
 				if (n < 2) { // first 2 buttons for format
 					setIsDat(n == 0);
-				} else { // last 2 buttons for single/multiple files
+				} else if (n < 4) { // last 2 buttons for single/multiple files
 					asSingle = n == 2;
+					asSingleX = allXEqual && asSingle;
+					if (asSingle) {
+						allButtons.get(4).setEnabled(allXEqual);
+						allButtons.get(4).setSelection(asSingleX);
+					}
+				} else { // 5th button to use only one x column
+					asSingleX = btn.getSelection();
 				}
 			}
 		};
@@ -71,7 +80,7 @@ public class PlotDataConversionPage extends ResourceChoosePage {
 		bFormat = new Button(c, SWT.RADIO);
 		allButtons.add(bFormat);
 		bFormat.setSelection(!asDat);
-		bFormat.setText("cvs");
+		bFormat.setText("csv");
 		bFormat.setToolTipText("save traces in rows as CSV");
 		bFormat.addSelectionListener(radioListener);
 
@@ -99,6 +108,22 @@ public class PlotDataConversionPage extends ResourceChoosePage {
 		bNumber.setToolTipText("save in multiple files");
 		bNumber.addSelectionListener(radioListener);
 
+		label = new Label(container, SWT.NONE);
+		label.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+
+		c = new Composite(container, SWT.NONE);
+		c.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
+		c.setLayout(new FillLayout(SWT.HORIZONTAL));
+
+		bNumber = new Button(c, SWT.CHECK);
+		allButtons.add(bNumber);
+		bNumber.setSelection(asSingleX);
+		bNumber.setEnabled(allXEqual);
+		bNumber.setText("single x column");
+		bNumber.setToolTipText("x columns have been found to be the same so can save just one x");
+		bNumber.addSelectionListener(radioListener);
+		label = new Label(c, SWT.NONE);
+
 		// spacer
 		label = new Label(container, SWT.NONE);
 		label.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true, 4, 1));
@@ -112,8 +137,14 @@ public class PlotDataConversionPage extends ResourceChoosePage {
 		return asSingle;
 	}
 
-	public void setIsSingle(boolean single) {
-		this.asSingle = single;
+	
+	public void setAllXEqual(boolean allXEqual) {
+		asSingleX = this.allXEqual = allXEqual;
+		this.asSingle = allXEqual;
+	}
+
+	public boolean isAsSingleX() {
+		return asSingleX;
 	}
 
 	public boolean isDat() {
@@ -125,6 +156,8 @@ public class PlotDataConversionPage extends ResourceChoosePage {
 		if (allButtons.size() > 3) {
 			allButtons.get(2).setEnabled(asDat); // only enable when choosing dat
 			allButtons.get(3).setEnabled(asDat);
+			allButtons.get(4).setEnabled(asDat && allXEqual);
+			allButtons.get(4).setSelection(asSingleX);
 		}
 	}
 

@@ -44,6 +44,7 @@ public class Plot1DConversionVisitor extends AbstractPlotConversionVisitor {
 
 	private boolean asDat = true;
 	private boolean asSingle = true;
+	private boolean asSingleX = true;
 
 	public Plot1DConversionVisitor(IPlottingSystem<?> system) {
 		super(system);
@@ -58,6 +59,10 @@ public class Plot1DConversionVisitor extends AbstractPlotConversionVisitor {
 
 	public void setAsSingle(boolean single) {
 		this.asSingle = single;
+	}
+
+	public void setAsSingleX(boolean singleX) {
+		this.asSingleX  = singleX;
 	}
 
 	@Override
@@ -168,7 +173,8 @@ public class Plot1DConversionVisitor extends AbstractPlotConversionVisitor {
 			yType = DTypeUtils.getBestFloatDType(yType);
 		}
 
-		Dataset allTraces = DatasetFactory.zeros(new int[] { length, 2*traces.length }, DTypeUtils.getBestDType(xType, yType));
+		int columns = asSingleX ? imax + 1 : 2 * imax;
+		Dataset allTraces = DatasetFactory.zeros(new int[] { length, columns }, DTypeUtils.getBestDType(xType, yType));
 		if (ragged && allTraces.hasFloatingPointElements()) {
 			allTraces.fill(Double.NaN);
 		}
@@ -178,13 +184,23 @@ public class Plot1DConversionVisitor extends AbstractPlotConversionVisitor {
 		int[] shape = new int[] {1, 1};
 		int size = firstY.getSize();
 		shape[0] = size;
-		slice.setSlice(0, 0, size, 1);
 		int j = 0;
 		slice.setSlice(1, j, j+1, 1);
-		if (firstX.getSize() > size) {
-			firstX = firstX.getSliceView(new Slice(size));
+		if (asSingleX) {
+			slice.setSlice(0, 0, length, 1);
+			if (firstX.getSize() < length) {
+				throw new IllegalArgumentException("First x dataset must be long as longest y dataset");
+			}
+			firstX = firstX.getSliceView(new Slice(length));
+			allTraces.setSlice(firstX.reshape(length, 1), slice);
+			slice.setSlice(0, 0, size, 1);
+		} else {
+			slice.setSlice(0, 0, size, 1);
+			if (firstX.getSize() > size) {
+				firstX = firstX.getSliceView(new Slice(size));
+			}
+			allTraces.setSlice(firstX.reshape(shape), slice);
 		}
-		allTraces.setSlice(firstX.reshape(shape), slice);
 		j++;
 		slice.setSlice(1, j, j+1, 1);
 		allTraces.setSlice(firstY.reshape(shape), slice);
@@ -192,13 +208,15 @@ public class Plot1DConversionVisitor extends AbstractPlotConversionVisitor {
 
 		for (i = 1; i < imax; i++) {
 			ILineTrace trace = traces[i];
-			Dataset x = DatasetUtils.convertToDataset(trace.getXData());
+			Dataset x = asSingleX ? null : DatasetUtils.convertToDataset(trace.getXData());
 			Dataset y = DatasetUtils.convertToDataset(trace.getYData());
 
-			if (x.getName().isEmpty()) {
-				headings.add("x" + i);
-			} else {
-				headings.add(x.getName().replace(' ', '_'));
+			if (x != null) {
+				if (x.getName().isEmpty()) {
+					headings.add("x" + i);
+				} else {
+					headings.add(x.getName().replace(' ', '_'));
+				}
 			}
 			if (y.getName().isEmpty()) {
 				headings.add("y" + i);
@@ -209,12 +227,14 @@ public class Plot1DConversionVisitor extends AbstractPlotConversionVisitor {
 			size = y.getSize();
 			shape[0] = size;
 			slice.setSlice(0, 0, size, 1);
-			slice.setSlice(1, j, j+1, 1);
-			if (x.getSize() > size) {
-				x = x.getSliceView(new Slice(size));
+			if (x != null) {
+				slice.setSlice(1, j, j+1, 1);
+				if (x.getSize() > size) {
+					x = x.getSliceView(new Slice(size));
+				}
+				allTraces.setSlice(x.reshape(shape), slice);
+				j++;
 			}
-			allTraces.setSlice(x.reshape(shape), slice);
-			j++;
 			slice.setSlice(1, j, j+1, 1);
 			allTraces.setSlice(y.reshape(shape), slice);
 			j++;

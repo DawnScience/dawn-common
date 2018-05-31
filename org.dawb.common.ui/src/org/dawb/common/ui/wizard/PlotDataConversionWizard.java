@@ -97,7 +97,7 @@ public class PlotDataConversionWizard extends Wizard implements IExportWizard {
 		conversionPage.setBrowseToExternalOnly(hasBrowseToExternalOnly);
 
 		boolean sameX = areXAxesAllEqual();
-		conversionPage.setIsSingle(sameX);
+		conversionPage.setAllXEqual(sameX);
 		addPage(conversionPage);
 	}
 
@@ -163,6 +163,7 @@ public class PlotDataConversionWizard extends Wizard implements IExportWizard {
 							
 							v1d.setAsDat(conversionPage.isDat());
 							v1d.setAsSingle(conversionPage.isSingle());
+							v1d.setAsSingleX(conversionPage.isAsSingleX());
 						}
 
 						// Bit with the juice
