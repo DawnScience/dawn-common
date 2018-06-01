@@ -159,7 +159,9 @@ public class ResourceChoosePage extends WizardPage {
 		FileContentProposalProvider prov = new FileContentProposalProvider();
 		ContentProposalAdapter ad = new ContentProposalAdapter(txtPath, new TextContentAdapter(), prov, null, null);
 		ad.setProposalAcceptanceStyle(ContentProposalAdapter.PROPOSAL_REPLACE);
-		if (path == null) txtPath.setText(path);
+		if (path != null) {
+			txtPath.setText(path);
+		}
 		txtPath.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		txtPath.addModifyListener(new ModifyListener() {			
 			@Override
