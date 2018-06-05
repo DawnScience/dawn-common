@@ -209,7 +209,7 @@ public class Plot1DConversionVisitor extends AbstractPlotConversionVisitor {
 		for (i = 1; i < imax; i++) {
 			ILineTrace trace = traces[i];
 			Dataset x = asSingleX ? null : DatasetUtils.convertToDataset(trace.getXData());
-			Dataset y = DatasetUtils.convertToDataset(trace.getYData());
+			Dataset y = DatasetUtils.convertToDataset(trace.getYData()).getSlice();
 
 			if (x != null) {
 				if (x.getName().isEmpty()) {
