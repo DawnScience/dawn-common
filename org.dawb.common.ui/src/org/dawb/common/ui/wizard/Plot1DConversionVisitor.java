@@ -245,7 +245,7 @@ public class Plot1DConversionVisitor extends AbstractPlotConversionVisitor {
 		dh.addDataset("AllTraces", allTraces);
 		saver.setHeader("#Traces extracted from Plot");
 		saver.setHeadings(headings);
-
+		saver.setCellFormat("%.16g");
 		saver.saveFile(dh);
 	}
 
