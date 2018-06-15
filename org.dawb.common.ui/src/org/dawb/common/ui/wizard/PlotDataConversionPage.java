@@ -11,6 +11,7 @@ package org.dawb.common.ui.wizard;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.dawb.common.ui.wizard.persistence.PersistenceExportWizard;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -41,6 +42,10 @@ public class PlotDataConversionPage extends ResourceChoosePage {
 
 	@Override
 	protected void createContentAfterFileChoose(Composite container) {
+		if (PersistenceExportWizard.FILE_EXTENSION.equalsIgnoreCase(getFileExtension())) {
+			return;
+		}
+
 		Label label = new Label(container, SWT.NONE);
 		label.setText("Format");
 		label.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
@@ -53,9 +58,6 @@ public class PlotDataConversionPage extends ResourceChoosePage {
 			public void widgetSelected(SelectionEvent e) {
 				Button btn = (Button) e.widget;
 
-				if (!btn.getSelection()) {
-					btn.setSelection(false);
-				}
 				int n = allButtons.indexOf(btn);
 				if (n < 2) { // first 2 buttons for format
 					setIsDat(n == 0);
