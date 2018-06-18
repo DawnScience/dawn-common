@@ -27,6 +27,9 @@ import org.eclipse.dawnsci.analysis.api.rpc.AnalysisRpcException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.python.pydev.ast.interpreter_managers.InterpreterManagersAPI;
+import org.python.pydev.ast.runners.SimpleRunner;
+import org.python.pydev.core.CorePlugin;
 import org.python.pydev.core.IInterpreterInfo;
 import org.python.pydev.core.IInterpreterManager;
 import org.python.pydev.core.IPythonNature;
@@ -35,7 +38,6 @@ import org.python.pydev.core.NotConfiguredInterpreterException;
 import org.python.pydev.core.PythonNatureWithoutProjectException;
 import org.python.pydev.plugin.PydevPlugin;
 import org.python.pydev.plugin.nature.PythonNature;
-import org.python.pydev.runners.SimpleRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -204,15 +206,13 @@ public class AnalysisRpcPythonPyDevService extends AnalysisRpcPythonService {
 
 	private static IInterpreterInfo getDefaultInfo(boolean autoConfig)
 			throws MisconfigurationException {
-		IInterpreterManager pythonInterpreterManager = PydevPlugin
-				.getPythonInterpreterManager();
+		IInterpreterManager pythonInterpreterManager = InterpreterManagersAPI.getPythonInterpreterManager();
 		return pythonInterpreterManager.getDefaultInterpreterInfo(autoConfig);
 	}
 
 	private static IInterpreterInfo getInfoFromName(String interpreterName)
 			throws MisconfigurationException {
-		IInterpreterManager pythonInterpreterManager = PydevPlugin
-				.getPythonInterpreterManager();
+		IInterpreterManager pythonInterpreterManager = InterpreterManagersAPI.getPythonInterpreterManager();
 		return pythonInterpreterManager.getInterpreterInfo(interpreterName,
 				new NullProgressMonitor());
 	}
@@ -257,7 +257,7 @@ public class AnalysisRpcPythonPyDevService extends AnalysisRpcPythonService {
 			pythonNature = PythonNature.getPythonNature(project);
 		}
 
-		IInterpreterManager manager = PydevPlugin.getPythonInterpreterManager();
+		IInterpreterManager manager = InterpreterManagersAPI.getPythonInterpreterManager();
 
 		String[] envp = null;
 		try {
@@ -384,7 +384,7 @@ public class AnalysisRpcPythonPyDevService extends AnalysisRpcPythonService {
 	private static String getPyDevPySrc() {
 		String pyDevPySrc = null;
 		try {
-			pyDevPySrc = PydevPlugin.getPySrcPath().getAbsolutePath();
+			pyDevPySrc = CorePlugin.getPySrcPath().getAbsolutePath();
 		} catch (CoreException e) {
 			logger.error(
 					"PydevPlugin's Src Path not available, debugging launched Python may not work",
