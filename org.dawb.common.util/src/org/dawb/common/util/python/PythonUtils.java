@@ -192,7 +192,7 @@ public class PythonUtils {
 			return esrfPy.getAbsolutePath();
 		}
 
-		final File diamondPy = new File("/dls_sw/prod/tools/RHEL5/bin/python2.6");
+		final File diamondPy = new File("/dls_sw/prod/tools/RHEL6-x86_64/Python/2-7-3/prefix/bin/python2.7");
 		if (diamondPy.exists()) {
 			return diamondPy.getAbsolutePath();
 		}
