@@ -15,9 +15,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.measure.unit.NonSI;
-import javax.measure.unit.SI;
-import javax.measure.unit.UnitFormat;
+import javax.measure.Unit;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Marshaller;
@@ -45,6 +43,7 @@ import org.eclipse.dawnsci.analysis.api.tree.GroupNode;
 import org.eclipse.dawnsci.analysis.api.tree.Node;
 import org.eclipse.dawnsci.analysis.api.tree.NodeLink;
 import org.eclipse.dawnsci.analysis.api.tree.Tree;
+import org.eclipse.dawnsci.analysis.api.unit.UnitUtils;
 import org.eclipse.dawnsci.nexus.NexusConstants;
 import org.eclipse.january.IMonitor;
 import org.eclipse.january.dataset.Dataset;
@@ -58,6 +57,8 @@ import org.eclipse.january.metadata.AxesMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import si.uom.NonSI;
+import tec.units.indriya.format.SimpleUnitFormat;
 import uk.ac.diamond.scisoft.analysis.io.ASCIIDataWithHeadingSaver;
 import uk.ac.diamond.scisoft.analysis.io.DataHolder;
 import uk.ac.diamond.scisoft.analysis.io.HDF5Loader;
@@ -549,19 +550,14 @@ public class CustomNCDConverter extends AbstractConversion  {
 				units = node.getAttribute("unit").getFirstElement();
 			}
 			if (units != null) {
-				UnitFormat unitFormat = UnitFormat.getUCUMInstance();
-				String angstrom = unitFormat.format(NonSI.ANGSTROM.inverse());
-				String nanometer = unitFormat.format(SI.NANO(SI.METER)
-						.inverse());
-				String angle = unitFormat.format(NonSI.DEGREE_ANGLE);
-				String dspace = unitFormat.format(NonSI.ANGSTROM);
-				if (units.equals(nanometer)) {
+				Unit<?> u = SimpleUnitFormat.getInstance().parse(units);
+				if (u.equals(UnitUtils.NANOMETRE.inverse())) {
 					return INVERSE_NM;
-				} else if (units.equals(angstrom)) {
+				} else if (u.equals(NonSI.ANGSTROM.inverse())) {
 					return INVERSE_ANGSTROM;
-				} else if (units.equals(angle)) {
+				} else if (u.equals(NonSI.DEGREE_ANGLE)) {
 					return DEGREES;
-				} else if (units.equals(dspace)) {
+				} else if (u.equals(NonSI.ANGSTROM)) {
 					return ANGSTROM;
 				}
 			}
