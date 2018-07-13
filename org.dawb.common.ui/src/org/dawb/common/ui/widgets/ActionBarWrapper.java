@@ -87,6 +87,10 @@ public class ActionBarWrapper extends SubActionBars2 {
 	public void setToolbarControl(Composite tools) {
 		this.toolbarControl = tools;
 	}
+	
+	public Composite getToolbarControl() {
+		return this.toolbarControl;
+	}
 
 	public void updateActionBars() {
 		super.updateActionBars();
