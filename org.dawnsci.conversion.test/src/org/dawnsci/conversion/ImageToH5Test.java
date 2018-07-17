@@ -12,6 +12,7 @@ package org.dawnsci.conversion;
 import static org.junit.Assert.fail;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.util.Arrays;
 
 import org.dawb.common.util.io.FileUtils;
@@ -23,6 +24,7 @@ import org.eclipse.dawnsci.analysis.api.conversion.IConversionService;
 import org.eclipse.dawnsci.hdf5.nexus.NexusFileFactoryHDF5;
 import org.eclipse.january.dataset.ILazyDataset;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import uk.ac.diamond.scisoft.analysis.io.LoaderServiceImpl;
@@ -55,6 +57,7 @@ public class ImageToH5Test {
 	 * We reduce to 100 x 2k for the test decks to run properly.
 	 * @throws Exception
 	 */
+	@Ignore
 	@Test
 	public void testLargeData() throws Exception {
 		
@@ -66,7 +69,7 @@ public class ImageToH5Test {
 
 		final File image = new File("testfiles/dir/ref-testscale_1_001.img");
 		
-		final File dir   = new File(System.getProperty("java.io.tmpdir"), "ImageToH5Test_"+testname);
+		final File dir   = Files.createTempDirectory("ImageToH5Test_"+testname).toFile();
 		try {
 			// Copy the file a few times.
 			for (int i = 0; i < shape[0]; i++) {
@@ -78,8 +81,7 @@ public class ImageToH5Test {
 			IConversionService service = new ConversionServiceImpl();
 			
 	        final IConversionContext context = service.open(dir.getAbsolutePath()+"/copy_.*img");
-	        final File output = new File(dir.getParentFile(), "imageStackTestOutput_"+testname+".h5");
-	        if (output.exists()) output.delete();
+	        final File output = File.createTempFile("imageStackTestOutput_"+testname, ".h5", dir);
 	        output.deleteOnExit();
 	        context.setOutputPath(output.getAbsolutePath());
 	        context.setDatasetName(dPath); // With this conversion dataset is the OUTPUT

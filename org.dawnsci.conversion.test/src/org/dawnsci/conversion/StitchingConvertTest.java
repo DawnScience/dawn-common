@@ -12,6 +12,8 @@ package org.dawnsci.conversion;
 import static org.junit.Assert.fail;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -34,7 +36,6 @@ import org.eclipse.dawnsci.analysis.dataset.impl.Image;
 import org.eclipse.dawnsci.analysis.dataset.roi.EllipticalROI;
 import org.eclipse.january.IMonitor;
 import org.eclipse.january.dataset.AggregateDataset;
-import org.eclipse.january.dataset.Dataset;
 import org.eclipse.january.dataset.IDataset;
 import org.eclipse.january.dataset.ILazyDataset;
 import org.eclipse.january.dataset.LazyDataset;
@@ -61,11 +62,11 @@ public class StitchingConvertTest {
 	double[][][] translations = new double[rows][columns][2];
 
 	@Before
-	public void before() {
-		dir = new File(System.getProperty("java.io.tmpdir"), "StitchTestFolder");
+	public void before() throws IOException {
+		dir  = Files.createTempDirectory("StitchTestFolder").toFile();
 		output = new File(dir.getAbsolutePath()+"/stitchedImage");
+		output.mkdirs();
 		stitchedFileName = "image.tif";
-		FileUtils.createNewUniqueDir(output);
 		new LocalServiceManager().setLoaderService(new LoaderServiceImpl());
 
 		sticher = BoofCVImageStitchingProcessCreator.createStitchingProcess();

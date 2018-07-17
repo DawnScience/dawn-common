@@ -12,6 +12,8 @@ package org.dawnsci.conversion;
 import static org.junit.Assert.fail;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -44,10 +46,10 @@ public class AlignConvertTest {
 	private IImageTransform transformer;
 
 	@Before
-	public void before() {
-		dir = new File(System.getProperty("java.io.tmpdir"), "AlignTestFolder");
+	public void before() throws IOException {
+		dir  = Files.createTempDirectory("AlignTestFolder").toFile();
 		output = new File(dir.getAbsolutePath()+"/Aligned_images");
-		FileUtils.createNewUniqueDir(output);
+		output.mkdirs();
 		new LocalServiceManager().setLoaderService(new LoaderServiceImpl());
 	}
 
@@ -129,8 +131,6 @@ public class AlignConvertTest {
 		IConversionService service = new ConversionServiceImpl();
 
 		final IConversionContext context = service.open(dir.getAbsolutePath());
-		final File output = new File(dir.getAbsolutePath() + "/Aligned_images");
-		FileUtils.createNewUniqueDir(output);
 
 		List<File> files = listFiles(dir, new String[] { "png" }, false);
 		String[] filePaths = new String[files.size()];

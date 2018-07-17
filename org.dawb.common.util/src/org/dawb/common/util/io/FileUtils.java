@@ -949,32 +949,6 @@ public final class FileUtils {
 	}
 	
 	/**
-	 * @param file
-	 * @return File
-	 */
-	public static File createNewUniqueDir(final File file) {
-		return createNewUniqueDir(file, FileUtils.NEWFOLDER);
-	}
-
-	/**
-	 * @param file
-	 * @param templateName
-	 * @return File
-	 */
-	public static File createNewUniqueDir(final File file, final String templateName) {
-		File sug = new File(file, templateName);
-		if (sug.exists()) {
-			int i = 2;
-			while (sug.exists()) {
-				sug = new File(file, templateName + " (" + i + ")");
-				++i;
-			}
-		}
-		sug.mkdirs();
-		return sug;
-	}
-
-	/**
 	 * @param name
 	 * @return String
 	 */

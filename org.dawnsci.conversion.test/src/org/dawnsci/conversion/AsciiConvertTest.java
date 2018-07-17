@@ -28,8 +28,6 @@ import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.sun.xml.bind.v2.runtime.AssociationMap;
-
 import uk.ac.diamond.scisoft.analysis.io.LoaderServiceImpl;
 
 

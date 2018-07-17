@@ -12,6 +12,7 @@ package org.dawnsci.conversion;
 import static org.junit.Assert.fail;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.util.Arrays;
 
 import org.dawb.common.util.io.FileUtils;
@@ -50,7 +51,7 @@ public class CompareConvertTest {
 
 		final File image = new File("testfiles/pCMF48_red_new_36408_1.nxs");
 		
-		final File dir   = new File(System.getProperty("java.io.tmpdir"), "CompareTest_"+testname);
+		final File dir  = Files.createTempDirectory("CompareTest+"+testname).toFile();
 		try {
 			// Copy the file a few times.
 			for (int i = 0; i < size; i++) {
