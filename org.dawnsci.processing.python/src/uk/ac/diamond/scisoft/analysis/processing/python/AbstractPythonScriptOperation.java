@@ -12,7 +12,7 @@ import org.eclipse.january.dataset.IDataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class AbstractPythonScriptOperation<T extends AbstractPythonScriptModel> extends AbstractOperation<AbstractPythonScriptModel,OperationData> {
+public abstract class AbstractPythonScriptOperation<T extends AbstractPythonScriptModel> extends AbstractOperation<T, OperationData> {
 
 	protected AnalysisRpcPythonPyDevService s = null;
 	protected PythonRunScriptService pythonRunScriptService;
