@@ -366,7 +366,7 @@ public class AnalysisRpcPythonPyDevService extends AnalysisRpcPythonService {
 		}
 	}
 
-	private static String getScisoftPath() {
+	public static String getScisoftPath() {
 		String scisoftpath = null;
 		try {
 			scisoftpath = BundleUtils.getBundleLocation(
