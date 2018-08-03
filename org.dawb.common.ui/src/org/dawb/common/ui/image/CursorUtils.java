@@ -8,9 +8,6 @@
  */
 package org.dawb.common.ui.image;
 
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-
 import org.eclipse.dawnsci.plotting.api.axis.IAxis;
 import org.eclipse.dawnsci.plotting.api.trace.IImageTrace;
 import org.eclipse.draw2d.ColorConstants;
@@ -37,8 +34,6 @@ public class CursorUtils {
 	private final static Color WHITE_COLOR = ColorConstants.white;
 
 	private static final int EXTRA_DECIMAL_PLACES = 2; // number of extra decimal places for cursor coordinates (over axes precision)
-
-    private static NumberFormat intensityFormat =  new DecimalFormat("############.0##");
 
     /**
      * 
@@ -74,7 +69,6 @@ public class CursorUtils {
 			}
 			double intensity = image.getDouble(i, j);
 		    if (!Double.isNaN(intensity)) {
-		    	image.setStringFormat(intensityFormat);
 		    	intensityText = image.getString(i, j);
 		    }
 			try {
@@ -94,7 +88,6 @@ public class CursorUtils {
 			if (!(x < 0 || y < 0 || x >= shape[1] || y >= shape[0])){
 				double intensity = image.getDouble(y, x);
 			    if (!Double.isNaN(intensity)) {
-			    	image.setStringFormat(intensityFormat);
 			    	intensityText = image.getString(y, x);
 			    }
 			}
