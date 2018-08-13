@@ -111,9 +111,8 @@ public class DocumentInsertionJob extends Job {
 		return Status.OK_STATUS;
 
 	}
-
-	private static final String PS_DNP_PLOT_GET_PLOTTING_SYSTEM = "ps = dnp.plot.getPlottingSystem(";
-
+	
+	
 	/**
 	 * This method inserts various setup commands if they cannot be found.
 	 * This step ensures that future plotting system commands echoed to python
@@ -127,38 +126,39 @@ public class DocumentInsertionJob extends Job {
 		
 		// Check numpy
 		if (inserter.getType()==InsertionType.PYTHON) {
-			checkAdd("# Turn py4j on under Window->Preferences->Py4J Default Server > 'Py4j active'", cmd, store.getLong(defaultPause));
+			checkAdd("# Turn py4j on under Window->Preferences->Py4j Default Server > 'Py4j active'", cmd, store.getLong(defaultPause));
 			checkAdd("import numpy", cmd, store.getLong(numpyPause));
 		}
 		
 		// Check that port is assigned correctly
-		if (!isDefault(DocumentInserter.PREF_DEFAULT_PORT)) {
+		if (!isDefault("PREF_DEFAULT_PORT")) {
 			checkAdd("import py4j", cmd, store.getLong(plottingPause));
-			final ScopedPreferenceStore store = new ScopedPreferenceStore(InstanceScope.INSTANCE, DocumentInserter.PY4J_DEFAULTSERVER);
-			int port = store.getInt(DocumentInserter.PREF_DEFAULT_PORT);
+			final ScopedPreferenceStore store = new ScopedPreferenceStore(InstanceScope.INSTANCE, "net.sf.py4j.defaultserver");
+			int port = store.getInt("PREF_DEFAULT_PORT");
 			checkAdd("py4j.java_gateway.DEFAULT_PORT="+port, cmd, 1000);
 		}
 
-		if (!isDefault(DocumentInserter.PREF_DEFAULT_CALLBACK_PORT)) {
+		if (!isDefault("PREF_DEFAULT_CALLBACK_PORT")) {
 			checkAdd("import py4j", cmd, store.getLong(defaultPause));
-			final ScopedPreferenceStore store = new ScopedPreferenceStore(InstanceScope.INSTANCE, DocumentInserter.PY4J_DEFAULTSERVER);
-			int port = store.getInt(DocumentInserter.PREF_DEFAULT_CALLBACK_PORT);
+			final ScopedPreferenceStore store = new ScopedPreferenceStore(InstanceScope.INSTANCE, "net.sf.py4j.defaultserver");
+			int port = store.getInt("PREF_DEFAULT_CALLBACK_PORT");
 			checkAdd("py4j.java_gateway.DEFAULT_PYTHON_PROXY_PORT="+port, cmd, 1000);
 		}
 			
-		if (cmd.indexOf(PS_DNP_PLOT_GET_PLOTTING_SYSTEM)<0) {
+		if (cmd.indexOf("ps = dnp.plot.getPlottingSystem(")<0) {
 			final List<Boolean> inserted = new ArrayList<Boolean>(1);
 			Display.getDefault().syncExec(new Runnable() {
 				public void run() {
 					IDocument document = viewer.getDocument();
-					if (document.get().indexOf(PS_DNP_PLOT_GET_PLOTTING_SYSTEM)<0) {
+	                if (document.get().indexOf("ps = dnp.plot.getPlottingSystem(")<0) {
 						try {
 							// We see if the active part might be a plotting system and take this name
 							IPlottingSystem<?> active = (IPlottingSystem<?>)EclipseUtils.getPage().getActivePart().getAdapter(IPlottingSystem.class);
 							if (active==null) active = (IPlottingSystem<?>)EclipseUtils.getPage().getActiveEditor().getAdapter(IPlottingSystem.class);
 							if (active==null) active = PlottingFactory.getPlottingSystems()!=null
-									? PlottingFactory.getPlottingSystems()[0] : null;
-							StringBuilder buf = new StringBuilder(PS_DNP_PLOT_GET_PLOTTING_SYSTEM);
+									                 ? PlottingFactory.getPlottingSystems()[0]
+									                 : null;
+							StringBuilder buf = new StringBuilder("ps = dnp.plot.getPlottingSystem(");
 							if (active!=null) {
 								buf.append("\"");
 								buf.append(active.getPlotName());
@@ -167,13 +167,13 @@ public class DocumentInsertionJob extends Job {
 							buf.append(")\n");
 							
 							document.replace(document.getLength(), 0, buf.toString());
-							viewer.setSelectedRange(document.getLength(), -1);
+						    viewer.setSelectedRange(document.getLength(), -1);
 							inserted.add(Boolean.TRUE);
 							
 						} catch (BadLocationException e) {
 							e.printStackTrace();
 						}
-					}
+	                }
 				}
 			});
 			if (inserted.size()==1 && inserted.get(0)) {
@@ -187,7 +187,7 @@ public class DocumentInsertionJob extends Job {
 	}
 
 	private boolean isDefault(String preference) {
-		final ScopedPreferenceStore store = new ScopedPreferenceStore(InstanceScope.INSTANCE, DocumentInserter.PY4J_DEFAULTSERVER);
+		final ScopedPreferenceStore store = new ScopedPreferenceStore(InstanceScope.INSTANCE, "net.sf.py4j.defaultserver");
 		final int def = store.getDefaultInt(preference);
 		final int val = store.getInt(preference);
 		return val==def;

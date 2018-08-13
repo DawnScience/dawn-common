@@ -66,10 +66,9 @@ class RegionGenerator extends AbstractMacroGenerator<Object> {
 	private String createCommand(IROI roi) {
 		
 		if (!pythonCmdMap.containsKey(new ClassKey(roi.getClass()))) {
-			return "print('"+roi.getClass().getSimpleName()+" does not have a python command')";
+			return "print '"+roi.getClass().getSimpleName()+" does not have a python command'";
 		}
 		IRootFlattener service = FlatteningService.getFlattener();
-		@SuppressWarnings("unchecked")
 		Map<String, Object> flat = (Map<String, Object>)service.flatten(roi);
 		
 		String varName = roi.getName();
