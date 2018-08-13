@@ -27,5 +27,10 @@
          </action>
       </editorContribution>
    </extension>
-
+   <extension
+         point="org.python.pydev.pydev_interpreter_new_custom_entries">
+      <interpreter_new_custom_entries_participant
+            class="org.dawnsci.macro.Py4JNewCustomEntries">
+      </interpreter_new_custom_entries_participant>
+   </extension>
 </plugin>

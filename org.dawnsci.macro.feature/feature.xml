@@ -17,20 +17,30 @@
    </license>
 
    <includes
-         id="net.sf.py4j.defaultserver.feature"
-         version="0.0.0"/>
-
-   <includes
-         id="net.sf.py4j.feature"
-         version="0.0.0"/>
-
-   <includes
          id="org.dawnsci.thirdparty.xml.feature"
          version="0.0.0"/>
 
    <includes
          id="org.python.pydev.feature"
          version="0.0.0"/>
+
+   <includes
+         id="org.py4j.defaultserver.feature"
+         version="0.0.0"/>
+
+   <plugin
+         id="py4j-java"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="py4j-python"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="true"/>
 
    <plugin
          id="org.dawnsci.macro"
