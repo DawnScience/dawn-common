@@ -32,7 +32,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.emf.common.ui,
  org.dawnsci.jexl,
  org.eclipse.dawnsci.analysis.api
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Export-Package: org.dawb.common.ui,
  org.dawb.common.ui.actions,
@@ -69,3 +69,4 @@ Import-Package: org.dawb.common.services,
  org.slf4j;version="[1.7.2,2.0.0)"
 Bundle-ClassPath: .
 Service-Component: OSGI-INF/*.xml
+Automatic-Module-Name: org.dawb.common.ui

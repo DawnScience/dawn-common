@@ -13,7 +13,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.georegression;bundle-version="0.7.0",
  org.apache.commons.math3;bundle-version="[3.2.0,4.0.0)"
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Export-Package: boofcv.abst.filter,
  boofcv.abst.filter.blur,
  boofcv.abst.filter.derivative,
@@ -40,3 +40,4 @@ Bundle-ClassPath: .,
  jars/org.boofcv.ip_0.18.0.jar,
  jars/org.boofcv.sfm_0.18.0.jar,
  jars/org.boofcv.recognition_0.18.0.jar
+Automatic-Module-Name: org.dawnsci.boofcv

@@ -5,7 +5,7 @@ Bundle-SymbolicName: org.dawb.common.util;singleton:=true
 Bundle-Version: 1.2.0.qualifier
 Bundle-Activator: org.dawb.common.util.Activator
 Bundle-Vendor: ESRF
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Export-Package: org.dawb.common.util,
  org.dawb.common.util.eclipse,
@@ -22,3 +22,4 @@ Export-Package: org.dawb.common.util,
 Import-Package: org.slf4j;version="[1.7.2,2.0.0)"
 Require-Bundle: org.eclipse.core.resources;bundle-version="3.7.101",
  org.eclipse.core.runtime;bundle-version="3.7.0"
+Automatic-Module-Name: org.dawb.common.util

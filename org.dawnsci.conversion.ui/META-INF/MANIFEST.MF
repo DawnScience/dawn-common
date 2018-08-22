@@ -33,3 +33,4 @@ Import-Package: org.dawb.common.ui.monitor,
 Export-Package: org.dawnsci.conversion.ui,
  org.dawnsci.conversion.ui.pages
 Service-Component: OSGI-INF/*.xml
+Automatic-Module-Name: org.dawnsci.conversion.ui
