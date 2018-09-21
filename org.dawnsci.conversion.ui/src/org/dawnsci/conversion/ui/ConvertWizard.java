@@ -19,6 +19,7 @@ import org.dawb.common.ui.util.EclipseUtils;
 import org.dawb.common.ui.wizard.AbstractSliceConversionPage;
 import org.dawnsci.conversion.ui.api.IConversionWizardPage;
 import org.dawnsci.conversion.ui.api.IConversionWizardPageService;
+import org.dawnsci.conversion.ui.api.IFileOverrideWizard;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -45,7 +46,7 @@ import org.slf4j.LoggerFactory;
  *   @date Aug 31, 2010
  *   @project org.edna.workbench.actions
  **/
-public class ConvertWizard extends Wizard implements IExportWizard{
+public class ConvertWizard extends Wizard implements IExportWizard, IFileOverrideWizard{
 
 	private static final Logger logger = LoggerFactory.getLogger(ConvertWizard.class);
 	
@@ -103,26 +104,36 @@ public class ConvertWizard extends Wizard implements IExportWizard{
 		final List<String> paths = new ArrayList<String>(7);
 		final List<String> sets  = new ArrayList<String>(7);
 		if (!selections.isEmpty()) {
-			if (selections.get(0) instanceof ITransferableDataObject) {
-				for (ITransferableDataObject ob : selections) {
-					if (!paths.contains(ob.getFilePath())) {
-						paths.add(ob.getFilePath());
-						sets.add(ob.getPath());
-					}
-				}
-			} else if (selections.get(0) instanceof File) {
-				for (int i = 0; i < selections.size(); i ++ ) {
-					File ob = (File) selections.get(i);
-					if (!paths.contains(ob.getAbsolutePath())) {
-						paths.add(ob.getAbsolutePath());
-						sets.add(ob.getPath());
-					}
+			for (ITransferableDataObject ob : selections) {
+				if (!paths.contains(ob.getFilePath())) {
+					paths.add(ob.getFilePath());
+					sets.add(ob.getPath());
 				}
 			}
 		}
 		this.overridePaths    = paths;
 		this.overrideDatasets = sets;
 	}
+	
+	public void setFileSelectionOverride(List<File> files) {
+		
+		final List<String> paths = new ArrayList<>();
+		final List<String> sets  = new ArrayList<>();
+		
+		if (!files.isEmpty()) {
+			for (File ob : files) {
+				if (!paths.contains(ob.getAbsolutePath())) {
+					paths.add(ob.getAbsolutePath());
+					sets.add(ob.getPath());
+				}
+			}
+		}
+
+		this.overridePaths    = paths;
+		this.overrideDatasets = sets;
+	}
+	
+	
 
 	@Override
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
@@ -212,5 +223,4 @@ public class ConvertWizard extends Wizard implements IExportWizard{
 
 		return true;
 	}
-
 }
