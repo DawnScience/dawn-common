@@ -11,13 +11,11 @@ package org.dawnsci.conversion;
 import java.awt.Dimension;
 import java.io.File;
 
-import org.dawb.common.services.ServiceManager;
 import org.dawb.common.ui.image.PaletteFactory;
 import org.dawnsci.conversion.converters.AVIImageConverter;
 import org.dawnsci.conversion.converters.ConversionInfoBean;
 import org.dawnsci.conversion.converters.util.LocalServiceManager;
 import org.dawnsci.conversion.schemes.AVIImageConverterScheme;
-import org.dawnsci.plotting.histogram.service.PaletteService;
 import org.dawnsci.plotting.services.ImageService;
 import org.dawnsci.plotting.services.PlotImageService;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
@@ -25,8 +23,6 @@ import org.eclipse.dawnsci.analysis.api.conversion.IConversionScheme;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionService;
 import org.eclipse.dawnsci.analysis.api.downsample.DownsampleMode;
 import org.eclipse.dawnsci.plotting.api.histogram.HistogramBound;
-import org.eclipse.dawnsci.plotting.api.histogram.IImageService;
-import org.eclipse.dawnsci.plotting.api.histogram.IPaletteService;
 import org.eclipse.dawnsci.plotting.api.histogram.ImageServiceBean;
 import org.eclipse.dawnsci.plotting.api.histogram.ImageServiceBean.HistoType;
 import org.eclipse.dawnsci.plotting.api.histogram.ImageServiceBean.ImageOrigin;
@@ -50,9 +46,6 @@ public class AVIImageConvertPluginTest {
 		
 		IConversionService service = new ConversionServiceImpl();
 		
-		// Not sure of this will work...
-		ServiceManager.setService(IPaletteService.class,     new PaletteService());
-		ServiceManager.setService(IImageService.class,       new ImageService());
 		new AVIImageConverter().setImageService(new ImageService());
 		new AVIImageConverter().setPlotImageService(new PlotImageService());
 		

@@ -10,16 +10,16 @@ package org.dawnsci.conversion.ui.pages;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.Optional;
 
-import org.dawb.common.services.ISystemService;
 import org.dawb.common.ui.util.GridUtils;
 import org.dawnsci.conversion.converters.ConversionInfoBean;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
 import org.eclipse.dawnsci.analysis.api.downsample.DownsampleMode;
 import org.eclipse.dawnsci.plotting.api.IPlottingSystem;
 import org.eclipse.dawnsci.plotting.api.PlotType;
+import org.eclipse.dawnsci.plotting.api.PlottingFactory;
 import org.eclipse.dawnsci.plotting.api.trace.IImageTrace;
-import org.eclipse.dawnsci.plotting.api.trace.ITrace;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
@@ -35,7 +35,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.events.ExpansionAdapter;
 import org.eclipse.ui.forms.events.ExpansionEvent;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
@@ -276,15 +275,16 @@ public final class AVIConvertPage extends AbstractSliceConversionPage {
 		bean.setAlwaysShowTitle(alwaysShowTitle);
 		
 		if (useCurrentColours) {
-			@SuppressWarnings("unchecked")
-			ISystemService<IPlottingSystem<Composite>> service = (ISystemService<IPlottingSystem<Composite>>)PlatformUI.getWorkbench().getService(ISystemService.class);
-			if (service!=null) {
-				// If we have a plotting system for the input file, use that.
-				final File file = new File(context.getFilePaths().get(0));
-				IPlottingSystem<Composite> system = service.getSystem(file.getName());
-				if (system!=null) {
-					IImageTrace image = getImageTrace(system);
-					if (image!=null) bean.setImageServiceBean(image.getImageServiceBean());
+			
+			IPlottingSystem<Object>[] plottingSystems = PlottingFactory.getPlottingSystems();
+			final String file = new File(context.getFilePaths().get(0)).getName();
+			for (IPlottingSystem<Object> s : plottingSystems) {
+				
+				Collection<IImageTrace> traces = s.getTracesByClass(IImageTrace.class);
+				Optional<IImageTrace> image = traces.stream().filter(t -> t.getName().contains(file)).findFirst();
+				if (image.isPresent()) {
+					bean.setImageServiceBean(image.get().getImageServiceBean());
+					break;
 				}
 			}
 		}
@@ -293,21 +293,7 @@ public final class AVIConvertPage extends AbstractSliceConversionPage {
 		
 		return context;
 	}
-	private IImageTrace getImageTrace(IPlottingSystem<Composite> system) {
-		final ITrace trace = getTrace(system);
-		return trace instanceof IImageTrace ? (IImageTrace)trace : null;
-	}
-	private ITrace getTrace(IPlottingSystem<Composite> system) {
-		if (system == null) return null;
 
-		final Collection<ITrace> traces = system.getTraces();
-		if (traces==null || traces.isEmpty())
-			return null;
-        return  traces.iterator().next();
-	}
-
-
-	
 	@Override
 	public IWizardPage getNextPage() {
 		return null;

@@ -506,14 +506,6 @@
        </objectContribution>
     </extension>
     <extension
-          point="org.eclipse.ui.services">
-       <serviceFactory
-             factoryClass="org.dawb.common.ui.plot.PlottingSystemService">
-          <service
-                serviceClass="org.dawb.common.services.ISystemService"></service>
-       </serviceFactory>
-    </extension>
-    <extension
           point="org.eclipse.ui.importWizards">
        <wizard
              class="org.dawb.common.ui.wizard.persistence.PersistenceImportWizard"

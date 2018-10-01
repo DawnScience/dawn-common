@@ -6,7 +6,6 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.lang.reflect.ParameterizedType;
 
-import org.dawb.common.services.ServiceManager;
 import org.dawnsci.persistence.ServiceLoader;
 import org.dawnsci.persistence.internal.PersistJsonOperationHelper;
 import org.dawnsci.persistence.internal.PersistJsonOperationsNode;
@@ -19,19 +18,16 @@ import org.eclipse.dawnsci.analysis.api.processing.IOperation;
 import org.eclipse.dawnsci.analysis.api.processing.IOperationService;
 import org.eclipse.dawnsci.analysis.api.processing.OperationData;
 import org.eclipse.dawnsci.analysis.api.processing.model.IOperationModel;
-import org.eclipse.dawnsci.analysis.api.processing.model.SleepModel;
 import org.eclipse.dawnsci.analysis.api.tree.GroupNode;
 import org.eclipse.dawnsci.analysis.dataset.roi.RectangularROI;
 import org.eclipse.dawnsci.analysis.dataset.roi.SectorROI;
 import org.eclipse.dawnsci.analysis.dataset.slicer.SliceFromSeriesMetadata;
 import org.eclipse.dawnsci.analysis.dataset.slicer.SliceInformation;
 import org.eclipse.dawnsci.analysis.dataset.slicer.SourceInformation;
-import org.eclipse.dawnsci.hdf5.HDF5FileFactory;
 import org.eclipse.dawnsci.hdf5.nexus.NexusFileFactoryHDF5;
 import org.eclipse.dawnsci.hdf5.nexus.NexusFileHDF5;
 import org.eclipse.dawnsci.nexus.NexusFile;
 import org.eclipse.dawnsci.nexus.NexusUtils;
-import org.eclipse.january.dataset.Dataset;
 import org.eclipse.january.dataset.DatasetFactory;
 import org.eclipse.january.dataset.IntegerDataset;
 import org.eclipse.january.dataset.Slice;
@@ -44,7 +40,6 @@ import uk.ac.diamond.scisoft.analysis.fitting.functions.FunctionFactory;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.Gaussian;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.Lorentzian;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.Polynomial;
-import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 import uk.ac.diamond.scisoft.analysis.processing.OperationServiceImpl;
 import uk.ac.diamond.scisoft.analysis.processing.operations.FunctionModel;
 
@@ -56,9 +51,9 @@ public class ReadWriteOperationTest {
 	@BeforeClass
 	public static void before() throws Exception {
 
-		ServiceManager.setService(IOperationService.class, new OperationServiceImpl());
+
 		new ServiceLoader().setNexusFactory(new NexusFileFactoryHDF5());
-		service = (IOperationService)ServiceManager.getService(IOperationService.class);
+		service = new OperationServiceImpl();
 		service.createOperations(service.getClass().getClassLoader(), "org.dawnsci.persistence.test.operations");
 		service.createOperations(service.getClass().getClassLoader(), "uk.ac.diamond.scisoft.analysis.processing.operations");
 		new PersistJsonOperationsNode().setOperationService(service);
