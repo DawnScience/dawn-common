@@ -23,11 +23,13 @@ import org.eclipse.dawnsci.analysis.api.processing.ExecutionType;
 import org.eclipse.dawnsci.analysis.api.processing.IExecutionVisitor;
 import org.eclipse.dawnsci.analysis.api.processing.IOperation;
 import org.eclipse.dawnsci.analysis.api.processing.IOperationContext;
+import org.eclipse.dawnsci.analysis.api.processing.IOperationFileMonitor;
 import org.eclipse.dawnsci.analysis.api.processing.IOperationService;
 import org.eclipse.dawnsci.analysis.api.processing.ISavesToFile;
 import org.eclipse.dawnsci.analysis.dataset.slicer.SliceFromSeriesMetadata;
 import org.eclipse.dawnsci.analysis.dataset.slicer.Slicer;
 import org.eclipse.dawnsci.analysis.dataset.slicer.SourceInformation;
+import org.eclipse.january.IMonitor;
 import org.eclipse.january.dataset.IDataset;
 import org.eclipse.january.dataset.ILazyDataset;
 import org.eclipse.january.metadata.AxesMetadata;
@@ -115,7 +117,13 @@ public class ProcessConversion extends AbstractConversion {
 			((ISavesToFile)exVisitor).includeLinkTo(context.getSelectedConversionFile().getAbsolutePath());
 		}
 		
-		cc.setMonitor(context.getMonitor());
+		IMonitor monitor = context.getMonitor();
+		
+		if (monitor instanceof IOperationFileMonitor) {
+			((IOperationFileMonitor) monitor).appendFilePath(full);
+		}
+		
+		cc.setMonitor(monitor);
 		cc.setVisitor(exVisitor);
 		cc.setSeries(info.getOperationSeries());
 		cc.setExecutionType(executionType);
