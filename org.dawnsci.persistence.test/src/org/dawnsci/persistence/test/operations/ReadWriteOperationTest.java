@@ -7,7 +7,6 @@ import java.io.File;
 import java.lang.reflect.ParameterizedType;
 
 import org.dawnsci.persistence.ServiceLoader;
-import org.dawnsci.persistence.internal.PersistJsonOperationHelper;
 import org.dawnsci.persistence.internal.PersistJsonOperationsNode;
 import org.dawnsci.persistence.internal.PersistenceConstants;
 import org.dawnsci.persistence.internal.PersistenceServiceImpl;
@@ -92,16 +91,15 @@ public class ReadWriteOperationTest {
 
 			IOperation[] readOperations = persist.getOperations();
 
-			final FunctionModel model = (FunctionModel)readOperations[0].getModel();
-            if (!poly.equals(model.getFunction())) {
-            	throw new Exception("Cannot get function from serialized file!");
-            }
-            
+			final FunctionModel model = (FunctionModel) readOperations[0].getModel();
+			if (!poly.equals(model.getFunction())) {
+				throw new Exception("Cannot get function from serialized file!");
+			}
 		} finally {
 			persist.close();
 		}
 	}
-	
+
 	@Test
 	public void testWriteReadOperations() throws Exception {
 		IOperation op2 = service.create("org.dawnsci.persistence.test.operations.JunkTestOperation");
@@ -110,27 +108,22 @@ public class ReadWriteOperationTest {
 		op2.setModel(model2);
 		((JunkTestOperationModel)model2).setxDim(50);
 
-		PersistJsonOperationHelper util = new PersistJsonOperationHelper();
-		String modelJson = util.getModelJson(model2);
+		String modelJson = PersistJsonOperationsNode.getModelJson(model2);
 
 		final File tmp = File.createTempFile("Test", ".nxs");
 		tmp.deleteOnExit();
 		tmp.createNewFile();
 		// TODO Must be closed in a try{} finally{} ?
 		NexusFile file = NexusFileHDF5.createNexusFile(tmp.getAbsolutePath());
-		util.writeOperations(file, new IOperation[]{op2});
-//		file.close();
-//
-//		file = NexusFileHDF5.createNexusFile(tmp.getAbsolutePath());
-//		file.openToRead();
+		PersistJsonOperationHelper util = new PersistJsonOperationHelper();
+		util.writeOperations(file, op2);
+
 		GroupNode g = NexusUtils.loadGroupFully(file, PersistenceConstants.PROCESS_ENTRY, 3);
 		IOperation[] readOperations = PersistJsonOperationsNode.readOperations(g);
 
-
 		assertEquals(((JunkTestOperationModel)(readOperations[0].getModel())).getxDim(), 50);
-
 	}
-	
+
 	@Test
 	public void testWriteReadOperationRoiFuncData() throws Exception {
 		IOperation op2 = service.create("org.dawnsci.persistence.test.operations.JunkTestOperationROI");
@@ -146,18 +139,13 @@ public class ReadWriteOperationTest {
 		model2.setRoi2(new RectangularROI());
 		op2.setModel(model2);
 
-		PersistJsonOperationHelper util = new PersistJsonOperationHelper();
-//		String modelJson = util.getModelJson(model2);
-
 		final File tmp = File.createTempFile("Test", ".nxs");
 		tmp.deleteOnExit();
 		tmp.createNewFile();
 		NexusFile file = NexusFileHDF5.createNexusFile(tmp.getAbsolutePath());
-		util.writeOperations(file, new IOperation[]{op2});
-//		file.close();
-//
-//		file = NexusFileHDF5.createNexusFile(tmp.getAbsolutePath());
-//		file.openToRead();
+		PersistJsonOperationHelper util = new PersistJsonOperationHelper();
+		util.writeOperations(file, op2);
+
 		GroupNode g = NexusUtils.loadGroupFully(file, PersistenceConstants.PROCESS_ENTRY, 3);
 		IOperation[] readOperations = PersistJsonOperationsNode.readOperations(g);
 		JunkTestModelROI mo = (JunkTestModelROI)readOperations[0].getModel();
@@ -168,7 +156,6 @@ public class ReadWriteOperationTest {
 		assertTrue(mo.getData() != null);
 		assertTrue(mo.getFunc() != null);
 		assertTrue(mo.getRoi2() != null);
-
 	}
 
 	@Test
@@ -186,8 +173,6 @@ public class ReadWriteOperationTest {
 		model2.setRoi2(new RectangularROI());
 		op2.setModel(model2);
 
-//		String modelJson = util.getModelJson(model2);
-
 		GroupNode n = PersistJsonOperationsNode.writeOperationsToNode(op2);
 		
 		IOperation<? extends IOperationModel, ? extends OperationData>[] readOperations = PersistJsonOperationsNode.readOperations(n);
@@ -200,9 +185,8 @@ public class ReadWriteOperationTest {
 		assertTrue(mo.getData() != null);
 		assertTrue(mo.getFunc() != null);
 		assertTrue(mo.getRoi2() != null);
-
 	}
-	
+
 	@Test
 	public void testWriteOrigin() throws Exception {
 		Slice[] slices = Slice.convertFromString("0:10:2,2:20,:,:");
@@ -210,24 +194,20 @@ public class ReadWriteOperationTest {
 		int[] dataDims = new int[]{2,3};
 		String path = "pathvalue";
 		String dsname = "dsname";
-		
+
 		SliceInformation si = new SliceInformation(null, null, new SliceND(shape,slices), dataDims, 100*100, 200);
 		SourceInformation so = new SourceInformation(path, dsname, null);
 		SliceFromSeriesMetadata ssm = new SliceFromSeriesMetadata(so,si);
-
-		PersistJsonOperationHelper util = new PersistJsonOperationHelper();
-
 
 		final File tmp = File.createTempFile("Test", ".nxs");
 		tmp.deleteOnExit();
 		tmp.createNewFile();
 		NexusFile file = NexusFileHDF5.createNexusFile(tmp.getAbsolutePath());
+		PersistJsonOperationHelper util = new PersistJsonOperationHelper();
 		util.writeOriginalDataInformation(file, ssm);
 		file.close();
 
 		OriginMetadata outOm = PersistJsonOperationsNode.readOriginalDataInformation(file.getFilePath());
-		outOm.toString();	
-		
+		outOm.toString();
 	}
-
 }

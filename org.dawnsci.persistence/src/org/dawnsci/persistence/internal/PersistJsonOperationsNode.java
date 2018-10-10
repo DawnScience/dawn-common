@@ -31,6 +31,7 @@ import org.eclipse.dawnsci.analysis.tree.impl.AttributeImpl;
 import org.eclipse.dawnsci.analysis.tree.impl.DataNodeImpl;
 import org.eclipse.dawnsci.analysis.tree.impl.GroupNodeImpl;
 import org.eclipse.dawnsci.nexus.NexusConstants;
+import org.eclipse.dawnsci.nexus.NexusException;
 import org.eclipse.dawnsci.nexus.NexusFile;
 import org.eclipse.january.dataset.Dataset;
 import org.eclipse.january.dataset.DatasetFactory;
@@ -46,6 +47,8 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.annotation.JsonIgnoreType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+
+import uk.ac.diamond.scisoft.analysis.io.NexusTreeUtils;
 
 public class PersistJsonOperationsNode {
 
@@ -70,24 +73,24 @@ public class PersistJsonOperationsNode {
 	public void setOperationService(IOperationService s) {
 		service = s;
 	}
-	
+
 	public static IOperation<? extends IOperationModel, ? extends OperationData>[] readOperations(Tree file) throws Exception {
-		NodeLink nl = file.findNodeLink(PersistenceConstants.PROCESS_ENTRY);
-		GroupNode n = (GroupNode)nl.getDestination();
-		return readOperations(n);
+		GroupNode g = NexusTreeUtils.findFirstEntryWithProcess(file.getGroupNode());
+		if (g == null) {
+			throw new NexusException("No entries with process groups have been found");
+		}
+		NodeLink p = NexusTreeUtils.findFirstNode(g, NexusConstants.PROCESS);
+		return readOperations((GroupNode) p.getDestination());
 	}
-	
+
 	public static IOperation<? extends IOperationModel, ? extends OperationData>[] readOperations(GroupNode process) throws Exception{
-		
-		List<IOperation> opList = new ArrayList<IOperation>();
+		List<IOperation<?, ?>> opList = new ArrayList<IOperation<?, ?>>();
 
 		
 		Collection<String> memberList = process.getNames();
 
 		int i = 0;
-		String[] name = new String[]{PersistenceConstants.PROCESS_ENTRY+Node.SEPARATOR+ Integer.toString(i)};
-
-		while (memberList.contains(Integer.toString(i))){
+		while (memberList.contains(Integer.toString(i))) {
 			GroupNode gn = (GroupNode)process.getNodeLink(Integer.toString(i)).getDestination();
 			DataNode dataNode = gn.getDataNode(DATA);
 			Dataset data = DatasetUtils.convertToDataset(dataNode.getDataset().getSlice());
@@ -110,13 +113,14 @@ public class PersistJsonOperationsNode {
 				logger.error("Could not read pass/save nodes", e);
 			}
 			
+			@SuppressWarnings("rawtypes")
 			IOperation op = service.create(sid);
-			Class modelType = ((AbstractOperationBase)op).getModelClass();
+			Class<?> modelType = ((AbstractOperationBase<?, ?>)op).getModelClass();
 			ObjectMapper mapper = getMapper();
 
 			try {
-			IOperationModel	 unmarshal = mapper.readValue(json, modelType);
-			op.setModel(unmarshal);
+				IOperationModel unmarshal = (IOperationModel) mapper.readValue(json, modelType);
+				op.setModel(unmarshal);
 			} catch (Exception e) {
 				logger.error("Could not read model values", e);
 				IOperationModel model  = (IOperationModel) modelType.newInstance();
@@ -126,14 +130,13 @@ public class PersistJsonOperationsNode {
 			op.setPassUnmodifiedData(p);
 			op.setStoreOutput(s);
 			
-			readSpecial(op.getModel(),gn,name[0],REGIONS);
-			readSpecial(op.getModel(),gn,name[0],FUNCTIONS);
-			readSpecial(op.getModel(),gn,name[0],DATASETS);
+			readSpecial(op.getModel(), gn, REGIONS);
+			readSpecial(op.getModel(), gn, FUNCTIONS);
+			readSpecial(op.getModel(), gn, DATASETS);
 			
 			opList.add(op);
 
-			name[0] = PersistenceConstants.PROCESS_ENTRY +"/"+ Integer.toString(++i);
-
+			i++;
 		}
 
 		return opList.isEmpty() ? null : opList.toArray(new IOperation[opList.size()]);
@@ -144,7 +147,7 @@ public class PersistJsonOperationsNode {
 		process.addAttribute(new AttributeImpl(NexusConstants.NXCLASS, NexusConstants.PROCESS));
 		
 		for (int i = 0; i < operations.length; i++) {
-			writeOperationToProcessGroup(process, i, operations[i]);
+			addOperationToProcessGroup(process, i, operations[i]);
 		}
 		
 		try {
@@ -172,7 +175,7 @@ public class PersistJsonOperationsNode {
 		return process;
 	}
 	
-	private static void writeOperationToProcessGroup(GroupNodeImpl n, int i, IOperation op) {
+	private static void addOperationToProcessGroup(GroupNodeImpl n, int i, IOperation<?, ?> op) {
 		String opId = op.getId();
 		String name = op.getName();
 		IDataset boolTrue = DatasetFactory.ones(IntegerDataset.class, 1);
@@ -206,11 +209,11 @@ public class PersistJsonOperationsNode {
 		
 		try {
 			Map<String, Object> m = specialObjects.get(IROI.class);
-			writeSpecialObjects(m,REGIONS,gn,converter);
+			addSpecialObjects(m,REGIONS,gn,converter);
 			m = specialObjects.get(IFunction.class);
-			writeSpecialObjects(m,FUNCTIONS,gn,converter);
+			addSpecialObjects(m,FUNCTIONS,gn,converter);
 			m = specialObjects.get(IDataset.class);
-			writeSpecialObjects(m,DATASETS,gn,converter);
+			addSpecialObjects(m,DATASETS,gn,converter);
 
 			String modelJson = getModelJson(op.getModel(), mapper);
 			DataNodeImpl json = new DataNodeImpl(1);
@@ -220,34 +223,29 @@ public class PersistJsonOperationsNode {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		
 	}
-	
-	private static void writeSpecialObjects(Map<String, Object> special, String type, GroupNodeImpl node,IJSonMarshaller converter) throws Exception  {
-		 if (!special.isEmpty()) {
-			 GroupNodeImpl gn = new GroupNodeImpl(1);
-			 gn.addAttribute(new AttributeImpl(NexusConstants.NXCLASS, NexusConstants.COLLECTION));
-			 node.addGroupNode(type, gn);
 
-			 
-			 for (Map.Entry<String, Object> entry : special.entrySet()) {
-				    String key = entry.getKey();
-				    Object value = entry.getValue();
-				    if (value instanceof IDataset) {
-				    	DataNodeImpl dn = new DataNodeImpl(1);
-				    	dn.setDataset((IDataset)value);
-				    	gn.addDataNode(key, dn);
-	
-				    } else {
-				    	String json = converter.marshal(value);
-				    	DataNodeImpl dn = new DataNodeImpl(1);
-				    	dn.setDataset(DatasetFactory.createFromObject(json));
-				    	gn.addDataNode(key, dn);
-				    	
-				    }
+	private static void addSpecialObjects(Map<String, Object> special, String type, GroupNodeImpl node,IJSonMarshaller converter) throws Exception  {
+		if (!special.isEmpty()) {
+			GroupNodeImpl gn = new GroupNodeImpl(1);
+			gn.addAttribute(new AttributeImpl(NexusConstants.NXCLASS, NexusConstants.COLLECTION));
+			node.addGroupNode(type, gn);
+
+			for (Map.Entry<String, Object> entry : special.entrySet()) {
+				String key = entry.getKey();
+				Object value = entry.getValue();
+				if (value instanceof IDataset) {
+					DataNodeImpl dn = new DataNodeImpl(1);
+					dn.setDataset((IDataset) value);
+					gn.addDataNode(key, dn);
+				} else {
+					String json = converter.marshal(value);
+					DataNodeImpl dn = new DataNodeImpl(1);
+					dn.setDataset(DatasetFactory.createFromObject(json));
+					gn.addDataNode(key, dn);
 				}
-		 }
+			}
+		}
 	}
 	
 	public static OriginMetadata readOriginalDataInformation(String path) throws Exception {
@@ -258,7 +256,7 @@ public class PersistJsonOperationsNode {
 			String dsn = group.getDataNode("dataset").getString();
 			String ss = group.getDataNode("sampling").getString();
 			
-			Dataset dd = DatasetUtils.sliceAndConvertLazyDataset(group.getDataNode("data dimensions").getDataset());
+			Dataset dd = DatasetUtils.sliceAndConvertLazyDataset(group.getDataNode("data_dimensions").getDataset());
 			int[] dataDims = dd.cast(IntegerDataset.class).getData();
 			
 			return MetadataFactory.createMetadata(OriginMetadata.class, null, Slice.convertFromString(ss), dataDims, fp, dsn);
@@ -288,19 +286,16 @@ public class PersistJsonOperationsNode {
 
 		return node;
 	}
-	
-	private static void readSpecial(IOperationModel model, GroupNode node, String name, String type) throws Exception {
 
+	private static void readSpecial(IOperationModel model, GroupNode node, String type) throws Exception {
 		Collection<String> memberList = node.getNames();
 
 		if (memberList.contains(type)) {
-			GroupNode gn = (GroupNode)node.getNodeLink(type).getDestination();
+			GroupNode gn = (GroupNode) node.getNodeLink(type).getDestination();
 			Collection<String> names = gn.getNames();
-//			IDataset data = dataNode.getDataset().getSlice();
 			for (String s : names) {
-//				String rName = s.substring(s.lastIndexOf(SLASH)+1);
 				if (model.isModelField(s)) {
-					Dataset ob = DatasetUtils.convertToDataset(gn.getDataNode(s).getDataset().getSlice());
+					Dataset ob = DatasetUtils.sliceAndConvertLazyDataset(gn.getDataNode(s).getDataset());
 					if (type.equals(DATASETS)) {
 						model.set(s, ob);
 					} else {
@@ -309,10 +304,9 @@ public class PersistJsonOperationsNode {
 					}
 				}
 			}
-		};
-
+		}
 	}
-	
+
 	private static Map<Class<?>,Map<String, Object>> getSpecialObjects(IOperationModel model) {
 
 		Map<Class<?>,Map<String, Object>> out = new HashMap<>();

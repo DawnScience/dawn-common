@@ -747,18 +747,23 @@ class PersistentFileImpl implements IPersistentFile {
 
 	@Override
 	public IOperation<? extends IOperationModel, ? extends OperationData>[] getOperations() throws Exception {
-		return PersistJsonOperationsNode.readOperations(NexusUtils.loadGroupFully(file, PersistenceConstants.PROCESS_ENTRY, 3));
+		GroupNode g;
+		try {
+			g = NexusUtils.loadGroupFully(file, PersistenceConstants.PROCESS_ENTRY, 3);
+		} catch (NexusException e) { // Need to ensure backward compatibility
+			g = NexusUtils.loadGroupFully(file, PersistenceConstants.ENTRY + Node.SEPARATOR + "process", 3);
+		}
+		return PersistJsonOperationsNode.readOperations(g);
 	}
 
 	@Override
+	@Deprecated
 	public void setOperationDataOrigin(OriginMetadata origin) throws Exception {
-		if (origin == null)
-			return;
-		PersistJsonOperationHelper helper = new PersistJsonOperationHelper();
-		helper.writeOriginalDataInformation(file, origin);
+		throw new UnsupportedOperationException("setOperationDataOrigin is not supported any longer");
 	}
 
 	@Override
+	@Deprecated
 	public OriginMetadata getOperationDataOrigin() throws Exception {
 		return null;
 	}

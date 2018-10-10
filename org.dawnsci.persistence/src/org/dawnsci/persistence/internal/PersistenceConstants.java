@@ -18,7 +18,7 @@ public class PersistenceConstants {
 	public static final String MASK_ENTRY     = "/entry/mask";
 	public static final String ROI_ENTRY      = "/entry/region";
 	public static final String FUNCTION_ENTRY = "/entry/function";
-	public static final String PROCESS_ENTRY  = "/entry/process";
+	public static final String PROCESS_ENTRY  = "/processed/process";
 	public static final String DIFFRACTIONMETADATA_ENTRY = "/entry/instrument";
 	public static final String SITE = "Diamond Light Source";
 }
