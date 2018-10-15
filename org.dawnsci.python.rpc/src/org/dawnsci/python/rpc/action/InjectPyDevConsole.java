@@ -11,6 +11,7 @@ package org.dawnsci.python.rpc.action;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -18,8 +19,6 @@ import java.util.regex.Pattern;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IParameterValues;
-import org.eclipse.dawnsci.macro.api.AbstractMacroGenerator;
-import org.eclipse.dawnsci.macro.api.IMacroService;
 import org.eclipse.january.dataset.IDataset;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
@@ -47,13 +46,10 @@ import org.python.pydev.shared_interactive_console.console.ui.internal.ScriptCon
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.ac.diamond.scisoft.analysis.rpc.FlatteningService;
+
 public class InjectPyDevConsole {
 	
-	// OSGi Injection
-	private static IMacroService mservice;
-	public void setMacroService(IMacroService s) {
-		mservice = s;
-	}
 	public InjectPyDevConsole() {
 		
 	}
@@ -130,7 +126,7 @@ public class InjectPyDevConsole {
 				}
 			}
 
-	        String flat = data != null ? createFlattenCommands(data, info.getInterpreterType()) : null;
+	        String flat = data != null ? createFlattenCommands(data, info) : null;
             if (flat!=null) cmd = cmd.concat(flat);
             
             if (console == null) {
@@ -151,13 +147,60 @@ public class InjectPyDevConsole {
 		return;
 	}
 
-	private String createFlattenCommands(Map<String, IDataset> d, int interpreterType) {
+	private String createFlattenCommands(Map<String, IDataset> data, InterpreterInfo info) {
 		
-		@SuppressWarnings("unchecked")
-		AbstractMacroGenerator<Map<String, IDataset>> gen = mservice.getGenerator(d.getClass());
-		return interpreterType==0 ? gen.getPythonCommand(d) : gen.getJythonCommand(d);
-	}
+		if (data==null || data.isEmpty()) return null;
+		
+		final StringBuilder     buf = new StringBuilder();
+		final List<String> sentData = new ArrayList<String>(3);
+		for (String varName : data.keySet()) {
+			
+			final IDataset set = data.get(varName);
+			Object object = FlatteningService.getFlattener().flatten(set);
+			if (object instanceof Map) {
 
+				final Map<String, Object> map = (Map<String, Object>)object;
+
+				String flattenedPath = (String)map.get("filename");
+
+				if (flattenedPath!=null) {
+					if (info.executableOrJar!=null) {
+						if (info.executableOrJar.toLowerCase().contains("python")) {
+							buf.append( varName+" = numpy.load(r'"+flattenedPath+"')\n");
+						} else if (info.executableOrJar.toLowerCase().contains("jython")) {
+							buf.append( varName+" = dnp.io.load(r'"+flattenedPath+"')\n");
+						}
+						sentData.add(varName);
+					}
+				}
+			}
+		}
+		
+		// We make a dictionary for them.
+		if (sentData.size()>1) {
+			buf.append("data = "+createDictionaryText(sentData)+"\n");
+		}
+		if (buf.length()>0) return buf.toString();
+		
+		return null;
+
+	}
+	
+	private String createDictionaryText(List<String> sentData) {
+		
+		final StringBuilder buf = new StringBuilder("{");
+		for (Iterator<String> iterator = sentData.iterator(); iterator.hasNext();) {
+			String varName = iterator.next();
+			buf.append("'");
+			buf.append(varName);
+			buf.append("' : ");
+			buf.append(varName);
+			if (iterator.hasNext()) buf.append(", ");
+		}
+		buf.append("}");
+		return buf.toString();
+	}
+	
 	private Map<String, IDataset> data;
 	/**
 	 * If there is a running console, then the variable are flattened and sent to it,
@@ -177,7 +220,7 @@ public class InjectPyDevConsole {
 			
 		} else {
 			this.data    = null;
-            String cmds  = createFlattenCommands(curData, ((InterpreterInfo)console.getInterpreterInfo()).getInterpreterType());
+            String cmds  = createFlattenCommands(curData, ((InterpreterInfo)console.getInterpreterInfo()));
 			if (cmds!=null) sendCommand(cmds, console);
 		}
 		
