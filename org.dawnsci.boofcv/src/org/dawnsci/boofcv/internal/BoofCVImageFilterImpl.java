@@ -80,7 +80,7 @@ public class BoofCVImageFilterImpl implements IImageFilterService {
 		int[] shape = Utils.getShape(input);
 
 		ImageSingleBand<?> converted = ConvertIDataset.convertFrom(input, ImageUInt8.class, 1);
-		Class<? extends ImageSingleBand<?>> derivType = GImageDerivativeOps.getDerivativeType(ImageUInt8.class);
+		Class<? extends ImageSingleBand<?>> derivType = (Class<? extends ImageSingleBand<?>>) GImageDerivativeOps.getDerivativeType(ImageUInt8.class);
 		ImageSingleBand<?> derivX = GeneralizedImageOps.createSingleBand(derivType, shape[1], shape[0]);
 		ImageSingleBand<?> derivY = GeneralizedImageOps.createSingleBand(derivType, shape[1], shape[0]);
 		// Calculate image's derivative
