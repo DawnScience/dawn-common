@@ -18,6 +18,7 @@ import org.eclipse.dawnsci.analysis.api.processing.IOperationService;
 import org.eclipse.dawnsci.analysis.api.processing.OperationData;
 import org.eclipse.dawnsci.analysis.api.processing.model.IOperationModel;
 import org.eclipse.dawnsci.analysis.api.tree.GroupNode;
+import org.eclipse.dawnsci.analysis.api.tree.Tree;
 import org.eclipse.dawnsci.analysis.dataset.roi.RectangularROI;
 import org.eclipse.dawnsci.analysis.dataset.roi.SectorROI;
 import org.eclipse.dawnsci.analysis.dataset.slicer.SliceFromSeriesMetadata;
@@ -25,6 +26,7 @@ import org.eclipse.dawnsci.analysis.dataset.slicer.SliceInformation;
 import org.eclipse.dawnsci.analysis.dataset.slicer.SourceInformation;
 import org.eclipse.dawnsci.hdf5.nexus.NexusFileFactoryHDF5;
 import org.eclipse.dawnsci.hdf5.nexus.NexusFileHDF5;
+import org.eclipse.dawnsci.nexus.NexusConstants;
 import org.eclipse.dawnsci.nexus.NexusFile;
 import org.eclipse.dawnsci.nexus.NexusUtils;
 import org.eclipse.january.dataset.DatasetFactory;
@@ -115,8 +117,7 @@ public class ReadWriteOperationTest {
 		tmp.createNewFile();
 		// TODO Must be closed in a try{} finally{} ?
 		NexusFile file = NexusFileHDF5.createNexusFile(tmp.getAbsolutePath());
-		PersistJsonOperationHelper util = new PersistJsonOperationHelper();
-		util.writeOperations(file, op2);
+		writeOperations(file, op2);
 
 		GroupNode g = NexusUtils.loadGroupFully(file, PersistenceConstants.PROCESS_ENTRY, 3);
 		IOperation[] readOperations = PersistJsonOperationsNode.readOperations(g);
@@ -143,8 +144,7 @@ public class ReadWriteOperationTest {
 		tmp.deleteOnExit();
 		tmp.createNewFile();
 		NexusFile file = NexusFileHDF5.createNexusFile(tmp.getAbsolutePath());
-		PersistJsonOperationHelper util = new PersistJsonOperationHelper();
-		util.writeOperations(file, op2);
+		writeOperations(file, op2);
 
 		GroupNode g = NexusUtils.loadGroupFully(file, PersistenceConstants.PROCESS_ENTRY, 3);
 		IOperation[] readOperations = PersistJsonOperationsNode.readOperations(g);
@@ -203,11 +203,29 @@ public class ReadWriteOperationTest {
 		tmp.deleteOnExit();
 		tmp.createNewFile();
 		NexusFile file = NexusFileHDF5.createNexusFile(tmp.getAbsolutePath());
-		PersistJsonOperationHelper util = new PersistJsonOperationHelper();
-		util.writeOriginalDataInformation(file, ssm);
+		writeOriginalDataInformation(file, ssm);
 		file.close();
 
 		OriginMetadata outOm = PersistJsonOperationsNode.readOriginalDataInformation(file.getFilePath());
 		outOm.toString();
 	}
+
+	private static final String PROCESSED_ENTRY = Tree.ROOT + "processed" + NexusFile.NXCLASS_SEPARATOR + NexusConstants.ENTRY;
+	private static final String ORIGIN = "origin";
+	private static final String PROCESS = "process";
+	
+	private static void writeOperations(NexusFile file, IOperation<? extends IOperationModel, ? extends OperationData>... operations) throws Exception {
+		GroupNode entryGroup = file.getGroup(PROCESSED_ENTRY, true);
+		GroupNode processGroup = PersistJsonOperationsNode.writeOperationsToNode(operations);
+		file.addNode(entryGroup, PROCESS, processGroup);
+	}
+
+	private static void writeOriginalDataInformation(NexusFile file, OriginMetadata origin) throws Exception {
+		GroupNode groupEntry = file.getGroup(PROCESSED_ENTRY, true);
+		
+		GroupNode processNode = file.getGroup(groupEntry, PROCESS, NexusConstants.PROCESS, true);
+		GroupNode originNode = PersistJsonOperationsNode.writeOriginalDataInformation(origin);
+		file.addNode(processNode, ORIGIN, originNode);
+	}
+
 }

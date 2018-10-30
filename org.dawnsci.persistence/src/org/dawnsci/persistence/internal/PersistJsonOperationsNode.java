@@ -64,7 +64,9 @@ public class PersistJsonOperationsNode {
 	private final static String VERSION = "version";
 	private final static String DATE = "date";
 	private final static String PROGRAM = "program";
+	private final static String TYPE = "type";
 	private final static String DAWN = "DAWN";
+	private final static Dataset JSON_MIME_TYPE = DatasetFactory.createFromObject("application/json");
 
 	private static IOperationService  service;
 	
@@ -90,8 +92,8 @@ public class PersistJsonOperationsNode {
 		Collection<String> memberList = process.getNames();
 
 		int i = 0;
-		while (memberList.contains(Integer.toString(i))) {
-			GroupNode gn = (GroupNode)process.getNodeLink(Integer.toString(i)).getDestination();
+		for (String number = Integer.toString(i); memberList.contains(number); number = Integer.toString(++i)) {
+			GroupNode gn = (GroupNode)process.getNodeLink(number).getDestination();
 			DataNode dataNode = gn.getDataNode(DATA);
 			Dataset data = DatasetUtils.convertToDataset(dataNode.getDataset().getSlice());
 			dataNode = gn.getDataNode(ID);
@@ -135,8 +137,6 @@ public class PersistJsonOperationsNode {
 			readSpecial(op.getModel(), gn, DATASETS);
 			
 			opList.add(op);
-
-			i++;
 		}
 
 		return opList.isEmpty() ? null : opList.toArray(new IOperation[opList.size()]);
@@ -214,6 +214,10 @@ public class PersistJsonOperationsNode {
 			addSpecialObjects(m,FUNCTIONS,gn,converter);
 			m = specialObjects.get(IDataset.class);
 			addSpecialObjects(m,DATASETS,gn,converter);
+
+			DataNodeImpl typeNode = new DataNodeImpl(1);
+			typeNode.setDataset(JSON_MIME_TYPE);
+			gn.addDataNode(TYPE, typeNode);
 
 			String modelJson = getModelJson(op.getModel(), mapper);
 			DataNodeImpl json = new DataNodeImpl(1);

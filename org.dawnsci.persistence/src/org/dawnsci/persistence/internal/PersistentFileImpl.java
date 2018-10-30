@@ -737,12 +737,14 @@ class PersistentFileImpl implements IPersistentFile {
 		PersistSinglePowderCalibration.writeCalibrationToFile(file, calibrationImage, metadata, info);
 	}
 
+	private static final String OLD_OPERATION_PROCESS_ENTRY = PersistenceConstants.ENTRY + Node.SEPARATOR + "process";
+
 	@Override
 	public void setOperations(IOperation<? extends IOperationModel, ? extends OperationData>... operations)
 			throws Exception {
 		GroupNode gn = PersistJsonOperationsNode.writeOperationsToNode(operations);
-		file.getGroup("/entry", true);
-		file.addNode("/entry/process", gn);
+		file.getGroup(PersistenceConstants.ENTRY, true);
+		file.addNode(OLD_OPERATION_PROCESS_ENTRY, gn);
 	}
 
 	@Override
@@ -751,7 +753,7 @@ class PersistentFileImpl implements IPersistentFile {
 		try {
 			g = NexusUtils.loadGroupFully(file, PersistenceConstants.PROCESS_ENTRY, 3);
 		} catch (NexusException e) { // Need to ensure backward compatibility
-			g = NexusUtils.loadGroupFully(file, PersistenceConstants.ENTRY + Node.SEPARATOR + "process", 3);
+			g = NexusUtils.loadGroupFully(file, OLD_OPERATION_PROCESS_ENTRY, 3);
 		}
 		return PersistJsonOperationsNode.readOperations(g);
 	}
