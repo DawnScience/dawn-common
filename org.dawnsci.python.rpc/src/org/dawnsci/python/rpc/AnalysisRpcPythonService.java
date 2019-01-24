@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
 
-import org.dawb.common.util.net.NetUtils;
 import org.dawnsci.python.rpc.commandline.CommandLineException;
 import org.dawnsci.python.rpc.commandline.ManagedCommandline;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -26,6 +25,7 @@ import org.eclipse.dawnsci.analysis.api.rpc.IAnalysisRpcClient;
 import org.eclipse.dawnsci.analysis.api.rpc.IAnalysisRpcPythonRemote;
 import org.eclipse.dawnsci.analysis.api.rpc.IAnalysisRpcPythonService;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
+import org.python.pydev.shared_core.net.SocketUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,8 +49,6 @@ public class AnalysisRpcPythonService implements IAnalysisRpcPythonService {
 			.getLogger(AnalysisRpcPythonService.class);
 
 	public static final String SCISOFT_PY_RPC_MAIN_MODULE = "scisoftpy.rpc";
-	public static final String PROPERTY_FREE_PORT_KEY = Activator.PLUGIN_ID
-			+ "rpc.python.server.free.port";
 
 	private final String jobUserDescription;
 	private final File workingDir;
@@ -84,7 +82,7 @@ public class AnalysisRpcPythonService implements IAnalysisRpcPythonService {
 			File pythonExe, File workingDir, Map<String, String> env)
 			throws AnalysisRpcException {
 		this(jobUserDescription, pythonExe, workingDir, env,
-				assignPort(PROPERTY_FREE_PORT_KEY));
+				assignPort());
 	}
 
 	/* Only exists so that assignPort can end up in two places. */
@@ -212,14 +210,8 @@ public class AnalysisRpcPythonService implements IAnalysisRpcPythonService {
 		command = null;
 	}
 
-	protected static int assignPort(String key) {
-		return NetUtils.getFreePort(getStartingPort(key));
-	}
-
-	protected static int getStartingPort(String key) {
-		String portstr = System.getProperty(key, "8713");
-		int startingPort = Integer.parseInt(portstr);
-		return startingPort;
+	protected static int assignPort() {
+		return SocketUtil.findUnusedLocalPorts(1)[0];
 	}
 
 	protected static String[] createParameters(File pythonExe, int port) {
@@ -229,7 +221,6 @@ public class AnalysisRpcPythonService implements IAnalysisRpcPythonService {
 		parameters[2] = "-m" + SCISOFT_PY_RPC_MAIN_MODULE;
 		parameters[3] = "" + port;
 		return parameters;
-
 	}
 
 	/**
