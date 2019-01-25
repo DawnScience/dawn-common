@@ -6,6 +6,7 @@ import org.dawnsci.python.rpc.AnalysisRpcPythonPyDevService;
 import org.dawnsci.python.rpc.PythonRunScriptService;
 import org.eclipse.dawnsci.analysis.api.processing.OperationData;
 import org.eclipse.dawnsci.analysis.api.processing.OperationException;
+import org.eclipse.dawnsci.analysis.api.rpc.IAnalysisRpcPythonService;
 import org.eclipse.dawnsci.analysis.dataset.operations.AbstractOperation;
 import org.eclipse.january.IMonitor;
 import org.eclipse.january.dataset.IDataset;
@@ -14,10 +15,10 @@ import org.slf4j.LoggerFactory;
 
 public abstract class AbstractPythonScriptOperation<T extends AbstractPythonScriptModel> extends AbstractOperation<T, OperationData> {
 
-	protected AnalysisRpcPythonPyDevService s = null;
+	protected IAnalysisRpcPythonService s = null;
 	protected PythonRunScriptService pythonRunScriptService;
 	
-	private final static Logger logger = LoggerFactory.getLogger(AbstractPythonScriptOperation.class);
+	private static final Logger logger = LoggerFactory.getLogger(AbstractPythonScriptOperation.class);
 	
 	@Override
 	public void init() {
@@ -25,9 +26,9 @@ public abstract class AbstractPythonScriptOperation<T extends AbstractPythonScri
 		try {
 			s = AnalysisRpcPythonPyDevService.create();
 			pythonRunScriptService = new PythonRunScriptService(s);
-			logger.debug("Time to start service: " + (System.currentTimeMillis()-t));
+			logger.debug("Time to start service: {}", (System.currentTimeMillis()-t));
 		} catch (Exception e) {
-			logger.debug("Failed to start service in: " + (System.currentTimeMillis()-t));
+			logger.debug("Failed to start service in: {}", (System.currentTimeMillis()-t));
 			logger.error("Could not create script service!");
 			throw new OperationException(this, "Could not create script service!");
 		}
@@ -47,7 +48,7 @@ public abstract class AbstractPythonScriptOperation<T extends AbstractPythonScri
 		return operationData;
 	}
 	
-	protected OperationData process(IDataset input, IMonitor monitor) throws OperationException {
+	protected OperationData process(IDataset input, IMonitor monitor) {
 		
 		if (s == null || pythonRunScriptService == null) throw new OperationException(this, "Could not create python interpreter");
 		if (model.getFilePath() == null || model.getFilePath().isEmpty()) throw new OperationException(this, "Path to script not set");
