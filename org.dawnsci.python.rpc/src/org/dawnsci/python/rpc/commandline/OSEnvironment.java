@@ -219,7 +219,6 @@ public class OSEnvironment {
    *         "variable=value".
    * @see #toArray()
    */
-  @SuppressWarnings("unchecked")
   public List<String> getEnvironment() {
     List<String> env = new ArrayList<String>();
     Enumeration keys = variables.keys();
