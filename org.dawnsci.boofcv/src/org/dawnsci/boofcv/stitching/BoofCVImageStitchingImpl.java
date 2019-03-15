@@ -38,11 +38,11 @@ import boofcv.struct.image.ImageSingleBand;
  */
 public class BoofCVImageStitchingImpl implements IImageStitchingProcess {
 
-	static {
-		System.out.println("Starting BoofCV image Stitching service.");
-	}
-
 	private static final Logger logger = LoggerFactory.getLogger(BoofCVImageStitchingImpl.class);
+
+	static {
+		logger.info("Starting BoofCV image Stitching service.");
+	}
 
 	public BoofCVImageStitchingImpl() {
 		// Important do nothing here, OSGI may start the service more than once.
