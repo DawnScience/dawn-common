@@ -286,7 +286,7 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 		formatter.setFixedLengths(false, true);
 		xTranslationText.setFormatter(formatter);
 		xTranslationText.getControl().setToolTipText("Expected translation in pixels in the X direction");
-		xTranslationText.setValue(new Double(25));
+		xTranslationText.setValue(25.);
 		xTranslationText.getControl().setEnabled(hasFeatureAssociated);
 		gridData = new GridData(SWT.FILL, SWT.CENTER, true, false); 
 		gridData.widthHint = 30;
@@ -325,7 +325,7 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 		formatter.setFixedLengths(false, true);
 		yTranslationText.setFormatter(formatter);
 		yTranslationText.getControl().setToolTipText("Expected translation in pixels in the y direction");
-		yTranslationText.setValue(new Double(25));
+		yTranslationText.setValue(25.);
 		yTranslationText.getControl().setEnabled(hasFeatureAssociated);
 		gridData = new GridData(SWT.FILL, SWT.CENTER, true, false); 
 		gridData.widthHint = 30;
