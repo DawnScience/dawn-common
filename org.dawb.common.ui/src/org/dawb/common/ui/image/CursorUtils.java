@@ -16,7 +16,8 @@ import org.eclipse.draw2d.MouseEvent;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.PointList;
-import org.eclipse.january.dataset.IDataset;
+import org.eclipse.january.dataset.Dataset;
+import org.eclipse.january.dataset.DatasetUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Cursor;
@@ -24,6 +25,7 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 
 public class CursorUtils {
@@ -44,59 +46,74 @@ public class CursorUtils {
      * @return
      */
 	public static Cursor getPositionCursor(MouseEvent me, IAxis xAxis, IAxis yAxis, IImageTrace imageTrace) {
-		
-		double xCoordinate = xAxis.getPositionValue(me.x);
-		double yCoordinate = yAxis.getPositionValue(me.y);
+		double xCoordinate = xAxis.getValueFromPosition(me.x);
+		double yCoordinate = yAxis.getValueFromPosition(me.y);
 		String intensityText = null;
-		if (imageTrace!=null && !imageTrace.hasTrueAxes()) {
-			xCoordinate = Math.floor(xCoordinate);
-			yCoordinate = Math.floor(yCoordinate);
-			IDataset image = imageTrace.getData();
-			int i, j;
-			if (imageTrace.getImageOrigin().isOnLeadingDiagonal()) {
-				i = (int) yCoordinate;
-				j = (int) xCoordinate;
-			} else {
-				i = (int) xCoordinate;
-				j = (int) yCoordinate;
-			}
-			int[] shape = image.getShape();
-			if (i >= shape[0]) {
-				i = shape[0] - 1;
-			}
-			if (j >= shape[1]) {
-				j = shape[1] - 1;
-			}
-			double intensity = image.getDouble(i, j);
-		    if (!Double.isNaN(intensity)) {
-		    	intensityText = image.getString(i, j);
-		    }
-			try {
-				double[] axisPnt = imageTrace.getPointInAxisCoordinates(new double[]{xCoordinate, yCoordinate});
-			    xCoordinate = axisPnt[0];
-			    yCoordinate = axisPnt[1];
-			} catch (Exception ignored) {
-				// It is not fatal for the custom axes not to work.
-			}
-		} else if (imageTrace!=null && imageTrace.hasTrueAxes()){
 
-			int[] shape = imageTrace.getData().getShape();
-			double[] globalRange = imageTrace.getGlobalRange();
-			int x = (int)Math.floor((xCoordinate-globalRange[0])/(globalRange[1]-globalRange[0])*shape[1]);
-			int y = (int)Math.floor((yCoordinate-globalRange[2])/(globalRange[3]-globalRange[2])*shape[0]);
-			IDataset image = imageTrace.getData();
-			if (!(x < 0 || y < 0 || x >= shape[1] || y >= shape[0])){
-				double intensity = image.getDouble(y, x);
-			    if (!Double.isNaN(intensity)) {
-			    	intensityText = image.getString(y, x);
-			    }
+		if (imageTrace != null) {
+			Dataset image = DatasetUtils.convertToDataset(imageTrace.getData());
+			int[] shape = image.getShapeRef();
+
+			if (!imageTrace.hasTrueAxes()) {
+				double[] axisPnt;
+				boolean transpose = !(imageTrace.getImageServiceBean().isTransposed() ^ imageTrace.getImageOrigin().isOnLeadingDiagonal());
+
+				if (transpose) {
+					axisPnt = new double[] {yCoordinate, xCoordinate};
+				} else {
+					axisPnt = new double[] {xCoordinate, yCoordinate};
+				}
+
+				try {
+					axisPnt = imageTrace.getPointInImageCoordinates(axisPnt);
+					xCoordinate = axisPnt[0];
+					yCoordinate = axisPnt[1];
+				} catch (Exception e) {
+				}
+				int i = (int) Math.floor(xCoordinate);
+				if (i >= shape[1]) {
+					i = shape[1] - 1;
+				} else if (i < 0) {
+					i = 0;
+				}
+				int j = (int) Math.floor(yCoordinate);
+				if (j >= shape[0]) {
+					j = shape[0] - 1;
+				} else if (j < 0) {
+					j = 0;
+				}
+				double intensity = image.getDouble(j, i);
+				if (!Double.isNaN(intensity)) {
+					intensityText = image.getString(j, i);
+				}
+				try {
+					axisPnt = imageTrace.getPointInAxisCoordinates(new double[] { i, j });
+					if (transpose) {
+						xCoordinate = axisPnt[1];
+						yCoordinate = axisPnt[0];
+					} else {
+						xCoordinate = axisPnt[0];
+						yCoordinate = axisPnt[1];
+					}
+				} catch (Exception ignored) {
+					// It is not fatal for the custom axes not to work.
+				}
+			} else {
+				double[] globalRange = imageTrace.getGlobalRange();
+				int x = (int) Math.floor((xCoordinate - globalRange[0]) / (globalRange[1] - globalRange[0]) * shape[1]);
+				int y = (int) Math.floor((yCoordinate - globalRange[2]) / (globalRange[3] - globalRange[2]) * shape[0]);
+				if (!(x < 0 || y < 0 || x >= shape[1] || y >= shape[0])) {
+					double intensity = image.getDouble(y, x);
+					if (!Double.isNaN(intensity)) {
+						intensityText = image.getString(y, x);
+					}
+				}
 			}
 		}
-		
+
 		StringBuilder buf = new StringBuilder();
 		if (intensityText != null) {
 			buf.append(intensityText);
-			//buf.append("  ");
 		}
 		buf.append("\n[");
 		buf.append(xAxis.format(xCoordinate, EXTRA_DECIMAL_PLACES));
@@ -105,13 +122,14 @@ public class CursorUtils {
 		buf.append("]");
 		
 		Dimension size = FigureUtilities.getTextExtents(buf.toString(), Display.getDefault().getSystemFont());
-		Image image = new Image(Display.getDefault(), size.width + CURSOR_SIZE, size.height + CURSOR_SIZE);		
+		Image image = new Image(Display.getDefault(), size.width + CURSOR_SIZE, size.height + CURSOR_SIZE);
 		GC    gc    = new GC(image);
 		
 		try {
 			//gc.setAlpha(0);
-			gc.setBackground(TRANSPARENT_COLOR);					
-			gc.fillRectangle(image.getBounds());
+			Rectangle bnds = image.getBounds();
+			gc.setBackground(TRANSPARENT_COLOR);
+			gc.fillRectangle(bnds);
 			gc.setForeground(BLACK_COLOR);
 			
 			// Draw cross
@@ -127,9 +145,9 @@ public class CursorUtils {
 			// Draw position
 			gc.setBackground(WHITE_COLOR);
 			gc.setForeground(BLACK_COLOR);
-			gc.fillRectangle(CURSOR_SIZE, CURSOR_SIZE, 
-					image.getBounds().width-CURSOR_SIZE, 
-					image.getBounds().height-CURSOR_SIZE);					
+			gc.fillRectangle(CURSOR_SIZE, CURSOR_SIZE,
+					bnds.width-CURSOR_SIZE,
+					bnds.height-CURSOR_SIZE);
 			gc.drawText(buf.toString(), CURSOR_SIZE, CURSOR_SIZE, true);
 			
 			ImageData imageData = image.getImageData();
