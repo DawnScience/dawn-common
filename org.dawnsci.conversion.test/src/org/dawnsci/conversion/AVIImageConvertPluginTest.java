@@ -8,7 +8,6 @@
  */
 package org.dawnsci.conversion;
 
-import java.awt.Dimension;
 import java.io.File;
 
 import org.dawb.common.ui.image.PaletteFactory;
@@ -28,7 +27,6 @@ import org.eclipse.dawnsci.plotting.api.histogram.ImageServiceBean.HistoType;
 import org.eclipse.dawnsci.plotting.api.histogram.ImageServiceBean.ImageOrigin;
 import org.junit.Before;
 import org.junit.Test;
-import org.monte.media.avi.AVIReader;
 
 import uk.ac.diamond.scisoft.analysis.io.LoaderServiceImpl;
 
@@ -67,15 +65,6 @@ public class AVIImageConvertPluginTest {
         context.setUserObject(info);
         
         service.process(context);
-        
-        // Check avi file
-        final AVIReader reader = new AVIReader(avi);
-        int trackCount = reader.getTrackCount();
-        if (trackCount!=1) throw new Exception("Incorrect number of tracks!");
-        Dimension d = reader.getVideoDimension();
-        if (d.width!=1024) throw new Exception("Incorrect downsampling applied!");
-        if (d.height!=1024) throw new Exception("Incorrect downsampling applied!");
-        
         // Done
         System.out.println("Test passed, avi file written!");
    	}

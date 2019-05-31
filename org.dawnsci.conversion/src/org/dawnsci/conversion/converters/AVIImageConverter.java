@@ -8,18 +8,10 @@
  */
 package org.dawnsci.conversion.converters;
 
-import static org.monte.media.FormatKeys.EncodingKey;
-import static org.monte.media.FormatKeys.FrameRateKey;
-import static org.monte.media.FormatKeys.MediaTypeKey;
-import static org.monte.media.VideoFormatKeys.DepthKey;
-import static org.monte.media.VideoFormatKeys.ENCODING_AVI_MJPG;
-import static org.monte.media.VideoFormatKeys.HeightKey;
-import static org.monte.media.VideoFormatKeys.QualityKey;
-import static org.monte.media.VideoFormatKeys.WidthKey;
-
 import java.awt.image.BufferedImage;
 import java.io.File;
 
+import org.dawnsci.conversion.converters.avi.AVIOutputStream;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
 import org.eclipse.dawnsci.plotting.api.IPlottingSystem;
 import org.eclipse.dawnsci.plotting.api.PlotType;
@@ -34,10 +26,6 @@ import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.services.IDisposable;
-import org.monte.media.Format;
-import org.monte.media.FormatKeys.MediaType;
-import org.monte.media.avi.AVIWriter;
-import org.monte.media.math.Rational;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -99,7 +87,7 @@ public class AVIImageConverter extends AbstractImageConversion {
 	}
 
 	private File       selected=null;
-	private AVIWriter  out;
+	private AVIOutputStream  out;
 	private Point XYD_PLOT_SIZE = new Point(1024,768);
 
 	private PlotImageData plotImageData;
@@ -130,7 +118,11 @@ public class AVIImageConverter extends AbstractImageConversion {
 				if (out!=null) out.close();
 
 				final File outputFile = getAVIFile();
-				this.out = new AVIWriter(outputFile);
+				out = new AVIOutputStream(outputFile, AVIOutputStream.VideoFormat.JPG, 24);
+	            out.setVideoCompressionQuality(1f);
+
+	            out.setTimeScale(1);
+	            out.setFrameRate(30);
 							
 				if (context.getMonitor()!=null) {
 					final String selectedName = context.getSelectedConversionFile()!=null ? context.getSelectedConversionFile().getName() : "";
@@ -152,18 +144,9 @@ public class AVIImageConverter extends AbstractImageConversion {
 			ImageData       data = getImageData(slice, plotImageData);
 			BufferedImage   img  = imageService.getBufferedImage(data);
 			
-			if (newAVIFile) {
-				Format format = new Format(EncodingKey, ENCODING_AVI_MJPG, DepthKey, 24, QualityKey, 1f);
-				format = format.prepend(MediaTypeKey, MediaType.VIDEO, //
-						FrameRateKey, new Rational(getFrameRate(), 1),// frame rate
-						WidthKey,     img.getWidth(), //
-						HeightKey,    img.getHeight());
 
-				out.addTrack(format);
-	        	out.setPalette(0, img.getColorModel());	       
-			}
 			
-	        out.write(0, img, 1);
+	        out.writeFrame(img);
 	        
 	        if (context.getMonitor()!=null) context.getMonitor().worked(1);
 	        
