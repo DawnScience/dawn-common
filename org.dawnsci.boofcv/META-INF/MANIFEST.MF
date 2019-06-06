@@ -5,13 +5,10 @@ Bundle-SymbolicName: org.dawnsci.boofcv;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.dawnsci.boofcv.Activator
 Require-Bundle: org.eclipse.core.runtime,
- org.eclipse.january;bundle-version="1.0.0",
  org.eclipse.dawnsci.analysis.api;bundle-version="1.0.0",
- org.eclipse.dawnsci.analysis.dataset;bundle-version="1.0.0",
+ org.eclipse.dawnsci.analysis.dataset;bundle-version="1.1.0",
  org.ddogleg;bundle-version="0.6.0",
- com.googlecode.efficient-java-matrix-library.core;bundle-version="[0.26.0,0.27.0)",
- org.georegression;bundle-version="0.7.0",
- org.apache.commons.math3;bundle-version="[3.2.0,4.0.0)"
+ org.georegression;bundle-version="0.7.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Export-Package: boofcv.abst.filter,
@@ -29,7 +26,10 @@ Export-Package: boofcv.abst.filter,
  boofcv.struct.image,
  org.dawnsci.boofcv,
  org.dawnsci.boofcv.converter,
- org.dawnsci.boofcv.stitching
+ org.dawnsci.boofcv.internal;x-internal:=true,
+ org.dawnsci.boofcv.registration,
+ org.dawnsci.boofcv.stitching,
+ org.dawnsci.boofcv.util
 Import-Package: org.eclipse.dawnsci.hdf5,
  org.slf4j;version="[1.7.2,2.0.0)"
 Service-Component: OSGI-INF/*.xml

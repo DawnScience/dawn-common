@@ -5,6 +5,4 @@ Bundle-Name: Examples
 Bundle-SymbolicName: org.dawb.workbench.examples
 Bundle-Version: 1.2.0.qualifier
 Bundle-Vendor: ESRF
-Require-Bundle: org.eclipse.ui,
- org.eclipse.core.runtime
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7

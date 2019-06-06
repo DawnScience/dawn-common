@@ -6,21 +6,19 @@ Bundle-Version: 1.3.0.qualifier
 Bundle-Activator: org.dawb.common.ui.Activator
 Bundle-Vendor: ESRF
 Require-Bundle: org.eclipse.core.runtime,
- org.eclipse.ui,
  org.eclipse.core.filesystem;bundle-version="1.3.1",
  org.eclipse.ui.ide;bundle-version="3.6.1",
  org.eclipse.core.resources;bundle-version="3.6.0",
  org.eclipse.dawnsci.hdf5;bundle-version="1.2.0",
  org.dawb.common.util;bundle-version="1.0.0",
- org.eclipse.january;bundle-version="2.1.5",
- uk.ac.diamond.scisoft.analysis;bundle-version="1.3.0",
+ uk.ac.diamond.scisoft.analysis;bundle-version="1.4.0",
  org.eclipse.dawnsci.plotting.api;bundle-version="1.2.0",
  org.eclipse.nebula.widgets.gallery;bundle-version="1.0.0.2017",
  org.eclipse.dawnsci.slicing.api;bundle-version="1.0.0",
  org.eclipse.richbeans.widgets;bundle-version="1.0.0",
  org.apache.batik.dom.svg;bundle-version="[1.7.0,1.8.0)",
- org.apache.batik.svggen;bundle-version="[1.7.0,1.8.0)",
  org.apache.batik.ext.awt;bundle-version="[1.7.0,1.8.0)",
+ org.apache.batik.svggen;bundle-version="[1.7.0,1.8.0)",
  org.eclipse.dawnsci.nexus,
  org.eclipse.e4.core.di.annotations,
  org.eclipse.e4.ui.di,
@@ -29,8 +27,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.e4.ui.services,
  org.eclipse.e4.ui.workbench,
  org.eclipse.emf.common.ui,
- org.dawnsci.jexl,
- org.eclipse.dawnsci.analysis.api
+ org.dawnsci.jexl
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Export-Package: org.dawb.common.ui,
