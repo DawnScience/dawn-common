@@ -12,7 +12,6 @@ import org.eclipse.dawnsci.plotting.api.axis.IAxis;
 import org.eclipse.dawnsci.plotting.api.trace.IImageTrace;
 import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.draw2d.FigureUtilities;
-import org.eclipse.draw2d.MouseEvent;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.PointList;
@@ -45,9 +44,9 @@ public class CursorUtils {
      * @param image -  may be null
      * @return
      */
-	public static Cursor getPositionCursor(MouseEvent me, IAxis xAxis, IAxis yAxis, IImageTrace imageTrace) {
-		double xCoordinate = xAxis.getValueFromPosition(me.x);
-		double yCoordinate = yAxis.getValueFromPosition(me.y);
+	public static Cursor getPositionCursor(int mx, int my, IAxis xAxis, IAxis yAxis, IImageTrace imageTrace) {
+		double xCoordinate = xAxis.getValueFromPosition(mx);
+		double yCoordinate = yAxis.getValueFromPosition(my);
 		String intensityText = null;
 
 		if (imageTrace != null) {
