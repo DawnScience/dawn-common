@@ -99,12 +99,6 @@
             image="conversion-images/CUSTOM_TOMO.png">
       </conversion_page>
       <conversion_page
-            conversion_page="org.dawnsci.conversion.ui.pages.AVIConvertPage"
-            conversion_scheme="org.dawnsci.conversion.schemes.AVIImageConverterScheme"
-            id="org.dawnsci.conversion.ui.conversionVideo"
-            image="conversion-images/AVI_FROM_3D.png">
-      </conversion_page>
-      <conversion_page
             conversion_page="org.dawnsci.conversion.ui.pages.NCDConvertPage"
             conversion_scheme="org.dawnsci.conversion.schemes.CustomNCDConverterScheme"
             id="org.dawnsci.conversion.ui.conversionNCD"
