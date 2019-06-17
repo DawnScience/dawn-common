@@ -15,7 +15,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.dawb.common.ui.util.EclipseUtils;
-import org.dawb.common.ui.wizard.AbstractSliceConversionPage;
 import org.dawnsci.conversion.ui.api.IConversionWizardPage;
 import org.dawnsci.conversion.ui.api.IConversionWizardPageService;
 import org.dawnsci.conversion.ui.api.IFileOverrideWizard;
@@ -57,7 +56,6 @@ public class ConvertWizard extends Wizard implements IExportWizard, IFileOverrid
 	private ConversionChoicePage setupPage;
 
 	private List<String> overridePaths;
-	private List<String> overrideDatasets;
 
 	public ConvertWizard() {
 		setNeedsProgressMonitor(true);
@@ -84,9 +82,6 @@ public class ConvertWizard extends Wizard implements IExportWizard, IFileOverrid
 		IConversionWizardPage[] pages = pageService.getPages(true);
 		
 		for (IConversionWizardPage page : pages) {
-			if (overrideDatasets!=null && overrideDatasets.size()>0 && page instanceof AbstractSliceConversionPage) {
-				((AbstractSliceConversionPage) page).setDatasetName(overrideDatasets.get(0));
-			}
 			addPage(page);
 		}
 		this.selectedConversionPage = pages[0];
@@ -112,7 +107,6 @@ public class ConvertWizard extends Wizard implements IExportWizard, IFileOverrid
 			}
 		}
 		this.overridePaths    = paths;
-		this.overrideDatasets = sets;
 	}
 	
 	public void setFileSelectionOverride(List<File> files) {
@@ -130,7 +124,6 @@ public class ConvertWizard extends Wizard implements IExportWizard, IFileOverrid
 		}
 
 		this.overridePaths    = paths;
-		this.overrideDatasets = sets;
 	}
 	
 	

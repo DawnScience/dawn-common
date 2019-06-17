@@ -185,7 +185,6 @@ public class AlignImagesConversionPage extends ResourceChoosePage
 		try {
 			IDataHolder holder = ServiceHolder.getLoaderService().getData(filePath, new IMonitor.Stub());
 			ILazyDataset lazy = holder.getLazyDataset(0);
-			int[] shape = lazy.getShape();
 			if (lazy.getRank() == 2)
 				firstImage = lazy.getSlice(new Slice());
 			else

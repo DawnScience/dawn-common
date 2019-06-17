@@ -80,12 +80,6 @@
             id="org.dawnsci.conversion.ui.conversionAscii1D"
             image="conversion-images/ASCII_FROM_1D.png">
       </conversion_page>
-      <conversion_page
-            conversion_page="org.dawnsci.conversion.ui.pages.ImageConvertPage"
-            conversion_scheme="org.dawnsci.conversion.schemes.ImageConverterScheme"
-            id="org.dawnsci.conversion.ui.conversionImage"
-            image="conversion-images/TIFF_FROM_3D.png">
-      </conversion_page>
      <conversion_page
             conversion_page="org.dawnsci.conversion.ui.pages.ImagesToStitchedConversionPage"
             conversion_scheme="org.dawnsci.conversion.schemes.ImagesToStitchedConverterScheme"

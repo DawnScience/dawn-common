@@ -21,8 +21,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.nebula.widgets.opal.checkboxgroup;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
-Import-Package: org.dawb.common.ui.util,
- org.eclipse.nebula.widgets.formattedtext,
+Import-Package: org.eclipse.nebula.widgets.formattedtext,
  org.slf4j;version="[1.7.2,2.0.0)"
 Export-Package: org.dawnsci.conversion.ui,
  org.dawnsci.conversion.ui.pages
