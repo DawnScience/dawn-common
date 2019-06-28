@@ -17,6 +17,7 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.january.dataset.Dataset;
 import org.eclipse.january.dataset.DatasetFactory;
 import org.eclipse.january.dataset.IDataset;
+import org.eclipse.january.dataset.IntegerDataset;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
 
@@ -38,7 +39,7 @@ public class CalibrationUtils {
 
 		if (checkEnabled) {
 			final boolean        isCalib = store.getBoolean(CalibrationConstants.USE);
-			if (!isCalib)  return DatasetFactory.createRange(0, set.getSize(), 1, Dataset.INT32);
+			if (!isCalib)  return DatasetFactory.createRange(IntegerDataset.class, 0, set.getSize(), 1);
 		}
 		
      	final String expr = store.getString(CalibrationConstants.EXPR);

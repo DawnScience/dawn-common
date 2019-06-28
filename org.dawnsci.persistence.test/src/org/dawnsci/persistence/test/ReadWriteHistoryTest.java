@@ -255,7 +255,7 @@ public class ReadWriteHistoryTest extends AbstractThreadTestBase {
 		int size = 1;
 		for (int d : shape) size *= d;
 		
-		Dataset da = DatasetFactory.createRange(size, Dataset.FLOAT64);
+		Dataset da = DatasetFactory.createRange(size);
 		if (index>-1) {
 			da.setName("history"+index);
 		} else {

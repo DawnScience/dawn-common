@@ -20,12 +20,12 @@ import org.dawnsci.persistence.PersistenceServiceCreator;
 import org.eclipse.dawnsci.analysis.api.diffraction.DetectorProperties;
 import org.eclipse.dawnsci.analysis.api.diffraction.DiffractionCrystalEnvironment;
 import org.eclipse.dawnsci.analysis.api.diffraction.IPowderCalibrationInfo;
+import org.eclipse.dawnsci.analysis.api.metadata.IDiffractionMetadata;
 import org.eclipse.dawnsci.analysis.api.persistence.IPersistenceService;
 import org.eclipse.dawnsci.analysis.api.persistence.IPersistentFile;
-import org.eclipse.january.dataset.Dataset;
 import org.eclipse.january.dataset.DatasetFactory;
 import org.eclipse.january.dataset.IDataset;
-import org.eclipse.dawnsci.analysis.api.metadata.IDiffractionMetadata;
+import org.eclipse.january.dataset.ShortDataset;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -56,13 +56,13 @@ public class ReadWritePowderCalibration {
 			// create the PersistentService
 			IPersistenceService persist = PersistenceServiceCreator.createPersistenceService();
 
-			IDataset ds = DatasetFactory.ones(new int[] {1000, 1500}, Dataset.INT16);
+			IDataset ds = DatasetFactory.ones(ShortDataset.class, 1000, 1500);
 			
 			IPowderCalibrationInfo info = new IPowderCalibrationInfo() {
 				
 				@Override
 				public IDataset getUsedDSpaceIndexValues() {
-					return DatasetFactory.createLinearSpace(0, 3, 4, Dataset.INT16);
+					return DatasetFactory.createLinearSpace(ShortDataset.class, 0, 3, 4);
 				}
 				
 				@Override
@@ -87,7 +87,7 @@ public class ReadWritePowderCalibration {
 				
 				@Override
 				public IDataset getCalibrantDSpaceValues() {
-					return DatasetFactory.createLinearSpace(1, 4, 4, Dataset.INT16);
+					return DatasetFactory.createLinearSpace(ShortDataset.class, 1, 4, 4);
 				}
 
 				@Override

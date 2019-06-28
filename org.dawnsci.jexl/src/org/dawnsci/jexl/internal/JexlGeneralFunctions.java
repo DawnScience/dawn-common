@@ -12,6 +12,7 @@ import org.eclipse.january.dataset.Dataset;
 import org.eclipse.january.dataset.DatasetFactory;
 import org.eclipse.january.dataset.DatasetUtils;
 import org.eclipse.january.dataset.IDataset;
+import org.eclipse.january.dataset.IntegerDataset;
 import org.eclipse.january.dataset.Slice;
 import org.eclipse.january.dataset.Stats;
 
@@ -49,7 +50,7 @@ public class JexlGeneralFunctions {
      * @return
      */
 	public static Dataset arange(final IDataset copy) {
-		return DatasetFactory.createRange(copy.getSize(), Dataset.INT32);
+		return DatasetFactory.createRange(IntegerDataset.class, copy.getSize());
 	}
 
 	public static Dataset mean(final Dataset data,final int axis) {
