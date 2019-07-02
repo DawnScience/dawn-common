@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-SymbolicName: org.dawnsci.io.test
+Bundle-Version: 1.0.0.qualifier
+Fragment-Host: org.dawnsci.io;bundle-version="1.2.0"
+Automatic-Module-Name: org.dawnsci.io.test
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Require-Bundle: org.junit;bundle-version="[4.10.0,5.0.0)"
+Bundle-Name: IO test
+Export-Package: org.dawnsci.io.test
