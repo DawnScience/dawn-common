@@ -28,8 +28,6 @@ import uk.ac.diamond.scisoft.analysis.io.ExtendedMetadataAdapter;
 
 public class SpecLoader extends AbstractFileLoader {
 	
-//	private static Logger logger = LoggerFactory.getLogger(SpecLoader.class);
-	
 	private Collection<String> dataNames;
 	private Map<String,Integer>dataSizes;
 	private Map<String,int[]>  dataShapes;
@@ -52,7 +50,7 @@ public class SpecLoader extends AbstractFileLoader {
 
 	@Override
 	public DataHolder loadFile() throws ScanFileHolderException {
-        return loadFile(null);
+		return loadFile(null);
 	}
 	
 	/**

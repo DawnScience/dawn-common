@@ -13,82 +13,78 @@ import java.util.regex.Pattern;
 
 public class SpecSyntax {
 
-	public static final Pattern COMMENT = Pattern.compile("\\#.*");
-	
-	public static final Pattern CMD;
-	public static final Pattern PRINT;
-	public static final Pattern SCAN_LINE;
-	public static final Pattern HEADER_LINE;
-	
-	private static final String TXT    = "([a-zA-Z][_a-zA-Z\\d]*)";
-    private static final String NUM    = "([-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?)";
-	private static final String TXTWS  = "([ \t]+[a-zA-Z][_a-zA-Z\\d]*)";
-	
-	private static final String TXTWS2_NOSPC  = "([ \t]*[_a-zA-Z\\d]*[ ]?[a-zA-Z]?[\\d]*)";
-	private static final String TXTWS2 = "([ \t]+[_a-zA-Z\\d]*[ ]?[a-zA-Z]?[\\d]*)";
-	
-    private static final String NUMWS  = "([ \t]+[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?)";
-	
-	static {
-		
-		StringBuilder buf = new StringBuilder();
-		buf.append(TXT);
-		buf.append(TXTWS);
-		buf.append(NUMWS);
-		for (int i = 0; i < 3; i++) {
-			buf.append(NUMWS);
-			buf.append("?");
-		}
-		CMD = Pattern.compile(buf.toString());
-		
-		buf = new StringBuilder();
-		buf.append(NUM);
-		buf.append(NUMWS);
-		for (int i = 0; i < 100; i++) {
-			buf.append(NUMWS);
-			buf.append("?");
-		}
-		SCAN_LINE = Pattern.compile(buf.toString());
-		
-		buf = new StringBuilder();
-		buf.append("#L");
-		buf.append(TXTWS2_NOSPC);
-		for (int i = 0; i < 50; i++) {
-			buf.append(TXTWS2);
-			buf.append("?");
-		}
-		HEADER_LINE = Pattern.compile(buf.toString());
+	/**
+	 * Comment lines start with &#35;
+	 */
+	public static final Pattern COMMENT_LINE = Pattern.compile("#.*");
 
-		PRINT = Pattern.compile("print ([a-zA-Z0-9\\'\"]+)");
-	}
-	
+	private static final String LABEL          = "[a-zA-Z]\\w*(?: ?\\w+)*"; // can include single spaces
+	private static final String LABEL_GROUP    = "(" + LABEL + ")";
+	private static final String WS_LABEL_GROUP = "(  +" + LABEL + ")"; // labels are separated by two (or more) spaces
+
+	/**
+	 * A label comprises multiple words separated by a single space where each word must begin with a letter (not digit)
+	 */
+	public static final Pattern LABEL_VALUE = Pattern.compile(LABEL_GROUP);
+	/**
+	 * A label comment line starts with "#L" followed by spaces then labels separated by two spaces
+	 */
+	public static final Pattern LABEL_LINE = Pattern.compile("#L[ ]+" + LABEL_GROUP + WS_LABEL_GROUP + "*");
+
+	private static final String NUMBER          = "[-+]?\\d+(?:\\.\\d*)?(?:[eE][-+]?\\d+)?";
+	private static final String NUMBER_GROUP    = "(" + NUMBER + ")";
+	private static final String WS_NUMBER_GROUP = "([ \t]+" + NUMBER + ")";
+
+	/**
+	 * A scan value is an integer or floating point number
+	 */
+	public static final Pattern SCAN_VALUE = Pattern.compile(NUMBER_GROUP);
+
+	/**
+	 * A scan line comprises scan values separated by white space characters (space or tabs)
+	 */
+	public static final Pattern SCAN_LINE = Pattern.compile(NUMBER_GROUP + WS_NUMBER_GROUP + "*");
+
+
 	public static void main(String[] args) throws Exception {
-		System.out.println(CMD.pattern());
-		System.out.println("1.0".matches(NUM));
-		
-		Matcher test = CMD.matcher("ascan phi 0.1 10 10 .1");
-		System.out.println(test.matches());
-		
-		System.out.println(CMD.matcher("ascan phi 0 10 10 1").matches());
-		System.out.println(CMD.matcher("ascan kap1 0 10 10 1").matches());
-		
-		test = SCAN_LINE.matcher("1.0 0.0 1.0 1.0 0.107 1.0");
-		System.out.println(test.matches());
-		System.out.println(test.groupCount());
-		
-		test = SCAN_LINE.matcher("0  0.0000  0 0   0.107  0");
-		System.out.println(test.matches());
-		System.out.println(test.groupCount());
-		
-		test = SCAN_LINE.matcher("0    0.0000        0        0      0.107        0");
-		System.out.println(test.matches());
-		System.out.println(test.groupCount());
+		check(COMMENT_LINE,
+				"#blahblah",
+				"234#"
+				);
 
-		test = HEADER_LINE.matcher("#L       Phi Detector  Monitor    Seconds  Flux I0");
-		System.out.println(test.matches());
-		System.out.println(test.groupCount());
+		check(SCAN_LINE,
+				"1.0 0.0 1.0 1.0 0.107 1.0",
+				"0  0.0000  0 0   0.107  7",
+				"0    0.0000        0        0      0.107        -3"
+				);
+
+		check(LABEL_LINE,
+				"#L abc",
+				"#L  abc",
+				"#L  abc efg",
+				"#L  abc  efg",
+				"#L  abc  efg hij",
+				"#L  abc  efg  hij",
+				"#L  abc  efg  hij klm",
+				"#L  abc  efg  hij klm nop",
+				"#L       Phi Detector  Monitor    Seconds  Flux I0"
+				);
 
 		System.out.println("FINISHED!");
+	}
 
+	private static void check(Pattern p, String... strings) {
+		for (String s : strings) {
+			Matcher m = p.matcher(s);
+			if (m.matches()) {
+				int imax = m.groupCount();
+				System.out.println("Groups: " + imax + " for |" + s + "|");
+				for (int i = 1; i <= imax; i++) {
+					System.out.println(i + ": " + m.group(i));
+				}
+			} else {
+				System.out.println("No match for " + s);
+			}
+		}
 	}
 }
