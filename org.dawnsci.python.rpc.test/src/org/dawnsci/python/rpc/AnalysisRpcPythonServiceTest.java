@@ -22,11 +22,8 @@ public class AnalysisRpcPythonServiceTest {
 	 */
 	@Test
 	public void testAssignPort() {
-		Assert.assertEquals(
-				AnalysisRpcPythonService.getStartingPort("made up key"), 8713);
-		System.setProperty("made_up_key_for_testAssignPort", "" + 8714);
-		Assert.assertEquals(AnalysisRpcPythonService
-				.getStartingPort("made_up_key_for_testAssignPort"), 8714);
+		Assert.assertNotEquals(AnalysisRpcPythonService.assignPort(),
+				AnalysisRpcPythonService.assignPort());
 	}
 
 	@Test

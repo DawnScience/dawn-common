@@ -11,6 +11,7 @@ package org.dawnsci.python.rpc;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,13 +29,13 @@ abstract public class AbstractPythonRunScriptServicePluginTest implements
 
 	private String getScript(String script) throws IOException {
 		final String scriptPath = BundleUtils.getBundleLocation(
-				"org.dawnsci.python.rpc").getAbsolutePath()
-				+ "/test/org/dawnsci/python/rpc/" + script;
+				"org.dawnsci.python.rpc.test").getAbsolutePath()
+				+ "/src/org/dawnsci/python/rpc/" + script;
 		// We need to keep all the files in the same directory so we can reuse the same
 		// launched service. So load the file and put it in the temp directory.
 		// See the exception raised in python_service_runscript.py if sys.path[0] is
 		// changed
-		String scriptContents = FileUtils.readFileToString(new File(scriptPath));
+		String scriptContents = FileUtils.readFileToString(new File(scriptPath), StandardCharsets.UTF_8);
 		return getTemp(scriptContents);
 	}
 

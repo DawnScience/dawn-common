@@ -14,10 +14,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.dawb.common.util.eclipse.BundleUtils;
-import org.dawnsci.python.rpc.AnalysisRpcPythonService;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.dawnsci.analysis.api.rpc.AnalysisRpcException;
-import org.python.pydev.plugin.PydevPlugin;
+import org.python.pydev.core.CorePlugin;
 
 class AnalysisRpcPythonServiceManual extends AnalysisRpcPythonService {
 	public AnalysisRpcPythonServiceManual() throws AnalysisRpcException,
@@ -32,7 +31,7 @@ class AnalysisRpcPythonServiceManual extends AnalysisRpcPythonService {
 		String scisoftpath = BundleUtils.getBundleLocation(
 				"uk.ac.diamond.scisoft.python").getAbsolutePath();
 		env.put("PYTHONPATH", scisoftpath + File.pathSeparator + scisoftpath
-				+ "/src" + File.pathSeparator + PydevPlugin.getPySrcPath());
+				+ "/src" + File.pathSeparator + CorePlugin.getPySrcPath());
 		return env;
 	}
 }
