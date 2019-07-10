@@ -51,7 +51,7 @@ public class SpecSyntax {
 		SCAN_LINE = Pattern.compile(buf.toString());
 		
 		buf = new StringBuilder();
-		buf.append("#");
+		buf.append("#L");
 		buf.append(TXTWS2_NOSPC);
 		for (int i = 0; i < 50; i++) {
 			buf.append(TXTWS2);
@@ -84,7 +84,7 @@ public class SpecSyntax {
 		System.out.println(test.matches());
 		System.out.println(test.groupCount());
 
-		test = HEADER_LINE.matcher("#       Phi Detector  Monitor    Seconds  Flux I0");
+		test = HEADER_LINE.matcher("#L       Phi Detector  Monitor    Seconds  Flux I0");
 		System.out.println(test.matches());
 		System.out.println(test.groupCount());
 
