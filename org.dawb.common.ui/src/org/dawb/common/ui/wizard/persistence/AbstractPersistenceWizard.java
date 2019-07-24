@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 
 public abstract class AbstractPersistenceWizard extends Wizard {
 
-	protected static final Logger logger = LoggerFactory.getLogger(PersistenceExportWizard.class);
+	protected static final Logger logger = LoggerFactory.getLogger(AbstractPersistenceWizard.class);
 	
 	public AbstractPersistenceWizard() {
 		

@@ -52,7 +52,7 @@ public class BoofCVImageTransformImpl<T extends ImageSingleBand<?>, TD extends T
 		System.out.println("Starting BoofCV image transform service.");
 	}
 
-	private Logger logger = LoggerFactory.getLogger(BoofCVImageFilterImpl.class);
+	private static final Logger logger = LoggerFactory.getLogger(BoofCVImageTransformImpl.class);
 
 	public BoofCVImageTransformImpl() {
 		// Important do nothing here, OSGI may start the service more than once.
