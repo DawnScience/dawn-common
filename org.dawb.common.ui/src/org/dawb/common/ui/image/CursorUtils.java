@@ -53,21 +53,14 @@ public class CursorUtils {
 			Dataset image = DatasetUtils.convertToDataset(imageTrace.getData());
 			int[] shape = image.getShapeRef();
 
+			boolean transpose = imageTrace.getImageServiceBean().isTransposed();
+			boolean leading = imageTrace.getImageOrigin().isOnLeadingDiagonal();
+			boolean flip = !(transpose ^ leading);
 			if (!imageTrace.hasTrueAxes()) {
-				double[] axisPnt;
-				boolean transpose = !(imageTrace.getImageServiceBean().isTransposed() ^ imageTrace.getImageOrigin().isOnLeadingDiagonal());
-
-				if (transpose) {
-					axisPnt = new double[] {yCoordinate, xCoordinate};
-				} else {
-					axisPnt = new double[] {xCoordinate, yCoordinate};
-				}
-
-				try {
-					axisPnt = imageTrace.getPointInImageCoordinates(axisPnt);
-					xCoordinate = axisPnt[0];
-					yCoordinate = axisPnt[1];
-				} catch (Exception e) {
+				if (flip) {
+					double t = xCoordinate;
+					xCoordinate = yCoordinate;
+					yCoordinate = t;
 				}
 				int i = (int) Math.floor(xCoordinate);
 				if (i >= shape[1]) {
@@ -81,19 +74,15 @@ public class CursorUtils {
 				} else if (j < 0) {
 					j = 0;
 				}
+
 				double intensity = image.getDouble(j, i);
 				if (!Double.isNaN(intensity)) {
 					intensityText = image.getString(j, i);
 				}
 				try {
-					axisPnt = imageTrace.getPointInAxisCoordinates(new double[] { i, j });
-					if (transpose) {
-						xCoordinate = axisPnt[1];
-						yCoordinate = axisPnt[0];
-					} else {
-						xCoordinate = axisPnt[0];
-						yCoordinate = axisPnt[1];
-					}
+					double[] axisPnt = imageTrace.getPointInAxisCoordinates(new double[] { xCoordinate, yCoordinate });
+					xCoordinate = axisPnt[flip ? 1 : 0];
+					yCoordinate = axisPnt[flip ? 0 : 1];
 				} catch (Exception ignored) {
 					// It is not fatal for the custom axes not to work.
 				}
@@ -115,9 +104,9 @@ public class CursorUtils {
 			buf.append(intensityText);
 		}
 		buf.append("\n[");
-		buf.append(xAxis.format(xCoordinate, EXTRA_DECIMAL_PLACES));
+		buf.append(Double.isNaN(xCoordinate) ? "--" : xAxis.format(xCoordinate, EXTRA_DECIMAL_PLACES));
 		buf.append(", ");
-		buf.append(yAxis.format(yCoordinate, EXTRA_DECIMAL_PLACES));
+		buf.append(Double.isNaN(yCoordinate) ? "--" : yAxis.format(yCoordinate, EXTRA_DECIMAL_PLACES));
 		buf.append("]");
 		
 		Dimension size = FigureUtilities.getTextExtents(buf.toString(), Display.getDefault().getSystemFont());
