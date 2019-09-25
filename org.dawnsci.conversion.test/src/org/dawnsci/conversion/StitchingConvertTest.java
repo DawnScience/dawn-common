@@ -38,7 +38,6 @@ import org.eclipse.january.IMonitor;
 import org.eclipse.january.dataset.AggregateDataset;
 import org.eclipse.january.dataset.IDataset;
 import org.eclipse.january.dataset.ILazyDataset;
-import org.eclipse.january.dataset.LazyDataset;
 import org.eclipse.january.dataset.Slice;
 import org.junit.After;
 import org.junit.Before;
@@ -175,8 +174,7 @@ public class StitchingConvertTest {
 			fail("Failed to load image stack:" + e);
 			return null;
 		}
-		ILazyDataset lazy = new LazyDataset("image stack", loader.getDType(), loader.getShape(), loader);
-		return lazy;
+		return loader.createLazyDataset("image stack");
 	}
 
 	private IDataset getStichedImage(ILazyDataset data, IROI roi) {

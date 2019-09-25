@@ -31,7 +31,6 @@ import org.eclipse.january.dataset.Dataset;
 import org.eclipse.january.dataset.DatasetUtils;
 import org.eclipse.january.dataset.IDataset;
 import org.eclipse.january.dataset.ILazyDataset;
-import org.eclipse.january.dataset.LazyDataset;
 
 import uk.ac.diamond.scisoft.analysis.io.ImageStackLoader;
 
@@ -102,9 +101,7 @@ public class ImagesToHDFConverter extends AbstractConversion{
 		}
 		Collections.sort(paths, new SortNatural<String>(true));
 		ImageStackLoader loader = new ImageStackLoader(paths, context.getMonitor());
-		LazyDataset lazyDataset = new LazyDataset("Folder Stack", loader.getDType(), loader.getShape(), loader);
-		return lazyDataset;
-
+		return loader.createLazyDataset("Folder Stack");
 	}
 
 	private boolean first = true;

@@ -22,7 +22,6 @@ import org.eclipse.january.dataset.DatasetUtils;
 import org.eclipse.january.dataset.IDataset;
 import org.eclipse.january.dataset.ILazyDataset;
 import org.eclipse.january.dataset.ILazyWriteableDataset;
-import org.eclipse.january.dataset.LazyDataset;
 import org.eclipse.january.dataset.Slice;
 import org.junit.Assert;
 import org.junit.Before;
@@ -42,7 +41,7 @@ public class ImageStitchingTest {
 		String[] files = Utils.getFileNames("resources/82702_UViewImage", true);
 		Utils.getArrayAsList(files, filenames);
 		ImageStackLoader loader = new ImageStackLoader(filenames, null);
-		data = new LazyDataset("test stack", loader.getDType(), loader.getShape(), loader);
+		data = loader.createLazyDataset("test stack");
 		stitcher = BoofCVImageStitchingProcessCreator.createStitchingProcess();
 		transform = BoofCVImageTransformCreator.createTransformService();
 	}

@@ -21,7 +21,6 @@ import org.eclipse.dawnsci.plotting.api.trace.IImageTrace;
 import org.eclipse.january.IMonitor;
 import org.eclipse.january.dataset.IDataset;
 import org.eclipse.january.dataset.ILazyDataset;
-import org.eclipse.january.dataset.LazyDataset;
 import org.eclipse.january.dataset.Slice;
 import org.eclipse.ui.IWorkbenchPage;
 
@@ -68,7 +67,7 @@ public class Utils {
 		List<IDataset> data = new ArrayList<IDataset>();
 		try {
 			ImageStackLoader loader = new ImageStackLoader(names, progressMonitorWrapper);
-			ILazyDataset lazyStack = new LazyDataset("Folder Stack", loader.getDType(), loader.getShape(), loader);
+			ILazyDataset lazyStack = loader.createLazyDataset("Folder Stack");
 			int[] shape = lazyStack.getShape();
 			for (int i = 0; i < shape[0]; i++) {
 				IDataset image = lazyStack.getSlice(new Slice(i, shape[0], shape[1])).squeeze();

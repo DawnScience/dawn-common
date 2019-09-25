@@ -17,13 +17,13 @@ import java.util.List;
 import org.apache.commons.math3.util.Pair;
 import org.dawnsci.boofcv.converter.ConvertIDataset;
 import org.dawnsci.boofcv.registration.ImageHessianRegistration;
+import org.eclipse.dawnsci.analysis.api.image.DetectionAlgoParameters;
 import org.eclipse.dawnsci.analysis.api.image.HessianRegParameters;
 import org.eclipse.dawnsci.analysis.api.image.IImageTransform;
-import org.eclipse.dawnsci.analysis.api.image.DetectionAlgoParameters;
 import org.eclipse.dawnsci.analysis.api.io.ScanFileHolderException;
 import org.eclipse.dawnsci.hdf5.HDF5Utils;
 import org.eclipse.january.IMonitor;
-import org.eclipse.january.dataset.Dataset;
+import org.eclipse.january.dataset.FloatDataset;
 import org.eclipse.january.dataset.IDataset;
 import org.eclipse.january.dataset.ILazyDataset;
 import org.eclipse.january.dataset.ILazyWriteableDataset;
@@ -90,11 +90,11 @@ public class BoofCVImageTransformImpl<T extends ImageSingleBand<?>, TD extends T
 		List<IDataset> alignedList = new ArrayList<IDataset>();
 		ImageFloat32 imageA = ConvertIDataset.convertFrom(images.get(0), ImageFloat32.class, 1);
 		alignedList.add(images.get(0));
-		if (images.get(0).getShape().length != 2)
+		if (images.get(0).getRank() != 2)
 			throw new Exception("Data shape is not 2D");
 		
 		for (int i = 1; i < images.size(); i++) {
-			if (images.get(i).getShape().length != 2)
+			if (images.get(i).getRank() != 2)
 				throw new Exception("Data shape is not 2D");
 			ImageFloat32 imageB = ConvertIDataset.convertFrom(images.get(i), ImageFloat32.class, 1);
 			ImageSingleBand<?> aligned = ImageHessianRegistration.registerHessian(imageA, imageB);
@@ -117,7 +117,8 @@ public class BoofCVImageTransformImpl<T extends ImageSingleBand<?>, TD extends T
 
 	@Override
 	public ILazyDataset align(ILazyDataset lazydata, DetectionAlgoParameters detectParams, HessianRegParameters hessianParams, IMonitor monitor) throws Exception {
-		if (lazydata.getShape().length != 3)
+		int[] shape = lazydata.getShape();
+		if (shape.length != 3)
 			throw new Exception("Supported Lazy data is 3D, please provide a 3D dataset");
 		// save on a temp file
 		String path = "/entry/data/";
@@ -126,14 +127,13 @@ public class BoofCVImageTransformImpl<T extends ImageSingleBand<?>, TD extends T
 		tmpFile.deleteOnExit();
 		String file = tmpFile.getAbsolutePath();
 		IDataset firstSlice = lazydata.getSlice(new Slice(1)).squeeze();
-		ILazyWriteableDataset lazy = HDF5Utils.createLazyDataset(file, path, name, lazydata.getShape(), null,
-				lazydata.getShape(), Dataset.FLOAT32, null, false);
+		ILazyWriteableDataset lazy = HDF5Utils.createLazyDataset(file, path, name, shape, null,
+				shape, FloatDataset.class, null, false);
 
 		//convert to boofcv data
 		ImageFloat32 imageA = ConvertIDataset.convertFrom(firstSlice, ImageFloat32.class, 1);
 		// add first image
 		appendDataset(lazy, firstSlice, 0, monitor);
-		int[] shape = lazydata.getShape();
 		if (firstSlice.getShape().length != 2)
 			throw new Exception("Data shape is not 2D");
 		
@@ -214,7 +214,8 @@ public class BoofCVImageTransformImpl<T extends ImageSingleBand<?>, TD extends T
 	}
 
 	private static void appendDataset(ILazyWriteableDataset lazy, IDataset data, int idx, IMonitor monitor) throws Exception {
-		SliceND ndSlice = new SliceND(lazy.getShape(), new int[] {idx, 0, 0}, new int[] {(idx+1), data.getShape()[0], data.getShape()[1]}, null);
+		int[] shape = data.getShape();
+		SliceND ndSlice = new SliceND(lazy.getShape(), new int[] {idx, 0, 0}, new int[] {(idx+1), shape[0], shape[1]}, null);
 		lazy.setSlice(monitor, data, ndSlice);
 	}
 

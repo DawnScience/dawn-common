@@ -24,7 +24,6 @@ import org.eclipse.dawnsci.analysis.dataset.function.Downsample;
 import org.eclipse.dawnsci.plotting.api.histogram.ImageServiceBean;
 import org.eclipse.january.dataset.IDataset;
 import org.eclipse.january.dataset.ILazyDataset;
-import org.eclipse.january.dataset.LazyDataset;
 
 import uk.ac.diamond.scisoft.analysis.io.ImageStackLoader;
 
@@ -77,7 +76,7 @@ public abstract class AbstractImageConversion extends AbstractConversion {
 					final IDataHolder holder = LocalServiceManager.getLoaderService().getData(images.get(0), context.getMonitor());
 		 		    Collections.sort(images, new SortNatural<String>(true));
 					ImageStackLoader loader = new ImageStackLoader(images, holder, context.getMonitor());
-					LazyDataset lazyDataset = new LazyDataset("Image Stack", loader.getDType(), loader.getShape(), loader);
+					ILazyDataset lazyDataset = loader.createLazyDataset("Image Stack");
 				    context.setLazyDataset(lazyDataset);
 				}
 				

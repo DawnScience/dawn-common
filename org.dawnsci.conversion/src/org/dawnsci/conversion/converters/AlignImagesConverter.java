@@ -19,7 +19,6 @@ import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
 import org.eclipse.january.dataset.IDataset;
 import org.eclipse.january.dataset.ILazyDataset;
-import org.eclipse.january.dataset.LazyDataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -132,8 +131,7 @@ public class AlignImagesConverter extends AbstractImageConversion {
 			Collections.sort(paths, new SortNatural<String>(true));
 			ImageStackLoader loader = new ImageStackLoader(paths,
 					context.getMonitor());
-			lazyDataset = new LazyDataset("Folder Stack",
-					loader.getDType(), loader.getShape(), loader);
+			lazyDataset = loader.createLazyDataset("Folder Stack");
 		} else {
 			lazyDataset = LocalServiceManager.getLoaderService().getData(regexs.get(0),null).getLazyDataset(0);
 		}

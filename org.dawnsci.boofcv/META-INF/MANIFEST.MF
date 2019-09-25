@@ -7,6 +7,7 @@ Bundle-Activator: org.dawnsci.boofcv.Activator
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.dawnsci.analysis.api;bundle-version="1.0.0",
  org.eclipse.dawnsci.analysis.dataset;bundle-version="1.1.0",
+ org.eclipse.dawnsci.hdf5;bundle-version="1.5.0",
  org.ddogleg;bundle-version="0.6.0",
  org.georegression;bundle-version="0.7.0"
 Bundle-ActivationPolicy: lazy
@@ -30,8 +31,7 @@ Export-Package: boofcv.abst.filter,
  org.dawnsci.boofcv.registration,
  org.dawnsci.boofcv.stitching,
  org.dawnsci.boofcv.util
-Import-Package: org.eclipse.dawnsci.hdf5,
- org.slf4j;version="[1.7.2,2.0.0)"
+Import-Package: org.slf4j;version="[1.7.2,2.0.0)"
 Service-Component: OSGI-INF/*.xml
 Bundle-ClassPath: .,
  jars/org.boofcv.feature_0.18.0.jar,

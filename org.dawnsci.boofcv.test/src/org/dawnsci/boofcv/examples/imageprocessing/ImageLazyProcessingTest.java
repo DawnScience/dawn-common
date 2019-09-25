@@ -24,7 +24,6 @@ import org.eclipse.january.dataset.DatasetUtils;
 import org.eclipse.january.dataset.IDataset;
 import org.eclipse.january.dataset.ILazyDataset;
 import org.eclipse.january.dataset.ILazyWriteableDataset;
-import org.eclipse.january.dataset.LazyDataset;
 import org.eclipse.january.dataset.Slice;
 import org.junit.Before;
 import org.junit.Test;
@@ -45,7 +44,7 @@ public class ImageLazyProcessingTest {
 		List<String> filenames = new ArrayList<String>();
 		Utils.getArrayAsList(files, filenames);
 		ImageStackLoader loader = new ImageStackLoader(filenames, null);
-		data = new LazyDataset("test stack", loader.getDType(), loader.getShape(), loader);
+		data = loader.createLazyDataset("test stack");
 		transform = BoofCVImageTransformCreator.createTransformService();
 	}
 
