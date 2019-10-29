@@ -1,0 +1,47 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>uk.ac.diamond</groupId>
+	<artifactId>dawn-common</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+
+	<parent>
+		<groupId>uk.ac.diamond</groupId>
+		<artifactId>uk.ac.diamond.aggregator</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+	</parent>
+
+	<modules>
+		<module>org.dawb.common.services</module>
+		<module>org.dawb.common.ui</module>
+		<module>org.dawb.common.util</module>
+		<module>org.dawb.workbench.examples</module>
+		<module>org.dawnsci.boofcv</module>
+		<module>org.dawnsci.boofcv.examples</module>
+		<module>org.dawnsci.boofcv.test</module>
+		<module>org.dawnsci.common.services.feature</module>
+		<module>org.dawnsci.common.ui.feature</module>
+		<module>org.dawnsci.conversion</module>
+		<module>org.dawnsci.conversion.feature</module>
+		<module>org.dawnsci.conversion.test</module>
+		<module>org.dawnsci.conversion.ui</module>
+		<module>org.dawnsci.io</module>
+		<module>org.dawnsci.io.test</module>
+		<module>org.dawnsci.jexl</module>
+		<module>org.dawnsci.jexl.test</module>
+		<module>org.dawnsci.jgoogleanalytics</module>
+		<module>org.dawnsci.jgoogleanalytics.test</module>
+		<module>org.dawnsci.persistence</module>
+		<module>org.dawnsci.persistence.feature</module>
+		<module>org.dawnsci.persistence.test</module>
+		<module>org.dawnsci.processing.docgenerator</module>
+		<module>org.dawnsci.processing.python</module>
+		<module>org.dawnsci.python.rpc</module>
+		<module>org.dawnsci.python.rpc.test</module>
+		<module>org.dawnsci.thirdparty.xml.feature</module>
+
+	</modules>
+</project>
+
