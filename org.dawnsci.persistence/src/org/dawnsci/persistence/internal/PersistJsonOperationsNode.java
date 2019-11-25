@@ -2,7 +2,6 @@ package org.dawnsci.persistence.internal;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
@@ -18,6 +17,7 @@ import org.eclipse.dawnsci.analysis.api.persistence.IJSonMarshaller;
 import org.eclipse.dawnsci.analysis.api.processing.IOperation;
 import org.eclipse.dawnsci.analysis.api.processing.IOperationService;
 import org.eclipse.dawnsci.analysis.api.processing.OperationData;
+import org.eclipse.dawnsci.analysis.api.processing.model.AbstractOperationModel;
 import org.eclipse.dawnsci.analysis.api.processing.model.IOperationModel;
 import org.eclipse.dawnsci.analysis.api.roi.IROI;
 import org.eclipse.dawnsci.analysis.api.tree.DataNode;
@@ -319,9 +319,14 @@ public class PersistJsonOperationsNode {
 		out.put(IFunction.class, new HashMap<String, Object>());
 		
 		final List<Field> allFields = new ArrayList<Field>(31);
-		allFields.addAll(Arrays.asList(model.getClass().getDeclaredFields()));
-		allFields.addAll(Arrays.asList(model.getClass().getSuperclass().getDeclaredFields()));
-		
+		Class<?> klazz = model.getClass();
+		do {
+			for (Field f : klazz.getDeclaredFields()) {
+				allFields.add(f);
+			}
+			klazz = klazz.getSuperclass();
+		} while(klazz != AbstractOperationModel.class && klazz != null);
+
 		for (Field field : allFields) {
 			Class<?> class1 = field.getType();
 			if (IROI.class.isAssignableFrom(class1)) {
