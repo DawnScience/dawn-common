@@ -242,7 +242,7 @@ public class PersistenceImportWizard extends AbstractPersistenceWizard implement
 	protected void createFit2DMask(String filePath, IPlottingSystem<?> system, IProgressMonitor monitor) throws Exception {
 		ILoaderService loader = ServiceLoader.getLoaderService();
 		final IDataHolder     holder = loader.getData(filePath, new ProgressMonitorWrapper(monitor));
-		final Dataset mask   = DatasetUtils.cast(holder.getDataset(0), Dataset.BOOL);
+		final Dataset mask   = DatasetUtils.cast(BooleanDataset.class, holder.getDataset(0));
 		final ITrace          trace  = system.getTraces().iterator().next();
 		
 		if (mask!=null && trace!=null && trace instanceof IImageTrace) {

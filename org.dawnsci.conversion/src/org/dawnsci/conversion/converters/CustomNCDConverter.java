@@ -50,6 +50,7 @@ import org.eclipse.january.dataset.Dataset;
 import org.eclipse.january.dataset.DatasetUtils;
 import org.eclipse.january.dataset.IDataset;
 import org.eclipse.january.dataset.ILazyDataset;
+import org.eclipse.january.dataset.InterfaceUtils;
 import org.eclipse.january.dataset.PositionIterator;
 import org.eclipse.january.dataset.Slice;
 import org.eclipse.january.dataset.StringDataset;
@@ -225,7 +226,7 @@ public class CustomNCDConverter extends AbstractConversion  {
 
 			Dataset errors = null;
 			if (hasErrors) {
-				errors = DatasetUtils.cast(data.getErrors(), data.getDType());
+				errors = DatasetUtils.cast(data.getClass(), data.getErrors());
 			}
 
 			String header = sb.toString();
@@ -294,30 +295,19 @@ public class CustomNCDConverter extends AbstractConversion  {
 	}
 	
 	private Dataset[] fixDtypes(Dataset axis, Dataset data, Dataset errors) {
-		int dataDtype = data.getDType();
-		int axisDtype = 0;
+		Class<? extends Dataset> dClass = data.getClass();
+		Class<? extends Dataset> aClass = axis == null ? null : axis.getClass();
+		Class<? extends Dataset> eClass = errors == null ? null : errors.getClass();
+		Class<? extends Dataset> bClass = InterfaceUtils.getBestInterface(InterfaceUtils.getBestInterface(dClass, aClass), eClass);
+
+		data = data.cast(bClass);
 		if (axis != null) {
-			axisDtype = axis.getDType();
+			axis = axis.cast(bClass);
 		}
-		int errorsDtype = 0;
 		if (errors != null) {
-			errorsDtype = errors.getDType();
-		}
-		int largestDtype = Math.max(Math.max(dataDtype, axisDtype), errorsDtype);
-		if (data.getDType() < largestDtype) {
-			data = improveLessPreciseData(data, largestDtype);
-		}
-		if (axis != null && axis.getDType() < largestDtype) {
-			axis = improveLessPreciseData(axis, largestDtype);
-		}
-		if (errors != null && errors.getDType() < largestDtype) {
-			errors = improveLessPreciseData(errors, largestDtype);
+			errors = errors.cast(bClass);
 		}
 		return new Dataset[]{axis, data, errors};
-	}
-	
-	private Dataset improveLessPreciseData(Dataset lessPreciseData, int dType) {
-		return lessPreciseData.cast(dType);
 	}
 
 	private void exportASCII(IDataset axis, Dataset data, IDataset errors, String fullName, String header, List<String> headings) throws ScanFileHolderException {
@@ -325,7 +315,7 @@ public class CustomNCDConverter extends AbstractConversion  {
 		IDataset[] columns = new IDataset[] {DatasetUtils.transpose(data, null)};
 		if (axis != null) {
 			if (axis.hasErrors()) {
-				Dataset axisErrors = DatasetUtils.cast(axis.getErrors(), data.getDType());
+				Dataset axisErrors = DatasetUtils.cast(data.getClass(), axis.getErrors());
 				columns = (IDataset[]) ArrayUtils.addAll(new IDataset[]{axis, axisErrors}, columns);
 				
 			} else {
@@ -430,7 +420,7 @@ public class CustomNCDConverter extends AbstractConversion  {
 
 			Dataset errors = null;
 			if (hasErrors) {
-				errors = DatasetUtils.cast(data.getErrors(), data.getDType());
+				errors = DatasetUtils.cast(data.getClass(), data.getErrors());
 				errors.squeeze();
 			}
 

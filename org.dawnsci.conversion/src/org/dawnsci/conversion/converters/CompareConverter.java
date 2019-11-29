@@ -28,6 +28,7 @@ import org.eclipse.january.dataset.DatasetFactory;
 import org.eclipse.january.dataset.DatasetUtils;
 import org.eclipse.january.dataset.IDataset;
 import org.eclipse.january.dataset.IndexIterator;
+import org.eclipse.january.dataset.StringDataset;
 
 /**
  * This converter creates stacks from 
@@ -114,7 +115,7 @@ public class CompareConverter extends AbstractConversion{
 
 	public static Dataset resize(final Dataset a, final int... shape) {
 
-		if (a.getDType() == Dataset.STRING)
+		if (a instanceof StringDataset)
 			return a;
 		int size = a.getSize();
 		Dataset rdata = DatasetFactory.zeros(a);

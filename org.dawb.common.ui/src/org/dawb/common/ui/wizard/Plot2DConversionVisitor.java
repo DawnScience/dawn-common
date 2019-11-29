@@ -16,9 +16,9 @@ import org.eclipse.dawnsci.plotting.api.IPlottingSystem;
 import org.eclipse.dawnsci.plotting.api.PlotType;
 import org.eclipse.dawnsci.plotting.api.trace.IImageTrace;
 import org.eclipse.dawnsci.plotting.api.trace.ITrace;
-import org.eclipse.january.dataset.DTypeUtils;
 import org.eclipse.january.dataset.Dataset;
 import org.eclipse.january.dataset.IDataset;
+import org.eclipse.january.dataset.InterfaceUtils;
 
 import uk.ac.diamond.scisoft.analysis.io.DataHolder;
 import uk.ac.diamond.scisoft.analysis.io.JavaImageSaver;
@@ -53,21 +53,13 @@ public class Plot2DConversionVisitor extends AbstractPlotConversionVisitor {
 				
 				IDataset data = trace.getData();
 				
-				int bits = 33;
-				int dbits = DTypeUtils.getDType(data);
-				
-				switch (dbits) {
-				case Dataset.INT8:
-					bits = 8;
-					break;
-				case Dataset.INT16:
-					bits = 16;
-					break;
-				case Dataset.INT32:
-					bits = 32;
-					break;
+				Class<? extends Dataset> clazz = InterfaceUtils.getInterface(data);
+				int bits;
+				if (InterfaceUtils.isFloating(clazz)) {
+					bits = 33;
+				} else {
+					bits = 8 * InterfaceUtils.getItemBytes(1, clazz);
 				}
-				
 				final File outFile = new File(context.getOutputPath());
 				if (!outFile.getParentFile().exists()) outFile.getParentFile().mkdirs();
 				final JavaImageSaver saver = new JavaImageSaver(outFile.getAbsolutePath(), getExtension(),bits, true);

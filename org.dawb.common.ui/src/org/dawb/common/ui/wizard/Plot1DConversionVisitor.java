@@ -20,11 +20,11 @@ import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
 import org.eclipse.dawnsci.plotting.api.IPlottingSystem;
 import org.eclipse.dawnsci.plotting.api.PlotType;
 import org.eclipse.dawnsci.plotting.api.trace.ILineTrace;
-import org.eclipse.january.dataset.DTypeUtils;
 import org.eclipse.january.dataset.Dataset;
 import org.eclipse.january.dataset.DatasetFactory;
 import org.eclipse.january.dataset.DatasetUtils;
 import org.eclipse.january.dataset.IDataset;
+import org.eclipse.january.dataset.InterfaceUtils;
 import org.eclipse.january.dataset.Slice;
 import org.eclipse.january.dataset.SliceND;
 
@@ -141,8 +141,6 @@ public class Plot1DConversionVisitor extends AbstractPlotConversionVisitor {
 		Dataset firstX = DatasetUtils.convertToDataset(traces[0].getXData());
 		Dataset firstY = DatasetUtils.convertToDataset(traces[0].getYData());
 		int length = firstY.getSize();
-		int xType = DTypeUtils.getDType(firstX);
-		int yType = DTypeUtils.getDType(firstY);
 		if (firstX.getName().isEmpty()) {
 			headings.add(imax == 1 ? "x" : "x0");
 		} else {
@@ -155,6 +153,8 @@ public class Plot1DConversionVisitor extends AbstractPlotConversionVisitor {
 		}
 
 		boolean ragged = false;
+		Class<? extends Dataset> xClass = firstX.getClass();
+		Class<? extends Dataset> yClass = firstY.getClass();
 		for (i = 1; i < imax; i++) {
 			ILineTrace trace = traces[i];
 			IDataset current = trace.getYData();
@@ -164,17 +164,17 @@ public class Plot1DConversionVisitor extends AbstractPlotConversionVisitor {
 				length = Math.max(length, size);
 				ragged = true;
 			}
-			xType = DTypeUtils.getBestDType(DTypeUtils.getDType(trace.getXData()), xType);
-			yType = DTypeUtils.getBestDType(DTypeUtils.getDType(current), yType);
+			xClass = InterfaceUtils.getBestInterface(InterfaceUtils.getInterface(trace.getXData()), xClass);
+			yClass = InterfaceUtils.getBestInterface(InterfaceUtils.getInterface(current), yClass);
 		}
 
 		if (ragged) { // use doubles or floats
-			xType = DTypeUtils.getBestFloatDType(xType);
-			yType = DTypeUtils.getBestFloatDType(yType);
+			xClass = InterfaceUtils.getBestFloatInterface(xClass);
+			yClass = InterfaceUtils.getBestFloatInterface(yClass);
 		}
 
 		int columns = asSingleX ? imax + 1 : 2 * imax;
-		Dataset allTraces = DatasetFactory.zeros(new int[] { length, columns }, DTypeUtils.getBestDType(xType, yType));
+		Dataset allTraces = DatasetFactory.zeros(InterfaceUtils.getBestInterface(xClass, yClass), length, columns);
 		if (ragged && allTraces.hasFloatingPointElements()) {
 			allTraces.fill(Double.NaN);
 		}
