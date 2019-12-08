@@ -354,7 +354,7 @@
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
-            category="org.dawnsci.preferences.root"
+            category="uk.ac.diamond.scisoft.analysis.rcp.preferences.root"
             class="org.dawb.common.ui.views.monitor.MonitorPreferencePage"
             id="org.dawb.common.ui.views.dashboard.dashboardPreferences"
             name="Monitor">
