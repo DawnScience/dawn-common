@@ -430,7 +430,7 @@
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
-            category="org.dawb.workbench.ui.visualizationPreferences"
+            category="uk.ac.diamond.scisoft.analysis.rcp.preferences.root"
             class="org.dawb.common.ui.preferences.ViewPreferencePage"
             id="org.edna.workbench.views.preferencePage"
             name="Image Monitor">
