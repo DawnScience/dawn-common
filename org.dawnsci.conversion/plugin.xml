@@ -1,15 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-   <extension
-         point="org.eclipse.dawnsci.analysis.api.operation">
-      <operation
-            class="org.dawnsci.conversion.operations.ExportAVIOperation"
-            description="Exports a sequence of images to an avi file"
-            id="org.dawnsci.conversion.operations.ExportAVIOperation"
-            model="org.dawnsci.conversion.operations.ExportAVIModel"
-            name="Export image stack to AVI">
-      </operation>
-   </extension>
 
 </plugin>

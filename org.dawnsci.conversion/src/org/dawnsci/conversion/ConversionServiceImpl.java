@@ -16,10 +16,12 @@ import org.eclipse.dawnsci.analysis.api.conversion.IConversion;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionScheme;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionService;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.swt.widgets.Display;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ConversionServiceImpl implements IConversionService {
+	
+	private static final Logger logger = LoggerFactory.getLogger(ConversionServiceImpl.class);
 	
 	static {
 		System.out.println("Starting conversion service.");
@@ -35,8 +37,8 @@ public class ConversionServiceImpl implements IConversionService {
 		try {
 			context.setFilePaths(paths);
 		} catch (Exception e) {
-			MessageDialog.openWarning(Display.getDefault().getActiveShell(), "Error opening conversion wizard", e.getMessage());
-			e.printStackTrace();
+			//TODO open should throw an exception!
+			logger.error("Could not set file paths!");
 		}
 		return context;
 	}
