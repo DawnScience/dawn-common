@@ -20,7 +20,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
 import org.eclipse.dawnsci.plotting.api.ProgressMonitorWrapper;
-import org.eclipse.dawnsci.slicing.api.util.SliceUtils;
 import org.eclipse.january.dataset.ILazyDataset;
 import org.eclipse.january.metadata.IMetadata;
 import org.eclipse.jface.action.Action;
@@ -47,6 +46,8 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
 import org.slf4j.LoggerFactory;
+
+import uk.ac.diamond.scisoft.analysis.utils.DataHolderUtils;
 
 public abstract class AbstractDatasetChoosePage extends ResourceChoosePage implements IConversionWizardPage{
 	
@@ -205,7 +206,7 @@ public abstract class AbstractDatasetChoosePage extends ResourceChoosePage imple
 					if (source==null || "".equals(source)) return;
 					// Attempt to use meta data, save memory
 					IDataHolder holder = ServiceHolder.getLoaderService().getData(source, new ProgressMonitorWrapper(monitor));
-					final List<String> names = SliceUtils.getSlicableNames(holder, getMinimumDataSize());
+					final List<String> names = DataHolderUtils.getSlicableNames(holder, getMinimumDataSize());
 					setDataNames(names.toArray(new String[names.size()]), null, holder);
 					return;
 

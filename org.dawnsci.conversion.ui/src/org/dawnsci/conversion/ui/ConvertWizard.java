@@ -25,7 +25,6 @@ import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionScheme;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionService;
 import org.eclipse.dawnsci.plotting.api.ProgressMonitorWrapper;
-import org.eclipse.dawnsci.slicing.api.data.ITransferableDataObject;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -88,25 +87,6 @@ public class ConvertWizard extends Wizard implements IExportWizard, IFileOverrid
 		
 		setWindowTitle("Convert Data Wizard");
 
-	}
-	
-
-	/**
-	 * Set an alternative file list than the current workbench selection by calling this method.
-	 * @param selections
-	 */
-	public void setSelectionOverride(List<ITransferableDataObject> selections) {
-		final List<String> paths = new ArrayList<String>(7);
-		final List<String> sets  = new ArrayList<String>(7);
-		if (!selections.isEmpty()) {
-			for (ITransferableDataObject ob : selections) {
-				if (!paths.contains(ob.getFilePath())) {
-					paths.add(ob.getFilePath());
-					sets.add(ob.getPath());
-				}
-			}
-		}
-		this.overridePaths    = paths;
 	}
 	
 	public void setFileSelectionOverride(List<File> files) {
