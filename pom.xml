@@ -20,26 +20,26 @@
 		<module>org.dawb.workbench.examples</module>
 		<module>org.dawnsci.boofcv</module>
 		<module>org.dawnsci.boofcv.examples</module>
-		<module>org.dawnsci.boofcv.test</module>
+		<!-- module>org.dawnsci.boofcv.test</module -->
 		<module>org.dawnsci.common.services.feature</module>
 		<module>org.dawnsci.common.ui.feature</module>
 		<module>org.dawnsci.conversion</module>
 		<module>org.dawnsci.conversion.feature</module>
-		<module>org.dawnsci.conversion.test</module>
+		<!-- module>org.dawnsci.conversion.test</module -->
 		<module>org.dawnsci.conversion.ui</module>
 		<module>org.dawnsci.io</module>
-		<module>org.dawnsci.io.test</module>
+		<!-- module>org.dawnsci.io.test</module -->
 		<module>org.dawnsci.jexl</module>
-		<module>org.dawnsci.jexl.test</module>
+		<!-- module>org.dawnsci.jexl.test</module -->
 		<module>org.dawnsci.jgoogleanalytics</module>
 		<module>org.dawnsci.jgoogleanalytics.test</module>
 		<module>org.dawnsci.persistence</module>
 		<module>org.dawnsci.persistence.feature</module>
-		<module>org.dawnsci.persistence.test</module>
+		<!-- module>org.dawnsci.persistence.test</module -->
 		<module>org.dawnsci.processing.docgenerator</module>
 		<module>org.dawnsci.processing.python</module>
 		<module>org.dawnsci.python.rpc</module>
-		<module>org.dawnsci.python.rpc.test</module>
+		<!-- module>org.dawnsci.python.rpc.test</module -->
 		<module>org.dawnsci.thirdparty.xml.feature</module>
 
 	</modules>
