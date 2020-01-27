@@ -23,7 +23,8 @@ Require-Bundle: org.apache.commons.lang;bundle-version="2.6.0",
  org.eclipse.dawnsci.nexus,
  jaxb-api;bundle-version="2.2.7",
  org.eclipse.dawnsci.plotting.api;bundle-version="1.2.0",
- org.dawb.common.util;bundle-version="1.2.0"
+ org.dawb.common.util;bundle-version="1.2.0",
+ javax.measure.unit-api;bundle-version="1.0.0"
 Export-Package: org.dawnsci.conversion,
  org.dawnsci.conversion.converters,
  org.dawnsci.conversion.converters.util,
