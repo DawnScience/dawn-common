@@ -203,7 +203,7 @@ public class HeaderTableView extends ViewPart implements ISelectionListener, IPa
 				selectMetadata((IMetadata)sel);
 			} else if( sel instanceof IMetadataProvider){
 				try {
-					selectMetadata(((IMetadataProvider)sel).getMetadata());
+					selectMetadata(((IMetadataProvider)sel).getFirstMetadata(IMetadata.class));
 				} catch (Exception e) {
 					logger.error("Cannot get metadata", e);
 				}
@@ -417,7 +417,7 @@ public class HeaderTableView extends ViewPart implements ISelectionListener, IPa
 	private void updateFromMetaDataProvider(IWorkbenchPart part) {
 		if (part instanceof IMetadataProvider) {
 			try {
-				meta = ((IMetadataProvider) part).getMetadata();
+				meta = ((IMetadataProvider) part).getFirstMetadata(IMetadata.class);
 				if (meta != null && !table.getTable().isDisposed()) {
 					updateTable.schedule();
 					setFileName(part.getTitle());

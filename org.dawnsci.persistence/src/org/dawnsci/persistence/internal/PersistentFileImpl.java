@@ -43,6 +43,7 @@ import org.eclipse.dawnsci.nexus.NexusUtils;
 import org.eclipse.january.DatasetException;
 import org.eclipse.january.IMonitor;
 import org.eclipse.january.dataset.BooleanDataset;
+import org.eclipse.january.dataset.ByteDataset;
 import org.eclipse.january.dataset.Comparisons;
 import org.eclipse.january.dataset.Dataset;
 import org.eclipse.january.dataset.DatasetFactory;
@@ -133,7 +134,7 @@ class PersistentFileImpl implements IPersistentFile {
 				// Inverse the dataset
 				bd = Comparisons.logicalNot(bd);
 
-				Dataset data = DatasetUtils.cast(bd, Dataset.INT8);
+				Dataset data = DatasetUtils.cast(ByteDataset.class, bd);
 
 				try {
 					data.setName(name);
@@ -148,8 +149,8 @@ class PersistentFileImpl implements IPersistentFile {
 	@Override
 	public void addMask(IMonitor mon, String name, IDataset mask) throws Exception {
 		// Inverse the dataset
-		mask = Comparisons.logicalNot((BooleanDataset) mask);
-		Dataset id = DatasetUtils.cast((BooleanDataset) mask, Dataset.INT8);
+		mask = Comparisons.logicalNot(mask);
+		Dataset id = DatasetUtils.cast(ByteDataset.class, mask);
 		GroupNode group = createDataNode(file, PersistenceConstants.MASK_ENTRY);
 		try {
 			file.createData(group, name, id);
@@ -460,7 +461,7 @@ class PersistentFileImpl implements IPersistentFile {
 			throw new Exception("The mask with the name " + maskName + " is null");
 		ILazyDataset lazy = datanode.getDataset();
 		IDataset bdataset = lazy.getSlice(new Slice(0, lazy.getShape()[0], 1)).squeeze();
-		BooleanDataset bd = (BooleanDataset) DatasetUtils.cast(bdataset, Dataset.BOOL);
+		BooleanDataset bd = DatasetUtils.cast(BooleanDataset.class, bdataset);
 		bd.setName(maskName);
 		if (getVersionNumber() > 1) {
 			// Inverse the dataset
@@ -477,7 +478,7 @@ class PersistentFileImpl implements IPersistentFile {
 			ILazyDataset data = datanode.getDataset();
 
 			IDataset bdataset = data.getSlice(new Slice(0, data.getShape()[0], 1)).squeeze();
-			BooleanDataset bd = (BooleanDataset) DatasetUtils.cast(bdataset, Dataset.BOOL);
+			BooleanDataset bd = DatasetUtils.cast(BooleanDataset.class, bdataset);
 			if (getVersionNumber() > 1) {
 				// Inverse the dataset
 				bd = Comparisons.logicalNot(bd);

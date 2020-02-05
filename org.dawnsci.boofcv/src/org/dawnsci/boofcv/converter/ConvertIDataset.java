@@ -8,8 +8,6 @@
  */
 package org.dawnsci.boofcv.converter;
 
-import georegression.struct.point.Point2D_I32;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,7 +20,6 @@ import org.eclipse.january.dataset.CompoundDoubleDataset;
 import org.eclipse.january.dataset.CompoundFloatDataset;
 import org.eclipse.january.dataset.CompoundIntegerDataset;
 import org.eclipse.january.dataset.CompoundShortDataset;
-import org.eclipse.january.dataset.DTypeUtils;
 import org.eclipse.january.dataset.Dataset;
 import org.eclipse.january.dataset.DatasetFactory;
 import org.eclipse.january.dataset.DatasetUtils;
@@ -30,6 +27,7 @@ import org.eclipse.january.dataset.DoubleDataset;
 import org.eclipse.january.dataset.FloatDataset;
 import org.eclipse.january.dataset.IDataset;
 import org.eclipse.january.dataset.IntegerDataset;
+import org.eclipse.january.dataset.InterfaceUtils;
 import org.eclipse.january.dataset.LongDataset;
 import org.eclipse.january.dataset.RGBDataset;
 import org.eclipse.january.dataset.ShortDataset;
@@ -50,6 +48,7 @@ import boofcv.struct.image.ImageUInt16;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.image.InterleavedS16;
 import boofcv.struct.image.MultiSpectral;
+import georegression.struct.point.Point2D_I32;
 
 /**
  * Functions for converting to and from {@link IDataset}.
@@ -86,7 +85,7 @@ public class ConvertIDataset {
 
 		if (sd instanceof BooleanDataset) {
 			ImageSInt8 dst = new ImageSInt8(width, height);
-			dst.data = ((ByteDataset) sd.cast(Dataset.INT8)).getData();
+			dst.data = sd.cast(ByteDataset.class).getData();
 			return dst;
 		} else if (sd instanceof ByteDataset) {
 			if (clazz == ImageUInt8.class) {
@@ -192,9 +191,9 @@ public class ConvertIDataset {
 
 	public static <T extends ImageBase<?>> T convertFrom(IDataset src, Class<T> clazz, int bands) {
 		Dataset ds;
-		int ddt = DTypeUtils.getDTypeFromClass(imageToElementClass.get(clazz), bands);
-		if (DTypeUtils.getDType(src) != ddt) {
-			ds = DatasetUtils.cast(src, ddt);
+		Class<? extends Dataset> dClass = InterfaceUtils.getInterfaceFromClass(bands, imageToElementClass.get(clazz));
+		if (!InterfaceUtils.getInterface(src).equals(dClass)) {
+			ds = DatasetUtils.cast(dClass, src);
 		} else {
 			ds = DatasetUtils.convertToDataset(src);
 		}
@@ -213,7 +212,7 @@ public class ConvertIDataset {
 		if (src instanceof ImageUInt8 || src instanceof ImageSInt8) {
 			Dataset dst = DatasetFactory.createFromObject(((ImageInt8<?>) src).data, src.height, src.width);
 			if (isBinary) {
-				dst = dst.cast(Dataset.BOOL);
+				dst = dst.cast(BooleanDataset.class);
 			}
 			return dst;
 		} else if (src instanceof ImageUInt16 || src instanceof ImageSInt16) {
