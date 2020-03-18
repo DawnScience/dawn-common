@@ -29,7 +29,7 @@ public abstract class AbstractPythonScriptOperation<T extends AbstractPythonScri
 			logger.debug("Time to start service: {}", (System.currentTimeMillis()-t));
 		} catch (Exception e) {
 			logger.debug("Failed to start service in: {}", (System.currentTimeMillis()-t));
-			logger.error("Could not create script service!");
+			logger.error("Could not create script service!", e);
 			throw new OperationException(this, "Could not create script service!");
 		}
 		

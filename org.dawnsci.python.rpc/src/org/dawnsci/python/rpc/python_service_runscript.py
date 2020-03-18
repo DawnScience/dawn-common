@@ -15,6 +15,7 @@ import os, sys, threading
 
 sys_path_0_lock = threading.Lock()
 sys_path_0_set = False
+state_cache = None
 
 def runScript(scriptPath, inputs, funcName='run'):
     '''
@@ -34,6 +35,7 @@ def runScript(scriptPath, inputs, funcName='run'):
     # and when they can be reused.
     global sys_path_0_lock
     global sys_path_0_set
+    global state_cache
     sys_path_0_lock.acquire()
     try:
         scriptDir = os.path.dirname(scriptPath)
@@ -51,6 +53,11 @@ def runScript(scriptPath, inputs, funcName='run'):
     finally:
         sys_path_0_lock.release()
 
+    if state_cache is None:
+        state_cache={}
+
+    inputs["state_cache"] = state_cache
+	
     # We don't use globals() to creating vars because we are not
     # trying to run within the context of this method
     vars = {'__name__': '<script>',
@@ -66,3 +73,7 @@ def runScript(scriptPath, inputs, funcName='run'):
     result = vars[funcName](**inputs)
 
     return result
+	
+def clearCache():
+    if state_cache:
+        state_cache.clear()

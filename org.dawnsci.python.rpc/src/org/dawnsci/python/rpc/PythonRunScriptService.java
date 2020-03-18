@@ -110,6 +110,9 @@ public class PythonRunScriptService implements IPythonRunScript {
 			// handler for it, then create a proxy to run the function
 			rpcservice.addHandlers("execfile(r'" + script + "')",
 					new String[] { "runScript" });
+			
+			rpcservice.addHandlers("execfile(r'" + script + "')",
+					new String[] { "clearCache" });
 		}
 		proxy = rpcservice.getClient().newProxyInstance(IPythonRunScript.class,
 				debug);
@@ -118,6 +121,7 @@ public class PythonRunScriptService implements IPythonRunScript {
 	@Override
 	public Map<String, Object> runScript(String scriptFullPath,
 			Map<String, ?> data) throws AnalysisRpcException {
+		
 		return proxy.runScript(scriptFullPath, data);
 	}
 
@@ -125,6 +129,7 @@ public class PythonRunScriptService implements IPythonRunScript {
 	public Map<String, Object> runScript(String scriptFullPath,
 			Map<String, ?> data, String funcName)
 			throws AnalysisRpcException {
+		
 		return proxy.runScript(scriptFullPath, data, funcName);
 	}
 	
@@ -135,5 +140,10 @@ public class PythonRunScriptService implements IPythonRunScript {
 	 */
 	public String formatException(AnalysisRpcRemoteException e) {
 		return e.getPythonFormattedStackTrace(PYTHON_SERVICE_RUNSCRIPT_PY);
+	}
+
+	@Override
+	public void clearCache() throws AnalysisRpcException {
+		proxy.clearCache();
 	}
 }

@@ -54,4 +54,10 @@ public interface IPythonRunScript {
 	public Map<String, Object> runScript(String scriptFullPath,
 			Map<String, ?> script_inputs, String funcName)
 			throws AnalysisRpcException;
+	
+	/**
+	 * Clear python state cache without having to stop interpreter
+	 * @throws AnalysisRpcException
+	 */
+	public void clearCache() throws AnalysisRpcException;
 }
