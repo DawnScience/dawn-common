@@ -109,11 +109,9 @@ public class PythonRunScriptService implements IPythonRunScript {
 			// script has a function definition called "runScript", add a
 			// handler for it, then create a proxy to run the function
 			rpcservice.addHandlers("execfile(r'" + script + "')",
-					new String[] { "runScript" });
-			
-			rpcservice.addHandlers("execfile(r'" + script + "')",
-					new String[] { "clearCache" });
+					new String[] { "runScript", "clearCache" });
 		}
+		
 		proxy = rpcservice.getClient().newProxyInstance(IPythonRunScript.class,
 				debug);
 	}

@@ -15,7 +15,7 @@ import os, sys, threading
 
 sys_path_0_lock = threading.Lock()
 sys_path_0_set = False
-state_cache = None
+state_cache = {}
 
 def runScript(scriptPath, inputs, funcName='run'):
     '''
@@ -35,7 +35,6 @@ def runScript(scriptPath, inputs, funcName='run'):
     # and when they can be reused.
     global sys_path_0_lock
     global sys_path_0_set
-    global state_cache
     sys_path_0_lock.acquire()
     try:
         scriptDir = os.path.dirname(scriptPath)
@@ -52,9 +51,6 @@ def runScript(scriptPath, inputs, funcName='run'):
             sys_path_0_set = True
     finally:
         sys_path_0_lock.release()
-
-    if state_cache is None:
-        state_cache={}
 
     inputs["state_cache"] = state_cache
 	
@@ -75,5 +71,4 @@ def runScript(scriptPath, inputs, funcName='run'):
     return result
 	
 def clearCache():
-    if state_cache:
-        state_cache.clear()
+    state_cache.clear()
