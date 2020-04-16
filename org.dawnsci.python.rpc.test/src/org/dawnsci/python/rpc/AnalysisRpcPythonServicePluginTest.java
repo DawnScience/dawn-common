@@ -10,7 +10,6 @@ package org.dawnsci.python.rpc;
 
 import java.io.IOException;
 
-import org.dawnsci.python.rpc.AnalysisRpcPythonService;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.dawnsci.analysis.api.rpc.AnalysisRpcException;
 import org.eclipse.dawnsci.analysis.api.rpc.IAnalysisRpcHandler;

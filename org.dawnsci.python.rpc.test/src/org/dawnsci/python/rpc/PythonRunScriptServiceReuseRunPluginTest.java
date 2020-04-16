@@ -11,7 +11,6 @@ package org.dawnsci.python.rpc;
 import java.io.IOException;
 import java.util.Map;
 
-import org.dawnsci.python.rpc.PythonRunScriptService;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.dawnsci.analysis.api.rpc.AnalysisRpcException;
 import org.junit.AfterClass;

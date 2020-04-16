@@ -27,6 +27,10 @@ import org.junit.Test;
 abstract public class AbstractPythonRunScriptServicePluginTest implements
 		IPythonRunScript {
 
+	@Override
+	public void clearCache() throws AnalysisRpcException {
+	}
+
 	private String getScript(String script) throws IOException {
 		final String scriptPath = BundleUtils.getBundleLocation(
 				"org.dawnsci.python.rpc.test").getAbsolutePath()

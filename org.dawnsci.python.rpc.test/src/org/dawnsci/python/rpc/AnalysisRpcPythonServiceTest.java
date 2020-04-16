@@ -10,7 +10,6 @@ package org.dawnsci.python.rpc;
 
 import java.io.File;
 
-import org.dawnsci.python.rpc.AnalysisRpcPythonService;
 import org.junit.Assert;
 import org.junit.Test;
 
