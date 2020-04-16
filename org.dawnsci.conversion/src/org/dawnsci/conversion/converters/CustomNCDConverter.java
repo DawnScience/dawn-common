@@ -20,7 +20,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Marshaller;
 
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.cansas.cansas1d.FloatUnitType;
 import org.cansas.cansas1d.IdataType;
 import org.cansas.cansas1d.ObjectFactory;
