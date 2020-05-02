@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Eclipse-BundleShape: dir
 Bundle-ManifestVersion: 2
-Bundle-Name: Rpc
+Bundle-Name: Dawn Python RPC
 Bundle-SymbolicName: org.dawnsci.python.rpc;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: Diamond Light Source

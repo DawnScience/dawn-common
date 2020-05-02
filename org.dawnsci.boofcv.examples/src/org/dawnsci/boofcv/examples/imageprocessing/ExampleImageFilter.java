@@ -135,7 +135,7 @@ public class ExampleImageFilter {
 	private static void nogenerics(ImageSingleBand<?> input) throws Throwable {
 		@SuppressWarnings("unchecked")
 		Class<ImageSingleBand<?>> inputType = (Class<ImageSingleBand<?>>) input.getClass();
-		Class<? extends ImageSingleBand<?>> derivType = GImageDerivativeOps.getDerivativeType(inputType);
+		Class<ImageSingleBand<?>> derivType = GImageDerivativeOps.getDerivativeType(inputType);
 
 		ImageSingleBand<?> blurred = GeneralizedImageOps.createSingleBand(
 				inputType, input.width, input.height);

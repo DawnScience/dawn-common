@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: JGoogle Analytics Test
+Bundle-Name: Dawn JGoogle Analytics Tests
 Bundle-SymbolicName: org.dawnsci.jgoogleanalytics.test
 Bundle-Version: 1.0.0.qualifier
 Fragment-Host: org.dawnsci.jgoogleanalytics

@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Util Plug-in
+Bundle-Name: Common Util
 Bundle-SymbolicName: org.dawb.common.util;singleton:=true
 Bundle-Version: 1.2.0.qualifier
 Bundle-Activator: org.dawb.common.util.Activator

@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Boofcv Examples
+Bundle-Name: Dawn BoofCV Examples
 Bundle-SymbolicName: org.dawnsci.boofcv.examples;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Require-Bundle: org.dawnsci.boofcv;bundle-version="1.0.0",
@@ -8,7 +8,7 @@ Require-Bundle: org.dawnsci.boofcv;bundle-version="1.0.0",
  uk.ac.diamond.scisoft.analysis;bundle-version="1.5.0",
  uk.ac.diamond.scisoft.analysis.plotserver;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Import-Package: org.dawb.common.ui.util,
  org.dawnsci.boofcv.converter,
  org.eclipse.dawnsci.plotting.api,

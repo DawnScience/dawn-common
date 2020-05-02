@@ -2,7 +2,7 @@ Dependency-Note: There should be few or no dependencies on this plugin
  as it can be used almost anywhere. The services are ofen eclipse based therefore this is an allowed dependency.
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Services
+Bundle-Name: Common Services
 Bundle-SymbolicName: org.dawb.common.services
 Bundle-Version: 1.2.0.qualifier
 Bundle-Activator: org.dawb.common.services.Activator

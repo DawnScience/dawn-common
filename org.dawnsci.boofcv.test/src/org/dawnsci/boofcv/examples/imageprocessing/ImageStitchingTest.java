@@ -14,7 +14,6 @@ import java.util.List;
 
 import org.dawnsci.boofcv.BoofCVImageStitchingProcessCreator;
 import org.dawnsci.boofcv.BoofCVImageTransformCreator;
-import org.dawnsci.boofcv.examples.util.Utils;
 import org.eclipse.dawnsci.analysis.api.image.IImageStitchingProcess;
 import org.eclipse.dawnsci.analysis.api.image.IImageTransform;
 import org.eclipse.january.IMonitor;
@@ -38,8 +37,8 @@ public class ImageStitchingTest {
 	@Before
 	public void init() throws Exception {
 		List<String> filenames = new ArrayList<String>();
-		String[] files = Utils.getFileNames("resources/82702_UViewImage", true);
-		Utils.getArrayAsList(files, filenames);
+		String[] files = TestUtils.getFileNames("resources/82702_UViewImage", true);
+		TestUtils.getArrayAsList(files, filenames);
 		ImageStackLoader loader = new ImageStackLoader(filenames, null);
 		data = loader.createLazyDataset("test stack");
 		stitcher = BoofCVImageStitchingProcessCreator.createStitchingProcess();

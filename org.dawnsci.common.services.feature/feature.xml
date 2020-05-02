@@ -6,7 +6,7 @@
 -->
 <feature
       id="org.dawnsci.common.services.feature"
-      label="Feature"
+      label="Dawn Common Services Feature"
       version="1.0.0.qualifier"
       provider-name="Diamond Light Source">
 

@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: python rpc Tests
+Bundle-Name: Dawn Python RPC Tests
 Bundle-SymbolicName: org.dawnsci.python.rpc.test
 Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: Diamond Light Source

@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Jgoogleanalytics
+Bundle-Name: Dawn JGoogle Analytics
 Bundle-SymbolicName: org.dawnsci.jgoogleanalytics;singleton:=true
 Bundle-Version: 1.0.0.qualifier
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Import-Package: org.dawb.common.util.eclipse,
  org.eclipse.core.commands.common,
  org.eclipse.january;bundle-version="1.0.0",

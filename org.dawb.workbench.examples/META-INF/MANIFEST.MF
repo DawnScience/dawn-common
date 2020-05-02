@@ -1,8 +1,9 @@
 Manifest-Version: 1.0
 Eclipse-BundleShape: dir
 Bundle-ManifestVersion: 2
-Bundle-Name: Examples
+Bundle-Name: Workbench Examples
 Bundle-SymbolicName: org.dawb.workbench.examples
 Bundle-Version: 1.2.0.qualifier
 Bundle-Vendor: ESRF
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Automatic-Module-Name: org.dawb.workbench.examples

@@ -68,6 +68,8 @@ public class PersistJsonOperationsNode {
 	private final static String DAWN = "DAWN";
 	private final static Dataset JSON_MIME_TYPE = DatasetFactory.createFromObject("application/json");
 
+	private final static Dataset NULL = DatasetFactory.createFromObject("null");
+
 	private static IOperationService  service;
 	
 	private final static Logger logger = LoggerFactory.getLogger(PersistJsonOperationsNode.class);
@@ -189,7 +191,7 @@ public class PersistJsonOperationsNode {
 		gn.addAttribute(new AttributeImpl(NexusConstants.NXCLASS, NexusConstants.NOTE));
 		n.addGroupNode(Integer.toString(i),gn);
 		DataNodeImpl nameNode = new DataNodeImpl(1);
-		nameNode.setDataset(DatasetFactory.createFromObject(name));
+		nameNode.setDataset(name == null ? NULL : DatasetFactory.createFromObject(name));
 		gn.addDataNode(NAME, nameNode);
 		
 		DataNodeImpl opNode = new DataNodeImpl(1);
@@ -271,11 +273,13 @@ public class PersistJsonOperationsNode {
 		GroupNode node = new GroupNodeImpl(1);
 		node.addAttribute(new AttributeImpl(NexusConstants.NXCLASS, NexusConstants.NOTE));
 		DataNode dn = new DataNodeImpl(1);
-		dn.setDataset(DatasetFactory.createFromObject(origin.getFilePath()));
+		String text = origin.getFilePath();
+		dn.setDataset(text == null ? NULL : DatasetFactory.createFromObject(text));
 		node.addDataNode("path", dn);
 		
 		dn = new DataNodeImpl(1);
-		dn.setDataset(DatasetFactory.createFromObject(origin.getDatasetName()));
+		text = origin.getDatasetName();
+		dn.setDataset(text == null ? NULL : DatasetFactory.createFromObject(text));
 		node.addDataNode("dataset", dn);
 		
 		if (origin instanceof SliceFromSeriesMetadata) {

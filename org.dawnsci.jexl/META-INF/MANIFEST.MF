@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Jexl
+Bundle-Name: Dawn Jexl
 Bundle-SymbolicName: org.dawnsci.jexl
 Bundle-Version: 1.2.0.qualifier
 Bundle-Activator: org.dawnsci.jexl.Activator

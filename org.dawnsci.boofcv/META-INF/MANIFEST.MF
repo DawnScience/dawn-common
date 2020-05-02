@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Eclipse-BundleShape: dir
 Bundle-ManifestVersion: 2
-Bundle-Name: Boofcv
+Bundle-Name: Dawn BoofCV
 Bundle-SymbolicName: org.dawnsci.boofcv;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.dawnsci.boofcv.Activator

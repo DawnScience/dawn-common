@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Boofcv Test
+Bundle-Name: Dawn BoofCV Tests
 Bundle-SymbolicName: org.dawnsci.boofcv.test
 Bundle-Version: 1.0.0.qualifier
 Fragment-Host: org.dawnsci.boofcv
@@ -8,8 +8,7 @@ Require-Bundle: org.junit,
  uk.ac.diamond.scisoft.analysis;bundle-version="1.5.0",
  org.dawnsci.boofcv.examples;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
-Import-Package: org.eclipse.dawnsci.hdf5
-Automatic-Module-Name: org.dawnsci.boofcv.test
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Export-Package: org.dawnsci.boofcv.converter,
  org.dawnsci.boofcv.examples.imageprocessing
+Automatic-Module-Name: org.dawnsci.boofcv.test

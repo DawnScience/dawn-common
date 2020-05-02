@@ -17,7 +17,6 @@ import java.util.List;
 
 import org.dawnsci.boofcv.BoofCVImageFilterServiceCreator;
 import org.dawnsci.boofcv.BoofCVImageTransformCreator;
-import org.dawnsci.boofcv.examples.util.Utils;
 import org.eclipse.dawnsci.analysis.api.image.IImageFilterService;
 import org.eclipse.dawnsci.analysis.api.image.IImageTransform;
 import org.eclipse.january.dataset.DatasetUtils;
@@ -40,9 +39,9 @@ public class ImageLazyProcessingTest {
 	public void init() throws Exception {
 		if (service == null)
 			service = BoofCVImageFilterServiceCreator.createFilterService();
-		String[] files = Utils.getFileNames("resources/82702_UViewImage", true);
+		String[] files = TestUtils.getFileNames("resources/82702_UViewImage", true);
 		List<String> filenames = new ArrayList<String>();
-		Utils.getArrayAsList(files, filenames);
+		TestUtils.getArrayAsList(files, filenames);
 		ImageStackLoader loader = new ImageStackLoader(filenames, null);
 		data = loader.createLazyDataset("test stack");
 		transform = BoofCVImageTransformCreator.createTransformService();
