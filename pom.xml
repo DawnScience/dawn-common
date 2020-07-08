@@ -28,7 +28,6 @@
 		<module>org.dawnsci.conversion.ui</module>
 		<module>org.dawnsci.io</module>
 		<module>org.dawnsci.jexl</module>
-		<module>org.dawnsci.jgoogleanalytics</module>
 		<module>org.dawnsci.persistence</module>
 		<module>org.dawnsci.persistence.feature</module>
 		<module>org.dawnsci.processing.docgenerator</module>
@@ -54,8 +53,6 @@
 				<module>org.dawnsci.conversion.test</module>
 				<module>org.dawnsci.io.test</module>
 				<module>org.dawnsci.jexl.test</module>
-				<!-- no releng.ant -->
-				<module>org.dawnsci.jgoogleanalytics.test</module>
 				<module>org.dawnsci.persistence.test</module>
 			</modules>
 		</profile>
