@@ -60,9 +60,13 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IExportWizard;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPart;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PersistenceExportWizard extends AbstractPersistenceWizard implements IExportWizard {
-	
+
+	private static final Logger logger = LoggerFactory.getLogger(PersistenceExportWizard.class);
+
 	public static final String ID = "org.dawnsci.plotting.exportMask";
 	
 	PlotDataConversionPage page;

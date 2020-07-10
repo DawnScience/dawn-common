@@ -52,6 +52,8 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IImportWizard;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPart;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import uk.ac.diamond.scisoft.analysis.diffraction.DiffractionMetadataUtils;
 import uk.ac.diamond.scisoft.analysis.io.NexusDiffractionCalibrationReader;
@@ -62,6 +64,8 @@ import uk.ac.diamond.scisoft.analysis.io.NexusDiffractionCalibrationReader;
  *
  */
 public class PersistenceImportWizard extends AbstractPersistenceWizard implements IImportWizard {
+
+	private static final Logger logger = LoggerFactory.getLogger(PersistenceImportWizard.class);
 
 	public static final String ID = "org.dawnsci.plotting.importMask";
 	private ResourceChoosePage fcp;
