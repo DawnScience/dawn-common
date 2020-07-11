@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="org.dawnsci.jre.win32.x86_64.feature"
+      label="AdoptOpenJDK JRE for Win32 x86_64"
+      version="8.252.9"
+      os="win32"
+      ws="win32"
+      arch="x86_64">
+
+   <description url="https://adoptopenjdk.net/about.html">
+      Adopt OpenJDK
+   </description>
+
+   <copyright url="https://openjdk.java.net/legal/openjdk-trademark-notice.html">
+   </copyright>
+
+   <license url="https://openjdk.java.net/legal/gplv2+ce.html">
+      OpenJDK code itself is licensed under GPL v2 with Classpath Exception (GPLv2+CE).
+   </license>
+
+</feature>

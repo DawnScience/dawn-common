@@ -48,12 +48,28 @@
 		</profile>
 		<profile>
 			<id>dawn</id>
+			<properties>
+				<adoptopenjdk.site.url>https://github.com/AdoptOpenJDK/openjdk8-binaries/releases/download</adoptopenjdk.site.url>
+				<adoptopenjdk.update>8u252</adoptopenjdk.update>
+				<adoptopenjdk.build>b09</adoptopenjdk.build>
+				<adoptopenjdk.version>${adoptopenjdk.update}-${adoptopenjdk.build}</adoptopenjdk.version>
+				<adoptopenjdk.version.suffix>${adoptopenjdk.update}${adoptopenjdk.build}</adoptopenjdk.version.suffix>
+				<adoptopenjdk.release.linux.dir>jdk${adoptopenjdk.version}</adoptopenjdk.release.linux.dir>
+				<adoptopenjdk.linux.sha256>a93be303ed62398dba9acb0376fb3caf8f488fcde80dc62d0a8e46256b3adfb1</adoptopenjdk.linux.sha256>
+				<adoptopenjdk.release.macos.dir>jdk${adoptopenjdk.version}.1</adoptopenjdk.release.macos.dir>
+				<adoptopenjdk.macos.sha256>f8206f0fef194c598de6b206a4773b2e517154913ea0e26c5726091562a034c8</adoptopenjdk.macos.sha256>
+				<adoptopenjdk.release.win32.dir>jdk${adoptopenjdk.version}.1</adoptopenjdk.release.win32.dir>
+				<adoptopenjdk.win32.sha256>582f58290c66d6fb7e437a92a91695d25386e2497f684715e6e1b8702a69a804</adoptopenjdk.win32.sha256>
+			</properties>
 			<modules>
 				<module>org.dawnsci.boofcv.test</module>
 				<module>org.dawnsci.conversion.test</module>
 				<module>org.dawnsci.io.test</module>
 				<module>org.dawnsci.jexl.test</module>
 				<module>org.dawnsci.persistence.test</module>
+				<module>org.dawnsci.jre.linux.x86_64.feature</module>
+				<module>org.dawnsci.jre.macos.x86_64.feature</module>
+				<module>org.dawnsci.jre.win32.x86_64.feature</module>
 			</modules>
 		</profile>
 		<profile>
