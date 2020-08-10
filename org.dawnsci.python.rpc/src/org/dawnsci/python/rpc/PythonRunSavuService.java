@@ -117,7 +117,7 @@ public class PythonRunSavuService implements IPythonRunSavu{
 
 			// script has a function definition called "runScript", add a
 			// handler for it, then create a proxy to run the function
-			rpcservice.addHandlers("execfile(r'" + script + "')",
+			rpcservice.addHandlers("exec(open(r'" + script + "').read())",
 					new String[] {
 						"runSavu",
 						"populate_plugins",

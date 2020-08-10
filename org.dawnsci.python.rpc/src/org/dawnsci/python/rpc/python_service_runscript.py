@@ -61,7 +61,7 @@ def runScript(scriptPath, inputs, funcName='run'):
             'runScriptFuncName': funcName}
 
     # Run the script, this generates a function to call
-    execfile(scriptPath, vars)
+    exec(open(scriptPath).read(), vars)
 
     # Run the function generated, in the Java interface, the runScript method
     # is declared as returning a Map<String, Object>, but that is not enforced

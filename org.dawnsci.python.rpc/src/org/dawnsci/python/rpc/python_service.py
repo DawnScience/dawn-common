@@ -69,7 +69,7 @@ def runScript(scriptPath, sets, outputs, additionalPaths=None):
         sys.stdout = writer(sys.stdout)
         sys.stderr = writer(sys.stderr)
 
-    execfile(scriptPath, globals(), locals()) # need to place locals from script in globals
+    exec(open(scriptPath).read(), globals(), locals())  # need to place locals from script in globals
 
     '''
     Read required results back from globals and locals,
