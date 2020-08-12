@@ -116,7 +116,7 @@ class PersistentFileImpl implements IPersistentFile {
 			this.file = ServiceLoader.getNexusFactory().newNexusFile(filePath);
 			file.openToRead();
 		} catch (Exception e) {
-			logger.error("Error creating Nexus file:" + e);
+			logger.error("Error creating persistent file {}:", filePath, e);
 		}
 	}
 
