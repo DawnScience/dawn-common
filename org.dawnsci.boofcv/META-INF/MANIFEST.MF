@@ -4,7 +4,6 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Dawn BoofCV
 Bundle-SymbolicName: org.dawnsci.boofcv;singleton:=true
 Bundle-Version: 1.0.0.qualifier
-Bundle-Activator: org.dawnsci.boofcv.Activator
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.dawnsci.analysis.api;bundle-version="1.0.0",
  org.eclipse.dawnsci.analysis.dataset;bundle-version="1.1.0",
