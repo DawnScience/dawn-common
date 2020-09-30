@@ -15,12 +15,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.dawnsci.conversion.ServiceLoader;
 import org.dawnsci.conversion.converters.util.LocalServiceManager;
-import org.eclipse.dawnsci.analysis.api.EventTracker;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversion;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
-import org.eclipse.dawnsci.analysis.api.conversion.IConversionScheme;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
 import org.eclipse.dawnsci.analysis.dataset.slicer.SliceFromSeriesMetadata;
 import org.eclipse.dawnsci.analysis.dataset.slicer.SliceViewIterator;
@@ -94,8 +91,7 @@ public abstract class AbstractConversion implements IConversion {
 	 */
 	@Override
 	public void close(IConversionContext context) throws Exception{
-		// track conversion event
-		trackConversion();
+		//do nothing
 	}
 	
 	protected IConversionContext getContext() {
@@ -292,19 +288,4 @@ public abstract class AbstractConversion implements IConversion {
 		return posExt == -1 ? fileName : fileName.substring(0, posExt);
 	}
 
-	/**
-	 * Tracks the conversion tool usage by recording an entry into the google analytics 
-	 * for the corresponding conversion scheme event.
-	 */
-	protected void trackConversion() {
-		IConversionScheme scheme = context.getConversionScheme();
-		try {
-			EventTracker tracker = ServiceLoader.getEventTracker();
-			String conversionName = scheme.toString();
-			if (tracker != null)
-				tracker.trackConversionEvent(conversionName);
-		} catch(Exception e) {
-			
-		}
-	}
 }

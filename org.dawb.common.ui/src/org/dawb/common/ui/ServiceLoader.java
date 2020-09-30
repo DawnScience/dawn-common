@@ -1,8 +1,7 @@
 package org.dawb.common.ui;
 
-import org.eclipse.dawnsci.analysis.api.EventTracker;
-import org.eclipse.dawnsci.analysis.api.persistence.IPersistenceService;
-import org.eclipse.dawnsci.analysis.api.io.ILoaderService;;
+import org.eclipse.dawnsci.analysis.api.io.ILoaderService;
+import org.eclipse.dawnsci.analysis.api.persistence.IPersistenceService;;
 
 /**
  * This class is used to inject services using OSGI
@@ -11,7 +10,6 @@ import org.eclipse.dawnsci.analysis.api.io.ILoaderService;;
  */
 public class ServiceLoader {
 
-	private static EventTracker eventTrackerService;
 	private static IPersistenceService persistenceService;
 	private static ILoaderService loaderService;
 
@@ -20,18 +18,6 @@ public class ServiceLoader {
 	 */
 	public ServiceLoader() {
 		
-	}
-
-	/**
-	 * Injected by OSGI
-	 * @param et
-	 */
-	public void setEventTrackerService(EventTracker et) {
-		eventTrackerService = et;
-	}
-
-	public static EventTracker getEventTrackerService() {
-		return eventTrackerService;
 	}
 
 	/**
