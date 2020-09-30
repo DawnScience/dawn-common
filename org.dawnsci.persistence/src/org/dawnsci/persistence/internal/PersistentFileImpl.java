@@ -752,9 +752,9 @@ class PersistentFileImpl implements IPersistentFile {
 	public IOperation<? extends IOperationModel, ? extends OperationData>[] getOperations() throws Exception {
 		GroupNode g;
 		try {
-			g = NexusUtils.loadGroupFully(file, PersistenceConstants.PROCESS_ENTRY, 3);
+			g = NexusUtils.loadGroupFully(file, PersistenceConstants.PROCESS_ENTRY, 2);
 		} catch (NexusException e) { // Need to ensure backward compatibility
-			g = NexusUtils.loadGroupFully(file, OLD_OPERATION_PROCESS_ENTRY, 3);
+			g = NexusUtils.loadGroupFully(file, OLD_OPERATION_PROCESS_ENTRY, 2);
 		}
 		return PersistJsonOperationsNode.readOperations(g);
 	}
@@ -766,8 +766,13 @@ class PersistentFileImpl implements IPersistentFile {
 	}
 
 	@Override
-	@Deprecated
 	public OriginMetadata getOperationDataOrigin() throws Exception {
-		return null;
+		GroupNode g;
+		try {
+			g = NexusUtils.loadGroupFully(file, PersistenceConstants.PROCESS_ENTRY, 3);
+		} catch (NexusException e) { // Need to ensure backward compatibility
+			g = NexusUtils.loadGroupFully(file, OLD_OPERATION_PROCESS_ENTRY, 3);
+		}
+		return PersistJsonOperationsNode.readOriginalDataInformation(g);
 	}
 }
