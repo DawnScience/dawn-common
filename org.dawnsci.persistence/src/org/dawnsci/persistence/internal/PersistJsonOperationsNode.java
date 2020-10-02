@@ -22,7 +22,6 @@ import org.eclipse.dawnsci.analysis.api.processing.model.IOperationModel;
 import org.eclipse.dawnsci.analysis.api.roi.IROI;
 import org.eclipse.dawnsci.analysis.api.tree.DataNode;
 import org.eclipse.dawnsci.analysis.api.tree.GroupNode;
-import org.eclipse.dawnsci.analysis.api.tree.Node;
 import org.eclipse.dawnsci.analysis.api.tree.NodeLink;
 import org.eclipse.dawnsci.analysis.api.tree.Tree;
 import org.eclipse.dawnsci.analysis.dataset.operations.AbstractOperationBase;
@@ -33,6 +32,9 @@ import org.eclipse.dawnsci.analysis.tree.impl.GroupNodeImpl;
 import org.eclipse.dawnsci.nexus.NexusConstants;
 import org.eclipse.dawnsci.nexus.NexusException;
 import org.eclipse.dawnsci.nexus.NexusFile;
+import org.eclipse.dawnsci.nexus.NexusUtils;
+import org.eclipse.january.DatasetException;
+import org.eclipse.january.MetadataException;
 import org.eclipse.january.dataset.Dataset;
 import org.eclipse.january.dataset.DatasetFactory;
 import org.eclipse.january.dataset.DatasetUtils;
@@ -253,22 +255,46 @@ public class PersistJsonOperationsNode {
 			}
 		}
 	}
-	
+
+	/**
+	 * Read information about original data
+	 * @param path
+	 * @param group NXprocess group
+	 * @return origin metadata
+	 * @throws Exception
+	 */
 	public static OriginMetadata readOriginalDataInformation(String path) throws Exception {
 		try (NexusFile nexusFile = ServiceLoader.getNexusFactory().newNexusFile(path)) {
 			nexusFile.openToRead();
-			GroupNode group = nexusFile.getGroup(PersistenceConstants.PROCESS_ENTRY + Node.SEPARATOR + ORIGIN, false);
-			String fp = group.getDataNode("path").getString();
-			String dsn = group.getDataNode("dataset").getString();
-			String ss = group.getDataNode("sampling").getString();
-			
-			Dataset dd = DatasetUtils.sliceAndConvertLazyDataset(group.getDataNode("data_dimensions").getDataset());
-			int[] dataDims = dd.cast(IntegerDataset.class).getData();
-			
-			return MetadataFactory.createMetadata(OriginMetadata.class, null, Slice.convertFromString(ss), dataDims, fp, dsn);
+			GroupNode group = NexusUtils.loadGroupFully(nexusFile, PersistenceConstants.PROCESS_ENTRY, 1);
+
+			return readOriginalDataInformation(group);
 		}
 	}
-	
+
+	/**
+	 * Read information about original data
+	 * @param group NXprocess group
+	 * @return origin metadata
+	 * @throws DatasetException
+	 * @throws MetadataException
+	 */
+	public static OriginMetadata readOriginalDataInformation(GroupNode group) throws DatasetException, MetadataException {
+		GroupNode origin = group.getGroupNode(ORIGIN);
+		if (origin == null) {
+			return null;
+		}
+		
+		String fp = origin.getDataNode("path").getString();
+		String dsn = origin.getDataNode("dataset").getString();
+		String ss = origin.getDataNode("sampling").getString();
+		
+		Dataset dd = DatasetUtils.sliceAndConvertLazyDataset(origin.getDataNode("data_dimensions").getDataset());
+		int[] dataDims = dd.cast(IntegerDataset.class).getData();
+		
+		return MetadataFactory.createMetadata(OriginMetadata.class, null, Slice.convertFromString(ss), dataDims, fp, dsn);
+	}
+
 	public static GroupNode writeOriginalDataInformation(OriginMetadata origin) {
 		GroupNode node = new GroupNodeImpl(1);
 		node.addAttribute(new AttributeImpl(NexusConstants.NXCLASS, NexusConstants.NOTE));
