@@ -57,6 +57,7 @@ public class TestUtils {
 			File tmpFile = new File(file);
 			if (tmpFile.exists())
 				tmpFile.delete();
+			tmpFile.deleteOnExit();
 			return HDF5Utils.createLazyDataset(file, nodepath, name, newShape, null, newShape, FloatDataset.class,
 					null, false);
 		} finally {
