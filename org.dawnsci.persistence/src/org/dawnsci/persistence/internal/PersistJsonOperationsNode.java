@@ -26,9 +26,7 @@ import org.eclipse.dawnsci.analysis.api.tree.NodeLink;
 import org.eclipse.dawnsci.analysis.api.tree.Tree;
 import org.eclipse.dawnsci.analysis.dataset.operations.AbstractOperationBase;
 import org.eclipse.dawnsci.analysis.dataset.slicer.SliceFromSeriesMetadata;
-import org.eclipse.dawnsci.analysis.tree.impl.AttributeImpl;
-import org.eclipse.dawnsci.analysis.tree.impl.DataNodeImpl;
-import org.eclipse.dawnsci.analysis.tree.impl.GroupNodeImpl;
+import org.eclipse.dawnsci.analysis.tree.TreeFactory;
 import org.eclipse.dawnsci.nexus.NexusConstants;
 import org.eclipse.dawnsci.nexus.NexusException;
 import org.eclipse.dawnsci.nexus.NexusFile;
@@ -97,7 +95,7 @@ public class PersistJsonOperationsNode {
 
 		int i = 0;
 		for (String number = Integer.toString(i); memberList.contains(number); number = Integer.toString(++i)) {
-			GroupNode gn = (GroupNode)process.getNodeLink(number).getDestination();
+			GroupNode gn = process.getGroupNode(number);
 			DataNode dataNode = gn.getDataNode(DATA);
 			Dataset data = DatasetUtils.convertToDataset(dataNode.getDataset().getSlice());
 			dataNode = gn.getDataNode(ID);
@@ -113,8 +111,8 @@ public class PersistJsonOperationsNode {
 				IDataset pass = dataNode.getDataset().getSlice();
 				dataNode = gn.getDataNode(SAVE);
 				IDataset save = dataNode.getDataset().getSlice();
-				p = pass.getInt(0) == 0 ? false : true;
-				s = save.getInt(0) == 0 ? false : true;
+				p = pass.getBoolean(0);
+				s = save.getBoolean(0);
 			} catch (Exception e) {
 				logger.error("Could not read pass/save nodes", e);
 			}
@@ -146,28 +144,28 @@ public class PersistJsonOperationsNode {
 		return opList.isEmpty() ? null : opList.toArray(new IOperation[opList.size()]);
 	}
 	
+	@SuppressWarnings("unchecked")
 	public static GroupNode writeOperationsToNode(IOperation<? extends IOperationModel, ? extends OperationData>... operations) {
-		GroupNodeImpl process = new GroupNodeImpl(1);
-		process.addAttribute(new AttributeImpl(NexusConstants.NXCLASS, NexusConstants.PROCESS));
-		
+		GroupNode process = NexusUtils.createNXclass(NexusConstants.PROCESS);
+
 		for (int i = 0; i < operations.length; i++) {
-			addOperationToProcessGroup(process, i, operations[i]);
+			GroupNode gn = createOperationInGroup(operations[i]);
+			process.addGroupNode(Integer.toString(i), gn);
 		}
-		
+
 		try {
-			
-			DataNodeImpl n = new DataNodeImpl(1);
+			DataNode n = TreeFactory.createDataNode(1);
 			n.setDataset(DatasetFactory.createFromObject(DAWN));
 			process.addDataNode(PROGRAM, n);
 			String date = String.format("%tFT%<tR", Calendar.getInstance(TimeZone.getDefault()));
 			
-			DataNodeImpl ndate = new DataNodeImpl(1);
+			DataNode ndate = TreeFactory.createDataNode(1);
 			ndate.setDataset(DatasetFactory.createFromObject(date));
 			process.addDataNode(DATE, ndate);
 			
 			String v = BundleUtils.getDawnVersion();
 			if (v != null) {
-				DataNodeImpl node = new DataNodeImpl(1);
+				DataNode node = TreeFactory.createDataNode(1);
 				node.setDataset(DatasetFactory.createFromObject(v));
 				process.addDataNode(VERSION, node);
 			}
@@ -179,81 +177,86 @@ public class PersistJsonOperationsNode {
 		return process;
 	}
 	
-	private static void addOperationToProcessGroup(GroupNodeImpl n, int i, IOperation<?, ?> op) {
+	private static GroupNode createOperationInGroup(IOperation<?, ?> op) {
 		String opId = op.getId();
 		String name = op.getName();
 		IDataset boolTrue = DatasetFactory.ones(IntegerDataset.class, 1);
 		IDataset boolFalse =  DatasetFactory.zeros(IntegerDataset.class, 1);
 		
-		Map<Class<?>, Map<String, Object>> specialObjects = getSpecialObjects(op.getModel());
-		
 		IDataset pass = op.isPassUnmodifiedData() ? boolTrue : boolFalse;
 		IDataset save = op.isStoreOutput() ? boolTrue : boolFalse;
-		GroupNodeImpl gn = new GroupNodeImpl(1);
-		gn.addAttribute(new AttributeImpl(NexusConstants.NXCLASS, NexusConstants.NOTE));
-		n.addGroupNode(Integer.toString(i),gn);
-		DataNodeImpl nameNode = new DataNodeImpl(1);
+		GroupNode gn = NexusUtils.createNXclass(NexusConstants.NOTE);
+		DataNode nameNode = TreeFactory.createDataNode(1);
 		nameNode.setDataset(name == null ? NULL : DatasetFactory.createFromObject(name));
 		gn.addDataNode(NAME, nameNode);
 		
-		DataNodeImpl opNode = new DataNodeImpl(1);
+		DataNode opNode = TreeFactory.createDataNode(1);
 		opNode.setDataset(DatasetFactory.createFromObject(opId));
 		gn.addDataNode(ID, opNode);
 		
-		DataNodeImpl saveNode = new DataNodeImpl(1);
+		DataNode saveNode = TreeFactory.createDataNode(1);
 		saveNode.setDataset(save);
 		gn.addDataNode(SAVE, saveNode);
 		
-		DataNodeImpl passNode = new DataNodeImpl(1);
+		DataNode passNode = TreeFactory.createDataNode(1);
 		passNode.setDataset(pass);
 		gn.addDataNode(PASS, passNode);
 		
 		ObjectMapper mapper = getMapper();
 		IJSonMarshaller converter = new JacksonMarshaller();
-		
+		Map<Class<?>, Map<String, Object>> specialObjects = getSpecialObjects(op.getModel());
+
 		try {
 			Map<String, Object> m = specialObjects.get(IROI.class);
-			addSpecialObjects(m,REGIONS,gn,converter);
+			addSpecialObjects(m, REGIONS, gn, converter);
 			m = specialObjects.get(IFunction.class);
-			addSpecialObjects(m,FUNCTIONS,gn,converter);
+			addSpecialObjects(m, FUNCTIONS, gn, converter);
 			m = specialObjects.get(IDataset.class);
-			addSpecialObjects(m,DATASETS,gn,converter);
+			addSpecialObjects(m, DATASETS, gn, converter);
 
-			DataNodeImpl typeNode = new DataNodeImpl(1);
+			DataNode typeNode = TreeFactory.createDataNode(1);
 			typeNode.setDataset(JSON_MIME_TYPE);
 			gn.addDataNode(TYPE, typeNode);
 
-			String modelJson = getModelJson(op.getModel(), mapper);
-			DataNodeImpl json = new DataNodeImpl(1);
+			String modelJson = mapper.writeValueAsString(op.getModel());
+			DataNode json = TreeFactory.createDataNode(1);
 			json.setDataset(DatasetFactory.createFromObject(modelJson));
 			gn.addDataNode(DATA, json);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.warn("Could not add model fields", e);
 		}
+
+		return gn;
 	}
 
-	private static void addSpecialObjects(Map<String, Object> special, String type, GroupNodeImpl node,IJSonMarshaller converter) throws Exception  {
+	private static void addSpecialObjects(Map<String, Object> special, String type, GroupNode node, IJSonMarshaller converter) throws Exception  {
 		if (!special.isEmpty()) {
-			GroupNodeImpl gn = new GroupNodeImpl(1);
-			gn.addAttribute(new AttributeImpl(NexusConstants.NXCLASS, NexusConstants.COLLECTION));
-			node.addGroupNode(type, gn);
+			GroupNode gn = requireNXcollection(node, type);
 
 			for (Map.Entry<String, Object> entry : special.entrySet()) {
 				String key = entry.getKey();
 				Object value = entry.getValue();
 				if (value instanceof IDataset) {
-					DataNodeImpl dn = new DataNodeImpl(1);
+					DataNode dn = TreeFactory.createDataNode(1);
 					dn.setDataset((IDataset) value);
 					gn.addDataNode(key, dn);
 				} else {
 					String json = converter.marshal(value);
-					DataNodeImpl dn = new DataNodeImpl(1);
+					DataNode dn = TreeFactory.createDataNode(1);
 					dn.setDataset(DatasetFactory.createFromObject(json));
 					gn.addDataNode(key, dn);
 				}
 			}
 		}
+	}
+
+	private static GroupNode requireNXcollection(GroupNode p, String name) {
+		GroupNode g = p.getGroupNode(name);
+		if (g == null) {
+			g = NexusUtils.createNXclass(NexusConstants.COLLECTION);
+			p.addGroupNode(name, g);
+		}
+		return g;
 	}
 
 	/**
@@ -296,25 +299,24 @@ public class PersistJsonOperationsNode {
 	}
 
 	public static GroupNode writeOriginalDataInformation(OriginMetadata origin) {
-		GroupNode node = new GroupNodeImpl(1);
-		node.addAttribute(new AttributeImpl(NexusConstants.NXCLASS, NexusConstants.NOTE));
-		DataNode dn = new DataNodeImpl(1);
+		GroupNode node = NexusUtils.createNXclass(NexusConstants.NOTE);
+		DataNode dn = TreeFactory.createDataNode(1);
 		String text = origin.getFilePath();
 		dn.setDataset(text == null ? NULL : DatasetFactory.createFromObject(text));
 		node.addDataNode("path", dn);
 		
-		dn = new DataNodeImpl(1);
+		dn = TreeFactory.createDataNode(1);
 		text = origin.getDatasetName();
 		dn.setDataset(text == null ? NULL : DatasetFactory.createFromObject(text));
 		node.addDataNode("dataset", dn);
 		
 		if (origin instanceof SliceFromSeriesMetadata) {
-			dn = new DataNodeImpl(1);
+			dn = TreeFactory.createDataNode(1);
 			dn.setDataset(DatasetFactory.createFromObject(Slice.createString(((SliceFromSeriesMetadata)origin).getSliceInfo().getSubSampling())));
 			node.addDataNode("sampling", dn);
 		}
 		
-		dn = new DataNodeImpl(1);
+		dn = TreeFactory.createDataNode(1);
 		dn.setDataset(DatasetFactory.createFromObject(origin.getDataDimensions()));
 		node.addDataNode("data_dimensions", dn);
 
@@ -342,7 +344,6 @@ public class PersistJsonOperationsNode {
 	}
 
 	private static Map<Class<?>,Map<String, Object>> getSpecialObjects(IOperationModel model) {
-
 		Map<Class<?>,Map<String, Object>> out = new HashMap<>();
 		out.put(IROI.class, new HashMap<String, Object>());
 		out.put(IDataset.class, new HashMap<String, Object>());
@@ -362,30 +363,27 @@ public class PersistJsonOperationsNode {
 			if (IROI.class.isAssignableFrom(class1)) {
 				try {
 					out.get(IROI.class).put(field.getName(), model.get(field.getName()));
-//					model.set(field.getName(), null);
 				} catch (Exception e) {
-					//Do nothing
+					logger.warn("Could not get region from model", e);
 				}
 			} else if (IDataset.class.isAssignableFrom(class1)) {
 				try {
 					out.get(IDataset.class).put(field.getName(), model.get(field.getName()));
-//					model.set(field.getName(), null);
 				} catch (Exception e) {
-					//Do nothing
+					logger.warn("Could not get dataset from model", e);
 				}
 			} else if (IFunction.class.isAssignableFrom(class1)) {
 				try {
 					out.get(IFunction.class).put(field.getName(), model.get(field.getName()));
-//					model.set(field.getName(), null);
 				} catch (Exception e) {
-					//Do nothing
+					logger.warn("Could not get function from model", e);
 				}
 			}
 		}
 		
 		return out;
 	}
-	
+
 	private static ObjectMapper getMapper() {
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
@@ -394,19 +392,11 @@ public class PersistJsonOperationsNode {
 		mapper.addMixInAnnotations(IFunction.class, MixIn.class);
 		return mapper;
 	}
-	
+
 	public static String getModelJson(IOperationModel model) throws Exception {
-
 		ObjectMapper mapper = getMapper();
-
 		return mapper.writeValueAsString(model);
 	}
-	
-	private static String getModelJson(IOperationModel model, ObjectMapper mapper) throws Exception {
 
-		return mapper.writeValueAsString(model);
-	}
-	
 	@JsonIgnoreType abstract class MixIn{};
-	
 }
