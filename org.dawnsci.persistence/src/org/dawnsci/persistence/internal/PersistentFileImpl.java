@@ -543,17 +543,6 @@ class PersistentFileImpl implements IPersistentFile {
 	}
 
 	@Override
-	public void setDiffractionMetadata(IDiffractionMetadata metadata) throws Exception {
-		throw new RuntimeException("DO NOT SAVE METADATA THIS WAY!");
-
-	}
-
-	@Override
-	public IDiffractionMetadata getDiffractionMetadata(IMonitor mon) throws Exception {
-		throw new RuntimeException("DO NOT READ METADATA THIS WAY!");
-	}
-
-	@Override
 	public String getVersion() throws Exception {
 		return file.getAttributeValue(PersistenceConstants.ENTRY + "@Version");
 	}
@@ -730,12 +719,6 @@ class PersistentFileImpl implements IPersistentFile {
 		} catch (Exception de) {
 			de.printStackTrace();
 		}
-	}
-
-	@Override
-	public void setPowderCalibrationInformation(IDataset calibrationImage, IDiffractionMetadata metadata,
-			IPowderCalibrationInfo info) throws Exception {
-		PersistSinglePowderCalibration.writeCalibrationToFile(file, calibrationImage, metadata, info);
 	}
 
 	private static final String OLD_OPERATION_PROCESS_ENTRY = PersistenceConstants.ENTRY + Node.SEPARATOR + "process";
