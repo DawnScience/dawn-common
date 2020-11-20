@@ -12,3 +12,4 @@ Require-Bundle: org.junit;bundle-version="[4.10.0,5.0.0)",
  uk.ac.diamond.scisoft.analysis.processing,
  org.dawnsci.jexl
 Automatic-Module-Name: org.dawnsci.persistence.test
+Export-Package: org.dawnsci.persistence.test.operations

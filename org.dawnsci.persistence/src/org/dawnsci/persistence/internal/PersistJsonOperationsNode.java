@@ -1,13 +1,15 @@
 package org.dawnsci.persistence.internal;
 
+import java.io.Serializable;
 import java.lang.reflect.Field;
+import java.time.OffsetDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TimeZone;
+import java.util.Map.Entry;
 
 import org.dawb.common.util.eclipse.BundleUtils;
 import org.dawnsci.persistence.ServiceLoader;
@@ -45,6 +47,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreType;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
@@ -66,6 +69,8 @@ public class PersistJsonOperationsNode {
 	private final static String PROGRAM = "program";
 	private final static String TYPE = "type";
 	private final static String DAWN = "DAWN";
+	private final static String AUTOCONFIG = "auto_configured";
+
 	private final static Dataset JSON_MIME_TYPE = DatasetFactory.createFromObject("application/json");
 
 	private final static Dataset NULL = DatasetFactory.createFromObject("null");
@@ -87,6 +92,7 @@ public class PersistJsonOperationsNode {
 		return readOperations((GroupNode) p.getDestination());
 	}
 
+	@SuppressWarnings("unchecked")
 	public static IOperation<? extends IOperationModel, ? extends OperationData>[] readOperations(GroupNode process) throws Exception{
 		List<IOperation<?, ?>> opList = new ArrayList<IOperation<?, ?>>();
 
@@ -97,21 +103,21 @@ public class PersistJsonOperationsNode {
 		for (String number = Integer.toString(i); memberList.contains(number); number = Integer.toString(++i)) {
 			GroupNode gn = process.getGroupNode(number);
 			DataNode dataNode = gn.getDataNode(DATA);
-			Dataset data = DatasetUtils.convertToDataset(dataNode.getDataset().getSlice());
+			Dataset data = DatasetUtils.sliceAndConvertLazyDataset(dataNode.getDataset());
 			dataNode = gn.getDataNode(ID);
-			Dataset id = DatasetUtils.convertToDataset(dataNode.getDataset().getSlice());
-			String json = data.getObject().toString();
-			String sid = id.getObject().toString();
+			Dataset id = DatasetUtils.sliceAndConvertLazyDataset(dataNode.getDataset());
+			String json = data.getString();
+			String sid = id.getString();
 			
 			boolean p = false;
 			boolean s = false;
 			
 			try {
 				dataNode = gn.getDataNode(PASS);
-				IDataset pass = dataNode.getDataset().getSlice();
-				dataNode = gn.getDataNode(SAVE);
-				IDataset save = dataNode.getDataset().getSlice();
+				Dataset pass = DatasetUtils.sliceAndConvertLazyDataset(dataNode.getDataset());
 				p = pass.getBoolean(0);
+				dataNode = gn.getDataNode(SAVE);
+				Dataset save = DatasetUtils.sliceAndConvertLazyDataset(dataNode.getDataset());
 				s = save.getBoolean(0);
 			} catch (Exception e) {
 				logger.error("Could not read pass/save nodes", e);
@@ -133,17 +139,55 @@ public class PersistJsonOperationsNode {
 			
 			op.setPassUnmodifiedData(p);
 			op.setStoreOutput(s);
-			
-			readSpecial(op.getModel(), gn, REGIONS);
-			readSpecial(op.getModel(), gn, FUNCTIONS);
-			readSpecial(op.getModel(), gn, DATASETS);
+
+			IJSonMarshaller converter = new JacksonMarshaller();
+			readSpecial(converter, op.getModel(), gn, REGIONS);
+			readSpecial(converter, op.getModel(), gn, FUNCTIONS);
+			readSpecial(converter, op.getModel(), gn, DATASETS);
 			
 			opList.add(op);
 		}
 
 		return opList.isEmpty() ? null : opList.toArray(new IOperation[opList.size()]);
 	}
-	
+
+	public static boolean hasConfiguredFields(GroupNode process) throws Exception {
+		Collection<String> memberList = process.getNames();
+
+		int i = 0;
+		for (String number = Integer.toString(i); memberList.contains(number); number = Integer.toString(++i)) {
+			GroupNode opNote = process.getGroupNode(number);
+			if (opNote.containsGroupNode(AUTOCONFIG)) {
+				return true;
+			}
+			
+		}
+		return false;
+	}
+
+	public static void applyConfiguredFields(GroupNode process, IOperation<? extends IOperationModel, ? extends OperationData>[] ops) throws Exception {
+		Collection<String> memberList = process.getNames();
+
+		int i = 0;
+		for (String number = Integer.toString(i); memberList.contains(number); number = Integer.toString(++i)) {
+			GroupNode opNote = process.getGroupNode(number);
+			Map<String, Serializable> config = readAutoConfiguredFields(opNote);
+			if (config != null) {
+				applyConfiguredFields(ops[i].getModel(), config);
+			}
+		}
+	}
+
+	private static void applyConfiguredFields(IOperationModel model, Map<String, Serializable> config) {
+		for (Entry<String, Serializable> e : config.entrySet()) {
+			try {
+				model.set(e.getKey(), e.getValue());
+			} catch (Exception ex) {
+				logger.error("Could not apply configured field {}={}", e.getKey(), e.getValue(), ex);
+			}
+		}
+	}
+
 	@SuppressWarnings("unchecked")
 	public static GroupNode writeOperationsToNode(IOperation<? extends IOperationModel, ? extends OperationData>... operations) {
 		GroupNode process = NexusUtils.createNXclass(NexusConstants.PROCESS);
@@ -157,8 +201,9 @@ public class PersistJsonOperationsNode {
 			DataNode n = TreeFactory.createDataNode(1);
 			n.setDataset(DatasetFactory.createFromObject(DAWN));
 			process.addDataNode(PROGRAM, n);
-			String date = String.format("%tFT%<tR", Calendar.getInstance(TimeZone.getDefault()));
-			
+
+			// date-time to minutes with time-zone offset
+			String date = OffsetDateTime.now().truncatedTo(ChronoUnit.MINUTES).toString();
 			DataNode ndate = TreeFactory.createDataNode(1);
 			ndate.setDataset(DatasetFactory.createFromObject(date));
 			process.addDataNode(DATE, ndate);
@@ -205,7 +250,33 @@ public class PersistJsonOperationsNode {
 		ObjectMapper mapper = getMapper();
 		IJSonMarshaller converter = new JacksonMarshaller();
 		Map<Class<?>, Map<String, Object>> specialObjects = getSpecialObjects(op.getModel());
+		
+		addModelFields(op, gn, mapper, converter, specialObjects);
 
+		return gn;
+	}
+
+	/**
+	 * Write auto-configured fields in group to operation note
+	 * @param note
+	 * @param fields
+	 */
+	public static GroupNode writeAutoConfiguredFieldsToNode(Map<String, Serializable> fields) {
+		GroupNode config = NexusUtils.createNXclass(NexusConstants.NOTE);
+		DataNode typeNode = TreeFactory.createDataNode(1);
+		typeNode.setDataset(JSON_MIME_TYPE);
+		config.addDataNode(TYPE, typeNode);
+		ObjectMapper mapper = getMapper();
+		IJSonMarshaller converter = new JacksonMarshaller();
+		addModelFields(config, mapper, converter, fields);
+
+		GroupNode note = TreeFactory.createGroupNode(1);
+		note.addGroupNode(AUTOCONFIG, config);
+		return note;
+	}
+
+	private static void addModelFields(IOperation<?, ?> op, GroupNode gn, ObjectMapper mapper,
+			IJSonMarshaller converter, Map<Class<?>, Map<String, Object>> specialObjects) {
 		try {
 			Map<String, Object> m = specialObjects.get(IROI.class);
 			addSpecialObjects(m, REGIONS, gn, converter);
@@ -225,8 +296,55 @@ public class PersistJsonOperationsNode {
 		} catch (Exception e) {
 			logger.warn("Could not add model fields", e);
 		}
+	}
 
-		return gn;
+	private static void addModelFields(GroupNode gn, ObjectMapper mapper,
+			IJSonMarshaller converter, Map<String, Serializable> fields) {
+
+		Map<String, Object> nonSpecials = new HashMap<>();
+		for (Entry<String, Serializable> e : fields.entrySet()) {
+			String k = e.getKey();
+			Object v = e.getValue();
+			GroupNode sg = null;
+			Class<? extends Object> c = v.getClass();
+			if (IROI.class.isAssignableFrom(c)) {
+				sg = requireNXcollection(gn, REGIONS);
+			} else if (IDataset.class.isAssignableFrom(c)) {
+				sg = requireNXcollection(gn, DATASETS);
+			} else if (IFunction.class.isAssignableFrom(c)) {
+				sg = requireNXcollection(gn, FUNCTIONS);
+			}
+
+			if (sg == null) {
+				nonSpecials.put(k,  v);
+			} else {
+				try {
+					addFieldNode(converter, sg, k, v);
+				} catch (Exception ex) {
+					logger.error("Could not add field {}", k, ex);
+				}
+			}
+		}
+
+		if (!nonSpecials.isEmpty()) {
+			try {
+				String modelJson = mapper.writeValueAsString(nonSpecials);
+				DataNode json = TreeFactory.createDataNode(1);
+				json.setDataset(DatasetFactory.createFromObject(modelJson));
+				gn.addDataNode(DATA, json);
+			} catch (JsonProcessingException ex) {
+				logger.error("Could not add configured fields in {}", DATA, ex);
+			}
+		}
+	}
+
+	private static GroupNode requireNXcollection(GroupNode p, String name) {
+		GroupNode g = p.getGroupNode(name);
+		if (g == null) {
+			g = NexusUtils.createNXclass(NexusConstants.COLLECTION);
+			p.addGroupNode(name, g);
+		}
+		return g;
 	}
 
 	private static void addSpecialObjects(Map<String, Object> special, String type, GroupNode node, IJSonMarshaller converter) throws Exception  {
@@ -246,17 +364,61 @@ public class PersistJsonOperationsNode {
 					dn.setDataset(DatasetFactory.createFromObject(json));
 					gn.addDataNode(key, dn);
 				}
+				addFieldNode(converter, gn, key, value);
 			}
 		}
 	}
 
-	private static GroupNode requireNXcollection(GroupNode p, String name) {
-		GroupNode g = p.getGroupNode(name);
-		if (g == null) {
-			g = NexusUtils.createNXclass(NexusConstants.COLLECTION);
-			p.addGroupNode(name, g);
+	private static void addFieldNode(IJSonMarshaller converter, GroupNode gn, String key, Object value)
+			throws Exception {
+		IDataset d;
+		if (value instanceof IDataset) {
+			d = (IDataset) value;
+		} else {
+			String json = converter.marshal(value);
+			d = DatasetFactory.createFromObject(json);
 		}
-		return g;
+		DataNode dn = TreeFactory.createDataNode(1);
+		dn.setDataset(d);
+		gn.addDataNode(key, dn);
+	}
+
+	/**
+	 * Read auto-configured operation fields
+	 * @param opNote
+	 * @return map of fields
+	 * @throws Exception
+	 */
+	public static Map<String, Serializable> readAutoConfiguredFields(GroupNode opNote) {
+		if (!opNote.containsGroupNode(AUTOCONFIG)) {
+			return null;
+		}
+
+		GroupNode configured = opNote.getGroupNode(AUTOCONFIG);
+		ObjectMapper mapper = getMapper();
+
+		Map<String, Serializable> fields;
+		String json = null;
+		try {
+			DataNode dataNode = configured.getDataNode(DATA);
+			Dataset data = DatasetUtils.sliceAndConvertLazyDataset(dataNode.getDataset());
+			json = data.getString();
+			fields = (Map) mapper.readValue(json, Map.class);
+		} catch (Exception e) {
+			if (json == null) {
+				logger.error("Could not read JSON from {}", DATA, e);
+			} else {
+				logger.error("Could not read values from {}", json, e);
+			}
+			fields = new HashMap<>();
+		}
+
+		IJSonMarshaller converter = new JacksonMarshaller();
+		readSpecial(fields, converter, configured, REGIONS);
+		readSpecial(fields, converter, configured, FUNCTIONS);
+		readSpecial(fields, converter, configured, DATASETS);
+
+		return fields;
 	}
 
 	/**
@@ -323,7 +485,7 @@ public class PersistJsonOperationsNode {
 		return node;
 	}
 
-	private static void readSpecial(IOperationModel model, GroupNode node, String type) throws Exception {
+	private static void readSpecial(IJSonMarshaller converter, IOperationModel model, GroupNode node, String type) throws Exception {
 		Collection<String> memberList = node.getNames();
 
 		if (memberList.contains(type)) {
@@ -335,9 +497,29 @@ public class PersistJsonOperationsNode {
 					if (type.equals(DATASETS)) {
 						model.set(s, ob);
 					} else {
-						IJSonMarshaller converter = new JacksonMarshaller();
 						model.set(s, converter.unmarshal(ob.getString()));
 					}
+				}
+			}
+		}
+	}
+
+	private static void readSpecial(Map<String, Serializable> map, IJSonMarshaller converter, GroupNode node, String type) {
+		Collection<String> memberList = node.getNames();
+
+		if (memberList.contains(type)) {
+			GroupNode gn = (GroupNode) node.getNodeLink(type).getDestination();
+			Collection<String> names = gn.getNames();
+			for (String s : names) {
+				try {
+					Dataset ob = DatasetUtils.sliceAndConvertLazyDataset(gn.getDataNode(s).getDataset());
+					if (type.equals(DATASETS)) {
+						map.put(s, ob);
+					} else {
+						map.put(s, (Serializable) converter.unmarshal(ob.getString()));
+					}
+				} catch (Exception e) {
+					logger.error("Could not read field {}", s, e);
 				}
 			}
 		}
@@ -387,9 +569,9 @@ public class PersistJsonOperationsNode {
 	private static ObjectMapper getMapper() {
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
-		mapper.addMixInAnnotations(IDataset.class, MixIn.class);
-		mapper.addMixInAnnotations(IROI.class, MixIn.class);
-		mapper.addMixInAnnotations(IFunction.class, MixIn.class);
+		mapper.addMixIn(IDataset.class, MixIn.class);
+		mapper.addMixIn(IROI.class, MixIn.class);
+		mapper.addMixIn(IFunction.class, MixIn.class);
 		return mapper;
 	}
 

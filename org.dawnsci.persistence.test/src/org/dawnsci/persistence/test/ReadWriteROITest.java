@@ -43,7 +43,7 @@ public class ReadWriteROITest extends AbstractThreadTestBase {
 	//Passes value by array
 	public IPersistentFile before(File[] tmp) throws Exception {
 
-		tmp[0] = File.createTempFile("TestRoi", ".txt");
+		tmp[0] = File.createTempFile("TestRoi", ".h5");
 		tmp[0].createNewFile();
 
 		// create the PersistentService
