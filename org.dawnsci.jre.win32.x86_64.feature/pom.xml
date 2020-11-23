@@ -11,7 +11,7 @@
 	</parent>
 
 	<artifactId>org.dawnsci.jre.win32.x86_64.feature</artifactId>
-	<version>8.252.9</version>
+	<version>${adoptopenjdk.bundle.version}</version>
 	<packaging>eclipse-feature</packaging>
 
 	<build>
@@ -52,7 +52,7 @@
 							<goal>wget</goal>
 						</goals>
 						<configuration>
-							<url>${adoptopenjdk.site.url}/${adoptopenjdk.release.win32.dir}/OpenJDK8U-jre_x64_windows_hotspot_${adoptopenjdk.version.suffix}.zip</url>
+							<url>${adoptopenjdk.site.url}/${adoptopenjdk.jre.prefix}_x64_windows_hotspot_${adoptopenjdk.version.suffix}.zip</url>
 							<sha256>${adoptopenjdk.win32.sha256}</sha256>
 							<unpack>true</unpack>
 						</configuration>
@@ -71,7 +71,7 @@
 							<goal>rename</goal>
 						</goals>
 						<configuration>
-							<sourceFile>${project.build.directory}/jdk${adoptopenjdk.version}-jre/</sourceFile>
+							<sourceFile>${project.build.directory}/${adoptopenjdk.jre.dir}/</sourceFile>
 							<destinationFile>${project.basedir}/jre/</destinationFile>
 						</configuration>
 					</execution>

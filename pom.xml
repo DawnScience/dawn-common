@@ -49,17 +49,16 @@
 		<profile>
 			<id>dawn</id>
 			<properties>
-				<adoptopenjdk.site.url>https://github.com/AdoptOpenJDK/openjdk8-binaries/releases/download</adoptopenjdk.site.url>
-				<adoptopenjdk.update>8u265</adoptopenjdk.update>
-				<adoptopenjdk.build>b01</adoptopenjdk.build>
-				<adoptopenjdk.version>${adoptopenjdk.update}-${adoptopenjdk.build}</adoptopenjdk.version>
-				<adoptopenjdk.version.suffix>${adoptopenjdk.update}${adoptopenjdk.build}</adoptopenjdk.version.suffix>
-				<adoptopenjdk.release.linux.dir>jdk${adoptopenjdk.version}</adoptopenjdk.release.linux.dir>
-				<adoptopenjdk.linux.sha256>9bce39f63d24626da75778f240294fa466a0ed117e32db798164621fe30b0723</adoptopenjdk.linux.sha256>
-				<adoptopenjdk.release.macos.dir>jdk${adoptopenjdk.version}</adoptopenjdk.release.macos.dir>
-				<adoptopenjdk.macos.sha256>6df6bd51fbc4527546308e1e1c06954e380e264e84b3263b0c128f8d0288eb51</adoptopenjdk.macos.sha256>
-				<adoptopenjdk.release.win32.dir>jdk${adoptopenjdk.version}</adoptopenjdk.release.win32.dir>
-				<adoptopenjdk.win32.sha256>ac9b2005c3a2efe6aecbacdb30ceb5a85bdf1a487e112d622af942f1000f4a27</adoptopenjdk.win32.sha256>
+				<adoptopenjdk.jre.prefix>OpenJDK11U-jre</adoptopenjdk.jre.prefix>
+				<adoptopenjdk.bundle.version>11.0.9</adoptopenjdk.bundle.version>
+				<adoptopenjdk.file.version>${adoptopenjdk.bundle.version}.1</adoptopenjdk.file.version>
+				<adoptopenjdk.build>1</adoptopenjdk.build>
+				<adoptopenjdk.site.url>https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-${adoptopenjdk.file.version}%2B${adoptopenjdk.build}</adoptopenjdk.site.url>
+				<adoptopenjdk.version.suffix>${adoptopenjdk.file.version}_${adoptopenjdk.build}</adoptopenjdk.version.suffix>
+				<adoptopenjdk.jre.dir>jdk-${adoptopenjdk.file.version}+${adoptopenjdk.build}-jre</adoptopenjdk.jre.dir>
+				<adoptopenjdk.linux.sha256>73ce5ce03d2efb097b561ae894903cdab06b8d58fbc2697a5abe44ccd8ecc2e5</adoptopenjdk.linux.sha256>
+				<adoptopenjdk.macos.sha256>7fb8b4d37be9404ac624ee6c406c6bec80e812f1f0ce9e7c9f5a02b8862d8bba</adoptopenjdk.macos.sha256>
+				<adoptopenjdk.win32.sha256>441475261adf6dbfde162e91531b68052a8c16647c64b87629d81a5012285a21</adoptopenjdk.win32.sha256>
 			</properties>
 			<modules>
 				<module>org.dawnsci.boofcv.test</module>

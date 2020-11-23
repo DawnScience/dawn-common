@@ -2,7 +2,7 @@
 <feature
       id="org.dawnsci.jre.win32.x86_64.feature"
       label="AdoptOpenJDK JRE for Win32 x86_64"
-      version="8.252.9"
+      version="11.0.9"
       os="win32"
       ws="win32"
       arch="x86_64">
@@ -12,6 +12,7 @@
    </description>
 
    <copyright url="https://openjdk.java.net/legal/openjdk-trademark-notice.html">
+      
    </copyright>
 
    <license url="https://openjdk.java.net/legal/gplv2+ce.html">
