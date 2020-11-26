@@ -12,7 +12,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
-import org.dawb.common.util.eclipse.BundleUtils;
 import org.eclipse.dawnsci.analysis.api.rpc.AnalysisRpcException;
 import org.eclipse.dawnsci.analysis.api.rpc.AnalysisRpcRemoteException;
 import org.eclipse.dawnsci.analysis.api.rpc.IAnalysisRpcPythonService;
@@ -92,8 +91,7 @@ public class PythonRunScriptService implements IPythonRunScript {
 			boolean debug, boolean skipAddHandler) throws IOException,
 			AnalysisRpcException {
 		if (!skipAddHandler) {
-			final File path = BundleUtils
-					.getBundleLocation(Activator.PLUGIN_ID);
+			final File path = PythonService.BUNDLE_LOCATION;
 			String script = path.getAbsolutePath() + SCRIPT_PATH
 					+ PYTHON_SERVICE_RUNSCRIPT_PY;
 

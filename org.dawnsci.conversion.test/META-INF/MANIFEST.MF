@@ -4,7 +4,7 @@ Bundle-Name: Conversion Tests
 Bundle-SymbolicName: org.dawnsci.conversion.test
 Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: Diamond Light Source
-Fragment-Host: org.dawnsci.conversion;bundle-version="[1.0.0,1.3.0)"
+Fragment-Host: org.dawnsci.conversion
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Require-Bundle: org.junit;bundle-version="[4.10.0,5.0.0)",
  org.dawb.common.ui;bundle-version="1.3.0",

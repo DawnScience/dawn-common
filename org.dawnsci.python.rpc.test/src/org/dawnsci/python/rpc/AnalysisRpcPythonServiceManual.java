@@ -29,7 +29,7 @@ class AnalysisRpcPythonServiceManual extends AnalysisRpcPythonService {
 			CoreException {
 		Map<String, String> env = new HashMap<String, String>();
 		String scisoftpath = BundleUtils.getBundleLocation(
-				"uk.ac.diamond.scisoft.python").getAbsolutePath();
+				PythonService.SCISOFTPY).getAbsolutePath();
 		env.put("PYTHONPATH", scisoftpath + File.pathSeparator + scisoftpath
 				+ "/src" + File.pathSeparator + CorePlugin.getPySrcPath());
 		return env;
