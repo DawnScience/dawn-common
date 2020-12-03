@@ -4,8 +4,8 @@ import org.eclipse.dawnsci.analysis.api.diffraction.IPowderCalibrationInfo;
 import org.eclipse.dawnsci.analysis.api.metadata.IDiffractionMetadata;
 import org.eclipse.dawnsci.analysis.api.tree.DataNode;
 import org.eclipse.dawnsci.analysis.api.tree.GroupNode;
-import org.eclipse.dawnsci.analysis.tree.TreeFactory;
 import org.eclipse.dawnsci.nexus.NexusConstants;
+import org.eclipse.dawnsci.nexus.NexusUtils;
 import org.eclipse.january.dataset.IDataset;
 
 import uk.ac.diamond.scisoft.analysis.io.NexusTreeUtils;
@@ -15,11 +15,9 @@ public class PersistSinglePowderCalibrationNode {
 	public static GroupNode persistSingleCalibration(IDataset calibrationImage,
 			IDiffractionMetadata metadata, IPowderCalibrationInfo info) {
 		
-		GroupNode entry = TreeFactory.createGroupNode(1);
-		entry.addAttribute(TreeFactory.createAttribute(NexusConstants.NXCLASS, NexusConstants.ENTRY));
+		GroupNode entry = NexusUtils.createNXclass(NexusConstants.ENTRY);
 		
-		GroupNode instrument = TreeFactory.createGroupNode(1);
-		instrument.addAttribute(TreeFactory.createAttribute(NexusConstants.NXCLASS, NexusConstants.INSTRUMENT));
+		GroupNode instrument = NexusUtils.createNXclass(NexusConstants.INSTRUMENT);
 		
 		entry.addGroupNode("instrument", instrument);
 		
@@ -36,8 +34,7 @@ public class PersistSinglePowderCalibrationNode {
 			
 			detector.addDataNode("data", data);
 			
-			GroupNode nxData = TreeFactory.createGroupNode(0);
-			nxData.addAttribute(TreeFactory.createAttribute(NexusConstants.NXCLASS, NexusConstants.DATA));
+			GroupNode nxData = NexusUtils.createNXclass(NexusConstants.DATA);
 			
 			nxData.addDataNode("data", data);
 			entry.addGroupNode("calibration_data", nxData);
@@ -46,8 +43,7 @@ public class PersistSinglePowderCalibrationNode {
 	}
 	
 	private static GroupNode createCalibrationMethod(IPowderCalibrationInfo info) {
-		GroupNode note = TreeFactory.createGroupNode(0);
-		note.addAttribute(TreeFactory.createAttribute(NexusConstants.NXCLASS, NexusConstants.NOTE));
+		GroupNode note = NexusUtils.createNXclass(NexusConstants.NOTE);
 		note.addDataNode("author",NexusTreeUtils.createDataNode("author", "DAWNScience", null));
 		note.addDataNode("description",NexusTreeUtils.createDataNode("description", info.getMethodDescription(), null));
 		note.addDataNode("d_space_index",NexusTreeUtils.createDataNode("description", info.getUsedDSpaceIndexValues(), null));
@@ -55,8 +51,7 @@ public class PersistSinglePowderCalibrationNode {
 		
 		if (info.getCitationInformation() == null || info.getCitationInformation().length == 0) return note;
 		
-		GroupNode cite = TreeFactory.createGroupNode(0);
-		cite.addAttribute(TreeFactory.createAttribute(NexusConstants.NXCLASS, NexusConstants.CITE));
+		GroupNode cite = NexusUtils.createNXclass(NexusConstants.CITE);
 		note.addGroupNode("reference", cite);
 		cite.addDataNode("description",NexusTreeUtils.createDataNode("description", info.getCitationInformation()[0], null));
 		cite.addDataNode("doi",NexusTreeUtils.createDataNode("doi", info.getCitationInformation()[1], null));
@@ -67,11 +62,9 @@ public class PersistSinglePowderCalibrationNode {
 	}
 	
 	private static GroupNode createCalibrationSample(IPowderCalibrationInfo info, double wavelength) {
-		GroupNode sample = TreeFactory.createGroupNode(0);
-		sample.addAttribute(TreeFactory.createAttribute(NexusConstants.NXCLASS, NexusConstants.SAMPLE));
+		GroupNode sample = NexusUtils.createNXclass(NexusConstants.SAMPLE);
 		
-		GroupNode beam = TreeFactory.createGroupNode(0);
-		beam.addAttribute(TreeFactory.createAttribute(NexusConstants.NXCLASS, NexusConstants.BEAM));
+		GroupNode beam = NexusUtils.createNXclass(NexusConstants.BEAM);
 		beam.addDataNode("incident_wavelength",NexusTreeUtils.createDataNode("incident_wavelength", wavelength, "angstrom"));
 		
 		sample.addGroupNode("beam", beam);

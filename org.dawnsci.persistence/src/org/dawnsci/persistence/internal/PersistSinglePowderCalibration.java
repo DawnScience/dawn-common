@@ -17,9 +17,10 @@ import org.eclipse.dawnsci.analysis.api.metadata.IDiffractionMetadata;
 import org.eclipse.dawnsci.analysis.api.tree.DataNode;
 import org.eclipse.dawnsci.analysis.api.tree.GroupNode;
 import org.eclipse.dawnsci.analysis.api.tree.Node;
-import org.eclipse.dawnsci.analysis.tree.impl.AttributeImpl;
+import org.eclipse.dawnsci.analysis.tree.TreeFactory;
 import org.eclipse.dawnsci.nexus.NexusConstants;
 import org.eclipse.dawnsci.nexus.NexusFile;
+import org.eclipse.dawnsci.nexus.NexusUtils;
 import org.eclipse.january.dataset.Dataset;
 import org.eclipse.january.dataset.DatasetFactory;
 import org.eclipse.january.dataset.DoubleDataset;
@@ -39,7 +40,7 @@ class PersistSinglePowderCalibration {
 			IDiffractionMetadata metadata, IPowderCalibrationInfo info) throws Exception {
 		
 		GroupNode parentNode = file.getGroup(DEFAULTINSTRUMENTNAME, true);
-		parentNode.addAttribute(new AttributeImpl(NexusConstants.INSTRUMENT));
+		parentNode.addAttribute(NexusUtils.createNXclassAttribute(NexusConstants.INSTRUMENT));
 //		String parent = HierarchicalDataFileUtils.createParentEntry(file, DEFAULTINSTRUMENTNAME,Nexus.INST);
 		
 		String parent = DEFAULTINSTRUMENTNAME + Node.SEPARATOR + "detector";
@@ -52,7 +53,7 @@ class PersistSinglePowderCalibration {
 		//make NXData in root as link to this data, make sure data has a link attribute back to the detector
 		GroupNode defaultGroupNode = file.getGroup(DEFAULTDATANAME, true);
 //		String group = file.group(DEFAULTDATANAME);
-		file.addAttribute(defaultGroupNode, new AttributeImpl(NexusConstants.NXCLASS, NexusConstants.DATA));
+		file.addAttribute(defaultGroupNode, NexusUtils.createNXclassAttribute(NexusConstants.DATA));
 //		file.setNexusAttribute(group, "NXdata");
 //		file.createLink(group, dataset.substring(dataset.lastIndexOf('/')+1), dataset); // TODO FIXME Is this right?
 		
@@ -152,10 +153,10 @@ class PersistSinglePowderCalibration {
 	private static String createNXtransformation(String name, String type, Dataset vector, Dataset offset, String units, String depends_on, double value, NexusFile file, String group) throws Exception {
 		
 		String ds = createDoubleDataset(name, value,file, group);
-		file.addAttribute(ds, new AttributeImpl(ds, vector));
-		file.addAttribute(ds, new AttributeImpl(ds, offset));
-		file.addAttribute(ds, new AttributeImpl("transformation_type", type));
-		file.addAttribute(ds, new AttributeImpl("depends_on", depends_on));
+		file.addAttribute(ds, TreeFactory.createAttribute(ds, vector));
+		file.addAttribute(ds, TreeFactory.createAttribute(ds, offset));
+		file.addAttribute(ds, TreeFactory.createAttribute("transformation_type", type));
+		file.addAttribute(ds, TreeFactory.createAttribute("depends_on", depends_on));
 		return ds;
 	}
 		

@@ -14,7 +14,7 @@ import org.eclipse.dawnsci.analysis.api.diffraction.DetectorProperties;
 import org.eclipse.dawnsci.analysis.api.diffraction.IPowderCalibrationInfo;
 import org.eclipse.dawnsci.analysis.api.tree.DataNode;
 import org.eclipse.dawnsci.analysis.api.tree.GroupNode;
-import org.eclipse.dawnsci.analysis.tree.impl.AttributeImpl;
+import org.eclipse.dawnsci.analysis.tree.TreeFactory;
 import org.eclipse.dawnsci.nexus.NexusConstants;
 import org.eclipse.dawnsci.nexus.NexusFile;
 import org.eclipse.january.dataset.Dataset;
@@ -29,22 +29,22 @@ class PersistDiffractionMetadataUtils {
 		Dataset xpixelNumber = DatasetFactory.createFromObject(new int[]{detprop.getPx()});
 		xpixelNumber.setName("x_pixel_number");
 		DataNode xPixelNumberNode = file.createData(parentGroup, xpixelNumber);
-		file.addAttribute(xPixelNumberNode, new AttributeImpl(NexusConstants.UNITS, "pixels"));
+		file.addAttribute(xPixelNumberNode, TreeFactory.createAttribute(NexusConstants.UNITS, "pixels"));
 
 		Dataset ypixelNumber = DatasetFactory.createFromObject(new int[]{detprop.getPy()});
 		ypixelNumber.setName("y_pixel_number");
 		DataNode yPixelNumberNode = file.createData(parentGroup, ypixelNumber);
-		file.addAttribute(yPixelNumberNode, new AttributeImpl(NexusConstants.UNITS, "pixels"));
+		file.addAttribute(yPixelNumberNode, TreeFactory.createAttribute(NexusConstants.UNITS, "pixels"));
 
 		Dataset xpixelSize = DatasetFactory.createFromObject(new double[]{detprop.getHPxSize()});
 		xpixelSize.setName("x_pixel_size");
 		DataNode xPixelSizeNode = file.createData(parentGroup, xpixelSize);
-		file.addAttribute(xPixelSizeNode, new AttributeImpl(NexusConstants.UNITS, "mm"));
+		file.addAttribute(xPixelSizeNode, TreeFactory.createAttribute(NexusConstants.UNITS, "mm"));
 
 		Dataset ypixelSize = DatasetFactory.createFromObject(new double[]{detprop.getVPxSize()});
 		ypixelSize.setName("y_pixel_size");
 		DataNode yPixelSizeNode = file.createData(parentGroup, ypixelSize);
-		file.addAttribute(yPixelSizeNode, new AttributeImpl(NexusConstants.UNITS, "mm"));
+		file.addAttribute(yPixelSizeNode, TreeFactory.createAttribute(NexusConstants.UNITS, "mm"));
 
 		double dist = detprop.getBeamCentreDistance();
 		double[] bc = detprop.getBeamCentreCoords();
@@ -52,17 +52,17 @@ class PersistDiffractionMetadataUtils {
 		Dataset bcXPix = DatasetFactory.createFromObject(new double[]{bc[0]});
 		bcXPix.setName("beam_center_x");
 		DataNode bcXPixNode = file.createData(parentGroup, bcXPix);
-		file.addAttribute(bcXPixNode, new AttributeImpl(NexusConstants.UNITS, "pixels"));
+		file.addAttribute(bcXPixNode, TreeFactory.createAttribute(NexusConstants.UNITS, "pixels"));
 
 		Dataset bcYPix = DatasetFactory.createFromObject(new double[]{bc[1]});
 		bcYPix.setName("beam_center_y");
 		DataNode bcYPixNode = file.createData(parentGroup, bcYPix);
-		file.addAttribute(bcYPixNode, new AttributeImpl(NexusConstants.UNITS, "pixels"));
+		file.addAttribute(bcYPixNode, TreeFactory.createAttribute(NexusConstants.UNITS, "pixels"));
 		
 		Dataset distance = DatasetFactory.createFromObject(new double[]{dist});
 		distance.setName("distance");
 		DataNode distanceNode = file.createData(parentGroup, distance);
-		file.addAttribute(distanceNode, new AttributeImpl(NexusConstants.UNITS, "mm"));
+		file.addAttribute(distanceNode, TreeFactory.createAttribute(NexusConstants.UNITS, "mm"));
 
 		Matrix3d or = detprop.getOrientation();
 		double[] orientation = new double[] {or.m00 ,or.m01, or.m02,
@@ -81,7 +81,7 @@ class PersistDiffractionMetadataUtils {
 		Dataset energy = DatasetFactory.createFromObject(new double[]{wavelength});
 		energy.setName("wavelength");
 		DataNode energyNode = file.createData(monochromatorGroup, energy);
-		file.addAttribute(energyNode, new AttributeImpl(NexusConstants.UNITS, "Angstrom"));
+		file.addAttribute(energyNode, TreeFactory.createAttribute(NexusConstants.UNITS, "Angstrom"));
 	}
 	
 	public static void writeWavelengthSample(NexusFile file, IPowderCalibrationInfo info, double wavelength) throws Exception {
@@ -105,7 +105,7 @@ class PersistDiffractionMetadataUtils {
 		Dataset w = DatasetFactory.createFromObject(new double[]{wavelength});
 		w.setName("incident_wavelength");
 		DataNode wNode = file.createData(beamNode, w);
-		file.addAttribute(wNode, new AttributeImpl(NexusConstants.UNITS, "Angstrom"));
+		file.addAttribute(wNode, TreeFactory.createAttribute(NexusConstants.UNITS, "Angstrom"));
 	}
 
 }
