@@ -10,14 +10,12 @@
 package org.dawnsci.python.rpc;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.dawb.common.util.eclipse.BundleUtils;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -53,9 +51,6 @@ public class AnalysisRpcPythonPyDevService extends AnalysisRpcPythonService {
 	private static final String PYTHON_ON_PATH = "python";
 
 	private static final Logger logger = LoggerFactory.getLogger(AnalysisRpcPythonPyDevService.class);
-
-	// TODO should we add bundle dependency on uk.ac.diamond.scisoft.python?
-	private static final String UK_AC_DIAMOND_SCISOFT_PYTHON = "uk.ac.diamond.scisoft.python";
 
 	static {
 		System.out.println("Starting Analysis RPC Pydev service.");
@@ -367,18 +362,11 @@ public class AnalysisRpcPythonPyDevService extends AnalysisRpcPythonService {
 	}
 
 	public static String getScisoftPath() {
-		String scisoftpath = null;
-		try {
-			scisoftpath = BundleUtils.getBundleLocation(
-					UK_AC_DIAMOND_SCISOFT_PYTHON).getAbsolutePath();
-		} catch (IOException e) {
-			logger.error(UK_AC_DIAMOND_SCISOFT_PYTHON
-					+ " not available, import of scisoftpy.rpc may fail", e);
-		} catch (NullPointerException e) {
-			logger.error(UK_AC_DIAMOND_SCISOFT_PYTHON
-					+ " not available, import of scisoftpy.rpc may fail", e);
+		if (PythonService.SCISOFTPY_BUNDLE_LOCATION == null) {
+			logger.error("{} not available, import of scisoftpy.rpc may fail", PythonService.SCISOFTPY);
 		}
-		return scisoftpath;
+
+		return PythonService.SCISOFTPY_BUNDLE_LOCATION;
 	}
 
 	private static String getPyDevPySrc() {

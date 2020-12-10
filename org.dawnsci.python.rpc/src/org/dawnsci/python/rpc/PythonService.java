@@ -10,6 +10,7 @@
 package org.dawnsci.python.rpc;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -17,12 +18,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.dawb.common.util.eclipse.BundleUtils;
 import org.dawb.common.util.net.NetUtils;
 import org.dawnsci.python.rpc.commandline.ManagedCommandline;
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.dawnsci.analysis.api.rpc.AnalysisRpcRemoteException;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,6 +46,40 @@ public class PythonService {
 	private ManagedCommandline command;
 	private AnalysisRpcClient  client;
 	private Thread             stopThread;
+
+	/**
+	 * Location of this bundle
+	 */
+	static File BUNDLE_LOCATION = null;
+
+	/**
+	 * Name of bundle that contains ScisoftPy
+	 */
+	public static final String SCISOFTPY = "uk.ac.diamond.scisoft.python";
+	/**
+	 * Location of bundle that contains ScisoftPy
+	 */
+	static String SCISOFTPY_BUNDLE_LOCATION = null;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(PythonService.class);
+		try {
+			BUNDLE_LOCATION = FileLocator.getBundleFile(bundle).getCanonicalFile();
+		} catch (Exception e) {
+			logger.error("Could not locate this bundle {}", bundle.getSymbolicName(), e);
+		}
+
+		bundle = Platform.getBundle(SCISOFTPY);
+		try {
+			if (bundle == null) {
+				logger.error("Could not resolve bundle {}", SCISOFTPY);
+			} else {
+				SCISOFTPY_BUNDLE_LOCATION = FileLocator.getBundleFile(bundle).getCanonicalPath();
+			}
+		} catch (IOException e) {
+			logger.error("Could not locate bundle {}", bundle.getSymbolicName(), e);
+		}
+	}
 
 	/**
 	 * Must use openConnection()
@@ -90,18 +128,18 @@ public class PythonService {
 			pyBuf.append(File.pathSeparatorChar);
 		}
 	    final int    port   = NetUtils.getFreePort(getServiceStartPort());
-		final File   path   = BundleUtils.getBundleLocation(Activator.PLUGIN_ID);
-		String script = path.getAbsolutePath()+"/org/dawnsci/python/rpc/python_service.py";;
-		if (new File(script).exists()) {
-			pyBuf.append(BundleUtils.getBundleLocation("uk.ac.diamond.scisoft.python").getAbsolutePath());
-		} else {
-			// Check if we are running a development version
-			script = path.getAbsolutePath()+"/src/org/dawnsci/python/rpc/python_service.py";
-			if (new File(script).exists()) {
-				pyBuf.append(BundleUtils.getBundleLocation("uk.ac.diamond.scisoft.python").getAbsolutePath()+"/src");
-			} else {
-				throw new RuntimeException("Couldn't find path to python_service.py!");
+		String script = "org/dawnsci/python/rpc/python_service.py";
+		if (BUNDLE_LOCATION != null) {
+			File src = new File(BUNDLE_LOCATION, "src");
+			if (!src.isDirectory()) { // Check if we are running a development version
+				src = BUNDLE_LOCATION;
 			}
+			script = new File(src, script).getAbsolutePath();
+		}
+		if (new File(script).exists() && SCISOFTPY_BUNDLE_LOCATION != null) {
+			pyBuf.append(SCISOFTPY_BUNDLE_LOCATION);
+		} else {
+			throw new RuntimeException("Couldn't find path to python_service.py!");
 		}
 		
 		service.command = new ManagedCommandline();
@@ -318,8 +356,7 @@ public class PythonService {
 		final File dir = getWorkingDir(scriptFullPath);
 		command.setWorkingDir(dir);
 		final List<String> additionalPaths = new ArrayList<String>(1);
-		additionalPaths.add(BundleUtils.getEclipseHome());
-		additionalPaths.add(new File(scriptFullPath).getParent().toString());
+		additionalPaths.add(new File(scriptFullPath).getParent());
 		if (System.getenv("PYTHONPATH")!=null) {
 			additionalPaths.addAll(Arrays.asList(System.getenv("PYTHONPATH").split(File.pathSeparator)));
 		}
@@ -353,7 +390,6 @@ public class PythonService {
 		
 		// We add fabio as an additional path to the service.
 		final List<String> additionalPaths = new ArrayList<String>(1);
-		additionalPaths.add(BundleUtils.getEclipseHome());
 		if (System.getenv("PYTHONPATH")!=null) {
 			additionalPaths.addAll(Arrays.asList(System.getenv("PYTHONPATH").split(File.pathSeparator)));
 		}
