@@ -1,5 +1,8 @@
 package org.dawnsci.persistence.internal;
 
+import java.io.Serializable;
+import java.util.Map;
+
 import org.eclipse.dawnsci.analysis.api.diffraction.IPowderCalibrationInfo;
 import org.eclipse.dawnsci.analysis.api.persistence.IPersistentNodeFactory;
 import org.eclipse.dawnsci.analysis.api.processing.IOperation;
@@ -30,5 +33,14 @@ public class PersistenceNodeFactory implements IPersistentNodeFactory {
 	public GroupNode writePowderCalibrationToFile(IDiffractionMetadata metadata,IDataset calibrationImage, IPowderCalibrationInfo info) {
 		return PersistSinglePowderCalibrationNode.persistSingleCalibration(calibrationImage, metadata, info);
 	}
-	
+
+	@Override
+	public GroupNode writeOperationFieldsToGroup(Map<String, Serializable> fields) {
+		return PersistJsonOperationsNode.writeAutoConfiguredFieldsToNode(fields);
+	}
+
+	@Override
+	public Map<String, Serializable> readOperationFields(GroupNode note) {
+		return PersistJsonOperationsNode.readAutoConfiguredFields(note);
+	}
 }

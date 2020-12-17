@@ -21,9 +21,7 @@ import java.util.Set;
 
 import org.dawnsci.persistence.ServiceLoader;
 import org.dawnsci.persistence.json.JacksonMarshaller;
-import org.eclipse.dawnsci.analysis.api.diffraction.IPowderCalibrationInfo;
 import org.eclipse.dawnsci.analysis.api.fitting.functions.IFunction;
-import org.eclipse.dawnsci.analysis.api.metadata.IDiffractionMetadata;
 import org.eclipse.dawnsci.analysis.api.persistence.IJSonMarshaller;
 import org.eclipse.dawnsci.analysis.api.persistence.IPersistentFile;
 import org.eclipse.dawnsci.analysis.api.processing.IOperation;
@@ -740,6 +738,30 @@ class PersistentFileImpl implements IPersistentFile {
 			g = NexusUtils.loadGroupFully(file, OLD_OPERATION_PROCESS_ENTRY, 2);
 		}
 		return PersistJsonOperationsNode.readOperations(g);
+	}
+
+	@Override
+	public boolean hasConfiguredFields() throws Exception {
+		GroupNode g;
+		try {
+			g = file.getGroup(PersistenceConstants.PROCESS_ENTRY, false);
+		} catch (NexusException e) { // Need to ensure backward compatibility
+			g = file.getGroup(OLD_OPERATION_PROCESS_ENTRY, false);
+		}
+
+		return PersistJsonOperationsNode.hasConfiguredFields(g);
+	}
+
+	@Override
+	public void applyConfiguredFields(IOperation<? extends IOperationModel, ? extends OperationData>[] ops) throws Exception {
+		GroupNode g;
+		try {
+			g = file.getGroup(PersistenceConstants.PROCESS_ENTRY, false);
+		} catch (NexusException e) { // Need to ensure backward compatibility
+			g = file.getGroup(OLD_OPERATION_PROCESS_ENTRY, false);
+		}
+
+		PersistJsonOperationsNode.applyConfiguredFields(g, ops);
 	}
 
 	@Override

@@ -4,7 +4,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
+import java.util.Map;
 
 import org.dawnsci.persistence.ServiceLoader;
 import org.dawnsci.persistence.internal.PersistJsonOperationsNode;
@@ -18,12 +20,14 @@ import org.eclipse.dawnsci.analysis.api.processing.IOperationService;
 import org.eclipse.dawnsci.analysis.api.processing.OperationData;
 import org.eclipse.dawnsci.analysis.api.processing.model.IOperationModel;
 import org.eclipse.dawnsci.analysis.api.tree.GroupNode;
+import org.eclipse.dawnsci.analysis.api.tree.Node;
 import org.eclipse.dawnsci.analysis.api.tree.Tree;
 import org.eclipse.dawnsci.analysis.dataset.roi.RectangularROI;
 import org.eclipse.dawnsci.analysis.dataset.roi.SectorROI;
 import org.eclipse.dawnsci.analysis.dataset.slicer.SliceFromSeriesMetadata;
 import org.eclipse.dawnsci.analysis.dataset.slicer.SliceInformation;
 import org.eclipse.dawnsci.analysis.dataset.slicer.SourceInformation;
+import org.eclipse.dawnsci.hdf5.HDF5FileFactory;
 import org.eclipse.dawnsci.hdf5.nexus.NexusFileFactoryHDF5;
 import org.eclipse.dawnsci.hdf5.nexus.NexusFileHDF5;
 import org.eclipse.dawnsci.nexus.NexusConstants;
@@ -34,8 +38,8 @@ import org.eclipse.january.dataset.IntegerDataset;
 import org.eclipse.january.dataset.Slice;
 import org.eclipse.january.dataset.SliceND;
 import org.eclipse.january.metadata.OriginMetadata;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import uk.ac.diamond.scisoft.analysis.fitting.functions.FunctionFactory;
@@ -45,6 +49,7 @@ import uk.ac.diamond.scisoft.analysis.fitting.functions.Polynomial;
 import uk.ac.diamond.scisoft.analysis.processing.OperationServiceImpl;
 import uk.ac.diamond.scisoft.analysis.processing.operations.FunctionModel;
 
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class ReadWriteOperationTest {
 	
 	private static IOperationService   service;
@@ -59,8 +64,8 @@ public class ReadWriteOperationTest {
 		// FIXME these calls fail to create operations when using Tycho build as
 		// the class loader cannot find classes are built in target/ directory
 		// maybe solution is to add that to class path
-		service.createOperations(service.getClass().getClassLoader(), "org.dawnsci.persistence.test.operations");
-		service.createOperations(service.getClass().getClassLoader(), "uk.ac.diamond.scisoft.analysis.processing.operations");
+		service.createOperations(ReadWriteOperationTest.class, "org.dawnsci.persistence.test.operations");
+		service.createOperations(service.getClass(), "uk.ac.diamond.scisoft.analysis.processing.operations");
 		new PersistJsonOperationsNode().setOperationService(service);
 		pservice = new PersistenceServiceImpl();
 		
@@ -69,7 +74,7 @@ public class ReadWriteOperationTest {
 		 */
 		FunctionFactory.registerFunction(Polynomial.class, true);
 	}
-	
+
 	@Test
 	public void testFunctionSimple() throws Exception {
 		
@@ -82,31 +87,20 @@ public class ReadWriteOperationTest {
 		final File tmp = File.createTempFile("Test", ".nxs");
 		tmp.deleteOnExit();
 		tmp.createNewFile();
-		NexusFile filewriter = NexusFileHDF5.openNexusFile(tmp.getAbsolutePath());
-		IPersistentFile persist = pservice.createPersistentFile(filewriter);
-		try {
+		try (IPersistentFile persist = pservice.createPersistentFile(NexusFileHDF5.createNexusFile(tmp.getAbsolutePath()))) {
 			persist.setOperations(functionOp);
-		} finally {
-			persist.close();
 		}
-		filewriter.close();
 
-		NexusFile filereader = NexusFileHDF5.openNexusFile(tmp.getAbsolutePath());
-		persist = pservice.createPersistentFile(filereader);
-		try {
-
+		try (IPersistentFile persist = pservice.createPersistentFile(NexusFileHDF5.openNexusFile(tmp.getAbsolutePath()))) {
 			IOperation[] readOperations = persist.getOperations();
 
 			final FunctionModel model = (FunctionModel) readOperations[0].getModel();
 			if (!poly.equals(model.getFunction())) {
 				throw new Exception("Cannot get function from serialized file!");
 			}
-		} finally {
-			persist.close();
 		}
 	}
 
-	@Ignore("Tycho testing fails 20200512")
 	@Test
 	public void testWriteReadOperations() throws Exception {
 		IOperation op2 = service.create("org.dawnsci.persistence.test.operations.JunkTestOperation");
@@ -120,17 +114,67 @@ public class ReadWriteOperationTest {
 		final File tmp = File.createTempFile("Test", ".nxs");
 		tmp.deleteOnExit();
 		tmp.createNewFile();
-		// TODO Must be closed in a try{} finally{} ?
-		NexusFile file = NexusFileHDF5.createNexusFile(tmp.getAbsolutePath());
-		writeOperations(file, op2);
 
-		GroupNode g = NexusUtils.loadGroupFully(file, PersistenceConstants.PROCESS_ENTRY, 3);
-		IOperation[] readOperations = PersistJsonOperationsNode.readOperations(g);
+		try (NexusFile file = NexusFileHDF5.createNexusFile(tmp.getAbsolutePath())) {
+			writeOperations(file, op2);
+	
+			GroupNode g = NexusUtils.loadGroupFully(file, PersistenceConstants.PROCESS_ENTRY, 3);
+			assertEquals(modelJson, g.getGroupNode("0").getDataNode("data").getString());
 
-		assertEquals(((JunkTestOperationModel)(readOperations[0].getModel())).getxDim(), 50);
+			IOperation[] readOperations = PersistJsonOperationsNode.readOperations(g);
+			assertEquals(((JunkTestOperationModel)(readOperations[0].getModel())).getxDim(), 50);
+		}
 	}
 
-	@Ignore("Tycho testing fails 20200512")
+	@Test
+	public void testWriteReadAutoConfigureOperations() throws Exception {
+		IOperation op = service.create("org.dawnsci.persistence.test.operations.DefaultAutoOperation");
+		Class modelType = (Class)((ParameterizedType)op.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+		DefaultAutoModel iModel  = (DefaultAutoModel) modelType.newInstance();
+		op.setModel(iModel);
+		iModel.setxDim(50);
+
+		String modelJson = PersistJsonOperationsNode.getModelJson(iModel);
+
+		final File tmp = File.createTempFile("Test", ".nxs");
+		tmp.deleteOnExit();
+		tmp.createNewFile();
+
+		try (NexusFile file = NexusFileHDF5.createNexusFile(tmp.getAbsolutePath())) {
+			int[] shape = new int[] {24, 1000};
+			int[] oShape = new int[] {shape[0]};
+			int current = 0;
+			Slice slice = new Slice(current, current + 1);
+	
+			SliceInformation si = new SliceInformation(new SliceND(shape, slice),
+					new SliceND(oShape, slice), new SliceND(shape), new int[] {1}, oShape[0], current);
+			SliceFromSeriesMetadata ssm = new SliceFromSeriesMetadata(si);
+			IntegerDataset data = DatasetFactory.createRange(IntegerDataset.class, shape[1]);
+			data.addMetadata(ssm);
+			OperationData od = op.execute(data, null);
+	
+			writeOperations(file, op);
+			writeAutoConfiguredFields(file, od.getConfiguredFields());
+	
+			GroupNode g = NexusUtils.loadGroupFully(file, PersistenceConstants.PROCESS_ENTRY, 3);
+			assertEquals(modelJson, g.getGroupNode("0").getDataNode("data").getString());
+
+			IOperation[] readOperations = PersistJsonOperationsNode.readOperations(g);
+			DefaultAutoModel oModel = (DefaultAutoModel) readOperations[0].getModel();
+			assertEquals(iModel.getxDim(), oModel.getxDim());
+			assertEquals(iModel.getFile(), oModel.getFile());
+			assertEquals(iModel.getRoiA(), oModel.getRoiA());
+			assertEquals(iModel.getValue(), oModel.getValue());
+	
+			assertTrue(PersistJsonOperationsNode.hasConfiguredFields(g));
+			PersistJsonOperationsNode.applyConfiguredFields(g, readOperations);
+			assertEquals(iModel.getxDim(), oModel.getxDim());
+			assertEquals("test.dat", oModel.getFile());
+			assertEquals(new RectangularROI(shape[1], 0), oModel.getRoiA());
+			assertEquals(Double.valueOf(0), oModel.getValue());
+		}
+	}
+
 	@Test
 	public void testWriteReadOperationRoiFuncData() throws Exception {
 		IOperation op2 = service.create("org.dawnsci.persistence.test.operations.JunkTestOperationROI");
@@ -149,22 +193,23 @@ public class ReadWriteOperationTest {
 		final File tmp = File.createTempFile("Test", ".nxs");
 		tmp.deleteOnExit();
 		tmp.createNewFile();
-		NexusFile file = NexusFileHDF5.createNexusFile(tmp.getAbsolutePath());
-		writeOperations(file, op2);
 
-		GroupNode g = NexusUtils.loadGroupFully(file, PersistenceConstants.PROCESS_ENTRY, 3);
-		IOperation[] readOperations = PersistJsonOperationsNode.readOperations(g);
-		JunkTestModelROI mo = (JunkTestModelROI)readOperations[0].getModel();
-		assertEquals(mo.getxDim(), 50);
-		assertTrue(mo.getRoi() != null);
-		assertTrue(mo.getBar() != null);
-		assertTrue(mo.getFoo() != null);
-		assertTrue(mo.getData() != null);
-		assertTrue(mo.getFunc() != null);
-		assertTrue(mo.getRoi2() != null);
+		try (NexusFile file = NexusFileHDF5.createNexusFile(tmp.getAbsolutePath())) {
+			writeOperations(file, op2);
+	
+			GroupNode g = NexusUtils.loadGroupFully(file, PersistenceConstants.PROCESS_ENTRY, 3);
+			IOperation[] readOperations = PersistJsonOperationsNode.readOperations(g);
+			JunkTestModelROI mo = (JunkTestModelROI)readOperations[0].getModel();
+			assertEquals(mo.getxDim(), 50);
+			assertTrue(mo.getRoi() != null);
+			assertTrue(mo.getBar() != null);
+			assertTrue(mo.getFoo() != null);
+			assertTrue(mo.getData() != null);
+			assertTrue(mo.getFunc() != null);
+			assertTrue(mo.getRoi2() != null);
+		}
 	}
 
-	@Ignore("Tycho testing fails 20200512")
 	@Test
 	public void testWriteReadOperationRoiFuncDataNode() throws Exception {
 		IOperation op2 = service.create("org.dawnsci.persistence.test.operations.JunkTestOperationROI");
@@ -209,11 +254,12 @@ public class ReadWriteOperationTest {
 		final File tmp = File.createTempFile("Test", ".nxs");
 		tmp.deleteOnExit();
 		tmp.createNewFile();
-		NexusFile file = NexusFileHDF5.createNexusFile(tmp.getAbsolutePath());
-		writeOriginalDataInformation(file, ssm);
-		file.close();
 
-		OriginMetadata outOm = PersistJsonOperationsNode.readOriginalDataInformation(file.getFilePath());
+		try (NexusFile file = NexusFileHDF5.createNexusFile(tmp.getAbsolutePath())) {
+			writeOriginalDataInformation(file, ssm);
+		}
+
+		OriginMetadata outOm = PersistJsonOperationsNode.readOriginalDataInformation(tmp.getAbsolutePath());
 		outOm.toString();
 	}
 
@@ -225,6 +271,13 @@ public class ReadWriteOperationTest {
 		GroupNode entryGroup = file.getGroup(PROCESSED_ENTRY, true);
 		GroupNode processGroup = PersistJsonOperationsNode.writeOperationsToNode(operations);
 		file.addNode(entryGroup, PROCESS, processGroup);
+	}
+
+	private void writeAutoConfiguredFields(NexusFile file, Map<String, Serializable> configuredFields) throws Exception {
+		GroupNode ac = PersistJsonOperationsNode.writeAutoConfiguredFieldsToNode(configuredFields);
+		String n = ac.getNames().iterator().next();
+		GroupNode note = file.getGroup(PROCESSED_ENTRY + Node.SEPARATOR + PROCESS + Node.SEPARATOR + "0", false);
+		file.addNode(note, n, ac.getGroupNode(n));
 	}
 
 	private static void writeOriginalDataInformation(NexusFile file, OriginMetadata origin) throws Exception {
