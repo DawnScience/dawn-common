@@ -18,6 +18,7 @@ import java.util.Map;
 import org.dawnsci.conversion.converters.util.LocalServiceManager;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversion;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
+import org.eclipse.dawnsci.analysis.api.conversion.IConversionVisitor;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
 import org.eclipse.dawnsci.analysis.dataset.slicer.SliceFromSeriesMetadata;
 import org.eclipse.dawnsci.analysis.dataset.slicer.SliceViewIterator;
@@ -52,12 +53,11 @@ public abstract class AbstractConversion implements IConversion {
 		
 		// If they directly specify an ILazyDataset, loop it and only
 		// it directly. Ignore file paths.
-		if (context.getLazyDataset()!=null) {
-			final ILazyDataset lz = context.getLazyDataset();
-			if (lz!=null) iterate(lz, lz.getName(), context);
-
-		} else {
-			final List<String> filePaths = context.getFilePaths();
+		ILazyDataset lz = context.getLazyDataset();
+		final List<String> filePaths = context.getFilePaths();
+		if (lz != null) {
+			iterate(lz, lz.getName(), context);
+		} else if (filePaths != null && !filePaths.isEmpty()) {
 			for (String filePathRegEx : filePaths) {
 				final List<File> paths = expand(filePathRegEx);
 				for (File path : paths) {
@@ -70,15 +70,22 @@ public abstract class AbstractConversion implements IConversion {
 							final List<String> data = getData(sets, nameRegExp);
 							if (data == null) continue;
 							for (String dsPath : data) {
-								final ILazyDataset lz = getLazyDataset(path, dsPath, context);
+								lz = getLazyDataset(path, dsPath, context);
 								if (lz!=null) iterate(lz, dsPath, context);
 							}
 						}
 					} else { 
-						final ILazyDataset lz = getLazyDataset(path, null, context);
+						lz = getLazyDataset(path, null, context);
 						iterate(lz, path.getName(), context);
 					}
 				}
+			}
+		} else {
+			// If no lazy dataset and no file paths specified then try conversion visitor directly
+			// as the existing implementations get their data from plotting systems
+			IConversionVisitor v = context.getConversionVisitor();
+			if (v != null) {
+				v.visit(context, null);
 			}
 		}
 	}

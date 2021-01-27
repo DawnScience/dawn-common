@@ -9,10 +9,9 @@
 package org.dawb.common.ui.wizard;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import org.dawb.common.util.io.FileUtils;
@@ -20,18 +19,15 @@ import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
 import org.eclipse.dawnsci.plotting.api.IPlottingSystem;
 import org.eclipse.dawnsci.plotting.api.PlotType;
 import org.eclipse.dawnsci.plotting.api.trace.ILineTrace;
+import org.eclipse.dawnsci.plotting.api.trace.PlotExportConstants;
 import org.eclipse.january.dataset.Dataset;
-import org.eclipse.january.dataset.DatasetFactory;
 import org.eclipse.january.dataset.DatasetUtils;
 import org.eclipse.january.dataset.IDataset;
-import org.eclipse.january.dataset.InterfaceUtils;
 import org.eclipse.january.dataset.Slice;
-import org.eclipse.january.dataset.SliceND;
+import org.eclipse.january.metadata.IMetadata;
 
-import uk.ac.diamond.scisoft.analysis.io.ASCIIDataHolderSaver;
-import uk.ac.diamond.scisoft.analysis.io.ASCIIDataWithHeadingSaver;
+import uk.ac.diamond.scisoft.analysis.io.ColumnTextSaver;
 import uk.ac.diamond.scisoft.analysis.io.DataHolder;
-import uk.ac.diamond.scisoft.analysis.utils.VersionSort;
 
 /**
  * TODO FIXME This is not a UI class. Suggest move to data/algorithm plugin like org.dawnsci.persistence perhaps.
@@ -78,17 +74,16 @@ public class Plot1DConversionVisitor extends AbstractPlotConversionVisitor {
 			outFile.getParentFile().mkdirs();
 		}
 
+		Collection<ILineTrace> traces = system.getTracesByClass(ILineTrace.class);
+		ILineTrace[] traceArray = traces.toArray(new ILineTrace[traces.size()]);
 		if (asDat) {
-			List<ILineTrace> traceList = new ArrayList<>(system.getTracesByClass(ILineTrace.class));
-			Collections.sort(traceList, ILineTraceComparator);
-			ILineTrace[] traces = traceList.toArray(new ILineTrace[traceList.size()]);
 			if (asSingle || system.getTraces(ILineTrace.class).size() == 1) {
-				saveLineTracesAsDat(context.getOutputPath(), traces);
+				saveLineTraces(true, context.getOutputPath(), traceArray);
 			} else {
-				saveLineTracesAsMultipleDat(context.getOutputPath(), traces);
+				saveLineTracesAsMultipleDat(context.getOutputPath(), traceArray);
 			}
 		} else {
-			saveLineTracesAsCSV(context.getOutputPath());
+			saveLineTraces(false, context.getOutputPath(), traceArray);
 		}
 	}
 
@@ -107,7 +102,7 @@ public class Plot1DConversionVisitor extends AbstractPlotConversionVisitor {
 		int digits = Math.max(2, (int) Math.ceil(Math.log10(imax)));
 		String format = String.format("%s-%%0%dd.%s", new File(f, n).getAbsolutePath(), digits, ext);
 		for (int i = 0; i < imax; i++) {
-			saveLineTracesAsDat(String.format(format, i), traces[i]);
+			saveLineTraces(true, String.format(format, i), traces[i]);
 		}
 	}
 
@@ -116,23 +111,8 @@ public class Plot1DConversionVisitor extends AbstractPlotConversionVisitor {
 		return asDat ? EXTENSION_DAT : EXTENSION_CSV;
 	}
 
-	private static final Comparator<ILineTrace> ILineTraceComparator = new Comparator<ILineTrace>() {
-		@Override
-		public int compare(ILineTrace a, ILineTrace b) {
-			if (a == null || a.getYData() == null || a.getYData().getName() == null || a.getYData().getName().isEmpty())
-				return 1;
-
-			if (b == null || b.getYData() == null || b.getYData().getName() == null || b.getYData().getName().isEmpty())
-				return -1;
-			
-			return VersionSort.versionCompare(
-					a.getYData().getName(),
-					b.getYData().getName()
-				);
-		}
-	};
-	
-	private void saveLineTracesAsDat(String filename, ILineTrace... traces) throws Exception {
+	private void saveLineTraces(boolean asDat, String filename, ILineTrace... traces) throws Exception {
+		List<String> preHeader = new ArrayList<>();
 		List<String> headings = new ArrayList<>();
 
 		int i = 0;
@@ -141,70 +121,39 @@ public class Plot1DConversionVisitor extends AbstractPlotConversionVisitor {
 		Dataset firstX = DatasetUtils.convertToDataset(traces[0].getXData());
 		Dataset firstY = DatasetUtils.convertToDataset(traces[0].getYData());
 		int length = firstY.getSize();
-		if (firstX.getName().isEmpty()) {
-			headings.add(imax == 1 ? "x" : "x0");
-		} else {
-			headings.add(firstX.getName().replace(' ', '_'));
-		}
-		if (firstY.getName().isEmpty()) {
-			headings.add(imax == 1 ? "y" : "y0");
-		} else {
-			headings.add(firstY.getName().replace(' ', '_'));
-		}
+		headings.add(getGoodXName(firstX, imax == 1 ? null : 0));
+		headings.add(getGoodYName(preHeader, firstY, imax == 1 ? null : 0));
 
-		boolean ragged = false;
-		Class<? extends Dataset> xClass = firstX.getClass();
-		Class<? extends Dataset> yClass = firstY.getClass();
-		for (i = 1; i < imax; i++) {
-			ILineTrace trace = traces[i];
-			IDataset current = trace.getYData();
-			
-			int size = current.getSize();
-			if (size > length) {
-				length = Math.max(length, size);
-				ragged = true;
+		if (asDat) {
+			for (i = 1; i < imax; i++) {
+				ILineTrace trace = traces[i];
+				IDataset current = trace.getYData();
+				
+				int size = current.getSize();
+				if (size > length) {
+					length = Math.max(length, size);
+				}
 			}
-			xClass = InterfaceUtils.getBestInterface(InterfaceUtils.getInterface(trace.getXData()), xClass);
-			yClass = InterfaceUtils.getBestInterface(InterfaceUtils.getInterface(current), yClass);
 		}
 
-		if (ragged) { // use doubles or floats
-			xClass = InterfaceUtils.getBestFloatInterface(xClass);
-			yClass = InterfaceUtils.getBestFloatInterface(yClass);
-		}
-
-		int columns = asSingleX ? imax + 1 : 2 * imax;
-		Dataset allTraces = DatasetFactory.zeros(InterfaceUtils.getBestInterface(xClass, yClass), length, columns);
-		if (ragged && allTraces.hasFloatingPointElements()) {
-			allTraces.fill(Double.NaN);
-		}
-
-		SliceND slice = new SliceND(allTraces.getShapeRef());
-
-		int[] shape = new int[] {1, 1};
 		int size = firstY.getSize();
-		shape[0] = size;
-		int j = 0;
-		slice.setSlice(1, j, j+1, 1);
-		if (asSingleX) {
-			slice.setSlice(0, 0, length, 1);
-			if (firstX.getSize() < length) {
-				throw new IllegalArgumentException("First x dataset must be long as longest y dataset");
+		if (asDat) {
+			if (asSingleX) {
+				if (firstX.getSize() < length) {
+					throw new IllegalArgumentException("First x dataset must be long as longest y dataset");
+				}
+				firstX = firstX.getSliceView(new Slice(length));
+			} else {
+				if (firstX.getSize() > size) {
+					firstX = firstX.getSliceView(new Slice(size));
+				}
 			}
-			firstX = firstX.getSliceView(new Slice(length));
-			allTraces.setSlice(firstX.reshape(length, 1), slice);
-			slice.setSlice(0, 0, size, 1);
-		} else {
-			slice.setSlice(0, 0, size, 1);
-			if (firstX.getSize() > size) {
-				firstX = firstX.getSliceView(new Slice(size));
-			}
-			allTraces.setSlice(firstX.reshape(shape), slice);
 		}
-		j++;
-		slice.setSlice(1, j, j+1, 1);
-		allTraces.setSlice(firstY.reshape(shape), slice);
-		j++;
+
+		int j = 0;
+		DataHolder dh = new DataHolder();
+		dh.addDataset(headings.get(j++), firstX);
+		dh.addDataset(headings.get(j++), firstY);
 
 		for (i = 1; i < imax; i++) {
 			ILineTrace trace = traces[i];
@@ -212,59 +161,81 @@ public class Plot1DConversionVisitor extends AbstractPlotConversionVisitor {
 			Dataset y = DatasetUtils.convertToDataset(trace.getYData());
 
 			if (x != null) {
-				if (x.getName().isEmpty()) {
-					headings.add("x" + i);
-				} else {
-					headings.add(x.getName().replace(' ', '_'));
-				}
+				headings.add(getGoodXName(x, i));
 			}
-			if (y.getName().isEmpty()) {
-				headings.add("y" + i);
-			} else {
-				headings.add(y.getName().replace(' ', '_'));
-			}
+			headings.add(getGoodYName(preHeader, y, i));
 
 			size = y.getSize();
-			shape[0] = size;
-			slice.setSlice(0, 0, size, 1);
 			if (x != null) {
-				slice.setSlice(1, j, j+1, 1);
-				if (x.getSize() > size) {
-					x = x.getSliceView(new Slice(size));
+				if (asDat) {
+					if (x.getSize() > size) {
+						x = x.getSliceView(new Slice(size));
+					}
 				}
-				allTraces.setSlice(x.reshape(shape), slice);
-				j++;
+				dh.addDataset(headings.get(j++), x);
 			}
-			slice.setSlice(1, j, j+1, 1);
-			allTraces.setSlice(y.reshape(shape), slice);
-			j++;
+			dh.addDataset(headings.get(j++), y);
 		}
 
-		ASCIIDataWithHeadingSaver saver = new ASCIIDataWithHeadingSaver(filename);
-		DataHolder dh = new DataHolder();
-		dh.addDataset("AllTraces", allTraces);
-		saver.setHeader("#Traces extracted from Plot");
+		ColumnTextSaver saver = new ColumnTextSaver(filename);
 		saver.setHeadings(headings);
-		saver.setCellFormat("%.16g");
+		if (asDat) {
+			saver.setCellFormat("%.16g");
+		} else {
+			saver.setDelimiter(ColumnTextSaver.COMMA);
+		}
+		saver.setHeaders(saver.createRow(preHeader.toArray(new String[preHeader.size()])));
 		saver.saveFile(dh);
 	}
 
-	private void saveLineTracesAsCSV(String filename) throws Exception {
-		Collection<ILineTrace> traces = system.getTracesByClass(ILineTrace.class);
-		int i = 0;
-		DataHolder dh = new DataHolder();
-		for (ILineTrace trace : traces) {
-			
-			IDataset x = trace.getXData();
-			IDataset y = trace.getYData();
-			dh.addDataset("Tracex_" + i, x);
-			dh.addDataset("Tracey_y" + i, y);
-			i++;
+	private String getGoodXName(IDataset d, Integer i) {
+		String n = d.getName();
+		if (n.isEmpty()) {
+			n = "x";
+			if (i != null) {
+				n += i;
+			}
+		}
+		return n;
+	}
+
+	private String getGoodYName(List<String> preHeader, IDataset d, Integer i) {
+		String n = null;
+		IMetadata md = d.getFirstMetadata(IMetadata.class);
+		if (md != null) {
+			try {
+				Serializable s = md.getMetaValue(PlotExportConstants.LABEL_NAME);
+				if (preHeader.isEmpty()) {
+					if (s != null) {
+						preHeader.add(0, s.toString());
+					} else {
+						preHeader.add(0, "scan");
+					}
+				}
+				s = md.getMetaValue(PlotExportConstants.LABEL_VALUE);
+				if (s != null) {
+					preHeader.add(i + 1, s.toString());
+				} else {
+					s = md.getMetaValue(PlotExportConstants.SCAN);
+					if (s != null) {
+						preHeader.add(i + 1, s.toString());
+					}
+				}
+
+				s = md.getMetaValue(PlotExportConstants.PLOT_NAME);
+				if (s != null) {
+					n = s.toString();
+				}
+			} catch (Exception e) {
+			}
 		}
 
-		ASCIIDataHolderSaver saver = new ASCIIDataHolderSaver(filename);
-		saver.saveFile(dh);
-
+		if (n == null) {
+			n = "y";
+			if (i != null) {
+				n += i;
+			}
+		}
+		return n;
 	}
-
 }

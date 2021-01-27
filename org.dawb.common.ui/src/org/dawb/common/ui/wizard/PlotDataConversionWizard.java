@@ -22,9 +22,7 @@ import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionService;
 import org.eclipse.dawnsci.plotting.api.IPlottingSystem;
 import org.eclipse.dawnsci.plotting.api.trace.ILineTrace;
-import org.eclipse.january.dataset.DatasetFactory;
 import org.eclipse.january.dataset.IDataset;
-import org.eclipse.january.dataset.IntegerDataset;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -79,15 +77,9 @@ public class PlotDataConversionWizard extends Wizard implements IExportWizard {
 			visitor = new Plot1DConversionVisitor(system);
 		}
 		
-		String[] junk = new String[1];
-		junk[0] = "";
-		context = service.open(junk);
+		context = service.open();
 		context.setConversionVisitor(visitor);
-		
-		//HACK - put in a dataset so the conversion class goes straight to iterate
-		context.setLazyDataset(DatasetFactory.zeros(IntegerDataset.class, new int[]{10}));
-		context.addSliceDimension(0, "all");
-		
+
 		conversionPage = new PlotDataConversionPage();
 		if (filePath!=null) {
 			conversionPage.setPath(filePath);
