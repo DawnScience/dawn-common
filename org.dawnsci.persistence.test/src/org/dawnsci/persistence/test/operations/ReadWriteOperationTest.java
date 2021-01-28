@@ -2,6 +2,7 @@ package org.dawnsci.persistence.test.operations;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.Serializable;
@@ -22,12 +23,12 @@ import org.eclipse.dawnsci.analysis.api.processing.model.IOperationModel;
 import org.eclipse.dawnsci.analysis.api.tree.GroupNode;
 import org.eclipse.dawnsci.analysis.api.tree.Node;
 import org.eclipse.dawnsci.analysis.api.tree.Tree;
+import org.eclipse.dawnsci.analysis.dataset.operations.AbstractOperationBase;
 import org.eclipse.dawnsci.analysis.dataset.roi.RectangularROI;
 import org.eclipse.dawnsci.analysis.dataset.roi.SectorROI;
 import org.eclipse.dawnsci.analysis.dataset.slicer.SliceFromSeriesMetadata;
 import org.eclipse.dawnsci.analysis.dataset.slicer.SliceInformation;
 import org.eclipse.dawnsci.analysis.dataset.slicer.SourceInformation;
-import org.eclipse.dawnsci.hdf5.HDF5FileFactory;
 import org.eclipse.dawnsci.hdf5.nexus.NexusFileFactoryHDF5;
 import org.eclipse.dawnsci.hdf5.nexus.NexusFileHDF5;
 import org.eclipse.dawnsci.nexus.NexusConstants;
@@ -38,7 +39,6 @@ import org.eclipse.january.dataset.IntegerDataset;
 import org.eclipse.january.dataset.Slice;
 import org.eclipse.january.dataset.SliceND;
 import org.eclipse.january.metadata.OriginMetadata;
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -61,9 +61,6 @@ public class ReadWriteOperationTest {
 
 		new ServiceLoader().setNexusFactory(new NexusFileFactoryHDF5());
 		service = new OperationServiceImpl();
-		// FIXME these calls fail to create operations when using Tycho build as
-		// the class loader cannot find classes are built in target/ directory
-		// maybe solution is to add that to class path
 		service.createOperations(ReadWriteOperationTest.class, "org.dawnsci.persistence.test.operations");
 		service.createOperations(service.getClass(), "uk.ac.diamond.scisoft.analysis.processing.operations");
 		new PersistJsonOperationsNode().setOperationService(service);
@@ -103,10 +100,20 @@ public class ReadWriteOperationTest {
 
 	@Test
 	public void testWriteReadOperations() throws Exception {
-		IOperation op2 = service.create("org.dawnsci.persistence.test.operations.JunkTestOperation");
-		Class modelType = (Class)((ParameterizedType)op2.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
-		IOperationModel model2  = (IOperationModel) modelType.newInstance();
-		op2.setModel(model2);
+		IOperation op = service.create("org.dawnsci.persistence.test.operations.JunkTestOperation");
+
+		AbstractOperationBase aop = null;
+		if (op instanceof AbstractOperationBase) {
+			aop = (AbstractOperationBase) op;
+		} else {
+			fail("Operation must extend AbstractOperationBase");
+		}
+
+		Class<?> modelType = aop.getModelClass();
+		assertEquals(JunkTestOperationModel.class, modelType);
+
+		IOperationModel model2  = (IOperationModel) modelType.getConstructor().newInstance();
+		op.setModel(model2);
 		((JunkTestOperationModel)model2).setxDim(50);
 
 		String modelJson = PersistJsonOperationsNode.getModelJson(model2);
@@ -116,7 +123,7 @@ public class ReadWriteOperationTest {
 		tmp.createNewFile();
 
 		try (NexusFile file = NexusFileHDF5.createNexusFile(tmp.getAbsolutePath())) {
-			writeOperations(file, op2);
+			writeOperations(file, op);
 	
 			GroupNode g = NexusUtils.loadGroupFully(file, PersistenceConstants.PROCESS_ENTRY, 3);
 			assertEquals(modelJson, g.getGroupNode("0").getDataNode("data").getString());
@@ -129,8 +136,8 @@ public class ReadWriteOperationTest {
 	@Test
 	public void testWriteReadAutoConfigureOperations() throws Exception {
 		IOperation op = service.create("org.dawnsci.persistence.test.operations.DefaultAutoOperation");
-		Class modelType = (Class)((ParameterizedType)op.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
-		DefaultAutoModel iModel  = (DefaultAutoModel) modelType.newInstance();
+		Class<?> modelType = (Class<?>) ((ParameterizedType)op.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+		DefaultAutoModel iModel  = (DefaultAutoModel) modelType.getConstructor().newInstance();
 		op.setModel(iModel);
 		iModel.setxDim(50);
 
@@ -178,8 +185,8 @@ public class ReadWriteOperationTest {
 	@Test
 	public void testWriteReadOperationRoiFuncData() throws Exception {
 		IOperation op2 = service.create("org.dawnsci.persistence.test.operations.JunkTestOperationROI");
-		Class modelType = (Class)((ParameterizedType)op2.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
-		JunkTestModelROI model2  = (JunkTestModelROI) modelType.newInstance();
+		Class<?> modelType = (Class<?>) ((ParameterizedType)op2.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+		JunkTestModelROI model2  = (JunkTestModelROI) modelType.getConstructor().newInstance();
 
 		model2.setRoi(new SectorROI());
 		model2.setxDim(50);
@@ -213,8 +220,8 @@ public class ReadWriteOperationTest {
 	@Test
 	public void testWriteReadOperationRoiFuncDataNode() throws Exception {
 		IOperation op2 = service.create("org.dawnsci.persistence.test.operations.JunkTestOperationROI");
-		Class modelType = (Class)((ParameterizedType)op2.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
-		JunkTestModelROI model2  = (JunkTestModelROI) modelType.newInstance();
+		Class<?> modelType = (Class<?>) ((ParameterizedType)op2.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+		JunkTestModelROI model2  = (JunkTestModelROI) modelType.getConstructor().newInstance();
 
 		model2.setRoi(new SectorROI());
 		model2.setxDim(50);
@@ -287,5 +294,4 @@ public class ReadWriteOperationTest {
 		GroupNode originNode = PersistJsonOperationsNode.writeOriginalDataInformation(origin);
 		file.addNode(processNode, ORIGIN, originNode);
 	}
-
 }
