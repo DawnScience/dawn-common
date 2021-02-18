@@ -121,23 +121,20 @@ public class Plot1DConversionVisitor extends AbstractPlotConversionVisitor {
 		Dataset firstX = DatasetUtils.convertToDataset(traces[0].getXData());
 		Dataset firstY = DatasetUtils.convertToDataset(traces[0].getYData());
 		int length = firstY.getSize();
-		headings.add(getGoodXName(firstX, imax == 1 ? null : 0));
-		headings.add(getGoodYName(preHeader, firstY, imax == 1 ? null : 0));
+		addGoodXName(headings, firstX, imax == 1 ? null : 0);
+		addGoodYName(headings, preHeader, firstY, imax == 1 ? null : 0);
 
+		int size = firstY.getSize();
 		if (asDat) {
 			for (i = 1; i < imax; i++) {
 				ILineTrace trace = traces[i];
 				IDataset current = trace.getYData();
 				
-				int size = current.getSize();
-				if (size > length) {
-					length = Math.max(length, size);
+				int cSize = current.getSize();
+				if (cSize > length) {
+					length = Math.max(length, cSize);
 				}
 			}
-		}
-
-		int size = firstY.getSize();
-		if (asDat) {
 			if (asSingleX) {
 				if (firstX.getSize() < length) {
 					throw new IllegalArgumentException("First x dataset must be long as longest y dataset");
@@ -161,9 +158,9 @@ public class Plot1DConversionVisitor extends AbstractPlotConversionVisitor {
 			Dataset y = DatasetUtils.convertToDataset(trace.getYData());
 
 			if (x != null) {
-				headings.add(getGoodXName(x, i));
+				addGoodXName(headings, x, i);
 			}
-			headings.add(getGoodYName(preHeader, y, i));
+			addGoodYName(headings, preHeader, y, i);
 
 			size = y.getSize();
 			if (x != null) {
@@ -188,7 +185,7 @@ public class Plot1DConversionVisitor extends AbstractPlotConversionVisitor {
 		saver.saveFile(dh);
 	}
 
-	private String getGoodXName(IDataset d, Integer i) {
+	private String addGoodXName(List<String> headings, IDataset d, Integer i) {
 		String n = d.getName();
 		if (n.isEmpty()) {
 			n = "x";
@@ -196,10 +193,16 @@ public class Plot1DConversionVisitor extends AbstractPlotConversionVisitor {
 				n += i;
 			}
 		}
-		return n;
+		int j = 1;
+		String t = n;
+		while (headings.contains(t)) {
+			t = String.format("%s_%d", n, j++);
+		}
+		headings.add(t);
+		return t;
 	}
 
-	private String getGoodYName(List<String> preHeader, IDataset d, Integer i) {
+	private String addGoodYName(List<String> headings, List<String> preHeader, IDataset d, Integer i) {
 		String n = null;
 		IMetadata md = d.getFirstMetadata(IMetadata.class);
 		if (md != null) {
@@ -236,6 +239,12 @@ public class Plot1DConversionVisitor extends AbstractPlotConversionVisitor {
 				n += i;
 			}
 		}
-		return n;
+		int j = 1;
+		String t = n;
+		while (headings.contains(t)) {
+			t = String.format("%s_%d", n, j++);
+		}
+		headings.add(t);
+		return t;
 	}
 }
