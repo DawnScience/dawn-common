@@ -54,13 +54,11 @@ public class JexlGeneralFunctions {
 	}
 
 	public static Dataset mean(final Dataset data,final int axis) {
-		data.squeeze();
-		return data.mean(axis);
+		return data.getSliceView().squeeze().mean(axis);
 	}
 	
 	public static Dataset sum(final Dataset data,final int axis) {
-		data.squeeze();
-		return data.sum(axis);
+		return data.getSliceView().squeeze().sum(axis);
 	}
 	
 	public static IDataset slice(final IDataset data,final int[] start,
@@ -70,38 +68,31 @@ public class JexlGeneralFunctions {
 	}
 	
 	public static Dataset stdDev(final Dataset data, final int axis) {
-		data.squeeze();
-		return data.stdDeviation(axis);
+		return data.getSliceView().squeeze().stdDeviation(axis);
 	}
 	
 	public static Dataset max (final Dataset data, final int axis) {
-		data.squeeze();
-		return data.max(axis);
+		return data.getSliceView().squeeze().max(axis);
 	}
 	
 	public static Dataset min(final Dataset data, final int axis) {
-		data.squeeze();
-		return data.min(axis);
+		return data.getSliceView().squeeze().min(axis);
 	}
 	
 	public static Dataset peakToPeak(final Dataset data, final int axis) {
-		data.squeeze();
-		return data.peakToPeak(axis);
+		return data.getSliceView().squeeze().peakToPeak(axis);
 	}
 	
 	public static Dataset product(final Dataset data, final int axis) {
-		data.squeeze();
-		return data.product(axis);
+		return data.getSliceView().squeeze().product(axis);
 	}
 	
 	public static Dataset rootMeanSquare(Dataset data, int axis) {
-		data.squeeze();
-		return data.rootMeanSquare(axis);
+		return data.getSliceView().squeeze().rootMeanSquare(axis);
 	}
 	
 	public static Dataset median(Dataset data, int axis) {
-		data.squeeze();
-		return Stats.median(data,axis);
+		return Stats.median(data.getSliceView().squeeze(),axis);
 	}
 	
 	public static Dataset slice(Dataset data, String sliceString) {
@@ -113,11 +104,10 @@ public class JexlGeneralFunctions {
 	}
 	
 	public static IDataset squeeze(IDataset data) {
-		return data.squeeze();
+		return data.getSliceView().squeeze();
 	}
 
 	public static Dataset reshape(Dataset data, int[] shape) {
-		Dataset out = data.clone();
-		return out.reshape(shape);
+		return data.reshape(shape);
 	}
 }

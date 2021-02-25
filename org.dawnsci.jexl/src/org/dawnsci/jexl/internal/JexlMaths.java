@@ -39,6 +39,10 @@ public class JexlMaths {
 		return Maths.sqrt(a);
 	}
 
+	public static Dataset hypot(final Object a, final Object b) {
+		return Maths.hypot(a, b);
+	}
+
 	public static Dataset cbrt(final Object a) {
 		return Maths.cbrt(a);
 	}
@@ -105,6 +109,10 @@ public class JexlMaths {
 
 	public static Dataset arctan(final Object a) {
 		return Maths.arctan(a);
+	}
+
+	public static Dataset arctan2(final Object a, final Object b) {
+		return Maths.arctan2(a, b);
 	}
 
 	public static Dataset toDegrees(final Object a) {

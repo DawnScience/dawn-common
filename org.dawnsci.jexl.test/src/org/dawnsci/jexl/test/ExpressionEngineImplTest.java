@@ -8,12 +8,17 @@
  */
 package org.dawnsci.jexl.test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.dawnsci.jexl.internal.ExpressionEngineImpl;
 import org.eclipse.dawnsci.analysis.api.expressions.IExpressionEngine;
+import org.eclipse.january.dataset.Dataset;
+import org.eclipse.january.dataset.DatasetFactory;
 import org.junit.Test;
 
 public class ExpressionEngineImplTest {
@@ -50,4 +55,43 @@ public class ExpressionEngineImplTest {
 		assertVariablesEquals("a['new'].va", "a.new.va");
 	}
 
+	public void assertExpressionEquals(Object expected, String expression, Map<String, Object> vars) throws Exception {
+		IExpressionEngine engine = new ExpressionEngineImpl();
+		if (vars != null) engine.setLoadedVariables(vars);
+		engine.createExpression(expression);
+		Object obj = engine.evaluate();
+		if (obj instanceof Double) {
+			assertEquals(((Number) expected).doubleValue(), ((Double) obj).doubleValue(), 1e-15); 
+		} else {
+			assertEquals(expected, obj);
+		}
+	}
+
+	enum Order {
+		One,
+		Two
+	}
+
+	@Test
+	public void testEvaluation() throws Exception {
+		assertExpressionEquals(5, "'hello'.size()", null);
+
+		Map<String, Object> vars = new HashMap<>();
+		vars.put("a","hello");
+		vars.put("e1", Order.Two);
+		assertExpressionEquals(5, "a.size()", vars);
+		assertExpressionEquals(true, "a == 'hello'", vars);
+		assertExpressionEquals(1, "e1.ordinal()", vars);
+		assertExpressionEquals(true, "e1.ordinal() == 1", vars);
+		assertExpressionEquals(true, "e1.toString() == 'Two'", vars);
+	}
+
+	@Test
+	public void testReshape() throws Exception {
+		Map<String, Object> vars = new HashMap<>();
+		vars.put("a", DatasetFactory.zeros(12));
+
+		Dataset z = DatasetFactory.zeros(12).reshape(4, 3);
+		assertExpressionEquals(z, "dat:reshape(a, 4, 3)", vars);
+	}
 }
