@@ -40,66 +40,101 @@
          unpack="false"/>
 
    <plugin
+         id="org.apache.batik.bridge"
+         download-size="0"
+         install-size="0"
+         version="1.9.1.v20190730-1743"
+         unpack="false"/>
+
+   <plugin
+         id="org.apache.batik.codec"
+         download-size="0"
+         install-size="0"
+         version="1.9.1.v20190730-1743"
+         unpack="false"/>
+
+   <plugin
+         id="org.apache.batik.gvt"
+         download-size="0"
+         install-size="0"
+         version="1.9.1.v20190730-1743"
+         unpack="false"/>
+
+   <plugin
+         id="org.apache.batik.script"
+         download-size="0"
+         install-size="0"
+         version="1.9.1.v20190730-1743"
+         unpack="false"/>
+
+   <plugin
+         id="org.apache.batik.transcoder"
+         download-size="0"
+         install-size="0"
+         version="1.9.1.v20190730-1743"
+         unpack="false"/>
+
+   <plugin
          id="org.apache.batik.dom"
          download-size="0"
          install-size="0"
-         version="1.7.1.v201505191845"
+         version="1.9.1.v20190730-1743"
          unpack="false"/>
 
    <plugin
          id="org.apache.batik.xml"
          download-size="0"
          install-size="0"
-         version="1.7.0.v201011041433"
+         version="1.9.1.v20190730-1743"
          unpack="false"/>
 
    <plugin
          id="org.apache.batik.parser"
          download-size="0"
          install-size="0"
-         version="1.7.0.v201011041433"
+         version="1.9.1.v20190730-1743"
          unpack="false"/>
 
    <plugin
          id="org.apache.batik.dom.svg"
          download-size="0"
          install-size="0"
-         version="1.7.0.v201011041433"
+         version="1.9.1.v20190730-1743"
          unpack="false"/>
 
    <plugin
          id="org.apache.batik.ext.awt"
          download-size="0"
          install-size="0"
-         version="1.7.0.v201011041433"
+         version="1.9.1.v20190730-1743"
          unpack="false"/>
 
    <plugin
          id="org.apache.batik.svggen"
          download-size="0"
          install-size="0"
-         version="1.7.0.v201011041433"
+         version="1.9.1.v20190730-1743"
          unpack="false"/>
 
    <plugin
          id="org.apache.batik.util"
          download-size="0"
          install-size="0"
-         version="1.7.0.v201011041433"
+         version="1.9.1.v20180703-1553"
          unpack="false"/>
 
    <plugin
          id="org.apache.batik.util.gui"
          download-size="0"
          install-size="0"
-         version="1.7.0.v200903091627"
+         version="1.9.1.v20190730-1743"
          unpack="false"/>
 
    <plugin
          id="org.apache.batik.css"
          download-size="0"
          install-size="0"
-         version="1.7.0.v201011041433"
+         version="1.9.1.v20181015-1528"
          unpack="false"/>
 
    <plugin
@@ -142,6 +177,34 @@
          download-size="0"
          install-size="0"
          version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.apache.batik.anim"
+         download-size="0"
+         install-size="0"
+         version="1.9.1.v20190730-1743"
+         unpack="false"/>
+
+   <plugin
+         id="org.apache.xalan"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.apache.batik.constants"
+         download-size="0"
+         install-size="0"
+         version="1.9.1.v20180227-1645"
+         unpack="false"/>
+
+   <plugin
+         id="org.apache.batik.i18n"
+         download-size="0"
+         install-size="0"
+         version="1.9.1.v20180227-1645"
          unpack="false"/>
 
 </feature>

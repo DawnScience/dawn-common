@@ -16,7 +16,15 @@ package org.dawb.common.ui.svg;
 
 import java.awt.Dimension;
 
-import org.apache.batik.dom.svg.SVGDOMImplementation;
+import org.apache.batik.anim.dom.SVGDOMImplementation;
+import org.apache.batik.ext.awt.image.codec.imageio.ImageIOJPEGImageWriter;
+import org.apache.batik.ext.awt.image.codec.imageio.ImageIOJPEGRegistryEntry;
+import org.apache.batik.ext.awt.image.codec.imageio.ImageIOPNGImageWriter;
+import org.apache.batik.ext.awt.image.codec.imageio.ImageIOPNGRegistryEntry;
+import org.apache.batik.ext.awt.image.codec.imageio.ImageIOTIFFImageWriter;
+import org.apache.batik.ext.awt.image.codec.imageio.ImageIOTIFFRegistryEntry;
+import org.apache.batik.ext.awt.image.spi.ImageTagRegistry;
+import org.apache.batik.ext.awt.image.spi.ImageWriterRegistry;
 import org.apache.batik.svggen.SVGGraphics2D;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.w3c.dom.DOMImplementation;
@@ -32,6 +40,20 @@ import org.w3c.dom.Element;
 public class GraphicsSVG extends GraphicsToGraphics2DAdaptor {
 
 	private Document doc;
+
+	static {
+		// workaround bad packaging of version 1.9.1.v20190730-1743 of
+		// org.apache.batik.ext.awt and org.apache.batik.codec
+		// https://bugs.eclipse.org/bugs/show_bug.cgi?id=522740#c46
+		// https://bugs.eclipse.org/bugs/show_bug.cgi?id=177986#c9
+		ImageWriterRegistry.getInstance().register(new ImageIOPNGImageWriter());
+		ImageWriterRegistry.getInstance().register(new ImageIOTIFFImageWriter());
+		ImageWriterRegistry.getInstance().register(new ImageIOJPEGImageWriter());
+
+		ImageTagRegistry.getRegistry().register(new ImageIOJPEGRegistryEntry());
+		ImageTagRegistry.getRegistry().register(new ImageIOPNGRegistryEntry());
+		ImageTagRegistry.getRegistry().register(new ImageIOTIFFRegistryEntry());
+	}
 
 	/**
 	 * Static initializer that will return an instance of <code>GraphicsSVG</code>
