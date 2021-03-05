@@ -70,6 +70,8 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
 	public static final String ID = "org.dawnsci.plotting.exportMask";
 	
 	PlotDataConversionPage page;
+	
+	private IPlottingSystem<?> plottingSystem;
 
 	private CheckWizardPage options;
 	
@@ -118,78 +120,81 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
 		if (staticFileName!=null)    page.setFileLabel(staticFileName);
 	}
 
-    @Override
+	@Override
 	public boolean canFinish() {
-    	if (page.isPageComplete() && getContainer().getCurrentPage()==page) {
-    		options.setDescription("Please choose the things to save in '"+page.getPath()+"'.");
-    		options.setOptionEnabled(PersistWizardConstants.ORIGINAL_DATA,   false);
-    		options.setOptionEnabled(PersistWizardConstants.IMAGE_HIST,      false);
-    		options.setOptionEnabled(PersistWizardConstants.MASK,            false);
-    		options.setOptionEnabled(PersistWizardConstants.REGIONS,         false);
-    		options.setOptionEnabled(PersistWizardConstants.DIFF_META,       false);
-    		options.setOptionEnabled(PersistWizardConstants.FUNCTIONS,       false);
+		if (page.isPageComplete() && getContainer().getCurrentPage()==page) {
+			options.setDescription("Please choose the things to save in '"+page.getPath()+"'.");
+			options.setOptionEnabled(PersistWizardConstants.ORIGINAL_DATA,   false);
+			options.setOptionEnabled(PersistWizardConstants.IMAGE_HIST,      false);
+			options.setOptionEnabled(PersistWizardConstants.MASK,            false);
+			options.setOptionEnabled(PersistWizardConstants.REGIONS,         false);
+			options.setOptionEnabled(PersistWizardConstants.DIFF_META,       false);
+			options.setOptionEnabled(PersistWizardConstants.FUNCTIONS,       false);
 
-    		File                file=null;
-    		IPersistentFile     pf=null;
-    		
-    		PERSIST_BLOCK: try {
-        		IPersistenceService service = ServiceLoader.getPersistenceService();
-        		file = new File(page.getAbsoluteFilePath());
-        		if (!file.exists()) break PERSIST_BLOCK;
-    		    pf    = service.getPersistentFile(file.getAbsolutePath());
-    		    final List<String>  names = pf.getMaskNames(null);
-    		    if (names!=null && !names.isEmpty()) {
-    		    	options.setStringValue(PersistWizardConstants.MASK, names.get(0));
-    		    }
-    		        		    
-    		} catch (Throwable ne) {
-    			logger.error("Cannot read persistence file at "+file);
-    		} finally {
-    			if (pf!=null) pf.close();
-    		}
+			File                file=null;
+			IPersistentFile     pf=null;
 
-    		final IPlottingSystem<?> system = PlottingSystemUtils.getPlottingSystem();
-    		if (system!=null) {
-    			if (system != null) {
-    				ITrace trace  = system.getTraces().iterator().next();
-    				if (trace!=null) {
-    					
-    					options.setOptionEnabled(PersistWizardConstants.ORIGINAL_DATA, true);
-    					
-    					if (trace instanceof IImageTrace && ((IImageTrace)trace).getMask()!=null) {
-    						options.setOptionEnabled(PersistWizardConstants.MASK, true);
-    					}
-    				}
-    				
-    				Map<String, IDataset> data = getData(system);
-    				boolean requireHistory = data != null && !data.isEmpty();
-      				options.setOptionEnabled(PersistWizardConstants.IMAGE_HIST, requireHistory);
-    				
-    				final Collection<IRegion> regions = system.getRegions();
-    				if (regions != null && !regions.isEmpty()) {
-    					options.setOptionEnabled(PersistWizardConstants.REGIONS, true);
-    				}
-    				
-    				if (trace!=null && trace instanceof IImageTrace && trace.getData() != null) {
-    					IDiffractionMetadata meta = trace.getData().getFirstMetadata(IDiffractionMetadata.class);
-    					if (meta != null) {
-    						options.setOptionEnabled(PersistWizardConstants.DIFF_META, true);
-    					}
-    				}
-    				
-    				final IWorkbenchPart   part   = EclipseUtils.getPage().getActivePart();
-    				if (part!=null) {
-    					final IFunctionService funcService = part.getAdapter(IFunctionService.class);
-    					if (funcService != null) {
-    						options.setOptionEnabled(PersistWizardConstants.FUNCTIONS, true);
-    					}
-    				}
+			PERSIST_BLOCK: try {
+				IPersistenceService service = ServiceLoader.getPersistenceService();
+				file = new File(page.getAbsoluteFilePath());
+				if (!file.exists()) break PERSIST_BLOCK;
+				pf    = service.getPersistentFile(file.getAbsolutePath());
+				final List<String>  names = pf.getMaskNames(null);
+				if (names!=null && !names.isEmpty()) {
+					options.setStringValue(PersistWizardConstants.MASK, names.get(0));
+				}
 
-    			}
-    		}
-    	}
-        return super.canFinish();
-    }
+			} catch (Throwable ne) {
+				logger.error("Cannot read persistence file at "+file);
+			} finally {
+				if (pf!=null) pf.close();
+			}
+
+			if (plottingSystem == null) {
+				plottingSystem =PlottingSystemUtils.getPlottingSystem();
+			}
+
+
+			if (plottingSystem != null) {
+				ITrace trace  = plottingSystem.getTraces().iterator().next();
+				if (trace!=null) {
+
+					options.setOptionEnabled(PersistWizardConstants.ORIGINAL_DATA, true);
+
+					if (trace instanceof IImageTrace && ((IImageTrace)trace).getMask()!=null) {
+						options.setOptionEnabled(PersistWizardConstants.MASK, true);
+					}
+				}
+
+				Map<String, IDataset> data = getData(plottingSystem);
+				boolean requireHistory = data != null && !data.isEmpty();
+				options.setOptionEnabled(PersistWizardConstants.IMAGE_HIST, requireHistory);
+
+				final Collection<IRegion> regions = plottingSystem.getRegions();
+				if (regions != null && !regions.isEmpty()) {
+					options.setOptionEnabled(PersistWizardConstants.REGIONS, true);
+				}
+
+				if (trace!=null && trace instanceof IImageTrace && trace.getData() != null) {
+					IDiffractionMetadata meta = trace.getData().getFirstMetadata(IDiffractionMetadata.class);
+					if (meta != null) {
+						options.setOptionEnabled(PersistWizardConstants.DIFF_META, true);
+					}
+				}
+
+				final IWorkbenchPart   part   = EclipseUtils.getPage().getActivePart();
+				if (part!=null) {
+					final IFunctionService funcService = part.getAdapter(IFunctionService.class);
+					if (funcService != null) {
+						options.setOptionEnabled(PersistWizardConstants.FUNCTIONS, true);
+					}
+				}
+
+			}
+		}
+
+		return super.canFinish();
+	}
 
 	@SuppressWarnings("unchecked")
 	private Map<String, IDataset> getData(final IPlottingSystem<?> system) {
@@ -217,7 +222,9 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
 			 file= workspace.getRoot().getFileForLocation(location);
 
 			 final IWorkbenchPart  part   = EclipseUtils.getPage().getActivePart();
-			 final IPlottingSystem<?> system = PlottingSystemUtils.getPlottingSystem();
+			 
+			 final IPlottingSystem<?> system = plottingSystem == null ? PlottingSystemUtils.getPlottingSystem() : plottingSystem;
+			 
 			 final IFunctionService funcService = part.getAdapter(IFunctionService.class);
 
 			 final IFile finalFile = file;
@@ -419,6 +426,10 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
 			logger.error("Cannot estimate work, assuming 100 things to do!", ne);
 			return 100;
 		}
+	}
+	
+	public void setPlottingSystem(IPlottingSystem<?> plottingSystem) {
+		this.plottingSystem = plottingSystem;
 	}
 
 }
