@@ -93,12 +93,6 @@
             image="conversion-images/CUSTOM_TOMO.png">
       </conversion_page>
       <conversion_page
-            conversion_page="org.dawnsci.conversion.ui.pages.NCDConvertPage"
-            conversion_scheme="org.dawnsci.conversion.schemes.CustomNCDConverterScheme"
-            id="org.dawnsci.conversion.ui.conversionNCD"
-            image="conversion-images/CUSTOM_NCD.png">
-      </conversion_page>
-      <conversion_page
             conversion_page="org.dawnsci.conversion.ui.pages.ImageToH5ConversionPage"
             conversion_scheme="org.dawnsci.conversion.schemes.ImagesToHDFConverterScheme"
             id="org.dawnsci.conversion.ui.conversionImageToH5"

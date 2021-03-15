@@ -28,8 +28,7 @@ Export-Package: org.dawnsci.conversion,
  org.dawnsci.conversion.converters,
  org.dawnsci.conversion.converters.util,
  org.dawnsci.conversion.schemes
-Bundle-ClassPath: .,
- jars/cansas1d-1.1.jar
+Bundle-ClassPath: .
 Bundle-ActivationPolicy: lazy
 Service-Component: OSGI-INF/*.xml
 Automatic-Module-Name: org.dawnsci.conversion
