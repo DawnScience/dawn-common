@@ -22,6 +22,7 @@ import org.eclipse.dawnsci.plotting.api.trace.ILineTrace;
 import org.eclipse.dawnsci.plotting.api.trace.PlotExportConstants;
 import org.eclipse.january.dataset.Dataset;
 import org.eclipse.january.dataset.DatasetUtils;
+import org.eclipse.january.dataset.DoubleDataset;
 import org.eclipse.january.dataset.IDataset;
 import org.eclipse.january.dataset.Slice;
 import org.eclipse.january.metadata.IMetadata;
@@ -149,13 +150,13 @@ public class Plot1DConversionVisitor extends AbstractPlotConversionVisitor {
 
 		int j = 0;
 		DataHolder dh = new DataHolder();
-		dh.addDataset(headings.get(j++), firstX);
-		dh.addDataset(headings.get(j++), firstY);
+		dh.addDataset(headings.get(j++), DatasetUtils.cast(DoubleDataset.class,firstX));
+		dh.addDataset(headings.get(j++), DatasetUtils.cast(DoubleDataset.class,firstY));
 
 		for (i = 1; i < imax; i++) {
 			ILineTrace trace = traces[i];
-			Dataset x = asSingleX ? null : DatasetUtils.convertToDataset(trace.getXData());
-			Dataset y = DatasetUtils.convertToDataset(trace.getYData());
+			Dataset x = asSingleX ? null : DatasetUtils.cast(DoubleDataset.class,trace.getXData());
+			Dataset y = DatasetUtils.cast(DoubleDataset.class, trace.getYData());
 
 			if (x != null) {
 				addGoodXName(headings, x, i);
