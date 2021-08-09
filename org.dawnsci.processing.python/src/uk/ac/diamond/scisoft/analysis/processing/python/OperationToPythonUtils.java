@@ -144,30 +144,12 @@ public class OperationToPythonUtils {
 	
 	public static OperationData unpackXY(Map<String, Object> output) throws MetadataException {
 		
-		IDataset data = (IDataset)output.get(DATA);
-		String dataTitle = (String) output.get(DATA_TITLE);
-		data.setName(dataTitle != null ? dataTitle : DATA);
-		
-		if (output.get(XAXIS) != null) {
-			AxesMetadata ax = MetadataFactory.createMetadata(AxesMetadata.class, 1);
-			
-			IDataset x = (IDataset)output.get(XAXIS);
-			String xAxisTitle = (String) output.get(XAXIS_TITLE);
-			x.setName(xAxisTitle != null ? xAxisTitle : XAXIS);
-			ax.addAxis(0, x);
-			data.addMetadata(ax);
-		}
-		
-		if (output.containsKey(ERROR)) {
-			IDataset error = (IDataset)output.get(ERROR);
-			error.setName(ERROR);
-			data.setErrors(error);
-		}
-		
+		IDataset data = processStandardMap(output);
 		IDataset[] aux = unpackAuxiliary(output);
 		
 		return aux == null ? new OperationData(data) : new OperationData(data, (Serializable[])aux);
 	}
+	
 
 	public static Map<String, Object> packXY(IDataset input) {
 				
@@ -219,6 +201,7 @@ public class OperationToPythonUtils {
 		
 	}
 	
+	@SuppressWarnings("rawtypes")
 	private static IDataset[] unpackAuxiliary(Map<String, Object> output) {
 		Object aux = output.get(AUXILIARY);
 		if (aux == null) return null;
@@ -237,10 +220,41 @@ public class OperationToPythonUtils {
 					IDataset d = DatasetFactory.createFromObject(object);
 					d.setName((String)key);
 					auxData.add(d);
+				} else if (object instanceof Map) {
+					try {
+						auxData.add(processStandardMap((Map)object));
+					} catch (Exception e) {
+						logger.error("Could not process map",e);
+					}
 				}
 			}
 		}
 
 		return auxData.isEmpty() ? null : auxData.toArray(new IDataset[auxData.size()]);
+	}
+	
+	private static IDataset processStandardMap(@SuppressWarnings("rawtypes") Map auxMap) throws MetadataException {
+		
+		IDataset data = (IDataset)auxMap.get(DATA);
+		String dataTitle = (String) auxMap.get(DATA_TITLE);
+		data.setName(dataTitle != null ? dataTitle : DATA);
+		
+		if (auxMap.get(XAXIS) != null) {
+			AxesMetadata ax = MetadataFactory.createMetadata(AxesMetadata.class, 1);
+			
+			IDataset x = (IDataset)auxMap.get(XAXIS);
+			String xAxisTitle = (String) auxMap.get(XAXIS_TITLE);
+			x.setName(xAxisTitle != null ? xAxisTitle : XAXIS);
+			ax.addAxis(0, x);
+			data.addMetadata(ax);
+		}
+		
+		if (auxMap.containsKey(ERROR)) {
+			IDataset error = (IDataset)auxMap.get(ERROR);
+			error.setName(ERROR);
+			data.setErrors(error);
+		}
+		
+		return data;
 	}
 }
