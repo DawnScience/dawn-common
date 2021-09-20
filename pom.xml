@@ -49,16 +49,16 @@
 		<profile>
 			<id>dawn</id>
 			<properties>
-				<adoptopenjdk.jre.prefix>OpenJDK11U-jre</adoptopenjdk.jre.prefix>
-				<adoptopenjdk.bundle.version>11.0.9</adoptopenjdk.bundle.version>
-				<adoptopenjdk.file.version>${adoptopenjdk.bundle.version}.1</adoptopenjdk.file.version>
-				<adoptopenjdk.build>1</adoptopenjdk.build>
-				<adoptopenjdk.site.url>https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-${adoptopenjdk.file.version}%2B${adoptopenjdk.build}</adoptopenjdk.site.url>
-				<adoptopenjdk.version.suffix>${adoptopenjdk.file.version}_${adoptopenjdk.build}</adoptopenjdk.version.suffix>
-				<adoptopenjdk.jre.dir>jdk-${adoptopenjdk.file.version}+${adoptopenjdk.build}-jre</adoptopenjdk.jre.dir>
-				<adoptopenjdk.linux.sha256>73ce5ce03d2efb097b561ae894903cdab06b8d58fbc2697a5abe44ccd8ecc2e5</adoptopenjdk.linux.sha256>
-				<adoptopenjdk.macos.sha256>7fb8b4d37be9404ac624ee6c406c6bec80e812f1f0ce9e7c9f5a02b8862d8bba</adoptopenjdk.macos.sha256>
-				<adoptopenjdk.win32.sha256>441475261adf6dbfde162e91531b68052a8c16647c64b87629d81a5012285a21</adoptopenjdk.win32.sha256>
+				<adoptium.jre.prefix>OpenJDK11U-jre</adoptium.jre.prefix>
+				<adoptium.bundle.version>11.0.12</adoptium.bundle.version>
+				<adoptium.file.version>${adoptium.bundle.version}</adoptium.file.version>
+				<adoptium.build>7</adoptium.build>
+				<adoptium.site.url>https://github.com/adoptium/temurin11-binaries/releases/download/jdk-${adoptium.file.version}%2B${adoptium.build}</adoptium.site.url>
+				<adoptium.version.suffix>${adoptium.file.version}_${adoptium.build}</adoptium.version.suffix>
+				<adoptium.jre.dir>jdk-${adoptium.file.version}+${adoptium.build}-jre</adoptium.jre.dir>
+				<adoptium.linux.sha256>e813e270b7ea0a13f9c400ce5abd4cb811aacbd536b8909e6c7f0e346f78348c</adoptium.linux.sha256>
+				<adoptium.macos.sha256>3de9566d6e47ebde10706d0d13e9b6e5777356e379fb376b431c32cd92367645</adoptium.macos.sha256>
+				<adoptium.win32.sha256>5e00dd1fa87749c819ca94d8f3f352e198de44a9e2c09b0e75cc120a63edea87</adoptium.win32.sha256>
 			</properties>
 			<modules>
 				<module>org.dawnsci.boofcv.test</module>

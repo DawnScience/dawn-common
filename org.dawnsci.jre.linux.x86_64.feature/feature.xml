@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="org.dawnsci.jre.linux.x86_64.feature"
-      label="AdoptOpenJDK JRE for Linux x86_64"
-      version="11.0.9"
+      label="Adoptium JRE for Linux x86_64"
+      version="11.0.12"
       os="linux"
       ws="gtk"
       arch="x86_64">
 
-   <description url="https://adoptopenjdk.net/about.html">
-      Adopt OpenJDK
+   <description url="https://adoptium.net/about.html">
+      Eclipse Temurin build of OpenJDK by Adoptium
    </description>
 
    <copyright url="https://openjdk.java.net/legal/openjdk-trademark-notice.html">

@@ -11,7 +11,7 @@
 	</parent>
 
 	<artifactId>org.dawnsci.jre.win32.x86_64.feature</artifactId>
-	<version>${adoptopenjdk.bundle.version}</version>
+	<version>11.0.12</version>
 	<packaging>eclipse-feature</packaging>
 
 	<build>
@@ -52,8 +52,8 @@
 							<goal>wget</goal>
 						</goals>
 						<configuration>
-							<url>${adoptopenjdk.site.url}/${adoptopenjdk.jre.prefix}_x64_windows_hotspot_${adoptopenjdk.version.suffix}.zip</url>
-							<sha256>${adoptopenjdk.win32.sha256}</sha256>
+							<url>${adoptium.site.url}/${adoptium.jre.prefix}_x64_windows_hotspot_${adoptium.version.suffix}.zip</url>
+							<sha256>${adoptium.win32.sha256}</sha256>
 							<unpack>true</unpack>
 						</configuration>
 					</execution>
@@ -71,7 +71,7 @@
 							<goal>rename</goal>
 						</goals>
 						<configuration>
-							<sourceFile>${project.build.directory}/${adoptopenjdk.jre.dir}/</sourceFile>
+							<sourceFile>${project.build.directory}/${adoptium.jre.dir}/</sourceFile>
 							<destinationFile>${project.basedir}/jre/</destinationFile>
 						</configuration>
 					</execution>
