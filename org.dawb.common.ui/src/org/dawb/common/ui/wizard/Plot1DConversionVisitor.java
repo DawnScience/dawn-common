@@ -233,6 +233,10 @@ public class Plot1DConversionVisitor extends AbstractPlotConversionVisitor {
 			} catch (Exception e) {
 			}
 		}
+		
+		if (n == null) {
+			n = d.getName();
+		}
 
 		if (n == null) {
 			n = "y";
