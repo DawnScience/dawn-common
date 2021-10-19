@@ -42,7 +42,7 @@ import org.slf4j.LoggerFactory;
  *
  *   @author gerring
  *   @date Aug 31, 2010
- *   @project org.edna.workbench.actions
+ *   @project org.dawb.workbench.actions
  **/
 public class ConvertWizard extends Wizard implements IExportWizard, IFileOverrideWizard{
 
@@ -181,7 +181,7 @@ public class ConvertWizard extends Wizard implements IExportWizard, IFileOverrid
 								ErrorDialog.openError(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
 													"File(s) Not Converted", 
 													null,
-													new Status(IStatus.WARNING, "org.edna.workbench.actions", buf.toString(), e));
+													new Status(IStatus.WARNING, "org.dawb.workbench.actions", buf.toString(), e));
 							}
 						});
 					return;

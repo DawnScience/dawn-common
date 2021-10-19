@@ -23,7 +23,7 @@ public class NetUtils {
 	public static int getFreePort(final int startPort) {
 
 	    int port = startPort;
-	    while(!NetUtils.isPortFree(port)) port++;
+	    while(!isPortFree(port)) port++;
 
 	    return port;
 	}

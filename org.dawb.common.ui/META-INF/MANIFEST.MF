@@ -54,8 +54,6 @@ Export-Package: org.dawb.common.ui,
  org.dawb.common.ui.util,
  org.dawb.common.ui.viewers,
  org.dawb.common.ui.views,
- org.dawb.common.ui.views.monitor,
- org.dawb.common.ui.views.monitor.actions,
  org.dawb.common.ui.widgets,
  org.dawb.common.ui.wizard,
  org.dawb.common.ui.wizard.persistence

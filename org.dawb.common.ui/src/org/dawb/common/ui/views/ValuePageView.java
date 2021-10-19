@@ -29,7 +29,7 @@ public class ValuePageView extends PageBookView {
 	/**
 	 * Need to keep as old view id so that old workspaces still work.
 	 */
-	public static final String ID = "org.dawb.passerelle.views.ValueView";
+	public static final String ID = "org.dawb.common.ui.views.ValueView";
     private static Logger logger = LoggerFactory.getLogger(ValuePageView.class);
 
 	@Override

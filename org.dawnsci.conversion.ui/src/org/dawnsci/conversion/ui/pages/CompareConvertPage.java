@@ -30,7 +30,7 @@ import org.eclipse.swt.widgets.Composite;
  *
  *   @author gerring
  *   @date Aug 31, 2010
- *   @project org.edna.workbench.actions
+ *   @project org.dawb.workbench.actions
  **/
 public class CompareConvertPage extends AbstractDatasetChoosePage  {
 	

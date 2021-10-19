@@ -3,21 +3,12 @@
 
 	<intro>
 		<description>
-		    The &apos;Project Explorer&apos; is the most useful part of the workbench. Here you have projects of different types, such as workflows and python.<br/>
+		    The &apos;Project Explorer&apos; is the most useful part of the workbench. Here you have projects of different types, such as python.<br/>
 		    If you cannot see the &apos;Project Explorer&apos; part go to: <br/><br/>
 		    <b>Window->Show View->Project Explorer</b>
       </description>
  	</intro>
-	
- 	<item title="Create a Workflow Project">
- 	  <description>
- 	  Click below to start the new workflow project wizard. This creates a project capable of containing new workflow files. You can also start this wizard by right clicking and selecting 'New...'.
-      </description>
-      <command
-            required="false"
-            serialization="org.eclipse.ui.newWizard(newWizardId=org.edna.passerelle.common.project.PasserelleWizard)"/>
-   </item>
-   
+
    <item title="Python Projects">
  	  <description>
  	  As seen in order tutorials, you can create projects for python code which will import to other machines. Right click in the Project Explorer and go to:<br/>

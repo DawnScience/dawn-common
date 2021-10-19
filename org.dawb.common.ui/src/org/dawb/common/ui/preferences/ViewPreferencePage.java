@@ -18,7 +18,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class ViewPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
-	public static final String ID = "org.edna.workbench.views.preferencePage";
+	public static final String ID = ViewConstants.PAGE_ID;
 	
 	/**
 	 * @wbp.parser.constructor

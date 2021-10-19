@@ -360,7 +360,7 @@ public class PythonService {
 		if (System.getenv("PYTHONPATH")!=null) {
 			additionalPaths.addAll(Arrays.asList(System.getenv("PYTHONPATH").split(File.pathSeparator)));
 		}
-        
+
 		final Object out = client.request("runScript", new Object[]{scriptFullPath, data, outputNames, additionalPaths}); 
 		
 		if (dir.exists() && (dir.list()==null || dir.list().length<1)) {
@@ -368,58 +368,24 @@ public class PythonService {
 		}
 		
 		// Calls the method 'runScript' in the script with the arguments
-	    return (Map<String,? extends Object>)out;
+		return (Map<String,? extends Object>)out;
 	}
-	
-    /**
-     * Run an edna plugin with some xml and get some xml back.
-     * 
-     * @param execDir
-     * @param pluginName
-     * @param ednaDebugMode
-     * @param xmlInputString
-     * @return
-     */
-	public String runEdnaPlugin(final String  execDir, 
-			                    final String  pluginName,
-			                    final boolean ednaDebugMode, 
-			                    final String  xmlInputString) throws Exception {
-		
-		//TODO Should AbstractEdnaPlugin set the working dir on the command so that
-		//streams from the process are logged correctly?
-		
-		// We add fabio as an additional path to the service.
-		final List<String> additionalPaths = new ArrayList<String>(1);
-		if (System.getenv("PYTHONPATH")!=null) {
-			additionalPaths.addAll(Arrays.asList(System.getenv("PYTHONPATH").split(File.pathSeparator)));
-		}
-		
-		final Object out = client.request("runEdnaPlugin", new Object[]{execDir, pluginName, ednaDebugMode, xmlInputString, additionalPaths}); 
-		// Calls the method 'runEdnaPlugin' in the script with the arguments
-	    return (String)out;
-	}
-
 
 	public static int getDebugPort() {
-		int port = 8613;
-		if (System.getProperty("org.dawb.passerelle.actors.scripts.python.debug.port")!=null) {
-			// In an emergency allow the port to be changed for the debug session.
-			port = Integer.parseInt(System.getProperty("org.dawb.passerelle.actors.scripts.python.debug.port"));
-		}
-		return port;
+		return getPort("org.dawnsci.python.debug.port", 8613);
 	}
-	
+
 	/**
 	 * Returns the port used to start the search for a free port in non-debug mode
 	 * @return
 	 */
 	private static int getServiceStartPort() {
-		int port = 8613;
-		if (System.getProperty("org.dawb.passerelle.actors.scripts.python.free.port")!=null) {
-			// In an emergency allow the port to be changed for the debug session.
-			port = Integer.parseInt(System.getProperty("org.dawb.passerelle.actors.scripts.python.free.port"));
-		}
-		return port;
+		return getPort("org.dawnsci.python.free.port", 8613);
+	}
+
+	private static int getPort(String property, int defPort) {
+		String propValue = System.getProperty(property);
+		return propValue == null ? defPort : Integer.parseInt(propValue);
 	}
 
 	/**
