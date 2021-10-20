@@ -2,7 +2,6 @@
 <?eclipse version="3.0"?>
 
 <plugin>
-   <extension-point id="hardwareClass" name="org.dawb.common.ui.views.dashboard.hardware.class" schema="schema/hardwareClass.exsd"/>
    <extension-point id="valueProviderPage" name="Value Provider Page" schema="schema/valueProviderPage.exsd"/>
    <extension-point id="editorExtension" name="Editor Extension" schema="schema/editorExtension.exsd"/>
 
@@ -12,7 +11,7 @@
             category="org.eclipse.ui.Basic"
             class="org.dawb.common.ui.project.FolderLinkWizard"
             icon="icons/data_folder_link.gif"
-            id="org.edna.common.ui.project.FolderLinkWizard"
+            id="org.dawb.common.ui.project.FolderLinkWizard"
             name="Data Folder Link">
       </wizard>
    </extension>
@@ -33,15 +32,6 @@
    <extension
          point="org.eclipse.ui.views">
       <view
-            allowMultiple="false"
-            category="uk.ac.diamond.scisoft.analysis.rcp"
-            class="org.dawb.common.ui.views.monitor.MonitorView"
-            icon="icons/dashboard.png"
-            id="org.dawb.common.ui.views.dashboardView"
-            name="Monitor"
-            restorable="true">
-      </view>
-      <view
             category="uk.ac.diamond.scisoft.analysis.rcp"
             class="org.dawb.common.ui.views.ImageMonitorView"
             icon="icons/image.gif"
@@ -52,134 +42,6 @@
    </extension>
    <extension
          point="org.eclipse.ui.menus">
-      <menuContribution
-            locationURI="toolbar:org.dawb.common.ui.views.dashboardView">
-         <command
-               commandId="org.dawb.common.ui.RefreshDashCommand"
-               icon="icons/page_refresh.png"
-               label="Refresh"
-               style="push"
-               tooltip="Refresh all values and reconnect">
-         </command>
-         <separator
-               name="org.dawb.common.ui.separator1"
-               visible="true">
-         </separator>
-         <command
-               commandId="org.dawb.common.ui.AddScannableCommand"
-               icon="icons/monitor_add.png"
-               label="Add monitor"
-               style="push"
-               tooltip="Add scannable">
-         </command>
-         <command
-               commandId="org.dawb.common.ui.DeleteServerObjectCommand"
-               icon="icons/cross.png"
-               label="Delete monitor"
-               style="push"
-               tooltip="Delete monitor">
-         </command>
-         <command
-               commandId="org.dawb.common.ui.DashUpCommand"
-               icon="icons/arrow_up.png"
-               label="Move Up"
-               style="push"
-               tooltip="Move selected motor up">
-         </command>
-         <command
-               commandId="org.dawb.common.ui.DashDownCommand"
-               icon="icons/arrow_down.png"
-               label="Move Down"
-               style="push"
-               tooltip="Move selected motor down">
-         </command>
-      </menuContribution>
-      <menuContribution
-            locationURI="popup:org.dawb.common.ui.views.dashboardView">
-         <command
-               commandId="org.dawb.common.ui.RefreshDashCommand"
-               icon="icons/page_refresh.png"
-               label="Refresh"
-               style="push"
-               tooltip="Refresh all values and reconnect">
-         </command>
-         <separator
-               name="org.dawb.common.ui.separator2"
-               visible="true">
-         </separator>
-         <command
-               commandId="org.dawb.common.ui.AddScannableCommand"
-               icon="icons/monitor_add.png"
-               label="Add monitor"
-               style="push"
-               tooltip="Add scannable">
-         </command>
-         <command
-               commandId="org.dawb.common.ui.DeleteServerObjectCommand"
-               icon="icons/cross.png"
-               label="Delete monitor"
-               style="push"
-               tooltip="Delete monitor">
-         </command>
-         <command
-               commandId="org.dawb.common.ui.DashUpCommand"
-               icon="icons/arrow_up.png"
-               label="Move Up"
-               style="push"
-               tooltip="Move selected motor up">
-         </command>
-         <command
-               commandId="org.dawb.common.ui.DashDownCommand"
-               icon="icons/arrow_down.png"
-               label="Move Down"
-               style="push"
-               tooltip="Move selected motor down">
-         </command>
-         <separator
-               name="org.dawb.common.ui.separator3"
-               visible="true">
-         </separator>
-         <command
-               commandId="org.dawb.common.ui.dashboard.DashboardPreferences"
-               label="Monitor Preferences..."
-               style="push">
-         </command>
-         <command
-               commandId="org.dawb.common.ui.dashboard.TangoPreferences"
-               label="Tango Preferences..."
-               style="push">
-         </command>
-      </menuContribution>
-      <menuContribution
-            locationURI="menu:org.dawb.common.ui.views.dashboardView">
-         <command
-               commandId="org.dawb.common.ui.ResetServerObjectsCommand"
-               label="Reset"
-               style="push"
-               tooltip="Reset to default view">
-         </command>
-         <command
-               commandId="org.dawb.common.ui.ClearServerObjectsCommand"
-               icon="icons/page_delete.png"
-               label="Clear"
-               style="push"
-               tooltip="Clear all objects">
-         </command>
-         <separator
-               name="org.dawb.common.ui.exafs.separator1"
-               visible="true">
-         </separator>
-         <command
-               commandId="org.dawb.common.ui.dashboard.DashboardPreferences"
-               label="Monitor Preferences..."
-               style="push">
-         </command>
-         <command
-               commandId="org.dawb.common.ui.dashboard.TangoPreferences"
-               label="Tango Preferences..."
-               style="push">
-         </command>
-      </menuContribution>
    </extension>
       <extension
          point="org.eclipse.ui.menus">
@@ -265,7 +127,7 @@
                name="org.dawb.workbench.ui.separator2">
          </separator>
          <command
-               commandId="org.edna.workbench.views.preference.preferenceDialog"
+               commandId="org.dawb.common.ui.preferenceDialog"
                label="Preferences..."
                style="push"
                tooltip="Preferences for the image monitor">
@@ -302,64 +164,12 @@
       </command>
       <command
             defaultHandler="org.dawb.common.ui.preferences.ViewPreferencesHandler"
-            id="org.edna.workbench.views.preference.preferenceDialog"
+            id="org.dawb.common.ui.preferenceDialog"
             name="Preferences...">
       </command>
       
    </extension>
    
-   <extension
-         point="org.eclipse.ui.commands">
-      <command
-            defaultHandler="org.dawb.common.ui.views.monitor.actions.AddHardwareObjectHandler"
-            id="org.dawb.common.ui.AddScannableCommand"
-            name="Add motor">
-      </command>
-      <command
-            defaultHandler="org.dawb.common.ui.views.monitor.actions.DeleteHardwareObjectHandler"
-            id="org.dawb.common.ui.DeleteServerObjectCommand"
-            name="Remove motor">
-      </command>
-      <command
-            defaultHandler="org.dawb.common.ui.views.monitor.actions.DashboardPreferencesAction"
-            id="org.dawb.common.ui.dashboard.DashboardPreferences"
-            name="Preferences">
-      </command>
-      <command
-            defaultHandler="org.dawb.common.ui.views.monitor.actions.ResetHardwareObjectsHandler"
-            id="org.dawb.common.ui.ResetServerObjectsCommand"
-            name="Reset">
-      </command>
-      <command
-            defaultHandler="org.dawb.common.ui.views.monitor.actions.RefreshDashHandler"
-            id="org.dawb.common.ui.RefreshDashCommand"
-            name="Refresh Dash">
-      </command>
-      <command
-            defaultHandler="org.dawb.common.ui.views.monitor.actions.ClearHardwareObjectsHandler"
-            id="org.dawb.common.ui.ClearServerObjectsCommand"
-            name="Clear">
-      </command>
-      <command
-            defaultHandler="org.dawb.common.ui.views.monitor.actions.MoveUpHandler"
-            id="org.dawb.common.ui.DashUpCommand"
-            name="Dash Item Up">
-      </command>
-      <command
-            defaultHandler="org.dawb.common.ui.views.monitor.actions.MoveDownHandler"
-            id="org.dawb.common.ui.DashDownCommand"
-            name="Dash Item Down">
-      </command>
-   </extension>
-   <extension
-         point="org.eclipse.ui.preferencePages">
-      <page
-            category="uk.ac.diamond.scisoft.analysis.rcp.preferences.root"
-            class="org.dawb.common.ui.views.monitor.MonitorPreferencePage"
-            id="org.dawb.common.ui.views.dashboard.dashboardPreferences"
-            name="Monitor">
-      </page>
-   </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
       <initializer
@@ -386,7 +196,7 @@
             category="uk.ac.diamond.scisoft.analysis.rcp"
             class="org.dawb.common.ui.views.ValuePageView"
             icon="icons/variable_xml.png"
-            id="org.dawb.passerelle.views.ValueView"
+            id="org.dawb.common.ui.views.ValueView"
             name="Value">
       </view>
       <view
@@ -405,7 +215,7 @@
       <menuContribution
             locationURI="popup:org.dawb.workbench.views.h5GalleryView">
          <command
-               commandId="org.edna.workbench.views.preference.preferenceDialog"
+               commandId="org.dawb.common.ui.preferenceDialog"
                label="Preferences..."
                style="push"
                tooltip="Preferences for the image">
@@ -423,7 +233,7 @@
       <page
             category="uk.ac.diamond.scisoft.analysis.rcp.preferences.root"
             class="org.dawb.common.ui.preferences.ViewPreferencePage"
-            id="org.edna.workbench.views.preferencePage"
+            id="org.dawb.common.ui.preferencePage"
             name="Image Monitor">
       </page>
    </extension>

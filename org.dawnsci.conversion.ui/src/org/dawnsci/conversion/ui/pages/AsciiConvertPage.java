@@ -27,7 +27,7 @@ import org.eclipse.swt.widgets.Label;
  *
  *   @author gerring
  *   @date Aug 31, 2010
- *   @project org.edna.workbench.actions
+ *   @project org.dawb.workbench.actions
  **/
 public class AsciiConvertPage extends AbstractDatasetChoosePage {
 	

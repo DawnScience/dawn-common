@@ -27,7 +27,7 @@ import org.eclipse.ui.handlers.HandlerUtil;
  *
  *   @author gerring
  *   @date Aug 31, 2010
- *   @project org.edna.workbench.actions
+ *   @project org.dawb.workbench.actions
  **/
 public class ConvertWizardHandler extends AbstractHandler implements IObjectActionDelegate {
 
