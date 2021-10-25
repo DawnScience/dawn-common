@@ -89,18 +89,18 @@ public class PrintSettings {
 	 * Scale is a complex enum that represents possible image scales and that also includes String names
 	 * and Double values for the items.
 	 */
-	public static enum Scale {
-		DEFAULT("100%",0.5), PERCENT75("75%",2.0), PERCENT66("66%",3.0), 
-		PERCENT50("50%", 4.0), PERCENT33("33%", 5.0), PERCENT25("25%", 6.0), PERCENT10("10%", 7.0);
+	public enum Scale {
+		DEFAULT("100%",1.0), PERCENT75("75%",0.75), PERCENT66("66%",0.66), 
+		PERCENT50("50%", 0.5), PERCENT33("33%", 0.33), PERCENT25("25%", 0.25), PERCENT10("10%", 0.1);
 		private final String name;
-		private final Double value;
+		private final double value;
 
 		/**
 		 * Scale constructor.
 		 * 
 		 * @param name
 		 */
-		Scale(String name, Double value) {
+		Scale(String name, double value) {
 			this.name = name;
 			this.value = value;
 		}
@@ -119,7 +119,7 @@ public class PrintSettings {
 		 * 
 		 * @return value
 		 */
-		public Double getValue() {
+		public double getValue() {
 			return value;
 		}
 	}
@@ -128,7 +128,7 @@ public class PrintSettings {
 	 * Resolution is a complex enum that represents possible image resolution and that also includes String names
 	 * and Double values for the items.
 	 */
-	public static enum Resolution {
+	public enum Resolution {
 		LOW("Low", 1), MEDIUM("Medium", 2), MEDIUMHIGH("Medium High", 3), HIGH("High", 4);
 		private final String name;
 		private final int value;
@@ -168,7 +168,7 @@ public class PrintSettings {
 	 * 
 	 * @author Kenneth Evans, Jr.
 	 */
-	public static enum Units {
+	public enum Units {
 		INCH("in", 1), CENTIMETER("cm", 1. / 2.54), MILLIMETER("mm", 1. / 254.);
 		private final String name;
 		private final double scale;
