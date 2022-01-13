@@ -8,9 +8,6 @@
  */
 package org.dawnsci.boofcv.stitching;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.dawnsci.boofcv.converter.ConvertIDataset;
 import org.eclipse.dawnsci.analysis.api.image.IImageStitchingProcess;
 import org.eclipse.january.IMonitor;
@@ -49,20 +46,8 @@ public class BoofCVImageStitchingImpl implements IImageStitchingProcess {
 	}
 
 	@Override
-	public IDataset stitch(List<IDataset> input, IMonitor monitor) throws Exception {
-		return stitch(input, 1, 6, 49, monitor);
-	}
-
-	@Override
 	public IDataset stitch(ILazyDataset input, IMonitor monitor) throws Exception {
 		return stitch(input, 1, 6, 49, monitor);
-	}
-
-	@Override
-	public IDataset stitch(List<IDataset> input, int rows, int columns, IMonitor monitor) throws Exception {
-		List<double[]> translations = new ArrayList<double[]>();
-		translations.add(new double[] {25, 25});
-		return stitch(input, rows, columns, 50, translations, false, monitor);
 	}
 
 	@Override
@@ -72,37 +57,10 @@ public class BoofCVImageStitchingImpl implements IImageStitchingProcess {
 	}
 
 	@Override
-	public IDataset stitch(List<IDataset> input, int rows, int columns, double fieldOfView, IMonitor monitor) throws Exception {
-		List<double[]> translations = new ArrayList<double[]>();
-		translations.add(new double[] {25, 25});
-		return stitch(input, rows, columns, fieldOfView, translations, true, monitor);
-	}
-
-	@Override
-	public IDataset stitch(List<IDataset> input, int rows, int columns, double fieldOfView, List<double[]> translations, boolean hasFeatureAssociation, IMonitor monitor) throws Exception {
-		int[] shape = input.get(0).getShape();
-		return stitch(input, rows, columns, fieldOfView, translations, hasFeatureAssociation, shape, monitor);
-	}
-
-	@Override
 	public IDataset stitch(ILazyDataset input, int rows, int columns, double fieldOfView, IMonitor monitor)
 			throws Exception {
 		double[][][] translations = makeTranslationArray(rows, columns, 25);
 		return stitch(input, rows, columns, 50, translations, true, input.getShape(), monitor);
-	}
-
-	@Override
-	public IDataset stitch(List<IDataset> input, int rows, int columns,
-			double fieldOfView, List<double[]> translations,
-			boolean hasFeatureAssociation, int[] originalShape, IMonitor monitor) throws Exception {
-		throw new Exception("Use the stitch method with the array parameter instead");
-	}
-
-	@Override
-	public IDataset stitch(ILazyDataset input, int rows, int columns,
-			double fieldOfView, List<double[]> translations,
-			boolean hasFeatureAssociation, int[] originalShape, IMonitor monitor) throws Exception {
-		throw new Exception("Use the stitch method with the array parameter instead");
 	}
 
 	@Override

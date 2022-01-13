@@ -267,7 +267,7 @@ class PersistentFileImpl implements IPersistentFile {
 				// add attributes according to NeXus standard for NXdata
 				file.addAttribute(group, TreeFactory.createAttribute(NexusConstants.DATA_SIGNAL, dataName));
 				if (isRGB) {
-					file.addAttribute(dNode, TreeFactory.createAttribute("interpretation", "rgba-image"));
+					file.addAttribute(dNode, TreeFactory.createAttribute(NexusConstants.INTERPRETATION, NexusConstants.INTERPRETATION_IMAGE_RGB));
 				}
 
 			} catch (NexusException ne) {
@@ -735,6 +735,7 @@ class PersistentFileImpl implements IPersistentFile {
 		try {
 			g = NexusUtils.loadGroupFully(file, PersistenceConstants.PROCESS_ENTRY, 2);
 		} catch (NexusException e) { // Need to ensure backward compatibility
+			logger.warn("Problem loading operation from {}", PersistenceConstants.PROCESS_ENTRY, e);
 			g = NexusUtils.loadGroupFully(file, OLD_OPERATION_PROCESS_ENTRY, 2);
 		}
 		return PersistJsonOperationsNode.readOperations(g);

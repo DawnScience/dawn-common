@@ -8,6 +8,7 @@
  */
 package org.dawnsci.boofcv.util;
 
+import org.eclipse.january.dataset.Dataset;
 import org.eclipse.january.dataset.IDataset;
 
 public class Utils {
@@ -18,7 +19,7 @@ public class Utils {
 	 * @return 2 or throws an IllegalArgumentException
 	 */
 	public static int[] getShape(IDataset input) {
-		int[] shape = input.getShape();
+		int[] shape = input instanceof Dataset ? ((Dataset) input).getShapeRef() : input.getShape();
 		if (shape.length != 2)
 			throw new IllegalArgumentException("The input data must be of dimension 2");
 		return shape;

@@ -29,6 +29,7 @@ import org.eclipse.january.dataset.IDataset;
 import org.eclipse.january.dataset.IntegerDataset;
 import org.eclipse.january.dataset.InterfaceUtils;
 import org.eclipse.january.dataset.LongDataset;
+import org.eclipse.january.dataset.RGBByteDataset;
 import org.eclipse.january.dataset.RGBDataset;
 import org.eclipse.january.dataset.ShortDataset;
 
@@ -47,6 +48,7 @@ import boofcv.struct.image.ImageSingleBand;
 import boofcv.struct.image.ImageUInt16;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.image.InterleavedS16;
+import boofcv.struct.image.InterleavedU8;
 import boofcv.struct.image.MultiSpectral;
 import georegression.struct.point.Point2D_I32;
 
@@ -122,6 +124,10 @@ public class ConvertIDataset {
 		} else if (sd instanceof DoubleDataset) {
 			ImageFloat64 dst = new ImageFloat64(width, height);
 			dst.data = ((DoubleDataset) sd).getData();
+			return dst;
+		} else if (sd instanceof RGBByteDataset) {
+			InterleavedU8  dst = new InterleavedU8(width, height, 3);
+			dst.data = ((RGBByteDataset) sd).getData();
 			return dst;
 		} else if (sd instanceof RGBDataset) {
 			InterleavedS16 dst = new InterleavedS16(width, height, 3);
@@ -239,7 +245,7 @@ public class ConvertIDataset {
 				datasets[i] = convertTo(msrc.getBand(i), isBinary);
 			}
 			if (n == 3) {
-				RGBDataset rgb = DatasetFactory.createCompoundDataset(RGBDataset.class, datasets[0], datasets[1], datasets[2]);
+				RGBByteDataset rgb = DatasetFactory.createCompoundDataset(RGBByteDataset.class, datasets[0], datasets[1], datasets[2]);
 				return rgb;
 			}
 			return DatasetUtils.createCompoundDataset(datasets);
@@ -261,7 +267,7 @@ public class ConvertIDataset {
 	public static Dataset contourImageToIDataset(List<Contour> contours,
 			int colorExternal, int colorInternal, int width, int height) {
 
-		RGBDataset out = DatasetFactory.zeros(RGBDataset.class, width, height);
+		RGBByteDataset out = DatasetFactory.zeros(RGBByteDataset.class, width, height);
 		for( Contour c : contours ) {
 			for(Point2D_I32 p : c.external ) {
 				out.set(colorExternal, p.x, p.y);
