@@ -11,7 +11,7 @@
 	</parent>
 
 	<artifactId>org.dawnsci.jre.linux.x86_64.feature</artifactId>
-	<version>11.0.13</version>
+	<version>11.0.14</version>
 	<packaging>eclipse-feature</packaging>
 
 	<build>
