@@ -2,7 +2,7 @@
 <feature
       id="org.dawnsci.jre.linux.x86_64.feature"
       label="Adoptium JRE for Linux x86_64"
-      version="11.0.12"
+      version="11.0.14.qualifier"
       os="linux"
       ws="gtk"
       arch="x86_64">
