@@ -16,6 +16,7 @@ import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Shell;
 
 /**
@@ -30,11 +31,6 @@ public class TextUtilitiesEx
      */
     private IMapMode mapmode;
 
-    /**
-     * Private graphics context used to measure rendered text metrics    
-     */
-    private static GC gc;
-    
     /**
      * Creates a new instance.
      * @param mapmode mapmode to be used for translating measurement units
@@ -86,8 +82,14 @@ public class TextUtilitiesEx
      * @param advancedGraphics
      * @return
      */
-    private static org.eclipse.swt.graphics.Point getTextDimension(String s, Font f, boolean advancedGraphics) {
-    	return getGC(f, advancedGraphics).textExtent(s);
+    private static Point getTextDimension(String s, Font f, boolean advancedGraphics) {
+        GC gc = getGC(f, advancedGraphics);
+        try {
+            Point pt = gc.textExtent(s);
+            return pt;
+        } finally {
+            gc.dispose();
+        }
     }
 
     /**
@@ -98,8 +100,14 @@ public class TextUtilitiesEx
      * @param advancedGraphics
      * @return
      */
-    private static org.eclipse.swt.graphics.Point getStringDimension(String s, Font f, boolean advancedGraphics) {
-    	return getGC(f, advancedGraphics).stringExtent(s);
+    private static Point getStringDimension(String s, Font f, boolean advancedGraphics) {
+        GC gc = getGC(f, advancedGraphics);
+        try {
+            Point pt = gc.stringExtent(s);
+            return pt;
+        } finally {
+            gc.dispose();
+        }
     }
     
     /**
@@ -143,9 +151,7 @@ public class TextUtilitiesEx
      */
     private static GC getGC(Font f, boolean advancedGraphics)
     {
-    	if(gc == null) {
-    		gc = new GC(new Shell());
-    	}
+		GC gc = new GC(new Shell());
     	gc.setFont(f);
     	gc.setAdvanced(advancedGraphics);
     	return gc;

@@ -35,6 +35,7 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -389,4 +390,12 @@ public final class TomoConvertPage extends ResourceChoosePage implements IConver
 		return null;
 	}
 
+	@Override
+	public void dispose() {
+		super.dispose();
+		Image i = warningLabel.getImage();
+		if (!i.isDisposed()) {
+			i.dispose();
+		}
+	}
 }

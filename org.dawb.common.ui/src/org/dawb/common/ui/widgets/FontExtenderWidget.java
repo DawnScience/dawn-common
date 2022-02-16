@@ -78,7 +78,7 @@ public class FontExtenderWidget extends Composite {
 					Rectangle rect = canvas.getBounds();
 					int width = rect.width;
 					// Get the width of each character
-					int fontWidth = event.gc.getFontMetrics().getAverageCharWidth();
+					double fontWidth = event.gc.getFontMetrics().getAverageCharacterWidth();
 					// Get the current Font height
 					int fontHeight = event.gc.getFontMetrics().getHeight();
 					//Calculate the fontHeight/fontWidth ratio
@@ -115,6 +115,14 @@ public class FontExtenderWidget extends Composite {
 		fontText = text;
 		if(canvas != null && !canvas.isDisposed())
 			canvas.redraw();
+	}
+
+	@Override
+	public void dispose() {
+		super.dispose();
+		if (font != null && !font.isDisposed()) {
+			font.dispose();
+		}
 	}
 
 	/**

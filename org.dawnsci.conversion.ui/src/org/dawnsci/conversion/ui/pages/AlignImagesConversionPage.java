@@ -258,7 +258,9 @@ public class AlignImagesConversionPage extends ResourceChoosePage
 								"/icons/warning_small.gif"));
 						MessageDialog messageDialog = new MessageDialog(Display.getCurrent().getActiveShell(),
 								"Error running image alignment", warning, "", MessageDialog.WARNING, dialogButtonLabel, 0);
+
 						messageDialog.open();
+						warning.dispose();
 					}
 				} else if (alignState == AlignMethod.HESSIAN_REGISTRATION) {
 					align(null);

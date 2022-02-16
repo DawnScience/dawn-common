@@ -184,6 +184,7 @@ public class GraphicsToGraphics2DAdaptor extends Graphics {
 	 * y coordinate for graphics translation
 	 */
 	private int transY = 0;
+	private GC swtGC;
 
 	/**
 	 * Constructor
@@ -237,8 +238,8 @@ public class GraphicsToGraphics2DAdaptor extends Graphics {
 			10,
 			10);
 		image = new Image(DisplayUtils.getDisplay(), tempRect);		
-		GC gc = new GC(image);
-		swtGraphics = new SWTGraphics(gc);
+		swtGC = new GC(image);
+		swtGraphics = new SWTGraphics(swtGC);
 	}
 
 	/**
@@ -357,7 +358,7 @@ public class GraphicsToGraphics2DAdaptor extends Graphics {
 	 */
 	public void dispose() {
 		swtGraphics.dispose();
-		
+		swtGC.dispose();
 		if (image != null) {
 			image.dispose();
 		}
@@ -634,18 +635,20 @@ public class GraphicsToGraphics2DAdaptor extends Graphics {
 	public void drawPolyline(PointList pointList) {
 
 		Path p = new Path(DisplayUtils.getDisplay());
-		Point point = pointList.getPoint(0);
-		p.moveTo(point.x, point.y);
-		
-		// Draw polylines as a series of lines
-		for (int x = 1; x < pointList.size(); x++) {
+		try {
+			Point point = pointList.getPoint(0);
+			p.moveTo(point.x, point.y);
 
-			point = pointList.getPoint(x);
-			
-			p.lineTo(point.x, point.y);
+			// Draw polylines as a series of lines
+			for (int x = 1; x < pointList.size(); x++) {
+				point = pointList.getPoint(x);
+				p.lineTo(point.x, point.y);
+			}
+
+			drawPath(p);
+		} finally {
+			p.dispose();
 		}
-		
-		drawPath(p);
 	}
 
 	/*

@@ -282,6 +282,13 @@ public class ConversionChoicePage extends ResourceChoosePage implements IConvers
 		return lastImage;
 	}
 
+	@Override
+	public void dispose() {
+		super.dispose();
+		if (lastImage != null && !lastImage.isDisposed()) {
+			lastImage.dispose();
+		}
+	}
 
 	protected void pathChanged()  {
 		final String filePath = getAbsoluteFilePath();

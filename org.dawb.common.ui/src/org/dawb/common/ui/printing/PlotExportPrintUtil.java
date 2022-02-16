@@ -324,6 +324,8 @@ public class PlotExportPrintUtil {
 		} else {
 			throw new RuntimeException("Cannot process " + fileType);
 		}
+		graphics.dispose();
+		gc.dispose();
 	}
 
 //	private static void copytoClipboard(Image image) {
