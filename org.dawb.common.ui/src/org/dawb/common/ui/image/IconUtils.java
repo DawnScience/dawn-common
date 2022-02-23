@@ -37,9 +37,10 @@ public class IconUtils {
         gc.setForeground(ColorConstants.white);
         gc.fillRectangle(new Rectangle(0,0,16,16));
         gc.setForeground(ColorConstants.darkGray);
-        gc.setFont(new Font(Display.getCurrent(), new FontData("Dialog", 6, SWT.BOLD)));
+        Font f = new Font(Display.getCurrent(), new FontData("Dialog", 6, SWT.BOLD));
+        gc.setFont(f);
         gc.drawText(iconText, 4, 2);
-        
+        f.dispose();
         gc.dispose();
 		
 		return new ImageDescriptor() {			
@@ -122,11 +123,13 @@ public class IconUtils {
             
         
         gc.dispose();
-		
+
+		ImageData fImageData = image.getImageData();
+		image.dispose();
 		return new ImageDescriptor() {			
 			@Override
 			public ImageData getImageData() {
-				return image.getImageData();
+				return fImageData;
 			}
 		};
 	}

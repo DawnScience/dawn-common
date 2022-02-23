@@ -173,8 +173,8 @@ public class ResourceChoosePage extends WizardPage {
 
 		if (!hasBrowseToExternalOnly) {
 			this.resourceButton = new Button(container, SWT.PUSH);
-			resourceButton.setImage(Activator.getImageDescriptor(
-					"icons/Project-data.png").createImage());
+			resourceButton.setImage(Activator.getImageAndAddDisposeListener(resourceButton,
+					"icons/Project-data.png"));
 			resourceButton.setToolTipText("Browse to "
 							+ (isDirectory() ? "folder" : "file")
 							+ " inside a project");
@@ -188,7 +188,7 @@ public class ResourceChoosePage extends WizardPage {
 		}
 
 		this.fileButton = new Button(container, SWT.PUSH);
-		fileButton.setImage(Activator.getImageDescriptor("icons/folder.png").createImage());
+		fileButton.setImage(Activator.getImageAndAddDisposeListener(fileButton, "icons/folder.png"));
 		fileButton.setToolTipText("Browse to an external "+(isDirectory()?"folder":"file")+".");
 		fileButton.addSelectionListener(new SelectionAdapter() {
 			@Override

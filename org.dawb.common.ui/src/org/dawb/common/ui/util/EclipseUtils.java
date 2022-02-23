@@ -45,9 +45,6 @@ import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Cursor;
-import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.FontData;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorDescriptor;
@@ -573,14 +570,6 @@ public class EclipseUtils {
 		IAdaptable adaptable = (IAdaptable)element;
 		Object adapter = adaptable.getAdapter(IResource.class);
 		return  ((IResource)adapter).getProject();
-	}
-	
-	public static void setBold(Control point) {
-		
-		final FontData[] fData = point.getFont().getFontData();
-		for (int i = 0; i < fData.length; i++) fData[i].setStyle(SWT.BOLD);
-		point.setFont(new Font(point.getDisplay(),fData));
-		
 	}
 
 	/**
