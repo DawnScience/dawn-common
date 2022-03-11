@@ -264,68 +264,72 @@ public class PlotExportPrintUtil {
 		
 		// fill the region in the AWT image with the transparent color
 		SWTGraphics graphics = new SWTGraphics(gc);
-		// Needed because the clipping is not set with GTK2
-		graphics.setClip(new Rectangle(0, 0, im.getBounds().width, im.getBounds().height));
-
-		printableFigure.paint(graphics);
-		// test for all possible file types
-		if (!Arrays.asList(FILE_FORMATS).contains(fileType.toLowerCase())
-				&& !Arrays.asList(FILE_TYPES).contains(fileType))
-			throw new RuntimeException("Cannot deal with file type " + fileType);
-
-		// This overrides given fileType!
-		// If they have specified the file type in the file name, use that.
-		String lname = filename.toLowerCase();
-		if (lname.endsWith(".png") || lname.endsWith(".jpg") || lname.endsWith(".jpeg"))
-			fileType = FILE_TYPES[0];
-		if (lname.endsWith(".ps") || lname.endsWith(".eps"))
-			fileType = FILE_TYPES[1];
-		if (lname.endsWith(".svg"))
-			fileType = FILE_TYPES[2];
-		if (fileType.equals(FILE_TYPES[0])) {
-			if (!lname.endsWith(".png") && !lname.endsWith(".jpg") && !lname.endsWith(".jpeg")) {
-				filename = filename + ".png";
-				lname = filename.toLowerCase();
-			}
-			ImageLoader loader = new ImageLoader();
-			loader.data = new ImageData[] { im.getImageData() };
-			loader.save(filename, lname.endsWith(".png") ? SWT.IMAGE_PNG : SWT.IMAGE_JPEG);
-		} else if (fileType.equals(FILE_TYPES[1])) {
-			if (!lname.endsWith(".ps") && !lname.endsWith(".eps"))
-				filename = filename + ".ps";
-			savePostScript(new File(filename), im);
-		} else if (fileType.equals(FILE_TYPES[2])) {
-			if (!lname.endsWith(".svg"))
-				filename = filename + ".svg";
-			final File file = new File(filename);
-			// save to SVG process in a Job
-			Job svgJob = new Job("Exporting to SVG") {
-				IStatus result = null;
-				@Override
-				protected IStatus run(final IProgressMonitor monitor) {
-					DisplayUtils.syncExec(new Runnable() {
-						@Override
-						public void run() {
-							try {
-								result = saveSVG(printableFigure, file, monitor);
-							} catch (IOException e) {
-								result = Status.CANCEL_STATUS;
-								logger.debug("Error writing to file:"+e.toString());
-							}
-						}
-					});
-					if (result == null)
-						result = Status.CANCEL_STATUS;
-					return result;
+		try {
+			// Needed because the clipping is not set with GTK2
+			graphics.setClip(new Rectangle(0, 0, im.getBounds().width, im.getBounds().height));
+	
+			printableFigure.paint(graphics);
+			// test for all possible file types
+			if (!Arrays.asList(FILE_FORMATS).contains(fileType.toLowerCase())
+					&& !Arrays.asList(FILE_TYPES).contains(fileType))
+				throw new RuntimeException("Cannot deal with file type " + fileType);
+	
+			// This overrides given fileType!
+			// If they have specified the file type in the file name, use that.
+			String lname = filename.toLowerCase();
+			if (lname.endsWith(".png") || lname.endsWith(".jpg") || lname.endsWith(".jpeg"))
+				fileType = FILE_TYPES[0];
+			if (lname.endsWith(".ps") || lname.endsWith(".eps"))
+				fileType = FILE_TYPES[1];
+			if (lname.endsWith(".svg"))
+				fileType = FILE_TYPES[2];
+			if (fileType.equals(FILE_TYPES[0])) {
+				if (!lname.endsWith(".png") && !lname.endsWith(".jpg") && !lname.endsWith(".jpeg")) {
+					filename = filename + ".png";
+					lname = filename.toLowerCase();
 				}
-			};
-			svgJob.setUser(true);
-			svgJob.schedule();
-		} else {
-			throw new RuntimeException("Cannot process " + fileType);
+				ImageLoader loader = new ImageLoader();
+				loader.data = new ImageData[] { im.getImageData() };
+				loader.save(filename, lname.endsWith(".png") ? SWT.IMAGE_PNG : SWT.IMAGE_JPEG);
+			} else if (fileType.equals(FILE_TYPES[1])) {
+				if (!lname.endsWith(".ps") && !lname.endsWith(".eps"))
+					filename = filename + ".ps";
+				savePostScript(new File(filename), im);
+			} else if (fileType.equals(FILE_TYPES[2])) {
+				if (!lname.endsWith(".svg"))
+					filename = filename + ".svg";
+				final File file = new File(filename);
+				// save to SVG process in a Job
+				Job svgJob = new Job("Exporting to SVG") {
+					IStatus result = null;
+					@Override
+					protected IStatus run(final IProgressMonitor monitor) {
+						DisplayUtils.syncExec(new Runnable() {
+							@Override
+							public void run() {
+								try {
+									result = saveSVG(printableFigure, file, monitor);
+								} catch (IOException e) {
+									result = Status.CANCEL_STATUS;
+									logger.debug("Error writing to file:"+e.toString());
+								}
+							}
+						});
+						if (result == null)
+							result = Status.CANCEL_STATUS;
+						return result;
+					}
+				};
+				svgJob.setUser(true);
+				svgJob.schedule();
+			} else {
+				throw new RuntimeException("Cannot process " + fileType);
+			}
+		} finally {
+			graphics.dispose();
+			gc.dispose();
+			im.dispose();
 		}
-		graphics.dispose();
-		gc.dispose();
 	}
 
 //	private static void copytoClipboard(Image image) {
