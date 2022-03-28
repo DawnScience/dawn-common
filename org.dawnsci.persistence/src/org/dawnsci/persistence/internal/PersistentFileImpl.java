@@ -43,12 +43,14 @@ import org.eclipse.january.IMonitor;
 import org.eclipse.january.dataset.BooleanDataset;
 import org.eclipse.january.dataset.ByteDataset;
 import org.eclipse.january.dataset.Comparisons;
+import org.eclipse.january.dataset.CompoundDataset;
 import org.eclipse.january.dataset.Dataset;
 import org.eclipse.january.dataset.DatasetFactory;
 import org.eclipse.january.dataset.DatasetUtils;
 import org.eclipse.january.dataset.IDataset;
 import org.eclipse.january.dataset.ILazyDataset;
 import org.eclipse.january.dataset.IntegerDataset;
+import org.eclipse.january.dataset.RGBByteDataset;
 import org.eclipse.january.dataset.RGBDataset;
 import org.eclipse.january.dataset.Slice;
 import org.eclipse.january.metadata.OriginMetadata;
@@ -254,12 +256,16 @@ class PersistentFileImpl implements IPersistentFile {
 				data.setName(dataName);
 
 				boolean isRGB = false;
+				
+				if (data instanceof RGBDataset || data instanceof RGBByteDataset) {
+					isRGB = true;
+				}
+				
 				// we create the dataset
 				DataNode dNode = null;
-				if (data instanceof RGBDataset) {
-					data = ((RGBDataset) data).asNonCompoundDataset(true);
+				if (data instanceof CompoundDataset) {
+					data = ((CompoundDataset) data).asNonCompoundDataset(true);
 					data.setName(dataName);
-					isRGB = true;
 				}
 
 				dNode = file.createData(group, data);
