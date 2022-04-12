@@ -10,7 +10,7 @@
 		<version>1.0.0-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>org.dawnsci.jre.linux.x86_64.feature</artifactId>
+	<artifactId>org.dawnsci.jre.linux.aarch64.feature</artifactId>
 	<version>11.0.15-SNAPSHOT</version>
 	<packaging>eclipse-feature</packaging>
 
@@ -24,7 +24,7 @@
 						<environment>
 							<os>linux</os>
 							<ws>gtk</ws>
-							<arch>x86_64</arch>
+							<arch>aarch64</arch>
 						</environment>
 					</environments>
 				</configuration>
@@ -52,8 +52,8 @@
 							<goal>wget</goal>
 						</goals>
 						<configuration>
-							<url>${adoptium.site.url}/${adoptium.jre.prefix}_x64_linux_hotspot_${adoptium.version.suffix}.tar.gz</url>
-							<sha256>${adoptium.linux.x86_64.sha256}</sha256>
+							<url>${adoptium.site.url}/${adoptium.jre.prefix}_aarch64_linux_hotspot_${adoptium.version.suffix}.tar.gz</url>
+							<sha256>${adoptium.linux.aarch64.sha256}</sha256>
 							<unpack>true</unpack>
 						</configuration>
 					</execution>

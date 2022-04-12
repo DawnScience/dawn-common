@@ -50,15 +50,17 @@
 			<id>dawn</id>
 			<properties>
 				<adoptium.jre.prefix>OpenJDK11U-jre</adoptium.jre.prefix>
-				<adoptium.bundle.version>11.0.14.1</adoptium.bundle.version>
+				<adoptium.bundle.version>11.0.15</adoptium.bundle.version>
 				<adoptium.file.version>${adoptium.bundle.version}</adoptium.file.version>
-				<adoptium.build>1</adoptium.build>
+				<adoptium.build>10</adoptium.build>
 				<adoptium.site.url>https://github.com/adoptium/temurin11-binaries/releases/download/jdk-${adoptium.file.version}%2B${adoptium.build}</adoptium.site.url>
 				<adoptium.version.suffix>${adoptium.file.version}_${adoptium.build}</adoptium.version.suffix>
 				<adoptium.jre.dir>jdk-${adoptium.file.version}+${adoptium.build}-jre</adoptium.jre.dir>
-				<adoptium.linux.sha256>b5a6960bc6bb0b1a967e307f908ea9b06ad7adbbd9df0b8954ab51374faa8a98</adoptium.linux.sha256>
-				<adoptium.macos.sha256>1b2f792ad05af9dba876db962c189527e645b48f50ceb842b4e39169de553303</adoptium.macos.sha256>
-				<adoptium.win32.sha256>49500200b482c407159e9907bb53efd2b2ad772623c3857c23c17c1304d421b5</adoptium.win32.sha256>
+				<adoptium.linux.aarch64.sha256>a9e1b9fcef7c2fa9911bd9f2bf51591102ee0367a667e154cf15f20d0c6faa6a</adoptium.linux.aarch64.sha256>
+				<adoptium.linux.x86_64.sha256>22831fd097dfb39e844cb34f42064ff26a0ada9cd13621d7b8bca8e9b9d3a5ee</adoptium.linux.x86_64.sha256>
+				<adoptium.macos.aarch64.sha256>6736f6ef503658f3ae48a54646a8ac6dc8ca286f10887dae22b41f2148882695</adoptium.macos.aarch64.sha256>
+				<adoptium.macos.x86_64.sha256>0a5419a45fe3680610ff15afa7d854c9b79579550327d14d616ea8ccd0e89505</adoptium.macos.x86_64.sha256>
+				<adoptium.win32.x86_64.sha256>606b43b51acff1ff7d77cfd253c8a13e73dda3cb638f4e9d2f74d09a9c1401fb</adoptium.win32.x86_64.sha256>
 			</properties>
 			<modules>
 				<module>org.dawnsci.boofcv.test</module>
@@ -69,6 +71,8 @@
 				<module>org.dawnsci.jre.linux.x86_64.feature</module>
 				<module>org.dawnsci.jre.macos.x86_64.feature</module>
 				<module>org.dawnsci.jre.win32.x86_64.feature</module>
+				<module>org.dawnsci.jre.linux.aarch64.feature</module>
+				<module>org.dawnsci.jre.macos.aarch64.feature</module>
 			</modules>
 		</profile>
 		<profile>
