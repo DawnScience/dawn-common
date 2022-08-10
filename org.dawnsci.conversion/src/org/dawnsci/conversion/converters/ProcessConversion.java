@@ -103,10 +103,10 @@ public class ProcessConversion extends AbstractConversion {
 		if (info.getProcessingOutputType() == ProcessingOutputType.ORIGINAL_AND_PROCESSED) {
 			File source = new File(context.getSelectedConversionFile().getAbsolutePath());
 			File dest = new File(full);
-			logger.debug("Copying original data ("+source.getAbsolutePath()+") to output file ("+dest.getAbsolutePath()+")");
+			logger.debug("Copying original data ({}) to output file ({})", source.getAbsolutePath(), dest.getAbsolutePath());
 			long start = System.currentTimeMillis();
 			FileUtils.copyNio(source, dest);
-			logger.debug("Copy ran in: " +(System.currentTimeMillis()-start)/1000. + " s : Thread" +Thread.currentThread().toString());
+			logger.debug("Copy ran in: {}s : Thread {}", (System.currentTimeMillis()-start)/1000.,Thread.currentThread().toString());
 		}
 		
 		ExecutionType executionType = info.getExecutionType();
