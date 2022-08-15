@@ -11,7 +11,7 @@
 	</parent>
 
 	<artifactId>org.dawnsci.jre.macos.aarch64.feature</artifactId>
-	<version>11.0.15-SNAPSHOT</version>
+	<version>11.0.16-SNAPSHOT</version>
 	<packaging>eclipse-feature</packaging>
 
 	<build>

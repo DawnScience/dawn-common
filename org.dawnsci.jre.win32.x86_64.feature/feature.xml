@@ -2,7 +2,7 @@
 <feature
       id="org.dawnsci.jre.win32.x86_64.feature"
       label="Adoptium JRE for Win32 x86_64"
-      version="11.0.15.qualifier"
+      version="11.0.16.qualifier"
       os="win32"
       ws="win32"
       arch="x86_64">

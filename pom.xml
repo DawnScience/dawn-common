@@ -50,17 +50,17 @@
 			<id>dawn</id>
 			<properties>
 				<adoptium.jre.prefix>OpenJDK11U-jre</adoptium.jre.prefix>
-				<adoptium.bundle.version>11.0.15</adoptium.bundle.version>
+				<adoptium.bundle.version>11.0.16</adoptium.bundle.version>
 				<adoptium.file.version>${adoptium.bundle.version}</adoptium.file.version>
-				<adoptium.build>10</adoptium.build>
+				<adoptium.build>8</adoptium.build>
 				<adoptium.site.url>https://github.com/adoptium/temurin11-binaries/releases/download/jdk-${adoptium.file.version}%2B${adoptium.build}</adoptium.site.url>
 				<adoptium.version.suffix>${adoptium.file.version}_${adoptium.build}</adoptium.version.suffix>
 				<adoptium.jre.dir>jdk-${adoptium.file.version}+${adoptium.build}-jre</adoptium.jre.dir>
-				<adoptium.linux.aarch64.sha256>a9e1b9fcef7c2fa9911bd9f2bf51591102ee0367a667e154cf15f20d0c6faa6a</adoptium.linux.aarch64.sha256>
-				<adoptium.linux.x86_64.sha256>22831fd097dfb39e844cb34f42064ff26a0ada9cd13621d7b8bca8e9b9d3a5ee</adoptium.linux.x86_64.sha256>
-				<adoptium.macos.aarch64.sha256>6736f6ef503658f3ae48a54646a8ac6dc8ca286f10887dae22b41f2148882695</adoptium.macos.aarch64.sha256>
-				<adoptium.macos.x86_64.sha256>0a5419a45fe3680610ff15afa7d854c9b79579550327d14d616ea8ccd0e89505</adoptium.macos.x86_64.sha256>
-				<adoptium.win32.x86_64.sha256>606b43b51acff1ff7d77cfd253c8a13e73dda3cb638f4e9d2f74d09a9c1401fb</adoptium.win32.x86_64.sha256>
+				<adoptium.linux.aarch64.sha256>3fa9cb99229ede53d4efddb686106df77794e02b1f4defea6b70b2b53380a8c7</adoptium.linux.aarch64.sha256>
+				<adoptium.linux.x86_64.sha256>74988677f1e1692f8f482ae5f75814b908bb3cf5a8b7d9872873a42e330e7595</adoptium.linux.x86_64.sha256>
+				<adoptium.macos.aarch64.sha256>5581660d969bde6ed4642ba5dbc4ed34170794e154cfeb43d9efbf24bd51d0bc</adoptium.macos.aarch64.sha256>
+				<adoptium.macos.x86_64.sha256>952fe98f6fe466a83b59ad93357bcf48c36a81596b260026d96f29bc84f0d6c4</adoptium.macos.x86_64.sha256>
+				<adoptium.win32.x86_64.sha256>47ed5341463829e1c74f3a05e5de3edf6278b3fa9ad5b45e0882f87aea3d83c5</adoptium.win32.x86_64.sha256>
 			</properties>
 			<modules>
 				<module>org.dawnsci.boofcv.test</module>

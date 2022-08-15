@@ -2,7 +2,7 @@
 <feature
       id="org.dawnsci.jre.macos.x86_64.feature"
       label="Adoptium JRE for macOS x86_64"
-      version="11.0.15.qualifier"
+      version="11.0.16.qualifier"
       os="macosx"
       ws="cocoa"
       arch="x86_64">

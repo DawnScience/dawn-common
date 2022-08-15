@@ -2,7 +2,7 @@
 <feature
       id="org.dawnsci.jre.linux.aarch64.feature"
       label="Adoptium JRE for Linux AArch64"
-      version="11.0.15.qualifier"
+      version="11.0.16.qualifier"
       os="linux"
       ws="gtk"
       arch="aarch64">
