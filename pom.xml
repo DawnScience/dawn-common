@@ -83,14 +83,6 @@
 				<module>org.dawnsci.python.rpc.test</module>
 			</modules>
 		</profile>
-		<profile>
-			<id>dawn-full</id>
-			<modules>
-				<module>org.dawnsci.processing.python</module>
-				<module>org.dawnsci.python.rpc</module>
-				<module>org.dawnsci.python.rpc.test</module>
-			</modules>
-		</profile>
 	</profiles>
 </project>
 
