@@ -133,6 +133,7 @@ public class TextUtilitiesEx
      * @param f the font
      * @param dimension the extents to be corrected
      */
+    @Deprecated
     private static void applyItalicBugHack(String s, Font f, Dimension extents)
     {
         if ((f.getFontData()[0].getStyle() & SWT.ITALIC) != 0 &&
