@@ -772,7 +772,7 @@ class PersistentFileImpl implements IPersistentFile {
 	}
 
 	@Override
-	@Deprecated
+	@Deprecated(since="Dawn 2.11")
 	public void setOperationDataOrigin(OriginMetadata origin) throws Exception {
 		throw new UnsupportedOperationException("setOperationDataOrigin is not supported any longer");
 	}

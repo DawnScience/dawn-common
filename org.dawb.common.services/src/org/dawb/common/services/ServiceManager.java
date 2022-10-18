@@ -22,6 +22,9 @@ import org.eclipse.dawnsci.analysis.api.io.ILoaderService;
 import org.eclipse.dawnsci.analysis.api.persistence.IPersistenceService;
 import org.eclipse.dawnsci.analysis.api.processing.IOperationService;
 import org.eclipse.ui.PlatformUI;
+
+import uk.ac.diamond.daq.util.logging.deprecation.DeprecationLogger;
+
 /**
  * This class gets a service even if we are running in headless mode.
  * 
@@ -32,9 +35,11 @@ import org.eclipse.ui.PlatformUI;
  * 
  * @deprecated Use OSGI Services instead. Get in touch if you need help with this...
  */
-@Deprecated
+@Deprecated(since="Dawn 1.8")
 public class ServiceManager {
 	
+	private static final String REPLACEMENT_TYPE = "OSGI Services";
+	private static final DeprecationLogger logger = DeprecationLogger.getLogger(ServiceManager.class);
 	private static final Collection<Class<? extends Object>> OFFLINE_SERVICES; 
 	static {
 		OFFLINE_SERVICES = new HashSet<Class<? extends Object>>(12);
@@ -58,6 +63,7 @@ public class ServiceManager {
 	 * @throws Exception
 	 */
 	public static Object getService(final Class<?> serviceClass) throws Exception {
+		logger.deprecatedMethod("getService(Class<?>)", null, REPLACEMENT_TYPE);
 		return getService(serviceClass, true);
 	}
 
@@ -74,6 +80,7 @@ public class ServiceManager {
 	 */
 	public static Object getService(final Class<?> serviceClass, boolean exceptionOnError) throws Exception {
 		
+		logger.deprecatedMethod("getService(Class<?>, boolean)", null, REPLACEMENT_TYPE);
 		
 		if (overrides!=null && overrides.containsKey(serviceClass)) {
 			return overrides.get(serviceClass);
@@ -117,11 +124,13 @@ public class ServiceManager {
 	 * @param service
 	 */
 	public static void setService(final Class<?> serviceClass, Object service) {
+		logger.deprecatedMethod("setService(Class<?>, Object)", null, REPLACEMENT_TYPE);
 		if (overrides==null) overrides = new HashMap<Class<?>, Object>(7);
 		overrides.put(serviceClass, service);
 	}
 	
 	public static void addOffline(final Class<?> service) {
+		logger.deprecatedMethod("addOffline(Class<?>)", null, REPLACEMENT_TYPE);
 		OFFLINE_SERVICES.add(service);
 	}
 }

@@ -56,8 +56,8 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.part.Page;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.progress.UIJob;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import uk.ac.diamond.daq.util.logging.deprecation.DeprecationLogger;
 
 /**
  * Use {@code HeaderTableE4Part} instead
@@ -65,12 +65,12 @@ import org.slf4j.LoggerFactory;
  * @author suchet + gerring
  * 
  */
-@Deprecated
+@Deprecated(since="Dawn 2.1")
 public class HeaderTableView extends ViewPart implements ISelectionListener, IPartListener {
 
 	public static final String ID = "org.dawb.common.ui.views.headerTableView";
 	
-	private static final Logger logger = LoggerFactory.getLogger(HeaderTableView.class);
+	private static final DeprecationLogger logger = DeprecationLogger.getLogger(HeaderTableView.class);
 	
 	private IMetadata           meta;
 	private StructuredSelection lastSelection;
@@ -88,6 +88,7 @@ public class HeaderTableView extends ViewPart implements ISelectionListener, IPa
 	 */
 	public HeaderTableView(final boolean requirePageUpdates) {
 		this.requirePageUpdates = requirePageUpdates;
+        logger.deprecatedClass();
 	}
 
 	/*

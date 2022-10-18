@@ -17,6 +17,8 @@ import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
 
+import uk.ac.diamond.daq.util.logging.deprecation.DeprecationLogger;
+
 /**
  * A utility class for building lookup tables
  * 
@@ -24,15 +26,21 @@ import org.eclipse.ui.preferences.ScopedPreferenceStore;
  * 
    @deprecated  use {@link org.eclipse.dawnsci.plotting.api.histogram.IPaletteService} instead
  */
-@Deprecated
+@Deprecated(since="Dawn 1.4")
 public class PaletteFactory {
 	
+	private static final String REPLACEMENT_TYPE = "org.eclipse.dawnsci.plotting.api.histogram.IPaletteService";
+	private static final DeprecationLogger logger = DeprecationLogger.getLogger(PaletteFactory.class);
 	public static final Map<String,Integer> PALETTES = PaletteFactory.getPaletteNames();
+	
+	private PaletteFactory() {
+		
+	}
 	
 	/**
 	 * An array with all the available palettes. They are null until used.
 	 */
-	static private PaletteData[] palettes = new PaletteData[PALETTES.size()];
+	private static PaletteData[] palettes = new PaletteData[PALETTES.size()];
 
 
 
@@ -40,6 +48,7 @@ public class PaletteFactory {
 	 * Make 256 level grayscale palette.
 	 */
 	public static PaletteData makeGrayScalePalette() {
+		logger.deprecatedMethod("makeGrayScalePalette()", null, REPLACEMENT_TYPE);
 		RGB grayscale[] = new RGB[256];
 		for (int i = 0; i < 256; i++) {
 			grayscale[i] = new RGB(i, i, i);
@@ -50,6 +59,7 @@ public class PaletteFactory {
 	 * Make 256 level grayscale palette.
 	 */
 	public static PaletteData makeGrayScalePaletteInverted() {
+		logger.deprecatedMethod("makeGrayScalePaletteInverted()", null, REPLACEMENT_TYPE);
 		RGB grayscale[] = new RGB[256];
 		for (int i = 0; i < 256; i++) {
 			grayscale[i] = new RGB(255-i, 255-i, 255-i);
@@ -61,6 +71,7 @@ public class PaletteFactory {
 	 * Make 256 level color palette.
 	 */
 	public static PaletteData makeColorPalette() {
+		logger.deprecatedMethod("makeColorPalette()", null, REPLACEMENT_TYPE);
 		RGB color[] = new RGB[256];
 		color[0] = new RGB(0, 0, 0);
 		int i = 1;
@@ -84,6 +95,7 @@ public class PaletteFactory {
 	 * Make 256 Jet Palette
 	 */
 	public static PaletteData makeJetPalette() {
+		logger.deprecatedMethod("makeJetPalette()", null, REPLACEMENT_TYPE);
 		RGB jet[] = new RGB[256];
 		
 		int nb = 256;
@@ -120,6 +132,7 @@ public class PaletteFactory {
 	 * Make 256 rainbow color palette - Jean-Luc Pon's algorithm.
 	 */
 	public static PaletteData makeRainbow1Palette() {
+		logger.deprecatedMethod("makeRainbow1Palette()", null, REPLACEMENT_TYPE);
 		RGB rainbow[] = new RGB[256];
 		RGB colorVal[] = new RGB[5];
 		colorVal[0] = new RGB(200, 0, 250); // purple
@@ -173,6 +186,7 @@ public class PaletteFactory {
 	 * Make 256 rainbow color palette - Ken Evans algorithm.
 	 */
 	public static PaletteData makeRainbow2Palette() {
+		logger.deprecatedMethod("makeRainbow2Palette()", null, REPLACEMENT_TYPE);
 		RGB rainbow[] = new RGB[256];
 		double nGroups = 5, nMembers = 45, nTotal = nGroups * nMembers;
 		double high = 1.000, medium = .375;
@@ -238,6 +252,7 @@ public class PaletteFactory {
 	 * Make 256 level Blues palette.
 	 */
 	public static PaletteData makeBluesPalette() {
+		logger.deprecatedMethod("makeBluesPalette()", null, REPLACEMENT_TYPE);
 	  RGB blues[] = new RGB[256];
 	  blues[0] = new RGB(247, 251, 255);
 	  blues[1] = new RGB(246, 250, 254);
@@ -501,6 +516,7 @@ public class PaletteFactory {
 	 * Make 256 level Greens palette.
 	 */
 	public static PaletteData makeGreensPalette() {
+		logger.deprecatedMethod("makeGreensPalette()", null, REPLACEMENT_TYPE);
 	  RGB greens[] = new RGB[256];
 	  greens[0] = new RGB(247, 252, 245);
 	  greens[1] = new RGB(246, 251, 244);
@@ -764,6 +780,7 @@ public class PaletteFactory {
 	 * Make 256 level Reds palette.
 	 */
 	public static PaletteData makeRedsPalette() {
+		logger.deprecatedMethod("makeRedsPalette()", null, REPLACEMENT_TYPE);
 	  RGB reds[] = new RGB[256];
 	  reds[0] = new RGB(255, 245, 240);
 	  reds[1] = new RGB(254, 244, 239);
@@ -1027,6 +1044,7 @@ public class PaletteFactory {
 	 * Make 256 level Pastel1 palette.
 	 */
 	public static PaletteData makePastel1Palette() {
+		logger.deprecatedMethod("makePastel1Palette()", null, REPLACEMENT_TYPE);
 	  RGB pastel1[] = new RGB[256];
 	  pastel1[0] = new RGB(251, 180, 174);
 	  pastel1[1] = new RGB(248, 180, 175);
@@ -1290,6 +1308,7 @@ public class PaletteFactory {
 	 * Make 256 level Spring palette.
 	 */
 	public static PaletteData makeSpringPalette() {
+		logger.deprecatedMethod("makeSpringPalette()", null, REPLACEMENT_TYPE);
 	  RGB spring[] = new RGB[256];
 	  spring[0] = new RGB(255, 0, 255);
 	  spring[1] = new RGB(255, 1, 254);
@@ -1553,6 +1572,7 @@ public class PaletteFactory {
 	 * Make 256 level Summer palette.
 	 */
 	public static PaletteData makeSummerPalette() {
+		logger.deprecatedMethod("makeSummerPalette()", null, REPLACEMENT_TYPE);
 	  RGB summer[] = new RGB[256];
 	  summer[0] = new RGB(0, 127, 102);
 	  summer[1] = new RGB(1, 128, 102);
@@ -1816,6 +1836,7 @@ public class PaletteFactory {
 	 * Make 256 level Autumn palette.
 	 */
 	public static PaletteData makeAutumnPalette() {
+		logger.deprecatedMethod("makeAutumnPalette()", null, REPLACEMENT_TYPE);
 	  RGB autumn[] = new RGB[256];
 	  autumn[0] = new RGB(255, 0, 0);
 	  autumn[1] = new RGB(255, 1, 0);
@@ -2079,6 +2100,7 @@ public class PaletteFactory {
 	 * Make 256 level Winter palette.
 	 */
 	public static PaletteData makeWinterPalette() {
+		logger.deprecatedMethod("makeWinterPalette()", null, REPLACEMENT_TYPE);
 	  RGB winter[] = new RGB[256];
 	  winter[0] = new RGB(0, 0, 255);
 	  winter[1] = new RGB(0, 1, 254);
@@ -2344,6 +2366,7 @@ public class PaletteFactory {
 	 * @return
 	 */
 	public static PaletteData getPalette() throws Exception {
+		logger.deprecatedMethod("getPalette()", null, REPLACEMENT_TYPE);
 		
 		final ScopedPreferenceStore store = new ScopedPreferenceStore(InstanceScope.INSTANCE, "org.dawb.common.ui");
 		final int index = store.getInt("palettePreference");
@@ -2351,10 +2374,12 @@ public class PaletteFactory {
 	}
 
 	public static PaletteData getPalette(int index) throws Exception{
+		logger.deprecatedMethod("getPalette(int)", null, REPLACEMENT_TYPE);
         return PaletteFactory.getPalette(index, false);
 	}
 	
 	public static PaletteData getPalette(int index, final boolean createCopy) throws Exception {
+		logger.deprecatedMethod("getPalette(int, boolean)", null, REPLACEMENT_TYPE);
 		if (index < 0 || index >= PALETTES.size()) {
 			return null;
 		}
@@ -2412,6 +2437,7 @@ public class PaletteFactory {
 	}
 	
 	public static Map<String, Integer> getPaletteNames() {
+		logger.deprecatedMethod("getPaletteNames()", null, REPLACEMENT_TYPE);
 
 		Map<String,Integer> PALETTES = new LinkedHashMap<String,Integer>(11);
 

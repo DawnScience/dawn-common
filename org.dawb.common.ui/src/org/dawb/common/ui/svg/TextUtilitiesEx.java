@@ -19,12 +19,16 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Shell;
 
+import uk.ac.diamond.daq.util.logging.deprecation.DeprecationLogger;
+
 /**
  * @author satif, crevells
  * @since 2.1
  */
 public class TextUtilitiesEx
     extends TextUtilities {
+	
+	private static final DeprecationLogger logger = DeprecationLogger.getLogger(TextUtilitiesEx.class);
 
     /**
      * The mapmode to be used for translating measurement units.
@@ -133,9 +137,10 @@ public class TextUtilitiesEx
      * @param f the font
      * @param dimension the extents to be corrected
      */
-    @Deprecated
+    @Deprecated(since="Dawn 1.11")
     private static void applyItalicBugHack(String s, Font f, Dimension extents)
     {
+    	logger.deprecatedMethod("applyItalicBugHack(String, Font, Dimension)");
         if ((f.getFontData()[0].getStyle() & SWT.ITALIC) != 0 &&
         		s.length() > 0) {
         	extents.width += (extents.width / s.length()) / 2;
