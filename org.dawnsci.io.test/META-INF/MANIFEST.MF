@@ -4,6 +4,6 @@ Bundle-Name: Dawn IO tests
 Bundle-SymbolicName: org.dawnsci.io.test
 Bundle-Version: 1.0.0.qualifier
 Fragment-Host: org.dawnsci.io;bundle-version="1.2.0"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-17
 Require-Bundle: org.junit;bundle-version="[4.10.0,5.0.0)"
 Automatic-Module-Name: org.dawnsci.io.test
