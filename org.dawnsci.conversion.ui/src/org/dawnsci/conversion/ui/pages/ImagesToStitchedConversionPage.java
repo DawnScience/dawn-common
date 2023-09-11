@@ -13,12 +13,12 @@ import java.io.File;
 import org.dawb.common.ui.wizard.ResourceChoosePage;
 import org.dawb.common.util.io.FileUtils;
 import org.dawnsci.conversion.converters.ImagesToStitchedConverter.ConversionStitchedBean;
-import org.dawnsci.conversion.ui.ServiceHolder;
 import org.dawnsci.conversion.ui.api.IConversionWizardPage;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
 import org.eclipse.dawnsci.analysis.api.image.IImageTransform;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
+import org.eclipse.dawnsci.analysis.api.io.ILoaderService;
 import org.eclipse.dawnsci.analysis.api.roi.IROI;
 import org.eclipse.dawnsci.analysis.dataset.roi.CircularROI;
 import org.eclipse.dawnsci.plotting.api.IPlottingSystem;
@@ -26,8 +26,8 @@ import org.eclipse.dawnsci.plotting.api.PlotType;
 import org.eclipse.dawnsci.plotting.api.PlottingFactory;
 import org.eclipse.dawnsci.plotting.api.region.IROIListener;
 import org.eclipse.dawnsci.plotting.api.region.IRegion;
-import org.eclipse.dawnsci.plotting.api.region.ROIEvent;
 import org.eclipse.dawnsci.plotting.api.region.IRegion.RegionType;
+import org.eclipse.dawnsci.plotting.api.region.ROIEvent;
 import org.eclipse.january.DatasetException;
 import org.eclipse.january.IMonitor;
 import org.eclipse.january.dataset.IDataset;
@@ -55,6 +55,7 @@ import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.ac.diamond.osgi.services.ServiceProvider;
 import uk.ac.diamond.scisoft.analysis.image.ImagePeemUtils;
 
 /**
@@ -148,7 +149,7 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 		String filePath = getSelectedPaths()[0];
 		IDataHolder holder = null;
 		try {
-			holder = ServiceHolder.getLoaderService().getData(filePath, new IMonitor.Stub());
+			holder = ServiceProvider.getService(ILoaderService.class).getData(filePath, new IMonitor.Stub());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -207,7 +208,7 @@ public class ImagesToStitchedConversionPage extends ResourceChoosePage
 		double angle = 0, fov = 0, theta = 0;
 		int rowNum = 0, columnNum = 0;
 		try {
-			IDataHolder holder = ServiceHolder.getLoaderService().getData(filePath, new IMonitor.Stub());
+			IDataHolder holder = ServiceProvider.getService(ILoaderService.class).getData(filePath, new IMonitor.Stub());
 			if (datFileLoaded) {
 				//load metadatavalues
 				IMetadata meta = holder.getMetadata();

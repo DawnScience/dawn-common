@@ -21,8 +21,8 @@ import org.dawnsci.conversion.converters.CustomTomoConverter;
 import org.dawnsci.conversion.converters.CustomTomoConverter.TomoInfoBean;
 import org.dawnsci.conversion.schemes.CustomTomoConverterScheme;
 import org.dawnsci.conversion.ui.Activator;
-import org.dawnsci.conversion.ui.ServiceHolder;
 import org.dawnsci.conversion.ui.api.IConversionWizardPage;
+import org.dawnsci.conversion.ui.api.IConversionWizardPageService;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionScheme;
@@ -47,6 +47,8 @@ import org.eclipse.ui.forms.events.ExpansionAdapter;
 import org.eclipse.ui.forms.events.ExpansionEvent;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.slf4j.LoggerFactory;
+
+import uk.ac.diamond.osgi.services.ServiceProvider;
 
 public final class TomoConvertPage extends ResourceChoosePage implements IConversionWizardPage {
 	
@@ -318,7 +320,8 @@ public final class TomoConvertPage extends ResourceChoosePage implements IConver
 		if (source==null || "".equals(source)) return null;
 		IConversionScheme scheme = context.getConversionScheme();
 	
-		CustomTomoConverterScheme schemeFromService = ServiceHolder.getConversionWizardPageService().getSchemeForClass(CustomTomoConverterScheme.class);
+		CustomTomoConverterScheme schemeFromService = ServiceProvider.getService(
+				IConversionWizardPageService.class).getSchemeForClass(CustomTomoConverterScheme.class);
 		
 		if (scheme == null || scheme != schemeFromService) return null;
 		

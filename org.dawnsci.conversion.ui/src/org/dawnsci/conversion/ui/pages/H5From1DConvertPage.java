@@ -20,11 +20,11 @@ import org.dawb.common.ui.util.GridUtils;
 import org.dawb.common.ui.wizard.ResourceChoosePage;
 import org.dawnsci.conversion.converters.Convert1DtoND.Convert1DInfoBean;
 import org.dawnsci.conversion.ui.Activator;
-import org.dawnsci.conversion.ui.ServiceHolder;
 import org.dawnsci.conversion.ui.api.IConversionWizardPage;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
+import org.eclipse.dawnsci.analysis.api.io.ILoaderService;
 import org.eclipse.dawnsci.plotting.api.ProgressMonitorWrapper;
 import org.eclipse.january.dataset.ILazyDataset;
 import org.eclipse.january.metadata.IMetadata;
@@ -56,6 +56,8 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.forms.events.ExpansionAdapter;
 import org.eclipse.ui.forms.events.ExpansionEvent;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
+
+import uk.ac.diamond.osgi.services.ServiceProvider;
 
 public class H5From1DConvertPage extends ResourceChoosePage implements
 IConversionWizardPage {
@@ -253,7 +255,7 @@ IConversionWizardPage {
 					final String source = getSourcePath(context);
 					if (source==null || "".equals(source)) return;
 					// Attempt to use meta data, save memory
-					final IMetadata    meta = ServiceHolder.getLoaderService().getMetadata(source, new ProgressMonitorWrapper(monitor));
+					final IMetadata    meta = ServiceProvider.getService(ILoaderService.class).getMetadata(source, new ProgressMonitorWrapper(monitor));
 					if (meta != null) {
 						final Collection<String> names = meta.getDataNames();
 						if (names !=null) {
@@ -262,7 +264,7 @@ IConversionWizardPage {
 						}
 					}
 
-					IDataHolder holder = ServiceHolder.getLoaderService().getData(source, new ProgressMonitorWrapper(monitor));
+					IDataHolder holder = ServiceProvider.getService(ILoaderService.class).getData(source, new ProgressMonitorWrapper(monitor));
 					final List<String> names = new ArrayList<String>(holder.toLazyMap().keySet());
 					Collections.sort(names);
 					setDataNames(names.toArray(new String[names.size()]), null, holder);

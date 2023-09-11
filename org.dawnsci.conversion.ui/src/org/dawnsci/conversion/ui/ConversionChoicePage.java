@@ -24,6 +24,7 @@ import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionScheme;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionService;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
+import org.eclipse.dawnsci.analysis.api.io.ILoaderService;
 import org.eclipse.january.IMonitor;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.swt.SWT;
@@ -43,6 +44,8 @@ import org.eclipse.swt.widgets.Text;
 import org.osgi.framework.Bundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import uk.ac.diamond.osgi.services.ServiceProvider;
 
 public class ConversionChoicePage extends ResourceChoosePage implements IConversionWizardPage {
 	
@@ -65,7 +68,7 @@ public class ConversionChoicePage extends ResourceChoosePage implements IConvers
 	private final static String SCHEME_KEY = "org.dawnsci.conversion.ui.schemeKey";
 	@Override
 	protected void createContentBeforeFileChoose(Composite container) {
-		conversionWizardPageService = ServiceHolder.getConversionWizardPageService();
+		conversionWizardPageService = ServiceProvider.getService(IConversionWizardPageService.class);
 		Label label = new Label(container, SWT.NONE);
 		label.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 4, 1));
 		
@@ -329,7 +332,7 @@ public class ConversionChoicePage extends ResourceChoosePage implements IConvers
 				if (selectedFiles!=null && selectedFiles.size()>1) {		
 					for (String path : selectedFiles) {
 						try {
-							holder = ServiceHolder.getLoaderService().getData(path, new IMonitor.Stub());
+							holder = ServiceProvider.getService(ILoaderService.class).getData(path, new IMonitor.Stub());
 						    if (holder==null) continue;
 						    if (holder.size()<1) continue;
 						    break;
@@ -338,7 +341,7 @@ public class ConversionChoicePage extends ResourceChoosePage implements IConvers
 						}
 					}
 				} else {
-					holder = ServiceHolder.getLoaderService().getData(filePath, new IMonitor.Stub());
+					holder = ServiceProvider.getService(ILoaderService.class).getData(filePath, new IMonitor.Stub());
 				}
 				boolean foundRequiredRank = false;
 				for (int i = 0; i < holder.size(); i++) {

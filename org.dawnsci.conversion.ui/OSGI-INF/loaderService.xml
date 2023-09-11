@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="true" name="Loader Service for Conversion">
-   <implementation class="org.dawnsci.conversion.ui.ServiceHolder"/>
-   <reference bind="setLoaderService" cardinality="1..1" interface="org.eclipse.dawnsci.analysis.api.io.ILoaderService" name="ILoaderService" policy="static"/>
-   <reference bind="setConversionWizardPageService" cardinality="1..1" interface="org.dawnsci.conversion.ui.api.IConversionWizardPageService" name="IConversionWizardPageService" policy="static"/>
-</scr:component>

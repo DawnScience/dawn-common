@@ -37,6 +37,8 @@ import org.eclipse.ui.PlatformUI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.ac.diamond.osgi.services.ServiceProvider;
+
 /**
  *   ConvertWizard
  *
@@ -67,8 +69,9 @@ public class ConvertWizard extends Wizard implements IExportWizard, IFileOverrid
 			return;
 		}
 		
-		pageService = ServiceHolder.getConversionWizardPageService();
-		if (pageService == null) {
+		try {
+			pageService = ServiceProvider.getService(IConversionWizardPageService.class);
+		} catch (IllegalArgumentException e) {
 			logger.error("Cannot get conversion wizardpage service through OSGI injection");
 			return;
 		}

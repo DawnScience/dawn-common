@@ -14,11 +14,11 @@ import java.util.List;
 import org.dawb.common.ui.util.GridUtils;
 import org.dawb.common.ui.wizard.ResourceChoosePage;
 import org.dawnsci.conversion.ui.Activator;
-import org.dawnsci.conversion.ui.ServiceHolder;
 import org.dawnsci.conversion.ui.api.IConversionWizardPage;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
+import org.eclipse.dawnsci.analysis.api.io.ILoaderService;
 import org.eclipse.dawnsci.plotting.api.ProgressMonitorWrapper;
 import org.eclipse.january.dataset.ILazyDataset;
 import org.eclipse.january.metadata.IMetadata;
@@ -47,6 +47,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
 import org.slf4j.LoggerFactory;
 
+import uk.ac.diamond.osgi.services.ServiceProvider;
 import uk.ac.diamond.scisoft.analysis.utils.DataHolderUtils;
 
 public abstract class AbstractDatasetChoosePage extends ResourceChoosePage implements IConversionWizardPage{
@@ -205,7 +206,7 @@ public abstract class AbstractDatasetChoosePage extends ResourceChoosePage imple
 					final String source = getSourcePath(context);
 					if (source==null || "".equals(source)) return;
 					// Attempt to use meta data, save memory
-					IDataHolder holder = ServiceHolder.getLoaderService().getData(source, new ProgressMonitorWrapper(monitor));
+					IDataHolder holder = ServiceProvider.getService(ILoaderService.class).getData(source, new ProgressMonitorWrapper(monitor));
 					final List<String> names = DataHolderUtils.getSlicableNames(holder, getMinimumDataSize());
 					setDataNames(names.toArray(new String[names.size()]), null, holder);
 					return;
