@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.dawb.common.ui.Activator;
-import org.dawb.common.ui.ServiceLoader;
 import org.dawb.common.ui.monitor.ProgressMonitorWrapper;
 import org.dawb.common.ui.util.EclipseUtils;
 import org.dawb.common.ui.util.GridUtils;
@@ -63,6 +62,8 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import uk.ac.diamond.osgi.services.ServiceProvider;
 
 /**
  * A page with a field for choosing an external file.
@@ -481,7 +482,7 @@ public class ResourceChoosePage extends WizardPage {
 
 		final IConversionScheme scheme = context.getConversionScheme();
 		IConversionVisitor     visitor= context.getConversionVisitor();
-		ILoaderService loader = ServiceLoader.getLoaderService();
+		ILoaderService loader = ServiceProvider.getService(ILoaderService.class);
 		final IMetadata        meta   = loader.getMetadata(source, new ProgressMonitorWrapper(monitor));
         final List<String>     names  = new ArrayList<String>(7);
         if (meta!=null) for (String name : meta.getDataShapes().keySet()) {

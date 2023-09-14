@@ -16,7 +16,6 @@ import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
 
 import org.dawb.common.ui.Activator;
-import org.dawb.common.ui.ServiceLoader;
 import org.dawb.common.ui.menu.CheckableActionGroup;
 import org.dawb.common.ui.preferences.ViewConstants;
 import org.dawb.common.ui.util.EclipseUtils;
@@ -89,6 +88,8 @@ import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import uk.ac.diamond.osgi.services.ServiceProvider;
 
 
 
@@ -500,7 +501,7 @@ public class ImageMonitorView extends ViewPart implements MouseListener, Selecti
 				if (ImageFileUtils.isImage(name))      return true;
 				
 				final String ext = FileUtils.getFileExtension(pathname);
-				ILoaderService loader = ServiceLoader.getLoaderService();
+				ILoaderService loader = ServiceProvider.getService(ILoaderService.class);
 				if (loader.getSupportedExtensions().contains(ext)) return true;
 				return false;
 

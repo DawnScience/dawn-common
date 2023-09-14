@@ -16,7 +16,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.dawb.common.ui.ServiceLoader;
 import org.dawb.common.ui.monitor.ProgressMonitorWrapper;
 import org.dawb.common.ui.plot.PlottingSystemUtils;
 import org.dawb.common.ui.util.EclipseUtils;
@@ -62,6 +61,8 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import uk.ac.diamond.osgi.services.ServiceProvider;
 
 public class PersistenceExportWizard extends AbstractPersistenceWizard implements IExportWizard {
 
@@ -135,7 +136,7 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
 			IPersistentFile     pf=null;
 
 			PERSIST_BLOCK: try {
-				IPersistenceService service = ServiceLoader.getPersistenceService();
+				IPersistenceService service = ServiceProvider.getService(IPersistenceService.class);
 				file = new File(page.getAbsoluteFilePath());
 				if (!file.exists()) break PERSIST_BLOCK;
 				pf    = service.getPersistentFile(file.getAbsolutePath());
@@ -238,7 +239,7 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
 					 IPersistenceService service = null;
 					 String savePath = null;;
 					 try {
-						  service = ServiceLoader.getPersistenceService();
+						  service = ServiceProvider.getService(IPersistenceService.class);
 						 if(finalFile != null)
 							 savePath = finalFile.getLocation().toOSString();
 						 else

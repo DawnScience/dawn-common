@@ -9,20 +9,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.dawb.common.ui.ServiceLoader;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionScheme;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
+import org.eclipse.dawnsci.analysis.api.io.ILoaderService;
 import org.eclipse.january.dataset.ShapeUtils;
 import org.eclipse.january.metadata.IMetadata;
+
+import uk.ac.diamond.osgi.services.ServiceProvider;
 
 public class DatasetNameUtils {
 
 	
 	public static Map<String, int[]> getDatasetInfo(String path, IConversionScheme scheme) {
 		IMetadata meta;
-		final Map<String, int[]>     names  = new HashMap<String, int[]>();
+		final Map<String, int[]> names  = new HashMap<String, int[]>();
 		try {
-			meta = ServiceLoader.getLoaderService().getMetadata(path, null);
+			meta = ServiceProvider.getService(ILoaderService.class).getMetadata(path, null);
 		} catch (Exception e) {
 			return names;
 		}
@@ -47,7 +49,7 @@ public class DatasetNameUtils {
         if (names.isEmpty()) {
         	IDataHolder dataHolder;
 			try {
-				dataHolder = ServiceLoader.getLoaderService().getData(path, null);
+				dataHolder = ServiceProvider.getService(ILoaderService.class).getData(path, null);
 			} catch (Exception e) {
 				return names;
 			}
