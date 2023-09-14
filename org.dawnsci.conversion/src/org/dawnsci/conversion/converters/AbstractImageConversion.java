@@ -16,15 +16,16 @@ import java.util.Collections;
 import java.util.List;
 
 import org.dawb.common.util.list.SortNatural;
-import org.dawnsci.conversion.converters.util.LocalServiceManager;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
 import org.eclipse.dawnsci.analysis.api.downsample.DownsampleMode;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
+import org.eclipse.dawnsci.analysis.api.io.ILoaderService;
 import org.eclipse.dawnsci.analysis.dataset.function.Downsample;
 import org.eclipse.dawnsci.plotting.api.histogram.ImageServiceBean;
 import org.eclipse.january.dataset.IDataset;
 import org.eclipse.january.dataset.ILazyDataset;
 
+import uk.ac.diamond.osgi.services.ServiceProvider;
 import uk.ac.diamond.scisoft.analysis.io.ImageStackLoader;
 
 public abstract class AbstractImageConversion extends AbstractConversion {
@@ -73,7 +74,8 @@ public abstract class AbstractImageConversion extends AbstractConversion {
 						for (File file : paths) images.add(file.getAbsolutePath());
 					}
 					
-					final IDataHolder holder = LocalServiceManager.getLoaderService().getData(images.get(0), context.getMonitor());
+					final IDataHolder holder = ServiceProvider.getService(ILoaderService.class)
+							.getData(images.get(0), context.getMonitor());
 		 		    Collections.sort(images, new SortNatural<String>(true));
 					ImageStackLoader loader = new ImageStackLoader(images, holder, context.getMonitor());
 					ILazyDataset lazyDataset = loader.createLazyDataset("Image Stack");

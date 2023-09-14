@@ -24,13 +24,13 @@ import org.dawb.common.util.io.FileUtils;
 import org.dawnsci.boofcv.BoofCVImageStitchingProcessCreator;
 import org.dawnsci.boofcv.BoofCVImageTransformCreator;
 import org.dawnsci.conversion.converters.ImagesToStitchedConverter.ConversionStitchedBean;
-import org.dawnsci.conversion.converters.util.LocalServiceManager;
 import org.dawnsci.conversion.schemes.ImagesToStitchedConverterScheme;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionScheme;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionService;
 import org.eclipse.dawnsci.analysis.api.image.IImageStitchingProcess;
 import org.eclipse.dawnsci.analysis.api.image.IImageTransform;
+import org.eclipse.dawnsci.analysis.api.io.ILoaderService;
 import org.eclipse.dawnsci.analysis.api.roi.IROI;
 import org.eclipse.dawnsci.analysis.dataset.impl.Image;
 import org.eclipse.dawnsci.analysis.dataset.roi.EllipticalROI;
@@ -40,25 +40,44 @@ import org.eclipse.january.dataset.IDataset;
 import org.eclipse.january.dataset.ILazyDataset;
 import org.eclipse.january.dataset.Slice;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
+import uk.ac.diamond.osgi.services.ServiceProvider;
 import uk.ac.diamond.scisoft.analysis.io.ImageStackLoader;
 import uk.ac.diamond.scisoft.analysis.io.LoaderServiceImpl;
 import uk.ac.diamond.scisoft.analysis.io.Utils;
 
 public class StitchingConvertTest {
+	
 	private static final IConversionScheme scheme = new ImagesToStitchedConverterScheme();
+	private static IImageStitchingProcess sticher;
+	private static IImageTransform transformer;
+	
 	private File dir;
 	private File output;
 	private String stitchedFileName;
-	private IImageStitchingProcess sticher;
-	private IImageTransform transformer;
 	private final int rows = 4;
 	private final int columns = 4;
 	private final double fieldOfView = 50;
 	private final double angle = 45;
 	double[][][] translations = new double[rows][columns][2];
+	
+	@BeforeClass
+	public static void setUpServices() {
+		sticher = BoofCVImageStitchingProcessCreator.createStitchingProcess();
+		transformer = BoofCVImageTransformCreator.createTransformService();
+		ServiceProvider.setService(IImageStitchingProcess.class, sticher);
+		ServiceProvider.setService(IImageTransform.class, transformer);
+		ServiceProvider.setService(ILoaderService.class, new LoaderServiceImpl());
+	}
+	
+	@AfterClass
+	public static void tearDownServices() {
+		ServiceProvider.reset();
+	}
 
 	@Before
 	public void before() throws IOException {
@@ -66,12 +85,6 @@ public class StitchingConvertTest {
 		output = new File(dir.getAbsolutePath()+"/stitchedImage");
 		output.mkdirs();
 		stitchedFileName = "image.tif";
-		new LocalServiceManager().setLoaderService(new LoaderServiceImpl());
-
-		sticher = BoofCVImageStitchingProcessCreator.createStitchingProcess();
-		transformer = BoofCVImageTransformCreator.createTransformService();
-		new ServiceLoader().setImageStitcher(sticher);
-		new ServiceLoader().setImageTransform(transformer);
 	}
 
 	@Test

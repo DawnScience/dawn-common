@@ -16,17 +16,20 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.dawnsci.conversion.converters.Convert1DtoND.Convert1DInfoBean;
-import org.dawnsci.conversion.converters.util.LocalServiceManager;
 import org.dawnsci.conversion.schemes.Convert1DtoNDScheme;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionScheme;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionService;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
+import org.eclipse.dawnsci.analysis.api.io.ILoaderService;
 import org.eclipse.dawnsci.hdf5.nexus.NexusFileFactoryHDF5;
+import org.eclipse.dawnsci.nexus.INexusFileFactory;
 import org.eclipse.january.dataset.ILazyDataset;
-import org.junit.Before;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
+import uk.ac.diamond.osgi.services.ServiceProvider;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 import uk.ac.diamond.scisoft.analysis.io.LoaderServiceImpl;
 
@@ -35,10 +38,15 @@ public class Convert1DtoNDTest {
 	private String testfile = "MoKedge_1_15.nxs";
 	private String nonNexusTest = "HyperOut.dat";
 	
-	@Before
-	public void before() {
-		new LocalServiceManager().setLoaderService(new LoaderServiceImpl());
-		new ServiceLoader().setNexusFileFactory(new NexusFileFactoryHDF5());
+	@BeforeClass
+	public static void setUpServices() {
+		ServiceProvider.setService(ILoaderService.class, new LoaderServiceImpl());
+		ServiceProvider.setService(INexusFileFactory.class, new NexusFileFactoryHDF5());
+	}
+	
+	@AfterClass
+	public static void tearDownServices() {
+		ServiceProvider.reset();
 	}
 	
 	@Test
@@ -62,7 +70,7 @@ public class Convert1DtoNDTest {
         
         service.process(context);
         
-        final IDataHolder   dh    = LocalServiceManager.getLoaderService().getData(tmp.getAbsolutePath(),null);
+        final IDataHolder dh = ServiceProvider.getService(ILoaderService.class).getData(tmp.getAbsolutePath(),null);
         final List<String> names = Arrays.asList("/entry1/counterTimer01/I0","/entry1/counterTimer01/lnI0It","/entry1/counterTimer01/It");
         for (String name : names) {
             ILazyDataset ds = dh.getLazyDataset(name);
@@ -100,7 +108,7 @@ public class Convert1DtoNDTest {
         
         service.process(context);
         
-        final IDataHolder   dh    = LocalServiceManager.getLoaderService().getData(tmp.getAbsolutePath(),null);
+        final IDataHolder dh = ServiceProvider.getService(ILoaderService.class).getData(tmp.getAbsolutePath(),null);
         final List<String> names = Arrays.asList("/entry1/counterTimer01/I0","/entry1/counterTimer01/lnI0It","/entry1/counterTimer01/It");
         for (String name : names) {
             ILazyDataset ds = dh.getLazyDataset(name);

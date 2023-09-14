@@ -16,27 +16,35 @@ import java.nio.file.Files;
 import java.util.Arrays;
 
 import org.dawb.common.util.io.FileUtils;
-import org.dawnsci.conversion.converters.util.LocalServiceManager;
 import org.dawnsci.conversion.schemes.CompareConverterScheme;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionScheme;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionService;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
+import org.eclipse.dawnsci.analysis.api.io.ILoaderService;
 import org.eclipse.dawnsci.hdf5.nexus.NexusFileFactoryHDF5;
+import org.eclipse.dawnsci.nexus.INexusFileFactory;
 import org.eclipse.january.dataset.ILazyDataset;
-import org.junit.Before;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
+import uk.ac.diamond.osgi.services.ServiceProvider;
 import uk.ac.diamond.scisoft.analysis.io.LoaderServiceImpl;
 
 public class CompareConvertTest {
 
 	private static final IConversionScheme scheme = new CompareConverterScheme();
 	
-	@Before
-	public void before() {
-		new LocalServiceManager().setLoaderService(new LoaderServiceImpl());
-		new ServiceLoader().setNexusFileFactory(new NexusFileFactoryHDF5());
+	@BeforeClass
+	public static void setUpServices() {
+		ServiceProvider.setService(ILoaderService.class, new LoaderServiceImpl());
+		ServiceProvider.setService(INexusFileFactory.class, new NexusFileFactoryHDF5());
+	}
+	
+	@AfterClass
+	public static void tearDownServices() {
+		ServiceProvider.reset();
 	}
 	
 	@Test
@@ -73,7 +81,8 @@ public class CompareConvertTest {
 	
 			service.process(context);
 			
-			final IDataHolder holder = LocalServiceManager.getLoaderService().getData(output.getAbsolutePath(),null);
+			final IDataHolder holder = ServiceProvider.getService(ILoaderService.class)
+					.getData(output.getAbsolutePath(),null);
 
 			ILazyDataset set = holder.getLazyDataset("/entry1/instrument/cold_head_temp/cold_head_temp");
 			final int[] shape = new int[]{size, 436};

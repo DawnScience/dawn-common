@@ -23,18 +23,21 @@ import java.util.List;
 import org.dawb.common.util.io.FileUtils;
 import org.dawnsci.boofcv.BoofCVImageTransformCreator;
 import org.dawnsci.conversion.converters.AlignImagesConverter.ConversionAlignBean;
-import org.dawnsci.conversion.converters.util.LocalServiceManager;
 import org.dawnsci.conversion.schemes.AlignImagesConverterScheme;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionScheme;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionService;
 import org.eclipse.dawnsci.analysis.api.image.IImageTransform;
+import org.eclipse.dawnsci.analysis.api.io.ILoaderService;
 import org.eclipse.january.IMonitor;
 import org.eclipse.january.dataset.IDataset;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
+import uk.ac.diamond.osgi.services.ServiceProvider;
 import uk.ac.diamond.scisoft.analysis.io.LoaderServiceImpl;
 import uk.ac.diamond.scisoft.analysis.io.Utils;
 
@@ -45,12 +48,21 @@ public class AlignConvertTest {
 	private File output;
 	private IImageTransform transformer;
 
+	@BeforeClass
+	public static void setUpServices() {
+		ServiceProvider.setService(ILoaderService.class, new LoaderServiceImpl());
+	}
+	
+	@AfterClass
+	public static void tearDownServices() {
+		ServiceProvider.reset();
+	}
+	
 	@Before
 	public void before() throws IOException {
 		dir  = Files.createTempDirectory("AlignTestFolder").toFile();
 		output = new File(dir.getAbsolutePath()+"/Aligned_images");
 		output.mkdirs();
-		new LocalServiceManager().setLoaderService(new LoaderServiceImpl());
 	}
 
 	@Test

@@ -14,10 +14,11 @@ import java.util.Collections;
 import java.util.List;
 
 import org.dawb.common.util.list.SortNatural;
-import org.dawnsci.conversion.ServiceLoader;
-import org.dawnsci.conversion.converters.util.LocalServiceManager;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
+import org.eclipse.dawnsci.analysis.api.image.IImageStitchingProcess;
+import org.eclipse.dawnsci.analysis.api.image.IImageTransform;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
+import org.eclipse.dawnsci.analysis.api.io.ILoaderService;
 import org.eclipse.dawnsci.analysis.api.roi.IROI;
 import org.eclipse.dawnsci.analysis.dataset.impl.Image;
 import org.eclipse.dawnsci.hdf5.HDF5Utils;
@@ -30,6 +31,7 @@ import org.eclipse.january.dataset.SliceND;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.ac.diamond.osgi.services.ServiceProvider;
 import uk.ac.diamond.scisoft.analysis.io.DataHolder;
 import uk.ac.diamond.scisoft.analysis.io.ImageStackLoader;
 import uk.ac.diamond.scisoft.analysis.io.JavaImageSaver;
@@ -72,7 +74,7 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 		ILazyDataset lazy = context.getLazyDataset();
 		// Rotate each image by angle degrees
 		double angle = conversionBean.getAngle();
-		IDataset rotatedSlice = ServiceLoader.getImageTransform().rotate(slice, angle);
+		IDataset rotatedSlice = ServiceProvider.getService(IImageTransform.class).rotate(slice, angle);
 
 		if (lazyfile == null)
 			lazyfile = createTempLazyFile(lazy.getShape(), "stitchedconverter.h5");
@@ -98,7 +100,9 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 			double[][][] translationsArray = conversionBean.getTranslationsArray();
 
 			// stitch the stack of images
-			IDataset stitched = ServiceLoader.getImageStitcher().stitch(lazyfile, rows, columns, fieldOfView, translationsArray, useFeatureAssociation, lazy.getShape(), context.getMonitor());
+			IDataset stitched = ServiceProvider.getService(IImageStitchingProcess.class)
+					.stitch(lazyfile, rows, columns, fieldOfView, translationsArray,
+							useFeatureAssociation, lazy.getShape(), context.getMonitor());
 
 			stitched.setName("stitched");
 			final File outputFile = new File(outputPath);
@@ -123,12 +127,12 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 
 	private ILazyDataset getLazyDataset() throws Exception {
 		List<String> regexs = context.getFilePaths();
-		final List<String> paths = new ArrayList<String>(Math.max(
-				regexs.size(), 10));
+		final List<String> paths = new ArrayList<>(Math.max(regexs.size(), 10));
 		ILazyDataset lazyDataset = null;
 		// if dat file: try to parse it and populate the list of all images paths 
 		if (regexs.size() == 1 && regexs.get(0).endsWith(".dat")) {
-			IDataHolder holder = LocalServiceManager.getLoaderService().getData(regexs.get(0),null);
+			IDataHolder holder = ServiceProvider.getService(ILoaderService.class)
+					.getData(regexs.get(0),null);
 			String[] names = holder.getNames();
 			for (String name : names) {
 				lazyDataset = holder.getLazyDataset(name);
@@ -140,14 +144,12 @@ public class ImagesToStitchedConverter extends AbstractImageConversion {
 			final List<File> files = expand(regex);
 			for (File file : files) {
 				try {
-					ILazyDataset data = LocalServiceManager.getLoaderService().getData(
-							file.getAbsolutePath(), context.getMonitor())
-							.getLazyDataset(0);
+					ILazyDataset data = ServiceProvider.getService(ILoaderService.class)
+							.getData(file.getAbsolutePath(), context.getMonitor()).getLazyDataset(0);
 					if (data.getRank() == 2)
 						paths.add(file.getAbsolutePath());
 				} catch (Exception ignored) {
 					logger.debug("Exception ignored:"+ignored.getMessage());
-					continue;
 				}
 			}
 		}

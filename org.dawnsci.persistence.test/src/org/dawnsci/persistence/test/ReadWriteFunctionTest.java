@@ -16,11 +16,17 @@ import java.util.Map;
 
 import org.dawnsci.jexl.internal.ExpressionServiceImpl;
 import org.dawnsci.persistence.PersistenceServiceCreator;
+import org.eclipse.dawnsci.analysis.api.expressions.IExpressionService;
 import org.eclipse.dawnsci.analysis.api.fitting.functions.IFunction;
 import org.eclipse.dawnsci.analysis.api.persistence.IPersistenceService;
 import org.eclipse.dawnsci.analysis.api.persistence.IPersistentFile;
+import org.eclipse.dawnsci.hdf5.nexus.NexusFileFactoryHDF5;
+import org.eclipse.dawnsci.nexus.INexusFileFactory;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
+import uk.ac.diamond.osgi.services.ServiceProvider;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.CompositeFunction;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.Fermi;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.Gaussian;
@@ -28,6 +34,18 @@ import uk.ac.diamond.scisoft.analysis.fitting.functions.JexlExpressionFunction;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.Parameter;
 
 public class ReadWriteFunctionTest {
+
+	@BeforeClass
+	public static void setupServices() {
+		// Set factory for test
+		ServiceProvider.setService(INexusFileFactory.class, new NexusFileFactoryHDF5());
+		ServiceProvider.setService(IExpressionService.class, new ExpressionServiceImpl());
+	}
+	
+	@AfterClass
+	public static void tearDownServices() {
+		ServiceProvider.reset();
+	}
 
 	// Do not put the annotation as the files needs to be created and closed
 	// after each test

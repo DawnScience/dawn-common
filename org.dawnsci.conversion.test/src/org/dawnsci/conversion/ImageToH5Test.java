@@ -16,27 +16,35 @@ import java.nio.file.Files;
 import java.util.Arrays;
 
 import org.dawb.common.util.io.FileUtils;
-import org.dawnsci.conversion.converters.util.LocalServiceManager;
 import org.dawnsci.conversion.schemes.ImagesToHDFConverterScheme;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionScheme;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionService;
+import org.eclipse.dawnsci.analysis.api.io.ILoaderService;
 import org.eclipse.dawnsci.hdf5.nexus.NexusFileFactoryHDF5;
+import org.eclipse.dawnsci.nexus.INexusFileFactory;
 import org.eclipse.january.dataset.ILazyDataset;
-import org.junit.Before;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import uk.ac.diamond.osgi.services.ServiceProvider;
 import uk.ac.diamond.scisoft.analysis.io.LoaderServiceImpl;
 
 public class ImageToH5Test {
 
 	private static final IConversionScheme scheme = new ImagesToHDFConverterScheme();
 	
-	@Before
-	public void before() {
-		new LocalServiceManager().setLoaderService(new LoaderServiceImpl());
-		new ServiceLoader().setNexusFileFactory(new NexusFileFactoryHDF5());
+	@BeforeClass
+	public static void setUpServices() {
+		ServiceProvider.setService(ILoaderService.class, new LoaderServiceImpl());
+		ServiceProvider.setService(INexusFileFactory.class, new NexusFileFactoryHDF5());
+	}
+
+	@AfterClass
+	public static void tearDownServices() {
+		ServiceProvider.reset();
 	}
 	
 	@Test
@@ -93,7 +101,8 @@ public class ImageToH5Test {
 				fail("Image stack was not written to "+output.getName());
 			}
 
-			final ILazyDataset set = LocalServiceManager.getLoaderService().getData(output.getAbsolutePath(), null).getLazyDataset(0);
+			final ILazyDataset set = ServiceProvider.getService(ILoaderService.class)
+					.getData(output.getAbsolutePath(), null).getLazyDataset(0);
 			if (!Arrays.equals(set.getShape(), shape)) {
 				fail("Dataset written with shape "+Arrays.toString(set.getShape())+", but expected shape was "+Arrays.toString(shape));
 			}

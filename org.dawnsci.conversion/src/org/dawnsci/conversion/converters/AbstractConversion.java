@@ -15,11 +15,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.dawnsci.conversion.converters.util.LocalServiceManager;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversion;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionVisitor;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
+import org.eclipse.dawnsci.analysis.api.io.ILoaderService;
 import org.eclipse.dawnsci.analysis.dataset.slicer.SliceFromSeriesMetadata;
 import org.eclipse.dawnsci.analysis.dataset.slicer.SliceViewIterator;
 import org.eclipse.dawnsci.analysis.dataset.slicer.SliceVisitor;
@@ -28,6 +28,8 @@ import org.eclipse.january.IMonitor;
 import org.eclipse.january.dataset.IDataset;
 import org.eclipse.january.dataset.ILazyDataset;
 import org.eclipse.january.dataset.SliceND;
+
+import uk.ac.diamond.osgi.services.ServiceProvider;
 
 /**
  * AbstractConversion details converting from hdf/nexus to other
@@ -135,11 +137,12 @@ public abstract class AbstractConversion implements IConversion {
 		if (lazy != null)
 			return lazy;
 
-		final IDataHolder   dh = LocalServiceManager.getLoaderService().getData(path.getAbsolutePath(), null);
+		final IDataHolder dh = ServiceProvider.getService(ILoaderService.class).getData(path.getAbsolutePath(), null);
 		context.setSelectedH5Path(dsPath);
 		if (context.getSliceDimensions()==null) {
 			// Because the data might be lazy and unloadable. We want to load all the data now.
-			IDataset data = LocalServiceManager.getLoaderService().getDataset(path.getAbsolutePath(),dsPath,(IMonitor)null);
+			IDataset data = ServiceProvider.getService(ILoaderService.class)
+					.getDataset(path.getAbsolutePath(),dsPath,(IMonitor)null);
 			data.setName(dsPath);
 			convert(data);
 			return null;
@@ -252,7 +255,7 @@ public abstract class AbstractConversion implements IConversion {
 	public List<String> getDataNames(File ioFile) throws Exception {
 
 		if (ioFile.isDirectory()) return Collections.emptyList();
-		final IDataHolder   dh    = LocalServiceManager.getLoaderService().getData(ioFile.getAbsolutePath(),null);
+		final IDataHolder dh = ServiceProvider.getService(ILoaderService.class).getData(ioFile.getAbsolutePath(),null);
 		
 		if (dh == null || dh.getNames() == null) return Collections.emptyList();
 		return Arrays.asList(dh.getNames());

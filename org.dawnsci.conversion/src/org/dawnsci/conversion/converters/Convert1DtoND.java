@@ -15,14 +15,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.dawnsci.conversion.ServiceLoader;
-import org.dawnsci.conversion.converters.util.LocalServiceManager;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
+import org.eclipse.dawnsci.analysis.api.io.ILoaderService;
 import org.eclipse.dawnsci.analysis.api.tree.DataNode;
 import org.eclipse.dawnsci.analysis.api.tree.GroupNode;
 import org.eclipse.dawnsci.analysis.api.tree.Node;
 import org.eclipse.dawnsci.analysis.api.tree.Tree;
 import org.eclipse.dawnsci.analysis.tree.TreeFactory;
+import org.eclipse.dawnsci.nexus.INexusFileFactory;
 import org.eclipse.dawnsci.nexus.NexusConstants;
 import org.eclipse.dawnsci.nexus.NexusFile;
 import org.eclipse.dawnsci.nexus.NexusUtils;
@@ -33,6 +33,8 @@ import org.eclipse.january.dataset.IDataset;
 import org.eclipse.january.dataset.ILazyDataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import uk.ac.diamond.osgi.services.ServiceProvider;
 
 public class Convert1DtoND extends AbstractConversion {
 	
@@ -53,7 +55,7 @@ public class Convert1DtoND extends AbstractConversion {
 		}
 		
 		//test file can be opened
-		NexusFile fileH = ServiceLoader.getNexusFileFactory().newNexusFile(context.getOutputPath());
+		NexusFile fileH = ServiceProvider.getService(INexusFileFactory.class).newNexusFile(context.getOutputPath());
 		fileH.createAndOpenToWrite();
 		fileH.close();
 		
@@ -70,14 +72,15 @@ public class Convert1DtoND extends AbstractConversion {
 	@Override
 	public void close(IConversionContext context) throws Exception {
 
-		try (NexusFile file = ServiceLoader.getNexusFileFactory().newNexusFile(context.getOutputPath())) {
+		try (NexusFile file = ServiceProvider.getService(INexusFileFactory.class).newNexusFile(context.getOutputPath())) {
 			file.openToWrite(true);
 			IDataset axis = null;
 			int axisLength = -1;
 			String axisName = context.getAxisDatasetName();
 			
 			if (axisName != null) {
-				axis = LocalServiceManager.getLoaderService().getDataset(context.getFilePaths().get(0),axisName,null);
+				axis = ServiceProvider.getService(ILoaderService.class)
+						.getDataset(context.getFilePaths().get(0),axisName,null);
 				axisLength = axis.getShape()[0];
 				
 			}

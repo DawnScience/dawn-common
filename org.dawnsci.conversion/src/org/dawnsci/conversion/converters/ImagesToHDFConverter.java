@@ -15,14 +15,14 @@ import java.util.Collections;
 import java.util.List;
 
 import org.dawb.common.util.list.SortNatural;
-import org.dawnsci.conversion.ServiceLoader;
-import org.dawnsci.conversion.converters.util.LocalServiceManager;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
+import org.eclipse.dawnsci.analysis.api.io.ILoaderService;
 import org.eclipse.dawnsci.analysis.api.tree.DataNode;
 import org.eclipse.dawnsci.analysis.api.tree.GroupNode;
 import org.eclipse.dawnsci.analysis.api.tree.Node;
 import org.eclipse.dawnsci.analysis.api.tree.Tree;
 import org.eclipse.dawnsci.analysis.tree.TreeFactory;
+import org.eclipse.dawnsci.nexus.INexusFileFactory;
 import org.eclipse.dawnsci.nexus.NexusConstants;
 import org.eclipse.dawnsci.nexus.NexusFile;
 import org.eclipse.dawnsci.nexus.NexusUtils;
@@ -32,6 +32,7 @@ import org.eclipse.january.dataset.DatasetUtils;
 import org.eclipse.january.dataset.IDataset;
 import org.eclipse.january.dataset.ILazyDataset;
 
+import uk.ac.diamond.osgi.services.ServiceProvider;
 import uk.ac.diamond.scisoft.analysis.io.ImageStackLoader;
 
 /**
@@ -51,7 +52,7 @@ public class ImagesToHDFConverter extends AbstractConversion{
 		super(context);
 
 		// We open the file here, and create the group.
-		hFile   = ServiceLoader.getNexusFileFactory().newNexusFile(context.getOutputPath());
+		hFile   = ServiceProvider.getService(INexusFileFactory.class).newNexusFile(context.getOutputPath());
 		hFile.createAndOpenToWrite();
 		// We make the group
 		final String datasetNameStr = context.getDatasetNames().get(0);
@@ -82,12 +83,13 @@ public class ImagesToHDFConverter extends AbstractConversion{
 	private ILazyDataset getLazyDataset() throws Exception {
 
 		final List<String> regexs = context.getFilePaths();
-		final List<String> paths = new ArrayList<String>(Math.max(regexs.size(),10));
+		final List<String> paths = new ArrayList<>(Math.max(regexs.size(),10));
 		for (String regex : regexs) {
 			final List<File>   files = expand(regex);
 			for (File file : files) {
 				try {
-					ILazyDataset data = LocalServiceManager.getLoaderService().getData(file.getAbsolutePath(), context.getMonitor()).getLazyDataset(0);
+					ILazyDataset data = ServiceProvider.getService(ILoaderService.class)
+							.getData(file.getAbsolutePath(), context.getMonitor()).getLazyDataset(0);
 					if (data.getRank()==2) paths.add(file.getAbsolutePath());
 				} catch (Exception ignored) {
 					continue;

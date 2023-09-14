@@ -14,9 +14,9 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.dawnsci.conversion.converters.util.LocalServiceManager;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
+import org.eclipse.dawnsci.analysis.api.io.ILoaderService;
 import org.eclipse.dawnsci.analysis.api.tree.DataNode;
 import org.eclipse.dawnsci.analysis.api.tree.GroupNode;
 import org.eclipse.dawnsci.analysis.api.tree.IFindInTree;
@@ -29,6 +29,7 @@ import org.eclipse.january.dataset.Slice;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.ac.diamond.osgi.services.ServiceProvider;
 import uk.ac.diamond.scisoft.analysis.io.DataHolder;
 import uk.ac.diamond.scisoft.analysis.io.JavaImageSaver;
 
@@ -44,10 +45,10 @@ public class CustomTomoConverter extends AbstractConversion {
 	@SuppressWarnings("unused")
 	private static final Logger logger = LoggerFactory.getLogger(CustomTomoConverter.class);
 
-	private final static String DEF = "definition";
-	private final static String NXTOMO = "nxtomo";
-	private final static String DATA_LOCATION = "instrument/detector/data";
-	private final static String KEY_LOCATION = "instrument/detector/image_key";
+	private static final String DEF = "definition";
+	private static final String NXTOMO = "nxtomo";
+	private static final String DATA_LOCATION = "instrument/detector/data";
+	private static final String KEY_LOCATION = "instrument/detector/image_key";
 	private int counter;
 	private int nImages;
 	
@@ -114,15 +115,14 @@ public class CustomTomoConverter extends AbstractConversion {
 
 	private IDataset getImageKey(TomoInfoBean bean, File path) {
 		try {
-			IDataHolder dh = LocalServiceManager.getLoaderService().getData(path.getAbsolutePath(), null);
+			IDataHolder dh = ServiceProvider.getService(ILoaderService.class).getData(path.getAbsolutePath(), null);
 			String nodepath = bean.tomoPath + KEY_LOCATION;
 			//path should start with /
 			nodepath = !nodepath.startsWith("/") ? "/" + nodepath : nodepath;
 			NodeLink link = dh.getTree().findNodeLink(nodepath);
 			DataNode datanode = (DataNode) link.getDestination();
 			ILazyDataset lazydata = datanode.getDataset();
-			IDataset dataset = lazydata.getSlice(new Slice(0, lazydata.getShape()[0], 1)).squeeze();
-			return dataset;
+			return lazydata.getSlice(new Slice(0, lazydata.getShape()[0], 1)).squeeze();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -130,17 +130,16 @@ public class CustomTomoConverter extends AbstractConversion {
 	}
 
 	private static String findGroupContainingDefinition(String path) throws Exception {
-		IDataHolder dh = LocalServiceManager.getLoaderService().getData(path, null);
+		IDataHolder dh = ServiceProvider.getService(ILoaderService.class).getData(path, null);
 		try {
 			IFindInTree treefinder = new IFindInTree() {
 				@Override
 				public boolean found(NodeLink node) {
-					if (node.getDestination() instanceof DataNode) {
-						DataNode datanode = (DataNode) node.getDestination();
-						ILazyDataset dataset = datanode.getDataset();
+					if (node.getDestination() instanceof DataNode dataNode) {
+						ILazyDataset dataset = dataNode.getDataset();
 						String name = dataset.getName();
-						if (name != null && name.toLowerCase().equals(DEF)) {
-							String value = datanode.getString();
+						if (DEF.equalsIgnoreCase(name)) {
+							String value = dataNode.getString();
 							if (value != null && value.toLowerCase().contains(NXTOMO))
 								return true;
 						}
@@ -153,15 +152,12 @@ public class CustomTomoConverter extends AbstractConversion {
 			GroupNode root = tree.getGroupNode();
 			Map<String, NodeLink> outmap = TreeUtils.treeBreadthFirstSearch(root, treefinder, true, null);
 			
-			Set<String> names = outmap.keySet();
-			if (names != null && !names.isEmpty()) {
-				for (String name : names) {
-					final String detectorPath = name;
-					int idx = detectorPath.lastIndexOf("/");
-					String parent = detectorPath.substring(0, idx);
-					return parent;
-				}
+			if (!outmap.isEmpty()) {
+				final String detectorPath = outmap.keySet().iterator().next();
+				int idx = detectorPath.lastIndexOf("/");
+				return detectorPath.substring(0, idx);
 			}
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

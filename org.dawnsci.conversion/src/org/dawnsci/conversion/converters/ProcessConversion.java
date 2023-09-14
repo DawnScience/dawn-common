@@ -13,7 +13,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 
-import org.dawnsci.conversion.converters.util.LocalServiceManager;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
 import org.eclipse.dawnsci.analysis.api.conversion.IProcessingConversionInfo;
 import org.eclipse.dawnsci.analysis.api.conversion.ProcessingOutputType;
@@ -36,16 +35,15 @@ import org.eclipse.january.metadata.AxesMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.ac.diamond.osgi.services.ServiceProvider;
 import uk.ac.diamond.scisoft.analysis.utils.FileUtils;
 
 public class ProcessConversion extends AbstractConversion {
 	
-	private final static Logger logger = LoggerFactory.getLogger(ProcessConversion.class);
+	private static final Logger logger = LoggerFactory.getLogger(ProcessConversion.class);
 
-	IOperationService service;
-	ILoaderService lservice;
-	private final static String PROCESSED = "_processed";
-	private final static String EXT= ".nxs";
+	private static final String PROCESSED = "_processed";
+	private static final String EXT = ".nxs";
 	
 	public ProcessConversion(IConversionContext context) {
 		super(context);
@@ -56,12 +54,9 @@ public class ProcessConversion extends AbstractConversion {
 				            final String               nameFrag,
 				            final IConversionContext   context) throws Exception {
 		
-		if (service == null) service = LocalServiceManager.getOperationService();
-		if (lservice == null) lservice = LocalServiceManager.getLoaderService();
-		
 		Object userObject = context.getUserObject();
 		
-		if (userObject == null || !(userObject instanceof IProcessingConversionInfo)) throw new IllegalArgumentException("User object not valid for conversion");
+		if (!(userObject instanceof IProcessingConversionInfo)) throw new IllegalArgumentException("User object not valid for conversion");
 		
 		IProcessingConversionInfo info = (IProcessingConversionInfo) userObject;
 		final Map<Integer, String> sliceDimensions = context.getSliceDimensions();
@@ -69,13 +64,14 @@ public class ProcessConversion extends AbstractConversion {
 		ILazyDataset localLazy = lz.getSliceView();
 		
 		Map<Integer, String> axesNames = context.getAxesNames();
-		AxesMetadata axm = lservice.getAxesMetadata(localLazy, context.getSelectedConversionFile().getAbsolutePath(), axesNames, false);
+		AxesMetadata axm = ServiceProvider.getService(ILoaderService.class)
+				.getAxesMetadata(localLazy, context.getSelectedConversionFile().getAbsolutePath(), axesNames, false);
 
 		SourceInformation si = new SourceInformation(context.getSelectedConversionFile().getAbsolutePath(), context.getDatasetNames().get(0), localLazy);
 		localLazy.setMetadata(new SliceFromSeriesMetadata(si));
 		localLazy.setMetadata(axm);
 		
-		IOperationContext cc = service.createContext();
+		IOperationContext cc = ServiceProvider.getService(IOperationService.class).createContext();
 		cc.setData(localLazy);
 		cc.setSlicing(Slicer.getSliceNDFromSliceDimensions(context.getSliceDimensions(), localLazy.getShape()));
 		cc.setDataDimensions(Slicer.getDataDimensions(localLazy.getShape(), context.getSliceDimensions()));
@@ -119,15 +115,15 @@ public class ProcessConversion extends AbstractConversion {
 		
 		IMonitor monitor = context.getMonitor();
 		
-		if (monitor instanceof IOperationFileMonitor) {
-			((IOperationFileMonitor) monitor).appendFilePath(full);
+		if (monitor instanceof IOperationFileMonitor opFileMonitor) {
+			opFileMonitor.appendFilePath(full);
 		}
 		
 		cc.setMonitor(monitor);
 		cc.setVisitor(exVisitor);
 		cc.setSeries(info.getOperationSeries());
 		cc.setExecutionType(executionType);
-		service.execute(cc);
+		ServiceProvider.getService(IOperationService.class).execute(cc);
 	}
 	
 	protected ILazyDataset getLazyDataset(final File                 path, 
@@ -138,7 +134,8 @@ public class ProcessConversion extends AbstractConversion {
 		if (lazyDataset != null) return lazyDataset;
 		
 
-		final IDataHolder   dh = LocalServiceManager.getLoaderService().getData(path.getAbsolutePath(),null);
+		final IDataHolder dh = ServiceProvider.getService(ILoaderService.class)
+				.getData(path.getAbsolutePath(),null);
 		context.setSelectedH5Path(dsPath);
 		if (context.getMonitor()!=null) {
 			context.getMonitor().subTask("Process '"+path.getAbsolutePath());

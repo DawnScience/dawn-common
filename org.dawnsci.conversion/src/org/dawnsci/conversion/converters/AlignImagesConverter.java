@@ -14,14 +14,15 @@ import java.util.Collections;
 import java.util.List;
 
 import org.dawb.common.util.list.SortNatural;
-import org.dawnsci.conversion.converters.util.LocalServiceManager;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
+import org.eclipse.dawnsci.analysis.api.io.ILoaderService;
 import org.eclipse.january.dataset.IDataset;
 import org.eclipse.january.dataset.ILazyDataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.ac.diamond.osgi.services.ServiceProvider;
 import uk.ac.diamond.scisoft.analysis.io.DataHolder;
 import uk.ac.diamond.scisoft.analysis.io.ImageStackLoader;
 import uk.ac.diamond.scisoft.analysis.io.JavaImageSaver;
@@ -99,12 +100,11 @@ public class AlignImagesConverter extends AbstractImageConversion {
 
 	private ILazyDataset getLazyDataset() throws Exception {
 		List<String> regexs = context.getFilePaths();
-		final List<String> paths = new ArrayList<String>(Math.max(
-				regexs.size(), 10));
+		final List<String> paths = new ArrayList<>(Math.max(regexs.size(), 10));
 		ILazyDataset lazyDataset = null;
 		// if dat file: try to parse it and populate the list of all images paths 
 		if (regexs.size() == 1 && regexs.get(0).endsWith(".dat")) {
-			IDataHolder holder = LocalServiceManager.getLoaderService().getData(regexs.get(0),null);
+			IDataHolder holder = ServiceProvider.getService(ILoaderService.class).getData(regexs.get(0),null);
 			String[] names = holder.getNames();
 			for (String name : names) {
 				lazyDataset = holder.getLazyDataset(name);
@@ -116,29 +116,29 @@ public class AlignImagesConverter extends AbstractImageConversion {
 			final List<File> files = expand(regex);
 			for (File file : files) {
 				try {
-					ILazyDataset data = LocalServiceManager.getLoaderService().getData(
+					ILazyDataset data = ServiceProvider.getService(ILoaderService.class).getData(
 							file.getAbsolutePath(), context.getMonitor())
 							.getLazyDataset(0);
 					if (data.getRank() == 2)
 						paths.add(file.getAbsolutePath());
 				} catch (Exception ignored) {
-					logger.debug("Exception ignored:"+ignored.getMessage());
-					continue;
+					logger.debug("Exception ignored: {}", ignored.getMessage());
 				}
 			}
 		}
-		if (paths.size() > 0) {
+		if (!paths.isEmpty()) {
 			Collections.sort(paths, new SortNatural<String>(true));
 			ImageStackLoader loader = new ImageStackLoader(paths,
 					context.getMonitor());
 			lazyDataset = loader.createLazyDataset("Folder Stack");
 		} else {
-			lazyDataset = LocalServiceManager.getLoaderService().getData(regexs.get(0),null).getLazyDataset(0);
+			lazyDataset = ServiceProvider.getService(ILoaderService.class).getData(regexs.get(0),null).getLazyDataset(0);
 		}
 		
 		return lazyDataset;
 	}
 
+	@Override
 	protected String getExtension() {
 		if (context.getUserObject() == null)
 			return "tif";

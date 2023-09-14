@@ -13,13 +13,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.dawnsci.conversion.ServiceLoader;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
 import org.eclipse.dawnsci.analysis.api.tree.DataNode;
 import org.eclipse.dawnsci.analysis.api.tree.GroupNode;
 import org.eclipse.dawnsci.analysis.api.tree.Node;
 import org.eclipse.dawnsci.analysis.api.tree.Tree;
 import org.eclipse.dawnsci.analysis.tree.TreeFactory;
+import org.eclipse.dawnsci.nexus.INexusFileFactory;
 import org.eclipse.dawnsci.nexus.NexusConstants;
 import org.eclipse.dawnsci.nexus.NexusFile;
 import org.eclipse.dawnsci.nexus.NexusUtils;
@@ -29,6 +29,8 @@ import org.eclipse.january.dataset.DatasetUtils;
 import org.eclipse.january.dataset.IDataset;
 import org.eclipse.january.dataset.IndexIterator;
 import org.eclipse.january.dataset.StringDataset;
+
+import uk.ac.diamond.osgi.services.ServiceProvider;
 
 /**
  * This converter creates stacks from 
@@ -46,7 +48,7 @@ public class CompareConverter extends AbstractConversion{
 		super(context);
 
 		// We open the file here, and create the group.
-		hFile   = ServiceLoader.getNexusFileFactory().newNexusFile(context.getOutputPath());
+		hFile   = ServiceProvider.getService(INexusFileFactory.class).newNexusFile(context.getOutputPath());
 		hFile.createAndOpenToWrite();
 		// For each dataset name we make a branch in the conversion file,
 		// to store the data.

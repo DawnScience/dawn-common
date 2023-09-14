@@ -19,15 +19,17 @@ import java.util.List;
 import java.util.Map;
 
 import org.dawnsci.conversion.converters.AsciiConvert1D;
-import org.dawnsci.conversion.converters.util.LocalServiceManager;
 import org.dawnsci.conversion.schemes.AsciiConvert1DScheme;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionScheme;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionService;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
-import org.junit.Before;
+import org.eclipse.dawnsci.analysis.api.io.ILoaderService;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
+import uk.ac.diamond.osgi.services.ServiceProvider;
 import uk.ac.diamond.scisoft.analysis.io.LoaderServiceImpl;
 
 
@@ -35,9 +37,14 @@ public class AsciiConvertTest {
 	private static final IConversionScheme scheme = new AsciiConvert1DScheme();
 	private String testfile = "MoKedge_1_15.nxs";
 	
-	@Before
-	public void before() {
-		new LocalServiceManager().setLoaderService(new LoaderServiceImpl());
+	@BeforeClass
+	public static void setupServices() {
+		ServiceProvider.setService(ILoaderService.class, new LoaderServiceImpl());
+	}
+	
+	@AfterClass
+	public static void tearDownServices() {
+		ServiceProvider.reset();
 	}
 	
 	@Test
@@ -57,7 +64,7 @@ public class AsciiConvertTest {
         
         service.process(context);
         
-        final IDataHolder   dh    = LocalServiceManager.getLoaderService().getData(tmp.getAbsolutePath(),null);
+        final IDataHolder dh = ServiceProvider.getService(ILoaderService.class).getData(tmp.getAbsolutePath(),null);
         final List<String> names = Arrays.asList("/entry1/counterTimer01/Energy","/entry1/counterTimer01/I0","/entry1/counterTimer01/lnI0It","/entry1/counterTimer01/It");
         for (String name : names) {
             if (dh.getDataset(name)==null) throw new Exception("Missing dataset "+name);
@@ -93,7 +100,7 @@ public class AsciiConvertTest {
         service.process(context);
         
         // Check rename worked
-        final IDataHolder   dh    = LocalServiceManager.getLoaderService().getData(tmp.getAbsolutePath(),null);
+        final IDataHolder dh = ServiceProvider.getService(ILoaderService.class).getData(tmp.getAbsolutePath(),null);
         final List<String> names = Arrays.asList("Energy","I0","lnI0It","It");
         for (String name : names) {
             if (dh.getDataset(name)==null) throw new Exception("Missing dataset "+name);

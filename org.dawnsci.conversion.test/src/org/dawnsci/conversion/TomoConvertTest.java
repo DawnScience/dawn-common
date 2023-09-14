@@ -11,16 +11,18 @@ package org.dawnsci.conversion;
 import java.io.File;
 
 import org.dawnsci.conversion.converters.CustomTomoConverter;
-import org.dawnsci.conversion.converters.util.LocalServiceManager;
 import org.dawnsci.conversion.schemes.CustomTomoConverterScheme;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionContext;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionScheme;
 import org.eclipse.dawnsci.analysis.api.conversion.IConversionService;
 import org.eclipse.dawnsci.analysis.api.io.IDataHolder;
+import org.eclipse.dawnsci.analysis.api.io.ILoaderService;
 import org.eclipse.january.dataset.IDataset;
-import org.junit.Before;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
+import uk.ac.diamond.osgi.services.ServiceProvider;
 import uk.ac.diamond.scisoft.analysis.io.LoaderFactory;
 import uk.ac.diamond.scisoft.analysis.io.LoaderServiceImpl;
 
@@ -28,9 +30,14 @@ public class TomoConvertTest {
 
 	private static final IConversionScheme scheme = new CustomTomoConverterScheme();
 	
-	@Before
-	public void before() {
-		new LocalServiceManager().setLoaderService(new LoaderServiceImpl());
+	@BeforeClass
+	public static void setUpServices() {
+		ServiceProvider.setService(ILoaderService.class, new LoaderServiceImpl());
+	}
+	
+	@AfterClass
+	public static void tearDownServices() {
+		ServiceProvider.reset();
 	}
 	
 	@Test

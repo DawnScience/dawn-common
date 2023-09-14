@@ -28,7 +28,9 @@ import org.eclipse.dawnsci.analysis.dataset.roi.SectorROI;
 import org.eclipse.dawnsci.analysis.dataset.slicer.SliceFromSeriesMetadata;
 import org.eclipse.dawnsci.analysis.dataset.slicer.SliceInformation;
 import org.eclipse.dawnsci.analysis.dataset.slicer.SourceInformation;
+import org.eclipse.dawnsci.hdf5.nexus.NexusFileFactoryHDF5;
 import org.eclipse.dawnsci.hdf5.nexus.NexusFileHDF5;
+import org.eclipse.dawnsci.nexus.INexusFileFactory;
 import org.eclipse.dawnsci.nexus.NexusConstants;
 import org.eclipse.dawnsci.nexus.NexusFile;
 import org.eclipse.dawnsci.nexus.NexusUtils;
@@ -37,9 +39,11 @@ import org.eclipse.january.dataset.IntegerDataset;
 import org.eclipse.january.dataset.Slice;
 import org.eclipse.january.dataset.SliceND;
 import org.eclipse.january.metadata.OriginMetadata;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import uk.ac.diamond.osgi.services.ServiceProvider;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.FunctionFactory;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.Gaussian;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.Lorentzian;
@@ -53,8 +57,9 @@ public class ReadWriteOperationTest {
 	private static IOperationService   service;
 	private static IPersistenceService pservice;
 	
-	@BeforeClass
-	public static void before() throws Exception {
+ 	@BeforeClass
+	public static void setUpServices() throws Exception {
+		ServiceProvider.setService(INexusFileFactory.class, new NexusFileFactoryHDF5());
 		service = new OperationServiceImpl();
 		service.createOperations(ReadWriteOperationTest.class, "org.dawnsci.persistence.test.operations");
 		service.createOperations(service.getClass(), "uk.ac.diamond.scisoft.analysis.processing.operations");
@@ -65,6 +70,11 @@ public class ReadWriteOperationTest {
 		 *function before it is called (or make this a JUnit PluginTest.
 		 */
 		FunctionFactory.registerFunction(Polynomial.class, true);
+	}
+	
+	@AfterClass
+	public static void tearDownServices() throws Exception {
+		ServiceProvider.reset();
 	}
 
 	@Test
