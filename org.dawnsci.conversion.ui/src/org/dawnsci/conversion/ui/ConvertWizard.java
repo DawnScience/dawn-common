@@ -63,7 +63,7 @@ public class ConvertWizard extends Wizard implements IExportWizard, IFileOverrid
 	}
 
 	public void addPages() {
-		service = ConversionServiceLoader.getService();
+		service = ServiceProvider.getService(IConversionService.class);
 		if (service == null) {
 			logger.error("Cannot get conversion service through OSGI injection");
 			return;
