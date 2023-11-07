@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.dawb.common.util.eclipse.BundleUtils;
-import org.dawnsci.persistence.ServiceLoader;
 import org.dawnsci.persistence.json.JacksonMarshaller;
 import org.eclipse.dawnsci.analysis.api.fitting.functions.IFunction;
 import org.eclipse.dawnsci.analysis.api.persistence.IJSonMarshaller;
@@ -29,6 +28,7 @@ import org.eclipse.dawnsci.analysis.api.tree.Tree;
 import org.eclipse.dawnsci.analysis.dataset.operations.AbstractOperationBase;
 import org.eclipse.dawnsci.analysis.dataset.slicer.SliceFromSeriesMetadata;
 import org.eclipse.dawnsci.analysis.tree.TreeFactory;
+import org.eclipse.dawnsci.nexus.INexusFileFactory;
 import org.eclipse.dawnsci.nexus.NexusConstants;
 import org.eclipse.dawnsci.nexus.NexusException;
 import org.eclipse.dawnsci.nexus.NexusFile;
@@ -51,6 +51,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
+import uk.ac.diamond.osgi.services.ServiceProvider;
 import uk.ac.diamond.scisoft.analysis.io.NexusTreeUtils;
 
 public class PersistJsonOperationsNode {
@@ -429,7 +430,7 @@ public class PersistJsonOperationsNode {
 	 * @throws Exception
 	 */
 	public static OriginMetadata readOriginalDataInformation(String path) throws Exception {
-		try (NexusFile nexusFile = ServiceLoader.getNexusFactory().newNexusFile(path)) {
+		try (NexusFile nexusFile = ServiceProvider.getService(INexusFileFactory.class).newNexusFile(path)) {
 			nexusFile.openToRead();
 			GroupNode group = NexusUtils.loadGroupFully(nexusFile, PersistenceConstants.PROCESS_ENTRY, 1);
 

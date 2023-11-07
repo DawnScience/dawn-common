@@ -9,10 +9,33 @@
 
 package org.dawnsci.persistence.test;
 
+import org.dawnsci.jexl.internal.ExpressionServiceImpl;
+import org.eclipse.dawnsci.analysis.api.expressions.IExpressionService;
+import org.eclipse.dawnsci.analysis.api.persistence.IMarshallerService;
+import org.eclipse.dawnsci.hdf5.nexus.NexusFileFactoryHDF5;
+import org.eclipse.dawnsci.json.MarshallerService;
+import org.eclipse.dawnsci.nexus.INexusFileFactory;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+
+import uk.ac.diamond.osgi.services.ServiceProvider;
+
 /**
  * Class to extend, does not have any tests itself.
  */
 public abstract class AbstractThreadTestBase {
+	
+	@BeforeClass
+	public static void setUpServices() {
+		ServiceProvider.setService(INexusFileFactory.class, new NexusFileFactoryHDF5());
+		ServiceProvider.setService(IExpressionService.class, new ExpressionServiceImpl());
+		ServiceProvider.setService(IMarshallerService.class, new MarshallerService());
+	}
+	
+	@AfterClass
+	public static void tearDownServices() {
+		ServiceProvider.reset();
+	}
 	
 
 	public void testInTestThread() throws Throwable{

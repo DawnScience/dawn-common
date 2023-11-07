@@ -12,13 +12,13 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 
-import org.dawnsci.persistence.ServiceLoader;
 import org.eclipse.dawnsci.analysis.api.expressions.IExpressionService;
 import org.eclipse.dawnsci.analysis.api.fitting.functions.IFunction;
 import org.eclipse.dawnsci.analysis.api.fitting.functions.IParameter;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import uk.ac.diamond.osgi.services.ServiceProvider;
 import uk.ac.diamond.scisoft.analysis.fitting.functions.JexlExpressionFunction;
 
 /**
@@ -84,7 +84,7 @@ public class FunctionBean {
 		// If a Jexl expression
 		if (clazz.equals(JexlExpressionFunction.class)) {
 			Constructor<?> constructor = clazz.getConstructor(IExpressionService.class, String.class);
-			function = (IFunction) constructor.newInstance(ServiceLoader.getExpressionService(),(String) getName());
+			function = (IFunction) constructor.newInstance(ServiceProvider.getService(IExpressionService.class), getName());
 			for (int i = 0; i < params.length; i++) {
 				((JexlExpressionFunction)function).setParameter(i, params[i]);
 			}

@@ -15,21 +15,12 @@ import static org.junit.Assert.fail;
 import java.io.File;
 
 import org.dawnsci.persistence.PersistenceServiceCreator;
-import org.dawnsci.persistence.ServiceLoader;
 import org.dawnsci.persistence.internal.PersistenceConstants;
 import org.eclipse.dawnsci.analysis.api.persistence.IPersistenceService;
 import org.eclipse.dawnsci.analysis.api.persistence.IPersistentFile;
-import org.eclipse.dawnsci.hdf5.nexus.NexusFileFactoryHDF5;
-import org.junit.Before;
 import org.junit.Test;
 
 public class ReadWriteTest extends AbstractThreadTestBase {
-
-	@Before
-	public void init() {
-		// Set factory for test
-		new ServiceLoader().setNexusFactory(new NexusFileFactoryHDF5());
-	}
 
 	@Test
 	public void testReadWriteWithThreads(){

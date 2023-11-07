@@ -10,16 +10,18 @@ package org.dawnsci.persistence.internal;
 
 import java.io.File;
 
-import org.dawnsci.persistence.ServiceLoader;
 import org.dawnsci.persistence.json.JacksonMarshaller;
 import org.eclipse.dawnsci.analysis.api.persistence.IPersistenceService;
 import org.eclipse.dawnsci.analysis.api.persistence.IPersistentFile;
 import org.eclipse.dawnsci.analysis.api.persistence.IPersistentNodeFactory;
+import org.eclipse.dawnsci.nexus.INexusFileFactory;
 import org.eclipse.dawnsci.nexus.NexusFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import uk.ac.diamond.osgi.services.ServiceProvider;
 
 /**
  * Implementation of IPersistenceService<br>
@@ -50,23 +52,20 @@ public class PersistenceServiceImpl implements IPersistenceService{
 
 	@Override
 	public IPersistentFile createPersistentFile(String filePath) throws Exception {
-		NexusFile file = null;
-		if (ServiceLoader.getNexusFactory() != null) {
-			file = ServiceLoader.getNexusFactory().newNexusFile(filePath);
-		}
+		NexusFile file = ServiceProvider.getService(INexusFileFactory.class).newNexusFile(filePath); // NOSONAR: method return open file
 		return new PersistentFileImpl(file);
 	}
 
 	@Override
 	public IPersistentFile createPersistentFile(Object file) throws Exception {
-		if (file instanceof File) {
-			file = ((File) file).getAbsolutePath();
+		if (file instanceof File f) {
+			file = f.getAbsolutePath();
 		}
-		if (file instanceof String) {
-			return createPersistentFile((String) file);
+		if (file instanceof String pathStr) {
+			return createPersistentFile(pathStr);
 		}
-		if (file instanceof NexusFile) {
-			return new PersistentFileImpl((NexusFile)file);
+		if (file instanceof NexusFile nexusFile) {
+			return new PersistentFileImpl(nexusFile);
 		}
 		throw new IllegalArgumentException("Parameter type not supported");
 	}

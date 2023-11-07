@@ -15,34 +15,22 @@ import java.io.File;
 import java.util.List;
 
 import org.dawnsci.persistence.PersistenceServiceCreator;
-import org.dawnsci.persistence.ServiceLoader;
 import org.eclipse.dawnsci.analysis.api.persistence.IPersistenceService;
 import org.eclipse.dawnsci.analysis.api.persistence.IPersistentFile;
-import org.eclipse.dawnsci.hdf5.nexus.NexusFileFactoryHDF5;
 import org.eclipse.january.dataset.Dataset;
 import org.eclipse.january.dataset.DatasetFactory;
 import org.eclipse.january.dataset.IDataset;
 import org.eclipse.january.dataset.ILazyDataset;
 import org.eclipse.january.dataset.Random;
-import org.junit.Before;
 import org.junit.Test;
 
 public class ReadWriteDataTest extends AbstractThreadTestBase {
-
-	@Before
-	public void init() {
-		// Set factory for test
-		new ServiceLoader().setNexusFactory(new NexusFileFactoryHDF5());
-	}
 
 	// Do not put the annotation as the files needs to be created and closed
 	// after each test
 	// so it can run with the thread tests
 	// Passes value by array
 	public IPersistentFile before(File[] tmp) throws Exception {
-		// Set factory for test
-		new ServiceLoader().setNexusFactory(new NexusFileFactoryHDF5());
-
 		tmp[0] = File.createTempFile("TestData", ".nxs");
 		tmp[0].createNewFile();
 

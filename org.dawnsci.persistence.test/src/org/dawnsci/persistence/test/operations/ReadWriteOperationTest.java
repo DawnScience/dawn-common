@@ -9,7 +9,6 @@ import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.util.Map;
 
-import org.dawnsci.persistence.ServiceLoader;
 import org.dawnsci.persistence.internal.PersistJsonOperationsNode;
 import org.dawnsci.persistence.internal.PersistenceConstants;
 import org.dawnsci.persistence.internal.PersistenceServiceImpl;
@@ -29,7 +28,6 @@ import org.eclipse.dawnsci.analysis.dataset.roi.SectorROI;
 import org.eclipse.dawnsci.analysis.dataset.slicer.SliceFromSeriesMetadata;
 import org.eclipse.dawnsci.analysis.dataset.slicer.SliceInformation;
 import org.eclipse.dawnsci.analysis.dataset.slicer.SourceInformation;
-import org.eclipse.dawnsci.hdf5.nexus.NexusFileFactoryHDF5;
 import org.eclipse.dawnsci.hdf5.nexus.NexusFileHDF5;
 import org.eclipse.dawnsci.nexus.NexusConstants;
 import org.eclipse.dawnsci.nexus.NexusFile;
@@ -57,9 +55,6 @@ public class ReadWriteOperationTest {
 	
 	@BeforeClass
 	public static void before() throws Exception {
-
-
-		new ServiceLoader().setNexusFactory(new NexusFileFactoryHDF5());
 		service = new OperationServiceImpl();
 		service.createOperations(ReadWriteOperationTest.class, "org.dawnsci.persistence.test.operations");
 		service.createOperations(service.getClass(), "uk.ac.diamond.scisoft.analysis.processing.operations");

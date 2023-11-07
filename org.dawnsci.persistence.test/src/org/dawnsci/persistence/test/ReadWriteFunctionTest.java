@@ -13,14 +13,12 @@ import static org.junit.Assert.assertEquals;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+
 import org.dawnsci.jexl.internal.ExpressionServiceImpl;
 import org.dawnsci.persistence.PersistenceServiceCreator;
-import org.dawnsci.persistence.ServiceLoader;
 import org.eclipse.dawnsci.analysis.api.fitting.functions.IFunction;
 import org.eclipse.dawnsci.analysis.api.persistence.IPersistenceService;
 import org.eclipse.dawnsci.analysis.api.persistence.IPersistentFile;
-import org.eclipse.dawnsci.hdf5.nexus.NexusFileFactoryHDF5;
-import org.junit.Before;
 import org.junit.Test;
 
 import uk.ac.diamond.scisoft.analysis.fitting.functions.CompositeFunction;
@@ -31,21 +29,11 @@ import uk.ac.diamond.scisoft.analysis.fitting.functions.Parameter;
 
 public class ReadWriteFunctionTest {
 
-	@Before
-	public void init() {
-		// Set factory for test
-		new ServiceLoader().setNexusFactory(new NexusFileFactoryHDF5());
-		new ServiceLoader().setExpressionService(new ExpressionServiceImpl());
-	}
-
 	// Do not put the annotation as the files needs to be created and closed
 	// after each test
 	// so it can run with the thread tests
 	// Passes value by array
 	public IPersistentFile before(File[] tmp) throws Exception {
-		// Set factory for test
-		new ServiceLoader().setNexusFactory(new NexusFileFactoryHDF5());
-
 		tmp[0] = File.createTempFile("TestFunction", ".txt");
 		tmp[0].createNewFile();
 

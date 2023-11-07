@@ -16,7 +16,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.dawnsci.persistence.PersistenceServiceCreator;
-import org.dawnsci.persistence.ServiceLoader;
 import org.eclipse.dawnsci.analysis.api.persistence.IPersistenceService;
 import org.eclipse.dawnsci.analysis.api.persistence.IPersistentFile;
 import org.eclipse.dawnsci.analysis.api.roi.IROI;
@@ -25,18 +24,9 @@ import org.eclipse.dawnsci.analysis.dataset.roi.LinearROI;
 import org.eclipse.dawnsci.analysis.dataset.roi.RectangularROI;
 import org.eclipse.dawnsci.analysis.dataset.roi.RingROI;
 import org.eclipse.dawnsci.analysis.dataset.roi.SectorROI;
-import org.eclipse.dawnsci.hdf5.nexus.NexusFileFactoryHDF5;
-import org.eclipse.dawnsci.json.MarshallerService;
-import org.junit.Before;
 import org.junit.Test;
 
 public class ReadWriteROITest extends AbstractThreadTestBase {
-
-	@Before
-	public void init() {
-		// Set factory for test
-		new ServiceLoader().setNexusFactory(new NexusFileFactoryHDF5());
-	}
 
 	//Do not put the annotation as the files needs to be created and closed after each test
 	//so it can run with the thread tests
@@ -46,10 +36,6 @@ public class ReadWriteROITest extends AbstractThreadTestBase {
 		tmp[0] = File.createTempFile("TestRoi", ".h5");
 		tmp[0].createNewFile();
 
-		// create the PersistentService
-		// and check that ServiceLoader.getJSONMarshaller() != null
-		if (ServiceLoader.getJSONMarshallerService() == null)
-			new ServiceLoader().setJSONMarshallerService(new MarshallerService());
 		IPersistenceService persist = PersistenceServiceCreator.createPersistenceService();
 		IPersistentFile file = persist.createPersistentFile(tmp[0].getAbsolutePath());
 		return file;

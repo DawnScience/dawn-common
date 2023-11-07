@@ -18,26 +18,16 @@ import java.util.Arrays;
 import java.util.Map;
 
 import org.dawnsci.persistence.PersistenceServiceCreator;
-import org.dawnsci.persistence.ServiceLoader;
 import org.dawnsci.persistence.internal.PersistenceConstants;
 import org.eclipse.dawnsci.analysis.api.persistence.IPersistenceService;
 import org.eclipse.dawnsci.analysis.api.persistence.IPersistentFile;
-import org.eclipse.dawnsci.hdf5.nexus.NexusFileFactoryHDF5;
-import org.eclipse.dawnsci.json.MarshallerService;
 import org.eclipse.january.IMonitor;
 import org.eclipse.january.dataset.Dataset;
 import org.eclipse.january.dataset.DatasetFactory;
 import org.eclipse.january.dataset.ILazyDataset;
-import org.junit.Before;
 import org.junit.Test;
 
 public class ReadWriteHistoryTest extends AbstractThreadTestBase {
-
-	@Before
-	public void init() {
-		// Set factory for test
-		new ServiceLoader().setNexusFactory(new NexusFileFactoryHDF5());
-	}
 
 	public void after(File tmp, IPersistentFile file){
 		if (tmp != null)
@@ -56,8 +46,6 @@ public class ReadWriteHistoryTest extends AbstractThreadTestBase {
 			tmp.deleteOnExit();
 			// create the PersistentService
 			// and check that ServiceLoader.getJSONMarshaller() != null
-			if (ServiceLoader.getJSONMarshallerService() == null)
-				new ServiceLoader().setJSONMarshallerService(new MarshallerService());
 			IPersistenceService persist = PersistenceServiceCreator.createPersistenceService();
 			IPersistentFile file = persist.createPersistentFile(tmp.getAbsolutePath());
 			
@@ -112,9 +100,6 @@ public class ReadWriteHistoryTest extends AbstractThreadTestBase {
 		tmp.createNewFile();
 		tmp.deleteOnExit();
 		// create the PersistentService
-		// and check that ServiceLoader.getJSONMarshaller() != null
-		if (ServiceLoader.getJSONMarshallerService() == null)
-			new ServiceLoader().setJSONMarshallerService(new MarshallerService());
 		IPersistenceService persist = PersistenceServiceCreator.createPersistenceService();
 		IPersistentFile file = persist.createPersistentFile(tmp.getAbsolutePath());
 		try {
@@ -162,9 +147,6 @@ public class ReadWriteHistoryTest extends AbstractThreadTestBase {
 			tmp.createNewFile();
 			tmp.deleteOnExit();
 			// create the PersistentService
-			// and check that ServiceLoader.getJSONMarshaller() != null
-			if (ServiceLoader.getJSONMarshallerService() == null)
-				new ServiceLoader().setJSONMarshallerService(new MarshallerService());
 			IPersistenceService persist = PersistenceServiceCreator.createPersistenceService();
 			IPersistentFile file = persist.createPersistentFile(tmp.getAbsolutePath());
 			// dataset

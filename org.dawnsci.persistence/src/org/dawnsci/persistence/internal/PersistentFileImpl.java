@@ -19,10 +19,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.dawnsci.persistence.ServiceLoader;
 import org.dawnsci.persistence.json.JacksonMarshaller;
 import org.eclipse.dawnsci.analysis.api.fitting.functions.IFunction;
 import org.eclipse.dawnsci.analysis.api.persistence.IJSonMarshaller;
+import org.eclipse.dawnsci.analysis.api.persistence.IMarshallerService;
 import org.eclipse.dawnsci.analysis.api.persistence.IPersistentFile;
 import org.eclipse.dawnsci.analysis.api.processing.IOperation;
 import org.eclipse.dawnsci.analysis.api.processing.OperationData;
@@ -34,6 +34,7 @@ import org.eclipse.dawnsci.analysis.api.tree.GroupNode;
 import org.eclipse.dawnsci.analysis.api.tree.Node;
 import org.eclipse.dawnsci.analysis.api.tree.NodeLink;
 import org.eclipse.dawnsci.analysis.tree.TreeFactory;
+import org.eclipse.dawnsci.nexus.INexusFileFactory;
 import org.eclipse.dawnsci.nexus.NexusConstants;
 import org.eclipse.dawnsci.nexus.NexusException;
 import org.eclipse.dawnsci.nexus.NexusFile;
@@ -56,6 +57,8 @@ import org.eclipse.january.dataset.Slice;
 import org.eclipse.january.metadata.OriginMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import uk.ac.diamond.osgi.services.ServiceProvider;
 
 /**
  * Implementation of IPersistentFile<br>
@@ -91,7 +94,7 @@ class PersistentFileImpl implements IPersistentFile {
 		}
 		// open file
 		if (file == null) {
-			file = ServiceLoader.getNexusFactory().newNexusFile(filePath);
+			file = ServiceProvider.getService(INexusFileFactory.class).newNexusFile(filePath);
 		}
 		try {
 			file.openToWrite(true);
@@ -113,7 +116,7 @@ class PersistentFileImpl implements IPersistentFile {
 	public PersistentFileImpl(String filePath) {
 		this.filePath = filePath;
 		try {
-			this.file = ServiceLoader.getNexusFactory().newNexusFile(filePath);
+			this.file = ServiceProvider.getService(INexusFileFactory.class).newNexusFile(filePath);
 			file.openToRead();
 		} catch (Exception e) {
 			logger.error("Error creating persistent file {}:", filePath, e);
@@ -508,8 +511,7 @@ class PersistentFileImpl implements IPersistentFile {
 					+ " entry does not exist in the file " + filePath);
 		// JSON deserialization
 		json = json.substring(1, json.length() - 1); // this is needed as somehow, the getAttribute adds [ ] around the json string...
-		IROI roi = (IROI) ServiceLoader.getJSONMarshallerService().unmarshal(json, IROI.class);
-		return roi;
+		return ServiceProvider.getService(IMarshallerService.class).unmarshal(json, IROI.class);
 	}
 
 	@Override
@@ -517,7 +519,7 @@ class PersistentFileImpl implements IPersistentFile {
 		Map<String, IROI> rois = new HashMap<>();
 		for (String name : getROINames(mon)) {
 			String json = file.getAttributeValue(PersistenceConstants.ROI_ENTRY + Node.SEPARATOR + name + "@JSON");
-			IROI roi = (IROI) ServiceLoader.getJSONMarshallerService().unmarshal(json, IROI.class);
+			IROI roi = ServiceProvider.getService(IMarshallerService.class).unmarshal(json, IROI.class);
 			rois.put(name, roi);
 		}
 		return rois;
@@ -602,7 +604,7 @@ class PersistentFileImpl implements IPersistentFile {
 	 * @throws Exception
 	 */
 	private void writeRoi(GroupNode group, String parent, String name, IROI roi) throws Exception {
-		String json = ServiceLoader.getJSONMarshallerService().marshal(roi);
+		String json = ServiceProvider.getService(IMarshallerService.class).marshal(roi);
 		// we create the dataset
 		Dataset data = DatasetFactory.createFromObject(IntegerDataset.class, (Object) new int[] { 0 });
 		try {
@@ -654,7 +656,7 @@ class PersistentFileImpl implements IPersistentFile {
 
 	@Override
 	public boolean isRegionSupported(IROI roi) {
-		return ServiceLoader.getJSONMarshallerService().isObjMixInSupported(roi);
+		return ServiceProvider.getService(IMarshallerService.class).isObjMixInSupported(roi);
 	}
 
 	@Override
