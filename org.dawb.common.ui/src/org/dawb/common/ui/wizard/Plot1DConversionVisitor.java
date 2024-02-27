@@ -186,6 +186,14 @@ public class Plot1DConversionVisitor extends AbstractPlotConversionVisitor {
 		saver.saveFile(dh);
 	}
 
+	private static String shortenDatasetPath(String name) {
+		int si = name.lastIndexOf('/');
+		if (si >= 0) {
+			name = name.substring(si + 1);
+		}
+		return name;
+	}
+
 	private String addGoodXName(List<String> headings, IDataset d, Integer i) {
 		String n = d.getName();
 		if (n.isEmpty()) {
@@ -195,7 +203,7 @@ public class Plot1DConversionVisitor extends AbstractPlotConversionVisitor {
 			}
 		}
 		int j = 1;
-		String t = n;
+		String t = shortenDatasetPath(n);
 		while (headings.contains(t)) {
 			t = String.format("%s_%d", n, j++);
 		}
@@ -245,7 +253,7 @@ public class Plot1DConversionVisitor extends AbstractPlotConversionVisitor {
 			}
 		}
 		int j = 1;
-		String t = n;
+		String t = shortenDatasetPath(n);
 		while (headings.contains(t)) {
 			t = String.format("%s_%d", n, j++);
 		}
