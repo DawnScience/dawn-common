@@ -5,5 +5,5 @@ Bundle-Name: Workbench Examples
 Bundle-SymbolicName: org.dawb.workbench.examples
 Bundle-Version: 1.2.0.qualifier
 Bundle-Vendor: ESRF
-Bundle-RequiredExecutionEnvironment: JavaSE-17
+Bundle-RequiredExecutionEnvironment: JavaSE-21
 Automatic-Module-Name: org.dawb.workbench.examples

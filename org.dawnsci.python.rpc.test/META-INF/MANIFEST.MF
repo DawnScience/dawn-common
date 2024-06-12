@@ -5,7 +5,7 @@ Bundle-SymbolicName: org.dawnsci.python.rpc.test
 Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: Diamond Light Source
 Fragment-Host: org.dawnsci.python.rpc
-Bundle-RequiredExecutionEnvironment: JavaSE-17
+Bundle-RequiredExecutionEnvironment: JavaSE-21
 Require-Bundle: org.junit,
  org.dawb.common.util
 Import-Package: org.apache.commons.io

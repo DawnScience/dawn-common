@@ -11,7 +11,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.ddogleg;bundle-version="0.6.0",
  org.georegression;bundle-version="0.7.0"
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-17
+Bundle-RequiredExecutionEnvironment: JavaSE-21
 Export-Package: boofcv.abst.filter,
  boofcv.abst.filter.blur,
  boofcv.abst.filter.derivative,

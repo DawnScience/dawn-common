@@ -5,7 +5,7 @@ Bundle-Name: Dawn Python RPC
 Bundle-SymbolicName: org.dawnsci.python.rpc;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: Diamond Light Source
-Bundle-RequiredExecutionEnvironment: JavaSE-17
+Bundle-RequiredExecutionEnvironment: JavaSE-21
 Export-Package: org.dawnsci.python.rpc,
  org.dawnsci.python.rpc.action,
  org.dawnsci.python.rpc.commandline
