@@ -24,7 +24,6 @@ import org.eclipse.january.dataset.Dataset;
 import org.eclipse.january.dataset.DatasetUtils;
 import org.eclipse.january.dataset.DoubleDataset;
 import org.eclipse.january.dataset.IDataset;
-import org.eclipse.january.dataset.Slice;
 import org.eclipse.january.metadata.IMetadata;
 
 import uk.ac.diamond.scisoft.analysis.io.ColumnTextSaver;
@@ -116,63 +115,36 @@ public class Plot1DConversionVisitor extends AbstractPlotConversionVisitor {
 		List<String> preHeader = new ArrayList<>();
 		List<String> headings = new ArrayList<>();
 
-		int i = 0;
+		DataHolder dh = new DataHolder();
 		int imax = traces.length;
 
-		Dataset firstX = DatasetUtils.convertToDataset(traces[0].getXData());
-		Dataset firstY = DatasetUtils.convertToDataset(traces[0].getYData());
-		int length = firstY.getSize();
-		addGoodXName(headings, firstX, imax == 1 ? null : 0);
-		addGoodYName(headings, preHeader, firstY, imax == 1 ? null : 0);
-
-		int size = firstY.getSize();
+		int length = -1;
+		int longestTraceIndex = 0;
 		if (asDat) {
-			for (i = 1; i < imax; i++) {
+			for (int i = 0; i < imax; i++) {
 				ILineTrace trace = traces[i];
 				IDataset current = trace.getYData();
-				
 				int cSize = current.getSize();
 				if (cSize > length) {
 					length = Math.max(length, cSize);
+					longestTraceIndex = i;
 				}
 			}
-			if (asSingleX) {
-				if (firstX.getSize() < length) {
-					throw new IllegalArgumentException("First x dataset must be long as longest y dataset");
-				}
-				firstX = firstX.getSliceView(new Slice(length));
-			} else {
-				if (firstX.getSize() > size) {
-					firstX = firstX.getSliceView(new Slice(size));
-				}
+			if (asSingleX && longestTraceIndex != 0) {
+				throw new IllegalArgumentException("First x dataset must be long as longest y dataset");
 			}
 		}
 
-		int j = 0;
-		DataHolder dh = new DataHolder();
-		dh.addDataset(headings.get(j++), DatasetUtils.cast(DoubleDataset.class,firstX));
-		dh.addDataset(headings.get(j++), DatasetUtils.cast(DoubleDataset.class,firstY));
-
-		for (i = 1; i < imax; i++) {
-			ILineTrace trace = traces[i];
-			Dataset x = asSingleX ? null : DatasetUtils.cast(DoubleDataset.class,trace.getXData());
-			Dataset y = DatasetUtils.cast(DoubleDataset.class, trace.getYData());
-
-			if (x != null) {
-				addGoodXName(headings, x, i);
-			}
-			addGoodYName(headings, preHeader, y, i);
-
-			size = y.getSize();
-			if (x != null) {
-				if (asDat) {
-					if (x.getSize() > size) {
-						x = x.getSliceView(new Slice(size));
-					}
+		if (imax == 1) {
+			addTrace(dh, headings, preHeader, null, traces[0]);
+		} else {
+			addTrace(dh, headings, preHeader, 0, traces[longestTraceIndex]);
+			int j = 0;
+			for (int i = 0; i < imax; i++) {
+				if (i != longestTraceIndex) {
+					addTrace(dh, headings, preHeader, j++, traces[i]);
 				}
-				dh.addDataset(headings.get(j++), x);
 			}
-			dh.addDataset(headings.get(j++), y);
 		}
 
 		ColumnTextSaver saver = new ColumnTextSaver(filename);
@@ -186,6 +158,24 @@ public class Plot1DConversionVisitor extends AbstractPlotConversionVisitor {
 		saver.saveFile(dh);
 	}
 
+	private void addTrace(DataHolder dh, List<String> headings, List<String> preHeader, Integer i, ILineTrace trace) {
+		Dataset x = asSingleX && dh.size() > 0 ? null : DatasetUtils.cast(DoubleDataset.class, trace.getXData());
+		Dataset y = DatasetUtils.cast(DoubleDataset.class, trace.getYData());
+		String xName = null;
+		if (x != null) {
+			xName = addGoodXName(headings, x, i);
+			dh.addDataset(xName, x);
+			if (x.hasErrors()) {
+				dh.addDataset(headings.getLast(), DatasetUtils.cast(DoubleDataset.class, x.getErrors()));
+			}
+		}
+		String yName = addGoodYName(headings, preHeader, y, i);
+		dh.addDataset(yName, y);
+		if (y.hasErrors()) {
+			dh.addDataset(headings.getLast(), DatasetUtils.cast(DoubleDataset.class, y.getErrors()));
+		}
+	}
+
 	private static String shortenDatasetPath(String name) {
 		int si = name.lastIndexOf('/');
 		if (si >= 0) {
@@ -193,6 +183,8 @@ public class Plot1DConversionVisitor extends AbstractPlotConversionVisitor {
 		}
 		return name;
 	}
+
+	private static final String ERRORS_SUFFIX = "_errors";
 
 	private String addGoodXName(List<String> headings, IDataset d, Integer i) {
 		String n = d.getName();
@@ -202,12 +194,26 @@ public class Plot1DConversionVisitor extends AbstractPlotConversionVisitor {
 				n += i;
 			}
 		}
+		return findNewName(headings, n, d.hasErrors());
+	}
+
+	private String findNewName(List<String> headings, String n, boolean hasErrors) {
 		int j = 1;
 		String t = shortenDatasetPath(n);
+		String suffix = String.format("_%d", j);
 		while (headings.contains(t)) {
-			t = String.format("%s_%d", n, j++);
+			if (t.endsWith(suffix)) {
+				String newSuffix = String.format("_%d", ++j);
+				t = t.replace(suffix, newSuffix);
+				suffix = newSuffix;
+			} else {
+				t = t + suffix;
+			}
 		}
 		headings.add(t);
+		if (hasErrors) {
+			headings.add(t + ERRORS_SUFFIX);
+		}
 		return t;
 	}
 
@@ -252,12 +258,7 @@ public class Plot1DConversionVisitor extends AbstractPlotConversionVisitor {
 				n += i;
 			}
 		}
-		int j = 1;
-		String t = shortenDatasetPath(n);
-		while (headings.contains(t)) {
-			t = String.format("%s_%d", n, j++);
-		}
-		headings.add(t);
-		return t;
+
+		return findNewName(headings, n, d.hasErrors());
 	}
 }

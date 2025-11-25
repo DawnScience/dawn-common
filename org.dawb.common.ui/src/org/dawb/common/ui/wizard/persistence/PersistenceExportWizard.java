@@ -34,6 +34,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.dawnsci.analysis.api.fitting.functions.IFunction;
 import org.eclipse.dawnsci.analysis.api.fitting.functions.IFunctionService;
+import org.eclipse.dawnsci.analysis.api.metadata.FitMetadata;
 import org.eclipse.dawnsci.analysis.api.metadata.IDiffractionMetadata;
 import org.eclipse.dawnsci.analysis.api.persistence.IPersistenceService;
 import org.eclipse.dawnsci.analysis.api.persistence.IPersistentFile;
@@ -191,6 +192,14 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
 					}
 				}
 
+				for (ITrace t: plottingSystem.getTraces()) {
+					FitMetadata fmd = t.getData().getFirstMetadata(FitMetadata.class);
+					if (fmd != null) {
+						options.setOptionEnabled(PersistWizardConstants.FUNCTIONS, true);
+						break;
+					}
+				}
+
 			}
 		}
 
@@ -311,17 +320,22 @@ public class PersistenceExportWizard extends AbstractPersistenceWizard implement
 						 
 						 
 
-						 if (options.is(PersistWizardConstants.FUNCTIONS)) {
-							 if (funcService != null) {
-								 Map<String, IFunction> functions = funcService.getFunctions();
-								 if (functions != null) {
-									 monitor.worked(functions.size());
-									 file.setFunctions(functions);
-								 }
-							 }
-						 }
-						 
-						 
+						if (options.is(PersistWizardConstants.FUNCTIONS)) {
+							Map<String, IFunction> functions = new HashMap<>();
+							if (funcService != null) {
+								functions.putAll(funcService.getFunctions());
+							}
+							for (ITrace t : system.getTraces()) {
+								FitMetadata fmd = t.getData().getFirstMetadata(FitMetadata.class);
+								if (fmd != null) {
+									functions.put("fit-" + t.getName(), fmd.getFitFunction());
+								}
+							}
+							if (functions != null) {
+								monitor.worked(functions.size());
+								file.setFunctions(functions);
+							}
+						}
 					 } catch (Exception e) {
 						 throw new InvocationTargetException(e);
 					 } finally {

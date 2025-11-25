@@ -8,6 +8,7 @@
  */
 package org.dawnsci.persistence.test;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
@@ -70,10 +71,12 @@ public class ReadWriteDataTest extends AbstractThreadTestBase {
 
 		// read the persistent file and retrieve the data
 		ILazyDataset dataRead = null;
+		ILazyDataset errorsRead = null;
 		List<ILazyDataset> axesRead = null;
 		try {
 			file = persist.getPersistentFile(tmp[0].getAbsolutePath());
 			dataRead = file.getData(null, "data");
+			errorsRead = dataRead.getErrors();
 			axesRead = file.getAxes(null, null, "Y Axis", "X Axis");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -81,8 +84,9 @@ public class ReadWriteDataTest extends AbstractThreadTestBase {
 		}
 
 		// test that the data/axes are the same
-		assertEquals(da.getShape()[0], dataRead.getShape()[0]);
-		assertEquals(da.getShape()[1], dataRead.getShape()[1]);
+		int[] dShape = da.getShape();
+		assertArrayEquals(dShape, dataRead.getShape());
+		assertArrayEquals(dShape, errorsRead.getShape());
 		assertEquals(axes[0].getName(), axesRead.get(0).getName());
 		assertEquals(axes[1].getName(), axesRead.get(1).getName());
 
@@ -122,10 +126,12 @@ public class ReadWriteDataTest extends AbstractThreadTestBase {
 
 		// read the persistent file and retrieve the regions
 		ILazyDataset dataRead = null;
+		ILazyDataset errorsRead = null;
 		List<ILazyDataset> axesRead = null;
 		try {
 			file = persist.getPersistentFile(tmp[0].getAbsolutePath());
 			dataRead = file.getData(null, "data");
+			errorsRead = dataRead.getErrors();
 			axesRead = file.getAxes(null, null, "Y Axis", "X Axis");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -133,8 +139,9 @@ public class ReadWriteDataTest extends AbstractThreadTestBase {
 		}
 
 		// test that the data/axes are the same
-		assertEquals(da.getShape()[0], dataRead.getShape()[0]);
-		assertEquals(da.getShape()[1], dataRead.getShape()[1]);
+		int[] dShape = da.getShape();
+		assertArrayEquals(dShape, dataRead.getShape());
+		assertArrayEquals(dShape, errorsRead.getShape());
 		assertEquals(axes[0].getName(), axesRead.get(0).getName());
 		assertEquals(axes[1].getName(), axesRead.get(1).getName());
 
@@ -161,6 +168,9 @@ public class ReadWriteDataTest extends AbstractThreadTestBase {
 		Dataset da = DatasetFactory.createRange(2048*2048);
 		da.setName("data");
 		da.setShape(2048, 2048);
+		Dataset de = DatasetFactory.zeros(da);
+		de.fill(2.5);
+		da.setErrors(de);
 
 		return da;
 	}
@@ -184,6 +194,9 @@ public class ReadWriteDataTest extends AbstractThreadTestBase {
 		for (int i = 0; i < 5; i++) {
 			Dataset da = Random.randn(size);
 			da.setName("data" + i);
+			Dataset ea = DatasetFactory.zeros(da);
+			ea.fill(i);
+			da.setErrors(ea);
 			try {
 				file.setData(da, axes);
 			} catch (Exception e) {
@@ -193,17 +206,20 @@ public class ReadWriteDataTest extends AbstractThreadTestBase {
 		}
 
 		ILazyDataset dataRead = null;
+		ILazyDataset errorsRead = null;
 		List<ILazyDataset> axesRead = null;
 		for (int i = 0; i < 5; i++) {
 			String dName = "data" + i;
 			try {
 				dataRead = file.getData(null, dName);
+				errorsRead = dataRead.getErrors();
 				axesRead = file.getAxes(null, dName, "X Axis");
 			} catch (Exception e) {
 				e.printStackTrace();
 				fail("Exception occured while reading the data/axes");
 			}
 			assertEquals(size, dataRead.getSize());
+			assertEquals(size, errorsRead.getSize());
 			assertEquals(1, axesRead.size());
 			assertEquals(size, axesRead.get(0).getSize());
 		}

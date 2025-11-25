@@ -176,14 +176,17 @@ class PersistentFileImpl implements IPersistentFile {
 		}
 	}
 
-	private final static String DATA = NexusConstants.DATA_DATA;
+	private static final String DATA = NexusConstants.DATA_DATA;
+	private static final String ERRORS = NexusConstants.DATA_ERRORS;
+	private static final String ERRORS_SUFFIX = NexusConstants.DATA_ERRORS_SUFFIX;
+
 	private Map<IDataset, String> cachedAxisPath = new IdentityHashMap<>();
 
 	@Override
 	public void setData(IDataset data, IDataset... axes) throws Exception {
 		// create nodes in separate try/catch clauses in order to try creating the
 		// next node even if the previous one wasn't successful
-		GroupNode group = createDataNode(file, PersistenceConstants.DATA_ENTRY);
+		GroupNode group = createNode(file, PersistenceConstants.DATA_ENTRY, NexusConstants.DATA);
 
 		if (data != null) {
 			String dataName = data.getName();
@@ -225,13 +228,18 @@ class PersistentFileImpl implements IPersistentFile {
 						} else {
 							a = group.getAttribute(an);
 						}
-						file.addAttribute(sGroup, a);
+						if (!NexusConstants.NXCLASS.equals(an)) {
+							file.addAttribute(sGroup, a);
+						}
 					}
 					String sPath = file.getPath(sGroup);
+					String signalErrors = signal + ERRORS_SUFFIX;
 					for (String n : oDataMap.keySet()) { // populate subgroup
 						Dataset d = oDataMap.get(n);
 						if (signal.equals(n)) {
 							d.setName(DATA);
+						} else if (signalErrors.equals(n)) {
+							d.setName(ERRORS);
 						} else { // update cache
 							String o = PersistenceConstants.DATA_ENTRY + Node.SEPARATOR + n;
 							for (Entry<IDataset, String> ad : cachedAxisPath.entrySet()) {
@@ -256,6 +264,7 @@ class PersistentFileImpl implements IPersistentFile {
 					dataName = DATA;
 					group = sGroup;
 				}
+				data = data.getSliceView();
 				data.setName(dataName);
 
 				boolean isRGB = false;
@@ -279,6 +288,16 @@ class PersistentFileImpl implements IPersistentFile {
 					file.addAttribute(dNode, TreeFactory.createAttribute(NexusConstants.INTERPRETATION, NexusConstants.INTERPRETATION_IMAGE_RGB));
 				}
 
+				if (data.hasErrors()) {
+					IDataset e = data.getErrors();
+					if (DATA.equals(dataName)) {
+						e.setName(ERRORS);
+					} else {
+						e.setName(dataName + ERRORS_SUFFIX);
+					}
+					file.createData(group, e);
+				}
+
 			} catch (NexusException ne) {
 				logger.error("Could not write data", ne);
 				throw ne;
@@ -294,6 +313,10 @@ class PersistentFileImpl implements IPersistentFile {
 			IDataset a = n < nAxes ? axes[n] : null;
 			if (a != null) {
 				String axisName = a.getName();
+				if (axisName.contains(Node.SEPARATOR)) {
+					axisName = axisName.substring(axisName.lastIndexOf(Node.SEPARATOR) + 1);
+					a.setName(axisName);
+				}
 				if (axisName.isEmpty()) {
 					if (rank == 1) {
 						axisName = "X Axis";
@@ -397,7 +420,12 @@ class PersistentFileImpl implements IPersistentFile {
 				throw new IllegalArgumentException("No such dataset found: " + dataName);
 			}
 		}
-		return group.getDataNode(dataName).getDataset();
+		ILazyDataset d = group.getDataNode(dataName).getDataset();
+		String errName = DATA.equals(dataName) ? ERRORS : dataName + ERRORS_SUFFIX;
+		if (group.containsDataNode(errName)) {
+			d.setErrors(group.getDataNode(errName).getDataset());
+		}
+		return d;
 	}
 
 	private static NodeLink getFirstSubGroup(GroupNode g) {
@@ -627,7 +655,9 @@ class PersistentFileImpl implements IPersistentFile {
 			group = file.getGroup("/entry", true);
 			file.addAttribute(group, TreeFactory.createAttribute(NexusConstants.NXCLASS, NexusConstants.ENTRY));
 			group = file.getGroup(path, true);
-			file.addAttribute(group, TreeFactory.createAttribute(NexusConstants.NXCLASS, nxclass));
+			if (!group.containsAttribute(NexusConstants.NXCLASS)) {
+				file.addAttribute(group, TreeFactory.createAttribute(NexusConstants.NXCLASS, nxclass));
+			}
 			return group;
 		} catch (NexusException e) {
 			e.printStackTrace();
